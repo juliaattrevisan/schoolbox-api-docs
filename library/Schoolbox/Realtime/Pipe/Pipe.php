@@ -12,29 +12,24 @@ use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 
 /**
- * This class encapsulates a Socket (pipe) and its associated information
- *
- * Class Pipe
- * @package Schoolbox\Realtime
+ * This class encapsulates a Socket (pipe) and its associated information.
  */
-class Pipe implements PipeInterface
+class Pipe
 {
     /**
-     * @var string
+     * Is this pipe locked, and if so by what command?
      */
-    private $commandLock;
+    private ?string $commandLock = null;
 
     /**
-     * @var int
+     * The pipe's user ID, if one has been set yet.
      */
-    protected $userId;
-
+    protected ?int $userId = null;
 
     /**
-     * @var array
+     * The request's cookies, if loaded yet.
      */
-    protected $cookies;
-
+    protected ?array $cookies = null;
 
     /**
      * Constructor
@@ -49,26 +44,27 @@ class Pipe implements PipeInterface
     ) {
     }
 
-
     /**
+     * Extract the socket key out of the given connection.
+     *
      * @param ConnectionInterface $conn
      * @return string
      */
-    public static function getSocketKeyForConnection(ConnectionInterface $conn)
+    public static function getSocketKeyForConnection(ConnectionInterface $conn): string
     {
         return static::getHeader($conn, 'sec-websocket-key');
     }
 
-
     /**
-     * Returns the Sec-Websocket-Key header of this websocket (unique connection identifier)
+     * Returns the Sec-Websocket-Key header of this websocket: this is a unique
+     * connection identifier.
+     *
      * @return string
      */
-    public function getSocketKey()
+    public function getSocketKey(): string
     {
         return self::getSocketKeyForConnection($this->socketConnection);
     }
-
 
     /**
      * Returns the given cookie of this websocket, if present.
@@ -76,10 +72,10 @@ class Pipe implements PipeInterface
      * @param string $name
      * @return string
      */
-    public function getCookie($name)
+    public function getCookie(string $name): string
     {
         // only do this once
-        if (!$this->cookies) {
+        if (!isset($this->cookies)) {
             $cookieString = static::getHeader($this->socketConnection, 'cookie');
 
             preg_match_all('`([A-Za-z]+)=([^;]+)`', $cookieString, $matches);
@@ -89,24 +85,22 @@ class Pipe implements PipeInterface
         return $this->cookies[$name] ?? '';
     }
 
-
     /**
      * Returns the session id of this websocket, if it has one.
      *
      * @return string
      */
-    public function getSession()
+    public function getSession(): string
     {
         return $this->getCookie(PipeManager::PHP_SESSION_PREFIX);
     }
-
 
     /**
      * Returns the remote address of the connection of this pipe.
      *
      * @return string
      */
-    public function getRemoteAddress()
+    public function getRemoteAddress(): string
     {
         // kosher according to http://socketo.me/docs/migration-3
         /**
@@ -118,9 +112,11 @@ class Pipe implements PipeInterface
 
 
     /**
+     * Close the pipe.
+     *
      * @return void
      */
-    public function close()
+    public function close(): void
     {
         // TODO I am not sure whether this needs to happen if calling $this->socketConnection->close()
         // Explicitly close the descriptor to the temp file associated with the
@@ -135,16 +131,20 @@ class Pipe implements PipeInterface
 
 
     /**
+     * Send data through the pipe's socket connection.
+     *
      * @param string $data
      * @return $this
      */
-    public function send($data)
+    public function send(string $data): self
     {
         $this->socketConnection->send($data);
         return $this;
     }
 
     /**
+     * Fetch the instance ID for this pipe.
+     *
      * @return string
      */
     public function getInstanceId(): string
@@ -153,29 +153,33 @@ class Pipe implements PipeInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getUserId()
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-
     /**
-     * @param int $id
+     * Set the user ID of the pipe, if any.
+     *
+     * @param int|null $id
+     * @return $this
      */
-    public function setUserId($id)
+    public function setUserId(?int $id)
     {
         $this->userId = $id;
+        return $this;
     }
 
-
     /**
+     * Extract a header out of the connection.
+     *
      * @param ConnectionInterface $conn
      * @param string $header
      * @return string
      */
-    protected static function getHeader(ConnectionInterface $conn, $header)
+    protected static function getHeader(ConnectionInterface $conn, string $header): string
     {
         $rq = self::extractWebSocketRequest($conn);
 
@@ -187,7 +191,6 @@ class Pipe implements PipeInterface
         // otherwise header not found
         return '';
     }
-
 
     /**
      * Extract the websocket request from out of the connection interface.
@@ -206,36 +209,33 @@ class Pipe implements PipeInterface
         return $conn->httpRequest;
     }
 
-
     /**
      * Prevent additional commands being executed by this pipe until it releases
      *
      * @param string $command
      * @return void
      */
-    public function lock($command)
+    public function lock(string $command): void
     {
         $this->commandLock = $command;
     }
-
 
     /**
      * Is this pipe currently locked?
      *
      * @return bool
      */
-    public function isLocked()
+    public function isLocked(): bool
     {
         return isset($this->commandLock);
     }
-
 
     /**
      * Release the command lock on this pipe
      *
      * @return void
      */
-    public function unlock()
+    public function unlock(): void
     {
         $this->commandLock = null;
     }
