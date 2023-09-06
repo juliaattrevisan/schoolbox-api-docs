@@ -103,13 +103,16 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /**
      * Constructor
      *
-     * @param LoopInterface $reactLoop
-     * @param InstanceRepository $instanceRepository
-     * @param PipeCollection $pipes
-     * @param ISubscriptionManager $subscriptionManager
-     * @param LoggerInterface $log
-     * @param DispatchStrategyInterface $strat
-     * @param int $fdLimit
+     * @param LoopInterface             $reactLoop           React loop: required for this object's task dispatcher to
+     *                                                       listen to job progress, and for timing out sessions.
+     * @param InstanceRepository        $instanceRepository  Repository of instances: required so that incoming
+     *                                                       connections may be associated with an instance.
+     * @param PipeCollection            $pipes               Collection of pipes this manager manages.
+     * @param ISubscriptionManager      $subscriptionManager Subscribes and unsubscribes users from sockets
+     * @param LoggerInterface           $log                 Logger
+     * @param DispatchStrategyInterface $strat               Strategy for dispatching jobs to the task dispatcher?
+     * @param int                       $fdLimit             Configurable limit of file descriptors: in practice,
+     *                                                       `self::FD_LIMIT_BUFFER` descriptors are left unused
      */
     public function __construct(
         private LoopInterface $reactLoop,
@@ -138,7 +141,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     {
         return sprintf('%s?prefix=%s', $redisUrl, self::REDIS_SESSION_PREFIX_BASE . $instanceId . ':');
     }
-
 
     /**
      * When a new connection is opened it will be passed to this method
@@ -188,8 +190,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
+     * Close a connection, with an associated error code.
+     *
      * @param ConnectionInterface $conn
      * @param int                 $code
      */
@@ -206,7 +209,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         $conn->close();
     }
-
 
     /**
      * This is called before or after a socket is closed (depends on how it's closed).
@@ -225,7 +227,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $pipe?->close();
     }
 
-
     /**
      * If there is an error with one of the sockets, or somewhere in the application where an Exception is thrown, the
      * Exception is sent back down the stack, handled by the Server and bubbled back up the application through this
@@ -238,10 +239,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onError(ConnectionInterface $conn, Exception $e): void
     {
-//        if ($e instanceof ConnectionException) {
-//            $this->log->warning("Connection to client lost, terminating");
-//        }
-//        else
         if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`i', $e->getMessage(), $matches)) {
             $this->log->warning("IOException: $matches[3] [$matches[2]] ($matches[1] bytes dropped)");
         } else {
@@ -256,7 +253,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             throw $e;
         }
     }
-
 
     /**
      * Triggered when a client sends data through the socket
@@ -338,7 +334,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
      * This method is invoked whenever something is published in Redis on one of our subscriptions
      *
@@ -367,7 +362,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         $action->execute($this);
     }
-
 
     /**
      * Factory method for converting a published redis message into a pipe action
@@ -399,7 +393,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         throw new InvalidArgumentException("Invalid channel supplied: '{$msg->getChannel()}'");
     }
 
-
     /**
      * When the initiator is backend (ie. something published on our subscription) the pipe method is going to be
      * an alert or a push. As such, it doesn't matter *which* pipe is used, because it will only be used as a basis
@@ -416,8 +409,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         return $firstPipe instanceof Pipe ? $firstPipe : null;
     }
 
-
     /**
+     * Enqueue a command through a pipe to the task dispatcher.
+     *
+     * The command's output will then be output to the pipe.
+     *
      * @param Pipe   $pipe
      * @param string $command
      * @param mixed  $payload
@@ -429,14 +425,15 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $this->taskDispatcher->enqueue($pipe, $command, $payload);
     }
 
-
     /**
+     *  Enqueue a command through the first pipe for the given user.
+     *
      * @param string $instanceId
      * @param int    $userId
      * @param string $command
      * @param mixed  $payload
-     * @throws QueueingException
      * @return void
+     * @throws QueueingException
      */
     public function enqueueUser(string $instanceId, int $userId, string $command, mixed $payload): void
     {
@@ -446,8 +443,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
+     * Write a payload to the transaction of the first pipe for the given user.
+     *
+     * Used within `\Schoolbox\Realtime\Pipe\Action\Push` to write data to an
+     * already open pipe?
+     *
      * @param string $instanceId
      * @param int    $userId
      * @param string $key
@@ -462,8 +463,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
+     * Retrieve the transaction for the given pipe.
+     *
      * @param  Pipe $pipe
      * @return Transaction
      */
@@ -494,8 +496,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         return $this->pushTransactions[$instanceId][$userId][$pipeId];
     }
 
-
     /**
+     * Pushes a payload generated from `$instances` to the given pipe.
+     *
      * @param Pipe       $pipe
      * @param Instance[] $instances
      * @throws InvalidArgumentException
@@ -514,7 +517,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             (new Decorator())->appendInstances($instances)->renderAsSocketArray(true)
         );
     }
-
 
     /**
      * Handles a response from a Worker
@@ -583,7 +585,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
      * Handles an error from a Worker
      *
@@ -597,8 +598,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $this->log->notice("Received worker error for '$command': " . json_encode($data));
     }
 
-
     /**
+     * Send a raw header to a pipe.
+     *
      * @param Pipe $pipe
      * @param int  $code
      * @param bool $allowRetry
@@ -624,7 +626,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         return false;
     }
 
-
     /**
      * Send data to a specific pipe.
      *
@@ -641,7 +642,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $pipe->send($encodedData);
     }
 
-
     /**
      * Send data to all pipes associated with a specific user.
      *
@@ -657,8 +657,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
+     * Refresh all timeouts associated with this user in this instance.
+     *
      * @param string $instanceId
      * @param int    $userId
      * @return void
@@ -681,8 +682,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         );
     }
 
-
     /**
+     * Timeout callback for a given user and instance: unregisters all pipes for
+     * that user/instance.
+     *
      * @param string $instanceId
      * @param int    $userId
      * @return void
