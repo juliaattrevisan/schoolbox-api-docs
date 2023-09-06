@@ -92,10 +92,12 @@ class Hydrator extends BaseHydrator
                         $tileFolder = null;
                     }
 
+                    $titleText = $tile->getTitleText();
+
                     return new FullResult(
                         $match,
                         $match->id,
-                        $tile->getTitleText(),
+                        ($titleText === '') ? $tile->getLink() : $titleText,
                         $tile->getLink(),
                         $match->type,
                         $match->relevance,
