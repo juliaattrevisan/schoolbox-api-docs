@@ -69,16 +69,22 @@ class TagFactory
              * Do an instanceof check to find out which
              */
             if ($assessment->getContext() instanceof \Schoolbox\Learning\Assessment\Project) {
+                /** @var \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $baseContext */
+                $baseContext = $assessment->getBaseContext();
+
                 return $this->produce(
-                    $assessment->getBaseContext()->getCourse()->getUuid(),
-                    $assessment->getBaseContext()->getUuid(),
+                    $baseContext->getCourse()->getUuid(),
+                    $baseContext->getUuid(),
                     null
                 );
             }
 
+            /** @var \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $context */
+            $context = $assessment->getBaseContext();
+
             return $this->produce(
-                $assessment->getContext()->getCourse()->getUuid(),
-                $assessment->getContext()->getUuid(),
+                $context->getCourse()->getUuid(),
+                $context->getUuid(),
                 null
             );
         }
