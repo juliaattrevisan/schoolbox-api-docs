@@ -16,6 +16,8 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\Session\Serialize\HandlerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\MultiInstance\ConfigRepository;
+use Schoolbox\MultiInstance\ConnectorRepository;
 use Schoolbox\Realtime\Subscription;
 
 /**
@@ -48,20 +50,29 @@ class PipeManagerFactory
         private IConnector $db,
         private DispatchStrategyInterface $strat,
         private int $fdLimit,
+        private ConnectorRepository $connectorRepository,
+        private ConfigRepository $configRepository,
     ) {
     }
 
 
     /**
-     * @return PipeManager
+     * @return MultiInstance\PipeManager
      */
     public function build()
     {
         // Requires multi-instance version
-        $validator   = new SessionValidator($this->redis, $this->handler, $this->sessionLength, $this->db);
+        $validator   = new MultiInstance\SessionValidator(
+            $this->redis,
+            $this->handler,
+            $this->connectorRepository,
+            $this->configRepository,
+        );
+//        $validator   = new SessionValidator($this->redis, $this->handler, $this->sessionLength, $this->db);
 
         // Requires multi-instance version
-        $pipes       = new PipeCollection($validator, $this->log);
+        $pipes       = new MultiInstance\PipeCollection($validator, $this->log);
+//        $pipes       = new PipeCollection($validator, $this->log);
 
         // Shouldn't need multi-instance?
         $subFactory  = new Subscription\Redis\SubscriptionFactory($this->redis, $this->asyncRedis);
@@ -70,7 +81,7 @@ class PipeManagerFactory
         $subManager  = new Subscription\SubscriptionManager($subFactory, $this->log);
 
         // Needs multi-instance, as it uses $pipes
-        $pipeManager = new PipeManager($this->loop, $pipes, $subManager, $this->log, $this->strat, $this->fdLimit);
+        $pipeManager = new MultiInstance\PipeManager($this->loop, $pipes, $subManager, $this->log, $this->strat, $this->fdLimit);
 
         // setup the listener
         $subFactory->setListener($pipeManager);

@@ -23,6 +23,8 @@ use React\Socket\SocketServer;
 use Schoolbox\Application\Daemon;
 use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\IConfigLoader;
+use Schoolbox\MultiInstance\ConfigRepository;
+use Schoolbox\MultiInstance\ConnectorRepository;
 use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
 
@@ -42,6 +44,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     // Config will always be per-instance: need some method to load them all
     /** @var IConfigLoader $config */
     $config = $di->get('config');
+    /** @var ConfigRepository $configRepository */
+    $configRepository = $di->get('multiInstance.configRepository');
 
     // The signal queue should always be global?
     // This is used for subscribing to retrieve new messages
@@ -51,6 +55,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     // Database will certainly be per-instance
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
+    /** @var ConnectorRepository $connectorRepository */
+    $connectorRepository = $di->get('multiInstance.connectorRepository');
 
     $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
 
@@ -67,7 +73,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $config->get('session_length'),
         $db,
         $stratBuilder->build($flags),
-        $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
+        $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
+        $connectorRepository,
+        $configRepository,
     ))->build();
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);
