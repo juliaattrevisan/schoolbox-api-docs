@@ -14,6 +14,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
@@ -134,7 +135,8 @@ class Module extends BaseModule
                     Access::getInstance(),
                 ),
                 new Database\ResultType\Badge\Hydrator(
-                    $mapperFactory->get(BadgeMapper::class)
+                    $mapperFactory->get(BadgeMapper::class),
+                    new PrefixGenerator($this->getConfig()),
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(

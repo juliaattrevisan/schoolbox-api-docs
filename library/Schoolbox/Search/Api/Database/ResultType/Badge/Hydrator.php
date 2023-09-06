@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
-use Schoolbox\Permission\Access\Access;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -33,7 +33,8 @@ class Hydrator extends BaseHydrator
      * @param BadgeMapper $badgeMapper Used to fetch badge for hydration.
      */
     public function __construct(
-        private BadgeMapper $badgeMapper
+        private BadgeMapper $badgeMapper,
+        private PrefixGenerator $prefixGenerator
     ) {
     }
 
@@ -69,6 +70,15 @@ class Hydrator extends BaseHydrator
                     // For other searched items, permission checks are done here.
                     // But badges are not linked to folders, so no permission checks.
 
+                    // Work out image path for badge
+                    $image = null;
+                    if ($badge->getIcon()) {
+                        $image = $this->prefixGenerator->generate() . $badge->getIcon();
+                    }
+                    if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
+                        $image =   $this->buildStorageImageUrl($badge->getImage())->__toString();
+                    }
+
                     return new FullResult(
                         $match,
                         $match->id,
@@ -79,7 +89,7 @@ class Hydrator extends BaseHydrator
                         $badge->getUpdatedAt(),
                         null, // A badge is not linked to any folder.
                         $badge->getCategory()->getName(), // Meta.  Context line for the search result.
-                        $badge->getImage(),
+                        $image,
                         'badge',
                         $this->truncateAroundKeyword($keyword, $badge->getBody(), self::DESCRIPTION_LENGTH),
                         $badge->getCreatedBy(),
