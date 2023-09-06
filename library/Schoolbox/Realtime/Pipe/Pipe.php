@@ -109,6 +109,10 @@ class Pipe implements PipeInterface
     public function getRemoteAddress()
     {
         // kosher according to http://socketo.me/docs/migration-3
+        /**
+         * @noinspection PhpPossiblePolymorphicInvocationInspection
+         * @phpstan-ignore-next-line
+         */
         return $this->socketConnection->remoteAddress ?: '0.0.0.0';
     }
 
