@@ -83,13 +83,13 @@ class Redirect extends AbstractRedirect
             /* Find out if external_id exists in canvas as an assignment identifier
              */
             $query = "
-                SELECT *
+                SELECT id AS canvas_id
                 FROM assignments
                 WHERE id = :assessmentCanvasId";
 
             if (!$this->canvasDb->isCanvasData2) {
                 $query = "
-                SELECT *
+                SELECT canvas_id
                 FROM assignment_dim
                 WHERE canvas_id = :assessmentCanvasId";
             }
@@ -107,13 +107,13 @@ class Redirect extends AbstractRedirect
             /* Find out if external_id exists in canvas as a quiz identifier
              */
             $query = "
-                SELECT *
+                SELECT assignment_id AS canvas_id
                 FROM quizzes
-                WHERE id = :assessmentCanvasId";
+                WHERE assignment_id = :assessmentCanvasId";
 
             if (!$this->canvasDb->isCanvasData2) {
                 $query = "
-                SELECT *
+                SELECT canvas_id
                 FROM quiz_dim
                 WHERE canvas_id = :assessmentCanvasId";
             }
