@@ -9,13 +9,17 @@
 
 namespace Schoolbox\Realtime\Subscription;
 
+/**
+ * Interface for building subscriptions.
+ */
 interface ISubscriptionFactory
 {
-
     /**
-     * @param string $instanceId
-     * @param int    $userId
+     * Build a subscription.
+     *
+     * @param string $instanceId The instance ID within which the user exists.
+     * @param int    $userId     The ID of the subscription's user.
      * @return ISubscription
      */
-    public function build($instanceId, $userId);
+    public function build(string $instanceId, int $userId): ISubscription;
 }

@@ -37,9 +37,7 @@ class SubscriptionManager implements ISubscriptionManager
     }
 
     /**
-     * @param string $instanceId
-     * @param int    $userId
-     * @return bool
+     * @inheritdoc
      */
     public function subscribeUser(string $instanceId, int $userId): bool
     {
@@ -58,22 +56,16 @@ class SubscriptionManager implements ISubscriptionManager
         return true;
     }
 
-
     /**
-     * @param string $instanceId
-     * @param int    $userId
-     * @return bool
+     * @inheritdoc
      */
     public function userHasSubscription(string $instanceId, int $userId): bool
     {
         return array_key_exists($userId, $this->subscriptions);
     }
 
-
     /**
-     * @param string $instanceId
-     * @param int    $userId
-     * @return ISubscription
+     * @inheritdoc
      */
     public function getUserSubscription(string $instanceId, int $userId): ISubscription
     {
@@ -85,11 +77,8 @@ class SubscriptionManager implements ISubscriptionManager
         return $this->subscriptions[$instanceId][$userId];
     }
 
-
     /**
-     * @param string $instanceId
-     * @param int    $userId
-     * @return bool
+     * @inheritdoc
      */
     public function removeSubscription(string $instanceId, int $userId): bool
     {
@@ -102,8 +91,9 @@ class SubscriptionManager implements ISubscriptionManager
         return true;
     }
 
-
     /**
+     * Cache this subscription.
+     *
      * @param string        $instanceId
      * @param int           $userId
      * @param ISubscription $subscription

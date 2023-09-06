@@ -15,59 +15,46 @@ use Schoolbox\Realtime\Subscription\ISubscription;
 use Alaress\Redis\Async;
 use Predis;
 
+/**
+ * A Redis-backed subscription.
+ *
+ * Requires the following objects in Redis:
+ * * a subscription to a queue
+ * * a set, which contains one or more keys to actual messages
+ * * actual messages
+ */
 class Subscription implements ISubscription
 {
     public const PATTERN_SUBSCRIPTION = 'msg:%s:%d:*';
     public const PATTERN_SET          = 'msg:%s:q:%d:unread';
     public const PATTERN_MESSAGE      = 'msg:%s:m:%s:*';
 
-
-    /** @var string */
-    private $instanceId;
-
-    /** @var int */
-    private $userId;
-
-    /** @var Async\Client */
-    private $asyncClient;
-
-    /** @var Predis\ClientInterface */
-    private $syncClient;
-
-    /** @var UnreadRetriever */
-    private $unreadRetriever;
-
     /**
      * Constructor
      *
-     * @param string                 $instanceId
-     * @param int                    $userId
-     * @param Predis\ClientInterface $syncClient
-     * @param Async\Client           $asyncClient
-     * @param Async\EventListener    $listener
-     * @param UnreadRetriever        $unreadRetriever
+     * @param string                 $instanceId      The instance ID within which the user exists.
+     * @param int                    $userId          The ID of the subscription's user.
+     * @param Predis\ClientInterface $syncClient      Synchronous Redis client: used for acknowledging messages.
+     * @param Async\Client           $asyncClient     Asynchronous Redis client: used for subscribing to a queue.
+     * @param Async\EventListener    $listener        The event listener for queue subscriptions.
+     * @param UnreadRetriever        $unreadRetriever Fetches unread messages for this subscription.
      * @throws Predis\ClientException
      */
     public function __construct(
-        $instanceId,
-        $userId,
-        Predis\ClientInterface $syncClient,
-        Async\Client $asyncClient,
+        private string $instanceId,
+        private int $userId,
+        private Predis\ClientInterface $syncClient,
+        private Async\Client $asyncClient,
         Async\EventListener $listener,
-        UnreadRetriever $unreadRetriever
+        private UnreadRetriever $unreadRetriever
     ) {
-        $this->instanceId      = $instanceId;
-        $this->userId          = $userId;
-        $this->asyncClient     = $asyncClient;
-        $this->syncClient      = $syncClient;
-        $this->unreadRetriever = $unreadRetriever;
-
         $this->asyncClient->psubscribe($this->getRouteKey(), $listener);
     }
 
-
     /**
-     * Clean yourself up
+     * Destructor:
+     * * unsubscribe from queue
+     * * release reference to Redis clients, so they may be garbage-collected
      */
     public function __destruct()
     {
@@ -81,12 +68,12 @@ class Subscription implements ISubscription
         unset($this->asyncClient, $this->syncClient);
     }
 
-
     /**
-     * @throws Predis\ClientException
-     * @return void
+     * @inheritdoc
+     *
+     * @throws Predis\ClientException if for some reason unsubscribe failed?
      */
-    public function unsubscribe()
+    public function unsubscribe(): void
     {
         if ($this->asyncClient instanceof Async\Client) {
             $this->asyncClient->unsubscribe($this->getRouteKey());
@@ -94,63 +81,67 @@ class Subscription implements ISubscription
         }
     }
 
-
     /**
-     * @return string
+     * @inheritdoc
      */
-    public function getRouteKey()
+    public function getRouteKey(): string
     {
         return sprintf(static::PATTERN_SUBSCRIPTION, $this->instanceId, $this->userId);
     }
 
-
     /**
+     * Retrieve the set identifier for this subscription.
+     *
      * @return string
      */
-    private function getSetIdentifier()
+    private function getSetIdentifier(): string
     {
         return sprintf(static::PATTERN_SET, $this->instanceId, $this->userId);
     }
 
     /**
-     * @param string $baseHash
+     * Retrieve the value in the set identified by `getSetIdentifier` for this
+     * message, if it is unread.
+     *
+     * @param string $baseHash The message's base hash: multiple instances of
+     *                         this message may exist in the set.
      * @return string
      */
-    private function getMessageScan($baseHash)
+    private function getMessageScan(string $baseHash): string
     {
         return sprintf(static::PATTERN_MESSAGE, $this->instanceId, $baseHash);
     }
 
     /**
-     * @param string $messageId
-     * @return bool
+     * @inheritdoc
      */
-    public function acknowledgeMessage($messageId)
+    public function acknowledgeMessage(string $messageId): bool
     {
         $cursor  = 0;
         $removed = 0;
 
+        // Find each instance of the base message within the set, and
+        // acknowledge it as read by removing it from the set.
         do {
-
             /** @var array $messageIds */
-            list($cursor, $messageIds) = $this->syncClient->sscan($this->getSetIdentifier(), $cursor, [ 'match' => $this->getMessageScan($messageId) ]);
+            [$cursor, $messageIds] = $this->syncClient->sscan(
+                $this->getSetIdentifier(),
+                $cursor,
+                ['match' => $this->getMessageScan($messageId)],
+            );
 
             foreach ($messageIds as $id) {
-                $removed += $this->syncClient->sRem($this->getSetIdentifier(), $id);
+                $removed += $this->syncClient->srem($this->getSetIdentifier(), $id);
             }
         } while ($cursor);
 
         return $removed > 0;
     }
 
-
     /**
-     * Returns the messages contained within this subscription
-     *
-     * @throws InvalidArgumentException
-     * @return Instance[]
+     * @inheritdoc
      */
-    public function getUnread()
+    public function getUnread(): array
     {
         return $this->unreadRetriever->getUnread($this->instanceId, $this->userId);
     }

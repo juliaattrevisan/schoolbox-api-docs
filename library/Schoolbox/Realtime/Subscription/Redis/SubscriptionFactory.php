@@ -15,48 +15,51 @@ use Schoolbox\Realtime\Subscription\ISubscription;
 use Schoolbox\Realtime\Subscription\ISubscriptionFactory;
 use Alaress\Redis\Async;
 
+/**
+ * Factory for creating subscription objects.
+ */
 class SubscriptionFactory implements ISubscriptionFactory
 {
-
-    /** @var Async\Client */
-    private $asyncClient;
-
-    /** @var Async\EventListener */
-    private $listener;
-
-    /** @var ClientInterface */
-    private $syncClient;
-
+    /**
+     * The async event listener which subscriptions this factory creates will
+     * use.
+     *
+     * Must be set before `build()` is called.
+     */
+    private Async\EventListener $listener;
 
     /**
-     * @param ClientInterface     $syncClient
-     * @param Async\Client        $asyncClient
+     * Constructor
+     *
+     * @param ClientInterface $syncClient
+     * @param Async\Client    $asyncClient
      */
-    public function __construct(ClientInterface $syncClient, Async\Client $asyncClient)
+    public function __construct(private ClientInterface $syncClient, private Async\Client $asyncClient)
     {
-        $this->syncClient  = $syncClient;
-        $this->asyncClient = $asyncClient;
     }
-
 
     /**
      * @param Async\EventListener $listener
      * @return $this
      */
-    public function setListener(Async\EventListener $listener)
+    public function setListener(Async\EventListener $listener): self
     {
         $this->listener = $listener;
         return $this;
     }
 
-
     /**
+     * Build a subscription.
+     *
+     * `$this->setListener` must be called first, as the subscription this
+     * creates requires a listener.
+     *
      * @param string $instanceId
      * @param int    $userId
-     * @throws ClientException
      * @return ISubscription
+     * @throws ClientException
      */
-    public function build($instanceId, $userId)
+    public function build(string $instanceId, int $userId): ISubscription
     {
         return new Subscription(
             $instanceId,
