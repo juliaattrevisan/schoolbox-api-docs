@@ -25,11 +25,6 @@ class Pipe implements PipeInterface
     private $commandLock;
 
     /**
-     * @var string
-     */
-    protected string $instanceId;
-
-    /**
      * @var int
      */
     protected $userId;
@@ -42,10 +37,16 @@ class Pipe implements PipeInterface
 
 
     /**
-     * @param ConnectionInterface $socketConnection
+     * Constructor
+     *
+     * @param ConnectionInterface $socketConnection The socket connection which created this pipe.
+     * @param string              $instanceId       The instance ID this pipe was created for: derived from the hostname
+     *                                              within the socket connection's HTTP request.
      */
-    public function __construct(private ConnectionInterface $socketConnection)
-    {
+    public function __construct(
+        private ConnectionInterface $socketConnection,
+        private string $instanceId,
+    ) {
     }
 
 
@@ -85,7 +86,7 @@ class Pipe implements PipeInterface
             $this->cookies = array_combine($matches[1], $matches[2]);
         }
 
-        return isset($this->cookies[$name]) ? $this->cookies[$name] : '';
+        return $this->cookies[$name] ?? '';
     }
 
 
@@ -144,13 +145,7 @@ class Pipe implements PipeInterface
      */
     public function getInstanceId(): string
     {
-        // TODO add factory for making pipes, which injects this
         return $this->instanceId;
-    }
-
-    public function setInstanceId(string $instanceId)
-    {
-        $this->instanceId = $instanceId;
     }
 
     /**

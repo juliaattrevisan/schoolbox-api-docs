@@ -160,13 +160,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             return;
         }
 
-        $pipe = new Pipe($conn);
-
-        // Extract the instance ID
+        // Extract the instance ID, and inject into pipe
         $instanceConfig = $this->instanceRepository->fetchConfigForHostname(
             Pipe::extractWebSocketRequest($conn)->getUri()->getHost()
         );
-        $pipe->setInstanceId($instanceConfig->instanceId);
+        $pipe = new Pipe($conn, $instanceConfig->instanceId);
 
         try {
             $this->log->info(sprintf('Received socket connection from %s', $pipe->getRemoteAddress()));
