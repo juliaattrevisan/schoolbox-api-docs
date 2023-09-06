@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Realtime\Pipe;
 
 use Predis\ClientInterface;
+use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;
 use Schoolbox\MultiInstance\ConfigRepository;
 use Schoolbox\MultiInstance\ConnectorRepository;
@@ -56,7 +57,8 @@ class SessionValidator
      * @param string $instanceId The instance ID to search within.
      * @param string $rememberMe The user's remember me token.
      * @return int
-     * @throws SessionException if the user wasn't found
+     * @throws SessionException       if the user wasn't found
+     * @throws CommunicationException if Redis could not be communicated with
      */
     public function findUserIdByRememberMe(string $instanceId, string $rememberMe): int
     {
@@ -86,7 +88,8 @@ class SessionValidator
      * @param string $instanceId The instance ID to search within.
      * @param string $sessionId  The user's session ID.
      * @return int
-     * @throws SessionException if the session could not be found or decoded
+     * @throws SessionException       if the session could not be found or decoded
+     * @throws CommunicationException if Redis could not be communicated with
      */
     public function findUserIdBySessionId(string $instanceId, string $sessionId): int
     {
@@ -120,7 +123,9 @@ class SessionValidator
      * @param string $label
      * @param string $prefix
      * @return string
-     * @throws SessionException if no token provided, or nothing found for token
+     * @throws SessionException       if no token provided, or nothing found for token
+     * @throws CommunicationException if Redis could not be communicated with
+     * @noinspection PhpDocRedundantThrowsInspection
      */
     private function findData(#[SensitiveParameter] string $token, string $label, string $prefix): string
     {

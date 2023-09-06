@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Realtime\Pipe;
 
 use Countable;
+use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\SessionException;
 
@@ -54,7 +55,8 @@ class PipeCollection implements Countable
      * Register this pipe within the collection.
      *
      * @param Pipe $pipe
-     * @throws SessionException if the session in `$pipe` is not valid
+     * @throws SessionException       if the session in `$pipe` is not valid
+     * @throws CommunicationException if Redis could not be communicated with
      */
     public function registerPipe(Pipe $pipe): void
     {
@@ -95,7 +97,7 @@ class PipeCollection implements Countable
         $sess = $sessionId ?: 'sessionless';
 
         $pipeCount = count($this->pipesBySocketKey);
-        $this->log->debug("Registered $userId @ $socketKey ($sess) [pipes={$pipeCount}]");
+        $this->log->debug("Registered $userId @ $socketKey ($sess) [pipes=$pipeCount]");
     }
 
     /**
@@ -127,10 +129,10 @@ class PipeCollection implements Countable
             unset($this->pipesBySocketKey[$socketKey]);
 
             $pipeCount = count($this->pipesBySocketKey);
-            $this->log->debug("Unregistered $socketKey [pipes={$pipeCount}]");
+            $this->log->debug("Unregistered $socketKey [pipes=$pipeCount]");
         } else {
             $pipeCount = count($this->pipesBySocketKey);
-            $this->log->debug("Ignoring closure of $socketKey [pipes={$pipeCount}]");
+            $this->log->debug("Ignoring closure of $socketKey [pipes=$pipeCount]");
         }
     }
 
