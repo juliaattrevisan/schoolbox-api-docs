@@ -179,7 +179,12 @@ class Controller extends Assessment\Controller
                     /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitImpl */
                     $unitImplId = $unitImpl->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
-                    $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options);
+                    $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options)
+                    // Remove Lesson plans, no linking to other lessons
+                    ->filter(function ($assessment) {
+                        /** @var IAssessable $assessment */
+                        return !($assessment instanceof Model);
+                    });
                     $unitImpl->setAssessables($assessments);
                     $courseAssessments['units'][] = [
                         'id' => $unitImplId,
@@ -202,7 +207,12 @@ class Controller extends Assessment\Controller
                     /** @var \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unitSpec */
                     $unitSpecId = $unitSpec->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
-                    $assessments = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpecId, $options);
+                    $assessments = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpecId, $options)
+                    // Remove Lesson plans, no linking to other lessons
+                    ->filter(function ($assessment) {
+                        /** @var IAssessable $assessment */
+                        return !($assessment instanceof Model);
+                    });
                     $unitSpec->setAssessables($assessments);
                     $courseAssessments['units'][] = [
                         'id' => $unitSpecId,
@@ -291,9 +301,9 @@ class Controller extends Assessment\Controller
      */
     public function postActivity(Model $assessment, IAssessable $linkedAssessment): void
     {
-        // don't link to my self...
-        if ($assessment === $linkedAssessment) {
-            $problem = (new ApiProblem('Unable to link lesson plan to itself.'))
+        // Don't link to lesson plans, this is a bad time
+        if ($linkedAssessment instanceof Model) {
+            $problem = (new ApiProblem('Unable to link to lesson plans.'))
                 ->setStatus(409)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(409);
