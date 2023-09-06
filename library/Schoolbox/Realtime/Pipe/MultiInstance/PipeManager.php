@@ -39,14 +39,14 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 {
     public const REDIS_SESSION_PREFIX_BASE = 'PHPREDIS_SESSION:';
 
-    const INACTIVE_TIMEOUT     = 300; // 5 minutes
+    private const INACTIVE_TIMEOUT     = 300; // 5 minutes
 
-    const PIPE_METHOD_ACKNOWLEDGE = 'ack';
-    const PIPE_METHOD_ALERT       = 'alert';
-    const PIPE_METHOD_FETCH       = 'fetch';
-    const PIPE_METHOD_PUSH        = 'push';
-    const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
-    const PIPE_METHOD_WAIT        = 'wait';
+    public const PIPE_METHOD_ACKNOWLEDGE = 'ack';
+    public const PIPE_METHOD_ALERT       = 'alert';
+    public const PIPE_METHOD_FETCH       = 'fetch';
+    public const PIPE_METHOD_PUSH        = 'push';
+    public const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
+    public const PIPE_METHOD_WAIT        = 'wait';
 
     /**
      * On the matter of File Descriptors: one or more file descriptors are opened by this process every time...
@@ -59,29 +59,21 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * is undesirable. This limit buffer is to mitigate any possible race condition between sockets opening and
      * others closing.
      */
-    const FD_LIMIT_BUFFER = 16;
+    private const FD_LIMIT_BUFFER = 16;
 
-    /** @var string[] */
-    private static $headerMap = [
+    /**
+     * Map of response codes to headers.
+     */
+    private const HEADER_MAP = [
         400 => 'Bad Request',
         401 => 'Unauthorized',
         503 => 'Service Unavailable',
     ];
 
-    /** @var PipeCollection */
-    private $pipes;
-
-    /** @var ISubscriptionManager */
-    private $subscriptionManager;
-
-    /** @var LoopInterface */
-    private $reactLoop;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var Dispatcher */
-    private $taskDispatcher;
+    /**
+     * Task dispatcher: used to spawn workers for handling commands.
+     */
+    private Dispatcher $taskDispatcher;
 
     /**
      * Push transactions (whatever those are), indexed by:
@@ -100,9 +92,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private array $userTimeouts = [];
 
-    /** @var int */
-    private $fdLimit;
-
+    /**
+     * File descriptor limit: if the number of descriptors this pipe manager
+     * has open is above this limit, reject incoming connections.
+     */
+    private int $fdLimit;
 
     /**
      * @param LoopInterface             $reactLoop
@@ -113,25 +107,22 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param int                       $fdLimit
      */
     public function __construct(
-        LoopInterface $reactLoop,
-        PipeCollection $pipes,
-        ISubscriptionManager $subscriptionManager,
-        LoggerInterface $log,
+        private LoopInterface $reactLoop,
+        private PipeCollection $pipes,
+        private ISubscriptionManager $subscriptionManager,
+        private LoggerInterface $log,
         DispatchStrategyInterface $strat,
-        $fdLimit
+        int $fdLimit
     ) {
-        $this->reactLoop           = $reactLoop;
-        $this->log                 = $log;
-        $this->subscriptionManager = $subscriptionManager;
-        $this->pipes               = $pipes;
-        $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
-        $this->fdLimit             = $fdLimit - self::FD_LIMIT_BUFFER;
-
+        $this->taskDispatcher = new Dispatcher($reactLoop, $this, $log, $strat);
+        $this->fdLimit        = $fdLimit - self::FD_LIMIT_BUFFER;
         $this->log->debug('Instantiated PipeManager');
     }
 
     /**
      * Returns an instance-specific session save path.
+     *
+     * @todo move to some other class, which manages sessions directly
      *
      * @param string $redisUrl
      * @param string $instanceId
@@ -197,7 +188,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         // handle the connection raw
         $conn->send(
             json_encode([
-                'error' => self::$headerMap[$code],
+                'error' => self::HEADER_MAP[$code],
                 'code'  => [$code],
                 'retry' => false,
             ])
@@ -412,7 +403,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function getFirstPipeForInstanceAndUser(string $instanceId, int $userId)
     {
-        return reset($this->pipes->getPipesByInstanceAndUserId($instanceId, $userId));
+        $pipes = $this->pipes->getPipesByInstanceAndUserId($instanceId, $userId);
+        return reset($pipes);
     }
 
 
@@ -606,9 +598,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function sendHeader($pipe, $code, $allowRetry = false): bool
     {
-        if (isset(self::$headerMap[$code])) {
+        if (isset(self::HEADER_MAP[$code])) {
             $data = [
-                'error' => self::$headerMap[$code],
+                'error' => self::HEADER_MAP[$code],
                 'code'  => $code,
             ];
 
