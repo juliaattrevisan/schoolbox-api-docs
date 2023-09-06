@@ -11,6 +11,7 @@ use Psr\Container\ContainerInterface;
 use Schoolbox\Search\Api;
 use Schoolbox\Search\Mock;
 use Schoolbox\Search\User;
+use Schoolbox\Search\Module as SearchModule;
 
 /**
  * Module configuration for search.
@@ -30,5 +31,8 @@ class Search implements ModuleConfigInterface
 
         $module = new User\Module($di);
         $module->registerModule('/search/user');
+
+        $module = new SearchModule($di);
+        $module->registerModule('/search');
     }
 }
