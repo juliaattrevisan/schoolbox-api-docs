@@ -231,6 +231,9 @@ class Scrub
                 $config->set('URI.Base', $uriBase);
             }
 
+            // Prevent position from being set on elements
+            $config->set('CSS.ForbiddenProperties', ['position']);
+
             //
             // Allow embeds and objects, allowing more properties than standard
             // HTMLPurifier definition allows.
