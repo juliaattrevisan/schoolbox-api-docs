@@ -57,7 +57,7 @@ class InstanceRegistryIssued extends Base
         // the instance ID custom claim matches the instance ID of this instance.
         return isset($claims[self::CLAIM_ISS]) &&
             parse_url($claims[self::CLAIM_ISS], PHP_URL_HOST) === parse_url($ir_url, PHP_URL_HOST) &&
-            $instance_id === INSTANCE_ID;
+            $instance_id === (string)INSTANCE_ID;
     }
 
     /**
