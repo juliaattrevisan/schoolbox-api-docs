@@ -276,6 +276,10 @@ class Mapper extends BaseMapper
          */
         $destination->setLearnosityReference($newLearnosityReference);
 
+        /* TODO Also redefine the tags in the cloned thing...but how?
+         *  You don't know when it finishes the cloning.
+         */
+
 //        $sectionMapper = $this->getJoinMapper('sections');
 //        $questionMapper = QuizQuestionMapper::getInstance();
 //        $solutionMapper = QuizSolutionMapper::getInstance();
