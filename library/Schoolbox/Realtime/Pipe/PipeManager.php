@@ -395,12 +395,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      *
      * @param string $instanceId
      * @param int    $userId
-     * @return Pipe
+     * @return Pipe|null
      */
-    private function getFirstPipeForInstanceAndUser(string $instanceId, int $userId)
+    private function getFirstPipeForInstanceAndUser(string $instanceId, int $userId): ?Pipe
     {
-        $pipes = $this->pipes->getPipesByInstanceAndUserId($instanceId, $userId);
-        return reset($pipes);
+        $pipes     = $this->pipes->getPipesByInstanceAndUserId($instanceId, $userId);
+        $firstPipe = reset($pipes);
+        return $firstPipe instanceof Pipe ? $firstPipe : null;
     }
 
 
@@ -427,7 +428,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function enqueueUser(string $instanceId, int $userId, string $command, mixed $payload): void
     {
-        $this->enqueue($this->getFirstPipeForInstanceAndUser($instanceId, $userId), $command, $payload);
+        $pipe = $this->getFirstPipeForInstanceAndUser($instanceId, $userId);
+        if ($pipe) {
+            $this->enqueue($pipe, $command, $payload);
+        }
     }
 
 
@@ -440,7 +444,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function transactUser(string $instanceId, int $userId, string $key, mixed $payload): void
     {
-        $this->getTransaction($this->getFirstPipeForInstanceAndUser($instanceId, $userId))->put($key, $payload);
+        $pipe = $this->getFirstPipeForInstanceAndUser($instanceId, $userId);
+        if ($pipe) {
+            $this->getTransaction($pipe)->put($key, $payload);
+        }
     }
 
 
