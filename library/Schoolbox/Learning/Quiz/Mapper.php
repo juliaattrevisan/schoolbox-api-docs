@@ -225,12 +225,12 @@ class Mapper extends BaseMapper
      *
      * @param IAssessable $source
      * @param IAssessable $destination
-     * @return string
+     * @return bool
      * @throws \DomainException
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function copyQuizConstituents(IAssessable $source, IAssessable $destination): string
+    public function copyQuizConstituents(IAssessable $source, IAssessable $destination): bool
     {
         $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
         $learnosityConsumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
