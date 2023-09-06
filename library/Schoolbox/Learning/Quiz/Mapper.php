@@ -274,11 +274,7 @@ class Mapper extends BaseMapper
          *  which won't have a Learnosity Reference field...weird behaviours
          *  But Why?
          */
-        if ($destination->getBaseAssessable() instanceof \Schoolbox\Learning\Assessment\Project) {
-            $destination->setLearnosityReference($newLearnosityReference);
-        } else {
-            $destination->getBaseAssessable()->setLearnosityReference($newLearnosityReference);
-        }
+        $destination->setLearnosityReference($newLearnosityReference);
 
 //        $sectionMapper = $this->getJoinMapper('sections');
 //        $questionMapper = QuizQuestionMapper::getInstance();
