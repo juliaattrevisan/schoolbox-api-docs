@@ -10,7 +10,8 @@
 namespace Schoolbox\Realtime\Subscription\Redis;
 
 use Predis\ClientException;
-use Predis\ClientInterface;
+use Schoolbox\MultiInstance\RedisAsyncClientRepository;
+use Schoolbox\MultiInstance\RedisClientRepository;
 use Schoolbox\Realtime\Subscription\ISubscription;
 use Schoolbox\Realtime\Subscription\ISubscriptionFactory;
 use Alaress\Redis\Async;
@@ -31,11 +32,13 @@ class SubscriptionFactory implements ISubscriptionFactory
     /**
      * Constructor
      *
-     * @param ClientInterface $syncClient
-     * @param Async\Client    $asyncClient
+     * @param RedisClientRepository      $redisClientRepository
+     * @param RedisAsyncClientRepository $redisAsyncClientRepository
      */
-    public function __construct(private ClientInterface $syncClient, private Async\Client $asyncClient)
-    {
+    public function __construct(
+        private RedisClientRepository $redisClientRepository,
+        private RedisAsyncClientRepository $redisAsyncClientRepository,
+    ) {
     }
 
     /**
@@ -61,13 +64,14 @@ class SubscriptionFactory implements ISubscriptionFactory
      */
     public function build(string $instanceId, int $userId): ISubscription
     {
+        $redisClient = $this->redisClientRepository->fetchForInstance($instanceId);
         return new Subscription(
             $instanceId,
             $userId,
-            $this->syncClient,
-            $this->asyncClient,
+            $redisClient,
+            $this->redisAsyncClientRepository->fetchForInstance($instanceId),
             $this->listener,
-            new UnreadRetriever($this->syncClient)
+            new UnreadRetriever($redisClient),
         );
     }
 }

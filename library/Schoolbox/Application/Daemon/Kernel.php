@@ -456,6 +456,16 @@ EOL;
                 ],
             )
         );
+        $di->set(
+            'multiInstance.redisAsyncClientRepository',
+            $di->lazyNew(
+                MultiInstance\RedisAsyncClientRepository::class,
+                [
+                    'configRepository' => $di->lazyGet('multiInstance.configRepository'),
+                    'loop'             => $di->lazy(fn () => $this->loop),
+                ],
+            )
+        );
 
         return $di;
     }

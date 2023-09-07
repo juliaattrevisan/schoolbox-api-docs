@@ -35,11 +35,6 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';
 
-    // Can it be assumed the Redis instance is the same for all instances?
-    $redis = Redis::getStorageClientInstance();
-    // Need the multi-instance Redis repository
-    /** @var MultiInstance\RedisClientRepository $redisClientRepository */
-    $redisClientRepository = $di->get('multiInstance.redisStorageClientRepository');
 
     // Need the multi-instance repository
     /** @var MultiInstance\InstanceRepository $instanceRepository */
@@ -49,14 +44,16 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var MultiInstance\ConfigRepository $configRepository */
     $configRepository = $di->get('multiInstance.configRepository');
 
-    // The signal queue should always be global?
-    // This is used for subscribing to retrieve new messages
-    /** @var Async\Client $asyncRedis */
-    $asyncRedis = $di->get('redis.signalQueue.sub');
-
     // Database will always be per-instance
     /** @var MultiInstance\ConnectorRepository $connectorRepository */
     $connectorRepository = $di->get('multiInstance.connectorRepository');
+
+    // Need the multi-instance Redis repositories
+    /** @var MultiInstance\RedisClientRepository $redisClientRepository */
+    $redisClientRepository = $di->get('multiInstance.redisStorageClientRepository');
+
+    /** @var MultiInstance\RedisAsyncClientRepository $redisAsyncClientRepository */
+    $redisAsyncClientRepository = $di->get('multiInstance.redisAsyncClientRepository');
 
     $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
 
@@ -68,12 +65,11 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $loop,
         new PhpHandler(),
         $log,
-        $redis,
-        $asyncRedis,
         $instanceRepository,
         $configRepository,
         $connectorRepository,
         $redisClientRepository,
+        $redisAsyncClientRepository,
         $stratBuilder->build($flags),
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
     ))->build();
