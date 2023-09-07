@@ -71,43 +71,28 @@
         </section>
     </div>
 
-    <div class="small-12 island">
-        <section>
-            {% if assessment.attachments is not empty %}
-                <fieldset>
-                    <div class="row">
-                        <div class="small-12 columns">
-                            <h2>Attachments</h2>
-                            <section>
-                                {# Attached files #}
-                                {% include '@learningAssessment/fragments/attachments.twig' with { attachments: assessment.attachments } %}
-                            </section>
-                        </div>
-                    </div>
-                </fieldset>
-            {% endif %}
+    {% if assessment.attachments is not empty %}
+        <div class="small-12 island">
+            <h3 class="subheader">Attachments</h3>
+            <section>
+                {# Attached files #}
+                {% include '@learningAssessment/fragments/attachments.twig' with { attachments: assessment.attachments } %}
+            </section>
+        </div>
+    {% endif %}
 
-            {# Linked Assessments #}
-            {% if assessment.linkedAssessments is not empty or isInstructor %}
-                <fieldset>
-                    <div class="row">
-                        <div class="small-12 columns">
-                            <h2>Linked Activities</h2>
-
-                            <div id="linked-activities-container">
-                                <linked-activities
-                                    :source-id = '{{ assessment.id }}'
-                                    :course-assessments = '{{ courseAssessments |json_encode }}'
-                                    :linked-activities = '{{ linkedAssessments |json_encode }}'
-                                    :is-instructor = '{% if isInstructor %}true{% else %}false{% endif %}'
-                                />
-                            </div>
-                            <script src="{{ CDN_PREFIX }}/js/bundle/linkedActivities.js?v={{ config.site_version }}"></script>
-                        </div>
-                    </div>
-                </fieldset>
-            {% endif %}
-        </section>
-        <a href="{{ returnUrl }}" class="submit button full-width">Return</a>
-    </div>
+    {% if assessment.linkedAssessments is not empty or isInstructor %}
+        <div class="small-12 island">
+            <h3 class="subheader">Activities</h3>
+            <div id="linked-activities-container">
+                <linked-activities
+                    :source-id = '{{ assessment.id }}'
+                    :course-assessments = '{{ courseAssessments |json_encode }}'
+                    :linked-activities = '{{ linkedAssessments |json_encode }}'
+                    :is-instructor = '{% if isInstructor %}true{% else %}false{% endif %}'
+                />
+            </div>
+            <script src="{{ CDN_PREFIX }}/js/bundle/linkedActivities.js?v={{ config.site_version }}"></script>
+        </div>
+    {% endif %}
 </div>

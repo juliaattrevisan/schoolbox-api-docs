@@ -94,8 +94,8 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <section>
-        <ul class="action-list grid">
+    <section v-if="store.linkedActivities.length > 0">
+        <ul class="information-list">
             <li
                 v-for="activity in store.linkedActivities"
                 :key="activity.id"
@@ -109,7 +109,20 @@ window.Vue.onMounted(() => {
                 ></linked-activities-item>
             </li>
         </ul>
+        <div v-if="isInstructor" class="component-action">
+            <section>
+                <a class="button" @click.prevent="store.isOpen = true">Link Activities</a>
+            </section>
+        </div>
     </section>
+    <div v-if="store.linkedActivities.length == 0" class="empty-state">
+        <i class="icon-link"></i>
+        <p>
+            There are currently no activities linked to this lesson. You may
+            <a @click.prevent="store.isOpen = true">link existing activities</a> to this lesson for students to complete
+            as part of this lesson.
+        </p>
+    </div>
 
     <sequential-reveal-modal
         size="medium"
@@ -204,10 +217,6 @@ window.Vue.onMounted(() => {
             <linked-activities-unlink></linked-activities-unlink>
         </template>
     </sequential-reveal-modal>
-
-    <section v-if="isInstructor">
-        <a href="#" class="button icon-link" @click.prevent="store.isOpen = true">Link Activities</a>
-    </section>
 
     <toast ref="toastEl"></toast>
 </template>
