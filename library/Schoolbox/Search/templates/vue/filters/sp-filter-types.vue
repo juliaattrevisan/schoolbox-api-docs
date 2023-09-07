@@ -34,7 +34,7 @@ const expandButtonText = window.Vue.computed(() => {
             >
                 {{ expandButtonText }}
             </button>
-            <ul class="option-list t-no-list-style l-flex-col l-gap-s">
+            <ul class="option-list t-no-list-style l-flex-col l-gap-xs">
                 <sp-filter-types-type
                     v-for="typeItem in filterTypesStore.allTypes"
                     :key="typeItem.value"
