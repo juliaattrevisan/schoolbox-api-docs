@@ -1,3 +1,6 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+
 <script>
     $(function() {
         $("[data-tab]").click(function(event) {
@@ -18,6 +21,27 @@
             } else {
                 $('#course-permissions').removeClass('hide');
             }
+        });
+
+        $('#courseTemplate').selectizeSelector({
+            multiple: true,
+            value: {{ courseTemplate|json_encode|raw }},
+            selectize: {
+                load: null,
+                options: {{ templates|json_encode|raw }},
+                hideSelected: true,
+                placeholder: 'Search Templates',
+            },
+        });
+        $('#unitTemplate').selectizeSelector({
+            multiple: true,
+            value: {{ unitTemplate|json_encode|raw }},
+            selectize: {
+                load: null,
+                options: {{ templates|json_encode|raw }},
+                hideSelected: true,
+                placeholder: 'Search Templates',
+            },
         });
     });
 </script>
@@ -48,15 +72,10 @@
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
-                                            <label>
+                                            <label for="courseTemplate">
                                                 Homepage Template
-                                                <select name="courseTemplate">
-                                                    <option {% if courseTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
-                                                    {% for template in templates %}
-                                                        <option {% if courseTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
-                                                    {% endfor %}
-                                                </select>
                                             </label>
+                                            <select id="courseTemplate" name="courseTemplate[]" multiple></select>
                                         </div>
                                         <div class="small-12 columns">
                                             <label>Default Access Permissions</label>
@@ -105,15 +124,10 @@
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
-                                            <label>
+                                            <label for="unitTemplate">
                                                 Homepage Template
-                                                <select name="unitTemplate">
-                                                    <option {% if unitTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
-                                                    {% for template in templates %}
-                                                        <option {% if unitTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
-                                                    {% endfor %}
-                                                </select>
                                             </label>
+                                            <select id="unitTemplate" name="unitTemplate[]" multiple></select>
                                         </div>
                                         <div class="small-12 columns">
                                             <label>Default Access Permissions</label>

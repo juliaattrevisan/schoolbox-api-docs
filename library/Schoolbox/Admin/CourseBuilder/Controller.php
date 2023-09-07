@@ -106,6 +106,14 @@ class Controller extends Base
             $permissions['unit'][$permission->getRoleId()][$permission->getPermission()] = 'checked';
         }
 
+        $templates = [];
+        foreach ($this->homepageTemplateMapper->findAll()->sortBy("name", "asc") as $template) {
+            $templates[] = [
+                'id'   => $template->getId(),
+                'name' => $template->getName(),
+            ];
+        }
+
         // Render this thing out
         $this->response = $this->responseFromTemplate(
             '@adminCourseBuilder/index.twig',
@@ -115,9 +123,9 @@ class Controller extends Base
                 'tab' => $tab != '' ? $tab : 'course',
                 'roles' => $this->roleMapper->findAll(),
                 'permissions' => $permissions,
-                'templates' => $this->homepageTemplateMapper->findAll()->sortBy("name", "asc"),
-                'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
-                'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                'templates' => $templates,
+                'courseTemplate' => explode(',', $this->getConfigLoader()->get('course_builder_default_course_page_template')),
+                'unitTemplate' => explode(',', $this->getConfigLoader()->get('course_builder_default_unit_page_template')),
                 'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                 'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
             ],
@@ -159,11 +167,11 @@ class Controller extends Base
         // Update default page templates
 
         $courseTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_course_page_template');
-        $courseTemplate->setValue($this->requestPost['courseTemplate']);
+        $courseTemplate->setValue(implode(',', $this->requestPost['courseTemplate']));
         $this->configMapper->save($courseTemplate);
 
         $unitTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_unit_page_template');
-        $unitTemplate->setValue($this->requestPost['unitTemplate']);
+        $unitTemplate->setValue(implode(',', $this->requestPost['unitTemplate']));
         $this->configMapper->save($unitTemplate);
 
         // Update default inheritance
