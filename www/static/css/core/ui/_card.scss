@@ -48,15 +48,18 @@
         // this aids accessibility, providing better screen reader context than
         // wrapping the entire card in an anchor while also allowing a wider click target
         // https://inclusive-components.design/cards/
-        a:first-child::before {
-            bottom: 0;
-            content: " ";
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            z-index: 1;
-        }
+        // put this on hold for now, not working as expected
+        // a:first-child::before {
+        //     bottom: 0;
+        //     content: " ";
+        //     height: 100%;
+        //     left: 0;
+        //     position: absolute;
+        //     right: 0;
+        //     top: 0;
+        //     width: 100%;
+        //     z-index: 1;
+        // }
     }
 
     // To highlight that the card is active, could be used when the card is selected via arrow navigation for example

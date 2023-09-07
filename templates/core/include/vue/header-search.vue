@@ -210,10 +210,11 @@ function formatPortrait(id: string) {
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
                     <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                 </div>
-                <div
+                <a
                     v-for="(result, i) in results"
                     :key="i"
                     :class="`c-card c-card--link c-card--border-end ${i === arrowCounter ? 'c-card--active' : ''}`"
+                    :href="paths.userPage + result.id"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
@@ -228,12 +229,12 @@ function formatPortrait(id: string) {
                         </div>
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h3>
-                                <a :href="paths.userPage + result.id">{{ result.formattedName }}</a>
+                                {{ result.formattedName }}
                             </h3>
                             <span class="meta">{{ result.metadata }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
                 <a
                     v-if="results.length && totalCount > results.length"
                     class="c-card c-card--link c-card--active"
