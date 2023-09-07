@@ -376,7 +376,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (preg_match('`^msg:(.+?):(\d+):(.*)$`', $msg->getChannel(), $matches)) {
             [, $instanceId, $userId, $method] = $matches;
 
-            $this->log->debug("Received $method for $userId instance $instanceId", [ 'char' => '>' ]);
+            $this->log->debug("Received $method for instance:user $instanceId:$userId ", [ 'char' => '>' ]);
 
             // in all cases, we expect the payload to be a standard message
             $instance = Instance::jsonUnserialize($msg->getPayload());
@@ -478,10 +478,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (empty($this->pushTransactions[$instanceId][$userId][$pipeId])) {
             $this->pushTransactions[$instanceId][$userId][$pipeId] = new Transaction(
                 $this->reactLoop,
-                function ($data) use ($pipe, $userId) {
+                function ($data) use ($pipe, $instanceId, $userId) {
 
                     // the timer contains the data to be processed
-                    $this->log->debug("Pushing cached messages to user $userId", [ 'char' => '<' ]);
+                    $this->log->debug("Pushing cached messages to instance:user $instanceId:$userId", [ 'char' => '<' ]);
 
                     try {
                         // enqueue to be dispatched
@@ -696,7 +696,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         // TODO consider parameterised logging
         $this->log->info(
-            "User $userId for instance $instanceId has timed out, "
+            "Instance:user $instanceId:$userId has timed out, "
             . ($success ? 'unsubscribed' : 'failed to unsubscribe')
         );
 
