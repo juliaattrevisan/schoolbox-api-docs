@@ -1236,12 +1236,6 @@ class MapperProxy
      */
     public function save(IAssessable $assessable, User $currentUser)
     {
-        print_r(sprintf(
-            "\n\nsave %s %s\n",
-            get_class($assessable),
-            $assessable->getTitle()
-        ));
-
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable);
         // Folder context translation:
