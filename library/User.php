@@ -249,10 +249,11 @@ class User extends DeprecatedModel
      * @param int|array $group
      * @param array     $residentialHouseIds
      * @param int|bool  $limit
+     * @param bool|null $enabled
      * @return array|bool
      * @throws Exception
      */
-    public function ajaxSearch($keyword, $group = 0, $residentialHouseIds = array(), $limit = false)
+    public function ajaxSearch($keyword, $group = 0, $residentialHouseIds = array(), $limit = false, bool $enabled = null)
     {
         //search for a user based on at least one of the above fields
         //assumes at least one contains something
@@ -332,6 +333,10 @@ class User extends DeprecatedModel
         }
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $query .= ' AND ' . $searchFilter;
+        }
+        // if limiting to those who are enabled or not
+        if (null !== $enabled) {
+            $query .= sprintf(" AND enabled = %s ", $enabled ? 1 : 0);
         }
         $query .= "ORDER BY group_id, lyl.sequence, lastname, chosen_name";
         if (is_numeric($limit)) {

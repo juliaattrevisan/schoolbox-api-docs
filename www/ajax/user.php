@@ -43,6 +43,9 @@ $showCampus = false;
 $residentialHouseID = $_GET['residentialHouseID'] ?? null;
 $showEmail = $_GET['email'] ?? false;
 
+// should we include those with notifications switched off?
+$notificationsEnabled = isset($_GET['notificationsEnabled']) ? (bool)$_GET['notificationsEnabled'] : null;
+
 if (!empty($residentialHouseID)) {
     $residentialHouseID = explode(';', $residentialHouseID);
 }
@@ -93,7 +96,8 @@ if (strlen($keyword) > 1 && strlen($keyword) < 64 && (strlen($groupID) || strlen
             $keyword,
             $groupID,
             $residentialHouseID,
-            30
+            30,
+            $notificationsEnabled
         );
         if ($userList && ($showEmail || $filterParents)) {
             $userCollection = $userMapper->findByColumn('id', array_column($userList, 'uid'))->indexBy('id');
