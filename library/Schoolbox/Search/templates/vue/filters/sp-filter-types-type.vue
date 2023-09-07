@@ -11,6 +11,32 @@ interface Props {
 const props = defineProps<Props>();
 
 const filterTypesStore = useFilterTypesStore();
+const isOpen = window.Vue.ref(false);
+
+/**
+ * To show/hide the sub types container
+ * @returns {string} - the height of the sub types container
+ */
+const subTypeHeight = window.Vue.computed(() => {
+    return isOpen.value ? "1fr" : "0fr";
+});
+
+/**
+ * To show/hide the sub types when selected
+ */
+function onShowSubTypesSelected() {
+    isOpen.value = !isOpen.value;
+}
+
+/**
+ * To show/hide the sub types when the all sub types button is clicked
+ */
+window.Vue.watch(
+    () => filterTypesStore.isAllSubTypesOpen,
+    (newValue) => {
+        isOpen.value = newValue;
+    }
+);
 
 /**
  * To add/remove the sub types when the parent type is selected/deselected
@@ -70,37 +96,36 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
                 />
                 <label :for="props.type.value">{{ props.type.title }}</label>
             </div>
-            <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Expand/collapse content"></a>
+            <button
+                v-if="props.type.subTypes"
+                class="icon-up-arrow collapse"
+                title="Expand/collapse content"
+                @click.prevent="onShowSubTypesSelected"
+            ></button>
         </div>
-        <div class="test">
-            <div>
-                <ul v-if="props.type.subTypes">
-                    <li v-for="subType in props.type.subTypes" :key="subType.value">
-                        <input
-                            :id="subType.value"
-                            v-model="filterTypesStore.activeTypes"
-                            type="checkbox"
-                            :value="subType.value"
-                        />
-                        <label :for="subType.value">{{ subType.title }}</label>
-                    </li>
-                </ul>
-            </div>
+        <div v-if="props.type.subTypes" class="sub-types">
+            <ul>
+                <li v-for="subType in props.type.subTypes" :key="subType.value">
+                    <input
+                        :id="subType.value"
+                        v-model="filterTypesStore.activeTypes"
+                        type="checkbox"
+                        :value="subType.value"
+                    />
+                    <label :for="subType.value">{{ subType.title }}</label>
+                </li>
+            </ul>
         </div>
     </li>
 </template>
 
 <style scoped>
-.test {
+.sub-types {
     display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 500ms;
+    grid-template-rows: v-bind(subTypeHeight);
+    transition: grid-template-rows 300ms;
 }
-.test div {
+.sub-types ul {
     overflow: hidden;
-}
-
-.test:hover {
-    grid-template-rows: 1fr;
 }
 </style>

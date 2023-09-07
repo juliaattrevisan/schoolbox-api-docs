@@ -12,7 +12,7 @@ const filterTypesStore = useFilterTypesStore();
 <template>
     <div>
         <label>Types</label>
-        <fieldset class="checklist">
+        <fieldset class="checklist f-no-margins">
             <ul class="option-list t-no-list-style">
                 <sp-filter-types-type
                     v-for="typeItem in filterTypesStore.allTypes"
