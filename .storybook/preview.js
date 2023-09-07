@@ -49,7 +49,7 @@ export const parameters = {
         pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
     },
     docs: {
-        // theme: themes.dark, // would be nice, but of course our Foundation styles do some funky things
+        theme: themes.dark,
     },
     layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
     options: {
