@@ -66,3 +66,6 @@ taskd_build_from_local: false
 # Should vagrant auto-configure network interfaces?
 # You may need to set to 'false' if your network assigns IP6 interfaces but can't route IP6 traffic
 network_auto_config: true
+
+# Enabling this will let your API cests evaluate responses against api schema yaml files
+# api_dir: "../schoolbox-api-docs"
