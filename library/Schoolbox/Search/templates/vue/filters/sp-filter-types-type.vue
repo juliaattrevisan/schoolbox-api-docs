@@ -98,7 +98,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
             </div>
             <button
                 v-if="props.type.subTypes"
-                :class="`button ${isOpen ? 'icon-down-arrow' : 'icon-up-arrow'} f-center-icon f-no-bkg`"
+                :class="`button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'} f-center-icon f-no-bkg`"
                 title="Expand/collapse content"
                 @click.prevent="onShowSubTypesSelected"
             ></button>

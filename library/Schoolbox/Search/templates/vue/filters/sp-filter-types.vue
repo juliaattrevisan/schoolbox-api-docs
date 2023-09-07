@@ -29,7 +29,7 @@ const expandButtonText = window.Vue.computed(() => {
         <label>Types</label>
         <div class="checklist">
             <button
-                :class="`button full-width ${filterTypesStore.isExpanded ? 'icon-down-arrow' : 'icon-up-arrow'}`"
+                :class="`button full-width ${filterTypesStore.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 @click.prevent="onExpandAllSelected"
             >
                 {{ expandButtonText }}
