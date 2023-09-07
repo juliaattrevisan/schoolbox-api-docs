@@ -24,6 +24,7 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MultiInstance;
@@ -446,12 +447,12 @@ EOL;
             )
         );
         $di->set(
-            'multiInstance.redisClientRepository',
+            'multiInstance.redisStorageClientRepository',
             $di->lazyNew(
                 MultiInstance\RedisClientRepository::class,
                 [
                     'configRepository' => $di->lazyGet('multiInstance.configRepository'),
-                    'loop'             => $di->lazy(fn () => $this->loop),
+                    'configKey'        => ConfigMapper::NAME_REDIS_URL,
                 ],
             )
         );

@@ -142,7 +142,7 @@ class SessionValidator
         }
 
         // this has the potential to throw CommunicationException?
-        $redisResponse = $this->redisClientRepository->fetchStorageClientForInstance($instanceId)->get($prefix . $token);
+        $redisResponse = $this->redisClientRepository->fetchForInstance($instanceId)->get($prefix . $token);
         if (!isset($redisResponse)) {
             throw new SessionException("No session found for given $label.");
         }

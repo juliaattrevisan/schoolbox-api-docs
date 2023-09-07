@@ -39,7 +39,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $redis = Redis::getStorageClientInstance();
     // Need the multi-instance Redis repository
     /** @var MultiInstance\RedisClientRepository $redisClientRepository */
-    $redisClientRepository = $di->get('multiInstance.redisClientRepository');
+    $redisClientRepository = $di->get('multiInstance.redisStorageClientRepository');
 
     // Need the multi-instance repository
     /** @var MultiInstance\InstanceRepository $instanceRepository */
