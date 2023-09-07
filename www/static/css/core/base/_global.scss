@@ -47,6 +47,7 @@ body {
     font-style: $body-font-style;
     font-weight: $body-font-weight;
     line-height: $base-line-height; // Set to $base-line-height to take on browser default of 150%
+    overflow-y: scroll; // Always show vertical scrollbar to avoid any layout shifts
     padding: 0;
     position: relative;
     -webkit-font-smoothing: antialiased; //Improve text rendering when available
