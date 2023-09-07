@@ -11,14 +11,10 @@ namespace Schoolbox\MultiInstance;
 
 use Alaress\Redis\Async\Client;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Config\ConfigMapper;
 
 /**
  * Repository for asynchronous Redis clients for all instances this node knows
  * about.
- *
- * This always creates connections to persistent Redis instances, because
- * there's no queue for the cached instance.
  */
 class RedisAsyncClientRepository
 {
@@ -36,10 +32,16 @@ class RedisAsyncClientRepository
      * Constructor
      *
      * @param ConfigRepository $configRepository Config repository: required for fetching Redis URLs for instances.
+     * @param string           $configKey        The config key which stores the Redis URL.
+     *                                           Should be one of the `Schoolbox\Config\ConfigMapper` constants
+     *                                           `NAME_REDIS_URL` or `NAME_REDIS_EPHEMERAL_URL`.
      * @param LoopInterface    $loop             Event loop: required for async clients.
      */
-    public function __construct(private ConfigRepository $configRepository, private LoopInterface $loop)
-    {
+    public function __construct(
+        private ConfigRepository $configRepository,
+        private string $configKey,
+        private LoopInterface $loop,
+    ) {
     }
 
     /**
@@ -52,7 +54,7 @@ class RedisAsyncClientRepository
     {
         $dsn = $this->configRepository
             ->fetchConfigForInstance($instanceId)
-            ->get(ConfigMapper::NAME_REDIS_URL);
+            ->get($this->configKey);
         return $this->clients[$dsn] ??= new Client($dsn, $this->loop);
     }
 }

@@ -416,7 +416,7 @@ EOL;
         $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            return new AsyncRedisClient($conf->get('redis_ephemeral_url'), $this->loop);
+            return new AsyncRedisClient($conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL), $this->loop);
         }));
 
         // Multi-instance repositories
@@ -462,6 +462,7 @@ EOL;
                 MultiInstance\RedisAsyncClientRepository::class,
                 [
                     'configRepository' => $di->lazyGet('multiInstance.configRepository'),
+                    'configKey'        => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
                     'loop'             => $di->lazy(fn () => $this->loop),
                 ],
             )
