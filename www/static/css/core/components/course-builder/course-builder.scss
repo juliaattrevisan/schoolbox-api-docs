@@ -6,8 +6,8 @@ styling and move all the code in here.
     .information-list {
         & .card {
             display: flex;
-            padding-bottom: var(--whitespace-xs);
-            padding-top: var(--whitespace-xs);
+            padding-bottom: var(--spacing-xs);
+            padding-top: var(--spacing-xs);
 
             & p {
                 &:last-child {

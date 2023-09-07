@@ -48,6 +48,6 @@ async function onApplySelected() {
 <style lang="scss" scoped>
 .c-filters {
     background-color: var(--foreground-colour);
-    padding: var(--whitespace-m);
+    padding: var(--spacing-m);
 }
 </style>

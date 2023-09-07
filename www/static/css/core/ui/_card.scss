@@ -21,7 +21,7 @@
         a {
             font-size: 13px;
             font-weight: 600;
-            padding: var(--whitespace-s) var(--whitespace-m);
+            padding: var(--spacing-s) var(--spacing-m);
             text-align: center;
             text-transform: uppercase;
 
@@ -33,7 +33,7 @@
 
     // Add inline (default left) border and grey background to card.
     &--child {
-        border-inline-start: var(--whitespace-s) solid #aaaaaa;
+        border-inline-start: var(--spacing-s) solid #aaaaaa;
     }
 
     // When we want the whole card to be selectable

@@ -30,7 +30,7 @@ useStore().init(props.endpoint, props.filterTypes);
 <style lang="scss" scoped>
 .c-search-page {
     display: grid;
-    gap: var(--whitespace-xl);
+    gap: var(--spacing-xl);
     grid-template-areas:
         "input input"
         "results filters";

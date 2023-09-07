@@ -136,7 +136,7 @@ function onSelected(result: Result) {
     background: var(--foreground-colour);
     border-left: 1px solid var(--form-border-color);
     border-right: 1px solid var(--form-border-color);
-    padding: var(--whitespace-s);
+    padding: var(--spacing-s);
     font-size: 0.825rem;
     font-style: italic;
 }

@@ -8,32 +8,32 @@
 .l-pad {
     @each $size in $global-sizes {
         &-#{$size} {
-            padding: var(--whitespace-#{$size});
+            padding: var(--spacing-#{$size});
 
             &--horiz {
-                padding-inline-end: var(--whitespace-#{$size});
-                padding-inline-start: var(--whitespace-#{$size});
+                padding-inline-end: var(--spacing-#{$size});
+                padding-inline-start: var(--spacing-#{$size});
             }
 
             &--vert {
-                padding-block-end: var(--whitespace-#{$size});
-                padding-block-start: var(--whitespace-#{$size});
+                padding-block-end: var(--spacing-#{$size});
+                padding-block-start: var(--spacing-#{$size});
             }
 
             &--top {
-                padding-block-start: var(--whitespace-#{$size});
+                padding-block-start: var(--spacing-#{$size});
             }
 
             &--bottom {
-                padding-block-end: var(--whitespace-#{$size});
+                padding-block-end: var(--spacing-#{$size});
             }
 
             &--left {
-                padding-inline-start: var(--whitespace-#{$size});
+                padding-inline-start: var(--spacing-#{$size});
             }
 
             &--right {
-                padding-inline-end: var(--whitespace-#{$size});
+                padding-inline-end: var(--spacing-#{$size});
             }
         }
     }
