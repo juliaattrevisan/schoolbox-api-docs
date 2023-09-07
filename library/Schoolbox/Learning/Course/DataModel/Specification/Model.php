@@ -13,6 +13,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractCourse;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Assessment\Course\Template\Model as CourseTemplateModel;
 
 /**
  * A Course Specification is a collection of Unit Specifications. It exists on a Folder.
@@ -46,6 +47,8 @@ class Model extends AbstractCourse
      * @var null|string
      */
     private ?string $uuid = '';
+
+    private CourseTemplateModel $template;
 
 
     /**
@@ -151,5 +154,23 @@ class Model extends AbstractCourse
     {
         $this->uuid = $uuid;
         return $this;
+    }
+
+    /**
+     * @param CourseTemplateModel $template
+     * @return Model
+     */
+    public function setTemplate(CourseTemplateModel $template): self
+    {
+        $this->template = $template;
+        return $this;
+    }
+
+    /**
+     * @return CourseTemplateModel
+     */
+    public function getTemplate(): CourseTemplateModel
+    {
+        return $this->template;
     }
 }

@@ -16,6 +16,7 @@ use Schoolbox\Learning\Course\DataModel\AbstractCourseMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\HomepageConfig;
 
@@ -48,6 +49,7 @@ class Mapper extends AbstractCourseMapper
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
         $this->uses('subject_code', self::TYPE_STRING);
         $this->uses('uuid', self::TYPE_STRING);
+        $this->joins('template_id', CourseTemplateMapper::class, 'id', null, null, null, 'template');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
