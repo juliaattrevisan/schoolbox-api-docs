@@ -25,7 +25,6 @@ use UnexpectedValueException;
  */
 class StudentAttributesTest extends TestCase
 {
-
     /**
      * Test we cannot generate a report for a soft-deleted student
      *
