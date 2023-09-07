@@ -152,7 +152,12 @@ class Overwriter
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
         );
 
-        (new Helper($api))->archive($assessment->getLearnosityReference());
+        /* FIXME Temporarily disabled due to https://help.learnosity.com/hc/en-us/requests/23138
+         *  Uncomment whent hat bug has been resolved. This was intended to archive the old version
+         *  of the quiz and then use the new version of the quiz. Disabling this means you have an
+         *  orphaned quiz that's published and available for people to use, which isn't ideal
+         */
+        // (new Helper($api))->archive($assessment->getLearnosityReference());
 
 //        $this->quizMapper->deleteQuizConstituents($assessment->getId());
     }
