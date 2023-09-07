@@ -64,7 +64,7 @@
                                         </th>
                                     {% endif %}
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left second-child white capability" title="{{ capability.name }}">{{ capability.name }}</th>
+                                    <th class="fixed-left second-child white capability">{{ capability.name | markdown }}</th>
 
                                     {% for studentId, student in students %}
                                         {% if not capability.show or not assessment.isMarkPerCapability %}
@@ -99,7 +99,7 @@
                                 {% for indicatorId, indicator in capability.indicators %}
                                     <tr class="indicator-row">
                                         {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                        <th class="fixed-left second-child white indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
+                                        <th class="fixed-left second-child white indicator">{{ indicator.name | markdown }}</th>
 
                                         {% for studentId, student in students %}
 
@@ -151,7 +151,7 @@
                                     <th class="fixed-left overall" rowspan="{{ rowSpan }}">Overall</th>
                                 {% endif %}
                                 {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                <th class="fixed-left white second-child capability">{{ capabilityData.name }}</th>
+                                <th class="fixed-left white second-child capability">{{ capabilityData.name | markdown }}</th>
 
                                 {% for studentId, studentData in students %}
                                     {% if capabilityData.show %}
@@ -172,7 +172,7 @@
                             {% for indicatorId, indicatorData in capabilityData.indicators %}
                                 <tr class="indicator-row summated">
                                     {# Class 'second-child' needed so that cells are styled correctly when the cell to the left spans mulitple rows. #}
-                                    <th class="fixed-left second-child white indicator">{{ indicatorData.name }}</th>
+                                    <th class="fixed-left second-child white indicator">{{ indicatorData.name | markdown }}</th>
                                     {% for studentId, studentData in students %}
                                         <td class="mark">
                                             {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised ?? '') %}
