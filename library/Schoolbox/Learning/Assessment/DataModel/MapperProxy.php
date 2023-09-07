@@ -1246,6 +1246,12 @@ class MapperProxy
             $context->setId($project->getId());
         }
 
+        /* FIXME But....WHY???
+         *  This allows you to update a spec's title when it was modified in the impl,
+         *  but...this shouldn't be necessary here like this?
+         */
+        $dataModel->setTitle($assessable->getTitle());
+
         /* TODO Remove this hack in SA-6049
          * If we are saving a new assessment, we need to save the assessment, then the sub-object (eg assess/box/task/project)
          * so that the sub-object has the assessment.id available.
