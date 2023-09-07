@@ -330,7 +330,7 @@ Usage:
                             />
                     </div>
 
-                    <div class="small-6 column">
+                    <div class="small-4 column">
                         {% include '@course/sub/sourceSelector.twig' with {
                             courseSpec: courseSpec,
                         } only %}
@@ -342,7 +342,23 @@ Usage:
                         </div>
                     {% endif %}
 
-                    <div class="small-6 column">
+                    <div class="small-4 column">
+                        <label class="required" for="template">
+                            Course Template
+                        </label>
+                        {% if templates.count > 1 %}
+                        <select name="template" required>
+                            {% for template in templates %}
+                                <option value="{{ template.id }}">{{ template.name }}</option>
+                            {% endfor %}
+                        </select>
+                        {% else %}
+                            <input name="template" value="{{ templates.first.id }}" disabled style="display: none">
+                            <input value="{{ templates.first.name }}" disabled>
+                        {% endif %}
+                    </div>
+
+                    <div class="small-4 column">
                         <label for="subjectCode">
                             {{ locale.subject.proper }} Code
                             <input id="subjectCode" type="text" name="subjectCode" size="40" value="{{ courseSpec.subjectCode ?? '' }}" maxlength="20" />

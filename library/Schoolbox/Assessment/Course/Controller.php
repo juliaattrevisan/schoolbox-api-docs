@@ -403,9 +403,12 @@ class Controller extends Base\Base
             $encodedReturnUrls[$unitSpecId] = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
         }
 
+        $courseTemplatesMapper = \Schoolbox\Assessment\Course\Template\Mapper::getInstance();
+
         $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
+                'templates'          => $courseTemplatesMapper->findAll(),
                 'courseSpec'        => $courseSpec,
                 'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 'folderAccess'      => $folderAccess,
@@ -428,10 +431,12 @@ class Controller extends Base\Base
      */
     public function newCourse(?string $name): void
     {
+        $courseTemplatesMapper = \Schoolbox\Assessment\Course\Template\Mapper::getInstance();
 
         $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
+                'templates'          => $courseTemplatesMapper->findAll(),
                 'courseSpec'         => null,
                 'courseName'         => $name ? urldecode($name) : null,
                 'curriculumEnabled'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
