@@ -47,10 +47,12 @@ if (is_numeric($this->arg[0])) {
 
     if ($allImages->count()) {
         foreach ($allImages as $currentImage) {
+            $description = $currentImage->getDescription();
+
             $this->setVar(
                 array(
                     'THUMBNAIL_ID'          => $currentImage->getId(),
-                    'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
+                    'THUMBNAIL_DESCRIPTION' => ($description !== '') ? $description : $currentImage->getTitle(),
                     'THUMBNAIL_SIZE'        => Config::get('thumbnail_size'),
                 )
             );
