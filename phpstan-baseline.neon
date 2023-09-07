@@ -5046,16 +5046,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Message/RoutePermissionMapper.php
 
 		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock \\(string\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock \\(string\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
 			message: "#^Cannot cast callable\\(\\)\\: mixed to string\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/WorkerProcess.php
@@ -5104,11 +5094,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerFactory\\:\\:\\$event \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Event\\\\Event\\) does not accept Alaress\\\\Scheduler\\\\Event\\\\EventInterface\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Trigger/TriggerFactory.php
-
-		-
-			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:sRem\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
