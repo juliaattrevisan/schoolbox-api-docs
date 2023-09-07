@@ -120,7 +120,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
                 $this->setVar(
                     [
                         'THUMBNAIL_ID'          => $currentImage->getId(),
-                        'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
+                        'THUMBNAIL_DESCRIPTION' => Scrub::text($currentImage->getDescription() ?: $currentImage->getTitle()),
                         'THUMBNAIL_SIZE'        => Config::get('thumbnail_size'),
                         'IMAGE_HEIGHT'          => Config::get('thumbnail_size'),
                         'IMAGE_WIDTH'           => Config::get('thumbnail_size'),
