@@ -22,6 +22,14 @@
 export function getHTMLSupportSettings() {
     return {
         htmlSupport: {
+            disallow: [
+                {
+                    name: "div",
+                    styles: {
+                        position: true,
+                    },
+                },
+            ],
             allow: [
                 // "img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float};"
                 {
@@ -75,7 +83,6 @@ export function getHTMLSupportSettings() {
                         display: true,
                         float: true,
                         border: true,
-                        position: true,
                         top: true,
                         bottom: true,
                         left: true,
