@@ -30,5 +30,6 @@ declare global {
          * www/static/js/alaress-datetime-picker/alaress-datetime-picker.js
          */
         alaressDateTimePicker(): JQuery;
+        collapsable(): JQuery;
     }
 }

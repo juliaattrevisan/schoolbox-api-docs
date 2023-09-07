@@ -491,7 +491,8 @@ class Translator
             foreach ($dataModel->getLinkedAssessments() as $idx => $dataChild) {
                 $subModel = $dataChild->getSubObject();
                 if ($subModel) {
-                    $domainChild = $this->translateToDomainModelRecursive($subModel, $depth + 1);
+                    // lesson plans can contain projects, so we need to reset the depth to 1
+                    $domainChild = $this->translateToDomainModelRecursive($subModel, 1);
                     $domainObject->getLinkedAssessments()[$idx] = $domainChild;
                 }
             }

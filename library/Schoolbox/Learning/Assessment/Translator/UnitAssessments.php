@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\Translator;
 
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\User;
 
 /**
@@ -39,6 +40,10 @@ class UnitAssessments
                 ])
             ];
         }
+        $assessments = null;
+        if ($assessment instanceof Project) {
+            $assessments = $assessment->getAssessables();
+        }
         return [
             'id'                => $assessment->getId(),
             'title'             => $assessment->getTitle(),
@@ -46,6 +51,7 @@ class UnitAssessments
             'closeAt'           => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
             'closeAtFormatted'  => $assessment->getCloseAt()?->getRelativeDay(),
             '_links'            => $links,
+            'assessments'    => $assessments?->map(new self($this->routeGenerator, $this->student)),
         ];
     }
 }
