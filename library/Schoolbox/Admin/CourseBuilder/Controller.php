@@ -114,6 +114,10 @@ class Controller extends Base
             ];
         }
 
+        $courseTemplates = \Schoolbox\Assessment\Course\Template\Mapper::getInstance();
+        $all = $courseTemplates->findAll();
+
+
         // Render this thing out
         $this->response = $this->responseFromTemplate(
             '@adminCourseBuilder/index.twig',
@@ -123,9 +127,10 @@ class Controller extends Base
                 'tab' => $tab != '' ? $tab : 'course',
                 'roles' => $this->roleMapper->findAll(),
                 'permissions' => $permissions,
-                'templates' => $templates,
-                'courseTemplate' => explode(',', $this->getConfigLoader()->get('course_builder_default_course_page_template')),
-                'unitTemplate' => explode(',', $this->getConfigLoader()->get('course_builder_default_unit_page_template')),
+                'availableTemplates' => $templates,
+                'courseTemplates'   => $courseTemplates->findAll(),
+                'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
+                'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
                 'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                 'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
             ],

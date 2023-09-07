@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Template;
 
+use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 
 /**
@@ -37,5 +39,35 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('courseInherit', self::TYPE_BOOLEAN);
         $this->uses('unitInherit', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('courseTemplate', 'courseTemplate')},
+                {$this->getJoinColumnString('unitTemplate', 'unitTemplate')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('courseTemplate', '', 'courseTemplate', true)}
+            INNER JOIN {$this->getJoinSql('unitTemplate', '', 'unitTemplate', true)}
+        ";
+    }
+
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $templates = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $template = $this->hydrate($row);
+            /** @var null|HomepageTemplate $courseTemplate */
+            $courseTemplate = $this->hydrateJoin($row, 'courseTemplate', 'courseTemplate');
+            $template->setCourseTemplate($courseTemplate);
+            /** @var null|HomepageTemplate $unitTemplate */
+            $unitTemplate = $this->hydrateJoin($row, 'unitTemplate', 'unitTemplate');
+            $template->setUnitTemplate($unitTemplate);
+            $templates->add($template);
+        }
+        return $templates;
     }
 }

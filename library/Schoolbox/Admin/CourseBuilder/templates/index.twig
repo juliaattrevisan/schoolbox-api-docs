@@ -28,7 +28,7 @@
             value: {{ courseTemplate|json_encode|raw }},
             selectize: {
                 load: null,
-                options: {{ templates|json_encode|raw }},
+                options: {{ availableTemplates|json_encode|raw }},
                 hideSelected: true,
                 placeholder: 'Search Templates',
             },
@@ -38,7 +38,7 @@
             value: {{ unitTemplate|json_encode|raw }},
             selectize: {
                 load: null,
-                options: {{ templates|json_encode|raw }},
+                options: {{ availableTemplates|json_encode|raw }},
                 hideSelected: true,
                 placeholder: 'Search Templates',
             },
@@ -56,6 +56,28 @@
 
     <div class="admin-content">
         {# Config page contents #}
+
+        <div> NEW UI:</div>
+        <table>
+            <tr>
+                <th>Template Name</th>
+                <th>Selected Course Page Template</th>
+                <th>Course Folder Inherit Perms?</th>
+                <th>Selected Unit Page Template</th>
+                <th>Unit Folder Inherit Perms?</th>
+            </tr>
+        {% for courseTemplate in courseTemplates %}
+            <tr>
+                <td>{{ courseTemplate.name }}</td>
+                <td>{{ courseTemplate.courseTemplate.name }}</td>
+                <td>{{ courseTemplate.courseInherit ? 'true' : 'false' }}</td>
+                <td>{{ courseTemplate.unitTemplate.name }}</td>
+                <td>{{ courseTemplate.unitInherit ? 'true' : 'false' }}</td>
+            </tr>
+        {% endfor %}
+
+        </table>
+        <hr />
         <div class="small-12 island">
             <dl class="tabs" data-tab="">
                 <dd class="{% if tab == 'course' %}active{% endif %}"><a data-tab id="course" href="#panel-course">Course Page</a></dd>
