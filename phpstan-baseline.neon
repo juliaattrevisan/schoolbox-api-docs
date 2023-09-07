@@ -5591,11 +5591,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Test/Booking/ValidationTest.php
 
 		-
-			message: "#^Access to an undefined property Faker\\\\Generator\\:\\:\\$bs\\.$#"
-			count: 1
-			path: library/Schoolbox/Search/Mock/ResultBuilder.php
-
-		-
 			message: "#^Property Schoolbox\\\\Statistics\\\\DataSource\\:\\:\\$folderMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Statistics/DataSource.php
