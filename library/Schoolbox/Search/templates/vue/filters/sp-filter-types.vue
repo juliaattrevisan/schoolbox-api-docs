@@ -10,10 +10,10 @@ const filterTypesStore = useFilterTypesStore();
 </script>
 
 <template>
-    <div class="small-12 columns">
+    <div>
         <label>Types</label>
         <fieldset class="checklist">
-            <ul class="option-list">
+            <ul class="option-list t-no-list-style">
                 <sp-filter-types-type
                     v-for="typeItem in filterTypesStore.allTypes"
                     :key="typeItem.value"

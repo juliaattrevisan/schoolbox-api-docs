@@ -59,26 +59,48 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
 
 <template>
     <li>
-        <input
-            :id="props.type.value"
-            v-model="filterTypesStore.activeTypes"
-            type="checkbox"
-            :value="props.type.value"
-            :class="{ indeterminate: isSomeSubTypesSelected }"
-        />
-        <label :for="props.type.value">{{ props.type.title }}</label>
-        <ul v-if="props.type.subTypes">
-            <li v-for="subType in props.type.subTypes" :key="subType.value">
+        <div class="l-flex-row">
+            <div class="l-flex__item--1">
                 <input
-                    :id="subType.value"
+                    :id="props.type.value"
                     v-model="filterTypesStore.activeTypes"
                     type="checkbox"
-                    :value="subType.value"
+                    :value="props.type.value"
+                    :class="{ indeterminate: isSomeSubTypesSelected }"
                 />
-                <label :for="subType.value">{{ subType.title }}</label>
-            </li>
-        </ul>
+                <label :for="props.type.value">{{ props.type.title }}</label>
+            </div>
+            <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Expand/collapse content"></a>
+        </div>
+        <div class="test">
+            <div>
+                <ul v-if="props.type.subTypes">
+                    <li v-for="subType in props.type.subTypes" :key="subType.value">
+                        <input
+                            :id="subType.value"
+                            v-model="filterTypesStore.activeTypes"
+                            type="checkbox"
+                            :value="subType.value"
+                        />
+                        <label :for="subType.value">{{ subType.title }}</label>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </li>
 </template>
 
-<style scoped></style>
+<style scoped>
+.test {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 500ms;
+}
+.test div {
+    overflow: hidden;
+}
+
+.test:hover {
+    grid-template-rows: 1fr;
+}
+</style>
