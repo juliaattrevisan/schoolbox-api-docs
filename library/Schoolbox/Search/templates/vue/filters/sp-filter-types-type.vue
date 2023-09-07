@@ -11,15 +11,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const filterTypesStore = useFilterTypesStore();
-const isOpen = window.Vue.ref(false);
-
-/**
- * To show/hide the sub types container
- * @returns {string} - the height of the sub types container
- */
-const subTypeHeight = window.Vue.computed(() => {
-    return isOpen.value ? "1fr" : "0fr";
-});
+const isOpen = window.Vue.ref(false); // whether the sub type are shown
 
 /**
  * To show/hide the sub types when selected
@@ -32,11 +24,19 @@ function onShowSubTypesSelected() {
  * To show/hide the sub types when the all sub types button is clicked
  */
 window.Vue.watch(
-    () => filterTypesStore.isAllSubTypesOpen,
+    () => filterTypesStore.isExpanded,
     (newValue) => {
         isOpen.value = newValue;
     }
 );
+
+/**
+ * To show/hide the sub types container
+ * @returns {string} - the height of the sub types container
+ */
+const subTypeHeight = window.Vue.computed(() => {
+    return isOpen.value ? "1fr" : "0fr";
+});
 
 /**
  * To add/remove the sub types when the parent type is selected/deselected
@@ -84,8 +84,8 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
 </script>
 
 <template>
-    <li>
-        <div class="l-flex-row">
+    <li class="l-flex-col f-min-btn-height">
+        <div class="l-flex-row f-no-margins">
             <div class="l-flex__item--1">
                 <input
                     :id="props.type.value"
@@ -98,14 +98,14 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
             </div>
             <button
                 v-if="props.type.subTypes"
-                class="icon-up-arrow collapse"
+                :class="`button ${isOpen ? 'icon-down-arrow' : 'icon-up-arrow'} f-no-bkg`"
                 title="Expand/collapse content"
                 @click.prevent="onShowSubTypesSelected"
             ></button>
         </div>
-        <div v-if="props.type.subTypes" class="sub-types">
+        <div v-if="props.type.subTypes" class="sub-types" :style="{ 'grid-template-rows': subTypeHeight }">
             <ul>
-                <li v-for="subType in props.type.subTypes" :key="subType.value">
+                <li v-for="subType in props.type.subTypes" :key="subType.value" class="f-min-btn-height">
                     <input
                         :id="subType.value"
                         v-model="filterTypesStore.activeTypes"
@@ -122,7 +122,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
 <style scoped>
 .sub-types {
     display: grid;
-    grid-template-rows: v-bind(subTypeHeight);
+    /* grid-template-rows: v-bind(subTypeHeight); */
     transition: grid-template-rows 300ms;
 }
 .sub-types ul {

@@ -13,7 +13,7 @@ export type FilterType = {
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     const allTypes = window.Vue.ref<FilterType[]>([]); // all filter types available
     const activeTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
-    const isAllSubTypesOpen = window.Vue.ref<boolean>(false); // to show/hide all the sub types
+    const isExpanded = window.Vue.ref<boolean>(false); // to show/hide all the sub types
 
     /**
      * Are there any types selected
@@ -73,7 +73,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     return {
         allTypes,
         activeTypes,
-        isAllSubTypesOpen,
+        isExpanded,
         addType,
         addSubTypes,
         removeSubTypes,
