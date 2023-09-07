@@ -213,6 +213,8 @@ class ConfigMapper extends Mapper
     public const NAME_REPORT_TITLE = 'report_title';
 
     public const NAME_REDIS_URL = 'redis_url';
+
+    public const NAME_REDIS_EPHEMERAL_URL = 'redis_ephemeral_url';
     public const NAME_TASKD_REDIS_URL = 'taskd_redis_url';
     public const NAME_TASKD_REDIS_QUEUE = 'taskd_redis_queue';
 
