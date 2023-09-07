@@ -5,6 +5,8 @@ create table courseTemplates
     name             varchar(250) null,
     courseTemplateId int(11) unsigned not null,
     unitTemplateId   int(11) unsigned not null,
+    courseInherit    bool,
+    unitInherit      bool,
     deleted_at       datetime     null,
     constraint courseTemplates_pk
         primary key (id),
@@ -15,16 +17,18 @@ create table courseTemplates
 );
 
 # copy config to new table
-INSERT INTO courseTemplates (name, courseTemplateId, unitTemplateId) VALUE
+INSERT INTO courseTemplates (name, courseTemplateId, unitTemplateId, courseInherit, unitInherit) VALUE
 (
     'Default',
     (SELECT value FROM config WHERE name='course_builder_default_course_page_template'),
-    (SELECT value FROM config WHERE name='course_builder_default_unit_page_template')
+    (SELECT value FROM config WHERE name='course_builder_default_unit_page_template'),
+    (SELECT value FROM config WHERE name='course_builder_default_course_page_inherit'),
+    (SELECT value FROM config WHERE name='course_builder_default_unit_page_inherit')
 );
 
 # ensure the course specs all have templates available
 alter table course_specification
-    add template_id int(11) unsigned null after uuid;
+    add template_id int(11) unsigned null after subject_code;
 
 alter table course_specification
     add constraint course_specification_courseTemplates_id_fk
