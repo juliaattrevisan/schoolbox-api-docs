@@ -128,15 +128,26 @@ HELP;
          */
         $activityReferences = array_values(array_filter(explode(',', $this->getOpt(self::OPT_LONG_REFERENCE) ?? '')));
 
+        /* This is meant to be default behaviour, but it's broken in Learnosity
+         */
+        $currentStates = [
+            Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
+            Helper::LEARNOSITY_ITEM_STATUS_UNPUBLISHED
+        ];
+
         $activities = $api->dataGetRequest('/itembank/activities', [
             'references' => $activityReferences,
-            'status' => [
-                /* This is meant to be default behaviour, but it's broken in Learnosity
-                 */
-                Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
-                Helper::LEARNOSITY_ITEM_STATUS_UNPUBLISHED
-            ]
+            'status' => $currentStates
         ]);
+
+        /* No activities? No trabajo
+         */
+        if (!\count($activities['data'])) {
+            $this->getLogger()->info(sprintf(
+                'No Learnosity Activities in state [%s] found: nothing to do. Exiting',
+                implode(', ', $currentStates)
+            ));
+        }
 
         foreach ($activities['data'] as $activity) {
             $activityReference = $activity['reference'];
