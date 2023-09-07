@@ -123,7 +123,7 @@ const meta: Meta<typeof SearchPage> = {
             handlers: mswHandlers,
         },
     },
-    title: "Temp/SearchPage",
+    title: "Draft/SearchPage",
 };
 export default meta;
 type Story = StoryObj<typeof SearchPage>;

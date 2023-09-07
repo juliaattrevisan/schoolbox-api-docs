@@ -103,6 +103,7 @@ const meta: Meta<typeof DataTable> = {
         endpoint,
         columnsConfig,
         tableOptions,
+        id: "staff-directory",
     },
     component: DataTable,
     decorators: [

@@ -1,21 +1,21 @@
-import PopUp from "./pop-up.vue";
+import FlipUp from "./flip-up.vue";
 
 export default {
-    title: "Animations/Badge Awards/Pop Up",
-    component: PopUp,
+    title: "Animations/Celebrating Achievement/Badge Awards/Flip Up",
+    component: FlipUp,
     parameters: {
         docs: {
             description: {
-                component: "_Pop Up_ badge award animation",
+                component: "_Flip up_ badge award animation",
             },
         },
     },
 };
 
 const Template = (args, { argTypes }) => ({
-    components: { PopUp },
+    components: { FlipUp },
     template: `
-        <pop-up />
+        <flip-up />
         `,
 });
 

@@ -1,21 +1,21 @@
-import SwingDown from "./swing-down.vue";
+import SpinIn from "./spin-in.vue";
 
 export default {
-    title: "Animations/Badge Awards/Swing Down",
-    component: SwingDown,
+    title: "Animations/Celebrating Achievement/Badge Awards/Spin In",
+    component: SpinIn,
     parameters: {
         docs: {
             description: {
-                component: "_Swing Down_ badge award animation",
+                component: "_Spin In_ badge award animation",
             },
         },
     },
 };
 
 const Template = (args, { argTypes }) => ({
-    components: { SwingDown },
+    components: { SpinIn },
     template: `
-        <swing-down />
+        <spin-in />
         `,
 });
 

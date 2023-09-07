@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/addon-docs";
+import AtomicDesign from "../assets/atomic-design.jpg";
 
 <Meta title="Getting Started/Design Systems" />
 
@@ -29,18 +30,14 @@ Some of the benefits of a design system include:
 
 8. Onboarding and Training: New team members can quickly get up to speed by referencing the design system's documentation, guidelines, and components, promoting a smooth onboarding process.
 
-## The current landscape
-
-Our current 'Design System' rests solely within our in product [**Pantry**](https://demo.schoolbox.com.au/pantry).
-It's purely a collection of components that are used to build the UI of the product.
-It's not a design system in the true sense of the word.
-
 ## Moving Forward
 
 As a key principle of our Design System moving forward, we will be adopting the Atomic Design methodology.
 Atomic Design is a design methodology created by Brad Frost that helps designers and developers create scalable and maintainable user interfaces.
 It breaks down the UI into smaller, reusable components, making it easier to manage and design complex systems.
 Atomic Design consists of five distinct stages or levels, each with its own purpose:
+
+<img src={AtomicDesign} alt="Atomic design diagram" className="pantry" />
 
 1. Atoms: At the core of Atomic Design are atoms, which represent the basic building blocks of a design. These are the smallest, indivisible components, such as buttons, input fields, and icons. At this level, you define the most basic styling and functionality.
 
@@ -56,3 +53,14 @@ The key principles of Atomic Design include modularity, reusability, and consist
 By breaking down the design into these discrete levels, designers and developers can work more efficiently, ensure design consistency across a project, and make it easier to maintain and update the user interface as the project evolves.
 
 Overall, Atomic Design is a powerful framework that encourages a systematic approach to UI design and development, making it especially useful for creating scalable and consistent designs in the world of web and application development.
+
+To read more about Atomic Design, check out the [Atomic Design Handbook](https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/2052653067/Frontend) stored within our Frontend resources in Confluence.
+
+## Inspiration
+
+To get an idea of the kind of design system we'd like to aim for, here's a few examples:
+
+-   [Nord Design System](https://nordhealth.design/)
+-   [Lighting Design System](https://www.lightningdesignsystem.com/)
+-   [Atlassian Design System](https://atlassian.design/)
+-   [Palmetto Design System](https://ux.palmetto.com/?path=/story/about-introduction--page)

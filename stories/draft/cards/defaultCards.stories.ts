@@ -16,7 +16,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Components/Cards/Default",
+    title: "Draft/Cards/Default",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

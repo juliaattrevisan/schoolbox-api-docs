@@ -4,7 +4,7 @@
  */
 
 import { clearCanvas } from "@js/util/canvasUtils";
-import { init } from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/dropDown";
+import { init } from "../../../../library/Schoolbox/Learning/Badge/Award/js/animations/swingDown";
 
 export default {
     data() {
@@ -50,7 +50,7 @@ export default {
                 <canvas :width="canvasWidth" :height="canvasHeight" ref="awardCanvas"></canvas>
             </div>
             <div class="badge-img-container__foreground">
-                <img src="../../assets/badge-award-sample.svg" ref="badgeImage" alt="badge sample" />
+                <img src="badge-award-sample.svg" ref="badgeImage" alt="badge sample" />
             </div>
         </div>
         <button @click="animateBadgeImage">Replay</button>

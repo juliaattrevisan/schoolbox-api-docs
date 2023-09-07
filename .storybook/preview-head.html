@@ -1,0 +1,4 @@
+<!-- vendor.js has all plugins found in webpack.dev.js EXCEPT Vue, as Vue is contained within Storybook and keeping it in causes conflicts -->
+<script src="vendors.js"></script>
+<!-- main.js matches that found in webpack.common.js EXCEPT initWebComponents.ts and imageLightboxInit.ts to avoid web component / loading issues -->
+<script src="main.js"></script>

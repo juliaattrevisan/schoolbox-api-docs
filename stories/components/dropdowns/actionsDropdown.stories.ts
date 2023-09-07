@@ -22,13 +22,13 @@ export default meta;
 type Story = StoryObj<typeof WcActionsDropdown>;
 
 /**
- *
+ * Shows the dropdown sitting in different regions of the viewport, which will determine which direction the dropdown opens.
  */
 export const Default: Story = {
     render: () => ({
         components: { WcActionsDropdown },
         template: `
-            <div class="l-flex-col l-flex--justify-space" style="height: 600px;">
+            <div id="container" class="l-flex-col l-flex--justify-space" style="height: 600px;">
                 <div class="l-flex-row l-flex--justify-space">
                     <div content-id="dropdown-1">
                         <wc-actions-dropdown content-id="dropdown-1"></wc-actions-dropdown>

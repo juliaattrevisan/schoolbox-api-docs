@@ -1,21 +1,21 @@
-import CoinSpin from "./coin-spin.vue";
+import DropDown from "./drop-down.vue";
 
 export default {
-    title: "Animations/Badge Awards/Coin Spin",
-    component: CoinSpin,
+    title: "Animations/Celebrating Achievement/Badge Awards/Drop Down",
+    component: DropDown,
     parameters: {
         docs: {
             description: {
-                component: "_Coin Spin_ badge award animation",
+                component: "_Drop Down_ badge award animation",
             },
         },
     },
 };
 
 const Template = (args, { argTypes }) => ({
-    components: { CoinSpin },
+    components: { DropDown },
     template: `
-        <coin-spin />
+        <drop-down />
         `,
 });
 
