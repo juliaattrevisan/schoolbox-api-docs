@@ -15,6 +15,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Tile\Model as TileModel;
 use Schoolbox\Tile\Mapper as TileMapper;
+use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -33,11 +34,14 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param TileMapper $tileMapper Used to fetch tiles for hydration.
-     * @param Access     $access     Used to determine if the current user may view this page.
+     * @param TileMapper       $tileMapper       Used to fetch tiles for hydration.
+     * @param TileLayoutMapper $tileLayoutMapper Used to fetch tileLayouts to help with tile hydration.
+     * @param FolderMapper     $folderMapper     Used to fetch folders to help with tile hydration.
+     * @param Access           $access           Used to determine if the current user may view this page.
      */
     public function __construct(
         private TileMapper $tileMapper,
+        private TileLayoutMapper $tileLayoutMapper,
         private FolderMapper $folderMapper,
         private Access $access,
     ) {
@@ -72,7 +76,12 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($tiles, $viewer) {
                 $tile = $tiles->getBy('id', $match->id);
                 if ($tile instanceof TileModel) {
-                    // TODO: Get $folderId somehow.
+                    try {
+                        $tileLayout = $this->tileLayoutMapper->findById($tile->getTileLayout()->getId());
+                        $folderId = $tileLayout->getFolder()->getId();
+                    } catch (MapperException $e) {
+                        $folderId = null;
+                    }
 
                     if ($folderId === null) {
                         // This tile is not linked to a folder, so it is of no interest.
