@@ -14,6 +14,7 @@ use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;
 use Schoolbox\MultiInstance\ConfigRepository;
 use Schoolbox\MultiInstance\ConnectorRepository;
+use Schoolbox\MultiInstance\RedisClientRepository;
 use Schoolbox\Realtime\SessionException;
 use SensitiveParameter;
 use UnexpectedValueException;
@@ -33,19 +34,19 @@ class SessionValidator
     /**
      * Constructor
      *
-     * @param ClientInterface     $redis               Redis instance which contains session data.
-     *                                                 (This should be the same for all instances served by this node:
-     *                                                 if not, a repository will be required.)
-     * @param HandlerInterface    $handler             Session serialization handler: required for decoding session data
-     *                                                 without actually creating the session.
-     * @param ConnectorRepository $connectorRepository Repository for database connections for all instances served by
-     *                                                 this node: required for converting a username to a user ID for a
-     *                                                 given instance.
-     * @param ConfigRepository    $configRepository    Repository for configs for all instances served by this node:
-     *                                                 required in order to determine each node's session expiry time.
+     * @param RedisClientRepository $redisClientRepository Repository for Redis clients for all instances served by this
+     *                                                     node.
+     * @param HandlerInterface      $handler               Session serialization handler: required for decoding session
+     *                                                     data without actually creating the session.
+     * @param ConnectorRepository   $connectorRepository   Repository for database connections for all instances served
+     *                                                     by this node: required for converting a username to a user ID
+     *                                                     for a given instance.
+     * @param ConfigRepository      $configRepository      Repository for configs for all instances served by this node:
+     *                                                     required in order to determine each node's session expiry
+     *                                                     time.
      */
     public function __construct(
-        private ClientInterface $redis,
+        private RedisClientRepository $redisClientRepository,
         private HandlerInterface $handler,
         private ConnectorRepository $connectorRepository,
         private ConfigRepository $configRepository,
@@ -64,7 +65,7 @@ class SessionValidator
      */
     public function findUserIdByRememberMe(string $instanceId, string $rememberMe): int
     {
-        $username = $this->findData($rememberMe, 'remember-me token', '');
+        $username = $this->findData($instanceId, $rememberMe, 'remember-me token', '');
 
         if (!isset($this->userIdCache[$instanceId][$username])) {
             // Not in cache: query database
@@ -97,7 +98,7 @@ class SessionValidator
     {
         try {
             $session = $this->handler->unserialize(
-                $this->findData($sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX_BASE . $instanceId . ':')
+                $this->findData($instanceId, $sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX_BASE . $instanceId . ':')
             );
         } catch (UnexpectedValueException $e) {
             throw new SessionException('Could not decode session', 0, $e);
@@ -121,6 +122,7 @@ class SessionValidator
     /**
      * Find data in Redis.
      *
+     * @param string $instanceId
      * @param string $token
      * @param string $label
      * @param string $prefix
@@ -129,14 +131,18 @@ class SessionValidator
      * @throws CommunicationException if Redis could not be communicated with
      * @noinspection PhpDocRedundantThrowsInspection
      */
-    private function findData(#[SensitiveParameter] string $token, string $label, string $prefix): string
-    {
+    private function findData(
+        string $instanceId,
+        #[SensitiveParameter] string $token,
+        string $label,
+        string $prefix,
+    ): string {
         if (!$token) {
             throw new SessionException("No $label provided on which to search.");
         }
 
         // this has the potential to throw CommunicationException?
-        $redisResponse = $this->redis->get($prefix . $token);
+        $redisResponse = $this->redisClientRepository->fetchStorageClientForInstance($instanceId)->get($prefix . $token);
         if (!isset($redisResponse)) {
             throw new SessionException("No session found for given $label.");
         }

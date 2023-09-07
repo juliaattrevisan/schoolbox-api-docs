@@ -46,6 +46,7 @@ class PipeManagerFactory
         private MultiInstance\InstanceRepository $instanceRepository,
         private MultiInstance\ConfigRepository $configRepository,
         private MultiInstance\ConnectorRepository $connectorRepository,
+        private MultiInstance\RedisClientRepository $redisClientRepository,
         private DispatchStrategyInterface $strat,
         private int $fdLimit,
     ) {
@@ -59,7 +60,7 @@ class PipeManagerFactory
     {
         // Requires multi-instance version
         $validator   = new SessionValidator(
-            $this->redis,
+            $this->redisClientRepository,
             $this->handler,
             $this->connectorRepository,
             $this->configRepository,

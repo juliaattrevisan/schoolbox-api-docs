@@ -451,7 +451,7 @@ EOL;
                 MultiInstance\RedisClientRepository::class,
                 [
                     'configRepository' => $di->lazyGet('multiInstance.configRepository'),
-                    'loop'             => $this->loop,
+                    'loop'             => $di->lazy(fn () => $this->loop),
                 ],
             )
         );

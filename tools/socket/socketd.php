@@ -37,6 +37,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     // Can it be assumed the Redis instance is the same for all instances?
     $redis = Redis::getStorageClientInstance();
+    // Need the multi-instance Redis repository
+    /** @var MultiInstance\RedisClientRepository $redisClientRepository */
+    $redisClientRepository = $di->get('multiInstance.redisClientRepository');
 
     // Need the multi-instance repository
     /** @var MultiInstance\InstanceRepository $instanceRepository */
@@ -70,6 +73,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $instanceRepository,
         $configRepository,
         $connectorRepository,
+        $redisClientRepository,
         $stratBuilder->build($flags),
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
     ))->build();
