@@ -25,6 +25,18 @@ class Model implements ISoftDeletable
     private HomepageTemplate $unitTemplate;
 
     /**
+     * Should newly created courses inherit folder perms from the parent?
+     * @var bool
+     */
+    private bool $courseInherit;
+
+    /**
+     * Should newly created units inherit folder perms from the parent course?
+     * @var bool
+     */
+    private bool $unitInherit;
+
+    /**
      * @return string
      */
     public function getName(): string
@@ -79,4 +91,39 @@ class Model implements ISoftDeletable
         return $this->unitTemplate;
     }
 
+    /**
+     * @param bool $courseInherit
+     * @return self
+     */
+    public function setCourseInherit(bool $courseInherit): self
+    {
+        $this->courseInherit = $courseInherit;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCourseInherit(): bool
+    {
+        return $this->courseInherit;
+    }
+
+    /**
+     * @param bool $unitInherit
+     * @return Model
+     */
+    public function setUnitInherit(bool $unitInherit): self
+    {
+        $this->unitInherit = $unitInherit;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUnitInherit(): bool
+    {
+        return $this->unitInherit;
+    }
 }
