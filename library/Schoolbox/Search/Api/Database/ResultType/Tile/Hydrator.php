@@ -71,17 +71,17 @@ class Hydrator extends BaseHydrator
         // Find the matching tiles.
         $tiles = $this->tileMapper->findByColumn('id', $ids);
 
+        // Get tileLayouts, indexed by tileLayoutId.  This is necessary because tileLayout info is not hydrated in $tiles.
+        // By getting this info here we avoid having to run many queries inside the loop.
+        $tileLayoutById = $this->tileLayoutMapper->findByColumn('id', $tiles->map(fn ($tile) => $tile->getTileLayout()->getId()));
+
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($tiles, $viewer) {
+            function (RawResult $match) use ($tiles, $viewer, $tileLayoutById) {
                 $tile = $tiles->getBy('id', $match->id);
                 if ($tile instanceof TileModel) {
-                    try {
-                        $tileLayout = $this->tileLayoutMapper->findById($tile->getTileLayout()->getId());
-                        $folderId = $tileLayout->getFolder()->getId();
-                    } catch (MapperException $e) {
-                        $folderId = null;
-                    }
+                    $tileLayout = $tileLayoutById[$tile->getTileLayout()->getId()];
+                    $folderId = $tileLayout->getFolder()->getId();
 
                     if ($folderId === null) {
                         // This tile is not linked to a folder, so it is of no interest.
