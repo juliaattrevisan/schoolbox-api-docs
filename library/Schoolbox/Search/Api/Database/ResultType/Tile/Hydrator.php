@@ -72,19 +72,21 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($tiles, $viewer) {
                 $tile = $tiles->getBy('id', $match->id);
                 if ($tile instanceof TileModel) {
-                    if ($match->folderId === null) {
+                    // TODO: Get $folderId somehow.
+
+                    if ($folderId === null) {
                         // This tile is not linked to a folder, so it is of no interest.
                         return null;
                     }
 
                     try {
                         // Check if the user has access to the tile's folder.
-                        $tileAccess = $this->access->getFolderAccess($viewer, $match->folderId);
+                        $tileAccess = $this->access->getFolderAccess($viewer, $folderId);
                         if ($tileAccess < UserAccess::ACCESS_READ) {
                             return null;
                         }
 
-                        $tileFolder = $this->folderMapper->findById($match->folderId);
+                        $tileFolder = $this->folderMapper->findById($folderId);
                     } catch (MapperException $e) {
                         // Tile folder could not be found for some reason.
                         // This is a slightly different situation to situation where tile is not linked to folder.

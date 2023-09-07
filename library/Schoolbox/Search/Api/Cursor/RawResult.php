@@ -32,7 +32,6 @@ class RawResult
         public string $title,
         public string $type,
         public float $relevance,
-        public ?int $folderId
     ) {
     }
 }

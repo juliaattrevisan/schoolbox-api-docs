@@ -87,7 +87,6 @@ class AggregateSource implements ISource
                 $row['title'],
                 $row['type'],
                 (float)$row['relevance'],
-                (($row['folderId'] === null) ? null : (int)$row['folderId'])
             );
         }
 

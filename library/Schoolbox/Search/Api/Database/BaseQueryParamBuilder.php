@@ -116,8 +116,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $idPart        AS id,
                 $titlePart     AS title,
                 $typePart      AS type,
-                $relevancePart AS relevance,
-                " . (($folderPart === null) ? "NULL" : $folderPart) . " AS folderId
+                $relevancePart AS relevance
             $from
             WHERE $where";
 

@@ -115,7 +115,6 @@ class Controller extends Base
                             $result->folder->getTitle(),
                             $folderResultType,
                             $result->relevance,
-                            $result->folder->getParent()?->getId()
                         );
                         [$folderResult] = $this->hydrator->hydrate(
                             $keyword,
