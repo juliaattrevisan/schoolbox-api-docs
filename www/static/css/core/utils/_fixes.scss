@@ -33,3 +33,10 @@
 .f-min-btn-height {
     min-height: 44px;
 }
+
+// to properly center icons in buttons
+// won't be required when we update to svg icons and udpate the button component
+.f-center-icon {
+    display: flex !important;
+    align-items: center !important;
+}
