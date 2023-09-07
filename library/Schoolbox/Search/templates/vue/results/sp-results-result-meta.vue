@@ -52,6 +52,7 @@ function getDateLong() {
         {{ getDateShort() }}</span
     >
     <span v-else-if="props.result.type === ResultTypes.EVENT" class="meta"> {{ getDateLong() }}</span>
+    <span v-else class="meta">{{ props.result.meta }}</span>
 </template>
 
 <style scoped></style>

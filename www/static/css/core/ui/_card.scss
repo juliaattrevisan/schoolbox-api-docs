@@ -2,6 +2,11 @@
     Styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
 */
 
+:root {
+    --alt-foreground-colour: #f9f9f9;
+    --border-colour: #aaaaaa;
+}
+
 .c-card {
     background-color: var(--foreground-colour);
     border-radius: var(--roundness-cards);
@@ -33,7 +38,8 @@
 
     // Add inline (default left) border and grey background to card.
     &--child {
-        border-inline-start: var(--spacing-s) solid #aaaaaa;
+        background-color: var(--alt-foreground-colour);
+        border-inline-start: var(--spacing-s) solid var(---border-colour);
     }
 
     // When we want the whole card to be selectable
@@ -100,10 +106,10 @@
     }
 
     &--border-end {
-        border-block-end: 1px solid rgba(0, 0, 0, 0.2);
+        border-block-end: 1px solid var(---border-colour);
     }
 
     &--alt-bkg {
-        background-color: #f6f6f6;
+        background-color: var(--alt-foreground-colour);
     }
 }

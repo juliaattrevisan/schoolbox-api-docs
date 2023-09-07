@@ -18,8 +18,8 @@ const props = defineProps<Props>();
 
 <template>
     <div :class="`c-card c-card--child ${!props.isLast ? `c-card--border-end` : ''}`">
-        <div class="l-flex-col l-gap-s l-pad-s">
-            <div class="l-flex-row l-gap-s l-pad-s">
+        <div class="l-flex-col l-gap-s l-pad-m">
+            <div class="l-flex-row l-gap-s">
                 <sp-results-result-image :result="props.subResult" :is-sub-result="true" />
                 <div class="l-flex-col l-flex--justify-center f-no-margins">
                     <sp-results-result-title :result="props.subResult" :is-sub-result="true" />
