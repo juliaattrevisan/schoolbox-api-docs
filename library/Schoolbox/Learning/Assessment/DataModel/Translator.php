@@ -136,7 +136,6 @@ class Translator
          * and just translate this $domainObject like we wanted
          */
         $this->translateToDataModelRecursive($domainObject);
-
         // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->dataModelCache[spl_object_hash($domainObject)];
     }
