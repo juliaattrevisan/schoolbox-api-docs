@@ -60,10 +60,10 @@ class NewsCreateCest
                 $i->sendGet('/news/' . $articleId);
                 $schemaFile = '/tmp/schoolbox-api-docs/openapi/components/schemas/news/commonFields.yaml';
                 if (file_exists($schemaFile)) {
-                    $schema   = Yaml::parseFile($schemaFile);
+                    $schema         = Yaml::parseFile($schemaFile);
                     $responseSchema = Yaml::parseFile('/tmp/schoolbox-api-docs/openapi/paths/news@{id}.yaml');
 
-                    $props2= $responseSchema['get']['responses']['200']['content']['application/json']['schema']['properties']['article']['allOf'][1];
+                    $props2 = $responseSchema['get']['responses']['200']['content']['application/json']['schema']['properties']['article']['allOf'][1];
                     $schema = array_merge_recursive($schema, $props2);
                     // TODO: codecept doesn't seem to be detecting type of _links properly
                     unset($schema['properties']['featureImage']['properties']['_links']['type']);
