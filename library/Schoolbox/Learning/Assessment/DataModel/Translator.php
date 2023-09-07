@@ -130,6 +130,11 @@ class Translator
         // This means we can always iterate a project's subAssessments in order(N) time.
         $rootAssessable = $domainObject;
         $levelsClimbed  = 0;
+        print_r(sprintf(
+            "translateToDataModel: %s %s\n",
+            $domainObject->getId(),
+            $domainObject->getTitle()
+        ));
         while ($rootAssessable->getContext() instanceof Project) {
             $levelsClimbed++;
             if ($levelsClimbed > $this->maxProjectLevels) {
@@ -137,6 +142,12 @@ class Translator
             }
             $rootAssessable = $rootAssessable->getContext();
         }
+
+        print_r(sprintf(
+            "rootAssessable->getContext: %s %s\n",
+            $rootAssessable->getId(),
+            $rootAssessable->getTitle()
+        ));
         $this->translateToDataModelRecursive($rootAssessable);
         // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->dataModelCache[spl_object_hash($domainObject)];
@@ -251,6 +262,12 @@ class Translator
             $this->checkProjectNestingLevel($depth);
         }
 
+        print_r(sprintf(
+            "translateToDataModelRecursive %s %s\n",
+            $domainObject->getId(),
+            $domainObject->getTitle()
+        ));
+
         // Attempt to translate assessments using the sub-translators
         $subTranslator = $this->getSubTranslatorDomain($domainObject);
         // TODO figure out which fields on assessable sub-objects are now redundant
@@ -318,7 +335,13 @@ class Translator
             if (!$dataModel->getAssessments()) {
                 $dataModel->setAssessments(new GenericCollection(AssessmentModel::class));
             }
+
             foreach ($domainObject->getAssessables() as $idx => $domainChild) {
+                print_r(sprintf(
+                    "domainChild: %s %s\n",
+                    $domainChild->getId(),
+                    $domainChild->getTitle()
+                ));
                 $subAssessmentModel = $this->translateToDataModelRecursive($domainChild, $depth + 1)->getAssessmentModel();
                 $subAssessmentModel->setContextProject($dataModel);
                 $dataModel->getAssessments()[$idx] = $subAssessmentModel;
