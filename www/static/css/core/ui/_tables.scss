@@ -569,6 +569,11 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         font-weight: normal;
         padding-left: 2rem;
     }
+    .capability :last-child,
+    .indicator :last-child {
+        /** Remove unsightly margin from bottom of capability/indicator **/
+        margin-bottom: 0;
+    }
 
     .mark {
         white-space: nowrap;
