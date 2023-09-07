@@ -23,9 +23,6 @@ class Search implements ModuleConfigInterface
      */
     public function configure(ContainerInterface $di): void
     {
-        $module = new Mock\Module($di);
-        $module->registerModule('/searchv2');
-
         $module = new Api\Module($di);
         $module->registerModule('/api/search');
 
