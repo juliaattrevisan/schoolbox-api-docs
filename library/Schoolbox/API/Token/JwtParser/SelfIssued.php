@@ -98,7 +98,7 @@ class SelfIssued extends Base
             );
         }
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
-            $_SESSION[self::CUSTOM_CLAIM_TASKD] = true;
+            $this->bypassIpTracking = true;
         }
 
         return $user;

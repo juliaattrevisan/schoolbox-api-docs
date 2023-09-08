@@ -35,6 +35,11 @@ abstract class Base implements IParser
     private array $decodeHeadersResults;
 
     /**
+     * @see IParser::bypassIpTracking()
+     */
+    public bool $bypassIpTracking = false;
+
+    /**
      * Decodes a JWT, and verifies that the JWT has been signed appropriately
      * and not tampered with.
      *
@@ -128,5 +133,13 @@ abstract class Base implements IParser
             }
         }
         return $this->decodeHeadersResults[$jwt];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bypassIpTracking(): bool
+    {
+        return $this->bypassIpTracking;
     }
 }

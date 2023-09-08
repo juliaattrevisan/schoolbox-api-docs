@@ -338,7 +338,7 @@ class SitePage
         $sessionUser       = $_SESSION['user'] ?? null;
         $sessionExpired    = !isset($_SESSION['lasttime'])
             || (int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time();
-        $sessionIpMismatch = $this->config->get('track_ip') && !isset($_SESSION[SelfIssued::CUSTOM_CLAIM_TASKD]) && ($_SESSION['ip'] ?? '') !== Session::getIP();
+        $sessionIpMismatch = !($_SESSION[Session::BYPASS_IP_TRACKING] ?? false) && $this->config->get('track_ip') && ($_SESSION['ip'] ?? '') !== Session::getIP();
         if (!$sessionUser instanceof User || $sessionExpired || $sessionIpMismatch) {
             // Catch users with the remember me cookie
             if ($this->config->get('session_remember')) {

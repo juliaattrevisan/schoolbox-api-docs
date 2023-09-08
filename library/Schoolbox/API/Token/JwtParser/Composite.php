@@ -28,6 +28,11 @@ class Composite implements IParser
     private array $parsers;
 
     /**
+     * @see IParser::bypassIpTracking()
+     */
+    public bool $bypassIpTracking = false;
+
+    /**
      * Constructor
      *
      * @param IParser ...$parsers
@@ -57,9 +62,19 @@ class Composite implements IParser
     {
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($jwt)) {
-                return $parser->determineUser($jwt);
+                $user = $parser->determineUser($jwt);
+                $this->bypassIpTracking = $parser->bypassIpTracking();
+                return $user;
             }
         }
         throw new NotFound();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bypassIpTracking(): bool
+    {
+        return $this->bypassIpTracking;
     }
 }
