@@ -11,7 +11,10 @@ interface Props {
     initialInput?: string; // to prefill the input
     isActiveWhenEmpty?: boolean; // can be selected while the input is empty
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    initialInput: "",
+    isActiveWhenEmpty: true,
+});
 
 const emit = defineEmits<{
     input: [value: string];

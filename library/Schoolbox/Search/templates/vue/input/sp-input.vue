@@ -32,14 +32,12 @@ async function onSearch() {
 <template>
     <form role="search" aria-label="Sitewide" @submit.prevent="onSearch">
         <search-input
-            :is-active="true"
+            :initial-input="queryStore.query"
             :is-active-when-empty="true"
             @input="onInput"
             @key-enter="onSearch"
             @click="onSearch"
         />
-        <!-- <input v-model="queryStore.query" type="text" /> -->
-        <!-- <button type="submit">Search</button> -->
     </form>
 </template>
 
