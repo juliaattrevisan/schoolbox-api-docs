@@ -64,14 +64,13 @@ class Authenticator
      *
      * @param string                $username
      * @param User\Token\Model|null $userToken
+     * @param bool|null             $bypassIpTracking
      * @return bool
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws SchoolboxNotAuthenticatedException if session couldn't be created
      */
-    public function createSession(string $username, ?User\Token\Model $userToken = null): bool
+    public function createSession(string $username, ?User\Token\Model $userToken = null, ?bool $bypassIpTracking = false): bool
     {
         $session = new Session();
-        if (!$session->create($username, $userToken?->getJwtId())) {
+        if (!$session->create($username, $userToken?->getJwtId(), $bypassIpTracking)) {
             throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
         }
 

@@ -294,7 +294,7 @@ class Controller extends Base
     private function authenticateViaJwt(#[SensitiveParameter] string $jwt): User
     {
         $user = $this->jwtParser->determineUser($jwt);
-        $this->auth->createSession($user->getUsername());
+        $this->auth->createSession($user->getUsername(), null, $this->jwtParser->bypassIpTracking());
         return $user;
     }
 

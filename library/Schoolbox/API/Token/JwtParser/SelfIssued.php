@@ -24,6 +24,8 @@ use SensitiveParameter;
  */
 class SelfIssued extends Base
 {
+    public const CUSTOM_CLAIM_TASKD = self::CUSTOM_CLAIM_NAMESPACE . 'taskd';
+
     /**
      * Constructor
      *
@@ -95,6 +97,10 @@ class SelfIssued extends Base
                 sprintf('JWT "%s" claim matches a deactivated user', self::CLAIM_SUB)
             );
         }
+        if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
+            $this->bypassIpTracking = true;
+        }
+
         return $user;
     }
 

@@ -13,7 +13,6 @@ use Firebase\JWT\JWK;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
-use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\Exception\Rejected;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;

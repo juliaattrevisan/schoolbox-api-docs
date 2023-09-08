@@ -7,6 +7,7 @@
 
 use League\Flysystem\FilesystemException;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\API\Token\JwtParser\SelfIssued;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -28,6 +29,11 @@ class Session
      * @var bool
      */
     private $useLoginLog = true;
+
+    /**
+     * If this is set to true in $_SESSION, track_ip check will be bypassed
+     */
+    public const BYPASS_IP_TRACKING = 'bypass_ip_tracking';
 
     /**
      * Is this a valid session ID? If not, this session should be thrown out
@@ -74,10 +80,10 @@ class Session
      *
      * @param string      $username New user's user.username
      * @param string|null $jwtId
+     * @param bool|null   $bypassIpTracking
      * @return bool Whether new Session started for proposed user
-     * @throws MapperException
      */
-    public function create(string $username, ?string $jwtId = null): bool
+    public function create(string $username, ?string $jwtId = null, ?bool $bypassIpTracking = false): bool
     {
         $userMapper   = UserMapper::getInstance();
         $groupHandler = new Group();
@@ -112,6 +118,9 @@ class Session
             // however, this survives user authentication and re-authentication
             $sessionIdentifier ??= Uuid::uuid4()->__toString();
             $_SESSION['identifier'] = $sessionIdentifier;
+            if ($bypassIpTracking) {
+                $_SESSION[self::BYPASS_IP_TRACKING] = true;
+            }
 
             // add mobile session data
             $sbmAuth = new Authenticator();

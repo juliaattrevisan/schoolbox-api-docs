@@ -11,6 +11,7 @@ namespace Schoolbox\TaskDaemon\Request\DownloadPages;
 
 use Alaress_Date_Format;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\API\Token\JwtParser\SelfIssued;
 use Schoolbox\Instance;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\User;
@@ -240,7 +241,7 @@ class MessageFactory
             'content'   => $this->content,
             'gotenberg' => null,
         ];
-        $token = $this->effector ? $this->tokenBuilder->generate($this->effector) : null;
+        $token = $this->effector ? $this->tokenBuilder->generate($this->effector, null, null, [SelfIssued::CUSTOM_CLAIM_TASKD => 1]) : null;
         if (isset($token)) {
             $params['token'] = $token;
         }

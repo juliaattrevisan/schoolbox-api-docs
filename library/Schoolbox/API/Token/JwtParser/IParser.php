@@ -134,4 +134,11 @@ interface IParser
      * @throws Exception\InvalidIdentity if the JWT is accepted, but does not identify a valid user.
      */
     public function determineUser(#[SensitiveParameter] string $jwt): User;
+
+    /**
+     * Whether the request can bypass IP check requested by the track_ip config
+     * When JWT contains a claim from taskd request, this will be set to true
+     * @return bool
+     */
+    public function bypassIpTracking(): bool;
 }
