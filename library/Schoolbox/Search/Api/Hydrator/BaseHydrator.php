@@ -31,7 +31,6 @@ abstract class BaseHydrator implements IHydrator
      */
     public const ENCODING = 'UTF-8';
 
-
     /**
      * This hydrator accepts any raw result whose:
      * * type matches `$this->getBaseType()`
