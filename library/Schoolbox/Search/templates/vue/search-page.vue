@@ -26,6 +26,16 @@ useStore().init(props.endpoint, props.filterTypes);
 
 const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
+
+/**
+ * start a search straight away if a keyword has been passed through
+ */
+window.Vue.onMounted(async () => {
+    const searchParams = new URLSearchParams(document.location.search);
+    if (searchParams.has("keyword")) {
+        await searchStore.search();
+    }
+});
 </script>
 
 <template>
