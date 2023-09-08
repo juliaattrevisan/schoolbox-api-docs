@@ -54,7 +54,7 @@ function onSelected() {
     border-right: 1px solid var(--form-border-color);
     display: flex;
     font-size: 0.825rem;
-    padding: var(--whitespace-s);
+    padding: var(--spacing-s);
     transition: background 0.2s;
     width: 100%;
     &:hover {

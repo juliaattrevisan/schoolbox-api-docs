@@ -77,7 +77,7 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
 
     @each $size in $global-sizes {
         &-gap--#{$size} {
-            grid-gap: var(--whitespace-#{$size});
+            grid-gap: var(--spacing-#{$size});
         }
     }
 

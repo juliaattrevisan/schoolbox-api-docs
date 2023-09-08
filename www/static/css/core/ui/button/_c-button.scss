@@ -33,12 +33,12 @@ button.c-button {
     border-radius: var(--roundness-interactibles);
     color: var(--content-ui-foreground);
     display: inline-flex;
-    gap: var(--whitespace-xs);
+    gap: var(--spacing-xs);
     justify-content: center;
     line-height: 1.1;
     min-height: 3rem;
     min-width: 5rem;
-    padding: var(--whitespace-xs) var(--whitespace-m);
+    padding: var(--spacing-xs) var(--spacing-m);
     text-align: center;
     transition: 200ms all ease-out;
 
@@ -90,7 +90,7 @@ button.c-button {
     &--icon-only {
         height: 3rem;
         min-width: auto;
-        padding: var(--whitespace-xs);
+        padding: var(--spacing-xs);
         width: 3rem;
         &__icon {
             width: 100%;

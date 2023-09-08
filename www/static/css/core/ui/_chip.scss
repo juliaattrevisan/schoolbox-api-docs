@@ -32,7 +32,7 @@
             .c-chip__icon {
                 &::before {
                     display: inline-block;
-                    margin-inline-end: var(--whitespace-xs);
+                    margin-inline-end: var(--spacing-xs);
                 }
 
                 &::after {
@@ -59,14 +59,14 @@
             flex-direction: row-reverse;
             font-weight: 400;
             margin: 0;
-            padding-block: var(--whitespace-xs);
-            padding-inline: var(--whitespace-m);
+            padding-block: var(--spacing-xs);
+            padding-inline: var(--spacing-m);
             user-select: none;
 
             .c-chip__icon {
                 color: var(--content-ui-foreground-contrast);
                 line-height: normal;
-                margin-inline-end: var(--whitespace-s);
+                margin-inline-end: var(--spacing-s);
 
                 &::before {
                     display: none;
@@ -80,11 +80,11 @@
                     border-radius: 2048px;
                     content: "";
                     display: flex;
-                    height: var(--whitespace-xs);
-                    margin-inline-end: var(--whitespace-s);
-                    margin-inline-start: var(--whitespace-xs);
+                    height: var(--spacing-xs);
+                    margin-inline-end: var(--spacing-s);
+                    margin-inline-start: var(--spacing-xs);
                     opacity: 0.5;
-                    width: var(--whitespace-xs);
+                    width: var(--spacing-xs);
                 }
             }
         }

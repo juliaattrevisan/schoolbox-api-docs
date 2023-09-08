@@ -81,7 +81,7 @@
                     icon use full space minus 1rem, which should be 16px, allowing 8px of space around it.
                 */
                 .icon:before {
-                    font-size: calc(var(--image-size-#{$size}) - var(--whitespace-m));
+                    font-size: calc(var(--image-size-#{$size}) - var(--spacing-m));
                 }
             }
         }
@@ -113,17 +113,17 @@
     &--round {
         //Apply to default sizes
         &.c-img .c-img__wrapper {
-            flex: 1 calc(var(--image-size-m) - var(--whitespace-xs));
-            max-height: calc(var(--image-size-m) - var(--whitespace-xs));
-            max-width: calc(var(--image-size-m) - var(--whitespace-xs));
+            flex: 1 calc(var(--image-size-m) - var(--spacing-xs));
+            max-height: calc(var(--image-size-m) - var(--spacing-xs));
+            max-width: calc(var(--image-size-m) - var(--spacing-xs));
         }
 
         @each $size in $global-image-sizes {
             &.c-img--#{$size} {
                 .c-img__wrapper {
-                    flex: 1 calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                    max-height: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
-                    max-width: calc(var(--image-size-#{$size}) - var(--whitespace-xs));
+                    flex: 1 calc(var(--image-size-#{$size}) - var(--spacing-xs));
+                    max-height: calc(var(--image-size-#{$size}) - var(--spacing-xs));
+                    max-width: calc(var(--image-size-#{$size}) - var(--spacing-xs));
                 }
 
                 .c-img__initials {

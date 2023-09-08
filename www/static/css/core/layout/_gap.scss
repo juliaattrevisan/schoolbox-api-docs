@@ -7,6 +7,6 @@
 
 @each $size in $global-sizes {
     .l-gap-#{$size} {
-        gap: var(--whitespace-#{$size});
+        gap: var(--spacing-#{$size});
     }
 }

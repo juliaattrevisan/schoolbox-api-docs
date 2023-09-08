@@ -1,16 +1,25 @@
 <style>
 
-table.docblock-argstable {
-    background: none;
-    border: none;
+/**
+ * These styles overwrite the heavy handed table styles in our core.css file,
+ * so the tables display better in the Storybook docs using the dark theme
+ */
+#storybook-docs table,
+ table.docblock-argstable {
+    background: none !important;
+    border: none !important;
 }
 
+#storybook-docs table thead,
 table.docblock-argstable thead {
-    background: none;
+    background: none !important;
 }
 
-table.docblock-argstable tr th, table tr td {
-    color: #C9CDCF;
+#storybook-docs table thead tr th,
+#storybook-docs table thead tr td,
+table.docblock-argstable tr th,
+table tr td {
+    color: #C9CDCF !important;
 }
 
 /**

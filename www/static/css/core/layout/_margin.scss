@@ -8,32 +8,32 @@
 .l-mar {
     @each $size in $global-sizes {
         &-#{$size} {
-            margin: var(--whitespace-#{$size});
+            margin: var(--spacing-#{$size});
 
             &--horiz {
-                margin-inline-end: var(--whitespace-#{$size});
-                margin-inline-start: var(--whitespace-#{$size});
+                margin-inline-end: var(--spacing-#{$size});
+                margin-inline-start: var(--spacing-#{$size});
             }
 
             &--vert {
-                margin-block-end: var(--whitespace-#{$size});
-                margin-block-start: var(--whitespace-#{$size});
+                margin-block-end: var(--spacing-#{$size});
+                margin-block-start: var(--spacing-#{$size});
             }
 
             &--top {
-                margin-block-start: var(--whitespace-#{$size});
+                margin-block-start: var(--spacing-#{$size});
             }
 
             &--bottom {
-                margin-block-end: var(--whitespace-#{$size});
+                margin-block-end: var(--spacing-#{$size});
             }
 
             &--left {
-                margin-inline-start: var(--whitespace-#{$size});
+                margin-inline-start: var(--spacing-#{$size});
             }
 
             &--right {
-                margin-inline-end: var(--whitespace-#{$size});
+                margin-inline-end: var(--spacing-#{$size});
             }
         }
     }

@@ -10,11 +10,11 @@ By abstracting design decisions into tokens, design systems become more flexible
 
 ## Colours
 
-_coming soon_
+_Draft_
 
 ## Typography
 
-_coming soon_
+_Draft_
 
 ## Spacing
 
@@ -23,14 +23,18 @@ These values are based on the [8-point grid system](https://spec.fm/specifics/8-
 As the default root text size is `16px`, `1rem` is equivalent to `16px`.
 These values are to be used for all spacing needs, including `margin`, `padding`, and `gap`.
 
-```
---whitespace-xs: 0.25rem;
---whitespace-s: 0.5rem;
---whitespace-m: 1rem;
---whitespace-l: 1.5rem;
---whitespace-xl: 2rem;
-```
+| Property   | Value     | Description         | CSS Custom Property |
+| ---------- | --------- | ------------------- | ------------------- |
+| spacing-xs | `0.25rem` | Extra Small Spacing | `var(--spacing-xs)` |
+| spacing-s  | `0.5rem`  | Small Spacing       | `var(--spacing-xs)` |
+| spacing-m  | `1rem`    | Medium Spacing      | `var(--spacing-m)`  |
+| spacing-l  | `1.5rem`  | Large Spacing       | `var(--spacing-l)`  |
+| spacing-xl | `2rem`    | Extra Large Spacing | `var(--spacing-xl)` |
 
-## Depth (z-index)
+## Depth _(z-index)_
 
-_coming soon_
+_Draft_
+
+| Property    | Value | Description | CSS Custom Property  | Example                                        |
+| ----------- | ----- | ----------- | -------------------- | ---------------------------------------------- |
+| depth-modal | `40`  | For modals  | `var(--depth-modal)` | ![depth modal example](/depth/depth-modal.jpg) |
