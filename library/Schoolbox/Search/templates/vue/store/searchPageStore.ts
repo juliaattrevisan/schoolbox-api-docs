@@ -11,23 +11,11 @@ export const useStore = defineStore("searchPage", () => {
     let endpoint = ""; // the endpoint to use for searching
 
     /**
-     * When switching between stories, we need to reset the data models
-     * as they persist between the stories otherwise
-     */
-    function checkForStorybook() {
-        if (typeof window.STORYBOOK_ENV !== "undefined") {
-            // useViewNodesStore().$reset();
-            // useActiveNodeStore().$reset();
-        }
-    }
-
-    /**
      * store any passed through properties
      * @param {string} $endpoint - the search api url
      * @param {FilterType[]} $filterTypes - the filter types
      */
     function init($endpoint: string, $filterTypes: FilterType[]) {
-        checkForStorybook();
         endpoint = $endpoint;
         useFilterTypesStore().allTypes = $filterTypes;
     }
