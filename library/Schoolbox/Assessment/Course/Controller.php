@@ -83,7 +83,7 @@ class Controller extends Base\Base
         private UserAccessMapper $userAccessMapper,
         private AssessmentMapper $assessmentMapper,
         private CurriculumNodeMapper $curriculumNodeMapper,
-        private CourseTemplateMapper $courseTemplateMapper
+        private CourseTemplateMapper $courseTemplateMapper,
     ) {
     }
 
@@ -222,6 +222,13 @@ class Controller extends Base\Base
                 $course = $deletedCourse->setDeletedAt(null);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $course = $this->courseSpecificationMapper->createModel();
+                // give the course the default template of initial `1: Default` or if that doesn't exist, the first non deleted entry...
+                try {
+                    $template = $this->courseTemplateMapper->findById(CourseTemplateMapper::INITIAL_DEFAULT);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $template = $this->courseTemplateMapper->findAll()->first();
+                }
+                $course->setTemplate($template);
             }
             $course->setFolder($courseFolder);
         }

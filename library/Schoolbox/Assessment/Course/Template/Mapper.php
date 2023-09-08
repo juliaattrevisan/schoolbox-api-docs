@@ -26,6 +26,13 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 class Mapper extends \Schoolbox\Mapper
 {
     /**
+     * Initial Default template was created with db ID 1
+     * This should be used for any courses that were previously created
+     * and courses spawned by `Convert this page to a unit page` action
+     */
+    public const INITIAL_DEFAULT = 1;
+
+    /**
      * @inheritDoc
      */
     protected function mapping(): void
