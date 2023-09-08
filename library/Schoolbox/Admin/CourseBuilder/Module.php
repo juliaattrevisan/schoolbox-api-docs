@@ -14,11 +14,10 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\RoleMapper;
 
@@ -55,7 +54,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(HomepageTemplateMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
-            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(CourseTemplateMapper::class),
         );
     }
 

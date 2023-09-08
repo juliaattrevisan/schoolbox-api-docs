@@ -13,48 +13,13 @@ namespace Schoolbox\Admin\CourseBuilder;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends Base
 {
-    /**
-     * A ConfigMapper instance
-     *
-     * @var ConfigMapper
-     */
-    private $configMapper;
-
-    /**
-     * A CourseConfigMapper instance
-     *
-     * @var CourseConfigMapper
-     */
-    private $courseConfigMapper;
-
-    /**
-     * A HomepageTemplateMapper instance
-     *
-     * @var HomepageTemplateMapper
-     */
-    private $homepageTemplateMapper;
-
-    /**
-     * A RoleMapper instance
-     *
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-    /**
-     * A FolderMapper instance
-     *
-     * @var FolderMapper
-     */
-    private $folderMapper;
-
     /**
      * Constructor
      *
@@ -62,20 +27,15 @@ class Controller extends Base
      * @param CourseConfigMapper     $courseConfigMapper
      * @param HomepageTemplateMapper $homepageTemplateMapper
      * @param RoleMapper             $roleMapper
-     * @param FolderMapper           $folderMapper
+     * @param CourseTemplateMapper   $courseTemplateMapper
      */
     public function __construct(
-        ConfigMapper $configMapper,
-        CourseConfigMapper $courseConfigMapper,
-        HomepageTemplateMapper $homepageTemplateMapper,
-        RoleMapper $roleMapper,
-        FolderMapper $folderMapper
+        private ConfigMapper $configMapper,
+        private CourseConfigMapper $courseConfigMapper,
+        private HomepageTemplateMapper $homepageTemplateMapper,
+        private RoleMapper $roleMapper,
+        private CourseTemplateMapper $courseTemplateMapper
     ) {
-        $this->configMapper = $configMapper;
-        $this->courseConfigMapper = $courseConfigMapper;
-        $this->homepageTemplateMapper = $homepageTemplateMapper;
-        $this->roleMapper = $roleMapper;
-        $this->folderMapper = $folderMapper;
     }
 
     /**
@@ -114,10 +74,6 @@ class Controller extends Base
             ];
         }
 
-        $courseTemplates = \Schoolbox\Assessment\Course\Template\Mapper::getInstance();
-        $all = $courseTemplates->findAll();
-
-
         // Render this thing out
         $this->response = $this->responseFromTemplate(
             '@adminCourseBuilder/index.twig',
@@ -128,9 +84,7 @@ class Controller extends Base
                 'roles' => $this->roleMapper->findAll(),
                 'permissions' => $permissions,
                 'availableTemplates' => $templates,
-                'courseTemplates'   => $courseTemplates->findAll(),
-                'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
-                'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                'courseTemplates'   => $this->courseTemplateMapper->findAll(),
                 'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                 'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
             ],
@@ -169,15 +123,51 @@ class Controller extends Base
             $this->courseConfigMapper->save($model);
         }
 
-        // Update default page templates
-
-        $courseTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_course_page_template');
-        $courseTemplate->setValue(implode(',', $this->requestPost['courseTemplate']));
-        $this->configMapper->save($courseTemplate);
-
-        $unitTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_unit_page_template');
-        $unitTemplate->setValue(implode(',', $this->requestPost['unitTemplate']));
-        $this->configMapper->save($unitTemplate);
+        // Update course templates
+        /**
+         * expected object to be received:
+         * ```
+         * [
+             * {
+             * "name": "Senior",
+             * "id": -1,
+             * "courseTemplate": 1,
+             * "unitTemplate": 5
+             * },
+             * {
+             * "name": "Junior",
+             * "id": -2,
+             * "courseTemplate": 2,
+             * "unitTemplate": 3
+             * },
+             * {
+             * "name": "Default",
+             * "id": 1,
+             * "courseTemplate": 1,
+             * "unitTemplate": 3
+             * }
+         * ]
+         * ```
+         */
+        $templates = $this->courseTemplateMapper->createCollection();
+        // get list of all posted template groups
+        foreach (json_decode($this->getRequestPost()->get('templates', ''), true) as $templateGroup) {
+            // iterate over template groups
+            // if id is larger than 1 then grab that from the db and update that entry
+            if (1 <= $templateGroup['id']) {
+                $template = $this->courseTemplateMapper->findById($templateGroup['id']);
+            } else {
+                // if id is less than 1 then spawn a new entry and set the values
+                $template = $this->courseTemplateMapper->createModel();
+            }
+            // set the new values
+            $template->setName($templateGroup['name']);
+            $template->setCourseTemplate($this->homepageTemplateMapper->findById($templateGroup['courseTemplate']));
+            $template->setUnitTemplate($this->homepageTemplateMapper->findById($templateGroup['unitTemplate']));
+            $templates->add($template);
+        }
+        // save the template groups
+        $this->courseTemplateMapper->save($templates);
 
         // Update default inheritance
 
@@ -191,6 +181,7 @@ class Controller extends Base
 
         // Send them back to the admin page
 
-        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
+        echo "yay complete..";
+//        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
     }
 }
