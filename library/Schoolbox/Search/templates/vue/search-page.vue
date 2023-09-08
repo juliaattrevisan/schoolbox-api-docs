@@ -31,7 +31,8 @@ const resultsStore = useResultsStore();
 
 <template>
     <div class="c-search-page">
-        <sp-input class="c-search-page__input" />
+        <!-- <sp-input class="c-search-page__input" /> -->
+        <sp-filters class="c-search-page__filters" />
         <div class="c-search-page__results l-flex-col l-gap-m">
             <sp-results-header />
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
@@ -40,7 +41,6 @@ const resultsStore = useResultsStore();
             <sp-results-none v-else-if="resultsStore.hasNoResults" />
             <sp-results v-else-if="resultsStore.hasResults" />
         </div>
-        <sp-filters class="c-search-page__filters" />
     </div>
 </template>
 
@@ -48,11 +48,9 @@ const resultsStore = useResultsStore();
 .c-search-page {
     display: grid;
     gap: var(--spacing-xl);
-    grid-template-areas:
-        "input input"
-        "results filters";
-    grid-template-columns: 1fr 500px;
-    grid-template-rows: auto 1fr;
+    grid-template-areas: "filters results";
+    grid-template-columns: 500px 1fr;
+    grid-template-rows: 1fr auto;
     &__input {
         grid-area: input;
     }

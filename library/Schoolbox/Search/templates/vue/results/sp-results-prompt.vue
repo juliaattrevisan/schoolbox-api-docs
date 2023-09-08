@@ -7,7 +7,7 @@
 <template>
     <div class="empty-state-flex-centered" data-test="sp-results-prompt">
         <i class="icon-search"></i>
-        <p>To begin, enter a search term in the textbox above.</p>
+        <p>To begin searching, please enter a search term.</p>
     </div>
 </template>
 
