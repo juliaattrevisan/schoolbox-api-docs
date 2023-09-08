@@ -810,20 +810,12 @@ class Controller extends Base\Base
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
-            $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
-
-            if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
-                $templateID = HomepageTemplate::HOMEPAGE_NONE;
-            } else {
-                $templateID = (int)$templateID;
-            }
-
             $folder = $this->persistFolder(
                 $name,
                 $courseSpec->getFolder()->getId(),
                 [],
-                $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                $templateID,
+                $courseSpec->getTemplate()->getUnitInherit(),
+                $courseSpec->getTemplate()->getUnitTemplate()->getId(),
                 $rolePermissions,
                 false,
                 []
