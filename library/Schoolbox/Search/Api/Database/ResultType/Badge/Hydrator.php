@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
+use Alaress\Html\ToText;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
@@ -78,7 +79,7 @@ class Hydrator extends BaseHydrator
                     if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
                         $image =   $this->buildStorageImageUrl($badge->getImage())->__toString();
                     }
-                    $badgeBody = $badge->getBody();
+                    $badgeBody = (new ToText($badge->getBody()))->getText();
                     return new FullResult(
                         $match,
                         $match->id,
