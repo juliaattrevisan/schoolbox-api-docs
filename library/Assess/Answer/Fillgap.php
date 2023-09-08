@@ -39,7 +39,6 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
          * TODO: It should be noted that a teacher should be prevented from creating a cloze question that doesn't have any blanks in it...
          */
         $actualAnswerCount = count($actualAnswers);
-        $totalMarks        = null;
         if ($actualAnswerCount > 0) {
             $totalMarks     = 0;
             $marksPerAnswer = $currentResponse['marks'] / $actualAnswerCount;
@@ -51,20 +50,19 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
                     $totalMarks += $marksPerAnswer;
                 }
             }
+            //fix mark to not overflow
+            if (9999999999999.99 <= $totalMarks) {
+                $totalMarks = '9999999999999.99';
+            }
+
+            /* Total marks for this question
+             */
+            $marks = [
+                'response_id' => $currentResponse['response_id'],
+                'mark'        => $totalMarks,
+            ];
+
+            $this->getResponseHandler()->update($marks);
         }
-
-        //fix mark to not overflow
-        if (9999999999999.99 <= $totalMarks) {
-            $totalMarks = '9999999999999.99';
-        }
-
-        /* Total marks for this question
-         */
-        $marks = array(
-            'response_id' => $currentResponse['response_id'],
-            'mark' => $totalMarks,
-        );
-
-        $this->getResponseHandler()->update($marks);
     }
 }
