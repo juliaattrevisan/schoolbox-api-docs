@@ -48,7 +48,7 @@ class Model extends AbstractCourse
      */
     private ?string $uuid = '';
 
-    private CourseTemplateModel $template;
+    private null|CourseTemplateModel $template = null;
 
 
     /**
@@ -167,9 +167,9 @@ class Model extends AbstractCourse
     }
 
     /**
-     * @return CourseTemplateModel
+     * @return null|CourseTemplateModel
      */
-    public function getTemplate(): CourseTemplateModel
+    public function getTemplate(): null|CourseTemplateModel
     {
         return $this->template;
     }

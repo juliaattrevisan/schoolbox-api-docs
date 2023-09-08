@@ -40,5 +40,5 @@ UPDATE course_specification SET course_specification.template_id = (SELECT id FR
 
 # ensure all courses to have a template set
 alter table course_specification
-    modify template_id int(11) unsigned not null;
+    modify template_id int(11) unsigned;
 
