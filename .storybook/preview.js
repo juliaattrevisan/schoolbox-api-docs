@@ -10,6 +10,7 @@
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
 import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import { themes } from "@storybook/theming";
+import "../stories/assets/styles/styles.css"; // add in any other styles we want to use in storybook only
 import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to load mock data into stories
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
