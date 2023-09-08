@@ -4,7 +4,6 @@
  */
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import SpInput from "./input/sp-input.vue";
 import SpResultsHeader from "./results/sp-results-header.vue";
 import SpResultsPrompt from "./results/sp-results-prompt.vue";
 import SpResultsError from "./results/sp-results-error.vue";
@@ -31,7 +30,6 @@ const resultsStore = useResultsStore();
 
 <template>
     <div class="c-search-page">
-        <!-- <sp-input class="c-search-page__input" /> -->
         <sp-filters class="c-search-page__filters" />
         <div class="c-search-page__results l-flex-col l-gap-m">
             <sp-results-header />
