@@ -39,7 +39,7 @@
     // Add inline (default left) border and grey background to card.
     &--child {
         background-color: var(--alt-foreground-colour);
-        border-inline-start: var(--spacing-s) solid var(---border-colour);
+        border-inline-start: var(--spacing-s) solid var(--border-colour);
     }
 
     // When we want the whole card to be selectable
@@ -106,7 +106,7 @@
     }
 
     &--border-end {
-        border-block-end: 1px solid var(---border-colour);
+        border-block-end: 1px solid var(--border-colour);
     }
 
     &--alt-bkg {
