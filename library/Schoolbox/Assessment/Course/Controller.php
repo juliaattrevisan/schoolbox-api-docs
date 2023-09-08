@@ -60,40 +60,6 @@ class Controller extends Base\Base
      */
     private const TAB = 'course';
 
-    /** @var FolderMapper */
-    private $folderMapper;
-
-    /**  @var CourseSpecificationMapper */
-    private $courseSpecificationMapper;
-
-    /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var UnitSpecificationMapper */
-    private $unitSpecificationMapper;
-
-    /** @var UnitImplementationMapper */
-    private $unitImplementationMapper;
-
-    /** @var  HomepageTemplateMapper */
-    private $homepageTemplateMapper;
-
-    /** @var CourseConfigMapper */
-    private $courseConfigMapper;
-
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
-
-    /** @var Access */
-    private $access;
-
-    /** @var AssessmentMapper */
-    private $assessmentMapper;
-
-    /** @var CurriculumNodeMapper */
-    private $curriculumNodeMapper;
-
-
     /**
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param CourseSpecificationMapper  $courseSpecificationMapper
@@ -108,30 +74,19 @@ class Controller extends Base\Base
      * @param CurriculumNodeMapper       $curriculumNodeMapper
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        CourseSpecificationMapper $courseSpecificationMapper,
-        UnitSpecificationMapper $unitSpecificationMapper,
-        UnitImplementationMapper $unitImplementationMapper,
-        FolderMapper $folderMapper,
-        HomepageTemplateMapper $homepageTemplateMapper,
-        Access $access,
-        CourseConfigMapper $courseConfigMapper,
-        UserAccessMapper $userAccessMapper,
-        AssessmentMapper $assessmentMapper,
-        CurriculumNodeMapper $curriculumNodeMapper,
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private CourseSpecificationMapper $courseSpecificationMapper,
+        private UnitSpecificationMapper $unitSpecificationMapper,
+        private UnitImplementationMapper $unitImplementationMapper,
+        private FolderMapper $folderMapper,
+        private HomepageTemplateMapper $homepageTemplateMapper,
+        private Access $access,
+        private CourseConfigMapper $courseConfigMapper,
+        private UserAccessMapper $userAccessMapper,
+        private AssessmentMapper $assessmentMapper,
+        private CurriculumNodeMapper $curriculumNodeMapper,
         private CourseTemplateMapper $courseTemplateMapper
     ) {
-        $this->assessmentMapperProxy      = $assessmentMapperProxy;
-        $this->courseSpecificationMapper  = $courseSpecificationMapper;
-        $this->unitSpecificationMapper    = $unitSpecificationMapper;
-        $this->unitImplementationMapper   = $unitImplementationMapper;
-        $this->folderMapper               = $folderMapper;
-        $this->homepageTemplateMapper     = $homepageTemplateMapper;
-        $this->access                     = $access;
-        $this->courseConfigMapper         = $courseConfigMapper;
-        $this->userAccessMapper           = $userAccessMapper;
-        $this->assessmentMapper           = $assessmentMapper;
-        $this->curriculumNodeMapper       = $curriculumNodeMapper;
     }
 
 
