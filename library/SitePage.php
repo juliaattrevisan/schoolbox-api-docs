@@ -7,7 +7,6 @@ use Aura\Router\Generator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\API\Token\JwtParser\SelfIssued;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Auth\Remember;
