@@ -116,9 +116,11 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('image.allowedFileExtension', 'm')},
                 {$this->getJoinColumnString('category', 'bc')},
                 {$this->getJoinColumnString('createdBy', 'c')},
+                {$this->getJoinColumnString('createdBy.pronoun', 'cp')},
                 {$this->getJoinColumnString('createdBy.role', 'cr')},
                 {$this->getJoinColumnString('updatedBy', 'u')},
                 {$this->getJoinColumnString('updatedBy.role', 'ur')},
+                {$this->getJoinColumnString('updatedBy.pronoun', 'up')},
                 {$yearLevelMapper->getColumnString('byl')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('image', '', 'i', true)}
@@ -126,8 +128,10 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
             INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr')}
+            LEFT  JOIN {$this->getJoinSql('createdBy.pronoun', 'c', 'cp')}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'u', true)}
             INNER JOIN {$this->getJoinSql('updatedBy.role', 'u', 'ur')}
+            LEFT  JOIN {$this->getJoinSql('updatedBy.pronoun', 'u', 'up')}
             LEFT JOIN {$this->getJoinSql('badge_year_level', '', 'byl')}
         ";
     }
@@ -216,31 +220,27 @@ class Mapper extends \Schoolbox\Mapper
             // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
             $collection[$badgeId]->setCurriculumNodes($this->getJoinMapper('curriculum_badge')->createCollection());
 
-            /* Set the creator and also their role
+            /* Set the creator and also their role and pronoun
              */
             $createdBy = $this->hydrateJoin($row, 'createdBy', 'c');
-
             if ($createdBy instanceof User) {
                 $role = $this->hydrateJoin($row, 'createdBy.role', 'cr');
-
                 if ($role instanceof Role) {
                     $createdBy->setRole($role);
                 }
-
+                $createdBy->setPronoun($this->hydrateJoin($row, 'createdBy.pronoun', 'cp'));
                 $collection[$badgeId]->setCreatedBy($createdBy);
             }
 
-            /* Set the updator and also their role
+            /* Set the updator and also their role and pronoun
              */
             $updatedBy = $this->hydrateJoin($row, 'updatedBy', 'u');
-
             if ($updatedBy instanceof User) {
                 $role = $this->hydrateJoin($row, 'updatedBy.role', 'ur');
-
                 if ($role instanceof Role) {
                     $updatedBy->setRole($role);
                 }
-
+                $updatedBy->setPronoun($this->hydrateJoin($row, 'updatedBy.pronoun', 'up'));
                 $collection[$badgeId]->setUpdatedBy($updatedBy);
             }
 

@@ -77,7 +77,7 @@ class Hydrator extends BaseHydrator
                         $image = $this->prefixGenerator->generate() . $badge->getIcon();
                     }
                     if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
-                        $image =   $this->buildStorageImageUrl($badge->getImage())->__toString();
+                        $image = $this->buildStorageImageUrl($badge->getImage())->__toString();
                     }
                     $badgeBody = (new ToText($badge->getBody()))->getText();
                     return new FullResult(
