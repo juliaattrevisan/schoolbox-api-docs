@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Blog;
 
+use Alaress\Html\ToText;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as Blog;
 use Schoolbox\Permission\Access\Access;
@@ -73,6 +74,7 @@ class Hydrator extends BaseHydrator
                 if ($access < UserAccess::ACCESS_READ) {
                     return null;
                 }
+                $blogBody = (new ToText($blog->getBody()))->getText();
                 return new FullResult(
                     $match,
                     $match->id,
@@ -87,7 +89,7 @@ class Hydrator extends BaseHydrator
                     null,
                     null,
                     self::BASE_TYPE,
-                    $this->truncateAroundKeyword($keyword, $blog->getBody(), self::DESCRIPTION_LENGTH),
+                    $this->truncateAroundKeyword($keyword, $blogBody) ?? $this->truncate($blogBody),
                     $blog->getOwner(),
                     [],
                     []

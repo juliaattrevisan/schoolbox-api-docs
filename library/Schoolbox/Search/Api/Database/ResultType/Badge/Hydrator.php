@@ -78,7 +78,7 @@ class Hydrator extends BaseHydrator
                     if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
                         $image =   $this->buildStorageImageUrl($badge->getImage())->__toString();
                     }
-
+                    $badgeBody = $badge->getBody();
                     return new FullResult(
                         $match,
                         $match->id,
@@ -93,7 +93,7 @@ class Hydrator extends BaseHydrator
                         $badge->getCategory()->getName(), // Meta.  Context line for the search result.
                         $image,
                         'badge',
-                        $this->truncateAroundKeyword($keyword, $badge->getBody(), self::DESCRIPTION_LENGTH),
+                        $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
                         $badge->getCreatedBy(),
                         [], // Context.  Empty since no linked folder.
                         [], // Links.  None for badges.

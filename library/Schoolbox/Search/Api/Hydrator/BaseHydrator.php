@@ -27,6 +27,12 @@ abstract class BaseHydrator implements IHydrator
     public const DESCRIPTION_LENGTH = 300;
 
     /**
+     * For use in multibyte string manipulations.
+     */
+    public const ENCODING = 'UTF-8';
+
+
+    /**
      * This hydrator accepts any raw result whose:
      * * type matches `$this->getBaseType()`
      * * type starts with `$this->getBaseType() . '.'`
@@ -91,21 +97,18 @@ abstract class BaseHydrator implements IHydrator
      *
      * @return string|null
      */
-    public function truncateAroundKeyword(string $keyword, string $content, int $maxChars): ?string
+    public function truncateAroundKeyword(string $keyword, string $content, int $maxChars = self::DESCRIPTION_LENGTH): ?string
     {
-        // As always, encoding is UTF-8
-        $encoding = 'UTF-8';
-
         // Is $keyword there? Don't truncate anything if it's not
-        $strpos = mb_stripos($content, $keyword, 0, $encoding);
+        $strpos = mb_stripos($content, $keyword, 0, self::ENCODING);
         if ($strpos !== false) {
             // How many chars before and after the keyword match?
             $charsBefore = (int)($maxChars / 2);
             $charsAfter  = $maxChars - $charsBefore;
 
             // Determine whether to add truncation marks (...)
-            $keywordStrlen = mb_strlen($keyword, $encoding);
-            $contentStrlen = mb_strlen($content, $encoding);
+            $keywordStrlen = mb_strlen($keyword, self::ENCODING);
+            $contentStrlen = mb_strlen($content, self::ENCODING);
 
             // Show marks before if the first character is after the start
             $cutStart       = $strpos - $charsBefore;
@@ -130,7 +133,7 @@ abstract class BaseHydrator implements IHydrator
                 preg_replace(
                     '/\s+/',
                     ' ',
-                    mb_strcut($content, $cutStart, $maxChars, $encoding),
+                    mb_strcut($content, $cutStart, $maxChars, self::ENCODING),
                 )
             );
             if ($startTruncated) {
@@ -142,5 +145,18 @@ abstract class BaseHydrator implements IHydrator
             return $truncated;
         }
         return null;
+    }
+
+    /**
+     * For use as fallback to $this->truncateAroundKeyword().
+     * E.g. $description = $this->truncateAroundKeyword($keyword, $content) ?? $this->truncate($content);
+     *
+     * @param string $content  The content to truncate.
+     * @param int    $maxChars The maximum number of characters to return.
+     * @returns string
+     */
+    public function truncate(string $content, int $maxChars = self::DESCRIPTION_LENGTH): string
+    {
+        return mb_strcut($content, 0, $maxChars, self::ENCODING);
     }
 }

@@ -74,6 +74,7 @@ class Hydrator extends BaseHydrator
                     if ($textboxAccess < UserAccess::ACCESS_READ) {
                         return null;
                     }
+                    $textboxBody = $textbox->getBody();
                     return new FullResult(
                         $match,
                         $match->id,
@@ -89,7 +90,7 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         'textbox',
-                        $this->truncateAroundKeyword($keyword, $textbox->getBody(), self::DESCRIPTION_LENGTH),
+                        $this->truncateAroundKeyword($keyword, $textboxBody) ?? $this->truncate($textboxBody),
                         null,
                         [$textbox->getCategory(),], // Context: textbox's folder
                         [], // texbox: none.
