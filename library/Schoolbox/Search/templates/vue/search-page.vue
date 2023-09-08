@@ -60,14 +60,11 @@ window.Vue.onMounted(async () => {
     grid-template-areas: "filters results";
     grid-template-columns: 500px 1fr;
     grid-template-rows: 1fr auto;
-    &__input {
-        grid-area: input;
+    &__filters {
+        grid-area: filters;
     }
     &__results {
         grid-area: results;
-    }
-    &__filters {
-        grid-area: filters;
     }
 }
 </style>
