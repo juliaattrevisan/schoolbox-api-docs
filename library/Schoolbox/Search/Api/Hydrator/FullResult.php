@@ -63,7 +63,7 @@ class FullResult
         public array $links = [],
     ) {
         // We don't want our search results to be polluted by ugly trailing newlines for example, so we trim.
-        foreach ($this as $key => $value) {
+        foreach (get_object_vars($this) as $key => $value) {
             if (in_array($key, ["title", "url", "type", "meta", "description"]) && $value !== null) {
                 $this->$key = trim($this->$key);
             }
