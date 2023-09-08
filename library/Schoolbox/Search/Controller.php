@@ -100,8 +100,8 @@ class Controller extends Base
 
         $pagesFoldersSubTypes = [
             ["title" => "Current " . $rosettaStone->translate("class", false, true), "value" => "page.class"],
-            ["title" => "Folder"  , "value" => "page.other"   ],
-            ["title" => "Group"   , "value" => "page.other"   ],
+            ["title" => "Folder"  , "value" => "page.folder"  ],
+            ["title" => "Group"   , "value" => "page.group"   ],
             ["title" => "Homepage", "value" => "page.homepage"],
         ];
 

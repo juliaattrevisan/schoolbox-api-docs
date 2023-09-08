@@ -25,6 +25,8 @@ export enum ResultTypes {
     PAGE_COURSE = "page.course",
     PAGE_HOMEPAGE = "page.homepage",
     PAGE_UNIT = "page.unit",
+    PAGE_FOLDER = "page.folder",
+    PAGE_GROUP = "page.group",
     PAGE_OTHER = "page.other",
     TEXTBOX = "textbox",
     TILE = "tile",
