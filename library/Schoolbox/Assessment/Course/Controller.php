@@ -44,7 +44,6 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
-use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\YearLevel;
 
@@ -61,17 +60,17 @@ class Controller extends Base\Base
     private const TAB = 'course';
 
     /**
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param UnitSpecificationMapper    $unitSpecificationMapper
-     * @param UnitImplementationMapper   $unitImplementationMapper
-     * @param FolderMapper               $folderMapper
-     * @param HomepageTemplateMapper     $homepageTemplateMapper
-     * @param Access                     $access
-     * @param CourseConfigMapper         $courseConfigMapper
-     * @param UserAccessMapper           $userAccessMapper
-     * @param AssessmentMapper           $assessmentMapper
-     * @param CurriculumNodeMapper       $curriculumNodeMapper
+     * @param AssessmentMapperProxy     $assessmentMapperProxy
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper   $unitSpecificationMapper
+     * @param UnitImplementationMapper  $unitImplementationMapper
+     * @param FolderMapper              $folderMapper
+     * @param Access                    $access
+     * @param CourseConfigMapper        $courseConfigMapper
+     * @param UserAccessMapper          $userAccessMapper
+     * @param AssessmentMapper          $assessmentMapper
+     * @param CurriculumNodeMapper      $curriculumNodeMapper
+     * @param CourseTemplateMapper      $courseTemplateMapper
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -79,7 +78,6 @@ class Controller extends Base\Base
         private UnitSpecificationMapper $unitSpecificationMapper,
         private UnitImplementationMapper $unitImplementationMapper,
         private FolderMapper $folderMapper,
-        private HomepageTemplateMapper $homepageTemplateMapper,
         private Access $access,
         private CourseConfigMapper $courseConfigMapper,
         private UserAccessMapper $userAccessMapper,
