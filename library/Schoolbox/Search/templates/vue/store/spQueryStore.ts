@@ -4,6 +4,8 @@
 
 import { defineStore } from "pinia";
 
+export const SEARCH_PARAM = "keyword"; // the incoming param to check for initial search
+
 export const useQueryStore = defineStore("spQuery", () => {
     /**
      * get the initial query from the url if it exists
@@ -11,7 +13,7 @@ export const useQueryStore = defineStore("spQuery", () => {
      */
     function getInitialQuery() {
         const searchParams = new URLSearchParams(document.location.search);
-        return searchParams.get("keyword") ?? "";
+        return searchParams.get(SEARCH_PARAM) ?? "";
     }
 
     const query = window.Vue.ref(getInitialQuery()); // current search input

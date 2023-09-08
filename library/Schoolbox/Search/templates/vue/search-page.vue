@@ -14,6 +14,7 @@ import { useStore } from "./store/searchPageStore";
 import type { FilterType } from "./filters/store/spFilterTypesStore";
 import { useSearchStore } from "./store/spSearchStore";
 import { useResultsStore } from "./results/store/spResultsStore";
+import { SEARCH_PARAM } from "./store/spQueryStore";
 
 interface Props {
     endpoint: string; // the search api endpoint
@@ -32,7 +33,7 @@ const resultsStore = useResultsStore();
  */
 window.Vue.onMounted(async () => {
     const searchParams = new URLSearchParams(document.location.search);
-    if (searchParams.has("keyword")) {
+    if (searchParams.has(SEARCH_PARAM)) {
         await searchStore.search();
     }
 });
