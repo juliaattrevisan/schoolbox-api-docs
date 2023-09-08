@@ -346,15 +346,23 @@ Usage:
                         <label class="required" for="template">
                             Course Template
                         </label>
-                        {% if templates.count > 1 %}
-                        <select name="template" required {% if courseSpec %}disabled{% endif %}>
-                            {% for template in templates %}
-                                <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}</option>
-                            {% endfor %}
-                        </select>
+                        {% if courseSpec %}
+                            {% if courseSpec.template %}
+                                <input value="{{ courseSpec.template.name }}" disabled>
+                            {% else %}
+                                <input value="No Template Selected" disabled>
+                            {% endif %}
                         {% else %}
-                            <input name="template" value="{{ templates.first.id }}" disabled style="display: none">
-                            <input value="{{ templates.first.name }}" disabled>
+                            {% if templates.count > 1 %}
+                            <select name="template" required {% if courseSpec %}disabled{% endif %}>
+                                {% for template in templates %}
+                                    <option value="{{ template.id }}">{{ template.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                                <input name="template" value="{{ templates.first.id }}" disabled style="display: none">
+                                <input value="{{ templates.first.name }}" disabled>
+                            {% endif %}
                         {% endif %}
                     </div>
 
