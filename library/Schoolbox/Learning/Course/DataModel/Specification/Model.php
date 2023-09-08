@@ -157,10 +157,10 @@ class Model extends AbstractCourse
     }
 
     /**
-     * @param CourseTemplateModel $template
+     * @param null|CourseTemplateModel $template
      * @return Model
      */
-    public function setTemplate(CourseTemplateModel $template): self
+    public function setTemplate(null|CourseTemplateModel $template): self
     {
         $this->template = $template;
         return $this;
