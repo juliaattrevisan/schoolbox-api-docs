@@ -43,8 +43,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->joins('courseTemplateId', HomepageTemplateMapper::class, 'id', null, null, 'courseTemplate', 'courseTemplate');
         $this->joins('unitTemplateId', HomepageTemplateMapper::class, 'id', null, null, 'unitTemplate', 'unitTemplate');
-        $this->uses('courseInherit', self::TYPE_BOOLEAN);
-        $this->uses('unitInherit', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
