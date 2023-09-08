@@ -74,7 +74,8 @@
                                     <div class="actions-small-1">
                                         <div class="list-item">
                                             <div class="card small-12">
-                                                <h3 class="icon-unit">
+                                                <span class="icon-unit"></span>
+                                                <h3>
                                                     {% if unit.isBeforeOpenDate==false or readOnly == false %}
                                                         {% if unit.specification.folder.id in accessibleFolderIds %}
                                                             <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>
