@@ -14,6 +14,7 @@ use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
+use Schoolbox\Assessment\Course\Template\Mapper;
 use Schoolbox\Resource\Folder\Ancestry;
 use UnexpectedValueException;
 use Schoolbox\Application;
@@ -408,7 +409,7 @@ class Controller extends Base\Base
         $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
-                'templates'          => $courseTemplatesMapper->findAll(),
+                'templates'         => $courseTemplatesMapper->findAll(),
                 'courseSpec'        => $courseSpec,
                 'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 'folderAccess'      => $folderAccess,
@@ -482,12 +483,17 @@ class Controller extends Base\Base
         try {
             $this->validateCourseData(trim($post['name']), (int)trim($post['parent']), null);
 
-            $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
-            if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
-                $templateID = HomepageTemplate::HOMEPAGE_NONE;
-            } else {
-                $templateID = (int)$templateID;
-            }
+            /**
+             * Template
+             */
+            $courseTemplateMapper = Mapper::getInstance();
+            $template = $courseTemplateMapper->findById($post['template']);
+//            $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
+//            if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
+//                $templateID = HomepageTemplate::HOMEPAGE_NONE;
+//            } else {
+//                $templateID = (int)$templateID;
+//            }
 
             // Create new CourseFolder
             $courseFolder = $this->persistFolder(
@@ -495,7 +501,7 @@ class Controller extends Base\Base
                 (int)trim($post['parent']),
                 array_filter(explode(',', $post['curriculumCodes'][0] ?? '')),
                 $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                $templateID,
+                $template->getCourseTemplate()->getId(),
                 $rolePermissions,
                 false,
                 []
@@ -503,7 +509,8 @@ class Controller extends Base\Base
 
             $courseSpec = $this->courseSpecificationMapper->createModel()
                 ->setFolder($courseFolder)
-                ->setSubjectCode(trim($post->get('subjectCode', '')));
+                ->setSubjectCode(trim($post->get('subjectCode', '')))
+                ->setTemplate($template);
 
             $courseFolder->setCourseSpecification($courseSpec);
 
