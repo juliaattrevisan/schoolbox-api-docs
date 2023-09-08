@@ -83,12 +83,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * Forum posts do not have a title, but the linked thread does have a title.
+     * If we search the thread title, then all posts for a matching thread will appear in the results.
+     * If we don't search the thread title, then the thread with matching title will only appear if a child post
+     * contains the keyword.
      *
      * @return string
      */
     protected function buildTitleExpression(): string
     {
-        return 'pt.title';
+        return '""'; // Not sure what to do here, but returning a blank string for now.
     }
 
     /**
