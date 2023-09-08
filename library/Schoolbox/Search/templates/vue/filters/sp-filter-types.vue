@@ -50,6 +50,6 @@ const expandButtonText = window.Vue.computed(() => {
     border: 1px solid var(--form-border-color);
 }
 .option-list {
-    padding: var(--whitespace-s);
+    padding: var(--spacing-s);
 }
 </style>
