@@ -34,9 +34,7 @@
                 <th>ID</th>
                 <th class="required">Template Name</th>
                 <th class="required">Selected Course Page Template</th>
-{#                <th class="required">Course Folder Inherit Perms?</th>#}
                 <th class="required">Selected Unit Page Template</th>
-{#                <th class="required">Unit Folder Inherit Perms?</th>#}
                 <th>Delete</th>
             </tr>
         {% for courseTemplate in courseTemplates %}
@@ -44,9 +42,7 @@
                 <td>{{ courseTemplate.id }}</td>
                 <td>{{ courseTemplate.name }}</td>
                 <td>{{ courseTemplate.courseTemplate.name }}</td>
-{#                <td>{{ courseTemplate.courseInherit ? 'true' : 'false' }}</td>#}
                 <td>{{ courseTemplate.unitTemplate.name }}</td>
-{#                <td>{{ courseTemplate.unitInherit ? 'true' : 'false' }}</td>#}
                 <td><a href="#" class="icon-delete" title="Delete Row"></a></td>
             </tr>
         {% endfor %}
