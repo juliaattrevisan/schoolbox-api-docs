@@ -347,9 +347,9 @@ Usage:
                             Course Template
                         </label>
                         {% if templates.count > 1 %}
-                        <select name="template" required>
+                        <select name="template" required {% if courseSpec %}disabled{% endif %}>
                             {% for template in templates %}
-                                <option value="{{ template.id }}">{{ template.name }}</option>
+                                <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}</option>
                             {% endfor %}
                         </select>
                         {% else %}
