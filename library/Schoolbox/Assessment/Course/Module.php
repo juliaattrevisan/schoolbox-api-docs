@@ -16,6 +16,7 @@ use Aura\Router\Map;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -170,6 +171,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(AssessmentMapper::class),
             $this->getMapperFactory()->get(CurriculumNodeMapper::class),
+            $this->getMapperFactory()->get(CourseTemplateMapper::class)
         );
     }
 
