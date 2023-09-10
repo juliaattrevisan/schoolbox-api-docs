@@ -8,14 +8,12 @@
 
 namespace Schoolbox\Comms\News;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\StickyStatus\Corrector;
@@ -25,7 +23,6 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
@@ -48,7 +45,7 @@ use function is_array;
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model[]|GenericCollection createCollection($contents = [])
  */
-class Mapper extends \Schoolbox\Mapper implements Searchable
+class Mapper extends \Schoolbox\Mapper
 {
     /**
      * This const represents "all topics", as an int id
