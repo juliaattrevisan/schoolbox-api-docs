@@ -12,7 +12,6 @@ use CallbackFilterIterator;
 use IteratorIterator;
 use LimitIterator;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -69,7 +68,6 @@ abstract class Base
      * Execute search
      * Execute search count
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param Mapper          $mapper
      * @param string          $keyword
@@ -78,7 +76,7 @@ abstract class Base
      * @param int             $offset
      * @param int             $limit
      */
-    public function search(ArticleResolver $articleResolver, User $user, Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
+    public function search(User $user, Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
     {
 
         /* Sanitise inputs
@@ -87,7 +85,7 @@ abstract class Base
 
         /* Collect search results
          */
-        $this->setResult($this->executeSearch($articleResolver, $user, $mapper, $sanitiser));
+        $this->setResult($this->executeSearch($user, $mapper, $sanitiser));
 
         /* You can save a db request by using the $setResult() outcome and
          * traversing to $currentPage-1 manually in php, manually constructing
@@ -96,32 +94,30 @@ abstract class Base
 
         /* Collect search results count without limit/offset params
          */
-        $this->setCount($this->executeSearchCount($articleResolver, $user, $mapper, $sanitiser));
+        $this->setCount($this->executeSearchCount($user, $mapper, $sanitiser));
     }
 
 
     /**
      * Get all the search results
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param Mapper          $mapper
      * @param Sanitiser       $sanitiser
      * @return Collection
      */
-    abstract protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser);
+    abstract protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser);
 
 
     /**
      * The total number of items found by the search
      *
-     * @param ArticleResolver   $articleResolver
      * @param User              $user
      * @param \Schoolbox\Mapper $mapper
      * @param Sanitiser         $sanitiser
      * @return int
      */
-    abstract protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser);
+    abstract protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser);
 
 
     /**
