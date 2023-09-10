@@ -26,12 +26,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $isAdministrator = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
-        );
-
-        $this->register('GET', '', 'search', $isAdministrator, null);
+        $this->register('GET', '', 'search', new Rule\IsLoggedIn());
     }
 
     /**
