@@ -13,13 +13,10 @@ namespace Schoolbox\Blog\Homepage\Post;
 use PDO;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -29,7 +26,7 @@ use Schoolbox\UserMapper;
 /**
  * @method Model createModel($idValue = null)
  */
-class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, IHomepageCleanable
+class Mapper extends BaseMapper implements FeedableMapperInterface, IHomepageCleanable
 {
     /**
      * Setup mapper
@@ -174,58 +171,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
             $blog = $this->hydrate($r, 'b');
             $blog->setOwner($user);
             $blog->setFolder($folder);
-            $c->add($blog);
-        }
-
-        return $c;
-    }
-
-    /**
-     * Find all the blog entries for a homepage
-     *
-     * TODO: But I don't think this is used?
-     *
-     * @param FolderModel $folder
-     * @param int|null    $limit
-     * @return Collection
-     */
-    public function findForCategory(FolderModel $folder, $limit = 0)
-    {
-        $query =
-            "
-			SELECT
-				{$this->getColumnString('b')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM `{$this->getTable()}` AS `b`
-            LEFT JOIN {$this->getJoinSql('owner', 'b', 'u')}
-			WHERE `b`.`deleted_at` IS NULL
-				AND `b`.`folder_id` = :folder_id
-			ORDER BY `b`.`created_at` DESC
-		";
-
-        if (is_numeric($limit) && $limit) {
-            $limitValue = (int)$limit;
-
-            $query .= " LIMIT {$limitValue}";
-        }
-
-        $stmt = $this->database->prepare($query);
-
-        $stmt->execute(
-            [
-                'folder_id' => $folder->getId(),
-            ]
-        );
-
-        $c = $this->createCollection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var User $user */
-            $user = $this->hydrateJoin($r, 'owner', 'u');
-
-            /** @var BlogModel $blog */
-            $blog = $this->hydrate($r, 'b');
-            $blog->setOwner($user);
             $c->add($blog);
         }
 
