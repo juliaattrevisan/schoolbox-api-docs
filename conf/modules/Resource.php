@@ -37,9 +37,5 @@ class Resource implements ModuleConfigInterface
 
         $googleFileModule = new Schoolbox\Resource\GoogleFile\Module($di);
         $googleFileModule->registerModule('/googleFile');
-        // Commented out as:
-        // * it's unused
-        // * it collides with folder search page www/resource/folder/search.php
-//        $folderSearchModule = new \Schoolbox\Resource\Folder\Search\Module($di);
     }
 }

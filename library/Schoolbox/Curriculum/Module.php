@@ -104,10 +104,7 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller(
-            $this->getMapperFactory()->get(NodeMapper::class),
-            $this->injector->get('commsNewsArticleResolver'),
-        );
+        return new Controller($this->getMapperFactory()->get(NodeMapper::class));
     }
 
     /* Getters / Setters

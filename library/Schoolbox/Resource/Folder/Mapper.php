@@ -83,7 +83,7 @@ use function strnatcasecmp;
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = [])
  */
-class Mapper extends AbstractFolderMapper implements ILocator, Searchable
+class Mapper extends AbstractFolderMapper implements ILocator
 {
     /**
      * Interface with external user database.
@@ -1783,35 +1783,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
         throw new MapperException\NotFound();
     }
-
-
-    /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * This also returns a count of all the items found in the search, not limited
-     * by params
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return Result
-     */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
-    {
-        if ($limit == 0) {
-            $limit = self::DEFAULT_LIMIT;
-        }
-
-        $searcher = new Result();
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
-
-        return $searcher;
-    }
-
 
     /* Getters/Setters
      */

@@ -263,7 +263,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * This also returns a count of all the items found in the search, not limited by params.
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param string          $keyword
      * @param int             $offset
@@ -272,14 +271,14 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param string          $sortDirection
      * @return Result
      */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
         if ($limit == 0) {
             $limit = self::DEFAULT_LIMIT;
         }
 
         $searcher = new Result();
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
     }

@@ -666,37 +666,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         return $statement->fetchAll(PDO::FETCH_COLUMN);
     }
 
-
-    /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return Search\Result
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC'): Search\Result
-    {
-        if (!$limit) {
-            $limit = self::DEFAULT_LIMIT;
-        }
-
-        // TODO snap this outside the mapper
-        /** @var IConnector $database */
-        $database = self::getDi()->get('databaseInternal');
-        $l10n = self::getDi()->get('l10n');
-        $searcher = new Search\Result($database, $l10n);
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
-
-        return $searcher;
-    }
-
-
     /**
      * Performs a check whether the homepage has at least one archived news.
      *

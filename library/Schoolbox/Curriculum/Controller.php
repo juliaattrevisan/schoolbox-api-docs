@@ -11,7 +11,6 @@
 namespace Schoolbox\Curriculum;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Curriculum\Node;
 
 class Controller extends Base
@@ -20,12 +19,6 @@ class Controller extends Base
      * @var Node\Mapper
      */
     private $nodeMapper;
-
-
-    /**
-     * @var ArticleResolver
-     */
-    private $articleResolver;
 
     /**
      * This is used when retrieving nodes from Curriculum UI, using api endpoint
@@ -37,14 +30,11 @@ class Controller extends Base
      * Constructor
      *
      * @param Node\Mapper          $nodeMapper
-     * @param ArticleResolver      $articleResolver
      */
     public function __construct(
-        Node\Mapper $nodeMapper,
-        ArticleResolver $articleResolver
+        Node\Mapper $nodeMapper
     ) {
         $this->nodeMapper      = $nodeMapper;
-        $this->articleResolver = $articleResolver;
     }
 
 
@@ -85,7 +75,6 @@ class Controller extends Base
         $search = trim($this->requestQuery['query']);
         $this->response = $this->responseAsJson(
             $this->nodeMapper->search(
-                $this->articleResolver,
                 $this->getSession()->getAuthUser(),
                 $search
             )

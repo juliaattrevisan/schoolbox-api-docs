@@ -10,9 +10,7 @@
 namespace Schoolbox\Resource\File;
 
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\IHomepageCleanable;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -27,7 +25,7 @@ use Schoolbox\UserMapper;
  * @method Model findById($id)
  * @method Model createModel($idValue = null)
  */
-class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, Searchable, IHomepageCleanable
+class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, IHomepageCleanable
 {
 
     /**
@@ -221,30 +219,6 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         return $files;
     }
 
-
-    /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return Resource\File\Search\Result
-     */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
-    {
-        if ($limit == 0) {
-            $limit = self::DEFAULT_LIMIT;
-        }
-
-        $searcher = new Resource\File\Search\Result();
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
-
-        return $searcher;
-    }
 
     /**
      * Pre-save callback: ensures that owner is not null.

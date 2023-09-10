@@ -22,7 +22,6 @@ interface Searchable
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param string          $keyword
      * @param int             $offset
@@ -31,5 +30,5 @@ interface Searchable
      * @param string          $sortDirection
      * @return Collection
      */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC');
+    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC');
 }

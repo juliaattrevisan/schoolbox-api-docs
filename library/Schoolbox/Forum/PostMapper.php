@@ -14,15 +14,12 @@ namespace Schoolbox\Forum;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
-use Schoolbox\Forum\Search\Result;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\User;
 
-class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
+class PostMapper extends Mapper implements FeedableMapperInterface
 {
     /** @var int */
     public const FORUM_POSTS_PER_PAGE = 15;
@@ -310,32 +307,5 @@ class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
                 ]);
 
         return ceil($stmt->fetch()['postCount'] / self::FORUM_POSTS_PER_PAGE);
-    }
-
-    /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * This also returns a count of all the items found in the search, not limited
-     * by params
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return Result | Collection
-     */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
-    {
-        if ($limit == 0) {
-            $limit = self::DEFAULT_LIMIT;
-        }
-
-        $searcher = new Result();
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
-
-        return $searcher;
     }
 }
