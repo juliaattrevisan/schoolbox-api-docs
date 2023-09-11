@@ -882,12 +882,12 @@ class ImportFactory
             $assessmentImpl = new QuizAssessment();
         } elseif ($row['itk.id']) {
             $assessmentImpl = new TaskAssessment();
-        } elseif ($row['ipr.id']) {
-            $assessmentImpl = new Project();
         } elseif ($row['ilt.id']) {
             $assessmentImpl = new LtiAssessment();
         } elseif ($row['implLessonPlan.id']) {
             $assessmentImpl = new LessonPlan();
+        } elseif ($row['ipr.id']) { // Project needs to be checked at last, as this is not set for an assessment in a project
+            $assessmentImpl = new Project();
         } else {
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['ia.id']}");
         }
