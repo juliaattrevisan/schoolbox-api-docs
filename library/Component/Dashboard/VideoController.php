@@ -38,6 +38,19 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
     protected $sortFields = array('name', 'date');
 
     /**
+     * Determine whether the current user should be able to see the video given as an argument.
+     *
+     * @param ResourceVideo $video
+     *
+     * @return boolean
+     */
+    private function isVisibleToCurrentUser(ResourceVideo $video): bool
+    {
+        // Read access users should not be able to see hidden videos.
+        return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
+    }
+
+    /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
      * @return boolean
@@ -84,13 +97,34 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
         if ($this->getConfig('video')) {
             try {
-                $this->defaultVideo = $videoResourceMapper->findByFileId($this->getConfig('video'));
+                $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
+
+                if (
+                    $video->isComplete()
+                    && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()
+                    && $this->isVisibleToCurrentUser($video)
+                ) {
+                    $this->defaultVideo = $video;
+                }
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // Ok to ignore. The video referenced by config no longer exists
                 $this->defaultVideo = $this->outputList->first();
             }
-        } else {
-            $this->defaultVideo = $this->outputList->first();
+        }
+
+        /* If defaultVideo is null, then we couldn't display the video that was originally chosen in the component config
+         * We must look for an alternative among the others in $outputList
+         */
+        if (null === $this->defaultVideo) {
+            // Show the first video that has completed encoding
+            foreach ($this->outputList as $video) {
+                /** @var ResourceVideo $video */
+                // Don't pick a video not visible to the user as the default video
+                if ($video->isComplete() && $this->isVisibleToCurrentUser($video)) {
+                    $this->defaultVideo = $video;
+                    break;
+                }
+            }
         }
 
         // Set up component name
