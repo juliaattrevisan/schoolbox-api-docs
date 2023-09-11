@@ -59,15 +59,28 @@ $app = new class extends CliTool\App
      */
 
     /**
-     * Get a particular schoolbox.assess row that not part of Learnosity already
+     * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
      */
-    private const QUERY_PARTICULAR_QUIZ = '
+    private const QUERY_QUIZ = "
         SELECT *
         FROM assess
         WHERE deleted_at IS NULL
+        AND availability = 'assess'
+        AND learnosity_reference IS NULL    
+    ";
+
+
+    /**
+     * Get a particular schoolbox.assess row that not part of Learnosity already
+     */
+    private const QUERY_PARTICULAR_QUIZ = "
+        SELECT *
+        FROM assess
+        WHERE deleted_at IS NULL
+        AND availability = 'assess'
         AND learnosity_reference IS NULL
         AND assessment_id = :assessmentId
-    ';
+    ";
 
 
     /**
@@ -104,6 +117,18 @@ $app = new class extends CliTool\App
         AND question_id = :questionId
         ORDER BY sequence ASC
     ';
+
+
+    /**
+     * A set of prepared statements we can recylce
+     *
+     * @var PDOStatement
+     */
+    private \PDOStatement $quizStatement;
+    private \PDOStatement $particularQuizStatement;
+    private \PDOStatement $sectionsStatement;
+    private \PDOStatement $questionStatement;
+    private \PDOStatement $answerStatement;
 
 
     /**
@@ -152,6 +177,14 @@ HELP;
             return;
         }
 
+        /* Precompile queries
+         */
+        $this->quizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUIZ);
+        $this->particularQuizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_PARTICULAR_QUIZ);
+        $this->sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
+        $this->questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
+        $this->answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
+
         /* Obtain data set.
          * If --assessment was specified, find its subobject and work with that.
          * Otherwise collect the whole set of non-deleted quizzes via a custom query.
@@ -161,13 +194,12 @@ HELP;
         if ('' === $assessmentId) {
             /* Get everything
              */
+            $legacyQuizzes = $this->getQuiz(null);
         } else {
             /* Get $assessmentId
              */
-            $legacyQuizzes = [$this->getQuiz((int)$assessmentId)];
+            $legacyQuizzes = $this->getQuiz((int)$assessmentId);
         }
-
-        print_r($legacyQuizzes);
 
         /* Commencing migration
          */
@@ -245,66 +277,79 @@ HELP;
      *     * is not deleted
      *     * is not yet in learnosity
      *
-     * @param int $assessId
+     * @param int|null $assessId
      * @return array
      */
-    private function getQuiz(int $assessId): array
+    private function getQuiz(?int $assessId): array
     {
-        /* Precompile queries
+        /* Conditionally get a particular quiz,
+         * otherwise get all of them
          */
-        $quizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_PARTICULAR_QUIZ);
-        $sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
-        $questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
-        $answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
+        if (null !== $assessId) {
+            $statement = $this->particularQuizStatement;
 
-        $quizStatement->execute([
-            'assessmentId' => $assessId
-        ]);
-
-        $quizRow = $quizStatement->fetch(\PDO::FETCH_ASSOC);
-        $quizRow['_sections'] = [];
-
-        /* Get its sections
-         */
-        $sectionsStatement->execute([
-            'assessId' => $quizRow['assess_id']
-        ]);
-
-        while ($sectionRow = $sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $sectionRow['_questions'] = [];
-
-            /* Get each section's questions
-             */
-            $questionStatement->execute([
-                'sectionId' => $sectionRow['section_id']
+            $statement->execute([
+                'assessmentId' => $assessId
             ]);
+        } else {
+            $statement = $this->quizStatement;
 
-            while ($questionRow = $questionStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $questionRow['_answers'] = [];
-
-                /* Decompile config
-                 */
-                $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
-
-                /* Get each question's answers
-                 */
-                $answerStatement->execute([
-                    'questionId' => $questionRow['question_id']
-                ]);
-
-                while ($answerRow = $answerStatement->fetch(\PDO::FETCH_ASSOC)) {
-                    $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
-
-                    $questionRow['_answers'][] = $answerRow;
-                }
-
-                $sectionRow['_questions'][] = $questionRow;
-            }
-
-            $quizRow['_sections'][] = $sectionRow;
+            $statement->execute();
         }
 
-        return $quizRow;
+        /* Final stack
+         */
+        $quizzes = [];
+
+        while ($quizRow = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $quizRow['_sections'] = [];
+
+            /* Get its sections
+             */
+            $this->sectionsStatement->execute([
+                'assessId' => $quizRow['assess_id']
+            ]);
+
+            while ($sectionRow = $this->sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $sectionRow['_questions'] = [];
+
+                /* Get each section's questions
+                 */
+                $this->questionStatement->execute([
+                    'sectionId' => $sectionRow['section_id']
+                ]);
+
+                while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
+                    $questionRow['_answers'] = [];
+
+                    /* Decompile config
+                     */
+                    $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
+
+                    /* Get each question's answers
+                     */
+                    $this->answerStatement->execute([
+                        'questionId' => $questionRow['question_id']
+                    ]);
+
+                    while ($answerRow = $this->answerStatement->fetch(\PDO::FETCH_ASSOC)) {
+                        $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
+
+                        $questionRow['_answers'][] = $answerRow;
+                    }
+
+                    $sectionRow['_questions'][] = $questionRow;
+                }
+
+                $quizRow['_sections'][] = $sectionRow;
+            }
+
+            /* Stack it up
+             */
+            $quizzes[] = $quizRow;
+        }
+
+        return $quizzes;
     }
 
 
