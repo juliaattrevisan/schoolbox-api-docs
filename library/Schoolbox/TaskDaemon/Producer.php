@@ -54,7 +54,11 @@ class Producer
     /**
      * Send the message to the task daemon.
      *
-     * @param Message $message The message to send
+     * @param Message    $message     The message to send
+     * @param float|null $delay       If set: delay the sending of the message
+     *                                by this many seconds.
+     * @param int|null   $maxAttempts If set: override the maximum number of
+     *                                attempts by this amount.
      * @return void
      * @throws Exception                   if the context's provider fails to
      *                                     send the message due to some internal
@@ -63,7 +67,7 @@ class Producer
      *                                     invalid destination
      * @throws InvalidMessageException     if an invalid message is specified
      */
-    public function send(Message $message)
+    public function send(Message $message, ?float $delay = null, ?int $maxAttempts = null): void
     {
         $this->context->createProducer()->send(
             $this->context->createQueue($this->queueName),
