@@ -29,16 +29,13 @@ class PayloadFactory
      * @param array $tags
      * @return array
      */
-    public function produce(string $type, array $data, array $tags)
+    public function produce(string $type, array $data, array $tags): array
     {
-        switch ($type) {
-            case self::LEARNOSITY_PAYLOAD_ACTIVITY:
-                return $this->setupActivityPayload($data, $tags);
-
-            case self::LEARNOSITY_PAYLOAD_ITEM:
-            default:
-                return [];
-        }
+        return match ($type) {
+            self::LEARNOSITY_PAYLOAD_ACTIVITY => $this->setupActivityPayload($data, $tags),
+            self::LEARNOSITY_PAYLOAD_ITEM => $this->setupItemPayload($data, $tags),
+            default => [],
+        };
     }
 
 
@@ -109,20 +106,19 @@ class PayloadFactory
                 'items' => [],
                 'rendering_type' => 'assess'
             ],
-
             /* A unique uuid in learnosity land that we can arbitrarily assign here
              */
             'reference' => (string)Uuid::uuid4(),
             /* Always spawn in PUBLISHED state
              */
             'status' => Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
-            /* The name of the quiz
-             */
-            'title' => $legacyQuiz['title'],
             /* Tags
              * TODO Fill in with some derived values about courses and units and classcodes
              */
-            'tags' => $tags
+            'tags' => $tags,
+            /* The name of the quiz
+             */
+            'title' => $legacyQuiz['title'],
         ];
 
         if ((int)$legacyQuiz['duration']) {
@@ -136,5 +132,41 @@ class PayloadFactory
         }
 
         return $activity;
+    }
+
+
+    /**
+     * Set up a payload for a single item
+     * (this will be vaguely synonymous with our legacy Section idea)
+     *
+     * @param array $section
+     * @param array $tags
+     * @return array
+     */
+    private function setupItemPayload(array $section, array $tags): array
+    {
+        $item = [
+            'questions' => [],
+            /* A unique uuid in learnosity land that we can arbitrarily assign here
+             */
+            'reference' => (string)Uuid::uuid4(),
+            /* Always spawn in PUBLISHED state
+             */
+            'status' => Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
+            /* Tags
+             * TODO Fill in with some derived values about courses and units and classcodes
+             */
+            'tags' => $tags,
+            /* The name of the quiz
+             */
+            'title' => $section['title'],
+        ];
+
+        /* Section Description
+         * If it was more than an empty string, make a placeholder Passage thing
+         * Otherwise skip it; there's nothing to say
+         */
+
+        return $item;
     }
 }

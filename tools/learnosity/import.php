@@ -275,6 +275,19 @@ HELP;
                 $tagFactory->produce(null, null, null)
             );
 
+            /* Set up a Learnosity Item which will be vaguely equivalent to a Section
+             * purely for the purposes of this importer
+             */
+            foreach ($legacyQuiz['_sections'] as $section) {
+                $item = $payloadFactory->produce(
+                    PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
+                    $section,
+                    /* TODO Need the MapperProxy to decide its tag set, I suppose
+                     */
+                    $tagFactory->produce(null, null, null)
+                );
+            }
+
             /* Stack it
              */
             $activityPayload['activities'][] = $activity;
