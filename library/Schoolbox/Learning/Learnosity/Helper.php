@@ -112,6 +112,18 @@ class Helper
         /* $activities['data'] is a one-element stack in this usage
          */
         foreach ($activities['data'] as $activity) {
+            /* Note that sometimes you get an error message like this from Learnosity
+             * due to a bug in their system: https://help.learnosity.com/hc/requests/23138
+             */
+
+            /* Shank the activity into the Archived state
+             */
+            $updatedActivity = $activity;
+            $updatedActivity['status'] = $status;
+            $activityPayload['activities'][] = $updatedActivity;
+
+            $activityArchiveResult = $this->api->dataSetRequest('/itembank/activities', $activityPayload);
+
             /* Then shank its items into the $status state
              */
             $itemReferences = [];
@@ -178,18 +190,6 @@ class Helper
 
                 return;
             }
-
-           /* Note that sometimes you get an error message like this from Learnosity
-            * due to a bug in their system: https://help.learnosity.com/hc/requests/23138
-            */
-
-            /* Shank the activity into the Archived state
-             */
-            $updatedActivity = $activity;
-            $updatedActivity['status'] = $status;
-            $activityPayload['activities'][] = $updatedActivity;
-
-            $activityArchiveResult = $this->api->dataSetRequest('/itembank/activities', $activityPayload);
         }
     }
 }
