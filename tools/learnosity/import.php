@@ -282,6 +282,10 @@ HELP;
             while ($questionRow = $questionStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $questionRow['_answers'] = [];
 
+                /* Decompile config
+                 */
+                $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
+
                 /* Get each question's answers
                  */
                 $answerStatement->execute([
@@ -289,6 +293,8 @@ HELP;
                 ]);
 
                 while ($answerRow = $answerStatement->fetch(\PDO::FETCH_ASSOC)) {
+                    $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
+
                     $questionRow['_answers'][] = $answerRow;
                 }
 
@@ -299,6 +305,52 @@ HELP;
         }
 
         return $quizRow;
+    }
+
+
+    /**
+     * Question Configurations hid some settings which we can use in Learnosity Land
+     *
+     * @param array $question
+     * @return mixed
+     */
+    private function decompileQuestionConfig(array $question): mixed
+    {
+        if ('' !== (string)$question['config']) {
+            return json_decode($question['config'], true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        return $question['config'];
+    }
+
+
+    /**
+     * Certain question types were supposed to have serialized answers
+     * These were never really treated like a codec and the handlers
+     * are intertwined with phplibs, which is annoying
+     *
+     * @param array $question
+     * @param array $answer
+     * @return mixed
+     */
+    private function decompileAnswer(array $question, array $answer): mixed
+    {
+        /* Quiz only uses types 2, 4 and 5
+         * (6,8,9,10,17 are all Survey)
+         */
+        $serializedAnswers = [
+            2, // Multi
+            4, // Match
+            5, // Radio
+        ];
+
+        if (in_array($question['type_id'], $serializedAnswers, false)) {
+            return unserialize($answer['answer'], [
+                'allowed_classes' => true
+            ]);
+        }
+
+        return $answer['answer'];
     }
 
 
