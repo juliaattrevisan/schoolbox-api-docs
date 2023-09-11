@@ -100,12 +100,10 @@ class Controller extends Base
     public function postSave()
     {
         // Blow away old permissions, could probably be more graceful and update
-
         $this->courseConfigMapper->deleteByColumn('page', 'course');
         $this->courseConfigMapper->deleteByColumn('page', 'unit');
 
         // Add course permissions back
-
         foreach ($this->requestPost->get('course_group', []) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('course');
@@ -115,7 +113,6 @@ class Controller extends Base
         }
 
         // Add unit permissions back
-
         foreach ($this->requestPost->get('unit_group', []) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('unit');
@@ -125,31 +122,6 @@ class Controller extends Base
         }
 
         // Update course templates
-        /**
-         * expected object to be received:
-         * ```
-         * [
-             * {
-             * "name": "Senior",
-             * "id": -1,
-             * "courseTemplate": 1,
-             * "unitTemplate": 5
-             * },
-             * {
-             * "name": "Junior",
-             * "id": -2,
-             * "courseTemplate": 2,
-             * "unitTemplate": 3
-             * },
-             * {
-             * "name": "Default",
-             * "id": 1,
-             * "courseTemplate": 1,
-             * "unitTemplate": 3
-             * }
-         * ]
-         * ```
-         */
         $templates = $this->courseTemplateMapper->createCollection();
         // get list of all posted template groups
         foreach (json_decode($this->getRequestPost()->get('templates', ''), true) as $templateGroup) {
@@ -171,7 +143,6 @@ class Controller extends Base
         $this->courseTemplateMapper->save($templates);
 
         // Update default inheritance
-
         $courseTemplate = $this->configMapper->findOneByColumn("name", "course_builder_default_course_page_inherit");
         $courseTemplate->setValue((string)(int)$this->requestPost->get('courseInherit'));
         $this->configMapper->save($courseTemplate);
@@ -186,6 +157,17 @@ class Controller extends Base
 //        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
     }
 
+    /**
+     * Soft delete the selected course template.
+     * This does nothing to the courses that are using this template.
+     * But will prevent any future courses from using this template.
+     *
+     * @api DELETE /adminv2/course-builder/delete/{templateId:\d+}
+     *
+     * @param $template
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function deleteTmpl($template): void
     {
         // ensure there is still 1 option left...

@@ -40,7 +40,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit', 'getAudit', $perms);
         $this->register('GET', "{/tab}", 'getIndex', $perms);
         $this->register('POST', "/save", 'postSave', $perms);
-        $this->register('DELETE', "/delete/{templateId}", 'deleteTmpl', $perms, $loadTemplate);
+        $this->register('DELETE', "/delete/{templateId:\d+}", 'deleteTmpl', $perms, $loadTemplate);
     }
 
     /**
