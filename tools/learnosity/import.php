@@ -56,6 +56,18 @@ $app = new class extends CliTool\App
 
 
     /**
+     * For prepared statements
+     */
+    private const QUERY_PARTICULAR_QUIZ = '
+        SELECT *
+        FROM assess
+        WHERE deleted_at IS NULL
+        AND learnosity_reference IS NULL
+        AND assessment_id = :assessmentId
+    ';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -113,6 +125,9 @@ HELP;
         } else {
             /* Get $assessmentId
              */
+            $legacyQuizzes = [$this->getQuiz((int)$assessmentId)];
+
+
         }
 
 
@@ -193,16 +208,30 @@ HELP;
      *     * is not yet in learnosity
      *
      * @param int $assessId
-     * @return void
+     * @return array
      */
-    private function getQuiz(int $assessId)
+    private function getQuiz(int $assessId): array
     {
-        $query = "
-            SELECT *
-            FROM assess
-            WHERE deleted_at IS NULL
-            AND learnosity_reference IS NULL
-        ";
+        $statement = $this->getDatabaseInternal()->prepare(self::QUERY_PARTICULAR_QUIZ);
+
+        $statement->execute([
+            'assessmentId' => $assessId
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $quiz = $row;
+
+            /* Get its sections
+             */
+
+            /* Get each section's questions
+             */
+
+            /* Get each question's answers
+             */
+        }
+
+        return $quiz;
     }
 
 
