@@ -13,6 +13,7 @@ use Interop\Queue\Context;
 use Interop\Queue\Exception;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
+use Schoolbox\TaskDaemon\Message\HeaderAdapter;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\TaskDaemon\Request\MessageSerializer;
 
@@ -22,33 +23,20 @@ use Schoolbox\TaskDaemon\Request\MessageSerializer;
 class Producer
 {
     /**
-     * The queue context to which messages will be sent.
-     */
-    private Context $context;
-
-    /**
-     * Serializer for converting messages to a format which the task daemon
-     * may understand.
-     */
-    private MessageSerializer $messageSerializer;
-
-    /**
-     * The name of the queue to send messages to.
-     */
-    private string $queueName;
-
-    /**
      * Constructor
      *
-     * @param Context           $context
-     * @param string            $queueName
-     * @param MessageSerializer $messageSerializer
+     * @param Context           $context           The queue context to which messages will be sent.
+     * @param string            $queueName         Serializer for converting messages to a format which the task daemon
+     *                                             may understand.
+     * @param MessageSerializer $messageSerializer The name of the queue to send messages to.
+     * @param HeaderAdapter     $headerAdapter     Adapter for setting task daemon specific headers on messages.
      */
-    public function __construct(Context $context, string $queueName, MessageSerializer $messageSerializer)
-    {
-        $this->context           = $context;
-        $this->queueName         = $queueName;
-        $this->messageSerializer = $messageSerializer;
+    public function __construct(
+        private Context $context,
+        private string $queueName,
+        private MessageSerializer $messageSerializer,
+        private HeaderAdapter $headerAdapter,
+    ) {
     }
 
     /**
@@ -69,9 +57,16 @@ class Producer
      */
     public function send(Message $message, ?float $delay = null, ?int $maxAttempts = null): void
     {
+        $enqueueMessage = $this->context->createMessage($this->messageSerializer->serialize($message));
+        if (isset($delay)) {
+            $this->headerAdapter->setDelay($enqueueMessage, $delay);
+        }
+        if (isset($maxAttempts)) {
+            $this->headerAdapter->setMaxAttempts($enqueueMessage, $maxAttempts);
+        }
         $this->context->createProducer()->send(
             $this->context->createQueue($this->queueName),
-            $this->context->createMessage($this->messageSerializer->serialize($message)),
+            $enqueueMessage,
         );
     }
 }
