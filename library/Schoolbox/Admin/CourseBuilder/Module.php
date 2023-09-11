@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Admin\CourseBuilder;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
@@ -25,23 +24,15 @@ class Module extends BaseModule
 {
     protected $basename = 'adminCourseBuilder';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutes(string $basePath)
+    protected function registerRoutes(): void
     {
-        $this->addGetRoute('getIndex', $basePath, "{/tab}");
-        $this->addPostRoute('postSave', $basePath, "/save");
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        $perms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser()
+        );
+        $this->register('GET', '/audit', 'getAudit', $perms);
+        $this->register('GET', "{/tab}", 'getIndex', $perms);
+        $this->register('POST', "/save", 'postSave', $perms);
     }
 
     /**
