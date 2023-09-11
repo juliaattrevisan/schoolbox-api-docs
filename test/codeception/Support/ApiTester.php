@@ -29,7 +29,7 @@ class ApiTester extends \Codeception\Actor
      * @return mixed
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getToken(int $userId)
+    public function getToken(int $userId): mixed
     {
         $token = $this->getAdminToken();
         $this->amBearerAuthenticated($token);
@@ -44,7 +44,7 @@ class ApiTester extends \Codeception\Actor
      * @return void
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function switchUser(\Schoolbox\User $user)
+    public function switchUser(\Schoolbox\User $user): void
     {
         $this->comment("Log in as {$user->getUsername()} ({$user->getId()})");
         $token = $this->getToken($user->getId());
@@ -55,11 +55,12 @@ class ApiTester extends \Codeception\Actor
 
 
     /**
-     * @param array $response
-     * @param array $schema
+     * @param array  $response
+     * @param array  $schema
+     * @param string $baseJsonPath
      * @return void
      */
-    public function checkSchema(array $response, array $schema): void
+    public function checkSchema(array $response, array $schema, string $baseJsonPath = '$.data[0]'): void
     {
         $notDocumentedProperties = array_diff(array_keys($response), array_keys($schema['properties']));
         $this->assertEmpty($notDocumentedProperties, 'Checked properties missing in document.');
@@ -70,7 +71,10 @@ class ApiTester extends \Codeception\Actor
                 $this->comment("$key doesn't have type : " . json_encode($value));
                 continue;
             }
-            if ($value['type'] === 'object') {
+            $responseVal = $this->grabDataFromResponseByJsonPath("$baseJsonPath.$key");
+            if ($responseVal[0] === null) {
+                $this->assertTrue(array_key_exists('nullable', $value));
+            } elseif ($value['type'] === 'object') {
                 if (!isset($value['properties'])) {
                     $this->comment("Object $key doesn't have properties");
                     continue;
@@ -80,20 +84,15 @@ class ApiTester extends \Codeception\Actor
                         $this->comment("$key doesn't have type : " . json_encode($value));
                         continue;
                     }
-                    $responseVal = $this->grabDataFromResponseByJsonPath("$.data[0].$key.$subKey");
+                    $responseVal = $this->grabDataFromResponseByJsonPath("$baseJsonPath.$key.$subKey");
                     if ($responseVal[0] === null) {
                         $this->assertTrue(array_key_exists('nullable', $subValue));
                     } else {
-                        $this->seeResponseMatchesJsonType([$subKey => $subValue['type']], "$.data[0].$key");
+                        $this->seeResponseMatchesJsonType([$subKey => $subValue['type']], "$baseJsonPath.$key");
                     }
                 }
             } else {
-                $responseVal = $this->grabDataFromResponseByJsonPath("$.data[0].$key");
-                if ($responseVal[0] === null) {
-                    $this->assertTrue(array_key_exists('nullable', $value));
-                } else {
-                    $this->seeResponseMatchesJsonType([$key => $value['type']], "$.data[0]");
-                }
+                $this->seeResponseMatchesJsonType([$key => $value['type']], $baseJsonPath);
             }
 
             $this->assertArrayHasKey($key, $response, "Checked whether property $key in document exists in response.");

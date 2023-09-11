@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Tests\Api\Assessment;
 
+use Aura\Di\Exception\ServiceNotFound;
+use Generator;
+use Symfony\Component\Yaml\Yaml;
 use Tests\Support\ApiTester;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -24,22 +27,21 @@ class ApiAssessmentCest
 
     private IAssessable $dueWork;
 
-    public function _before(ApiTester $i)
+    public function _before(ApiTester $i): void
     {
         // rely on an existing assessment for now
         $this->dueWork = $i->getExistingAssessment(null);
-        $this->folder = $this->dueWork->getBaseContext()->getFolder();
+        $this->folder  = $this->dueWork->getBaseContext()->getFolder();
     }
 
     /**
      * @param ApiTester $i
      * @return void
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
-    public function run(ApiTester $i)
+    public function run(ApiTester $i): void
     {
         $users = $i->getUsers();
-        /** @var User $user */
         foreach ($users as $user) {
             $this->testGet($i, $user);
         }
@@ -49,9 +51,9 @@ class ApiAssessmentCest
      * Get a list of assessments
      * @param ApiTester $i
      * @param User      $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
-    private function testGet(ApiTester $i, User $user)
+    private function testGet(ApiTester $i, User $user): void
     {
         $i->switchUser($user);
         foreach ($this->filterData() as $filterData) {
@@ -69,16 +71,25 @@ class ApiAssessmentCest
                     continue;
                 }
                 $dataCount = count($i->grabDataFromResponseByJsonPath('$.data')[0]);
-                $i->comment("{$dataCount} retrieved.");
+                $i->comment("$dataCount retrieved.");
                 $count = $i->grabDataFromResponseByJsonPath('$.metadata.count');
-                $i->comment("{$count[0]} found.");
+                $i->comment("$count[0] found.");
+                $schemaFile = '/tmp/schoolbox-api-docs/openapi/components/schemas/assessment-item.yaml';
+                if ($dataCount > 0 && file_exists($schemaFile)) {
+                    $schema   = Yaml::parseFile($schemaFile);
+                    $response = $i->grabDataFromResponseByJsonPath("$.data[0]");
+                    $i->checkSchema($response[0], $schema);
+                }
             } else {
                 $i->seeResponseCodeIs(401);
             }
         }
     }
 
-    private function filterData()
+    /**
+     * @return Generator
+     */
+    private function filterData(): Generator
     {
         yield [
             'filter' => [

@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Tests\Api\News;
 
+use Aura\Di\Exception\ServiceNotFound;
+use Generator;
+use Symfony\Component\Yaml\Yaml;
 use Tests\Support\ApiTester;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
-use Schoolbox\User;
 
 /**
  * news@create.yaml
@@ -22,7 +24,7 @@ class NewsCreateCest
 {
     private Folder $folder;
 
-    public function _before(ApiTester $i)
+    public function _before(ApiTester $i): void
     {
         $this->folder = $i->getFolder();
     }
@@ -31,15 +33,15 @@ class NewsCreateCest
     /**
      * Create a news article
      * @param ApiTester $i
+     * @throws ServiceNotFound
      */
-    public function testPost(ApiTester $i)
+    public function testPost(ApiTester $i): void
     {
         $users     = $i->getUsers();
         $superUser = $i->createTestUser('super-' . time(), Role::STAFF, true);
 
         $articleIds = [];
 
-        /** @var User $user */
         foreach ($users as $user) {
             $i->switchUser($user);
             foreach ($this->getCreateTestData($i) as $postData) {
@@ -55,6 +57,20 @@ class NewsCreateCest
                 } else {
                     $i->seeResponseCodeIs(401);
                 }
+                $i->sendGet('/news/' . $articleId);
+                $schemaFile = '/tmp/schoolbox-api-docs/openapi/components/schemas/news/commonFields.yaml';
+                if (file_exists($schemaFile)) {
+                    $schema         = Yaml::parseFile($schemaFile);
+                    $responseSchema = Yaml::parseFile('/tmp/schoolbox-api-docs/openapi/paths/news@{id}.yaml');
+
+                    $props2 = $responseSchema['get']['responses']['200']['content']['application/json']['schema']['properties']['article']['allOf'][1];
+                    $schema = array_merge_recursive($schema, $props2);
+                    // TODO: codecept doesn't seem to be detecting type of _links properly
+                    unset($schema['properties']['featureImage']['properties']['_links']['type']);
+                    $response = $i->grabDataFromResponseByJsonPath('$.article');
+                    $i->checkSchema($response[0], $schema, '$.article');
+                }
+
 
                 $articleIds[] = $articleId;
             }
@@ -73,15 +89,31 @@ class NewsCreateCest
             ];
 
             $i->sendPostAsJson("/discussion/comms/$articleId/threads", $threadData);
+            $schemaFile = '/tmp/schoolbox-api-docs/openapi/components/schemas/discussionThread-read.yaml';
+            if (file_exists($schemaFile)) {
+                $schema   = Yaml::parseFile($schemaFile);
+                $response = $i->grabDataFromResponseByJsonPath('$');
+                $i->checkSchema($response[0], $schema, '$');
+            }
+
             $threadId = $i->grabDataFromResponseByJsonPath('$.id')[0];
             $i->sendPost("/discussion/comms/$articleId/threads/$threadId/comments", $commentData);
             $i->seeResponseCodeIs(200);
             $i->sendGet("/discussion/comms/$articleId/threads/$threadId/comments", []);
-            $test = $i->grabResponse();
+            $schemaFile = '/tmp/schoolbox-api-docs/openapi/components/schemas/discussionComment-read.yaml';
+            if (file_exists($schemaFile)) {
+                $schema   = Yaml::parseFile($schemaFile);
+                $response = $i->grabDataFromResponseByJsonPath('$.data[0]');
+//                $i->checkSchema($response[0], $schema);
+            }
         }
     }
 
-    private function getCreateTestData(ApiTester $i)
+    /**
+     * @param ApiTester $i
+     * @return Generator
+     */
+    private function getCreateTestData(ApiTester $i): Generator
     {
         yield [
             'data' => [
