@@ -55,8 +55,11 @@ $app = new class extends CliTool\App
     private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
 
 
+    /* For prepared statements
+     */
+
     /**
-     * For prepared statements
+     * Get a particular schoolbox.assess row that not part of Learnosity already
      */
     private const QUERY_PARTICULAR_QUIZ = '
         SELECT *
@@ -64,6 +67,18 @@ $app = new class extends CliTool\App
         WHERE deleted_at IS NULL
         AND learnosity_reference IS NULL
         AND assessment_id = :assessmentId
+    ';
+
+
+    /**
+     * Get the sections in a particular schoolbox.assess
+     */
+    private const QUERY_SECTION = '
+        SELECT *
+        FROM assess_section
+        WHERE deleted_at IS NULL
+        AND assess_id = :assessId
+        ORDER BY sequence ASC
     ';
 
 
@@ -126,10 +141,9 @@ HELP;
             /* Get $assessmentId
              */
             $legacyQuizzes = [$this->getQuiz((int)$assessmentId)];
-
-
         }
 
+        print_r($legacyQuizzes);
 
         /* Commencing migration
          */
@@ -212,23 +226,34 @@ HELP;
      */
     private function getQuiz(int $assessId): array
     {
-        $statement = $this->getDatabaseInternal()->prepare(self::QUERY_PARTICULAR_QUIZ);
-
-        $statement->execute([
+        $quizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_PARTICULAR_QUIZ);
+        $quizStatement->execute([
             'assessmentId' => $assessId
         ]);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $quiz = $row;
+        $quiz = [];
+
+        while ($quizRow = $quizStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $quiz = $quizRow;
+            $quiz['_sections'] = [];
 
             /* Get its sections
              */
+            $sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
+            $sectionsStatement->execute([
+                'assessId' => $quiz['assess_id']
+            ]);
 
-            /* Get each section's questions
-             */
+            while ($sectionRow = $sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $quiz['_sections'][] = $sectionRow;
 
-            /* Get each question's answers
-             */
+                /* Get each section's questions
+                 */
+
+                /* Get each question's answers
+                 */
+            }
+
         }
 
         return $quiz;
