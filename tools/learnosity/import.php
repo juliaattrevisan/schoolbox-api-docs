@@ -11,6 +11,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
+use Schoolbox\Learning\Learnosity\TagFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -215,7 +216,7 @@ HELP;
 
         /* Generates sets of tags for Activities' and Items' assignations
          */
-        $tagFactory = new \Schoolbox\Learning\Learnosity\TagFactory($this->getConfig()->get('site_school_code'));
+        $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
 
         /* Produces Learnosity payloads
          */
