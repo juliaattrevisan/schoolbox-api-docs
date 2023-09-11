@@ -47,7 +47,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
     private function isVisibleToCurrentUser(ResourceVideo $video): bool
     {
         // Read access users should not be able to see hidden videos.
-        return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
+        return !$video->getFile()->isHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
     }
 
     /**
