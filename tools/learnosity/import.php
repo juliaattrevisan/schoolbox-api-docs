@@ -231,32 +231,30 @@ HELP;
             'assessmentId' => $assessId
         ]);
 
-        $quiz = [];
+        $quizRow = $quizStatement->fetch(\PDO::FETCH_ASSOC);
 
-        while ($quizRow = $quizStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $quiz = $quizRow;
-            $quiz['_sections'] = [];
+        $quizRow['_sections'] = [];
 
-            /* Get its sections
+        /* Get its sections
+         */
+        $sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
+        $sectionsStatement->execute([
+            'assessId' => $quizRow['assess_id']
+        ]);
+
+        while ($sectionRow = $sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $sectionRow['_questions'] = [];
+
+            $quizRow['_sections'][] = $sectionRow;
+
+            /* Get each section's questions
              */
-            $sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
-            $sectionsStatement->execute([
-                'assessId' => $quiz['assess_id']
-            ]);
 
-            while ($sectionRow = $sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $quiz['_sections'][] = $sectionRow;
-
-                /* Get each section's questions
-                 */
-
-                /* Get each question's answers
-                 */
-            }
-
+            /* Get each question's answers
+             */
         }
 
-        return $quiz;
+        return $quizRow;
     }
 
 
