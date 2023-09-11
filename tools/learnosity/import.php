@@ -83,6 +83,30 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Get the questions in a particular schoolbox.assess_section
+     */
+    private const QUERY_QUESTION = '
+        SELECT *
+        FROM assess_question
+        WHERE deleted_at IS NULL
+        AND section_id = :sectionId
+        ORDER BY sequence ASC
+    ';
+
+
+    /**
+     * Get the answers in a particular schoolbox.assess_question
+     */
+    private const QUERY_ANSWER = '
+        SELECT *
+        FROM assess_answer
+        WHERE deleted_at IS NULL
+        AND question_id = :questionId
+        ORDER BY sequence ASC
+    ';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -232,7 +256,6 @@ HELP;
         ]);
 
         $quizRow = $quizStatement->fetch(\PDO::FETCH_ASSOC);
-
         $quizRow['_sections'] = [];
 
         /* Get its sections
@@ -245,13 +268,31 @@ HELP;
         while ($sectionRow = $sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
             $sectionRow['_questions'] = [];
 
-            $quizRow['_sections'][] = $sectionRow;
-
             /* Get each section's questions
              */
+            $questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
+            $questionStatement->execute([
+                'sectionId' => $sectionRow['section_id']
+            ]);
 
-            /* Get each question's answers
-             */
+            while ($questionRow = $questionStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $questionRow['_answers'] = [];
+
+                /* Get each question's answers
+                 */
+                $answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
+                $answerStatement->execute([
+                    'questionId' => $questionRow['question_id']
+                ]);
+
+                while ($answerRow = $answerStatement->fetch(\PDO::FETCH_ASSOC)) {
+                    $questionRow['_answers'][] = $answerRow;
+                }
+
+                $sectionRow['_questions'][] = $questionRow;
+            }
+
+            $quizRow['_sections'][] = $sectionRow;
         }
 
         return $quizRow;
