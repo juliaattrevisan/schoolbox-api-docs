@@ -178,7 +178,8 @@ class MessageFactory
                     $zipFilename,
                 ),
             ])
-            ->build($zipFilename);
+            ->setOutfile($zipFilename)
+            ->build();
     }
 
     /**

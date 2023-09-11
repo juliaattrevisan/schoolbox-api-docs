@@ -16,6 +16,11 @@ use Schoolbox\User;
 
 /**
  * Factory for building request messages.
+ *
+ * Most use-cases for the task daemon should extend `BaseMessageFactory`
+ * instead: that class provides convenience methods for the basic task daemon
+ * parameters, and also allows override for building parameters for each task
+ * type.
  */
 class MessageFactory
 {

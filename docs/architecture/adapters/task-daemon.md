@@ -57,6 +57,7 @@ $messageProducer->send($message);
 $message = $downloadPagesMessageFactory
     ->addFileContent('image.jpg', 'https://example.com/image.jpg')
     ->addPdfContent('index.pdf', 'https://instance.schoolbox.cloud/')
-    ->build('output.zip');
+    ->setOutfile('output.zip')
+    ->build();
 $messageProducer->send($message);
 ```

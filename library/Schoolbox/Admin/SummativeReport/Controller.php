@@ -691,7 +691,8 @@ class Controller extends ConfigController
                     'to'      => call_user_func($userSerializer, $this->getUser()),
                 ])
                 ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
-                ->build($outfile);
+                ->setOutfile($outfile)
+                ->build();
 
             /* Send it to task for async processing
              */
