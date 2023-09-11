@@ -281,6 +281,14 @@ HELP;
 
             /* Send it
              */
+            $this->getLogger()->info(sprintf(
+                'Importing quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
+                $legacyQuiz['title'],
+                $legacyQuiz['assessment_id'],
+                $legacyQuiz['assess_id'],
+                $activity['reference']
+            ));
+
             $api->dataSetRequest('/itembank/activities', $activityPayload);
         }
 
