@@ -12,7 +12,6 @@ use Schoolbox\Video\ResourceVideo;
 
 class Component_Dashboard_VideoController extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * @var Collection|ResourceVideo[]
      */
