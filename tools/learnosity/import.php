@@ -249,7 +249,9 @@ HELP;
 
             /* TODO Potentially aggregate N records instead of one at a time?
              */
-            $activityPayload = [];
+            $activityPayload = [
+                'activities' => []
+            ];
 
             /* Get the legacy quiz's contents
              */
@@ -258,15 +260,16 @@ HELP;
             /* Set up a Learnosity Activity payload
              * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
              */
-            $activity = $this->setupActivityPayload($tagFactory->produce(null, null, null));
+            $activity = $this->setupActivityPayload(
+                $legacyQuiz,
+                $tagFactory->produce(null, null, null)
+            );
 
+            $activityPayload['activities'][] = $activity;
 
-
-            $activityPayload[] = $activity;
-            print_r($activityPayload);
             /* Send it
              */
-//            $api->dataSetRequest('/itembank/activities', $activityPayload);
+            $api->dataSetRequest('/itembank/activities', $activityPayload);
         }
 
 
@@ -386,57 +389,50 @@ HELP;
 
         /* Final stack
          */
-        $quizzes = [];
+        $quizRow = $this->quizStatement->fetch(\PDO::FETCH_ASSOC);
+        $quizRow['_sections'] = [];
 
-        while ($quizRow = $this->quizStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $quizRow['_sections'] = [];
+        /* Get its sections
+         */
+        $this->sectionsStatement->execute([
+            'assessId' => $quizRow['assess_id']
+        ]);
 
-            /* Get its sections
+        while ($sectionRow = $this->sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $sectionRow['_questions'] = [];
+
+            /* Get each section's questions
              */
-            $this->sectionsStatement->execute([
-                'assessId' => $quizRow['assess_id']
+            $this->questionStatement->execute([
+                'sectionId' => $sectionRow['section_id']
             ]);
 
-            while ($sectionRow = $this->sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $sectionRow['_questions'] = [];
+            while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $questionRow['_answers'] = [];
 
-                /* Get each section's questions
+                /* Decompile config
                  */
-                $this->questionStatement->execute([
-                    'sectionId' => $sectionRow['section_id']
+                $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
+
+                /* Get each question's answers
+                 */
+                $this->answerStatement->execute([
+                    'questionId' => $questionRow['question_id']
                 ]);
 
-                while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
-                    $questionRow['_answers'] = [];
+                while ($answerRow = $this->answerStatement->fetch(\PDO::FETCH_ASSOC)) {
+                    $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
 
-                    /* Decompile config
-                     */
-                    $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
-
-                    /* Get each question's answers
-                     */
-                    $this->answerStatement->execute([
-                        'questionId' => $questionRow['question_id']
-                    ]);
-
-                    while ($answerRow = $this->answerStatement->fetch(\PDO::FETCH_ASSOC)) {
-                        $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
-
-                        $questionRow['_answers'][] = $answerRow;
-                    }
-
-                    $sectionRow['_questions'][] = $questionRow;
+                    $questionRow['_answers'][] = $answerRow;
                 }
 
-                $quizRow['_sections'][] = $sectionRow;
+                $sectionRow['_questions'][] = $questionRow;
             }
 
-            /* Stack it up
-             */
-            $quizzes[] = $quizRow;
+            $quizRow['_sections'][] = $sectionRow;
         }
 
-        return $quizzes;
+        return $quizRow;
     }
 
 
@@ -489,17 +485,14 @@ HELP;
     /**
      * Set up a payload for a single activity
      *
+     * @param array $legacyQuiz
      * @param array $tags
      * @return array
      */
-    private function setupActivityPayload(array $tags): array
+    private function setupActivityPayload(array $legacyQuiz, array $tags): array
     {
-        return [
-            'reference' => (string)Uuid::uuid4(),
+        $activity = [
             'data' => [
-                /* Fill in after the fact
-                 */
-                'items' => [],
                 'config' => [
                     /* TODO dedupe this with the other implementation, I suppose
                      *  Not sure where it would go though
@@ -537,13 +530,52 @@ HELP;
                             ['type' => 'next_button'],
                         ]
                     ],
+                    /* Time (duration)
+                     */
+                    'time' => [
+                        /* Force submission when time expires
+                         * TODO may be controversial but seems desired, since it minimises
+                         *  the quantity of "unfinalised attempts"
+                         */
+                        'limit_type' => 'hard',
+                        /* Show countdown timer
+                         * TODO may be controversial (stressful)
+                         */
+                        'countdown_option' => true
+                    ]
                 ],
+                /* Fill in after the fact
+                 */
+                'items' => [],
                 'rendering_type' => 'assess'
             ],
-            /* TODO Fill in with some derived values about courses and units and classcodes
+
+            /* A unique uuid in learnosity land that we can arbitrarily assign here
+             */
+            'reference' => (string)Uuid::uuid4(),
+            /* Always spawn in PUBLISHED state
+             */
+            'status' => \Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
+            /* The name of the quiz
+             */
+            'title' => $legacyQuiz['title'],
+            /* Tags
+             * TODO Fill in with some derived values about courses and units and classcodes
              */
             'tags' => $tags
         ];
+
+        if ((int)$legacyQuiz['duration']) {
+            /* If a duration was set, configure it similarly
+             */
+            $activity['data']['config']['time']['max_time'] = (int)$legacyQuiz['duration'];
+
+            /* Warn users when 60 seconds remains
+             */
+            $activity['data']['config']['time']['warning_time'] = 60;
+        }
+
+        return $activity;
     }
 
 
