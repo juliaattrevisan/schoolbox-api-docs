@@ -256,55 +256,11 @@ HELP;
             $legacyQuiz = $this->getQuiz($legacyQuizId);
 
             /* Set up a Learnosity Activity payload
+             * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
              */
-            $activity = [
-                'reference' => (string)Uuid::uuid4(),
-                'data' => [
-                    'items' => [],
-                    'config' => [
-                        /* TODO dedupe this with the other implementation, I suppose
-                         *  Not sure where it would go though
-                         */
-                        'regions' => [
-                            'top-left' => [
-                                ['type' => 'title_element'],
-                            ],
-                            'top-right' => [
-                                ['type' => 'itemcount_element'],
-                                ['type' => 'pause_button'],
-                                ['type' => 'reading_timer_element'],
-                                ['type' => 'timer_element'],
-                            ],
-                            'items' => [
-                                ['type' => 'progress_element'],
-                                ['type' => 'slider_element']
-                            ],
-                            'right' => [
-                                ['type' => 'save_button'],
-                                ['type' => 'reviewscreen_button'],
-                                ['type' => 'resource_button'],
-                                ['type' => 'accessibility_button'],
-                                ['type' => 'flagitem_button'],
-                                ['type' => 'masking_button'],
-                                ['type' => 'verticaltoc_element'],
-                            ],
-                            'bottom-left' => [
-                                [
-                                    'type' => 'previous_button',
-                                    'show_label_option' => true
-                                ],
-                            ],
-                            'bottom-right' => [
-                                ['type' => 'next_button'],
-                            ]
-                        ],
-                    ],
-                    'rendering_type' => 'assess'
-                ],
-                /* TODO Fill in with some derived values about courses and units and classcodes
-                 */
-                'tags' => $tagFactory->produce(null, null, null)
-            ];
+            $activity = $this->setupActivityPayload($tagFactory->produce(null, null, null));
+
+
 
             $activityPayload[] = $activity;
             print_r($activityPayload);
@@ -527,6 +483,67 @@ HELP;
         }
 
         return $answer['answer'];
+    }
+
+
+    /**
+     * Set up a payload for a single activity
+     *
+     * @param array $tags
+     * @return array
+     */
+    private function setupActivityPayload(array $tags): array
+    {
+        return [
+            'reference' => (string)Uuid::uuid4(),
+            'data' => [
+                /* Fill in after the fact
+                 */
+                'items' => [],
+                'config' => [
+                    /* TODO dedupe this with the other implementation, I suppose
+                     *  Not sure where it would go though
+                     */
+                    'regions' => [
+                        'top-left' => [
+                            ['type' => 'title_element'],
+                        ],
+                        'top-right' => [
+                            ['type' => 'itemcount_element'],
+                            ['type' => 'pause_button'],
+                            ['type' => 'reading_timer_element'],
+                            ['type' => 'timer_element'],
+                        ],
+                        'items' => [
+                            ['type' => 'progress_element'],
+                            ['type' => 'slider_element']
+                        ],
+                        'right' => [
+                            ['type' => 'save_button'],
+                            ['type' => 'reviewscreen_button'],
+                            ['type' => 'resource_button'],
+                            ['type' => 'accessibility_button'],
+                            ['type' => 'flagitem_button'],
+                            ['type' => 'masking_button'],
+                            ['type' => 'verticaltoc_element'],
+                        ],
+                        'bottom-left' => [
+                            [
+                                'type' => 'previous_button',
+                                'show_label_option' => true
+                            ],
+                        ],
+                        'bottom-right' => [
+                            ['type' => 'next_button'],
+                        ]
+                    ],
+                ],
+                'rendering_type' => 'assess'
+            ],
+            /* TODO Fill in with some derived values about courses and units and classcodes
+             */
+            'tags' => $tags
+        ];
     }
 
 
