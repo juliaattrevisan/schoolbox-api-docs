@@ -172,10 +172,7 @@ class Controller extends Base
     {
         // ensure there is still 1 option left...
         if (1 === $this->courseTemplateMapper->countAll()) {
-            $problem = (new ApiProblem('Must have 1 Course Template available'))
-                ->setStatus(409)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(409);
+            $this->sendJsonError('Must have 1 Course Template available', 409);
             return; //exit early
         }
 
