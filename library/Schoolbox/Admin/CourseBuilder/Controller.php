@@ -40,8 +40,6 @@ class Controller extends Base
 
     /**
      * Show options
-     *
-     * @param string $tab
      */
     public function getIndex()
     {
