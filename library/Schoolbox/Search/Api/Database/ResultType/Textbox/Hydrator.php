@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
+use Alaress\Html\ToText;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Textbox\Model as TextboxModel;
@@ -74,6 +75,7 @@ class Hydrator extends BaseHydrator
                     if ($textboxAccess < UserAccess::ACCESS_READ) {
                         return null;
                     }
+                    $textboxBody = (new ToText($textbox->getBody()))->getText();
                     return new FullResult(
                         $match,
                         $match->id,
@@ -89,7 +91,7 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         'textbox',
-                        $this->truncateAroundKeyword($keyword, $textbox->getBody(), self::DESCRIPTION_LENGTH),
+                        $this->truncateAroundKeyword($keyword, $textboxBody) ?? $this->truncate($textboxBody),
                         null,
                         [$textbox->getCategory(),], // Context: textbox's folder
                         [], // texbox: none.

@@ -175,21 +175,15 @@ class Hydrator extends BaseHydrator
     {
         // Find keyword in blurb, then body
         if ($article->getBlurb()) {
-            $truncatedBlurb = $this->truncateAroundKeyword(
-                $keyword,
-                (new ToText($article->getBlurb()))->getText(),
-                self::DESCRIPTION_LENGTH,
-            );
+            $blurbText = (new ToText($article->getBlurb()))->getText();
+            $truncatedBlurb = $this->truncateAroundKeyword($keyword, $blurbText) ?? $this->truncate($blurbText);
             if ($truncatedBlurb) {
                 return $truncatedBlurb;
             }
         }
         if ($article->getBody()) {
-            return $this->truncateAroundKeyword(
-                $keyword,
-                (new ToText($article->getBody()))->getText(),
-                self::DESCRIPTION_LENGTH,
-            );
+            $bodyText = (new ToText($article->getBody()))->getText();
+            return $this->truncateAroundKeyword($keyword, $bodyText) ?? $this->truncate($bodyText);
         }
 
         return null;

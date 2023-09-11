@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
+use Alaress\Html\ToText;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
@@ -76,14 +77,14 @@ class Hydrator extends BaseHydrator
                         $image = $this->prefixGenerator->generate() . $badge->getIcon();
                     }
                     if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
-                        $image =   $this->buildStorageImageUrl($badge->getImage())->__toString();
+                        $image = $this->buildStorageImageUrl($badge->getImage())->__toString();
                     }
-
+                    $badgeBody = (new ToText($badge->getBody()))->getText();
                     return new FullResult(
                         $match,
                         $match->id,
                         $badge->getName(), // The closest thing to a title for a badge is badge.name.
-                        '', // There is no 'view specific badge' page, so blank string here.
+                        '',  // There is no 'view specific badge' page, so blank string here.
                         $match->type,
                         $match->relevance,
                         $badge->getUpdatedAt(),
@@ -91,7 +92,7 @@ class Hydrator extends BaseHydrator
                         $badge->getCategory()->getName(), // Meta.  Context line for the search result.
                         $image,
                         'badge',
-                        $this->truncateAroundKeyword($keyword, $badge->getBody(), self::DESCRIPTION_LENGTH),
+                        $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
                         $badge->getCreatedBy(),
                         [], // Context.  Empty since no linked folder.
                         [], // Links.  None for badges.
