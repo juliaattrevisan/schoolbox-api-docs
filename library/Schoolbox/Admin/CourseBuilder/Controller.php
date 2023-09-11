@@ -151,10 +151,8 @@ class Controller extends Base
         $unitTemplate->setValue((string)(int)$this->requestPost->get('unitInherit'));
         $this->configMapper->save($unitTemplate);
 
-        // Send them back to the admin page
-
-        echo "yay complete..";
-//        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
+        // Success, just return nothing. no errors occurred...
+        $this->response = $this->responseEmpty();
     }
 
     /**
