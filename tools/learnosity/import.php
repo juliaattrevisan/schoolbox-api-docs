@@ -8,7 +8,9 @@
 
 declare(strict_types=1);
 
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Learnosity\Api;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -53,6 +55,12 @@ $app = new class extends CliTool\App
      * Import a particular quiz from the schoolbox.assessment table
      */
     private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
+
+
+    /**
+     * Learnosity has some strict requirements about where api requests originate
+     */
+    private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
 
 
     /* For prepared statements
@@ -191,6 +199,22 @@ HELP;
             return;
         }
 
+        /* Don't have access to $_SERVER superglobal here
+         * TODO Maybe make this into a cli arg if you use this outside of vagrant
+         */
+        $serverName = self::DEFAULT_SERVER_NAME;
+
+        /* Initialise dependencies
+         */
+        $api = new Api(
+            $serverName,
+            $this->getConfig()->get('learnosity_consumer_key'),
+            $this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getLogger()
+        );
+
+        $tagFactory = new \Schoolbox\Learning\Learnosity\TagFactory($this->getConfig()->get('site_school_code'));
+
         /* Precompile queries
          */
         $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
@@ -221,9 +245,72 @@ HELP;
         $this->getLogger()->info('Learnosity Migration.');
 
         foreach ($legacyQuizIds as $legacyQuizId) {
+            $this->refreshLock($lock);
+
+            /* TODO Potentially aggregate N records instead of one at a time?
+             */
+            $activityPayload = [];
+
+            /* Get the legacy quiz's contents
+             */
             $legacyQuiz = $this->getQuiz($legacyQuizId);
 
-            print_r($legacyQuiz);
+            /* Set up a Learnosity Activity payload
+             */
+            $activity = [
+                'reference' => (string)Uuid::uuid4(),
+                'data' => [
+                    'items' => [],
+                    'config' => [
+                        /* TODO dedupe this with the other implementation, I suppose
+                         *  Not sure where it would go though
+                         */
+                        'regions' => [
+                            'top-left' => [
+                                ['type' => 'title_element'],
+                            ],
+                            'top-right' => [
+                                ['type' => 'itemcount_element'],
+                                ['type' => 'pause_button'],
+                                ['type' => 'reading_timer_element'],
+                                ['type' => 'timer_element'],
+                            ],
+                            'items' => [
+                                ['type' => 'progress_element'],
+                                ['type' => 'slider_element']
+                            ],
+                            'right' => [
+                                ['type' => 'save_button'],
+                                ['type' => 'reviewscreen_button'],
+                                ['type' => 'resource_button'],
+                                ['type' => 'accessibility_button'],
+                                ['type' => 'flagitem_button'],
+                                ['type' => 'masking_button'],
+                                ['type' => 'verticaltoc_element'],
+                            ],
+                            'bottom-left' => [
+                                [
+                                    'type' => 'previous_button',
+                                    'show_label_option' => true
+                                ],
+                            ],
+                            'bottom-right' => [
+                                ['type' => 'next_button'],
+                            ]
+                        ],
+                    ],
+                    'rendering_type' => 'assess'
+                ],
+                /* TODO Fill in with some derived values about courses and units and classcodes
+                 */
+                'tags' => $tagFactory->produce(null, null, null)
+            ];
+
+            $activityPayload[] = $activity;
+            print_r($activityPayload);
+            /* Send it
+             */
+//            $api->dataSetRequest('/itembank/activities', $activityPayload);
         }
 
 
