@@ -252,20 +252,41 @@ HELP;
          */
         $this->getLogger()->info('Learnosity Migration.');
 
-        foreach ($legacyQuizIds as $legacyQuizId) {
-            $this->refreshLock($lock);
+        try {
+            foreach ($legacyQuizIds as $legacyQuizId) {
+                $this->refreshLock($lock);
 
-            /* Get the legacy quiz's contents
-             */
-            $legacyQuiz = $this->getQuiz($legacyQuizId);
+                /* Get the legacy quiz's contents
+                 */
+                $legacyQuiz = $this->getQuiz($legacyQuizId);
 
-            /* Make the overall Learnosity payloads which we then send later with
-             * a little postprocessing to put things into the exactly correct format.
-             * Learnosity is really particular about such things.
+                /* Make the overall Learnosity payloads which we then send later with
+                 * a little postprocessing to put things into the exactly correct format.
+                 * Learnosity is really particular about such things.
+                 */
+                $blueprint = $activityBuilder->build($legacyQuiz);
+
+                /* Actually do it
+                 */
+                if ($this->perform()) {
+                    $this->getLogger()->info(sprintf(
+                        'Importing legacy quiz "%s" (assess_id: %s) with learnosity_reference %s',
+                        $blueprint['activities'][0]['title'],
+                        $legacyQuizId,
+                        $blueprint['activities'][0]['reference']
+                    ));
+
+                    /* Iterate and bombard Learnosity with api requests pewpewpew
+                     */
+//                    $api->dataSetRequest('/itembank/items', $itemPayload);
+//                    $api->dataSetRequest('/itembank/activities', $activityPayload);
+                }
+            }
+        } catch (\Alaress\Lock\LockRefreshException $e) {
+            /* Lock TTL expired; just leave politely
              */
-            $blueprint = $activityBuilder->build($legacyQuiz);
+            return;
         }
-
 
         /*
             foreach $quiz in $quizzes
@@ -324,30 +345,12 @@ HELP;
 //                $item['reference']
 //            ));
 
-//                $api->dataSetRequest('/itembank/items', $itemPayload);
-//            $api->dataSetRequest('/itembank/activities', $activityPayload);
 
-
-
-//        try {
-//            for ($i = 0; $i < 10; $i++) {
-//                $this->refreshLock($lock);
-//
-//                /* Your logic goes here
-//                 */
-//            }
-//        } catch (\Alaress\Lock\LockRefreshException $e) {
-//            /* Lock TTL expired; just leave politely
-//             */
-//            return;
-//        }
-//
-//
-//        /* Announce conclusion
-//         */
-//        if (!$this->perform()) {
-//            $this->getLogger()->info('Planning finished.');
-//        }
+        /* Announce conclusion
+         */
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
 
         /* Announce lock release
           */
@@ -518,7 +521,7 @@ HELP;
  * You should generally try to fix those, even though in some special cases php will throw notices
  * for its own expected behaviours which will inadvertently cause this to fail
  */
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

@@ -43,7 +43,7 @@ class PayloadFactory
         return match ($type) {
             self::LEARNOSITY_PAYLOAD_ACTIVITY => $this->setupActivityNode($data, $tags),
             self::LEARNOSITY_PAYLOAD_ITEM => $this->setupItemNode($data, $tags),
-            self::LEARNOSITY_PAYLOAD_QUESTION => $this->setupQuestionNode($data, $tags),
+            self::LEARNOSITY_PAYLOAD_QUESTION => $this->setupQuestionNode($data),
             default => [],
         };
     }
@@ -194,7 +194,6 @@ class PayloadFactory
                         'type' => 'sharedpassage',
                     ],
                     'reference' => $reference,
-
                 ]
             ];
 
@@ -222,13 +221,11 @@ class PayloadFactory
     private function setupQuestionNode(array $question): array
     {
         return [
-            'questions' => [
-                /* TODO Detect question type
-                 */
-                'data' => [],
-                'type' => null,
-                'reference' => (string)UUid::uuid4(),
-            ]
+            /* TODO Detect question type
+             */
+            'data' => [],
+            'type' => null,
+            'reference' => (string)UUid::uuid4(),
         ];
     }
 }

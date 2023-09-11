@@ -63,7 +63,7 @@ class ActivityBuilder
         /* Set up a Learnosity Activity payload
          * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
          */
-        $activity = $payloadFactory->produce(
+        $activityStruct = $payloadFactory->produce(
             PayloadFactory::LEARNOSITY_PAYLOAD_ACTIVITY,
             $legacyQuiz,
             /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -75,7 +75,7 @@ class ActivityBuilder
          * purely for the purposes of this importer
          */
         foreach ($legacyQuiz['_sections'] as $section) {
-            $item = $payloadFactory->produce(
+            $itemStruct = $payloadFactory->produce(
                 PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
                 $section,
                 /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -86,22 +86,51 @@ class ActivityBuilder
             /* Accumulate all the questions we found in $section and
              * pile them up here
              */
+            $questionStructs = [];
+
             foreach ($section['_questions'] as $question) {
-                $question = $payloadFactory->produce(
+                $questionStruct = $payloadFactory->produce(
                     PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
                     $question,
                     null
                 );
+
+                $this->logger->debug(sprintf(
+                    'Built blueprint for question "%s" (question_id: %s) with learnosity_reference %s',
+                    \TextFormatter::cutSentence($question['question'], 64),
+                    $question['question_id'],
+                    $questionStruct['reference']
+                ));
+
+                /* Stack it
+                 */
+                $questionStructs[] = $questionStruct;
             }
+
+            $this->logger->debug(sprintf(
+                'Built blueprint for item "%s" (section_id: %s) with learnosity_reference %s',
+                $section['title'],
+                $section['section_id'],
+                $itemStruct['reference']
+            ));
 
             /* Stack it
              */
-            $activity['data']['items'][$item['reference']] = $item;
+            $itemStruct['questions'] = $questionStructs;
+            $activityStruct['data']['items'][$itemStruct['reference']] = $itemStruct;
         }
 
         /* Stack it
          */
-        $activityPayload['activities'][] = $activity;
+        $activityPayload['activities'][] = $activityStruct;
+
+        $this->logger->debug(sprintf(
+            'Built blueprint for quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
+            $legacyQuiz['title'],
+            $legacyQuiz['assessment_id'],
+            $legacyQuiz['assess_id'],
+            $activityStruct['reference']
+        ));
 
         return $activityPayload;
     }
