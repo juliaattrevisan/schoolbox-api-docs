@@ -21,6 +21,14 @@ class PayloadFactory
 
 
     /**
+     * @param string $authorId
+     */
+    public function __construct(private string $authorId)
+    {
+    }
+
+
+    /**
      * Spawns a Learnosity-friendly payload structure for Activities,
      * Items, etc. based on the data provided.
      *
@@ -32,8 +40,8 @@ class PayloadFactory
     public function produce(string $type, array $data, array $tags): array
     {
         return match ($type) {
-            self::LEARNOSITY_PAYLOAD_ACTIVITY => $this->setupActivityPayload($data, $tags),
-            self::LEARNOSITY_PAYLOAD_ITEM => $this->setupItemPayload($data, $tags),
+            self::LEARNOSITY_PAYLOAD_ACTIVITY => $this->setupActivityNode($data, $tags),
+            self::LEARNOSITY_PAYLOAD_ITEM => $this->setupItemNode($data, $tags),
             default => [],
         };
     }
@@ -46,7 +54,7 @@ class PayloadFactory
      * @param array $tags
      * @return array
      */
-    private function setupActivityPayload(array $legacyQuiz, array $tags): array
+    private function setupActivityNode(array $legacyQuiz, array $tags): array
     {
         $activity = [
             'data' => [
@@ -143,9 +151,17 @@ class PayloadFactory
      * @param array $tags
      * @return array
      */
-    private function setupItemPayload(array $section, array $tags): array
+    private function setupItemNode(array $section, array $tags): array
     {
         $item = [
+            /* This decides where a feature/question appears in a layout
+             */
+            'definition' => [
+                'widgets' => []
+            ],
+            /* Features and Questions are indexed separately
+             */
+            'features' => [],
             'questions' => [],
             /* A unique uuid in learnosity land that we can arbitrarily assign here
              */
@@ -166,6 +182,24 @@ class PayloadFactory
          * If it was more than an empty string, make a placeholder Passage thing
          * Otherwise skip it; there's nothing to say
          */
+        if ('' !== trim((string)$section['description'])) {
+            $reference = (string)UUid::uuid4();
+
+            $sectionDescription = [
+                'content' => $section['description'],
+                'reference' => $reference,
+                'type' => 'sharedpassage',
+            ];
+
+            /* Associate in two distinct ways
+             * Note that each Feature needs to be saved separately
+             */
+            $item['definition']['widgets'][] = [
+                'reference' => $reference
+            ];
+
+            $item['features'][$reference] = $sectionDescription;
+        }
 
         return $item;
     }

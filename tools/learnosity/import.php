@@ -218,10 +218,6 @@ HELP;
          */
         $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
 
-        /* Produces Learnosity payloads
-         */
-        $payloadFactory = new PayloadFactory();
-
         /* Precompile queries
          */
         $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
@@ -264,6 +260,14 @@ HELP;
              */
             $legacyQuiz = $this->getQuiz($legacyQuizId);
 
+            /* Produces Learnosity payloads
+             *
+             * TODO this author identfier should be a (schoolcode, user id) tuple for
+             *  auditing reasons, to deconflict with other schools who used the same
+             *  user id. It's mandatory as part of Question creation.
+             */
+            $payloadFactory = new PayloadFactory((string)$legacyQuiz['user_id']);
+
             /* Set up a Learnosity Activity payload
              * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
              */
@@ -286,6 +290,25 @@ HELP;
                      */
                     $tagFactory->produce(null, null, null)
                 );
+
+                $itemPayload = [
+                    'items' => [$item]
+                ];
+
+                /* Send it
+                 */
+                $this->getLogger()->debug(sprintf(
+                    'Importing item "%s" (section_id: %s) with learnosity_reference %s',
+                    $section['title'],
+                    $section['section_id'],
+                    $item['reference']
+                ));
+
+//                $api->dataSetRequest('/itembank/items', $itemPayload);
+
+                /* Stack it
+                 */
+                $activity['data']['items'][] = $item['reference'];
             }
 
             /* Stack it
@@ -302,7 +325,7 @@ HELP;
                 $activity['reference']
             ));
 
-            $api->dataSetRequest('/itembank/activities', $activityPayload);
+//            $api->dataSetRequest('/itembank/activities', $activityPayload);
         }
 
 
