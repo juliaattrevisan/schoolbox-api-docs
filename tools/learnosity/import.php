@@ -61,25 +61,38 @@ $app = new class extends CliTool\App
     /**
      * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
      */
-    private const QUERY_QUIZ = "
-        SELECT *
+    private const QUERY_LEGACY_QUIZ_IDS = "
+        SELECT assess_id
         FROM assess
         WHERE deleted_at IS NULL
         AND availability = 'assess'
-        AND learnosity_reference IS NULL    
+        AND learnosity_reference IS NULL
+    ";
+
+
+    /**
+     * Get a particular the schoolbox.assess row that isn't part of Learnosity Land already
+     */
+    private const QUERY_LEGACY_QUIZ_ID = "
+        SELECT assess_id
+        FROM assess
+        WHERE deleted_at IS NULL
+        AND availability = 'assess'
+        AND learnosity_reference IS NULL
+        AND assessment_id = :assessmentId
     ";
 
 
     /**
      * Get a particular schoolbox.assess row that not part of Learnosity already
      */
-    private const QUERY_PARTICULAR_QUIZ = "
+    private const QUERY_QUIZ = "
         SELECT *
         FROM assess
         WHERE deleted_at IS NULL
         AND availability = 'assess'
         AND learnosity_reference IS NULL
-        AND assessment_id = :assessmentId
+        AND assess_id = :assessId
     ";
 
 
@@ -124,8 +137,9 @@ $app = new class extends CliTool\App
      *
      * @var PDOStatement
      */
+    private \PDOStatement $legacyQuizIdsStatement;
+    private \PDOStatement $legacyQuizIdStatement;
     private \PDOStatement $quizStatement;
-    private \PDOStatement $particularQuizStatement;
     private \PDOStatement $sectionsStatement;
     private \PDOStatement $questionStatement;
     private \PDOStatement $answerStatement;
@@ -179,8 +193,9 @@ HELP;
 
         /* Precompile queries
          */
+        $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
+        $this->legacyQuizIdStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_ID);
         $this->quizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUIZ);
-        $this->particularQuizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_PARTICULAR_QUIZ);
         $this->sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
         $this->questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
         $this->answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
@@ -194,16 +209,23 @@ HELP;
         if ('' === $assessmentId) {
             /* Get everything
              */
-            $legacyQuizzes = $this->getQuiz(null);
+            $legacyQuizIds = $this->getLegacyQuizIds();
         } else {
             /* Get $assessmentId
              */
-            $legacyQuizzes = $this->getQuiz((int)$assessmentId);
+            $legacyQuizIds = $this->getLegacyQuizIds((int)$assessmentId);
         }
 
         /* Commencing migration
          */
         $this->getLogger()->info('Learnosity Migration.');
+
+        foreach ($legacyQuizIds as $legacyQuizId) {
+            $legacyQuiz = $this->getQuiz($legacyQuizId);
+
+            print_r($legacyQuiz);
+        }
+
 
         /*
             foreach $quiz in $quizzes
@@ -273,35 +295,57 @@ HELP;
 
 
     /**
+     * Get a set of all schoolbox.assess primary identifiers because
+     * we need to process each quiz individually:
+     *     * and utilise the lock mechanism
+     *     * and avoid loading EVERYTHING into memory
+     *
+     * TODO potentially replace this with a QueryIterator but for now this will do
+     *
+     * @param int|null $assessmentId
+     * @return array
+     */
+    private function getLegacyQuizIds(?int $assessmentId = null): array
+    {
+        if (null === $assessmentId) {
+            $statement = $this->legacyQuizIdsStatement;
+            $statement->execute();
+        } else {
+            $statement = $this->legacyQuizIdStatement;
+            $statement->execute([
+                'assessmentId' => $assessmentId
+            ]);
+        }
+
+        $ids = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[$row['assess_id']] = $row['assess_id'];
+        }
+
+        return array_values($ids);
+    }
+
+
+    /**
      * Get a quiz that:
      *     * is not deleted
      *     * is not yet in learnosity
      *
-     * @param int|null $assessId
+     * @param int $assessId
      * @return array
      */
-    private function getQuiz(?int $assessId): array
+    private function getQuiz(int $assessId): array
     {
-        /* Conditionally get a particular quiz,
-         * otherwise get all of them
-         */
-        if (null !== $assessId) {
-            $statement = $this->particularQuizStatement;
-
-            $statement->execute([
-                'assessmentId' => $assessId
-            ]);
-        } else {
-            $statement = $this->quizStatement;
-
-            $statement->execute();
-        }
+        $this->quizStatement->execute([
+            'assessId' => $assessId
+        ]);
 
         /* Final stack
          */
         $quizzes = [];
 
-        while ($quizRow = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($quizRow = $this->quizStatement->fetch(\PDO::FETCH_ASSOC)) {
             $quizRow['_sections'] = [];
 
             /* Get its sections
