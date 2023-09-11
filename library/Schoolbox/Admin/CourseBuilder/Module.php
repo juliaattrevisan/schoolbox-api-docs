@@ -37,8 +37,7 @@ class Module extends BaseModule
             return $this->preloadTemplate($params);
         };
 
-        $this->register('GET', '/audit', 'getAudit', $perms);
-        $this->register('GET', "{/tab}", 'getIndex', $perms);
+        $this->register('GET', "", 'getIndex', $perms);
         $this->register('POST', "/save", 'postSave', $perms);
         $this->register('DELETE', "/delete/{templateId:\d+}", 'deleteTmpl', $perms, $loadTemplate);
     }

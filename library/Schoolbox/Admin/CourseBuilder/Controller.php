@@ -11,7 +11,6 @@
 namespace Schoolbox\Admin\CourseBuilder;
 
 use Alaress\Web\Controller\Base;
-use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
@@ -44,7 +43,7 @@ class Controller extends Base
      *
      * @param string $tab
      */
-    public function getIndex($tab = '')
+    public function getIndex()
     {
 
         // Get default permissions for course and unit pages
@@ -81,7 +80,6 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminCourseBuilder.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminCourseBuilder.getIndex')),
-                'tab' => $tab != '' ? $tab : 'course',
                 'roles' => $this->roleMapper->findAll(),
                 'permissions' => $permissions,
                 'availableTemplates' => $templates,
