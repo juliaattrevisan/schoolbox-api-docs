@@ -961,6 +961,55 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * This does not change self, but returns new date object of the start date of the current school year
+     * @return $this
+     */
+    public function getStartOfSchoolYear(): self
+    {
+        $startDateString = $this->locale->startOfSchoolYear();
+        $start           = DateTime::createFromFormat('d/m/Y', $startDateString . '/' . $this->getYear())->setTime(0, 0);
+
+        $startDate = clone $this;
+        if (!$start) {
+            return $startDate->startOfYear();
+        }
+
+        if ($start->getTimestamp() > $startDate->getUnixTimeStamp()) {
+            // less one year
+            $start = $start->modify('-1 year');
+        }
+
+        $startDate->setFromFormat($start->format(self::DATABASE_DATE_FORMAT), self::DATABASE_DATE_FORMAT);
+        return $startDate->startOfDay();
+    }
+
+    /**
+     * This does not change self, but returns new date object of the end date of the current school year
+     * @return $this
+     */
+    public function endOfSchoolYear(): self
+    {
+        $endDate = clone $this;
+        return $endDate->getStartOfSchoolYear()->addYears(1)->addDays(-1)->endOfDay();
+    }
+
+    /**
+     * Returns string to represent the current school year, e.g. 2023-2024
+     * Returns a single year if the end date is in January
+     * @return string
+     */
+    public function getSchoolYear(): string
+    {
+        $startYear = $this->getStartOfSchoolYear();
+        $endYear = $this->endOfSchoolYear();
+
+        if ($startYear->getYear() === $endYear->getYear() || (int)$endYear->getMonth() === 1) {
+            return $startYear->getYear();
+        }
+        return sprintf('%s-%s', $startYear->getYear(), $endYear->getYear());
+    }
+
+    /**
      * Resets the date to the first day of the ISO-8601 week (Monday) and the time to 00:00:00
      *
      * @return $this

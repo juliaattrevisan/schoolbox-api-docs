@@ -224,6 +224,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_NAME_FORMAT = 'name_format';
     public const NAME_INSTANCE_REGISTRY_URL = 'instance_registry_url';
+    public const NAME_START_OF_SCHOOL_YEAR  = 'start_of_school_year';
 
     /**
      * Skin Config Fields

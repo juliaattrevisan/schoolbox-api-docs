@@ -14,6 +14,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -33,6 +34,7 @@ class Helper
     const COUNT_PERIOD_6MONTHS      = 2;
     const COUNT_PERIOD_CURRENT_YEAR = 3;
     const COUNT_PERIOD_CURRENT_TERM = 4;
+    const COUNT_PERIOD_SCHOOL_YEAR  = 5;
 
     /**
      * @var PastoralTypeMapper
@@ -55,14 +57,14 @@ class Helper
     private PastoralDataSource $pastoralDataSource;
 
     /**
-     * @var Collection|PastoralType[]|null
+     * @var GenericCollection|null
      */
-    private $pastoralTypesWhitelist;
+    private ?GenericCollection$pastoralTypesWhitelist = null;
 
     /**
-     * @var Collection|PastoralSubType[]|null
+     * @var GenericCollection|null
      */
-    private $pastoralSubTypesWhitelist;
+    private ?GenericCollection $pastoralSubTypesWhitelist = null;
 
     /**
      * @var Generator
@@ -96,7 +98,7 @@ class Helper
     /**
      * initialise fallback whitelist of types and subtypes to use
      */
-    private function initTypeWhitelists(bool $allowWithoutIcons = false)
+    private function initTypeWhitelists(bool $allowWithoutIcons = false): void
     {
         /**
          * we only need to run this once
@@ -146,7 +148,7 @@ class Helper
         foreach ($students as $student) {
             $output->setOffset(
                 $student->getId(),
-                $this->countStudentEventsByTypes($viewer, $student, $pastoralTypes, $pastoralSubtypes, false, $startDate)
+                $this->countStudentEventsByTypes($viewer, $student, $pastoralTypes, $pastoralSubtypes, $startDate)
             );
         }
 
@@ -160,12 +162,11 @@ class Helper
      * @param User                     $student
      * @param Collection|null          $typesWhitelist
      * @param Collection|null          $subTypesWhitelist
-     * @param bool                     $partitionByMonth
      * @param Alaress_Date_Format|null $startDate
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, bool $partitionByMonth = false, ?Alaress_Date_Format $startDate = null): Collection
+    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, ?Alaress_Date_Format $startDate = null): Collection
     {
         /**
          * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
@@ -187,9 +188,7 @@ class Helper
             )
         );
 
-        $output = $this->decorateCounts($studentCounts, $pastoralSubtypes, $pastoralTypes, $student);
-
-        return $output;
+        return $this->decorateCounts($studentCounts, $pastoralSubtypes, $pastoralTypes, $student);
     }
 
     /**
@@ -345,12 +344,13 @@ class Helper
             case self::COUNT_PERIOD_FOREVER:
                 return null;
             case self::COUNT_PERIOD_6MONTHS:
-                $date = new Alaress_Date_Format();
                 return $date->addMonths(-6);
             case self::COUNT_PERIOD_CURRENT_YEAR:
                 return $date->startOfYear();
             case self::COUNT_PERIOD_CURRENT_TERM:
                 return $this->termMapper->findForToday()->getStart();
+            case self::COUNT_PERIOD_SCHOOL_YEAR:
+                return $date->getStartOfSchoolYear();
             case self::COUNT_PERIOD_12MONTHS:
             default:
                 return $date->addYears(-1);
