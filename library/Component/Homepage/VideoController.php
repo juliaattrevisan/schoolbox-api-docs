@@ -13,7 +13,6 @@ use Schoolbox\Video\ResourceVideoMapper;
 
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Collection|ResourceVideo[]
      */
