@@ -167,7 +167,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                 $comment = Scrub::text($video->getFile()->getDescription());
 
-                if ($video->getStatus() === "completed") {
+                if ($video->getStatus() === "completed" && $this->isVisibleToCurrentUser($video)) {
                     if (strlen($comment)) {
                         $this->setVar(array(
                             'VIDEO_LIST_COMMENT' => $comment
