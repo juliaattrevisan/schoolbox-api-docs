@@ -16,7 +16,7 @@ async function onTryAgainSelected() {
 </script>
 
 <template>
-    <div class="alert-box alert" data-test-sp-results-error>
+    <div class="alert-box alert" data-test="sp-results-error">
         <template v-if="searchStore.searchError">
             {{ searchStore.searchError.title }}
         </template>

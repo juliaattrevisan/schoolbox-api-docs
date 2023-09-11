@@ -1,5 +1,5 @@
 /**
- *  _u-typography.scss
+ *  _typography.scss
  *
  *  This file exists to hold all of the utility classes that interact with typography specifically. Why is it a
  *  separate file? Because it is meant to *only* hold utility classes, and therefore it sits within the utils
@@ -8,6 +8,17 @@
 
 // Utility class to provide word breaking where required. Good to use whenever something
 // might return a URL in a string as these may not automatically break.
-.u-break-word {
+.t-break-word {
     word-break: break-word;
+}
+
+// to remove the default list style from all lists
+.t-no-list-style {
+    list-style: none;
+    ul {
+        list-style: none;
+    }
+    ul ul {
+        list-style: none;
+    }
 }

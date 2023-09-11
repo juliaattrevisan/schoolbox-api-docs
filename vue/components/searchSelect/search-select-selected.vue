@@ -9,6 +9,7 @@ import SearchSelectSelectedItem from "./search-select-selected-item.vue";
 interface Props {
     selected: Result[]; // the selected results
     formValueName: string; // the name of the form value
+    isSingleSelect: boolean; // whether only one result can be selected
 }
 const props = defineProps<Props>();
 
@@ -40,6 +41,7 @@ function onRemoveItem(result: Result) {
             v-for="result in props.selected"
             :key="result.id"
             :result="result"
+            :is-single-select="props.isSingleSelect"
             @remove="onRemoveItem"
         />
     </div>

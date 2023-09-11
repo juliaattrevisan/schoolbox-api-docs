@@ -16,7 +16,7 @@ beforeEach(() => {
 test("do not show load more button when no more results to load", async () => {
     const resultsStore = useResultsStore();
     await resultsStore.$patch({ results: [{ id: 1, name: "test" }] });
-    expect(wrapper.find("[data-sp-results-list-load-more-button]").exists()).toBe(false);
+    expect(wrapper.find("[data-test=sp-results-list-load-more-button]").exists()).toBe(false);
 });
 
 test("show load more button when more results to load", async () => {
@@ -27,11 +27,11 @@ test("show load more button when more results to load", async () => {
         results.push({ id: i, name: "test" });
     }
     await resultsStore.$patch({ results: results });
-    expect(wrapper.find("[data-sp-results-list-load-more-button]").exists()).toBe(true);
+    expect(wrapper.find("[data-test=sp-results-list-load-more-button]").exists()).toBe(true);
 });
 
 test("show all results loaded when all results have been loaded", async () => {
     const resultsStore = useResultsStore();
     await resultsStore.$patch({ hasLoadedAllResults: true });
-    expect(wrapper.find("[data-sp-results-list-load-more-all-loaded]").exists()).toBe(true);
+    expect(wrapper.find("[data-test=sp-results-list-load-more-all-loaded]").exists()).toBe(true);
 });

@@ -1,29 +1,24 @@
 <script setup lang="ts">
 /**
- * To display the current search results
+ * To display the list of returned results
  */
 
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import SpResultsHeader from "./sp-results-header.vue";
-import SpResultsPrompt from "./sp-results-prompt.vue";
-import SpResultsError from "./sp-results-error.vue";
-import SpResultsNone from "./sp-results-none.vue";
-import SpResultsList from "./list/sp-results-list.vue";
-import { useSearchStore } from "../store/spSearchStore";
 import { useResultsStore } from "./store/spResultsStore";
+import SpResultsResult from "./sp-results-result.vue";
+import SpResultsLoadMore from "./sp-results-load-more.vue";
 
-const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
 </script>
 
 <template>
-    <div class="l-flex__item--1 l-flex-col l-gap-m">
-        <sp-results-header />
-        <sp-results-prompt v-if="searchStore.hasNotSearched" />
-        <loading-table v-else-if="searchStore.isSearching" />
-        <sp-results-error v-else-if="searchStore.hasLoadError" />
-        <sp-results-none v-else-if="resultsStore.hasNoResults" />
-        <sp-results-list v-else-if="resultsStore.hasResults" />
+    <div class="l-flex-col l-gap-m" data-test="sp-results">
+        <sp-results-result
+            v-for="(result, index) in resultsStore.results"
+            :key="result.id"
+            :result="result"
+            :index="index"
+        />
+        <sp-results-load-more />
     </div>
 </template>
 

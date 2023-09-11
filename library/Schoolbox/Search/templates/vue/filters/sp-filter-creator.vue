@@ -10,6 +10,11 @@ import { Creator, useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
 
 const filterCreatorsStore = useFilterCreatorsStore();
 
+const currentUser: Creator = {
+    id: window.schoolboxUser.id,
+    name: window.schoolboxUser.name,
+};
+
 /**
  * We only allow one creator to be selected at a time,
  * so only select a result if there isn't one already selected
@@ -42,6 +47,7 @@ function onRemoved() {
             endpoint="/ajax/user.php?groupID=0&query="
             :selected="filterCreatorsStore.creator"
             :is-single-select="true"
+            :default-results="[currentUser as Result]"
             @select="onSelected"
             @remove="onRemoved"
         />

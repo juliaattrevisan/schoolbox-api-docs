@@ -4,38 +4,52 @@
  */
 
 import { useFilterTypesStore } from "./store/spFilterTypesStore";
+import SpFilterTypesType from "./sp-filter-types-type.vue";
 
 const filterTypesStore = useFilterTypesStore();
+
+/**
+ * To show/hide all the sub types when the all sub types button is clicked
+ */
+function onExpandAllSelected() {
+    filterTypesStore.isExpanded = !filterTypesStore.isExpanded;
+}
+
+/**
+ * To show/hide the sub types container
+ * @returns {string} - the height of the sub types container
+ */
+const expandButtonText = window.Vue.computed(() => {
+    return filterTypesStore.isExpanded ? "Collapse all" : "Expand all";
+});
 </script>
 
 <template>
-    <div class="small-12 columns">
+    <div>
         <label>Types</label>
-        <fieldset class="checklist">
-            <ul class="option-list">
-                <li v-for="filter in filterTypesStore.allTypes" :key="filter.value">
-                    <input
-                        :id="filter.value"
-                        v-model="filterTypesStore.selectedTypes"
-                        type="checkbox"
-                        :value="filter.value"
-                    />
-                    <label :for="filter.value">{{ filter.title }}</label>
-                    <ul v-if="filter.subTypes">
-                        <li v-for="subType in filter.subTypes" :key="subType.value">
-                            <input
-                                :id="subType.value"
-                                v-model="filterTypesStore.selectedTypes"
-                                type="checkbox"
-                                :value="subType.value"
-                            />
-                            <label :for="subType.value">{{ subType.title }}</label>
-                        </li>
-                    </ul>
-                </li>
+        <div class="checklist">
+            <button
+                :class="`button full-width ${filterTypesStore.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                @click.prevent="onExpandAllSelected"
+            >
+                {{ expandButtonText }}
+            </button>
+            <ul class="option-list t-no-list-style l-flex-col l-gap-xs f-no-margins">
+                <sp-filter-types-type
+                    v-for="typeItem in filterTypesStore.allTypes"
+                    :key="typeItem.value"
+                    :type="typeItem"
+                />
             </ul>
-        </fieldset>
+        </div>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.checklist {
+    border: 1px solid var(--form-border-color);
+}
+.option-list {
+    padding: var(--spacing-s);
+}
+</style>

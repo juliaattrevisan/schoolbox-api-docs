@@ -7,6 +7,7 @@ import type { Result } from "./types/Result";
 
 interface Props {
     result: Result; // the selected result
+    isSingleSelect: boolean; // whether only one result can be selected
 }
 const props = defineProps<Props>();
 
@@ -38,10 +39,14 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <div class="selected-item l-flex-row l-flex--align-center l-pad-s l-gap-s">
+    <div
+        :class="`selected-item l-flex-row l-flex--align-center l-pad-s l-gap-s ${
+            props.isSingleSelect ? 'l-flex__item--1' : ''
+        }`"
+    >
         <button
             type="button"
-            class="title-button"
+            :class="`selected-item__name-button ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
             :title="`View ${props.result.name}`"
             :aria-label="`View ${props.result.name}`"
             :disabled="isDisabled"
@@ -51,7 +56,7 @@ function onRemoveSelected() {
         </button>
         <button
             type="button"
-            class="remove-button icon-close"
+            class="selected-item__remove-button icon-close"
             :title="`Remove ${props.result.name}`"
             :aria-label="`Remove ${props.result.name}`"
             @click.prevent="onRemoveSelected"
@@ -68,20 +73,19 @@ function onRemoveSelected() {
     overflow: hidden;
     text-align: left;
     white-space: nowrap;
-}
-
-.title-button {
-    background: var(--body-background);
-    margin: 0;
-    min-height: 0;
-    padding: 0;
-    text-overflow: ellipsis;
-}
-
-.remove-button {
-    background: var(--body-background);
-    height: 1rem;
-    min-height: 0;
-    padding: 0;
+    &__name-button {
+        background: none;
+        margin: 0;
+        min-height: 0;
+        padding: 0;
+        text-align: left;
+        text-overflow: ellipsis;
+    }
+    &__remove-button {
+        background: none;
+        height: 1rem;
+        min-height: 0;
+        padding: 0;
+    }
 }
 </style>

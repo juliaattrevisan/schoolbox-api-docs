@@ -8,6 +8,7 @@
 // Margins usually should no longer be applied directly on an element and should instead be added to the parent
 // via the l-gap utility classes
 .f-no-margins {
+    margin: 0 !important;
     h1,
     h2,
     h3,
@@ -17,7 +18,25 @@
     a,
     span,
     input,
-    button {
+    button,
+    label {
         margin: 0 !important;
     }
+}
+
+.f-no-bkg {
+    background: none !important;
+}
+
+// WCAG recommends a min height of 44 px
+// https://www.accessguide.io/guide/large-target-size
+.f-min-btn-height {
+    min-height: 44px;
+}
+
+// to properly center icons in buttons
+// won't be required when we update to svg icons and udpate the button component
+.f-center-icon {
+    display: flex !important;
+    align-items: center !important;
 }

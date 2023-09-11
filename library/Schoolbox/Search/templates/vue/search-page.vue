@@ -3,11 +3,18 @@
  * To search Schoolobx
  */
 
-import SpInput from "./input/sp-input.vue";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import SpResultsHeader from "./results/sp-results-header.vue";
+import SpResultsPrompt from "./results/sp-results-prompt.vue";
+import SpResultsError from "./results/sp-results-error.vue";
+import SpResultsNone from "./results/sp-results-none.vue";
 import SpResults from "./results/sp-results.vue";
 import SpFilters from "./filters/sp-filters.vue";
 import { useStore } from "./store/searchPageStore";
 import type { FilterType } from "./filters/store/spFilterTypesStore";
+import { useSearchStore } from "./store/spSearchStore";
+import { useResultsStore } from "./results/store/spResultsStore";
+import { SEARCH_PARAM } from "./store/spQueryStore";
 
 interface Props {
     endpoint: string; // the search api endpoint
@@ -17,13 +24,32 @@ const props = defineProps<Props>();
 
 // initialise the store
 useStore().init(props.endpoint, props.filterTypes);
+
+const searchStore = useSearchStore();
+const resultsStore = useResultsStore();
+
+/**
+ * start a search straight away if a keyword has been passed through
+ */
+window.Vue.onMounted(async () => {
+    const searchParams = new URLSearchParams(document.location.search);
+    if (searchParams.has(SEARCH_PARAM)) {
+        await searchStore.search();
+    }
+});
 </script>
 
 <template>
     <div class="c-search-page">
-        <sp-input class="c-search-page__input" />
-        <sp-results class="c-search-page__results" />
         <sp-filters class="c-search-page__filters" />
+        <div class="c-search-page__results l-flex-col l-gap-m">
+            <sp-results-header />
+            <sp-results-prompt v-if="searchStore.hasNotSearched" />
+            <loading-table v-else-if="searchStore.isSearching" />
+            <sp-results-error v-else-if="searchStore.hasLoadError" />
+            <sp-results-none v-else-if="resultsStore.hasNoResults" />
+            <sp-results v-else-if="resultsStore.hasResults" />
+        </div>
     </div>
 </template>
 
@@ -31,19 +57,14 @@ useStore().init(props.endpoint, props.filterTypes);
 .c-search-page {
     display: grid;
     gap: var(--spacing-xl);
-    grid-template-areas:
-        "input input"
-        "results filters";
-    grid-template-columns: 1fr 500px;
-    grid-template-rows: auto 1fr;
-    &__input {
-        grid-area: input;
+    grid-template-areas: "filters results";
+    grid-template-columns: 500px 1fr;
+    grid-template-rows: 1fr auto;
+    &__filters {
+        grid-area: filters;
     }
     &__results {
         grid-area: results;
-    }
-    &__filters {
-        grid-area: filters;
     }
 }
 </style>

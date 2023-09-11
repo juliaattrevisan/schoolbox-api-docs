@@ -2,6 +2,11 @@
     Styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
 */
 
+:root {
+    --alt-foreground-colour: #f9f9f9;
+    --border-colour: #aaaaaa;
+}
+
 .c-card {
     background-color: var(--foreground-colour);
     border-radius: var(--roundness-cards);
@@ -33,7 +38,8 @@
 
     // Add inline (default left) border and grey background to card.
     &--child {
-        border-inline-start: var(--spacing-s) solid #aaaaaa;
+        background-color: var(--alt-foreground-colour);
+        border-inline-start: var(--spacing-s) solid var(--border-colour);
     }
 
     // When we want the whole card to be selectable
@@ -48,15 +54,18 @@
         // this aids accessibility, providing better screen reader context than
         // wrapping the entire card in an anchor while also allowing a wider click target
         // https://inclusive-components.design/cards/
-        a:first-child::before {
-            bottom: 0;
-            content: " ";
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            z-index: 1;
-        }
+        // put this on hold for now, not working as expected
+        // a:first-child::before {
+        //     bottom: 0;
+        //     content: " ";
+        //     height: 100%;
+        //     left: 0;
+        //     position: absolute;
+        //     right: 0;
+        //     top: 0;
+        //     width: 100%;
+        //     z-index: 1;
+        // }
     }
 
     // To highlight that the card is active, could be used when the card is selected via arrow navigation for example
@@ -97,10 +106,10 @@
     }
 
     &--border-end {
-        border-block-end: 1px solid rgba(0, 0, 0, 0.2);
+        border-block-end: 1px solid var(--border-colour);
     }
 
     &--alt-bkg {
-        background-color: #f6f6f6;
+        background-color: var(--alt-foreground-colour);
     }
 }
