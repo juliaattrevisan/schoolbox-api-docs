@@ -269,6 +269,8 @@ HELP;
             $activity = $payloadFactory->produce(
                 PayloadFactory::LEARNOSITY_PAYLOAD_ACTIVITY,
                 $legacyQuiz,
+                /* TODO Need the MapperProxy to decide its tag set, I suppose
+                 */
                 $tagFactory->produce(null, null, null)
             );
 
