@@ -116,10 +116,7 @@ class Controller extends Base
             "subTypes" => $pagesFoldersSubTypes
         ];
 
-        $userSubTypes = [
-            ["title" => "Guest", "value" => "user.guest"],
-            ["title" => "Staff", "value" => "user.staff"],
-        ];
+        $userSubTypes = [];
 
         if ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) {
             if ($configLoader->get('student_search_enable')) {
@@ -130,6 +127,13 @@ class Controller extends Base
                 $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
             }
         }
+        else if($loggedInUserRole->isStaff())  {
+            $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
+            $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
+        }
+
+        $userSubTypes[] = ["title" => "Staff", "value" => "user.staff"];
+        $userSubTypes[] = ["title" => "Guest", "value" => "user.guest"];
 
         $filters[] = [
             "title" => "Users",
