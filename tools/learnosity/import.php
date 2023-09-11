@@ -264,8 +264,6 @@ HELP;
              * Learnosity is really particular about such things.
              */
             $plan = $planFactory->build($legacyQuiz);
-
-            print_r($plan);
         }
 
 

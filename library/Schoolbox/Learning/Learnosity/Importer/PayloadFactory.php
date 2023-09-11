@@ -18,6 +18,7 @@ class PayloadFactory
 {
     public const LEARNOSITY_PAYLOAD_ACTIVITY = 'activity';
     public const LEARNOSITY_PAYLOAD_ITEM = 'item';
+    public const LEARNOSITY_PAYLOAD_QUESTION = 'question';
 
 
     /**
@@ -34,14 +35,15 @@ class PayloadFactory
      *
      * @param string $type
      * @param array $data
-     * @param array $tags
+     * @param array|null $tags
      * @return array
      */
-    public function produce(string $type, array $data, array $tags): array
+    public function produce(string $type, array $data, ?array $tags): array
     {
         return match ($type) {
             self::LEARNOSITY_PAYLOAD_ACTIVITY => $this->setupActivityNode($data, $tags),
             self::LEARNOSITY_PAYLOAD_ITEM => $this->setupItemNode($data, $tags),
+            self::LEARNOSITY_PAYLOAD_QUESTION => $this->setupQuestionNode($data, $tags),
             default => [],
         };
     }
@@ -56,7 +58,7 @@ class PayloadFactory
      */
     private function setupActivityNode(array $legacyQuiz, array $tags): array
     {
-        $activity = [
+        $struct = [
             'data' => [
                 'config' => [
                     /* TODO dedupe this with the other implementation, I suppose
@@ -132,14 +134,14 @@ class PayloadFactory
         if ((int)$legacyQuiz['duration']) {
             /* If a duration was set, configure it similarly
              */
-            $activity['data']['config']['time']['max_time'] = (int)$legacyQuiz['duration'];
+            $struct['data']['config']['time']['max_time'] = (int)$legacyQuiz['duration'];
 
             /* Warn users when 60 seconds remains
              */
-            $activity['data']['config']['time']['warning_time'] = 60;
+            $struct['data']['config']['time']['warning_time'] = 60;
         }
 
-        return $activity;
+        return $struct;
     }
 
 
@@ -153,7 +155,7 @@ class PayloadFactory
      */
     private function setupItemNode(array $section, array $tags): array
     {
-        $item = [
+        $struct = [
             /* This decides where a feature/question appears in a layout
              */
             'definition' => [
@@ -186,21 +188,47 @@ class PayloadFactory
             $reference = (string)UUid::uuid4();
 
             $sectionDescription = [
-                'content' => $section['description'],
-                'reference' => $reference,
-                'type' => 'sharedpassage',
+                'features' => [
+                    'data' => [
+                        'content' => $section['description'],
+                        'type' => 'sharedpassage',
+                    ],
+                    'reference' => $reference,
+
+                ]
             ];
 
             /* Associate in two distinct ways
              * Note that each Feature needs to be saved separately
              */
-            $item['definition']['widgets'][] = [
+            $struct['definition']['widgets'][] = [
                 'reference' => $reference
             ];
 
-            $item['features'][$reference] = $sectionDescription;
+            $struct['features'][$reference] = $sectionDescription;
         }
 
-        return $item;
+        return $struct;
+    }
+
+
+    /**
+     * Set up a payload for a Question that lives in an Item.
+     * $question comes with $answers too, from our db
+     *
+     * @param array $question
+     * @return array
+     */
+    private function setupQuestionNode(array $question): array
+    {
+        return [
+            'questions' => [
+                /* TODO Detect question type
+                 */
+                'data' => [],
+                'type' => null,
+                'reference' => (string)UUid::uuid4(),
+            ]
+        ];
     }
 }

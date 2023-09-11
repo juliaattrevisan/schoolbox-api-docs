@@ -81,6 +81,17 @@ class PayloadPlanFactory
                 $this->tagFactory->produce(null, null, null)
             );
 
+            /* Accumulate all the questions we found in $section and
+             * pile them up here
+             */
+            foreach ($section['_questions'] as $question) {
+                $question = $payloadFactory->produce(
+                    PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
+                    $question,
+                    null
+                );
+            }
+
             /* Stack it
              */
             $activity['data']['items'][$item['reference']] = $item;
