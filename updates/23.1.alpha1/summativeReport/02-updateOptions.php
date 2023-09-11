@@ -50,7 +50,8 @@ HELP;
             $new['summary']['workType'] = [];
             $new['class']['workType'] = [];
 
-            foreach ($pre['summary']['workType'] as $id) {
+            // use the config summary > worktype, or empty array
+            foreach ($pre['summary']['workType'] ?? [] as $id) {
                 // spawn new worktype
                 $new['summary']['workType'][$id] = [
                     'grades' => $pre['summary']['grades'],
@@ -58,7 +59,8 @@ HELP;
                     'rubrics' => $pre['summary']['rubrics'],
                 ];
             }
-            foreach ($pre['class']['workType'] as $id) {
+            // use the config class > worktype, or empty array
+            foreach ($pre['class']['workType'] ?? [] as $id) {
                 // spawn new worktype
                 $new['class']['workType'][$id] = [
                     'grades' => $pre['class']['grades'],
