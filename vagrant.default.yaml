@@ -69,4 +69,4 @@ network_auto_config: true
 
 # Enabling this will let your API cests evaluate responses against api schema yaml files
 # api_dir: "../schoolbox-api-docs"
-api_dir: ''
+api_dir: null
