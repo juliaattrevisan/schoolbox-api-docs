@@ -11,6 +11,7 @@
 namespace Schoolbox\Admin\CourseBuilder;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
@@ -183,5 +184,21 @@ class Controller extends Base
 
         echo "yay complete..";
 //        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
+    }
+
+    public function deleteTmpl($template): void
+    {
+        // ensure there is still 1 option left...
+        if (1 === $this->courseTemplateMapper->countAll()) {
+            $problem = (new ApiProblem('Must have 1 Course Template available'))
+                ->setStatus(409)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(409);
+            return; //exit early
+        }
+
+        //Purge the template
+        $this->courseTemplateMapper->delete($template);
+        $this->response = $this->responseEmpty();
     }
 }
