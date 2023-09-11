@@ -195,7 +195,7 @@ class Controller extends Assessment\Controller
                         'openDateFormatted'  => $unitImpl->getOpenDate()?->getRelativeTime(),
                         'relativeCloseDateFormatted' => $unitImpl->getRelativeDueDate()->getRelativeTime(),
                         'relativeOpenDateFormatted' => $unitImpl->getRelativeOpenDate()->getRelativeTime(),
-                        'assessments' => $assessments->map($unitAssessmentsTranslator)
+                        'assessments' => $assessments->reindex()->map($unitAssessmentsTranslator)
                     ];
                 }
             } else {
@@ -225,7 +225,7 @@ class Controller extends Assessment\Controller
                         'openDateFormatted' => null, // No Open Date for specifications
                         'relativeCloseDateFormatted' => null, // No Close Date for specifications
                         'relativeOpenDateFormatted' => null, // No Open Date for specifications
-                        'assessments' => $assessments->map($unitAssessmentsTranslator)
+                        'assessments' => $assessments->reindex()->map($unitAssessmentsTranslator)
                     ];
                 }
             }
