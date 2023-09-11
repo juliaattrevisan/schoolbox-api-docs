@@ -962,18 +962,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
     /**
      * This does not change self, but returns new date object of the start date of the current school year
-     * @return $this
+     * @return Alaress_Date_Format
      */
-    public function getStartOfSchoolYear(): self
+    public function getStartOfSchoolYear(): Alaress_Date_Format
     {
         $startDateString = $this->locale->startOfSchoolYear();
-        $start           = DateTime::createFromFormat('d/m/Y', $startDateString . '/' . $this->getYear())->setTime(0, 0);
+        $start           = DateTime::createFromFormat('d/m/Y', $startDateString . '/' . $this->getYear());
 
         $startDate = clone $this;
-        if (!$start) {
+        if (!$start instanceof DateTime) {
             return $startDate->startOfYear();
         }
 
+        $start = $start->setTime(0, 0);
         if ($start->getTimestamp() > $startDate->getUnixTimeStamp()) {
             // less one year
             $start = $start->modify('-1 year');
@@ -985,9 +986,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
     /**
      * This does not change self, but returns new date object of the end date of the current school year
-     * @return $this
      */
-    public function endOfSchoolYear(): self
+    public function endOfSchoolYear(): Alaress_Date_Format
     {
         $endDate = clone $this;
         return $endDate->getStartOfSchoolYear()->addYears(1)->addDays(-1)->endOfDay();
@@ -1004,7 +1004,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         $endYear = $this->endOfSchoolYear();
 
         if ($startYear->getYear() === $endYear->getYear() || (int)$endYear->getMonth() === 1) {
-            return $startYear->getYear();
+            return (string)$startYear->getYear();
         }
         return sprintf('%s-%s', $startYear->getYear(), $endYear->getYear());
     }

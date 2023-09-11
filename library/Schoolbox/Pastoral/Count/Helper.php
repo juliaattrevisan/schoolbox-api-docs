@@ -59,7 +59,7 @@ class Helper
     /**
      * @var GenericCollection|null
      */
-    private ?GenericCollection$pastoralTypesWhitelist = null;
+    private ?GenericCollection $pastoralTypesWhitelist = null;
 
     /**
      * @var GenericCollection|null

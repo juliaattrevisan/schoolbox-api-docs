@@ -12,7 +12,6 @@
  */
 class Alaress_Date_Locale_Static extends Alaress_Date_Locale_Abstract
 {
-
     /* Pretty formatting
      */
     protected $local = 'd/m/Y g:ia';
