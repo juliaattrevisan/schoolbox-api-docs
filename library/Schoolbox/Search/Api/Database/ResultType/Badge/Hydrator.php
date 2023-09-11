@@ -84,9 +84,7 @@ class Hydrator extends BaseHydrator
                         $match,
                         $match->id,
                         $badge->getName(), // The closest thing to a title for a badge is badge.name.
-                        $this->buildBaseUrl()
-                             ->withPath("/learning/badge/{$badge->getId()}/update")
-                             ->__toString(),
+                        '',  // There is no 'view specific badge' page, so blank string here.
                         $match->type,
                         $match->relevance,
                         $badge->getUpdatedAt(),
