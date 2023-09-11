@@ -2136,11 +2136,6 @@ parameters:
 			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
 
 		-
-			message: "#^Return type \\(void\\) of method Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\Mapper\\:\\:search\\(\\) should be compatible with return type \\(Schoolbox\\\\Collection\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\CMS\\\\Log\\\\Model\\:\\:getObjectId\\(\\) should return string but returns int\\.$#"
 			count: 1
 			path: library/Schoolbox/CMS/Log/Model.php
@@ -2339,11 +2334,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Lists\\\\Base\\:\\:\\$articleResolver \\(Schoolbox\\\\Comms\\\\News\\\\Audience\\\\ArticleResolver\\) does not accept Schoolbox\\\\Comms\\\\News\\\\Audience\\\\IArticleResolver\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Lists/Base.php
-
-		-
-			message: "#^Return type \\(Schoolbox\\\\Comms\\\\News\\\\Search\\\\Result\\) of method Schoolbox\\\\Comms\\\\News\\\\Mapper\\:\\:search\\(\\) should be compatible with return type \\(Schoolbox\\\\Collection\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Mapper.php
 
 		-
 			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
@@ -5316,19 +5306,9 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/WebDav/TreeBuilder.php
 
 		-
-			message: "#^Return type \\(Schoolbox\\\\Resource\\\\File\\\\Search\\\\Result\\) of method Schoolbox\\\\Resource\\\\File\\\\Mapper\\:\\:search\\(\\) should be compatible with return type \\(Schoolbox\\\\Collection\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Resource/File/Mapper.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/File/Notifier.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 3
-			path: library/Schoolbox/Resource/File/Search/Renderer.php
 
 		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Folder\\\\Ancestry\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Resource\\\\Folder\\\\Ancestry\\) but returns Schoolbox\\\\Resource\\\\Folder\\\\Ancestry\\.$#"
@@ -5376,11 +5356,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Mapper.php
 
 		-
-			message: "#^Return type \\(Schoolbox\\\\Resource\\\\Folder\\\\Search\\\\Result\\) of method Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\:\\:search\\(\\) should be compatible with return type \\(Schoolbox\\\\Collection\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Mapper.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between int\\<min, \\-1\\>\\|int\\<1, max\\> and '0' will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Mapper.php
@@ -5411,11 +5386,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Search/Result.php
-
-		-
 			message: "#^Call to function is_null\\(\\) with Schoolbox\\\\Resource\\\\HomepageTemplate will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/HomepageConfigMapper.php
@@ -5431,44 +5401,9 @@ parameters:
 			path: library/Schoolbox/Resource/Link.php
 
 		-
-			message: "#^Return type \\(Schoolbox\\\\Resource\\\\Link\\\\Search\\\\Result\\) of method Schoolbox\\\\Resource\\\\LinkMapper\\:\\:search\\(\\) should be compatible with return type \\(Schoolbox\\\\Collection\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Resource/LinkMapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Log\\:\\:getObject\\(\\) should return Schoolbox\\\\Resource\\\\File\\\\Model\\|Schoolbox\\\\Resource\\\\Folder\\\\Model\\|Schoolbox\\\\Resource\\\\Link\\|Schoolbox\\\\Resource\\\\Textbox\\\\Model but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Log.php
-
-		-
-			message: "#^Method Schoolbox\\\\Resource\\\\Search\\\\Definition\\:\\:getMapper\\(\\) should return Schoolbox\\\\Mapper\\\\Searchable but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Definition.php
-
-		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Search\\\\Definition\\:\\:\\$mapper \\(Schoolbox\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\\\Searchable\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Definition.php
-
-		-
-			message: "#^Cannot call method getOffset\\(\\) on null\\.$#"
-			count: 4
-			path: library/Schoolbox/Resource/Search/Results.php
-
-		-
-			message: "#^Parameter \\#5 \\$limit \\(null\\) of method Schoolbox\\\\Resource\\\\Search\\\\Results\\:\\:search\\(\\) should be compatible with parameter \\$limit \\(int\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Results.php
-
-		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Search\\\\Results\\:\\:\\$result \\(null\\) does not accept Schoolbox\\\\Collection\\.$#"
-			count: 2
-			path: library/Schoolbox/Resource/Search/Results.php
-
-		-
-			message: "#^Return type \\(void\\) of method Schoolbox\\\\Resource\\\\Search\\\\Results\\:\\:search\\(\\) should be compatible with return type \\(Schoolbox\\\\Collection\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Resource/Search/Results.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"

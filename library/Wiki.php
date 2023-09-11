@@ -224,67 +224,6 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return parent::update($data);
     }
 
-
-    /**
-     * @param string $keyword
-     * @param int    $offset
-     * @param int    $limit
-     * @param null   $count
-     * @param string $sort_by
-     * @param string $sort_dir
-     * @return array|bool
-     */
-    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
-    {
-        /** @var \Schoolbox\User $user */
-        $user     = $_SESSION['user'];
-
-        $offset   = intval($offset);
-        $limit    = intval($limit);
-        $sort_dir = (strtolower($sort_dir) === 'desc' ? 'desc' : 'asc');
-
-        $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
-                            MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
-                        FROM `wikiRevision`
-                        LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
-                        JOIN `folder` ON `folder`.id = `wiki`.categoryID AND `folder`.deleted_at IS NULL
-                        LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
-                        LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
-                            AND `perms`.gid = :roleId
-                            AND `perms`.type > 0
-                        LEFT JOIN `userAccess` ON `wiki`.categoryID = `userAccess`.sid
-                            AND `userAccess`.service = 1
-                            AND `userAccess`.uid = :userId
-                        WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`heading`,`body`) AGAINST (:keyword)
-                            AND deleted = 'false'
-                        ORDER BY {$this->db->getQuoter()->quoteIdentifier($sort_by)} $sort_dir
-                        LIMIT $offset, $limit;
-            ";
-
-        $count_query = "SELECT COUNT(*)
-                        FROM `wikiRevision`
-                        LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
-                        JOIN `folder` ON `folder`.id = `wiki`.categoryID AND `folder`.deleted_at IS NULL
-                        LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
-                        LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
-                            AND `perms`.gid = :roleId
-                            AND `perms`.type > 0
-                        LEFT JOIN `userAccess` ON `wiki`.categoryID = `userAccess`.sid
-                            AND `userAccess`.service = 1
-                            AND `userAccess`.uid = :userId
-                        WHERE (`perms`.cid OR `userAccess`.sid)
-                            AND MATCH(`heading`,`body`) AGAINST (:keyword)
-                            AND `deleted` = 'false'
-            ";
-
-        $params = ['keyword' => $keyword, 'userId' => $user->getId(), 'roleId' => $user->getRole()->getId()];
-        $count = $this->db->query($count_query, $params)->fetchColumn();
-
-        return $this->db->query($query, $params)->fetchAll();
-    }
-
-
     /**
      * Turns all stub links red
      *
