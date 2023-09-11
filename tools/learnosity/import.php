@@ -250,7 +250,13 @@ HELP;
      */
     private function getQuiz(int $assessId): array
     {
+        /* Precompile queries
+         */
         $quizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_PARTICULAR_QUIZ);
+        $sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
+        $questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
+        $answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
+
         $quizStatement->execute([
             'assessmentId' => $assessId
         ]);
@@ -260,7 +266,6 @@ HELP;
 
         /* Get its sections
          */
-        $sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
         $sectionsStatement->execute([
             'assessId' => $quizRow['assess_id']
         ]);
@@ -270,7 +275,6 @@ HELP;
 
             /* Get each section's questions
              */
-            $questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
             $questionStatement->execute([
                 'sectionId' => $sectionRow['section_id']
             ]);
@@ -280,7 +284,6 @@ HELP;
 
                 /* Get each question's answers
                  */
-                $answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
                 $answerStatement->execute([
                     'questionId' => $questionRow['question_id']
                 ]);
