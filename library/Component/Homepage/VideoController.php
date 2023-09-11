@@ -41,7 +41,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     private function isVisibleToCurrentUser($video): bool
     {
         // Read access users should not be able to see hidden videos.
-        return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
+        return !$video->getFile()->isHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
     }
 
 
