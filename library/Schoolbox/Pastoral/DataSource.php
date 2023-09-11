@@ -205,7 +205,7 @@ class DataSource
 
         $typeWheres     = [];
         $typeParams     = [];
-        $startDateWhere = $startDate ? ' AND created_at >= :startDate ' : '';
+        $startDateWhere = $startDate ? ' AND COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :startDate ' : '';
 
         if (!empty($typeIds)) {
             $typeBindings = Builder::getBindings($typeIds, 'typeId');
@@ -254,14 +254,14 @@ class DataSource
     public function countRecordsByTypeGroupByMonth(User $viewer, User $student, ?Alaress_Date_Format $startDate): array
     {
         $where          = $this->getPermissionClause($viewer, $student, null, null);
-        $startDateWhere = $startDate ? ' AND created_at >= :startDate ' : '';
+        $startDateWhere = $startDate ? ' AND COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :startDate ' : '';
 
         $sql = "
-        SELECT count(*) as count, p.type_id as typeId, p.subtype_id as subtypeId, month(p.created_at) as partition_month, year(p.created_at) as partition_year
+        SELECT count(*) as count, p.type_id as typeId, p.subtype_id as subtypeId, month(COALESCE(`p`.`occurred_on`, `p`.`created_at`)) as partition_month, year(COALESCE(`p`.`occurred_on`, `p`.`created_at`)) as partition_year
                 FROM pastoral p
         WHERE ({$where['where']})
         {$startDateWhere}
-        GROUP BY year(p.created_at), month(p.created_at), p.type_id, p.subtype_id
+        GROUP BY partition_year, partition_month, p.type_id, p.subtype_id
         ";
 
         $params = $startDate
