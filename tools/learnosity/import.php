@@ -1,0 +1,231 @@
+<?php
+
+/**
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @link        http://www.schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+use Schoolbox\Application\CliTool;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+
+/**
+ * CLI Tool
+ *
+ * Copy this to /tools folder
+ *
+ * To redirect log output to a file(s):
+ *     STDOUT is file descriptor 1
+ *     STDERR is file descriptor 2; our logger output ends up going here
+ *
+ *     Example: php example.php 2> log.txt
+ */
+$app = new class extends CliTool\App
+{
+    /**
+     * Make sure to add your locking script to the Lock Inspector tool
+     * const LOCK_NAMES in Inspector.php
+     */
+    public const LOCK_NAME = 'learnosity_migration';
+
+
+    /**
+     * Decide how long this should be based on your usage
+     * You might have to adjust it, but it should cover the cost of an iteration
+     */
+    private const LOCK_TTL = 60;
+
+
+    /**
+     * --help
+     *
+     * Print help text for those who don't know how to use this tool
+     */
+    private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * --assessment
+     *
+     * Import a particular quiz from the schoolbox.assessment table
+     */
+    private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_ASSESSMENT_ID
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Learnosity Migrator
+
+Replicates legacy quizzes from schoolbox.assess into its modern Learnosity incarnation.
+Each question type and contents is mapped to their closest Learnosity synonyms.
+
+You can specify a particular assessment to import; otherwise it imports everything
+that is alive (ie. everything that is not soft-deleted). 
+
+Usage: import.php [--assessment <assessmentId>] [--perform]
+Example: import.php --assessment 123456 --perform
+
+HELP;
+            return;
+        }
+
+        /* Decide how loudly to announce lock acquisition failure
+         *
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
+         * specifically check for acquisition
+         */
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
+        }
+
+        /* Obtain data set.
+         * If --assessment was specified, find its subobject and work with that.
+         * Otherwise collect the whole set of non-deleted quizzes via a custom query.
+         */
+        $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+
+        if ('' === $assessmentId) {
+            /* Get everything
+             */
+        } else {
+            /* Get $assessmentId
+             */
+        }
+
+
+        /* Commencing migration
+         */
+        $this->getLogger()->info('Learnosity Migration.');
+
+        /*
+            foreach $quiz in $quizzes
+                $this->refreshLock();
+
+                set up an Activity payload
+                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+
+                foreach $section in $quiz
+                    $this->refreshLock();
+
+                    set up an Item payload
+                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+
+                    foreach $question in $section
+                        $this->refreshLock();
+
+                        set up a new Question payload
+                        https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+                            - detect question type
+                            - spawn importer accordingly
+                            - importer->import()
+
+                        you'll probably need its answers, too, from assess_answer
+                        which you need to deserialize. It's not particularly obvious
+                        what format this payload should be in, but try this:
+                        https://reference.learnosity.com/questions-api/questiontypes
+
+                    send the Item containing multiple Questions into Learnosity itself?
+                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+
+                send the whole Activity, its Items and its Questions into Learnosity
+                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+
+                if successful, update the learnosity_reference so we know it ended up in learnosity
+                otherwise something went wrong and this row is still a candidate for import
+        */
+
+
+
+//        try {
+//            for ($i = 0; $i < 10; $i++) {
+//                $this->refreshLock($lock);
+//
+//                /* Your logic goes here
+//                 */
+//            }
+//        } catch (\Alaress\Lock\LockRefreshException $e) {
+//            /* Lock TTL expired; just leave politely
+//             */
+//            return;
+//        }
+//
+//
+//        /* Announce conclusion
+//         */
+//        if (!$this->perform()) {
+//            $this->getLogger()->info('Planning finished.');
+//        }
+
+        /* Announce lock release
+          */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
+    }
+
+
+    /**
+     * Get a quiz that:
+     *     * is not deleted
+     *     * is not yet in learnosity
+     *
+     * @param int $assessId
+     * @return void
+     */
+    private function getQuiz(int $assessId)
+    {
+        $query = "
+            SELECT *
+            FROM assess
+            WHERE deleted_at IS NULL
+            AND learnosity_reference IS NULL
+        ";
+    }
+
+
+    /**
+     * FIXME Decide whether this script must be run as root
+     *  By default, this returns false (see CliTool\App) but if you're using methods that require
+     *  access to special folders (such as when you're creating files) you need to run this as root.
+     *  Otherwise it'll fail with a generic error that might mislead you
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+};
+
+/* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
+ *
+ * You should generally try to fix those, even though in some special cases php will throw notices
+ * for its own expected behaviours which will inadvertently cause this to fail
+ */
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
