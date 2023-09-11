@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Importer\PayloadPlanFactory;
+use Schoolbox\Learning\Learnosity\Importer\ActivityBuilder;
 use Schoolbox\Learning\Learnosity\TagFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -218,10 +218,10 @@ HELP;
          */
         $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
 
-        /* Generates payload "plans" so you can inspect them before committing to
+        /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
          */
-        $planFactory = new PayloadPlanFactory($tagFactory);
+        $activityBuilder = new ActivityBuilder($tagFactory, $this->getLogger());
 
         /* Precompile queries
          */
@@ -263,7 +263,7 @@ HELP;
              * a little postprocessing to put things into the exactly correct format.
              * Learnosity is really particular about such things.
              */
-            $plan = $planFactory->build($legacyQuiz);
+            $blueprint = $activityBuilder->build($legacyQuiz);
         }
 
 

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Learnosity\TagFactory;
 
 /**
@@ -24,14 +25,15 @@ use Schoolbox\Learning\Learnosity\TagFactory;
  * using cleanse.php or the ui itself. There is no mass-archive or
  * mass-soft-delete; you have to do it programmatically.
  */
-class PayloadPlanFactory
+class ActivityBuilder
 {
     /**
      * Constructor
      *
      * @param TagFactory $tagFactory
+     * @param LoggerInterface $logger
      */
-    public function __construct(private TagFactory $tagFactory)
+    public function __construct(private TagFactory $tagFactory, private LoggerInterface $logger)
     {
     }
 
