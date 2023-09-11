@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
+use Schoolbox\Learning\Learnosity\Importer\PayloadPlanFactory;
 use Schoolbox\Learning\Learnosity\TagFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -218,6 +218,11 @@ HELP;
          */
         $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
 
+        /* Generates payload "plans" so you can inspect them before committing to
+         * sending them to Learnosity
+         */
+        $planFactory = new PayloadPlanFactory($tagFactory);
+
         /* Precompile queries
          */
         $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
@@ -250,82 +255,17 @@ HELP;
         foreach ($legacyQuizIds as $legacyQuizId) {
             $this->refreshLock($lock);
 
-            /* TODO Potentially aggregate N records instead of one at a time?
-             */
-            $activityPayload = [
-                'activities' => []
-            ];
-
             /* Get the legacy quiz's contents
              */
             $legacyQuiz = $this->getQuiz($legacyQuizId);
 
-            /* Produces Learnosity payloads
-             *
-             * TODO this author identfier should be a (schoolcode, user id) tuple for
-             *  auditing reasons, to deconflict with other schools who used the same
-             *  user id. It's mandatory as part of Question creation.
+            /* Make the overall Learnosity payloads which we then send later with
+             * a little postprocessing to put things into the exactly correct format.
+             * Learnosity is really particular about such things.
              */
-            $payloadFactory = new PayloadFactory((string)$legacyQuiz['user_id']);
+            $plan = $planFactory->build($legacyQuiz);
 
-            /* Set up a Learnosity Activity payload
-             * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
-             */
-            $activity = $payloadFactory->produce(
-                PayloadFactory::LEARNOSITY_PAYLOAD_ACTIVITY,
-                $legacyQuiz,
-                /* TODO Need the MapperProxy to decide its tag set, I suppose
-                 */
-                $tagFactory->produce(null, null, null)
-            );
-
-            /* Set up a Learnosity Item which will be vaguely equivalent to a Section
-             * purely for the purposes of this importer
-             */
-            foreach ($legacyQuiz['_sections'] as $section) {
-                $item = $payloadFactory->produce(
-                    PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
-                    $section,
-                    /* TODO Need the MapperProxy to decide its tag set, I suppose
-                     */
-                    $tagFactory->produce(null, null, null)
-                );
-
-                $itemPayload = [
-                    'items' => [$item]
-                ];
-
-                /* Send it
-                 */
-                $this->getLogger()->debug(sprintf(
-                    'Importing item "%s" (section_id: %s) with learnosity_reference %s',
-                    $section['title'],
-                    $section['section_id'],
-                    $item['reference']
-                ));
-
-//                $api->dataSetRequest('/itembank/items', $itemPayload);
-
-                /* Stack it
-                 */
-                $activity['data']['items'][] = $item['reference'];
-            }
-
-            /* Stack it
-             */
-            $activityPayload['activities'][] = $activity;
-
-            /* Send it
-             */
-            $this->getLogger()->info(sprintf(
-                'Importing quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
-                $legacyQuiz['title'],
-                $legacyQuiz['assessment_id'],
-                $legacyQuiz['assess_id'],
-                $activity['reference']
-            ));
-
-//            $api->dataSetRequest('/itembank/activities', $activityPayload);
+            print_r($plan);
         }
 
 
@@ -365,6 +305,29 @@ HELP;
                 if successful, update the learnosity_reference so we know it ended up in learnosity
                 otherwise something went wrong and this row is still a candidate for import
         */
+
+
+//
+//            /* Send it
+//             */
+//            $this->getLogger()->info(sprintf(
+//                'Importing quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
+//                $legacyQuiz['title'],
+//                $legacyQuiz['assessment_id'],
+//                $legacyQuiz['assess_id'],
+//                $activity['reference']
+//            ));
+//            /* Send it
+//             */
+//            $this->getLogger()->debug(sprintf(
+//                'Importing item "%s" (section_id: %s) with learnosity_reference %s',
+//                $section['title'],
+//                $section['section_id'],
+//                $item['reference']
+//            ));
+
+//                $api->dataSetRequest('/itembank/items', $itemPayload);
+//            $api->dataSetRequest('/itembank/activities', $activityPayload);
 
 
 
