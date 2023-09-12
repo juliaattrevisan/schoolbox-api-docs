@@ -29,10 +29,9 @@ class PayloadFactory
     /**
      * Constructor.
      *
-     * @param string $authorId
      * @param Factory $strategyFactory
      */
-    public function __construct(private string $authorId, private Strategy\Factory $strategyFactory)
+    public function __construct(private Strategy\Factory $strategyFactory)
     {
     }
 
