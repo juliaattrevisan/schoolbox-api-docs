@@ -106,18 +106,6 @@ class Translator
     /**
      * Translates an assessment DomainObject to a DataModel
      *
-     * We need a mechanism to prevent projects transforming their children, who each transform their parent, Ad infinitum.
-     * We need to ensure logically unique instances are respected, and also aim to translate assessments once only.
-     * By always translating from root down, we can achieve order-N^2 for a theoretical order-N problem. We will
-     * need a secondary cache to achieve order-N translation of random assessment collections that contain projects.
-     * // TODO see SA-5744.
-     *
-     * Translating up the object graph is problematic. It requires placing the current assessment in its parent context's assessment
-     * collection at the same index. This becomes a N^2 operation, and N^3 for collections containing projects (bad).
-     * Translating down the graph is order-N, and N^2 for collections containing projects.
-     *
-     * For now, we do need to re-transform relationships & properties even if entity is cached because those relationships may have changed
-     *
      * @param IAssessable $domainObject
      * @return IAssessableDataModel
      *
@@ -126,19 +114,6 @@ class Translator
      */
     public function translateToDataModel(IAssessable $domainObject): IAssessableDataModel
     {
-        // Always translate from top-down.
-        // This means we can always iterate a project's subAssessments in order(N) time.
-        $rootAssessable = $domainObject;
-        $levelsClimbed  = 0;
-
-        while ($rootAssessable->getContext() instanceof Project) {
-            $levelsClimbed++;
-            if ($levelsClimbed > $this->maxProjectLevels) {
-                throw new LogicException("Unable to find root project after $levelsClimbed iterations. You have a cycle or too many project nesting levels");
-            }
-            $rootAssessable = $rootAssessable->getContext();
-        }
-
         /* Ignore the random andy logic about $rootAssessable
          * and just translate this $domainObject like we wanted
          */
@@ -161,18 +136,7 @@ class Translator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel): IAssessable
     {
-        // Always translate from top-down.
-        // This means we can always iterate a project's subAssessments in order(N) time.
-        $root = $dataModel;
-        $levelsClimbed  = 0;
-        while ($root->getAssessmentModel() instanceof AssessmentModel && $root->getAssessmentModel()->getContextProject() instanceof ProjectModel) {
-            $levelsClimbed++;
-            if ($levelsClimbed > $this->maxProjectLevels) {
-                throw new LogicException("Unable to find root project after $levelsClimbed iterations. You have a cycle or too many project nesting levels");
-            }
-            $root = $root->getAssessmentModel()->getContextProject();
-        }
-        $this->translateToDomainModelRecursive($root);
+        $this->translateToDomainModelRecursive($dataModel);
         // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->domainObjectCache[spl_object_hash($dataModel)];
     }
