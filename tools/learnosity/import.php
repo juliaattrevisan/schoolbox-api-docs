@@ -264,7 +264,17 @@ HELP;
                  * a little postprocessing to put things into the exactly correct format.
                  * Learnosity is really particular about such things.
                  */
-                $blueprint = $activityBuilder->build($legacyQuiz);
+                try {
+                    $blueprint = $activityBuilder->build($legacyQuiz);
+                } catch (\DomainException $e) {
+                    $this->getLogger()->warning($e->getMessage());
+                    $this->getLogger()->warning(sprintf(
+                        'Skipping assess_id %s',
+                        $legacyQuiz['assess_id']
+                    ));
+
+                    continue;
+                }
 
                 /* Actually do it
                  */

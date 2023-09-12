@@ -41,6 +41,7 @@ class PayloadFactory
      * @param array $data
      * @param array|null $tags
      * @return array
+     * @throws \DomainException
      */
     public function produce(string $type, array $data, ?array $tags): array
     {
@@ -221,14 +222,24 @@ class PayloadFactory
      *
      * @param array $question
      * @return array
+     * @throws \DomainException
      */
     private function setupQuestionNode(array $question): array
     {
         $strategy = $this->strategyFactory->produce($question['type_id']);
 
+        /* Unknown question type
+         */
+        if (null === $strategy) {
+            throw new \DomainException(sprintf(
+                'Unknown/unsupported question type %s in StrategyFactory when processing question %s in section_id %s',
+                $question['type_id'],
+                $question['question_id'],
+                $question['section_id']
+            ));
+        }
+
         return [
-            /* TODO Detect question type
-             */
             'data' => $strategy?->convert($question),
             'type' => $strategy?->getLearnosityEquivalent(),
             'reference' => (string)UUid::uuid4(),

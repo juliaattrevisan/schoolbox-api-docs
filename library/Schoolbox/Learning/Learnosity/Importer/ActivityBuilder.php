@@ -43,6 +43,7 @@ class ActivityBuilder
      *
      * @param array $legacyQuiz
      * @return array|array[]
+     * @throws \DomainException
      */
     public function build(array $legacyQuiz): array
     {
@@ -98,9 +99,10 @@ class ActivityBuilder
                 );
 
                 $this->logger->debug(sprintf(
-                    'Built blueprint for question "%s" (question_id: %s) with learnosity_reference %s',
+                    'Built blueprint for question "%s" (question_id: %s, type: %s) with learnosity_reference %s',
                     \TextFormatter::cutSentence($question['question'], 64),
                     $question['question_id'],
+                    $question['type_id'],
                     $questionStruct['reference']
                 ));
 

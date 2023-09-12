@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
 
 /**
  * Converts a Schoolbox "Short Answer" question into its Learnosity equivalent
+ * https://reference.learnosity.com/questions-api/questiontypes#shorttext
  */
 class Short implements IStrategy
 {
@@ -28,8 +29,25 @@ class Short implements IStrategy
      */
     public function convert(array $question): array
     {
-        print_r($question);
+        /* FIXME This should always exist but what happens if it somehow doesn't?
+         *  Is that even a possibility in the fleet atm
+         */
+        $answer = $question['_answers'][0]['answer'];
 
-        return [];
+        return [
+            'case_sensitive' => false,
+            'instant_feedback' => true,
+            'max_length' => 250,
+            'stimulus' => $question['question'],
+            'type' => $this->getLearnosityEquivalent(),
+            'validation' => [
+                'automarkable' => false,
+                'scoring_type' => 'exactMatch',
+                'valid_response' => [
+                    'value' =>  $answer,
+                    'score' => (float)$question['marks']
+                ]
+            ]
+        ];
     }
 }
