@@ -101,6 +101,10 @@ class Inspector extends CliTool\App
         /* LISS Replay
          */
         Replay::LOCK_NAME => 'LISS Payload Replay (./tools/synchronise/liss/replay.php)',
+
+        /* Learnosity Migration
+         */
+        \Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool::LOCK_NAME => 'Learnosity Migration (./tools/learnosity/import.php)',
     ];
 
 
