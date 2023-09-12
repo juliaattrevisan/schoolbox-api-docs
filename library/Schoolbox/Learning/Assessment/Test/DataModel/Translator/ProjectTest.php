@@ -1292,7 +1292,7 @@ class ProjectTest extends TestCase
         $p1->getAssessments()[2] = $p2->getAssessmentModel();
         $p1->getAssessments()[3] = $p3->getAssessmentModel();
         $p2->getAssessmentModel()->setContextProject($p1);
-        $p3->getAssessmentModel()->setContextProject($p2);
+        $p3->getAssessmentModel()->setContextProject($p1);
 
         // #4 and #5 are children of #2
         $p2->getAssessments()[4] = $p4->getAssessmentModel();
