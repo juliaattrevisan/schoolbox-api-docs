@@ -106,20 +106,30 @@ class Translator
     /**
      * Translates an assessment DomainObject to a DataModel
      *
-     * @param IAssessable $domainObject
+     * @param IAssessable $domainObject The domain object to translate.
+     * @param int         $depth        The current depth of translation.
+     *                                  This translator will translate the context project of `$domainObject`
+     *                                  recursively: if it translates more than `$this->maxProjectLevels` down, this
+     *                                  will detect a cyclic graph and raise a `LogicException`.
      * @return IAssessableDataModel
      *
      * @throws UnexpectedValueException If assessment does not have a context
      * @throws LogicException If cyclic graph detected
      */
-    public function translateToDataModel(IAssessable $domainObject): IAssessableDataModel
+    public function translateToDataModel(IAssessable $domainObject, int $depth = 1): IAssessableDataModel
     {
+        if ($depth > $this->maxProjectLevels) {
+            throw new LogicException("Unable to find root project after $depth iterations. You have a cycle or too many project nesting levels");
+        }
+
         // Is `$domainObject` within a project?
         // If so, translate the project first so that `$domainObject` has access
         // to its fully-realised project
         $context = $domainObject->getContext();
         if ($context instanceof Project) {
-            $this->translateToDataModel($context);
+            if (!isset($this->dataModelCache[spl_object_hash($context)])) {
+                $this->translateToDataModel($context, $depth + 1);
+            }
         }
 
         /* Ignore the random andy logic about $rootAssessable
@@ -135,21 +145,31 @@ class Translator
     /**
      * Translates the data model to a domain model.
      *
-     * @param IAssessableDataModel $dataModel
+     * @param IAssessableDataModel $dataModel The data model to translate.
+     * @param int                  $depth     The current depth of translation.
+     *                                        This translator will translate the context project of `dataModel`
+     *                                        recursively: if it translates more than `$this->maxProjectLevels` down,
+     *                                        this will detect a cyclic graph and raise a `LogicException`.
      * @return IAssessable
      * @throws UnexpectedValueException if $dataModel wasn't able to be translated
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
      */
-    public function translateToDomainModel(IAssessableDataModel $dataModel): IAssessable
+    public function translateToDomainModel(IAssessableDataModel $dataModel, int $depth = 1): IAssessable
     {
+        if ($depth > $this->maxProjectLevels) {
+            throw new LogicException("Unable to find root project after $depth iterations. You have a cycle or too many project nesting levels");
+        }
+
         // Is `$dataModel` within a project?
         // If so, translate the project first so that `$dataModel` has access to
         // its fully-realised project
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();
         if ($context instanceof ProjectModel) {
-            $this->translateToDomainModel($context);
+            if (!isset($this->domainObjectCache[spl_object_hash($context)])) {
+                $this->translateToDomainModel($context, $depth + 1);
+            }
         }
 
         $this->translateToDomainModelRecursive($dataModel);
