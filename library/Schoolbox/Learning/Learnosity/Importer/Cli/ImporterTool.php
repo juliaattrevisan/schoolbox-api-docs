@@ -412,6 +412,7 @@ HELP;
      *
      * @param int|null $assessmentId
      * @return array
+     * @throws \PDOException
      */
     private function getLegacyQuizIds(?int $assessmentId = null): array
     {
@@ -442,6 +443,8 @@ HELP;
      *
      * @param int $assessId
      * @return array
+     * @throws \JsonException
+     * @throws \PDOException
      */
     private function getQuiz(int $assessId): array
     {
@@ -503,6 +506,7 @@ HELP;
      *
      * @param array $question
      * @return mixed
+     * @throws \JsonException
      */
     private function decompileQuestionConfig(array $question): mixed
     {
