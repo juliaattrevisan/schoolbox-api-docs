@@ -96,7 +96,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(): string
     {
-        // NVL2: if param 1 is not null returns param 2, otherwise param 3
+        // NVL2: if param 1 is not null returns param 2, otherwise param 3 (https://mariadb.com/kb/en/nvl2/)
         return "CONCAT(
             'page.',
             NVL2(

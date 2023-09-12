@@ -57,6 +57,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 // We ought to be able to use the expression itself in the WHERE clause, like this:
                 //    Example: $whereParts = "$typePart IN ({$bindings->getPlaceholder()})";
                 // But that does not produce expected results for unknown reasons.  So we introduce a HAVING clause.
+                // @see https://github.com/alaress/schoolbox/pull/28994
                 $havingParts[] = "`type` IN ({$bindings->getPlaceholder()})";
 
                 $params = array_merge($params, $bindings->getParams());
