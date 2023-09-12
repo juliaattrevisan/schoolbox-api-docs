@@ -202,11 +202,11 @@ class Notifier extends ResourceNotifier
         if (!$resource instanceof Textbox) {
             return false;
         }
-        /** @var UserAccess $folderAccess */
         try {
             $folderAccess = $this->access->getFolderAccess($currentUser, $resource->getCategory()->getId());
         } catch (MapperException) {
             $this->log->warning("Failed to get access for folder:{$resource->getId()} user {$currentUser->getId()}");
+            return false;
         }
         return $folderAccess > UserAccess::ACCESS_READ || ($folderAccess === UserAccess::ACCESS_READ && $this->hasVisibleComponent($resource));
     }
