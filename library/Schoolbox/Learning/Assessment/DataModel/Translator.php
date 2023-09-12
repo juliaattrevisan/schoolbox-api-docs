@@ -165,7 +165,11 @@ class Translator
         // Is `$dataModel` within a project?
         // If so, translate the project first so that `$dataModel` has access to
         // its fully-realised project
-        $context = $dataModel->getAssessmentModel()->getAssessmentContext();
+        $assessmentModel = $dataModel->getAssessmentModel();
+        if (!$assessmentModel instanceof AssessmentModel) {
+            throw new UnexpectedValueException('$dataModel has no assessment model');
+        }
+        $context = $assessmentModel->getAssessmentContext();
         if ($context instanceof ProjectModel) {
             if (!isset($this->domainObjectCache[spl_object_hash($context)])) {
                 $this->translateToDomainModel($context, $depth + 1);
