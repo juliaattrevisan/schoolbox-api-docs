@@ -71,10 +71,15 @@
         }
 
         function validateEmail(email) {
-            // Source: https://www.w3.org/TR/2012/WD-html-markup-20120329/input.email.html
+            // Source: https://www.w3.org/TR/2012/WD-html-markup-20120329/input.email.html,
+            // plus non-ASCII characters allowed
             // Replaced ’ character with ' as ’ is not even a valid email character for input type email.
             // Seems like it's a typo from the source.
-            var validEmailFilter = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+            const letterClass      = 'a-zA-Z0-9\\P{ASCII}';
+            const validEmailFilter = new RegExp(
+                `^[${letterClass}.!#$%&'*+/=?^_\`{|}~-]+@[${letterClass}-]+(?:\.[${letterClass}-]+)*$`,
+                'u'
+            );
             var emailIsInBetweenRegex = /\<([^)]+)\>/; // Is email string in between <>? E.g <alaress@alaress.com.au>
 
             if (emailIsInBetweenRegex.test(email)) {
