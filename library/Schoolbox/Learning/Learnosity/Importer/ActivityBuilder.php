@@ -120,11 +120,20 @@ class ActivityBuilder
              * pile them up here
              */
             foreach ($section['_questions'] as $question) {
-                $questionStruct = $payloadFactory->produce(
-                    PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
-                    $question,
-                    null
-                );
+                /* TODO temporary shim while constructing Strategies
+                 */
+                try {
+                    $questionStruct = $payloadFactory->produce(
+                        PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
+                        $question,
+                        null
+                    );
+                }
+                catch (\DomainException $e) {
+                    $this->logger->warning($e->getMessage());
+                    continue;
+                }
+
 
                 /* Stack it
                  */
