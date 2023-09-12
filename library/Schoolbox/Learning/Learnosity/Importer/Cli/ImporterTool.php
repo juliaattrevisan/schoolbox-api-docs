@@ -12,6 +12,9 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\ActivityBuilder;
+use Schoolbox\Learning\Learnosity\Importer\Strategy\MatchingPairs;
+use Schoolbox\Learning\Learnosity\Importer\Strategy\Multi;
+use Schoolbox\Learning\Learnosity\Importer\Strategy\Radio;
 use Schoolbox\Learning\Learnosity\TagFactory;
 class ImporterTool extends CliTool\App
 {
@@ -533,9 +536,9 @@ HELP;
          * (6,8,9,10,17 are all Survey)
          */
         $serializedAnswers = [
-            2, // Multi
-            4, // Match
-            5, // Radio
+            Multi::QUESTION_TYPE_ID,
+            MatchingPairs::QUESTION_TYPE_ID,
+            Radio::QUESTION_TYPE_ID,
         ];
 
         if (in_array($question['type_id'], $serializedAnswers, false)) {
