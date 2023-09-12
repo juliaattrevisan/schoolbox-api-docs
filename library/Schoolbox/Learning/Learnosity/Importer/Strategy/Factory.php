@@ -14,7 +14,6 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  */
 class Factory
 {
-
     /**
      * Use the question's type_id field to figure out what kind
      * of question this was in Schoolbox and then spawn the thing
@@ -31,6 +30,7 @@ class Factory
             case Radio::QUESTION_TYPE_ID: return new Radio();
             case Fillgap::QUESTION_TYPE_ID: return new Fillgap();
             case Multi::QUESTION_TYPE_ID: return new Multi();
+            case MatchingPairs::QUESTION_TYPE_ID: return new MatchingPairs();
 
             default: return null;
         }
