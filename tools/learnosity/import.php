@@ -59,6 +59,14 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --blueprint
+     *
+     * Show the payload we intend to send to learnosity land
+     */
+    private const OPT_LONG_BLUEPRINT = 'blueprint';
+
+
+    /**
      * Learnosity has some strict requirements about where api requests originate
      */
     private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
@@ -161,7 +169,8 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_ASSESSMENT_ID
+            self::OPT_LONG_ASSESSMENT_ID,
+            self::OPT_LONG_BLUEPRINT,
         ];
     }
 
@@ -180,10 +189,14 @@ Replicates legacy quizzes from schoolbox.assess into its modern Learnosity incar
 Each question type and contents is mapped to their closest Learnosity synonyms.
 
 You can specify a particular assessment to import; otherwise it imports everything
-that is alive (ie. everything that is not soft-deleted). 
+that is alive (ie. everything that is not soft-deleted).
+
+Use --blueprint option in either mode to show the array struct we intended to send to Learnosity
+dumped to the cli. This is useful for manual inspection before committing to a --perform  
 
 Usage: import.php [--assessment <assessmentId>] [--perform]
 Example: import.php --assessment 123456 --perform
+Example: import.php --assessment 123456 --blueprint
 
 HELP;
             return;
@@ -282,6 +295,12 @@ HELP;
                     ));
 
                     continue;
+                }
+
+                /* Optionally show array payloads
+                 */
+                if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+                    print_r($blueprint);
                 }
 
                 /* Actually do it
