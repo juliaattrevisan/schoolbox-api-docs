@@ -17,5 +17,5 @@ class Installer extends Package\BaseCurriculum
     /**
      * @inheritdoc
      */
-    protected string $sourceFile = __DIR__ . '/NSWCurriculum23-27a.csv';
+    protected string $sourceFile = __DIR__ . '/NSWCurriculum23-27.csv';
 }

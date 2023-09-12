@@ -75,7 +75,7 @@ function processRowsSubStrand($handle, array &$output_rows, int $lastSubject_id,
 }
 
 // Define input and output file paths
-$output_file = 'NSWCurriculum23-27a.csv';
+$output_file = 'NSWCurriculum23-27.csv';
 
 // Files
 $subjectFiles = [
@@ -104,7 +104,7 @@ $seenCodes = [];
 // Define a 2-dimensional array to store the rows of the output CSV file
 $output_rows = [];
 
-$output_rows[] = [1, 0, 'NSW Curriculum 23-27a', null, 0, null];
+$output_rows[] = [1, 0, 'NSW Curriculum 23-27', null, 0, null];
 
 // For each file, do things...
 foreach ($subjectFiles as $subject => $filesArray) {
