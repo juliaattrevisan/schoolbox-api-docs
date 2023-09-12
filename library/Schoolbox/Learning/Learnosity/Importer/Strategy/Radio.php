@@ -63,6 +63,10 @@ class Radio implements IStrategy
             'stimulus' => $question['question'],
             'type' => $this->getLearnosityEquivalent(),
             'ui_style' => [
+                /* An undocumented setting as per https://help.learnosity.com/hc/en-us/requests/23242
+                 * [number, upper-alpha, lower-alpha] are possibilities
+                 */
+                'choice_label' => 'lower-alpha',
                 'type' => 'block'
             ],
             'validation' => [
