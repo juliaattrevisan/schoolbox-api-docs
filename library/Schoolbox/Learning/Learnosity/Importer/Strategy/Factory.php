@@ -31,6 +31,7 @@ class Factory
             case Fillgap::QUESTION_TYPE_ID: return new Fillgap();
             case Multi::QUESTION_TYPE_ID: return new Multi();
             case MatchingPairs::QUESTION_TYPE_ID: return new MatchingPairs();
+            case Numeric::QUESTION_TYPE_ID: return new Numeric();
 
             default: return null;
         }
