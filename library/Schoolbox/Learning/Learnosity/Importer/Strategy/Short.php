@@ -16,6 +16,12 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
 class Short implements IStrategy
 {
     /**
+     * Corresponds to a row in our assess_luQuestionType lookup
+     */
+    public const QUESTION_TYPE_ID = 1;
+
+
+    /**
      * @inheritDoc
      */
     public function getLearnosityEquivalent(): string

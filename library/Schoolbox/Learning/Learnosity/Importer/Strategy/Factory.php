@@ -26,7 +26,7 @@ class Factory
     public function produce(int $typeId): ?IStrategy
     {
         switch ($typeId) {
-            case 1: return new Short();
+            case Short::QUESTION_TYPE_ID: return new Short();
 
             default: return null;
         }
