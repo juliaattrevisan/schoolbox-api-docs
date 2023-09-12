@@ -124,11 +124,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * Page results do not currently have dates: thus this will be null.
+     * A page's date is its updated_at date.
+     *
+     * @return string|null
      */
     protected function buildDateExpression(): ?string
     {
-        return null;
+        return 'f.updated_at';
     }
 
     /**
