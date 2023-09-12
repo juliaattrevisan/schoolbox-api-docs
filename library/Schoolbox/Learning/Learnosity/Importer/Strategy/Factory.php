@@ -30,6 +30,7 @@ class Factory
             case Exact::QUESTION_TYPE_ID: return new Exact();
             case Radio::QUESTION_TYPE_ID: return new Radio();
             case Fillgap::QUESTION_TYPE_ID: return new Fillgap();
+            case Multi::QUESTION_TYPE_ID: return new Multi();
 
             default: return null;
         }

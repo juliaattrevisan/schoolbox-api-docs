@@ -120,7 +120,7 @@ class ActivityBuilder
              * pile them up here
              */
             foreach ($section['_questions'] as $question) {
-                /* TODO temporary shim while constructing Strategies
+                /* FIXME temporary shim while constructing Strategies
                  */
                 try {
                     $questionStruct = $payloadFactory->produce(
