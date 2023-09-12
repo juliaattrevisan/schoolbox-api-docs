@@ -27,9 +27,9 @@
                 </div>
                 {% if readOnly == false %}
                 <nav>
-                    <wc-actions-dropdown content-id="unit-options{{ unit.id }}"></wc-actions-dropdown>
+                    <wc-actions-dropdown content-id="component{{ componentInstance.id }}-unit-options{{ unit.id }}"></wc-actions-dropdown>
                 </nav>
-                <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
+                <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-unit-options{{ unit.id }}">
 
                     {% if unit.isAfterDueDate == false %}
                     <li class="separator">Create</li>

@@ -118,7 +118,7 @@
                 {% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %}
                     <nav>
                         {% if hasAssessmentRoutes or hasCourseRoutes %}
-                            <wc-actions-dropdown content-id="options-task{{ assessment.id }}"></wc-actions-dropdown>
+                            <wc-actions-dropdown content-id="component{{ componentInstance.id }}-options-task{{ assessment.id }}"></wc-actions-dropdown>
                         {% elseif isParticipant %}
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
                                 assessment: assessment,
@@ -130,7 +130,7 @@
                 {% endif %}
 
                 {% if hasAssessmentRoutes or hasCourseRoutes %}
-                    <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
+                    <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-options-task{{ assessment.id }}">
                         {% if hasAssessmentRoutes %}
                             <li class="separator">{{ locale.translate('assessment', false, true) }}</li>
                             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
