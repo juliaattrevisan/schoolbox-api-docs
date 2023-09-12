@@ -36,6 +36,8 @@ class RichText implements IStrategy
     public function convert(array $question): array
     {
         return [
+            /* Apparently the upper limit is 100,000
+             */
             'max_length' => 99999,
             'stimulus' => $question['question'],
             'type' => $this->getLearnosityEquivalent(),
