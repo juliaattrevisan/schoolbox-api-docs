@@ -333,6 +333,17 @@ HELP;
                     $legacyQuiz['assess_id']
                 ));
 
+                /* If this dosen't have an assessment_id, idk what this is,
+                 * because you can't get here anymore.
+                 */
+                if ('' === trim((string)$legacyQuiz['assessment_id'])) {
+                    $this->getLogger()->warning(sprintf(
+                        'Missing assessment_id; skipping'
+                    ));
+
+                    continue;
+                }
+
                 /* Make the overall Learnosity payloads which we then send later with
                  * a little postprocessing to put things into the exactly correct format.
                  * Learnosity is really particular about such things.
