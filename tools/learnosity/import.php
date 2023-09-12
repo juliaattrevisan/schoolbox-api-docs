@@ -236,6 +236,10 @@ HELP;
          */
         $activityBuilder = new ActivityBuilder($tagFactory, $this->getLogger());
 
+        /* Capture absic metrics
+         */
+        $timing = [];
+
         /* Precompile queries
          */
         $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
@@ -314,9 +318,17 @@ HELP;
 
                     /* Iterate and bombard Learnosity with api requests pewpewpew
                      */
+                    $start = microtime(true);
+
                     foreach ($blueprint as $data) {
                         $api->dataSetRequest($data['endpoint'], $data['payload']);
                     }
+
+                    $end = microtime(true);
+
+                    /* Capture metrics
+                     */
+                    $timing[] = $end - $start;
                 }
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
@@ -324,6 +336,21 @@ HELP;
              */
             return;
         }
+
+        /* Report some metrics
+         */
+        $numImported = \count($timing);
+
+        if (!$numImported) {
+            $this->getLogger()->info('No quizzes imported; none found. Exiting.');
+            return;
+        }
+
+        $this->getLogger()->info(sprintf(
+            'Number of quizzes imported: %s. Average time taken per quiz: %s seconds',
+            $numImported,
+            array_sum($timing)/$numImported
+        ));
 
         /*
             foreach $quiz in $quizzes
