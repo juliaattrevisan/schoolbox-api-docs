@@ -119,20 +119,18 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             $params['cursorId']        = $cursor->id;
         }
 
-        $where = implode(' AND ', $whereParts);
-        $having = implode(' AND ', $havingParts);
-
         // Build query and params
         $from = $this->buildFromStatement();
-        $query = "
-            SELECT DISTINCT
+        $query = (
+            "SELECT DISTINCT
                 $idPart        AS id,
                 $titlePart     AS title,
                 $typePart      AS type,
                 $relevancePart AS relevance
-            $from
-            WHERE $where
-            HAVING $having";
+            $from" .
+            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') .
+            ((count($havingParts) > 0) ? "\nHAVING " . implode(' AND ', $havingParts) : '')
+        );
 
         // Build order parts
         $orderParts = [];
