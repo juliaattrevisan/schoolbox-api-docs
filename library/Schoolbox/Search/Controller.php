@@ -146,6 +146,7 @@ class Controller extends Base
         ];
 
         $filters[] = ["title" => $rosettaStone->translate("news", false, true), "value" => "news"];
+        $filters[] = ["title" => "Blogs", "value" => "blog"];
         $filters[] = ["title" => "Events", "value" => "events"];
         $filters[] = ["title" => "Forums", "value" => "forum"];
         $filters[] = ["title" => "Links", "value" => "link"];
