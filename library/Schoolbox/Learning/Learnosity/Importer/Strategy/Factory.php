@@ -24,16 +24,15 @@ class Factory
      */
     public function produce(int $typeId): ?IStrategy
     {
-        switch ($typeId) {
-            case Short::QUESTION_TYPE_ID: return new Short();
-            case Exact::QUESTION_TYPE_ID: return new Exact();
-            case Radio::QUESTION_TYPE_ID: return new Radio();
-            case Fillgap::QUESTION_TYPE_ID: return new Fillgap();
-            case Multi::QUESTION_TYPE_ID: return new Multi();
-            case MatchingPairs::QUESTION_TYPE_ID: return new MatchingPairs();
-            case Numeric::QUESTION_TYPE_ID: return new Numeric();
-
-            default: return null;
-        }
+        return match ($typeId) {
+            Short::QUESTION_TYPE_ID => new Short(),
+            Exact::QUESTION_TYPE_ID => new Exact(),
+            Radio::QUESTION_TYPE_ID => new Radio(),
+            Fillgap::QUESTION_TYPE_ID => new Fillgap(),
+            Multi::QUESTION_TYPE_ID => new Multi(),
+            MatchingPairs::QUESTION_TYPE_ID => new MatchingPairs(),
+            Numeric::QUESTION_TYPE_ID => new Numeric(),
+            default => null,
+        };
     }
 }
