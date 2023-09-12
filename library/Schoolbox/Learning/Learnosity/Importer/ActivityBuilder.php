@@ -126,8 +126,7 @@ class ActivityBuilder
                         $question,
                         null
                     );
-                }
-                catch (\DomainException $e) {
+                } catch (\DomainException $e) {
                     $this->logger->warning($e->getMessage());
                     continue;
                 }

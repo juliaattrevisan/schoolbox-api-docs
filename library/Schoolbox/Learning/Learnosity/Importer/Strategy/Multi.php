@@ -60,7 +60,7 @@ class Multi implements IStrategy
 
         return [
             'instant_feedback' => false,
-            'multiple_responses'=> true,
+            'multiple_responses' => true,
             'options' => $options,
             'stimulus' => $question['question'],
             'type' => $this->getLearnosityEquivalent(),

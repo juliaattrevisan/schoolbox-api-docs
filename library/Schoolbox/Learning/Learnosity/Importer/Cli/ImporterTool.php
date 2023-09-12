@@ -429,7 +429,7 @@ HELP;
         $this->getLogger()->info(sprintf(
             'Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
             $numImported,
-            round(array_sum($timing)/$numImported)
+            round(array_sum($timing) / $numImported)
         ));
 
         /* Announce conclusion
