@@ -67,6 +67,7 @@ class ImporterTool extends CliTool\App
 
     /**
      * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
+     * This is the default mechanism by which to mass-import everything
      */
     private const QUERY_LEGACY_QUIZ_IDS = "
         SELECT assess_id
@@ -78,27 +79,29 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * Get a particular the schoolbox.assess row that isn't part of Learnosity Land already
+     * Get a particular the schoolbox.assess row
+     *
+     * Note that using this will arbitrarily spawn a new quiz each and every time and should
+     * be used carefully; you will be creating orphaned data by repeatedly using this. This
+     * tool will not archive something it is about to replace.
      */
     private const QUERY_LEGACY_QUIZ_ID = "
         SELECT assess_id
         FROM assess
         WHERE deleted_at IS NULL
         AND availability = 'assess'
-        AND learnosity_reference IS NULL
         AND assessment_id = :assessmentId
     ";
 
 
     /**
-     * Get a particular schoolbox.assess row that not part of Learnosity already
+     * Get a particular schoolbox.assess row
      */
     private const QUERY_QUIZ = "
         SELECT *
         FROM assess
         WHERE deleted_at IS NULL
         AND availability = 'assess'
-        AND learnosity_reference IS NULL
         AND assess_id = :assessId
     ";
 
