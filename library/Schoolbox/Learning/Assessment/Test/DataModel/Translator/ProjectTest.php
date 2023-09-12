@@ -58,7 +58,6 @@ class ProjectTest extends TestCase
     {
         return new class extends Assessment\Mapper
         {
-
             public function createModel($id = null)
             {
                 return parent::createModel()->setId($id);
@@ -743,7 +742,7 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider provider_linear_data_project_tree
+     * @dataProvider providerLinearDataProjectTree
      * @param ProjectModel $projectModel
      * @param int          $id           Id of this project node
      * @param int          $upExpected   How many nodes above this one?
@@ -753,7 +752,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    public function test_linear_data_project_tree(ProjectModel $projectModel, int $id, int $upExpected, int $downExpected)
+    public function testLinearDataProjectTree(ProjectModel $projectModel, int $id, int $upExpected, int $downExpected)
     {
         /** @var Project $domainObject */
         $domainObject = $this->translator->translateToDomainModel($projectModel);
@@ -922,7 +921,7 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider provider_branched_data_project_tree
+     * @dataProvider providerBranchedDataProjectTree
      * @param ProjectModel $projectModel
      * @param int          $id
      * @param int          $up
@@ -933,7 +932,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    public function test_branched_data_project_tree(ProjectModel $projectModel, int $id, int $up, int $treeSize, int $descendants)
+    public function testBranchedDataProjectTree(ProjectModel $projectModel, int $id, int $up, int $treeSize, int $descendants)
     {
         /** @var Project $domainObject */
         $domainObject = $this->translator->translateToDomainModel($projectModel);
@@ -956,7 +955,7 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider provider_linear_domain_project_tree
+     * @dataProvider providerLinearDomainProjectTree
      * @param Project $projectObject
      * @param int     $id           Id of this project node
      * @param int     $upExpected   How many nodes above this one?
@@ -964,7 +963,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    public function test_linear_domain_project_tree(Project $projectObject, int $id, int $upExpected, int $downExpected)
+    public function testLinearDomainProjectTree(Project $projectObject, int $id, int $upExpected, int $downExpected)
     {
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($projectObject);
@@ -1129,7 +1128,7 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider provider_branched_domain_project_tree
+     * @dataProvider providerBranchedDomainProjectTree
      * @param Project $projectObject
      * @param int     $id
      * @param int     $up
@@ -1138,7 +1137,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    public function test_branched_domain_project_tree(Project $projectObject, int $id, int $up, int $treeSize, int $descendants)
+    public function testBranchedDomainProjectTree(Project $projectObject, int $id, int $up, int $treeSize, int $descendants)
     {
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($projectObject);
@@ -1215,7 +1214,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function provider_linear_data_project_tree(): array
+    public function providerLinearDataProjectTree(): array
     {
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
                                   ->setAssessments(new GenericCollection(AssessmentModel::class))
@@ -1265,7 +1264,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function provider_branched_data_project_tree(): array
+    public function providerBranchedDataProjectTree(): array
     {
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
                                   ->setAssessments(new GenericCollection(AssessmentModel::class))
@@ -1316,7 +1315,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function provider_linear_domain_project_tree(): array
+    public function providerLinearDomainProjectTree(): array
     {
         $p1 = (new Project())->setId(1)
                              ->setAssessables(new GenericCollection(IAssessable::class))
@@ -1362,7 +1361,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function provider_branched_domain_project_tree(): array
+    public function providerBranchedDomainProjectTree(): array
     {
         $p1 = (new Project())->setId(1)
                              ->setAssessables(new GenericCollection(IAssessable::class))
