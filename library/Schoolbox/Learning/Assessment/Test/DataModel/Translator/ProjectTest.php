@@ -1294,7 +1294,7 @@ class ProjectTest extends TestCase
         $p2->getAssessmentModel()->setContextProject($p1);
         $p3->getAssessmentModel()->setContextProject($p2);
 
-        // #4 and #4 are children of #2
+        // #4 and #5 are children of #2
         $p2->getAssessments()[4] = $p4->getAssessmentModel();
         $p2->getAssessments()[5] = $p5->getAssessmentModel();
         $p4->getAssessmentModel()->setContextProject($p2);
