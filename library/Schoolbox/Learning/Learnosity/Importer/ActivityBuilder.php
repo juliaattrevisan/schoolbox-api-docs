@@ -54,9 +54,11 @@ class ActivityBuilder
 
         /* Produces Learnosity payloads
          *
-         * TODO this author identfier should be a (schoolcode, user id) tuple for
+         * TODO this author identifier should be a (schoolcode, user id) tuple for
          *  auditing reasons, to deconflict with other schools who used the same
-         *  user id. It's mandatory as part of Question creation.
+         *  user id. It's mandatory as part of Question creation. We can assign
+         *  it here in the blueprint, or in the actual api payload itself while
+         *  performing
          */
         $payloadFactory = new PayloadFactory((string)$legacyQuiz['user_id']);
 
