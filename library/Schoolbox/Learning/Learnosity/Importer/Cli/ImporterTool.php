@@ -223,6 +223,8 @@ HELP;
          */
         $serverName = self::DEFAULT_SERVER_NAME;
 
+        $schoolCode = $this->getConfig()->get('site_school_code');
+
         /* Initialise dependencies
          */
         $api = new Api(
@@ -234,12 +236,12 @@ HELP;
 
         /* Generates sets of tags for Activities' and Items' assignations
          */
-        $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
+        $tagFactory = new TagFactory($schoolCode);
 
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
          */
-        $activityBuilder = new ActivityBuilder($tagFactory, $this->getLogger());
+        $activityBuilder = new ActivityBuilder($schoolCode, $tagFactory, $this->getLogger());
 
         /* Capture absic metrics
          */

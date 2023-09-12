@@ -30,11 +30,15 @@ class ActivityBuilder
     /**
      * Constructor
      *
+     * @param string $schoolCode
      * @param TagFactory $tagFactory
      * @param LoggerInterface $logger
      */
-    public function __construct(private TagFactory $tagFactory, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private string $schoolCode,
+        private TagFactory $tagFactory,
+        private LoggerInterface $logger
+    ) {
     }
 
 
@@ -141,10 +145,12 @@ class ActivityBuilder
                     'endpoint' => '/itembank/questions',
                     'payload' => [
                         'meta' => [
-                            /* TODO this should have a schoolcode prefix
-                             */
                             'user' => [
-                                'id' => (string)$legacyQuiz['user_id']
+                                'id' => sprintf(
+                                    '%s__%s',
+                                    $this->schoolCode,
+                                    $legacyQuiz['user_id']
+                                )
                             ]
                         ],
                         'questions' => [$questionStruct]
