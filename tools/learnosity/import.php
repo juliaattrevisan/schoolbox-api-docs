@@ -307,16 +307,16 @@ HELP;
                  */
                 if ($this->perform()) {
                     $this->getLogger()->info(sprintf(
-                        'Importing legacy quiz "%s" (assess_id: %s) with learnosity_reference %s',
-                        $blueprint['activities'][0]['title'],
+                        'Importing legacy quiz "%s" (assess_id: %s)',
+                        $legacyQuiz['title'],
                         $legacyQuizId,
-                        $blueprint['activities'][0]['reference']
                     ));
 
                     /* Iterate and bombard Learnosity with api requests pewpewpew
                      */
-//                    $api->dataSetRequest('/itembank/items', $itemPayload);
-//                    $api->dataSetRequest('/itembank/activities', $activityPayload);
+                    foreach ($blueprint as $data) {
+                        $api->dataSetRequest($data['endpoint'], $data['payload']);
+                    }
                 }
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {

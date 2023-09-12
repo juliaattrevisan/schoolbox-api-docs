@@ -94,7 +94,8 @@ class ActivityBuilder
 
             if (!empty($feature)) {
                 $payloadSequence[] = [
-                    '/itembank/features' => [
+                    'endpoint' => '/itembank/features',
+                    'payload' => [
                         'features' => [$feature]
                     ]
                 ];
@@ -128,7 +129,8 @@ class ActivityBuilder
                 /* Stack it
                  */
                 $payloadSequence[] = [
-                    '/itembank/questions' => [
+                    'endpoint' => '/itembank/questions',
+                    'payload' => [
                         'meta' => [
                             /* TODO this should have a schoolcode prefix
                              */
@@ -162,8 +164,9 @@ class ActivityBuilder
             /* Stack it
              */
             $payloadSequence[] = [
-                '/itembank/items' => [
-                    'items' => $itemStruct
+                'endpoint' => '/itembank/items',
+                'payload' => [
+                    'items' => [$itemStruct]
                 ]
             ];
 
@@ -181,7 +184,8 @@ class ActivityBuilder
             /* Stack it
              */
             $payloadSequence[] = [
-                '/itembank/activities' => [
+                'endpoint' => '/itembank/activities',
+                'payload' => [
                     'activities' => [$activityStruct]
                 ]
             ];
