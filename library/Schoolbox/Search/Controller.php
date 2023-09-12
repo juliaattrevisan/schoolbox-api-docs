@@ -118,21 +118,21 @@ class Controller extends Base
 
         $userSubTypes = [];
 
-        if ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) {
-            if ($configLoader->get('student_search_enable')) {
-                $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
-            }
-
-            if ($configLoader->get('parent_search_enable')) {
-                $userSubTypes[] = ["title" => "Parent", "value" => "user.parent"];
-            }
-        } else {
-            if ($loggedInUserRole->isStaff()) {
-                $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
-                $userSubTypes[] = ["title" => "Parent", "value" => "user.parent"];
-            }
-        } elseif ($loggedInUserRole->isStaff()) {
+        if (
+            $loggedInUserRole->isStaff() || (
+                ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) &&
+                $configLoader->get('student_search_enable')
+            )
+        ) {
             $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
+        }
+
+        if (
+            $loggedInUserRole->isStaff() || (
+                ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) &&
+                $configLoader->get('parent_search_enable')
+            )
+        ) {
             $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
         }
 
