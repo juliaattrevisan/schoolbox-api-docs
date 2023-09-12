@@ -435,6 +435,9 @@ class Translator
             $projectDomainModel = $this->getCachedDomainObject($context, $this->getSubTranslatorData($context));
             if ($projectDomainModel instanceof AssessmentContext) {
                 $domainObject->setContext($projectDomainModel);
+
+                // Also need to determine and set project's context
+                $projectDomainModel->setContext($context->getAssessmentModel()->getAssessmentContext());
             }
         }
 
