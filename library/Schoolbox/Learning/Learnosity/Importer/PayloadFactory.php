@@ -236,8 +236,8 @@ class PayloadFactory
         }
 
         return [
-            'data' => $strategy?->convert($question),
-            'type' => $strategy?->getLearnosityEquivalent(),
+            'data' => $strategy->convert($question),
+            'type' => $strategy->getLearnosityEquivalent(),
             'reference' => (string)UUid::uuid4(),
         ];
     }

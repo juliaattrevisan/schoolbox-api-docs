@@ -55,7 +55,7 @@ class ActivityBuilder
 
         /* Produces Learnosity payloads
          */
-        $payloadFactory = new PayloadFactory((string)$legacyQuiz['user_id'], new Strategy\Factory());
+        $payloadFactory = new PayloadFactory(new Strategy\Factory());
 
         /* Set up a Learnosity Activity payload
          * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
