@@ -138,6 +138,11 @@ class ActivityBuilder
                     continue;
                 }
 
+                /* TODO To optimise further, maybe, we can collect all the QuestionStructs
+                 *  and pump them into one mega payload instead of lots of little ones to
+                 *  save on the transmission time (each api request to Learnosity took around
+                 *  ~2sec in a vagrant)
+                 */
 
                 /* Stack it
                  */
