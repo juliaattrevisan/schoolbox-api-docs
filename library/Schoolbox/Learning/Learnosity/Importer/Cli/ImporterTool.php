@@ -153,8 +153,9 @@ class ImporterTool extends CliTool\App
         LIMIT 1
     ';
 
+
     /**
-     * A set of prepared statements we can recylce
+     * A set of prepared statements we can recycle
      *
      * @var \PDOStatement
      */
@@ -194,7 +195,9 @@ Replicates legacy quizzes from schoolbox.assess into its modern Learnosity incar
 Each question type and contents is mapped to their closest Learnosity synonyms.
 
 You can specify a particular assessment to import; otherwise it imports everything
-that is alive (ie. everything that is not soft-deleted).
+that is:
+ * alive (ie. everything that is not soft-deleted)
+ * not already in learnosity (ie. assess.learnosity_reference is null) 
 
 Use --blueprint option in either mode to show the array struct we intended to send to Learnosity
 dumped to the cli. This is useful for manual inspection before committing to a --perform  
@@ -243,7 +246,7 @@ HELP;
          */
         $activityBuilder = new ActivityBuilder($schoolCode, $tagFactory, $this->getLogger());
 
-        /* Capture absic metrics
+        /* Capture basic metrics
          */
         $timing = [];
 
@@ -261,7 +264,7 @@ HELP;
          * If --assessment was specified, find its subobject and work with that.
          * Otherwise collect the whole set of non-deleted quizzes via a custom query.
          *
-         * TODO Mayb expand this to include a set of assessmentIds.
+         * TODO Maybe expand this to include a set of assessmentIds.
          */
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
 
@@ -278,7 +281,6 @@ HELP;
         /* Commencing migration
          */
         $this->getLogger()->info('Learnosity Migration.');
-
         $this->getLogger()->info('');
 
         /*
@@ -333,7 +335,7 @@ HELP;
                     $legacyQuiz['assess_id']
                 ));
 
-                /* If this dosen't have an assessment_id, idk what this is,
+                /* If this doesn't have an assessment_id, idk what this is,
                  * because you can't get here anymore.
                  */
                 if ('' === trim((string)$legacyQuiz['assessment_id'])) {

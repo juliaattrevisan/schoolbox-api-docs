@@ -149,7 +149,7 @@ class ActivityBuilder
                                  * user id. It's mandatory as part of Question creation. We can assign
                                  * it here in the blueprint, or in the actual api payload itself while
                                  * performing. This is because user 123 in one school means a whole
-                                 * dude in another school.
+                                 * different dude in another school.
                                  */
                                 'id' => sprintf(
                                     '%s__%s',
