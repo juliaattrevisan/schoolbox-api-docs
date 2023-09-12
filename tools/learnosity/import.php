@@ -271,6 +271,42 @@ HELP;
 
         $this->getLogger()->info('');
 
+        /*
+            foreach $quiz in $quizzes
+                $this->refreshLock();
+
+                set up an Activity payload
+                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+
+                foreach $section in $quiz
+                    $this->refreshLock();
+
+                    set up an Item payload
+                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+
+                    foreach $question in $section
+                        $this->refreshLock();
+
+                        set up a new Question payload
+                        https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+                            - detect question type
+                            - spawn importer accordingly
+                            - importer->import()
+
+                        you'll probably need its answers, too, from assess_answer
+                        which you need to deserialize. It's not particularly obvious
+                        what format this payload should be in, but try this:
+                        https://reference.learnosity.com/questions-api/questiontypes
+
+                    send the Item containing multiple Questions into Learnosity itself?
+                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+
+                send the whole Activity, its Items and its Questions into Learnosity
+                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+
+                if successful, update the learnosity_reference so we know it ended up in learnosity
+                otherwise something went wrong and this row is still a candidate for import
+        */
         try {
             foreach ($legacyQuizIds as $legacyQuizId) {
                 $this->refreshLock($lock);
@@ -362,64 +398,6 @@ HELP;
             $numImported,
             round(array_sum($timing)/$numImported)
         ));
-
-        /*
-            foreach $quiz in $quizzes
-                $this->refreshLock();
-
-                set up an Activity payload
-                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
-
-                foreach $section in $quiz
-                    $this->refreshLock();
-
-                    set up an Item payload
-                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
-
-                    foreach $question in $section
-                        $this->refreshLock();
-
-                        set up a new Question payload
-                        https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
-                            - detect question type
-                            - spawn importer accordingly
-                            - importer->import()
-
-                        you'll probably need its answers, too, from assess_answer
-                        which you need to deserialize. It's not particularly obvious
-                        what format this payload should be in, but try this:
-                        https://reference.learnosity.com/questions-api/questiontypes
-
-                    send the Item containing multiple Questions into Learnosity itself?
-                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
-
-                send the whole Activity, its Items and its Questions into Learnosity
-                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
-
-                if successful, update the learnosity_reference so we know it ended up in learnosity
-                otherwise something went wrong and this row is still a candidate for import
-        */
-
-
-//
-//            /* Send it
-//             */
-//            $this->getLogger()->info(sprintf(
-//                'Importing quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
-//                $legacyQuiz['title'],
-//                $legacyQuiz['assessment_id'],
-//                $legacyQuiz['assess_id'],
-//                $activity['reference']
-//            ));
-//            /* Send it
-//             */
-//            $this->getLogger()->debug(sprintf(
-//                'Importing item "%s" (section_id: %s) with learnosity_reference %s',
-//                $section['title'],
-//                $section['section_id'],
-//                $item['reference']
-//            ));
-
 
         /* Announce conclusion
          */
