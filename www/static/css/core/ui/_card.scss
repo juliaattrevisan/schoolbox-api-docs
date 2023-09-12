@@ -14,6 +14,11 @@
     position: relative;
     text-align: start;
 
+    // Ensure the card title will wrap if it's too long instead of overflowing and breaking the flex layout
+    h3 {
+        word-break: break-word;
+    }
+
     p:last-child {
         margin-bottom: 0;
     }
