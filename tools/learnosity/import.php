@@ -252,6 +252,8 @@ HELP;
         /* Obtain data set.
          * If --assessment was specified, find its subobject and work with that.
          * Otherwise collect the whole set of non-deleted quizzes via a custom query.
+         *
+         * TODO Mayb expand this to include a set of assessmentIds.
          */
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
 
