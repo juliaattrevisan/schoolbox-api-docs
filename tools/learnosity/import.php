@@ -269,6 +269,8 @@ HELP;
          */
         $this->getLogger()->info('Learnosity Migration.');
 
+        $this->getLogger()->info('');
+
         try {
             foreach ($legacyQuizIds as $legacyQuizId) {
                 $this->refreshLock($lock);
@@ -310,17 +312,18 @@ HELP;
                 /* Actually do it
                  */
                 if ($this->perform()) {
-                    $this->getLogger()->info(sprintf(
-                        'Importing legacy quiz "%s" (assess_id: %s)',
-                        $legacyQuiz['title'],
-                        $legacyQuizId,
-                    ));
+                    $this->getLogger()->info('Importing into Learnosity. This might take a while.');
 
                     /* Iterate and bombard Learnosity with api requests pewpewpew
                      */
                     $start = microtime(true);
 
                     foreach ($blueprint as $data) {
+                        $this->getLogger()->debug(sprintf(
+                            '%s: transmitting payload to learnosity...',
+                            $data['endpoint']
+                        ));
+
                         $api->dataSetRequest($data['endpoint'], $data['payload']);
                     }
 
@@ -330,6 +333,14 @@ HELP;
                      */
                     $timing[] = $end - $start;
                 }
+
+                $this->getLogger()->info(sprintf(
+                    'Finished processing "%s" (assess_id: %s)',
+                    $legacyQuiz['title'],
+                    $legacyQuiz['assess_id']
+                ));
+
+                $this->getLogger()->info('');
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
@@ -347,9 +358,9 @@ HELP;
         }
 
         $this->getLogger()->info(sprintf(
-            'Number of quizzes imported: %s. Average time taken per quiz: %s seconds',
+            'Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
             $numImported,
-            array_sum($timing)/$numImported
+            round(array_sum($timing)/$numImported)
         ));
 
         /*
