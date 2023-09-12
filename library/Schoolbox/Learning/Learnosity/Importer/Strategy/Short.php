@@ -42,7 +42,7 @@ class Short implements IStrategy
 
         return [
             'case_sensitive' => false,
-            'instant_feedback' => true,
+            'instant_feedback' => false,
             'max_length' => 250,
             'stimulus' => $question['question'],
             'type' => $this->getLearnosityEquivalent(),

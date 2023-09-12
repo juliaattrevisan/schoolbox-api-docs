@@ -27,6 +27,7 @@ class Factory
     {
         switch ($typeId) {
             case Short::QUESTION_TYPE_ID: return new Short();
+            case Exact::QUESTION_TYPE_ID: return new Exact();
 
             default: return null;
         }
