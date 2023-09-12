@@ -131,6 +131,9 @@ class Controller extends Base
                 $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
                 $userSubTypes[] = ["title" => "Parent", "value" => "user.parent"];
             }
+        } elseif ($loggedInUserRole->isStaff()) {
+            $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
+            $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
         }
 
         $userSubTypes[] = ["title" => "Staff", "value" => "user.staff"];
