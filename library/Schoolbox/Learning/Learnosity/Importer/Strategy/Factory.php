@@ -32,6 +32,7 @@ class Factory
             Multi::QUESTION_TYPE_ID => new Multi(),
             MatchingPairs::QUESTION_TYPE_ID => new MatchingPairs(),
             Numeric::QUESTION_TYPE_ID => new Numeric(),
+            RichText::QUESTION_TYPE_ID => new RichText(),
             default => null,
         };
     }

@@ -7,9 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Learning\Learnosity\Importer\Strategy;
-
-use Schoolbox\Learning\Learnosity\Importer\Strategy\IStrategy;
+namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
 
 /**
  * Converts a Schoolbox "Rich Text" question into its Learnosity equivalent
