@@ -140,6 +140,16 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Associate a newly-imported learnosity quiz with the legacy one
+     */
+    private const QUERY_ASSOCIATE_LEARNOSITY = '
+        UPDATE assess
+        SET learnosity_reference = :learnosityReference
+        WHERE assess_id = :assessId
+        LIMIT 1
+    ';
+
+    /**
      * A set of prepared statements we can recylce
      *
      * @var \PDOStatement
@@ -150,6 +160,7 @@ class ImporterTool extends CliTool\App
     private \PDOStatement $sectionsStatement;
     private \PDOStatement $questionStatement;
     private \PDOStatement $answerStatement;
+    private \PDOStatement $associateStatement;
 
 
     /**
@@ -238,6 +249,7 @@ HELP;
         $this->sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
         $this->questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
         $this->answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
+        $this->associateStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
 
         /* Obtain data set.
          * If --assessment was specified, find its subobject and work with that.
@@ -342,11 +354,11 @@ HELP;
                 if ($this->perform()) {
                     $this->getLogger()->info('Importing into Learnosity. This might take a while.');
 
-                    /* Iterate and bombard Learnosity with api requests pewpewpew
-                     */
                     $start = microtime(true);
 
-                    foreach ($blueprint as $data) {
+                    /* Iterate and bombard Learnosity with api requests pewpewpew
+                     */
+                    foreach ($blueprint['payloadSequence'] as $data) {
                         $this->getLogger()->debug(sprintf(
                             '%s: transmitting payload to learnosity...',
                             $data['endpoint']
@@ -354,6 +366,18 @@ HELP;
 
                         $api->dataSetRequest($data['endpoint'], $data['payload']);
                     }
+
+                    /* Associate the learnosity reference back to our legacy quiz
+                     */
+                    $this->getLogger()->info(sprintf(
+                        'Associating legacy quiz with learnosity_reference %s',
+                        $blueprint['activityLearnosityReference']
+                    ));
+
+                    $this->associateStatement->execute([
+                        'learnosityReference' => $blueprint['activityLearnosityReference'],
+                        'assessId' => $legacyQuizId
+                    ]);
 
                     $end = microtime(true);
 

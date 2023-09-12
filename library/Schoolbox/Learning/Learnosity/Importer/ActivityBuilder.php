@@ -208,6 +208,9 @@ class ActivityBuilder
             ));
         }
 
-        return $payloadSequence;
+        return [
+            'activityLearnosityReference' => $activityStruct['reference'],
+            'payloadSequence' => $payloadSequence
+        ];
     }
 }
