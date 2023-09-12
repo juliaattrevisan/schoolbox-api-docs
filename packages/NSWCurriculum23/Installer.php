@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace NSWCurriculum23a;
+namespace NSWCurriculum23;
 
 use Schoolbox\Admin\Package;
 

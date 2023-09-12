@@ -158,7 +158,8 @@ abstract class BaseCurriculum implements IPackageInstall
                              ->setName($parent['name'])
                              ->setDescription($parent['description'])
                              ->setCode(trim($parent['code']))
-                             ->setOrder($parent['order']);
+                             ->setOrder($parent['order'])
+                             ->setUuid($parent['uuid'] ?? null);
 
                 $this->getCurriculumMapper()->save($node);
 
@@ -212,7 +213,8 @@ abstract class BaseCurriculum implements IPackageInstall
                      ->setName($row['name'])
                      ->setDescription($row['description'])
                      ->setCode(trim($row['code']))
-                     ->setOrder($row['order']);
+                     ->setOrder($row['order'])
+                     ->setUuid($row['uuid'] ?? null);
 
         $this->getCurriculumMapper()->save($node);
 
