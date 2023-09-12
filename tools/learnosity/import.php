@@ -260,6 +260,14 @@ HELP;
                  */
                 $legacyQuiz = $this->getQuiz($legacyQuizId);
 
+                /* Announce what we're doing
+                 */
+                $this->getLogger()->info(sprintf(
+                    'Processing "%s" (assess_id: %s)',
+                    $legacyQuiz['title'],
+                    $legacyQuiz['assess_id']
+                ));
+
                 /* Make the overall Learnosity payloads which we then send later with
                  * a little postprocessing to put things into the exactly correct format.
                  * Learnosity is really particular about such things.
