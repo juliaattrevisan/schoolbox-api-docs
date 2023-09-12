@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Learnosity\Helper;
+use Schoolbox\Learning\Learnosity\Importer\Strategy\Factory;
 
 /**
  * Spawns a Learnosity-friendly payload structure for Activities,
@@ -22,9 +23,12 @@ class PayloadFactory
 
 
     /**
+     * Constructor.
+     *
      * @param string $authorId
+     * @param Factory $strategyFactory
      */
-    public function __construct(private string $authorId)
+    public function __construct(private string $authorId, private Strategy\Factory $strategyFactory)
     {
     }
 
@@ -220,10 +224,12 @@ class PayloadFactory
      */
     private function setupQuestionNode(array $question): array
     {
+        $strategy = $this->strategyFactory->produce($question['type_id']);
+
         return [
             /* TODO Detect question type
              */
-            'data' => [],
+            'data' => $strategy?->convert($question),
             'type' => null,
             'reference' => (string)UUid::uuid4(),
         ];

@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
+
+/**
+ * Decide which converter to spawn
+ */
+class Factory
+{
+
+    /**
+     * Use the question's type_id field to figure out what kind
+     * of question this was in Schoolbox and then spawn the thing
+     * which produces its Learnosity equivalent
+     *
+     * @param int $typeId
+     * @return IStrategy|null
+     */
+    public function produce(int $typeId): ?IStrategy
+    {
+        switch ($typeId) {
+            case 1: return new Short();
+
+            default: return null;
+        }
+    }
+}

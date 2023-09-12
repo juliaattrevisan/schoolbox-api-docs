@@ -60,7 +60,7 @@ class ActivityBuilder
          *  it here in the blueprint, or in the actual api payload itself while
          *  performing
          */
-        $payloadFactory = new PayloadFactory((string)$legacyQuiz['user_id']);
+        $payloadFactory = new PayloadFactory((string)$legacyQuiz['user_id'], new Strategy\Factory());
 
         /* Set up a Learnosity Activity payload
          * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
