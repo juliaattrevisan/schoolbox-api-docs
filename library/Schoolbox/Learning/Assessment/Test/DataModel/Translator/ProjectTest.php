@@ -1195,6 +1195,7 @@ class ProjectTest extends TestCase
     {
         /* Collections might start of being null instead, for whatever reason
          */
+        /** @phpstan-ignore-next-line - the assessable list may be null */
         if (null === $projectObject->getAssessables()) {
             $projectObject->setAssessables(new GenericCollection(IAssessable::class));
         }
