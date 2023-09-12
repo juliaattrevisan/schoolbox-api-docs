@@ -14,16 +14,21 @@ namespace Schoolbox\Resource\Textbox;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Component_Instance;
 use Monolog\Logger;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
+use Schoolbox\Resource\Textbox\Model as Textbox;
 use Schoolbox\User;
 
 class Notifier extends ResourceNotifier
@@ -87,7 +92,7 @@ class Notifier extends ResourceNotifier
             ->setMeta(['time' => \Alaress_Date_Format::now()->getUnixTimeStamp()])
             ->addFilter('roletype', [$roletype]);
 
-        $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
+        $envelope->broadcastToCategory($category, $this->getAccessLevel($resource), $bob->build());
 
         return $envelope;
     }
@@ -181,11 +186,53 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @return int
      * @param Model $resource
+     * @return int
      */
     protected function getAccessLevel($resource): int
     {
-        return UserAccess::ACCESS_READ;
+        return $this->hasVisibleComponent($resource) ? UserAccess::ACCESS_READ : UserAccess::ACCESS_WRITE;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canAccess(Link|Folder|Textbox|File|null $resource, User $currentUser): bool
+    {
+        if (!$resource instanceof Textbox) {
+            return false;
+        }
+        /** @var UserAccess $folderAccess */
+        try {
+            $folderAccess = $this->access->getFolderAccess($currentUser, $resource->getCategory()->getId());
+        } catch (MapperException) {
+            $this->log->warning("Failed to get access for folder:{$resource->getId()} user {$currentUser->getId()}");
+        }
+        return $folderAccess > UserAccess::ACCESS_READ || ($folderAccess === UserAccess::ACCESS_READ && $this->hasVisibleComponent($resource));
+    }
+
+
+    /**
+     * Whether there's a component visible to readonly users
+     * @param Model $resource
+     * @return bool
+     */
+    private function hasVisibleComponent(Textbox $resource): bool
+    {
+        try {
+            $components = \Schoolbox\Resource\Textbox\Mapper::getInstance()->findComponentUsage($resource);
+        } catch (MapperException) {
+            return false;
+        }
+        foreach ($components as $component) {
+            $configs = $component->getConfig()->indexBy('key');
+            $collapsed = (int)$configs->offsetGet('collapse')?->getValue() === 1;
+            $noTitle = (int)$configs->offsetGet('showComponentTitle')?->getValue() === 0;
+            /** @var Component_Instance $component */
+            if ($component->getIdentifier() === $resource->getCategory()->getId() && !($collapsed && $noTitle)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

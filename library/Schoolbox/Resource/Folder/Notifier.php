@@ -13,21 +13,21 @@ namespace Schoolbox\Resource\Folder;
 
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\File\Model as File;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
+use Schoolbox\Resource\Textbox\Model as Textbox;
 use Schoolbox\User;
 
 class Notifier extends ResourceNotifier
 {
-
-    const TRIGGER_RENAMED = 'renamed';
-    const TRIGGER_MOVED = 'moved';
-
-
     /**
      * @inheritdoc
      */
@@ -171,5 +171,21 @@ class Notifier extends ResourceNotifier
     protected function getAccessLevel($resource): int
     {
         return UserAccess::ACCESS_READ;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canAccess(Link|Folder|Textbox|File|null $resource, User $currentUser): bool
+    {
+        if (!$resource instanceof Folder) {
+            return false;
+        }
+        try {
+            return $this->access->getFolderAccess($currentUser, $resource->getId()) >= UserAccess::ACCESS_READ;
+        } catch (MapperException) {
+            $this->log->warning("Failed to get access for folder:{$resource->getId()} user {$currentUser->getId()}");
+        }
+        return false;
     }
 }
