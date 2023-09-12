@@ -47,11 +47,7 @@ class ActivityBuilder
      */
     public function build(array $legacyQuiz): array
     {
-        /* TODO Potentially aggregate N records instead of one at a time?
-         */
-        $activityPayload = [
-            'activities' => []
-        ];
+        $payloadSequence = [];
 
         /* Produces Learnosity payloads
          *
@@ -86,17 +82,63 @@ class ActivityBuilder
                 $this->tagFactory->produce(null, null, null)
             );
 
+            /* Optional Passage feature to emulate section descriptions
+             */
+            $feature = $payloadFactory->produce(
+                PayloadFactory::LEARNOSITY_PAYLOAD_SECTION_FEATURE,
+                $section,
+                /* TODO Need the MapperProxy to decide its tag set, I suppose
+                 */
+                $this->tagFactory->produce(null, null, null)
+            );
+
+            if (!empty($feature)) {
+                $payloadSequence[] = [
+                    '/itembank/features' => [
+                        'features' => [$feature]
+                    ]
+                ];
+
+                $this->logger->debug(sprintf(
+                    'Built blueprint for feature "%s" (section_id: %s) with learnosity_reference %s',
+                    \TextFormatter::cutSentence($section['title'], 64),
+                    $section['section_id'],
+                    $feature['reference']
+                ));
+
+                /* Item payload needs to know this reference
+                 */
+                $itemStruct['features'][] = $feature['reference'];
+
+                $itemStruct['definition']['widgets'][] = [
+                    'reference' => $feature['reference']
+                ];
+            }
+
             /* Accumulate all the questions we found in $section and
              * pile them up here
              */
-            $questionStructs = [];
-
             foreach ($section['_questions'] as $question) {
                 $questionStruct = $payloadFactory->produce(
                     PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
                     $question,
                     null
                 );
+
+                /* Stack it
+                 */
+                $payloadSequence[] = [
+                    '/itembank/questions' => [
+                        'meta' => [
+                            /* TODO this should have a schoolcode prefix
+                             */
+                            'user' => [
+                                'id' => (string)$legacyQuiz['user_id']
+                            ]
+                        ],
+                        'questions' => [$questionStruct]
+                    ]
+                ];
 
                 $this->logger->debug(sprintf(
                     'Built blueprint for question "%s" (question_id: %s, type: %s) with learnosity_reference %s',
@@ -106,10 +148,24 @@ class ActivityBuilder
                     $questionStruct['reference']
                 ));
 
-                /* Stack it
+                /* Item payload needs to know this reference
                  */
-                $questionStructs[] = $questionStruct;
+                $itemStruct['definition']['widgets'][] = [
+                    'reference' => $questionStruct['reference']
+                ];
+
+                $itemStruct['questions'][] = [
+                    'reference' => $questionStruct['reference']
+                ];
             }
+
+            /* Stack it
+             */
+            $payloadSequence[] = [
+                '/itembank/items' => [
+                    'items' => $itemStruct
+                ]
+            ];
 
             $this->logger->debug(sprintf(
                 'Built blueprint for item "%s" (section_id: %s) with learnosity_reference %s',
@@ -118,24 +174,27 @@ class ActivityBuilder
                 $itemStruct['reference']
             ));
 
+            /* Activity payload needs to know this reference
+             */
+            $activityStruct['data']['items'][] = $itemStruct['reference'];
+
             /* Stack it
              */
-            $itemStruct['questions'] = $questionStructs;
-            $activityStruct['data']['items'][$itemStruct['reference']] = $itemStruct;
+            $payloadSequence[] = [
+                '/itembank/activities' => [
+                    'activities' => [$activityStruct]
+                ]
+            ];
+
+            $this->logger->debug(sprintf(
+                'Built blueprint for quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
+                $legacyQuiz['title'],
+                $legacyQuiz['assessment_id'],
+                $legacyQuiz['assess_id'],
+                $activityStruct['reference']
+            ));
         }
 
-        /* Stack it
-         */
-        $activityPayload['activities'][] = $activityStruct;
-
-        $this->logger->debug(sprintf(
-            'Built blueprint for quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
-            $legacyQuiz['title'],
-            $legacyQuiz['assessment_id'],
-            $legacyQuiz['assess_id'],
-            $activityStruct['reference']
-        ));
-
-        return $activityPayload;
+        return $payloadSequence;
     }
 }

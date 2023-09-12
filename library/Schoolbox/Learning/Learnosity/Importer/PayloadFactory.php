@@ -19,6 +19,8 @@ class PayloadFactory
 {
     public const LEARNOSITY_PAYLOAD_ACTIVITY = 'activity';
     public const LEARNOSITY_PAYLOAD_ITEM = 'item';
+
+    public const LEARNOSITY_PAYLOAD_SECTION_FEATURE = 'sectionFeature';
     public const LEARNOSITY_PAYLOAD_QUESTION = 'question';
 
 
@@ -48,6 +50,7 @@ class PayloadFactory
         return match ($type) {
             self::LEARNOSITY_PAYLOAD_ACTIVITY => $this->setupActivityNode($data, $tags),
             self::LEARNOSITY_PAYLOAD_ITEM => $this->setupItemNode($data, $tags),
+            self::LEARNOSITY_PAYLOAD_SECTION_FEATURE => $this->setupSectionFeatureNode($data, $tags),
             self::LEARNOSITY_PAYLOAD_QUESTION => $this->setupQuestionNode($data),
             default => [],
         };
@@ -160,7 +163,7 @@ class PayloadFactory
      */
     private function setupItemNode(array $section, array $tags): array
     {
-        $struct = [
+        return [
             /* This decides where a feature/question appears in a layout
              */
             'definition' => [
@@ -184,37 +187,30 @@ class PayloadFactory
              */
             'title' => $section['title'],
         ];
-
-        /* Section Description
-         * If it was more than an empty string, make a placeholder Passage thing
-         * Otherwise skip it; there's nothing to say
-         */
-        if ('' !== trim((string)$section['description'])) {
-            $reference = (string)UUid::uuid4();
-
-            $sectionDescription = [
-                'features' => [
-                    'data' => [
-                        'content' => $section['description'],
-                        'type' => 'sharedpassage',
-                    ],
-                    'reference' => $reference,
-                ]
-            ];
-
-            /* Associate in two distinct ways
-             * Note that each Feature needs to be saved separately
-             */
-            $struct['definition']['widgets'][] = [
-                'reference' => $reference
-            ];
-
-            $struct['features'][$reference] = $sectionDescription;
-        }
-
-        return $struct;
     }
 
+
+    /**
+     * Optional section Description
+     *
+     * If it was more than an empty string, make a placeholder Passage thing
+     * Otherwise skip it; there's nothing to say
+     */
+    private function setupSectionFeatureNode(array $section, array $tags): array
+    {
+        if ('' !== trim((string)$section['description'])) {
+            return [
+                'data' => [
+                    'content' => $section['description'],
+                    'type' => 'sharedpassage',
+                ],
+                'reference' => (string)UUid::uuid4(),
+                'type' => 'sharedpassage',
+            ];
+        }
+
+        return [];
+    }
 
     /**
      * Set up a payload for a Question that lives in an Item.
