@@ -230,7 +230,7 @@ class PayloadFactory
             /* TODO Detect question type
              */
             'data' => $strategy?->convert($question),
-            'type' => null,
+            'type' => $strategy?->getLearnosityEquivalent(),
             'reference' => (string)UUid::uuid4(),
         ];
     }

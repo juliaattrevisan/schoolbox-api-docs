@@ -17,6 +17,15 @@ class Short implements IStrategy
     /**
      * @inheritDoc
      */
+    public function getLearnosityEquivalent(): string
+    {
+        return 'shorttext';
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function convert(array $question): array
     {
         print_r($question);

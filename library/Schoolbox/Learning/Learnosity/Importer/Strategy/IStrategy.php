@@ -12,6 +12,15 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
 interface IStrategy
 {
     /**
+     * The equivalent Learnosity concept as listed in
+     * https://reference.learnosity.com/questions-api/questiontypes
+     *
+     * @return string
+     */
+    public function getLearnosityEquivalent(): string;
+
+
+    /**
      * Convert schoolbox data $question into its learnosity equivalent
      *
      * @param array $question
