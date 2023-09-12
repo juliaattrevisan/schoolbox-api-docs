@@ -54,12 +54,6 @@ class ActivityBuilder
         $payloadSequence = [];
 
         /* Produces Learnosity payloads
-         *
-         * TODO this author identifier should be a (schoolcode, user id) tuple for
-         *  auditing reasons, to deconflict with other schools who used the same
-         *  user id. It's mandatory as part of Question creation. We can assign
-         *  it here in the blueprint, or in the actual api payload itself while
-         *  performing
          */
         $payloadFactory = new PayloadFactory((string)$legacyQuiz['user_id'], new Strategy\Factory());
 
@@ -151,6 +145,13 @@ class ActivityBuilder
                     'payload' => [
                         'meta' => [
                             'user' => [
+                                /* This author identifier should be a (schoolcode, user id) tuple for
+                                 * auditing reasons, to deconflict with other schools who used the same
+                                 * user id. It's mandatory as part of Question creation. We can assign
+                                 * it here in the blueprint, or in the actual api payload itself while
+                                 * performing. This is because user 123 in one school means a whole
+                                 * dude in another school.
+                                 */
                                 'id' => sprintf(
                                     '%s__%s',
                                     $this->schoolCode,
