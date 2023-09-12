@@ -114,6 +114,14 @@ class Translator
      */
     public function translateToDataModel(IAssessable $domainObject): IAssessableDataModel
     {
+        // Is `$domainObject` within a project?
+        // If so, translate the project first so that `$domainObject` has access
+        // to its fully-realised project
+        $context = $domainObject->getContext();
+        if ($context instanceof Project) {
+            $this->translateToDataModel($context);
+        }
+
         /* Ignore the random andy logic about $rootAssessable
          * and just translate this $domainObject like we wanted
          */
@@ -136,6 +144,14 @@ class Translator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel): IAssessable
     {
+        // Is `$dataModel` within a project?
+        // If so, translate the project first so that `$dataModel` has access to
+        // its fully-realised project
+        $context = $dataModel->getAssessmentModel()->getAssessmentContext();
+        if ($context instanceof ProjectModel) {
+            $this->translateToDomainModel($context);
+        }
+
         $this->translateToDomainModelRecursive($dataModel);
         // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->domainObjectCache[spl_object_hash($dataModel)];
@@ -435,9 +451,6 @@ class Translator
             $projectDomainModel = $this->getCachedDomainObject($context, $this->getSubTranslatorData($context));
             if ($projectDomainModel instanceof AssessmentContext) {
                 $domainObject->setContext($projectDomainModel);
-
-                // Also need to determine and set project's context
-                $projectDomainModel->setContext($context->getAssessmentModel()->getAssessmentContext());
             }
         }
 
