@@ -411,7 +411,11 @@ HELP;
                             $data['count']
                         ));
 
-                        $api->dataSetRequest($data['endpoint'], $data['payload']);
+                        /* Skip zero-sized payloads
+                         */
+                        if ($data['count'] > 0) {
+                            $api->dataSetRequest($data['endpoint'], $data['payload']);
+                        }
                     }
 
                     /* Associate the learnosity reference back to our legacy quiz
