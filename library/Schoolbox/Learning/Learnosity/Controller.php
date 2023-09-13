@@ -912,42 +912,48 @@ class Controller extends Base
             'references' => [
                 $quiz->getLearnosityReference()
             ]
-        ])['data'][0]['data']['items'];
+        ])['data'][0]['data']['items'] ?? null;
 
-        /* Find a list of Learnosity Items (questions) available in this quiz
-         * This includes more info about each item
+        /* $itemReferences is null when you try to horizontal mark a non-learnosity quiz.
+         * This shouldn't happen except during dev, since our importer would have shanked
+         * everything into learnosity's db
          */
-        $items = $this->api->dataGetRequest('itembank/items', [
-            'references' => array_column($itemReferences, 'id')
-        ])['data'];
-
-        /* Consolidate reference and titles into an in-order lookup
-         * (because $items is in some non-sequenced order)
-         */
-        foreach ($itemReferences as &$itemReference) {
-            /* FIXME Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-             *  we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+        if (null !== $itemReferences) {
+            /* Find a list of Learnosity Items (questions) available in this quiz
+             * This includes more info about each item
              */
-            if (!is_array($itemReference)) {
-                $itemReference = [
-                    'reference' => $itemReference,
-                    'id' => $itemReference
-                ];
-            }
+            $items = $this->api->dataGetRequest('itembank/items', [
+                'references' => array_column($itemReferences, 'id')
+            ])['data'];
 
-            $reference = $itemReference['reference'];
-
-            /* Find it in the set of $items
+            /* Consolidate reference and titles into an in-order lookup
+             * (because $items is in some non-sequenced order)
              */
-            foreach ($items as $item) {
-                if ($reference === $item['reference']) {
-                    $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
-                    $itemReference['title'] = $title;
+            foreach ($itemReferences as &$itemReference) {
+                /* FIXME Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                 *  we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                 */
+                if (!is_array($itemReference)) {
+                    $itemReference = [
+                        'reference' => $itemReference,
+                        'id' => $itemReference
+                    ];
+                }
+
+                $reference = $itemReference['reference'];
+
+                /* Find it in the set of $items
+                 */
+                foreach ($items as $item) {
+                    if ($reference === $item['reference']) {
+                        $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
+                        $itemReference['title'] = $title;
+                    }
                 }
             }
-        }
 
-        unset($itemReference);
+            unset($itemReference);
+        }
 
         /* Obtain their scores from Learnosity
          */
