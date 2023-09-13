@@ -256,7 +256,7 @@ HELP;
 
         /* A context lookup builder thing for conveniently deriving tags
         */
-        $contextLookup = new ContextLookup($this->getDatabaseInternal(), $tagFactory);
+        $contextLookup = new ContextLookup($this->getDatabaseInternal(), $tagFactory, $this->getLogger());
 
         /* Generates payload array structs
          */

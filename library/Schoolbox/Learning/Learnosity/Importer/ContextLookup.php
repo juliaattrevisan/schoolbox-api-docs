@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Exception;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Learnosity\TagFactory;
 
 /**
@@ -125,14 +125,19 @@ class ContextLookup
     private \PDOStatement $courseUnitImplStatement;
     private \PDOStatement $folderStatement;
 
+
     /**
      * Constructor.
      *
      * @param IConnector $db
      * @param TagFactory $tagFactory
+     * @param LoggerInterface $logger
      */
-    public function __construct(private IConnector $db, private TagFactory $tagFactory)
-    {
+    public function __construct(
+        private IConnector $db,
+        private TagFactory $tagFactory,
+        private LoggerInterface $logger
+    ) {
         $this->mvRelationStatement= $this->db->prepare(self::QUERY_MV_RELATION);
         $this->courseSpecStatement = $this->db->prepare(self::QUERY_COURSE_SPEC);
         $this->courseUnitSpecStatement = $this->db->prepare(self::QUERY_COURSE_UNIT_SPEC);
@@ -148,7 +153,7 @@ class ContextLookup
      *
      * @param int $assessmentId
      * @return array
-     * @throws Exception
+     * @throws \PDOException
      */
     public function find(int $assessmentId): array
     {
@@ -160,6 +165,8 @@ class ContextLookup
         $key = $this->encodeRow($row);
 
         if (isset($this->lookup[$key])) {
+            $this->logger->debug('Recycling previously found tags');
+
             return $this->lookup[$key];
         }
 
@@ -167,6 +174,10 @@ class ContextLookup
          * Look up $assessmentId the row in mv_assessment_relation
          * Interpret the columns
          */
+        $this->logger->debug(sprintf(
+            'Generating tags for encoded key %s',
+            $key
+        ));
 
         /* If course_specification_id is set, find out its name and uuid
          * If course_unit_specification_id is set, find out its name and uuid
@@ -328,7 +339,7 @@ class ContextLookup
 
         $codes = [];
 
-        /* TODO Supprt multiple folder codes
+        /* TODO Support multiple folder codes
          *  Do this as a single tag for now...?
          */
         while ($row = $this->folderStatement->fetch(\PDO::FETCH_ASSOC)) {
