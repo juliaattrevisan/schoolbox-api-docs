@@ -12,10 +12,10 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\ActivityBuilder;
-use Schoolbox\Learning\Learnosity\Importer\Strategy\MatchingPairs;
-use Schoolbox\Learning\Learnosity\Importer\Strategy\Multi;
-use Schoolbox\Learning\Learnosity\Importer\Strategy\Radio;
+use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
+use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
+
 
 class ImporterTool extends CliTool\App
 {
@@ -254,10 +254,14 @@ HELP;
          */
         $tagFactory = new TagFactory($schoolCode);
 
+        /* Generates payload array structs
+         */
+        $payloadFactory = new PayloadFactory(new Strategy\Factory());
+
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
          */
-        $activityBuilder = new ActivityBuilder($schoolCode, $tagFactory, $this->getLogger());
+        $activityBuilder = new ActivityBuilder($schoolCode, $payloadFactory, $tagFactory, $this->getLogger());
 
         /* Capture basic metrics
          */
@@ -599,9 +603,9 @@ HELP;
          * (6,8,9,10,17 are all Survey)
          */
         $serializedAnswers = [
-            Multi::QUESTION_TYPE_ID,
-            MatchingPairs::QUESTION_TYPE_ID,
-            Radio::QUESTION_TYPE_ID,
+            Strategy\Multi::QUESTION_TYPE_ID,
+            Strategy\MatchingPairs::QUESTION_TYPE_ID,
+            Strategy\Radio::QUESTION_TYPE_ID,
         ];
 
         if (in_array($question['type_id'], $serializedAnswers, false)) {

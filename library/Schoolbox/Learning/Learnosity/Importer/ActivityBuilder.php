@@ -31,11 +31,13 @@ class ActivityBuilder
      * Constructor
      *
      * @param string $schoolCode
+     * @param PayloadFactory $payloadFactory
      * @param TagFactory $tagFactory
      * @param LoggerInterface $logger
      */
     public function __construct(
         private string $schoolCode,
+        private PayloadFactory $payloadFactory,
         private TagFactory $tagFactory,
         private LoggerInterface $logger
     ) {
@@ -56,14 +58,10 @@ class ActivityBuilder
     {
         $payloadSequence = [];
 
-        /* Produces Learnosity payloads
-         */
-        $payloadFactory = new PayloadFactory(new Strategy\Factory());
-
         /* Set up a Learnosity Activity payload
          * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
          */
-        $activityStruct = $payloadFactory->produce(
+        $activityStruct = $this->payloadFactory->produce(
             PayloadFactory::LEARNOSITY_PAYLOAD_ACTIVITY,
             $legacyQuiz,
             /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -83,7 +81,7 @@ class ActivityBuilder
         foreach ($legacyQuiz['_sections'] as $section) {
             /* Optional Passage feature to emulate section descriptions
              */
-            $feature = $payloadFactory->produce(
+            $feature = $this->payloadFactory->produce(
                 PayloadFactory::LEARNOSITY_PAYLOAD_SECTION_FEATURE,
                 $section,
                 /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -105,7 +103,7 @@ class ActivityBuilder
 
                 /* Item payload needs to know this reference
                  */
-                $itemStruct = $payloadFactory->produce(
+                $itemStruct = $this->payloadFactory->produce(
                     PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
                     $section,
                     /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -135,7 +133,7 @@ class ActivityBuilder
                 /* FIXME temporary shim while constructing Strategies
                  */
                 try {
-                    $questionStruct = $payloadFactory->produce(
+                    $questionStruct = $this->payloadFactory->produce(
                         PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
                         $question,
                         null
@@ -159,7 +157,7 @@ class ActivityBuilder
 
                 /* Item payload needs to know this reference
                  */
-                $itemStruct = $payloadFactory->produce(
+                $itemStruct = $this->payloadFactory->produce(
                     PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
                     $section,
                     /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -285,14 +283,10 @@ class ActivityBuilder
     {
         $payloadSequence = [];
 
-        /* Produces Learnosity payloads
-         */
-        $payloadFactory = new PayloadFactory(new Strategy\Factory());
-
         /* Set up a Learnosity Activity payload
          * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
          */
-        $activityStruct = $payloadFactory->produce(
+        $activityStruct = $this->payloadFactory->produce(
             PayloadFactory::LEARNOSITY_PAYLOAD_ACTIVITY,
             $legacyQuiz,
             /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -313,7 +307,7 @@ class ActivityBuilder
          * purely for the purposes of this importer
          */
         foreach ($legacyQuiz['_sections'] as $section) {
-            $itemStruct = $payloadFactory->produce(
+            $itemStruct = $this->payloadFactory->produce(
                 PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
                 $section,
                 /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -323,7 +317,7 @@ class ActivityBuilder
 
             /* Optional Passage feature to emulate section descriptions
              */
-            $feature = $payloadFactory->produce(
+            $feature = $this->payloadFactory->produce(
                 PayloadFactory::LEARNOSITY_PAYLOAD_SECTION_FEATURE,
                 $section,
                 /* TODO Need the MapperProxy to decide its tag set, I suppose
@@ -359,7 +353,7 @@ class ActivityBuilder
                 /* FIXME temporary shim while constructing Strategies
                  */
                 try {
-                    $questionStruct = $payloadFactory->produce(
+                    $questionStruct = $this->payloadFactory->produce(
                         PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
                         $question,
                         null
