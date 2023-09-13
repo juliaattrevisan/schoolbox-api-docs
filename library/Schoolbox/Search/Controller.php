@@ -55,11 +55,19 @@ class Controller extends Base
     {
         // The hard-coded filters list returned by this function originated in https://schoolbox.atlassian.net/browse/SA-7782.
 
-        $filters = [];
-
-        $loggedInUserRole = $this->getUser()->getRole();
-        $configLoader = $this->getConfigLoader();
         $rosettaStone = self::$rosettaStone;
+
+        $filters = [
+            ["title" => $rosettaStone->translate("news", false, true), "value" => "news"],
+            ["title" => "Blogs", "value" => "blog"],
+            ["title" => "Events", "value" => "event"],
+            ["title" => "Forums", "value" => "forum"],
+            ["title" => "Links", "value" => "link"],
+            ["title" => "Textboxes", "value" => "textbox"],
+            ["title" => "Tiles", "value" => "tile"],
+        ];
+
+        $configLoader = $this->getConfigLoader();
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $subTypes = [
@@ -116,7 +124,12 @@ class Controller extends Base
             "subTypes" => $pagesFoldersSubTypes
         ];
 
-        $userSubTypes = [];
+        $userSubTypes = [
+            ["title" => "Staff", "value" => "user.staff"],
+            ["title" => "Guest", "value" => "user.guest"]
+        ];
+
+        $loggedInUserRole = $this->getUser()->getRole();
 
         if (
             $loggedInUserRole->isStaff() || (
@@ -136,22 +149,11 @@ class Controller extends Base
             $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
         }
 
-        $userSubTypes[] = ["title" => "Staff", "value" => "user.staff"];
-        $userSubTypes[] = ["title" => "Guest", "value" => "user.guest"];
-
         $filters[] = [
             "title" => "Users",
             "value" => "user",
             "subTypes" => $userSubTypes
         ];
-
-        $filters[] = ["title" => $rosettaStone->translate("news", false, true), "value" => "news"];
-        $filters[] = ["title" => "Blogs", "value" => "blog"];
-        $filters[] = ["title" => "Events", "value" => "event"];
-        $filters[] = ["title" => "Forums", "value" => "forum"];
-        $filters[] = ["title" => "Links", "value" => "link"];
-        $filters[] = ["title" => "Textboxes", "value" => "textbox"];
-        $filters[] = ["title" => "Tiles", "value" => "tile"];
 
         // Sort top-level filters.
         usort($filters, [$this, 'compareFilterArraysForSortingPurposes']);
