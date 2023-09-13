@@ -153,6 +153,21 @@ class Controller extends Base
         $filters[] = ["title" => "Textboxes", "value" => "textbox"];
         $filters[] = ["title" => "Tiles", "value" => "tile"];
 
+        // Sort top-level filters.
+        usort($filters, [$this, 'compareFilterArraysForSortingPurposes']);
+
+        // Sort second-level filters (subTypes).
+        foreach ($filters as &$filter) {
+            if (array_key_exists('subTypes', $filter)) {
+                usort($filter['subTypes'], [$this, 'compareFilterArraysForSortingPurposes']);
+            }
+        }
+
         return $filters;
+    }
+
+    static function compareFilterArraysForSortingPurposes($filterA, $filterB)
+    {
+        return strnatcmp($filterA["title"], $filterB["title"]);
     }
 }
