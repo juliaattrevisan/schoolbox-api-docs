@@ -22,6 +22,7 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
@@ -55,6 +56,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     // Note that DeletedAtDate is used in the base class.
     use CreatedAtDate;
     use UpdatedAtDate;
+    use UpdatedBy;
 
     use Node\Traits\HasCurriculumNodes;
     use CreateCollection;
@@ -133,11 +135,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * @var ?User
      */
-    private ?User $updatedBy = null;
-
-    /**
-     * @var ?User
-     */
     private ?User $deletedBy = null;
 
     /**
@@ -155,24 +152,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function setCreatedBy(User $creator): self
     {
         $this->createdBy = $creator;
-        return $this;
-    }
-
-    /**
-     * @return ?User
-     */
-    public function getUpdatedBy(): ?User
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * @param User $updater
-     * @return static
-     */
-    public function setUpdatedBy(User $updater): self
-    {
-        $this->updatedBy = $updater;
         return $this;
     }
 

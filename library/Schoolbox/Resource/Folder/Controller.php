@@ -544,7 +544,7 @@ class Controller extends BaseController
         // update role permission
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
 
-        $folder->setUpdatedBy($user);
+        $folder->setUpdatedBy($user->getId());
 
         // Save folder (also persists class-codes + year-level joins)
         $this->folderMapper->save($folder);
