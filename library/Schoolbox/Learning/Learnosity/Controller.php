@@ -104,6 +104,9 @@ class Controller extends Base
                     'reference' => [
                         'show' => false,
                     ],
+                    /* Hide the "Source" tab
+                     */
+                    'source' => false,
                     /* Tags are only spawned upon clicking Save, not before
                      */
                     'tags_on_create' => $tags
