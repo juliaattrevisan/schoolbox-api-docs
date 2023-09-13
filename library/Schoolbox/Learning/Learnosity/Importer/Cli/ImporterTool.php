@@ -411,7 +411,14 @@ HELP;
                             $data['count']
                         ));
 
-                        /* Skip zero-sized payloads
+                        /* Skip zero-sized payloads; learnosity hates that
+                         *
+                         * (alternatively capture exception but probably not helpful most of the time)
+                         *
+                         * The main way this has happened to me is when you create a quiz
+                         * using learnosity, then artificially reset its learnosity_reference
+                         * to null, then try to reimport that back into learnosity - this is
+                         * an exceedingly particular scenario that shouldn't happen organically.
                          */
                         if ($data['count'] > 0) {
                             $api->dataSetRequest($data['endpoint'], $data['payload']);
