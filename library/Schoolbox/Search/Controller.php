@@ -166,7 +166,12 @@ class Controller extends Base
         return $filters;
     }
 
-    static function compareFilterArraysForSortingPurposes($filterA, $filterB)
+    /**
+     * @param $filterA
+     * @param $filterB
+     * @return int
+     */
+    static function compareFilterArraysForSortingPurposes($filterA, $filterB): int
     {
         return strnatcmp($filterA["title"], $filterB["title"]);
     }
