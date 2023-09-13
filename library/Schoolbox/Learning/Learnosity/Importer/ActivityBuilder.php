@@ -76,6 +76,7 @@ class ActivityBuilder
          * save on the transmission time (each api request to Learnosity took around
          * ~2sec in a vagrant)
          */
+        $batchFeaturePayload = [];
         $batchItemPayload = [];
         $batchQuestionPayload = [];
 
@@ -91,19 +92,16 @@ class ActivityBuilder
             );
 
             if (!empty($feature)) {
-                $payloadSequence[] = [
-                    'endpoint' => '/itembank/features',
-                    'payload' => [
-                        'features' => [$feature]
-                    ]
-                ];
-
                 $this->logger->debug(sprintf(
                     'Built blueprint for feature "%s" (section_id: %s) with learnosity_reference %s',
                     \TextFormatter::cutSentence($section['title'], 64),
                     $section['section_id'],
                     $feature['reference']
                 ));
+
+                /* Stack it
+                 */
+                $batchFeaturePayload[] = $feature;
 
                 /* Item payload needs to know this reference
                  */
@@ -192,6 +190,18 @@ class ActivityBuilder
 
                 $batchItemPayload[] = $itemStruct;
             }
+        }
+
+        /* Stack it
+         * Send all the features together
+         */
+        if (\count($batchFeaturePayload)) {
+            $payloadSequence[] = [
+                'endpoint' => '/itembank/features',
+                'payload' => [
+                    'features' => $batchFeaturePayload
+                ]
+            ];
         }
 
         /* Stack it
