@@ -33,12 +33,14 @@ class BlueprintBuilder
      * @param string $schoolCode
      * @param PayloadFactory $payloadFactory
      * @param TagFactory $tagFactory
+     * @param ContextLookup $contextLookup
      * @param LoggerInterface $logger
      */
     public function __construct(
         private string $schoolCode,
         private PayloadFactory $payloadFactory,
         private TagFactory $tagFactory,
+        private ContextLookup $contextLookup,
         private LoggerInterface $logger
     ) {
     }
@@ -58,15 +60,23 @@ class BlueprintBuilder
     {
         $payloadSequence = [];
 
+        /* Find some taggies
+         */
+        $tags = $this->contextLookup->find((int)$legacyQuiz['assessment_id']);
+
+        $this->logger->debug(sprintf(
+            'Assigning %s tags to this quiz: [%s]',
+            \count($tags),
+            implode(', ', array_column($tags, 'name'))
+        ));
+        
         /* Set up a Learnosity Activity payload
          * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
          */
         $activityStruct = $this->payloadFactory->produce(
             PayloadFactory::LEARNOSITY_PAYLOAD_ACTIVITY,
             $legacyQuiz,
-            /* TODO Need the MapperProxy to decide its tag set, I suppose
-             */
-            $this->tagFactory->produce(null, null, null)
+            $tags
         );
 
         /* To optimise further, maybe, we can collect all the QuestionStructs
@@ -84,9 +94,7 @@ class BlueprintBuilder
             $feature = $this->payloadFactory->produce(
                 PayloadFactory::LEARNOSITY_PAYLOAD_SECTION_FEATURE,
                 $section,
-                /* TODO Need the MapperProxy to decide its tag set, I suppose
-                 */
-                $this->tagFactory->produce(null, null, null)
+                $tags
             );
 
             if (!empty($feature)) {
@@ -106,9 +114,7 @@ class BlueprintBuilder
                 $itemStruct = $this->payloadFactory->produce(
                     PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
                     $section,
-                    /* TODO Need the MapperProxy to decide its tag set, I suppose
-                     */
-                    $this->tagFactory->produce(null, null, null)
+                    $tags
                 );
 
                 $itemStruct['features'][] = $feature['reference'];
@@ -160,9 +166,7 @@ class BlueprintBuilder
                 $itemStruct = $this->payloadFactory->produce(
                     PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
                     $section,
-                    /* TODO Need the MapperProxy to decide its tag set, I suppose
-                     */
-                    $this->tagFactory->produce(null, null, null)
+                    $tags
                 );
 
                 $itemStruct['definition']['widgets'][] = [

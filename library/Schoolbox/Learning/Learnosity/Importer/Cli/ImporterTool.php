@@ -265,7 +265,7 @@ HELP;
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
          */
-        $blueprintBuilder = new BlueprintBuilder($schoolCode, $payloadFactory, $tagFactory, $this->getLogger());
+        $blueprintBuilder = new BlueprintBuilder($schoolCode, $payloadFactory, $tagFactory, $contextLookup, $this->getLogger());
 
         /* Capture basic metrics
          */
@@ -298,15 +298,6 @@ HELP;
              */
             $legacyQuizIds = $this->getLegacyQuizIds((int)$assessmentId);
         }
-
-
-        /* FIXME temporary build in situ
-         */
-        $tags = $contextLookup->find((int)$assessmentId);
-        print_r($tags);
-        die();
-
-
 
         /* Commencing migration
          */
@@ -453,6 +444,11 @@ HELP;
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
+            return;
+        } catch (\Exception $e) {
+            /* Some other random death
+             */
+            $this->getLogger()->warning($e->getMessage());
             return;
         }
 
