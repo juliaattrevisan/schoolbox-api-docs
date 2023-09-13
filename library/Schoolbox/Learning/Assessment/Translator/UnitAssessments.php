@@ -66,7 +66,7 @@ class UnitAssessments
             'id'                => $assessment->getId(),
             'title'             => $assessment->getTitle(),
             'assessmentType'    => $assessment->getFamilyName(),
-            'course'            => $assessment->getBaseContext()->getSpecification()->getCourse()->getFolder()->getTitle(),
+            'course'            => $this->getCourseName($assessment),
             'unit'              => $assessment->getBaseContext()->getTitle(),
             'projectName'       => $projectName,
             'closeAt'           => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
@@ -74,5 +74,18 @@ class UnitAssessments
             '_links'            => $links,
             'assessments'    => $assessments?->reindex()->map(new self($this->routeGenerator, $this->student)),
         ];
+    }
+    private function getCourseName(IAssessable $assessable): ?string
+    {
+        $base = $assessable->getBaseContext();
+        if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+            // Implementation
+            return $base->getSpecification()->getCourse()->getFolder()->getTitle();
+        } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+            // Specification
+            return $base->getCourse()->getFolder()->getTitle();
+        }
+        //no course, return null
+        return null;
     }
 }
