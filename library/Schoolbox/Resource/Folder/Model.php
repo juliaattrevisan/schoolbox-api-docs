@@ -133,6 +133,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private User $updater;
 
     /**
+     * @var User
+     */
+    private User $deleter;
+
+    /**
      * @return User
      */
     public function getCreator(): User
@@ -165,6 +170,24 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function setUpdater(User $updater): self
     {
         $this->updater = $updater;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getDeleter(): User
+    {
+        return $this->deleter;
+    }
+
+    /**
+     * @param User $deleter
+     * @return static
+     */
+    public function setDeleter(User $deleter): self
+    {
+        $this->updater = $deleter;
         return $this;
     }
 
