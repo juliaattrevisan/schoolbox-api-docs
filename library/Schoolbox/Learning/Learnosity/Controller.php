@@ -809,7 +809,11 @@ class Controller extends Base
          *
          * TODO What was supposed to happen for multiple attempts in a horizontal marking context?
          */
-        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
+        $pb = $this->attemptMapper->getPredicateBuilder()
+            ->equals('assess_id', $quiz->getId())
+            ->notNull('learnosity_reference');
+
+        $attempts = $this->attemptMapper->findByPredicates($pb, [
             'order' => [
                 'finish' => 'desc'
             ]
