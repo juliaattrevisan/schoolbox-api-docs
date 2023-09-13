@@ -269,7 +269,7 @@ class ContextLookup
             'id' => $courseSpecId
         ]);
 
-        return $this->courseSpecStatement->fetch(\PDO::FETCH_ASSOC);
+        return (array)$this->courseSpecStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
@@ -286,7 +286,7 @@ class ContextLookup
             'id' => $courseUnitSpecId
         ]);
 
-        return $this->courseUnitSpecStatement->fetch(\PDO::FETCH_ASSOC);
+        return (array)$this->courseUnitSpecStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
@@ -303,7 +303,7 @@ class ContextLookup
             'id' => $courseImplId
         ]);
 
-        return $this->courseImplStatement->fetch(\PDO::FETCH_ASSOC);
+        return (array)$this->courseImplStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
@@ -320,7 +320,7 @@ class ContextLookup
             'id' => $courseUnitImplId
         ]);
 
-        return $this->courseUnitImplStatement->fetch(\PDO::FETCH_ASSOC);
+        return (array)$this->courseUnitImplStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
