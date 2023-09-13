@@ -138,7 +138,7 @@ class ContextLookup
         private TagFactory $tagFactory,
         private LoggerInterface $logger
     ) {
-        $this->mvRelationStatement= $this->db->prepare(self::QUERY_MV_RELATION);
+        $this->mvRelationStatement = $this->db->prepare(self::QUERY_MV_RELATION);
         $this->courseSpecStatement = $this->db->prepare(self::QUERY_COURSE_SPEC);
         $this->courseUnitSpecStatement = $this->db->prepare(self::QUERY_COURSE_UNIT_SPEC);
         $this->courseImplStatement = $this->db->prepare(self::QUERY_COURSE_IMPL);

@@ -70,7 +70,7 @@ class BlueprintBuilder
             \count($tags),
             implode(', ', array_column($tags, 'name'))
         ));
-        
+
         /* Set up a Learnosity Activity payload
          * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
          */
