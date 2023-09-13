@@ -33,4 +33,6 @@ interface Alaress_Date_Locale_Interface
     public function calendarDateTime(): string;
 
     public function weekendDays(): array;
+
+    public function startOfSchoolYear();
 }

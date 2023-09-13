@@ -70,25 +70,27 @@ class Model implements ISoftDeletable
     public const ACTION_STATUS_COMPLETED = 'completed';
 
     // Strings that can be converted to actual dates using strtotime
-    public const THIS_YEAR      = 'first day of january';
-    public const PAST_FORTNIGHT = '14 days ago';
-    public const THIS_TERM      = 'this term'; // this is the only one that isn't a strtotime string
-    public const TODAY          = 'today';
-    public const PAST_6_MONTHS  = '6 months ago';
-    public const PAST_3_MONTHS  = '3 months ago';
-    public const PAST_MONTH     = '1 month ago';
-    public const PAST_WEEK      = '7 days ago';
+    public const THIS_YEAR        = 'first day of january';
+    public const THIS_SCHOOL_YEAR = 'first day of school year';
+    public const PAST_FORTNIGHT   = '14 days ago';
+    public const THIS_TERM        = 'this term'; // this is the only one that isn't a strtotime string
+    public const TODAY            = 'today';
+    public const PAST_6_MONTHS    = '6 months ago';
+    public const PAST_3_MONTHS    = '3 months ago';
+    public const PAST_MONTH       = '1 month ago';
+    public const PAST_WEEK        = '7 days ago';
 
     // Mappings of strings to labels that will be shown in the UI
     public const RELATIVE_DATE_PRESETS = [
-        self::THIS_YEAR      => 'This year',
-        self::THIS_TERM      => 'This term',
-        self::PAST_6_MONTHS  => 'Past 6 months',
-        self::PAST_3_MONTHS  => 'Past 3 months',
-        self::PAST_MONTH     => 'Past month',
-        self::PAST_FORTNIGHT => 'Past fortnight',
-        self::PAST_WEEK      => 'Past week',
-        self::TODAY          => 'Today',
+        self::THIS_YEAR        => 'This year',
+        self::THIS_SCHOOL_YEAR => 'This school year',
+        self::THIS_TERM        => 'This term',
+        self::PAST_6_MONTHS    => 'Past 6 months',
+        self::PAST_3_MONTHS    => 'Past 3 months',
+        self::PAST_MONTH       => 'Past month',
+        self::PAST_FORTNIGHT   => 'Past fortnight',
+        self::PAST_WEEK        => 'Past week',
+        self::TODAY            => 'Today',
     ];
 
     /** @var bool $dashboard */

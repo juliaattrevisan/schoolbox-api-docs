@@ -24,6 +24,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
     protected $calendarDate;
     protected $calendarDateTime;
     protected $weekendDays;
+    protected $startOfSchoolYear;
 
     /**
      * Get the preferred local format
@@ -133,5 +134,10 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
     public function weekendDays(): array
     {
         return $this->weekendDays;
+    }
+
+    public function startOfSchoolYear()
+    {
+        return $this->startOfSchoolYear;
     }
 }

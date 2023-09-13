@@ -18,6 +18,7 @@ use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
@@ -42,6 +43,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Twig\Error\Error as TwigError;
 use TypeError;
 use UnexpectedValueException;
 
@@ -108,18 +110,18 @@ class Controller extends Base
      */
     public function getGradesYear(User $viewee, int $year): void
     {
-        $from = (new Alaress_Date_Format())->setYear($year)->startOfYear();
-        $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
+        $from = (new Alaress_Date_Format())->setYear($year)->getStartOfSchoolYear();
+        $to = (new Alaress_Date_Format())->setYear($year)->endOfSchoolYear();
 
         // Create new term for the full year summary.  Note this term will not exist in the database, so its ID will be null.
         // Functions that accept this fake term as a parameter cannot assume it has a non-null ID.
         $term = $this->termMapper->createModel()
-            ->setTitle($from->getYear() . ' Full Year')
-            ->setCode($from->getYear() . '-full-year')
+            ->setTitle($from->getSchoolYear() . ' Year')
+            ->setCode($from->getStartOfSchoolYear()->getYear() . '-full-year')
             ->setStart($from)
             ->setActualFinish($to);
 
-        $this->getCustomGrades($viewee, $term, true);
+        $this->getCustomGrades($viewee, $term, $from->getStartOfSchoolYear()->getYear());
     }
 
     /**
@@ -141,12 +143,14 @@ class Controller extends Base
     }
 
     /**
-     * @param User       $viewee
-     * @param Term\Model $term
-     * @param Boolean    $termIsWholeYear
+     * @param User        $viewee
+     * @param Model       $term
+     * @param string|null $selectedYear
      * @return void
+     * @throws TwigError
+     * @throws MapperException
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, bool $termIsWholeYear = false): void
+    private function getCustomGrades(User $viewee, Term\Model $term, string $selectedYear = null): void
     {
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $gradeHelper       = new Helper(
@@ -173,7 +177,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
-            'year'             => ($termIsWholeYear ? $term->getStart()->getYear() : null),
+            'year'             => $selectedYear,
             'terms'            => $this->termMapper->findAllWithExtraordinary($viewee),
             'folders'          => $folders,
             'assessmentTasks'  => $assessmentTasks,

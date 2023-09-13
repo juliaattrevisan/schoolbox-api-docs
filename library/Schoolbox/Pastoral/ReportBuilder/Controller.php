@@ -99,7 +99,7 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser(), dashboardOnly: false);
+        $reportsAll  = $this->pastoralReportMapper->findForUser($this->getUser(), dashboardOnly: false);
         $isModerator = $this->getUser()->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL) !== null;
 
         $reportsMine  = [];
@@ -155,7 +155,7 @@ class Controller extends Base
         // Students
 
         $studentsSelected = [];
-        $yearPrefix = $this->l10n->translate('year', false, true);
+        $yearPrefix       = $this->l10n->translate('year', false, true);
 
         /** @var User $student */
         foreach ($report->getStudents() as $student) {
@@ -197,7 +197,7 @@ class Controller extends Base
         $foldersSelected = $report->getFolders()->map(
             static function (Folder $folder) {
                 return [
-                    'id' => $folder->getId(),
+                    'id'   => $folder->getId(),
                     'name' => $folder->getTitle(),
                 ];
             }
@@ -226,13 +226,15 @@ class Controller extends Base
         } else {
             // this will be localised in twig...
             $orderFields[PastoralReport::ORDER_SEVERITY] = 'Severity';
-            $severities = $this->pastoralSeverityMapper->findAll();
+            $severities                                  = $this->pastoralSeverityMapper->findAll();
         }
 
         // Remove fields that are not supported
-        $report->setOrder($report->getOrder()->filter(static function (string $order) use ($orderFields) {
-            return in_array($order, array_keys($orderFields));
-        }));
+        $report->setOrder(
+            $report->getOrder()->filter(static function (string $order) use ($orderFields) {
+                return in_array($order, array_keys($orderFields));
+            })
+        );
         // Add order fields missing in the current report
         foreach (array_keys($orderFields) as $orderCurrent) {
             if (!in_array($orderCurrent, $report->getOrder()->getAll())) {
@@ -255,7 +257,7 @@ class Controller extends Base
 
         // Default to using relative date
         $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
-        $report->setRelativeDateString($report->getRelativeDateString() ?? PastoralReport::THIS_YEAR);
+        $report->setRelativeDateString($report->getRelativeDateString() ?? PastoralReport::THIS_SCHOOL_YEAR);
 
         /* A stack of all YearLevel instances, ordered by sequence from the admin area
          */
@@ -456,9 +458,13 @@ class Controller extends Base
             $now        = Alaress_Date_Format::now();
             $beforeDate = (clone $now)->endOfYear();
             $afterDate  = (clone $now)->startOfYear();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_SCHOOL_YEAR) {
+            $now        = Alaress_Date_Format::now();
+            $beforeDate = (clone $now)->endOfSchoolYear();
+            $afterDate  = (clone $now)->getStartOfSchoolYear();
         } else {
             $beforeDate = Alaress_Date_Format::now();
-            $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
+            $afterDate  = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
         }
 
         $students = $report->getStudents();
@@ -565,7 +571,7 @@ class Controller extends Base
             }
         } else {
             $report->setUsesRelativeDate(true);
-            $report->setRelativeDateString(PastoralReport::THIS_YEAR);
+            $report->setRelativeDateString(PastoralReport::THIS_SCHOOL_YEAR);
 
             // Update with POSTed relative date if it's valid
             $relativeDateString = $post->get('relative-dates-dropdown');
@@ -590,7 +596,10 @@ class Controller extends Base
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));
             $report->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', false));
-            $actionStatus = in_array($post->get('actionStatus'), [PastoralReport::ACTION_STATUS_PENDING, PastoralReport::ACTION_STATUS_COMPLETED])
+            $actionStatus = in_array($post->get('actionStatus'), [
+                PastoralReport::ACTION_STATUS_PENDING,
+                PastoralReport::ACTION_STATUS_COMPLETED,
+            ])
                 ? $post->get('actionStatus')
                 : null;
             $report->setActionStatus($actionStatus);
@@ -656,9 +665,9 @@ class Controller extends Base
         $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
         $this->response = $this->responseAsJson([
-            'status' => 'OK',
-            'result' => $result,
-        ]);
+                                                    'status' => 'OK',
+                                                    'result' => $result,
+                                                ]);
     }
 
     /**

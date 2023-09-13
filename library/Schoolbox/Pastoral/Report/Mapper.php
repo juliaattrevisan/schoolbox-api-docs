@@ -73,7 +73,7 @@ class Mapper extends BaseMapper
         $this->uses('action_status', self::TYPE_STRING, self::COLUMN_ENUM, null, [
             Model::ACTION_STATUS_PENDING,
             Model::ACTION_STATUS_COMPLETED,
-            null
+            null,
         ]);
         $this->uses('notification_enabled', self::TYPE_BOOLEAN);
 
@@ -342,7 +342,7 @@ class Mapper extends BaseMapper
             $params["campusLike$i"] = "%,{$campus->getId()},%";
         }
         $campusWheres[] = "`campuses` IS NULL ";
-        $wheres[] = sprintf("(%s)", implode(' OR ', $campusWheres));
+        $wheres[]       = sprintf("(%s)", implode(' OR ', $campusWheres));
 
         // Folder
         $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
@@ -500,42 +500,47 @@ class Mapper extends BaseMapper
         $dateParams = [];
 
         $dates = [
-            PastoralReport::THIS_YEAR      =>
+            PastoralReport::THIS_YEAR        =>
                 [
                     'start' => (clone $now)->startOfYear(),
                     'end'   => (clone $now)->endOfYear(),
                 ],
-            PastoralReport::THIS_TERM      =>
+            PastoralReport::THIS_SCHOOL_YEAR =>
+                [
+                    'start' => (clone $now)->getStartOfSchoolYear(),
+                    'end'   => (clone $now)->endOfSchoolYear(),
+                ],
+            PastoralReport::THIS_TERM        =>
                 [
                     'start' => $thisTerm->getStart(),
                     'end'   => $thisTerm->getActualFinish(),
                 ],
-            PastoralReport::PAST_6_MONTHS  =>
+            PastoralReport::PAST_6_MONTHS    =>
                 [
                     'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_6_MONTHS)),
                     'end'   => $now,
                 ],
-            PastoralReport::PAST_3_MONTHS  =>
+            PastoralReport::PAST_3_MONTHS    =>
                 [
                     'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_3_MONTHS)),
                     'end'   => $now,
                 ],
-            PastoralReport::PAST_MONTH     =>
+            PastoralReport::PAST_MONTH       =>
                 [
                     'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_MONTH)),
                     'end'   => $now,
                 ],
-            PastoralReport::PAST_FORTNIGHT =>
+            PastoralReport::PAST_FORTNIGHT   =>
                 [
                     'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_FORTNIGHT)),
                     'end'   => $now,
                 ],
-            PastoralReport::PAST_WEEK      =>
+            PastoralReport::PAST_WEEK        =>
                 [
                     'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_WEEK)),
                     'end'   => $now,
                 ],
-            PastoralReport::TODAY          =>
+            PastoralReport::TODAY            =>
                 [
                     'start' => (clone $now)->startOfDay(),
                     'end'   => (clone $now)->endOfDay(),

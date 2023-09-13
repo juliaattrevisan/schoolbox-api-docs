@@ -12,7 +12,6 @@
  */
 class Alaress_Date_Locale_Static extends Alaress_Date_Locale_Abstract
 {
-
     /* Pretty formatting
      */
     protected $local = 'd/m/Y g:ia';
@@ -32,4 +31,5 @@ class Alaress_Date_Locale_Static extends Alaress_Date_Locale_Abstract
     protected $calendarDateTime = 'jS M g:ia';
 
     protected $weekendDays = [Alaress_Date_Format::SATURDAY,Alaress_Date_Format::SUNDAY];
+    protected $startOfSchoolYear = '01/01'; // d/m
 }

@@ -161,6 +161,15 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
     }
 
     /**
+     * Gets the start date of the school academic year in format of d/m
+     * @return string
+     */
+    public function startOfSchoolYear(): string
+    {
+        return $this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_START_OF_SCHOOL_YEAR);
+    }
+
+    /**
      * Do not preserve the config loader on serialize/unserialize: it should not
      * be stored, and will be reloaded whenever `getConfig` is called anyway.
      *
