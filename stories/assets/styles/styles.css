@@ -60,3 +60,13 @@ table tr td {
     height: 100%;
     width: 100%;
 }
+/* Icons Page Styles */
+[class^="icon-"],
+[class*=" icon-"] {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    stroke-width: 0;
+    stroke: var(--content-ui-foreground);
+    fill: var(--content-ui-foreground);
+}
