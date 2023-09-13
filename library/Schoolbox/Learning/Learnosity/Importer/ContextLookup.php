@@ -204,12 +204,15 @@ class ContextLookup
         /* If course_* is null and course_unit_* is null, then we're in a homepage context;
          * use the folder id to find the folder's name and uuid
          */
+        $folderCodes = $this->findFolderCodes((int)$row['folder_id']);
 
-            /* Generate the set of tags and remember it in $this->lookup for
-             * this particular combination of columns
-             */
+        /* Generate the set of tags and remember it in $this->lookup for
+         * this particular combination of columns
+         */
+        $tags = $this->tagFactory->produce(null, null, $folderCodes);
+        $this->lookup[$key] = $tags;
 
-        return [];
+        return $this->lookup[$key];
     }
 
 
