@@ -302,7 +302,8 @@ HELP;
 
         /* FIXME temporary build in situ
          */
-        $contextLookup->find((int)$assessmentId);
+        $tags = $contextLookup->find((int)$assessmentId);
+        print_r($tags);
         die();
 
 

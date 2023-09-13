@@ -80,12 +80,50 @@ class ContextLookup
     ';
 
 
+    /**
+     * For finding the (name, uuid) tuple of a course spec
+     * via a course impl
+     */
+    private const QUERY_COURSE_IMPL = '
+        SELECT f.name, cs.uuid 
+        FROM course_implementation ci
+        INNER JOIN course_specification cs ON ci.course_specification_id = cs.id
+        INNER JOIN folder f ON cs.folder_id = f.id
+        WHERE ci.id = :id
+    ';
+
+
+    /**
+     * For finding the (name, uuid) tuple of a course unit spec
+     * via a course unit impl
+     */
+    private const QUERY_COURSE_UNIT_IMPL = '
+        SELECT f.name, cus.uuid 
+        FROM course_unit_implementation cui
+        INNER JOIN course_unit_specification cus ON cui.course_unit_specification_id = cus.id
+        LEFT JOIN folder f ON cus.folder_id = f.id
+        WHERE cui.id = :id
+    ';
+
+
+    /**
+     * For finding the (name, code) tuple of a folder
+     */
+    private const QUERY_FOLDER = '
+        SELECT code
+        FROM folder_code
+        WHERE folder_id = :id
+    ';
+
+
     /* For prepared statements
      */
     private \PDOStatement $mvRelationStatement;
     private \PDOStatement $courseSpecStatement;
     private \PDOStatement $courseUnitSpecStatement;
-
+    private \PDOStatement $courseImplStatement;
+    private \PDOStatement $courseUnitImplStatement;
+    private \PDOStatement $folderStatement;
 
     /**
      * Constructor.
@@ -98,6 +136,9 @@ class ContextLookup
         $this->mvRelationStatement= $this->db->prepare(self::QUERY_MV_RELATION);
         $this->courseSpecStatement = $this->db->prepare(self::QUERY_COURSE_SPEC);
         $this->courseUnitSpecStatement = $this->db->prepare(self::QUERY_COURSE_UNIT_SPEC);
+        $this->courseImplStatement = $this->db->prepare(self::QUERY_COURSE_IMPL);
+        $this->courseUnitImplStatement = $this->db->prepare(self::QUERY_COURSE_UNIT_IMPL);
+        $this->folderStatement = $this->db->prepare(self::QUERY_FOLDER);
     }
 
 
@@ -130,7 +171,7 @@ class ContextLookup
         /* If course_specification_id is set, find out its name and uuid
          * If course_unit_specification_id is set, find out its name and uuid
          */
-        if ('' !== $row['course_specification_id'] && '' !== $row['course_unit_specification_id']) {
+        if ($row['course_specification_id'] && $row['course_unit_specification_id']) {
             $courseSpec = $this->findCourseSpec((int)$row['course_specification_id']);
             $courseUnitSpec = $this->findCourseUnitSpec((int)$row['course_unit_specification_id']);
 
@@ -146,10 +187,19 @@ class ContextLookup
         /* If course_implementation_id is set, find out its corresponding spec's name and uuid
          * If course_unit_implementation_id is set, find out its corresponding spec's name and uuid
          */
+        if ($row['course_implementation_id'] && $row['course_unit_implementation_id']) {
+            $courseSpec = $this->findCourseSpecViaImpl((int)$row['course_implementation_id']);
+            $courseUnitSpec = $this->findCourseUnitSpecViaImpl((int)$row['course_unit_implementation_id']);
+            $folderCodes = $this->findFolderCodes((int)$row['folder_id']);
 
             /* Generate the set of tags and remember it in $this->lookup for
              * this particular combination of columns
              */
+            $tags = $this->tagFactory->produce($courseSpec['uuid'], $courseUnitSpec['uuid'], $folderCodes);
+            $this->lookup[$key] = $tags;
+
+            return $this->lookup[$key];
+        }
 
         /* If course_* is null and course_unit_* is null, then we're in a homepage context;
          * use the folder id to find the folder's name and uuid
@@ -223,5 +273,65 @@ class ContextLookup
         ]);
 
         return $this->courseUnitSpecStatement->fetch(\PDO::FETCH_ASSOC);
+    }
+
+
+    /**
+     * Finds the (name, uuid) spec tuple for a course impl
+     *
+     * @param int $courseImplId
+     * @return mixed
+     * @throws \PDOException
+     */
+    private function findCourseSpecViaImpl(int $courseImplId): array
+    {
+        $this->courseImplStatement->execute([
+            'id' => $courseImplId
+        ]);
+
+        return $this->courseImplStatement->fetch(\PDO::FETCH_ASSOC);
+    }
+
+
+    /**
+     * Finds the (name, uuid) spec tuple for a course unit impl
+     *
+     * @param int $courseUnitImplId
+     * @return mixed
+     * @throws \PDOException
+     */
+    private function findCourseUnitSpecViaImpl(int $courseUnitImplId): array
+    {
+        $this->courseUnitImplStatement->execute([
+            'id' => $courseUnitImplId
+        ]);
+
+        return $this->courseUnitImplStatement->fetch(\PDO::FETCH_ASSOC);
+    }
+
+
+    /**
+     * Finds the csv of folder codes for a folderId
+     *
+     * @param int $folderId
+     * @return string
+     * @throws \PDOException
+     */
+    private function findFolderCodes(int $folderId): string
+    {
+        $this->folderStatement->execute([
+            'id' => $folderId
+        ]);
+
+        $codes = [];
+
+        /* TODO Supprt multiple folder codes
+         *  Do this as a single tag for now...?
+         */
+        while ($row = $this->folderStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $codes[] = $row['code'];
+        }
+
+        return implode(', ', $codes);
     }
 }
