@@ -12,10 +12,10 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
+use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
-
 
 class ImporterTool extends CliTool\App
 {
@@ -254,6 +254,10 @@ HELP;
          */
         $tagFactory = new TagFactory($schoolCode);
 
+        /* A context lookup builder thing for conveniently deriving tags
+        */
+        $contextLookup = new ContextLookup($this->getDatabaseInternal(), $tagFactory);
+
         /* Generates payload array structs
          */
         $payloadFactory = new PayloadFactory(new Strategy\Factory());
@@ -294,6 +298,14 @@ HELP;
              */
             $legacyQuizIds = $this->getLegacyQuizIds((int)$assessmentId);
         }
+
+
+        /* FIXME temporary build in situ
+         */
+        $contextLookup->find((int)$assessmentId);
+        die();
+
+
 
         /* Commencing migration
          */
