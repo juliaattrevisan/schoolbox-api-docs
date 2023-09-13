@@ -55,6 +55,7 @@ class BlueprintBuilder
      * @param array $legacyQuiz
      * @return array|array[]
      * @throws \DomainException
+     * @throws \PDOException
      */
     public function buildFlattened(array $legacyQuiz): array
     {
