@@ -351,8 +351,9 @@ HELP;
                 /* Announce what we're doing
                  */
                 $this->getLogger()->info(sprintf(
-                    'Processing "%s" (assess_id: %s)',
+                    'Processing "%s" (assessment_id: %s, assess_id: %s)',
                     $legacyQuiz['title'],
+                    $legacyQuiz['assessment_id'],
                     $legacyQuiz['assess_id']
                 ));
 
@@ -419,6 +420,8 @@ HELP;
                          * using learnosity, then artificially reset its learnosity_reference
                          * to null, then try to reimport that back into learnosity - this is
                          * an exceedingly particular scenario that shouldn't happen organically.
+                         *
+                         * Or, there's just an empty section somehow.
                          */
                         if ($data['count'] > 0) {
                             $api->dataSetRequest($data['endpoint'], $data['payload']);
@@ -444,7 +447,7 @@ HELP;
                     $timing[] = $end - $start;
                 }
 
-                $this->getLogger()->info('Finished');
+                $this->getLogger()->info('Finished.');
                 $this->getLogger()->info('');
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
