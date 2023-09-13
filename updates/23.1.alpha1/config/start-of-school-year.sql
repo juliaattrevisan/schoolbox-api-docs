@@ -11,7 +11,7 @@ INSERT INTO `config`(`name`,
                      `sequence`)
 VALUES ('start_of_school_year',
         '01/01',
-        'Start of school year',
+        'Start of School Year',
         'Add the first date of the school''s academic year for filtering data in d/m format. This will apply across multiple academic years, so the date should only include a day and a month.',
         (SELECT `id` FROM `lu_config_field` WHERE `field` = 'input'),
         (SELECT `id` FROM `lu_config_type` WHERE `type` = 'Localisation'),
