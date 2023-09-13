@@ -52,7 +52,7 @@ class ActivityBuilder
      * @return array|array[]
      * @throws \DomainException
      */
-    public function build(array $legacyQuiz): array
+    public function buildFlattened(array $legacyQuiz): array
     {
         $payloadSequence = [];
 

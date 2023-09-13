@@ -58,6 +58,18 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * --preserve-sections
+     *
+     * Decide whether to preserve sections or not.
+     *
+     * Preserving sections interprets legacy quiz Sections as a single
+     * Learnosity Item, but is detrimental to question reuse and
+     * horizontal marking.
+     */
+    private const OPT_LONG_PRESERVE_SECTIONS = 'preserve-sections';
+
+
+    /**
      * Learnosity has some strict requirements about where api requests originate
      */
     private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
@@ -177,6 +189,7 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_HELP,
             self::OPT_LONG_ASSESSMENT_ID,
             self::OPT_LONG_BLUEPRINT,
+            self::OPT_LONG_PRESERVE_SECTIONS,
         ];
     }
 
@@ -351,7 +364,13 @@ HELP;
                  * Learnosity is really particular about such things.
                  */
                 try {
-                    $blueprint = $activityBuilder->build($legacyQuiz);
+                    /* Choose which construction style you want
+                     */
+                    if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
+                        $blueprint = $activityBuilder->buildClassically($legacyQuiz);
+                    } else {
+                        $blueprint = $activityBuilder->buildFlattened($legacyQuiz);
+                    }
                 } catch (\DomainException $e) {
                     $this->getLogger()->warning($e->getMessage());
                     $this->getLogger()->warning(sprintf(
