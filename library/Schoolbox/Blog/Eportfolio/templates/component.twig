@@ -9,7 +9,7 @@
             event.preventDefault();
             var commentId = $(event.target).attr('data-comment-id');
             var blogId = $(event.target).attr('data-blog-id');
-            var commentCount = $('#commentCount-' + blogId).attr('data-numcomments');
+            var commentCount = $('#component{{ componentInstanceId }}-commentCount-' + blogId).attr('data-numcomments');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this comment?',
@@ -28,10 +28,10 @@
                         // Remove button if there are no comments left, otherwise update the displayed count
 
                         if (commentCount <= 0)
-                            $('#commentCount-' + blogId).remove();
+                            $('#component{{ componentInstanceId }}-commentCount-' + blogId).remove();
                         else {
-                            $('#commentCount-' + blogId).html('Show Comments (' + commentCount + ')');
-                            $('#commentCount-' + blogId).attr('data-numcomments', commentCount);
+                            $('#component{{ componentInstanceId }}-commentCount-' + blogId).html('Show Comments (' + commentCount + ')');
+                            $('#component{{ componentInstanceId }}-commentCount-' + blogId).attr('data-numcomments', commentCount);
                         }
                     });
                 }
@@ -57,7 +57,7 @@
 
     {% for blog in blogs %}
 
-        <li class="actions-small-1" id="blog_{{ blog.getId }}" data-blog>
+        <li class="actions-small-1" id="component{{ componentInstanceId }}-blog_{{ blog.getId }}" data-blog>
 
             <div class="list-item">
                 <div class="card small-12">
@@ -79,17 +79,17 @@
                 {% endif %}
                 <div>
                     {% if blogComments[blog.getId] | length > 0 %}
-                        <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">
+                        <a id="component{{ componentInstanceId }}-commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">
                             Show Comments ({{ blogComments[blog.getId] | length }})
                         </a>
                         <span class="pipe meta"></span>
                     {% endif %}
 
-                    <a data-toggle="commentform-{{ blog.getId }}" class='article-read-more'>Add comment</a>
+                    <a data-toggle="component{{ componentInstanceId }}-commentform-{{ blog.getId }}" class='article-read-more'>Add comment</a>
                 </div>
             </article>
             <div class="discussion">
-                <ul class="information-list" id="blogComment_{{ blog.getId }}">
+                <ul class="information-list" id="component{{ componentInstanceId }}-blogComment_{{ blog.getId }}">
                     {% for comment in blogComments[blog.getId] %}
                         <li class="actions-small-1" data-thread>
                             <div class="list-item">
@@ -113,7 +113,7 @@
             </div>
         </li>
         {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
-            <li class="row hide" id="commentform-{{ blog.getId }}">
+            <li class="row hide" id="component{{ componentInstanceId }}-commentform-{{ blog.getId }}">
                 <div class="editPanel socialstream-new-post">
                     <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post" data-blog-comment-form>
                         <input type="hidden" name="returnUrl" value="{{ RETURN_URL.current }}">
