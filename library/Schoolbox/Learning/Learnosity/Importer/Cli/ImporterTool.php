@@ -444,12 +444,7 @@ HELP;
                     $timing[] = $end - $start;
                 }
 
-                $this->getLogger()->info(sprintf(
-                    'Finished processing "%s" (assess_id: %s)',
-                    $legacyQuiz['title'],
-                    $legacyQuiz['assess_id']
-                ));
-
+                $this->getLogger()->info('Finished');
                 $this->getLogger()->info('');
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
