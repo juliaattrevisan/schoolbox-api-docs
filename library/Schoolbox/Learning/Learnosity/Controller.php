@@ -921,6 +921,16 @@ class Controller extends Base
          * (because $items is in some non-sequenced order)
          */
         foreach ($itemReferences as &$itemReference) {
+            /* FIXME Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+             *  we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+             */
+            if (!is_array($itemReference)) {
+                $itemReference = [
+                    'reference' => $itemReference,
+                    'id' => $itemReference
+                ];
+            }
+
             $reference = $itemReference['reference'];
 
             /* Find it in the set of $items
@@ -938,7 +948,7 @@ class Controller extends Base
         /* Obtain their scores from Learnosity
          */
         $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => array_values($sessions)
+            'session_id' => array_values(array_filter($sessions))
         ])['data'];
 
         /* Reforge it into a generic set of tuples
