@@ -162,7 +162,7 @@ class Controller extends Assessment\Controller
          * get list of all activities within this course
          * only for staff
          */
-        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments($this->routeGenerator, $student);
+        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments($this->routeGenerator, $student, hideLessonPlan: true);
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
             // if we are inside a project get the projects context
