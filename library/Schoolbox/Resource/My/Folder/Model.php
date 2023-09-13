@@ -10,7 +10,6 @@
 namespace Schoolbox\Resource\My\Folder;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\User;
