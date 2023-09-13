@@ -202,6 +202,7 @@ class PayloadFactory
             return [
                 'data' => [
                     'content' => $section['description'],
+                    'heading' => $section['title'],
                     'type' => 'sharedpassage',
                 ],
                 'reference' => (string)UUid::uuid4(),
