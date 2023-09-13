@@ -25,7 +25,7 @@ use Schoolbox\Learning\Learnosity\TagFactory;
  * using cleanse.php or the ui itself. There is no mass-archive or
  * mass-soft-delete; you have to do it programmatically.
  */
-class ActivityBuilder
+class BlueprintBuilder
 {
     /**
      * Constructor

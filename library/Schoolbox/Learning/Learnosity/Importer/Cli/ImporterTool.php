@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Importer\ActivityBuilder;
+use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -261,7 +261,7 @@ HELP;
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
          */
-        $activityBuilder = new ActivityBuilder($schoolCode, $payloadFactory, $tagFactory, $this->getLogger());
+        $blueprintBuilder = new BlueprintBuilder($schoolCode, $payloadFactory, $tagFactory, $this->getLogger());
 
         /* Capture basic metrics
          */
@@ -371,9 +371,9 @@ HELP;
                     /* Choose which construction style you want
                      */
                     if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                        $blueprint = $activityBuilder->buildClassically($legacyQuiz);
+                        $blueprint = $blueprintBuilder->buildClassically($legacyQuiz);
                     } else {
-                        $blueprint = $activityBuilder->buildFlattened($legacyQuiz);
+                        $blueprint = $blueprintBuilder->buildFlattened($legacyQuiz);
                     }
                 } catch (\DomainException $e) {
                     $this->getLogger()->warning($e->getMessage());
