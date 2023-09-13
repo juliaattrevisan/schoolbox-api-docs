@@ -178,6 +178,13 @@ class BlueprintBuilder
                     'reference' => $questionStruct['reference']
                 ];
 
+                /* In a flattened structure, name the item after the question
+                 * for lack of any other value; remove any richtext bidness
+                 * from the question text we offered (good luck to those who
+                 * only had an image as their question, though.)
+                 */
+                $itemStruct['title'] = strip_tags($question['question']);
+
                 /* Activity payload needs to know this reference
                  */
                 $activityStruct['data']['items'][] = $itemStruct['reference'];
