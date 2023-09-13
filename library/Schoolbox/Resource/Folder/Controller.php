@@ -364,7 +364,7 @@ class Controller extends BaseController
 
         try {
             $this->postUpdateFolder($newFolder);
-        } catch (Router\Exception\RouteNotFound|MapperException $e) {
+        } catch (Router\Exception\RouteNotFound | MapperException $e) {
             throw new SchoolboxException("Could not updated folder.", 0, $e);
         }
     }
