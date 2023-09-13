@@ -21,19 +21,17 @@ class ModelToArray
      */
     public function __invoke(Model $courseTemplate): array
     {
-        $course = [
-            'id'    => $courseTemplate->getCourseTemplate()?->getId(),
-            'name'  => $courseTemplate->getCourseTemplate()?->getName(),
-        ];
-        $unit = [
-            'id'    => $courseTemplate->getUnitTemplate()?->getId(),
-            'name'  => $courseTemplate->getUnitTemplate()?->getName(),
-        ];
         return [
             'id'                => $courseTemplate->getId(),
             'name'              => $courseTemplate->getName(),
-            'courseTemplate'    => $courseTemplate->getCourseTemplate() ? $course : null,
-            'unitTemplate'      => $courseTemplate->getUnitTemplate() ? $unit : null,
+            'courseTemplate'    => [
+                'id'    => $courseTemplate->getCourseTemplate()->getId(),
+                'name'  => $courseTemplate->getCourseTemplate()->getName(),
+            ],
+            'unitTemplate'      => [
+                'id'    => $courseTemplate->getUnitTemplate()->getId(),
+                'name'  => $courseTemplate->getUnitTemplate()->getName(),
+            ],
         ];
     }
 }
