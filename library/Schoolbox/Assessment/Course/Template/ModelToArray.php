@@ -17,7 +17,7 @@ class ModelToArray
 {
     /**
      * @param Model $courseTemplate
-     * @return array{id: int, name: string, courseTempalte: ?array{id: string, name: string}, unitTemplate: ?array{id: string, name: string}}
+     * @return array{id: int, name: string, courseTemplate: array{id: int, name: string}, unitTemplate: array{id: int, name: string}}
      */
     public function __invoke(Model $courseTemplate): array
     {
