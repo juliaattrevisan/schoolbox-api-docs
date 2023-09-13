@@ -20,9 +20,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
-use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
