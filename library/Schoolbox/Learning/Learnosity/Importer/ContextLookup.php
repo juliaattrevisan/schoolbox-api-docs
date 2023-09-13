@@ -260,7 +260,7 @@ class ContextLookup
      * Finds the (name, uuid) tuple for a course spec
      *
      * @param int $courseSpecId
-     * @return mixed
+     * @return array
      * @throws \PDOException
      */
     private function findCourseSpec(int $courseSpecId): array
@@ -269,7 +269,7 @@ class ContextLookup
             'id' => $courseSpecId
         ]);
 
-        return (array)$this->courseSpecStatement->fetch(\PDO::FETCH_ASSOC);
+        return $this->courseSpecStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
@@ -277,7 +277,7 @@ class ContextLookup
      * Finds the (name, uuid) tuple for a course unit spec
      *
      * @param int $courseUnitSpecId
-     * @return mixed
+     * @return array
      * @throws \PDOException
      */
     private function findCourseUnitSpec(int $courseUnitSpecId): array
@@ -286,7 +286,7 @@ class ContextLookup
             'id' => $courseUnitSpecId
         ]);
 
-        return (array)$this->courseUnitSpecStatement->fetch(\PDO::FETCH_ASSOC);
+        return $this->courseUnitSpecStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
@@ -294,7 +294,7 @@ class ContextLookup
      * Finds the (name, uuid) spec tuple for a course impl
      *
      * @param int $courseImplId
-     * @return mixed
+     * @return array
      * @throws \PDOException
      */
     private function findCourseSpecViaImpl(int $courseImplId): array
@@ -303,7 +303,7 @@ class ContextLookup
             'id' => $courseImplId
         ]);
 
-        return (array)$this->courseImplStatement->fetch(\PDO::FETCH_ASSOC);
+        return $this->courseImplStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
@@ -311,7 +311,7 @@ class ContextLookup
      * Finds the (name, uuid) spec tuple for a course unit impl
      *
      * @param int $courseUnitImplId
-     * @return mixed
+     * @return array
      * @throws \PDOException
      */
     private function findCourseUnitSpecViaImpl(int $courseUnitImplId): array
@@ -320,7 +320,7 @@ class ContextLookup
             'id' => $courseUnitImplId
         ]);
 
-        return (array)$this->courseUnitImplStatement->fetch(\PDO::FETCH_ASSOC);
+        return $this->courseUnitImplStatement->fetch(\PDO::FETCH_ASSOC);
     }
 
 
