@@ -293,6 +293,15 @@ class ActivityBuilder
             $this->tagFactory->produce(null, null, null)
         );
 
+        /* To optimise further, maybe, we can collect all the QuestionStructs
+         * and pump them into one mega payload instead of lots of little ones to
+         * save on the transmission time (each api request to Learnosity took around
+         * ~2sec in a vagrant)
+         */
+        $batchFeaturePayload = [];
+        $batchItemPayload = [];
+        $batchQuestionPayload = [];
+
         /* Set up a Learnosity Item which will be vaguely equivalent to a Section
          * purely for the purposes of this importer
          */
@@ -316,19 +325,16 @@ class ActivityBuilder
             );
 
             if (!empty($feature)) {
-                $payloadSequence[] = [
-                    'endpoint' => '/itembank/features',
-                    'payload' => [
-                        'features' => [$feature]
-                    ]
-                ];
-
                 $this->logger->debug(sprintf(
                     'Built blueprint for feature "%s" (section_id: %s) with learnosity_reference %s',
                     \TextFormatter::cutSentence($section['title'], 64),
                     $section['section_id'],
                     $feature['reference']
                 ));
+
+                /* Stack it
+                 */
+                $batchFeaturePayload[] = $feature;
 
                 /* Item payload needs to know this reference
                  */
@@ -338,13 +344,6 @@ class ActivityBuilder
                     'reference' => $feature['reference']
                 ];
             }
-
-            /* To optimise further, maybe, we can collect all the QuestionStructs
-             * and pump them into one mega payload instead of lots of little ones to
-             * save on the transmission time (each api request to Learnosity took around
-             * ~2sec in a vagrant)
-             */
-            $batchQuestionPayload = [];
 
             /* Accumulate all the questions we found in $section and
              * pile them up here
@@ -386,41 +385,12 @@ class ActivityBuilder
                 ];
             }
 
-            /* Stack it
-             * Send all the questions together
+            /* Activity payload needs to know this reference
              */
-            $payloadSequence[] = [
-                'endpoint' => '/itembank/questions',
-                'payload' => [
-                    'meta' => [
-                        'user' => [
-                            /* This author identifier should be a (schoolcode, user id) tuple for
-                             * auditing reasons, to deconflict with other schools who used the same
-                             * user id. It's mandatory as part of Question creation. We can assign
-                             * it here in the blueprint, or in the actual api payload itself while
-                             * performing. This is because user 123 in one school means a whole
-                             * different dude in another school.
-                             */
-                            'id' => sprintf(
-                                '%s__%s',
-                                $this->schoolCode,
-                                $legacyQuiz['user_id']
-                            )
-                        ]
-                    ],
-                    'questions' => $batchQuestionPayload
-                ]
-            ];
+            $activityStruct['data']['items'][] = $itemStruct['reference'];
 
-            /* Stack it
+            /* Put this item into the set
              */
-            $payloadSequence[] = [
-                'endpoint' => '/itembank/items',
-                'payload' => [
-                    'items' => [$itemStruct]
-                ]
-            ];
-
             $this->logger->debug(sprintf(
                 'Built blueprint for item "%s" (section_id: %s) with learnosity_reference %s',
                 $section['title'],
@@ -428,27 +398,72 @@ class ActivityBuilder
                 $itemStruct['reference']
             ));
 
-            /* Activity payload needs to know this reference
-             */
-            $activityStruct['data']['items'][] = $itemStruct['reference'];
+            $batchItemPayload[] = $itemStruct;
+        }
 
-            /* Stack it
-             */
+        /* Stack it
+         * Send all the features together
+         */
+        if (\count($batchFeaturePayload)) {
             $payloadSequence[] = [
-                'endpoint' => '/itembank/activities',
+                'endpoint' => '/itembank/features',
                 'payload' => [
-                    'activities' => [$activityStruct]
+                    'features' => $batchFeaturePayload
                 ]
             ];
-
-            $this->logger->debug(sprintf(
-                'Built blueprint for quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
-                $legacyQuiz['title'],
-                $legacyQuiz['assessment_id'],
-                $legacyQuiz['assess_id'],
-                $activityStruct['reference']
-            ));
         }
+
+        /* Stack it
+         * Send all the questions together
+         */
+        $payloadSequence[] = [
+            'endpoint' => '/itembank/questions',
+            'payload' => [
+                'meta' => [
+                    'user' => [
+                        /* This author identifier should be a (schoolcode, user id) tuple for
+                         * auditing reasons, to deconflict with other schools who used the same
+                         * user id. It's mandatory as part of Question creation. We can assign
+                         * it here in the blueprint, or in the actual api payload itself while
+                         * performing. This is because user 123 in one school means a whole
+                         * different dude in another school.
+                         */
+                        'id' => sprintf(
+                            '%s__%s',
+                            $this->schoolCode,
+                            $legacyQuiz['user_id']
+                        )
+                    ]
+                ],
+                'questions' => $batchQuestionPayload
+            ]
+        ];
+
+        /* Stack it
+         */
+        $payloadSequence[] = [
+            'endpoint' => '/itembank/items',
+            'payload' => [
+                'items' => $batchItemPayload
+            ]
+        ];
+
+        /* Stack it
+         */
+        $payloadSequence[] = [
+            'endpoint' => '/itembank/activities',
+            'payload' => [
+                'activities' => [$activityStruct]
+            ]
+        ];
+
+        $this->logger->debug(sprintf(
+            'Built blueprint for quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
+            $legacyQuiz['title'],
+            $legacyQuiz['assessment_id'],
+            $legacyQuiz['assess_id'],
+            $activityStruct['reference']
+        ));
 
         return [
             'activityLearnosityReference' => $activityStruct['reference'],
