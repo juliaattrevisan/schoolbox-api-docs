@@ -12,13 +12,13 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use Alaress;
 use Alaress\Redis;
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use PDO;
 use PDOException;
@@ -111,6 +111,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+
+        $this->joins('created_by', UserMapper::class, 'id', null, null, 'creator', 'creator');
+        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updater', 'updater');
+
         $this->uses('colour', self::TYPE_COLOR);
 
         // Joins:
@@ -235,7 +239,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *                                  course folder, or within a unit
      * @throws Exception                if the folder has a parent, but it
      *                                  doesn't exist
-     *
      */
     public function validateCourse(Model $folder, ?Model $previous = null): void
     {

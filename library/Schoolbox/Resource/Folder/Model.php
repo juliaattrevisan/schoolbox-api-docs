@@ -123,6 +123,52 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $assessables;
 
     /**
+     * @var User
+     */
+    private User $creator;
+
+    /**
+     * @var User
+     */
+    private User $updater;
+
+    /**
+     * @return User
+     */
+    public function getCreator(): User
+    {
+        return $this->creator;
+    }
+
+    /**
+     * @param User $creator
+     * @return static
+     */
+    public function setCreator(User $creator): self
+    {
+        $this->creator = $creator;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUpdater(): User
+    {
+        return $this->updater;
+    }
+
+    /**
+     * @param User $updater
+     * @return static
+     */
+    public function setUpdater(User $updater): self
+    {
+        $this->updater = $updater;
+        return $this;
+    }
+
+    /**
      * Does this category have a homepage?
      *
      * @return bool
