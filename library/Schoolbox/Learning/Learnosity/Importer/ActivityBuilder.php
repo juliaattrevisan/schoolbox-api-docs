@@ -114,6 +114,13 @@ class ActivityBuilder
                 ];
             }
 
+            /* To optimise further, maybe, we can collect all the QuestionStructs
+             * and pump them into one mega payload instead of lots of little ones to
+             * save on the transmission time (each api request to Learnosity took around
+             * ~2sec in a vagrant)
+             */
+            $batchQuestionPayload = [];
+
             /* Accumulate all the questions we found in $section and
              * pile them up here
              */
@@ -131,37 +138,8 @@ class ActivityBuilder
                     continue;
                 }
 
-                /* TODO To optimise further, maybe, we can collect all the QuestionStructs
-                 *  and pump them into one mega payload instead of lots of little ones to
-                 *  save on the transmission time (each api request to Learnosity took around
-                 *  ~2sec in a vagrant)
+                /* Put this question into the set
                  */
-
-                /* Stack it
-                 */
-                $payloadSequence[] = [
-                    'endpoint' => '/itembank/questions',
-                    'payload' => [
-                        'meta' => [
-                            'user' => [
-                                /* This author identifier should be a (schoolcode, user id) tuple for
-                                 * auditing reasons, to deconflict with other schools who used the same
-                                 * user id. It's mandatory as part of Question creation. We can assign
-                                 * it here in the blueprint, or in the actual api payload itself while
-                                 * performing. This is because user 123 in one school means a whole
-                                 * different dude in another school.
-                                 */
-                                'id' => sprintf(
-                                    '%s__%s',
-                                    $this->schoolCode,
-                                    $legacyQuiz['user_id']
-                                )
-                            ]
-                        ],
-                        'questions' => [$questionStruct]
-                    ]
-                ];
-
                 $this->logger->debug(sprintf(
                     'Built blueprint for question "%s" (question_id: %s, type: %s) with learnosity_reference %s',
                     \TextFormatter::cutSentence($question['question'], 64),
@@ -169,6 +147,8 @@ class ActivityBuilder
                     $question['type_id'],
                     $questionStruct['reference']
                 ));
+
+                $batchQuestionPayload[] = $questionStruct;
 
                 /* Item payload needs to know this reference
                  */
@@ -180,6 +160,32 @@ class ActivityBuilder
                     'reference' => $questionStruct['reference']
                 ];
             }
+
+            /* Stack it
+             * Send all the questions together
+             */
+            $payloadSequence[] = [
+                'endpoint' => '/itembank/questions',
+                'payload' => [
+                    'meta' => [
+                        'user' => [
+                            /* This author identifier should be a (schoolcode, user id) tuple for
+                             * auditing reasons, to deconflict with other schools who used the same
+                             * user id. It's mandatory as part of Question creation. We can assign
+                             * it here in the blueprint, or in the actual api payload itself while
+                             * performing. This is because user 123 in one school means a whole
+                             * different dude in another school.
+                             */
+                            'id' => sprintf(
+                                '%s__%s',
+                                $this->schoolCode,
+                                $legacyQuiz['user_id']
+                            )
+                        ]
+                    ],
+                    'questions' => $batchQuestionPayload
+                ]
+            ];
 
             /* Stack it
              */
