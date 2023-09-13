@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
+use Schoolbox\Assessment\Course\Template\ModelToArray as ModelToArray;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -81,7 +82,7 @@ class Controller extends Base
                 'roles' => $this->roleMapper->findAll(),
                 'permissions' => $permissions,
                 'availableTemplates' => $templates,
-                'courseTemplates'   => $this->courseTemplateMapper->findAll(),
+                'courseTemplates'   => $this->courseTemplateMapper->findAll()->reindex()->map(new ModelToArray()),
                 'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                 'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
             ],
