@@ -75,6 +75,7 @@ class Controller extends Base
      * @throws ValidationException
      * @throws \DomainException Thrown when site_school_code is empty string
      * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function getContent(IAssessable $assessment): void
     {
@@ -84,6 +85,13 @@ class Controller extends Base
          * not when authorApp initialises for the first time
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+
+        if ('' === (string)$assessment->getLearnosityReference()) {
+            throw new \RuntimeException(sprintf(
+                'Assessment %s is not in learnosity; try importing it with the cli tool',
+                $assessment->getId()
+            ));
+        }
 
         $tags = $tagFactory->produceFromAssessment($assessment);
 
