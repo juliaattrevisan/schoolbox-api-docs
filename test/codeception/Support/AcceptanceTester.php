@@ -168,7 +168,7 @@ class AcceptanceTester extends Actor
         $i = $this;
         $i->click('button.icon-search.no-text');
         $i->fillField('input#search-field', $fullname);
-        $i->click($fullname);
+        $i->click(['css' => 'a[data-test="header-search-user-result-link-' . $fullname . '"]']);
         $i->waitForText($fullname, 5);
     }
 
