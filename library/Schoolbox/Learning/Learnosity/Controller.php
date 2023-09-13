@@ -1163,10 +1163,19 @@ class Controller extends Base
                     ]
                 ],
                 'activity_edit' => [
-                    'title' => [
-                        'show' => true,
-                        'show_reference' => true
-                    ]
+                    'item' => [
+                        'title' => [
+                            'show' => true
+                        ]
+                    ],
+                    'item_search' => [
+                        'title' => [
+                            'show' => true,
+                        ],
+                    ],
+                    'reference' => [
+                        'show' => false,
+                    ],
                 ]
             ],
             'user' => [
