@@ -226,6 +226,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
     }
 
 
@@ -2432,5 +2433,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $folderCodesWithCampusCode,
             $folderCodesWithCampusCodeUntrimmed
         );
+    }
+
+    /**
+     * @param Model $folder
+     * @return void
+     * @throws Exception
+     */
+    protected function softDeleteFields(Model $folder): void
+    {
+        /* Remember who deleted this thing, in a dirty doubletap
+         */
+        $folder->setDeletedBy($this->getSessionUser());
+        $this->save($folder);
     }
 }
