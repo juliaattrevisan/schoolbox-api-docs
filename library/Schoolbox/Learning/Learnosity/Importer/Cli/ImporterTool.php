@@ -376,9 +376,9 @@ HELP;
                     /* Choose which construction style you want
                      */
                     if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                        $blueprint = $blueprintBuilder->buildClassically($legacyQuiz);
+                        $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
                     } else {
-                        $blueprint = $blueprintBuilder->buildFlattened($legacyQuiz);
+                        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
                     }
                 } catch (\DomainException $e) {
                     $this->getLogger()->warning($e->getMessage());

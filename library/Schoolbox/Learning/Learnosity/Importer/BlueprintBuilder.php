@@ -57,7 +57,7 @@ class BlueprintBuilder
      * @throws \DomainException
      * @throws \PDOException
      */
-    public function buildFlattened(array $legacyQuiz): array
+    public function buildFlattenSections(array $legacyQuiz): array
     {
         $payloadSequence = [];
 
@@ -291,7 +291,7 @@ class BlueprintBuilder
      * @return array|array[]
      * @throws \DomainException
      */
-    public function buildClassically(array $legacyQuiz): array
+    public function buildPreserveSections(array $legacyQuiz): array
     {
         $payloadSequence = [];
 
