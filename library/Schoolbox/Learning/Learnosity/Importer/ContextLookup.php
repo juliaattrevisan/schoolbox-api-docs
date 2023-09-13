@@ -111,16 +111,20 @@ class ContextLookup
      */
     public function find(int $assessmentId): array
     {
+        $row = $this->findRow($assessmentId);
+
         /* Try finding it in $this->lookup first; if it's not there
          * we need to fetch it
          */
+        $key = $this->encodeRow($row);
+
+        if (isset($this->lookup[$key])) {
+            return $this->lookup[$key];
+        }
 
         /* Otherwise,
          * Look up $assessmentId the row in mv_assessment_relation
-         */
-        $row = $this->findRow($assessmentId);
-
-        /* Interpret the columns
+         * Interpret the columns
          */
 
         /* If course_specification_id is set, find out its name and uuid
@@ -129,11 +133,15 @@ class ContextLookup
         if ('' !== $row['course_specification_id'] && '' !== $row['course_unit_specification_id']) {
             $courseSpec = $this->findCourseSpec((int)$row['course_specification_id']);
             $courseUnitSpec = $this->findCourseUnitSpec((int)$row['course_unit_specification_id']);
-        }
 
             /* Generate the set of tags and remember it in $this->lookup for
              * this particular combination of columns
              */
+            $tags = $this->tagFactory->produce($courseSpec['uuid'], $courseUnitSpec['uuid'], null);
+            $this->lookup[$key] = $tags;
+
+            return $this->lookup[$key];
+        }
 
         /* If course_implementation_id is set, find out its corresponding spec's name and uuid
          * If course_unit_implementation_id is set, find out its corresponding spec's name and uuid
@@ -169,6 +177,18 @@ class ContextLookup
         ]);
 
         return $this->mvRelationStatement->fetch(\PDO::FETCH_ASSOC);
+    }
+
+
+    /**
+     * Encodes the columns of $row into a string to use as a hash lookup
+     *
+     * @param array $row
+     * @return string
+     */
+    private function encodeRow(array $row): string
+    {
+        return implode(',', array_values($row));
     }
 
 
