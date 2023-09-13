@@ -1823,7 +1823,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Delete folder and children
      *
      * @param int $id
-     * @param \Schoolbox\User $deletor
+     * @param User $deletor
      * @throws SchoolboxException
      */
     public function deleteFolder($id, $deletor)
@@ -1874,11 +1874,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param int $source
      * @param int $destination
-     * @param \Schoolbox\User $mover
+     * @param User $mover
      * @throws SchoolboxException
      * @throws MapperException
      */
-    public function moveFolder($source, $destination, $mover)
+    public function moveFolder(int $source, int $destination, User $mover): void
     {
         $errorMapper = ErrorMapper::getInstance();
 
@@ -1948,7 +1948,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
         }
 
-        $folderMapper->save($movedFolder->setParent($parentFolder));
+        $folderMapper->save($movedFolder->setParent($parentFolder)->setUpdatedBy($this->getSessionUser()));
     }
 
 
