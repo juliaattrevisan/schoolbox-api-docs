@@ -200,7 +200,8 @@ class ActivityBuilder
                 'endpoint' => '/itembank/features',
                 'payload' => [
                     'features' => $batchFeaturePayload
-                ]
+                ],
+                'count' => \count($batchFeaturePayload)
             ];
         }
 
@@ -227,7 +228,8 @@ class ActivityBuilder
                     ]
                 ],
                 'questions' => $batchQuestionPayload
-            ]
+            ],
+            'count' => \count($batchQuestionPayload)
         ];
 
         /* Stack it
@@ -237,7 +239,8 @@ class ActivityBuilder
             'endpoint' => '/itembank/items',
             'payload' => [
                 'items' => $batchItemPayload
-            ]
+            ],
+            'count' => \count($batchItemPayload)
         ];
 
         /* Stack it
@@ -246,7 +249,11 @@ class ActivityBuilder
             'endpoint' => '/itembank/activities',
             'payload' => [
                 'activities' => [$activityStruct]
-            ]
+            ],
+            /* Always one quiz at a time for now
+             * (Might be more if you expand cli arg to allow multiple ids)
+             */
+            'count' => 1
         ];
 
         $this->logger->debug(sprintf(
@@ -259,7 +266,7 @@ class ActivityBuilder
 
         return [
             'activityLearnosityReference' => $activityStruct['reference'],
-            'payloadSequence' => $payloadSequence
+            'payloadSequence' => $payloadSequence,
         ];
     }
 
@@ -409,7 +416,8 @@ class ActivityBuilder
                 'endpoint' => '/itembank/features',
                 'payload' => [
                     'features' => $batchFeaturePayload
-                ]
+                ],
+                'count' => \count($batchFeaturePayload)
             ];
         }
 
@@ -436,7 +444,8 @@ class ActivityBuilder
                     ]
                 ],
                 'questions' => $batchQuestionPayload
-            ]
+            ],
+            'count' => \count($batchQuestionPayload)
         ];
 
         /* Stack it
@@ -445,7 +454,8 @@ class ActivityBuilder
             'endpoint' => '/itembank/items',
             'payload' => [
                 'items' => $batchItemPayload
-            ]
+            ],
+            'count' => \count($batchItemPayload)
         ];
 
         /* Stack it
@@ -454,7 +464,11 @@ class ActivityBuilder
             'endpoint' => '/itembank/activities',
             'payload' => [
                 'activities' => [$activityStruct]
-            ]
+            ],
+            /* Always one quiz at a time for now
+             * (Might be more if you expand cli arg to allow multiple ids)
+             */
+            'count' => 1
         ];
 
         $this->logger->debug(sprintf(
@@ -467,7 +481,7 @@ class ActivityBuilder
 
         return [
             'activityLearnosityReference' => $activityStruct['reference'],
-            'payloadSequence' => $payloadSequence
+            'payloadSequence' => $payloadSequence,
         ];
     }
 }

@@ -398,8 +398,9 @@ HELP;
                      */
                     foreach ($blueprint['payloadSequence'] as $data) {
                         $this->getLogger()->debug(sprintf(
-                            '%s: transmitting payload to learnosity...',
-                            $data['endpoint']
+                            '%s: transmitting payload (size: %s) to learnosity...',
+                            $data['endpoint'],
+                            $data['count']
                         ));
 
                         $api->dataSetRequest($data['endpoint'], $data['payload']);
