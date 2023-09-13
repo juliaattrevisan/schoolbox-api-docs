@@ -45,11 +45,230 @@ class ActivityBuilder
     /**
      * Build a payload "plan" for $legacyQuiz
      *
+     * This preserves legacy Section content which is interpreted as a
+     * Learnosity Feature, removing the spectre of Sections entirely
+     *
      * @param array $legacyQuiz
      * @return array|array[]
      * @throws \DomainException
      */
     public function build(array $legacyQuiz): array
+    {
+        $payloadSequence = [];
+
+        /* Produces Learnosity payloads
+         */
+        $payloadFactory = new PayloadFactory(new Strategy\Factory());
+
+        /* Set up a Learnosity Activity payload
+         * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+         */
+        $activityStruct = $payloadFactory->produce(
+            PayloadFactory::LEARNOSITY_PAYLOAD_ACTIVITY,
+            $legacyQuiz,
+            /* TODO Need the MapperProxy to decide its tag set, I suppose
+             */
+            $this->tagFactory->produce(null, null, null)
+        );
+
+        /* Set up a Learnosity Item which will be vaguely equivalent to a Section
+         * purely for the purposes of this importer
+         */
+        $batchItemPayload = [];
+
+        foreach ($legacyQuiz['_sections'] as $section) {
+            /* Optional Passage feature to emulate section descriptions
+             */
+            $feature = $payloadFactory->produce(
+                PayloadFactory::LEARNOSITY_PAYLOAD_SECTION_FEATURE,
+                $section,
+                /* TODO Need the MapperProxy to decide its tag set, I suppose
+                 */
+                $this->tagFactory->produce(null, null, null)
+            );
+
+            if (!empty($feature)) {
+                $payloadSequence[] = [
+                    'endpoint' => '/itembank/features',
+                    'payload' => [
+                        'features' => [$feature]
+                    ]
+                ];
+
+                $this->logger->debug(sprintf(
+                    'Built blueprint for feature "%s" (section_id: %s) with learnosity_reference %s',
+                    \TextFormatter::cutSentence($section['title'], 64),
+                    $section['section_id'],
+                    $feature['reference']
+                ));
+
+                /* Item payload needs to know this reference
+                 */
+                $itemStruct = $payloadFactory->produce(
+                    PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
+                    $section,
+                    /* TODO Need the MapperProxy to decide its tag set, I suppose
+                     */
+                    $this->tagFactory->produce(null, null, null)
+                );
+
+                $itemStruct['features'][] = $feature['reference'];
+
+                $itemStruct['definition']['widgets'][] = [
+                    'reference' => $feature['reference']
+                ];
+
+                /* Activity payload needs to know this reference
+                 */
+                $activityStruct['data']['items'][] = $itemStruct['reference'];
+
+                /* Stack it
+                 */
+                $batchItemPayload[] = $itemStruct;
+            }
+
+            /* To optimise further, maybe, we can collect all the QuestionStructs
+             * and pump them into one mega payload instead of lots of little ones to
+             * save on the transmission time (each api request to Learnosity took around
+             * ~2sec in a vagrant)
+             */
+            $batchQuestionPayload = [];
+
+            /* Accumulate all the questions we found in $section and
+             * pile them up here
+             */
+            foreach ($section['_questions'] as $question) {
+                /* FIXME temporary shim while constructing Strategies
+                 */
+                try {
+                    $questionStruct = $payloadFactory->produce(
+                        PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
+                        $question,
+                        null
+                    );
+                } catch (\DomainException $e) {
+                    $this->logger->warning($e->getMessage());
+                    continue;
+                }
+
+                /* Put this question into the set
+                 */
+                $this->logger->debug(sprintf(
+                    'Built blueprint for question "%s" (question_id: %s, type: %s) with learnosity_reference %s',
+                    \TextFormatter::cutSentence($question['question'], 64),
+                    $question['question_id'],
+                    $question['type_id'],
+                    $questionStruct['reference']
+                ));
+
+                $batchQuestionPayload[] = $questionStruct;
+
+                /* Item payload needs to know this reference
+                 */
+                $itemStruct = $payloadFactory->produce(
+                    PayloadFactory::LEARNOSITY_PAYLOAD_ITEM,
+                    $section,
+                    /* TODO Need the MapperProxy to decide its tag set, I suppose
+                     */
+                    $this->tagFactory->produce(null, null, null)
+                );
+
+                $itemStruct['definition']['widgets'][] = [
+                    'reference' => $questionStruct['reference']
+                ];
+
+                $itemStruct['questions'][] = [
+                    'reference' => $questionStruct['reference']
+                ];
+
+                /* Activity payload needs to know this reference
+                 */
+                $activityStruct['data']['items'][] = $itemStruct['reference'];
+
+                /* Put this item into the set
+                 */
+                $this->logger->debug(sprintf(
+                    'Built blueprint for item "%s" (section_id: %s) with learnosity_reference %s',
+                    $section['title'],
+                    $section['section_id'],
+                    $itemStruct['reference']
+                ));
+
+                $batchItemPayload[] = $itemStruct;
+            }
+
+            /* Stack it
+             * Send all the questions together
+             */
+            $payloadSequence[] = [
+                'endpoint' => '/itembank/questions',
+                'payload' => [
+                    'meta' => [
+                        'user' => [
+                            /* This author identifier should be a (schoolcode, user id) tuple for
+                             * auditing reasons, to deconflict with other schools who used the same
+                             * user id. It's mandatory as part of Question creation. We can assign
+                             * it here in the blueprint, or in the actual api payload itself while
+                             * performing. This is because user 123 in one school means a whole
+                             * different dude in another school.
+                             */
+                            'id' => sprintf(
+                                '%s__%s',
+                                $this->schoolCode,
+                                $legacyQuiz['user_id']
+                            )
+                        ]
+                    ],
+                    'questions' => $batchQuestionPayload
+                ]
+            ];
+
+            /* Stack it
+             * Send all the items together
+             */
+            $payloadSequence[] = [
+                'endpoint' => '/itembank/items',
+                'payload' => [
+                    'items' => $batchItemPayload
+                ]
+            ];
+
+            /* Stack it
+             */
+            $payloadSequence[] = [
+                'endpoint' => '/itembank/activities',
+                'payload' => [
+                    'activities' => [$activityStruct]
+                ]
+            ];
+
+            $this->logger->debug(sprintf(
+                'Built blueprint for quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
+                $legacyQuiz['title'],
+                $legacyQuiz['assessment_id'],
+                $legacyQuiz['assess_id'],
+                $activityStruct['reference']
+            ));
+        }
+
+        return [
+            'activityLearnosityReference' => $activityStruct['reference'],
+            'payloadSequence' => $payloadSequence
+        ];
+    }
+
+
+    /**
+     * Build a payload "plan" for $legacyQuiz
+     *
+     * This maintains our legacy idea of "sections" which are interpreted
+     * as analogous to Learnosity Items
+     *
+     * @param array $legacyQuiz
+     * @return array|array[]
+     * @throws \DomainException
+     */
+    public function buildClassically(array $legacyQuiz): array
     {
         $payloadSequence = [];
 
