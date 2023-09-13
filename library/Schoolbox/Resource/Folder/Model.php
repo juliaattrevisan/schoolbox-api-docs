@@ -125,69 +125,69 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * @var ?User
      */
-    private ?User $creator = null;
+    private ?User $createdBy = null;
 
     /**
      * @var ?User
      */
-    private ?User $updater = null;
+    private ?User $updatedBy = null;
 
     /**
      * @var ?User
      */
-    private ?User $deleter = null;
+    private ?User $deletedBy = null;
 
     /**
      * @return ?User
      */
-    public function getCreator(): ?User
+    public function getCreatedBy(): ?User
     {
-        return $this->creator;
+        return $this->createdBy;
     }
 
     /**
      * @param User $creator
      * @return static
      */
-    public function setCreator(User $creator): self
+    public function setCreatedBy(User $creator): self
     {
-        $this->creator = $creator;
+        $this->createdBy = $creator;
         return $this;
     }
 
     /**
      * @return ?User
      */
-    public function getUpdater(): ?User
+    public function getUpdatedBy(): ?User
     {
-        return $this->updater;
+        return $this->updatedBy;
     }
 
     /**
      * @param User $updater
      * @return static
      */
-    public function setUpdater(User $updater): self
+    public function setUpdatedBy(User $updater): self
     {
-        $this->updater = $updater;
+        $this->updatedBy = $updater;
         return $this;
     }
 
     /**
      * @return ?User
      */
-    public function getDeleter(): ?User
+    public function getDeletedBy(): ?User
     {
-        return $this->deleter;
+        return $this->deletedBy;
     }
 
     /**
      * @param User $deleter
      * @return static
      */
-    public function setDeleter(User $deleter): self
+    public function setDeletedBy(User $deleter): self
     {
-        $this->updater = $deleter;
+        $this->deletedBy = $deleter;
         return $this;
     }
 
