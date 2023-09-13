@@ -156,9 +156,12 @@ class Controller extends Base
         ];
 
         // Sort top-level filters.
+        // Note that sorting is necessary here because we cannot hard-code the order given that we are using
+        // the $rosettaStone to translate hard-coded filter names into localised names.
         usort($filters, [$this, 'compareFilterArraysForSortingPurposes']);
 
         // Sort second-level filters (subTypes).
+        // Sorting is necessary for the reason given above.
         foreach ($filters as &$filter) {
             if (array_key_exists('subTypes', $filter)) {
                 usort($filter['subTypes'], [$this, 'compareFilterArraysForSortingPurposes']);
