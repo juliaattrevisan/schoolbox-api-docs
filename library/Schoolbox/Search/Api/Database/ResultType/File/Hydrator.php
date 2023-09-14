@@ -95,7 +95,7 @@ class Hydrator extends BaseHydrator
                         $file->getFolder(),
                         null,
                         // Image? show thumbnail, otherwise show mimetype thumb
-                        $this->prefixGenerator->generate() .'/images/mime/'. $file->getMimetype()->getIconFile(),
+                        $this->prefixGenerator->generate() . '/images/mime/' . $file->getMimetype()->getIconFile(),
                         'file',
                         $file->getDescription(),
                         // Should this be modified by instead?
