@@ -94,6 +94,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
+    <h3 v-if="isInstructor || store.linkedActivities.length > 0" class="subheader">Activities</h3>
     <section v-if="store.linkedActivities.length > 0">
         <ul class="information-list">
             <li
@@ -115,7 +116,7 @@ window.Vue.onMounted(() => {
             </section>
         </div>
     </section>
-    <div v-if="store.linkedActivities.length == 0" class="empty-state">
+    <div v-else-if="isInstructor" class="empty-state">
         <i class="icon-link"></i>
         <p>
             There are currently no activities linked to this lesson. You may
@@ -125,6 +126,7 @@ window.Vue.onMounted(() => {
     </div>
 
     <sequential-reveal-modal
+        v-if="isInstructor"
         size="medium"
         :is-open="store.isOpen"
         :is-next-selected="store.isNextSelected"
@@ -138,6 +140,7 @@ window.Vue.onMounted(() => {
     >
         <template #sequence-1>
             <section>
+                <h1>Link Activities</h1>
                 <ul class="information-list expandable-card">
                     <li
                         v-for="unit in sortedUnitsByDate"
@@ -209,6 +212,7 @@ window.Vue.onMounted(() => {
     </sequential-reveal-modal>
 
     <sequential-reveal-modal
+        v-if="isInstructor"
         size="medium"
         :is-open="store.isSingleUnlinkOpen"
         @closed="store.isSingleUnlinkOpen = false"
