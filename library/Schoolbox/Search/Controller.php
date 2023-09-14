@@ -91,7 +91,7 @@ class Controller extends Base
         }
 
         if ($configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)) {
-            $filters[] = ["title" => "Badges", "value" => "badges"];
+            $filters[] = ["title" => "Badges", "value" => "badge"];
         }
 
         $filters[] = [
