@@ -109,11 +109,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $this->uses('inherit', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('created_by', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('updated_by', self::TYPE_INTEGER);
 
-        $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
 
         $this->uses('colour', self::TYPE_COLOR);

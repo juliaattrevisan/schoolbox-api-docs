@@ -360,7 +360,7 @@ class Controller extends BaseController
             ->setCodes(new GenericCollection(Code\Model::class))
             ->setYearLevels(new GenericCollection(YearLevel\Model::class))
             ->setCurriculumNodes(new GenericCollection(Curriculum\Node\Model::class))
-            ->setCreatedBy($this->getUser());
+            ->setCreatedBy($this->getUser()->getId());
 
         try {
             $this->postUpdateFolder($newFolder);

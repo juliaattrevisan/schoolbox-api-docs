@@ -12,7 +12,7 @@ trait UpdatedBy
     /**
      * @var int|null
      */
-    protected $updatedBy;
+    protected ?int $updatedBy;
 
     /**
      * @return int|null
