@@ -770,7 +770,8 @@ class Controller extends Base
 
         /* Get the new result back from learnosity
          *
-         * FIXME This occurs too quickly. We refetch the session score before
+         * FIXME Add Polling Mechanism
+         *  This occurs too quickly. We refetch the session score before
          *  Learnosity had a chance to finish updating it, so we always get
          *  the old value back.
          *
