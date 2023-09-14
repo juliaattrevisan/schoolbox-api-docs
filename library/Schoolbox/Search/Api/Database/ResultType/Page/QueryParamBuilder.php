@@ -91,12 +91,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * course: pages with a related course specification
      * * unit: pages with a related unit specification
      * * class: pages with a class code
+     * * group: pages with a user group
      * * homepage: pages with no class code, but a homepage
-     * * other: pages without a homepage
+     * * folder: pages without a homepage
      */
     protected function buildTypeExpression(): string
     {
-        // NVL2: if param 1 is not null returns param 2, otherwise param 3
+        // NVL2: if param 1 is not null returns param 2, otherwise param 3 (https://mariadb.com/kb/en/nvl2/)
         return "CONCAT(
             'page.',
             NVL2(
@@ -108,7 +109,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     NVL2(
                         fc.code,
                         'class',
-                        NVL2(hc.template, 'homepage', 'other')
+                        NVL2(
+                            ug.cid,
+                            'group',
+                            NVL2(hc.template, 'homepage', 'folder')
+                        )
                     )
                 )
             )
@@ -124,11 +129,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * Page results do not currently have dates: thus this will be null.
+     * A page's date is its updated_at date.
+     *
+     * @return string|null
      */
     protected function buildDateExpression(): ?string
     {
-        return null;
+        return 'f.updated_at';
     }
 
     /**
@@ -164,6 +171,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
             LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
             LEFT JOIN homepage_config hc ON f.id = hc.cid
+            LEFT JOIN userGroups ug ON f.id = ug.cid
         ";
     }
 }

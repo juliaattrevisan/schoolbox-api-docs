@@ -55,11 +55,19 @@ class Controller extends Base
     {
         // The hard-coded filters list returned by this function originated in https://schoolbox.atlassian.net/browse/SA-7782.
 
-        $filters = [];
-
-        $loggedInUserRole = $this->getUser()->getRole();
-        $configLoader = $this->getConfigLoader();
         $rosettaStone = self::$rosettaStone;
+
+        $filters = [
+            ["title" => $rosettaStone->translate("news", false, true), "value" => "news"],
+            ["title" => "Blogs", "value" => "blog"],
+            ["title" => "Events", "value" => "event"],
+            ["title" => "Forums", "value" => "forum"],
+            ["title" => "Links", "value" => "link"],
+            ["title" => "Textboxes", "value" => "textbox"],
+            ["title" => "Tiles", "value" => "tile"],
+        ];
+
+        $configLoader = $this->getConfigLoader();
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $subTypes = [
@@ -83,7 +91,7 @@ class Controller extends Base
         }
 
         if ($configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)) {
-            $filters[] = ["title" => "Badges", "value" => "badges"];
+            $filters[] = ["title" => "Badges", "value" => "badge"];
         }
 
         $filters[] = [
@@ -99,15 +107,15 @@ class Controller extends Base
         ];
 
         $pagesFoldersSubTypes = [
-            ["title" => "Current " . $rosettaStone->translate("class", false, true), "value" => "page.class"],
-            ["title" => "Folder"  , "value" => "page.folder"  ],
-            ["title" => "Group"   , "value" => "page.group"   ],
-            ["title" => "Homepage", "value" => "page.homepage"],
+            ["title" => "Current " . $rosettaStone->translate("class", true, true), "value" => "page.class"],
+            ["title" => "Folders"  , "value" => "page.folder"  ],
+            ["title" => "Groups"   , "value" => "page.group"   ],
+            ["title" => "Homepages", "value" => "page.homepage"],
         ];
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $pagesFoldersSubTypes[] = ["title" => "Course", "value" => "page.course"];
-            $pagesFoldersSubTypes[] = ["title" => $rosettaStone->translate("unit", false, true), "value" => "page.unit"];
+            $pagesFoldersSubTypes[] = ["title" => "Courses", "value" => "page.course"];
+            $pagesFoldersSubTypes[] = ["title" => $rosettaStone->translate("unit", true, true), "value" => "page.unit"];
         }
 
         $filters[] = [
@@ -116,25 +124,30 @@ class Controller extends Base
             "subTypes" => $pagesFoldersSubTypes
         ];
 
-        $userSubTypes = [];
+        $userSubTypes = [
+            ["title" => "Staff", "value" => "user.staff"],
+            ["title" => "Guest", "value" => "user.guest"]
+        ];
 
-        if ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) {
-            if ($configLoader->get('student_search_enable')) {
-                $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
-            }
+        $loggedInUserRole = $this->getUser()->getRole();
 
-            if ($configLoader->get('parent_search_enable')) {
-                $userSubTypes[] = ["title" => "Parent", "value" => "user.parent"];
-            }
-        } else {
-            if ($loggedInUserRole->isStaff()) {
-                $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
-                $userSubTypes[] = ["title" => "Parent", "value" => "user.parent"];
-            }
+        if (
+            $loggedInUserRole->isStaff() || (
+                ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) &&
+                $configLoader->get('student_search_enable')
+            )
+        ) {
+            $userSubTypes[] = ["title" => "Student", "value" => "user.student"];
         }
 
-        $userSubTypes[] = ["title" => "Staff", "value" => "user.staff"];
-        $userSubTypes[] = ["title" => "Guest", "value" => "user.guest"];
+        if (
+            $loggedInUserRole->isStaff() || (
+                ($loggedInUserRole->isStudent() || $loggedInUserRole->isParent()) &&
+                $configLoader->get('parent_search_enable')
+            )
+        ) {
+            $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
+        }
 
         $filters[] = [
             "title" => "Users",
@@ -142,13 +155,29 @@ class Controller extends Base
             "subTypes" => $userSubTypes
         ];
 
-        $filters[] = ["title" => $rosettaStone->translate("news", false, true), "value" => "news"];
-        $filters[] = ["title" => "Events", "value" => "events"];
-        $filters[] = ["title" => "Forums", "value" => "forum"];
-        $filters[] = ["title" => "Links", "value" => "link"];
-        $filters[] = ["title" => "Textboxes", "value" => "textbox"];
-        $filters[] = ["title" => "Tiles", "value" => "tile"];
+        // Sort top-level filters.
+        // Note that sorting is necessary here because we cannot hard-code the order given that we are using
+        // the $rosettaStone to translate hard-coded filter names into localised names.
+        usort($filters, [$this, 'compareFilterArraysForSortingPurposes']);
+
+        // Sort second-level filters (subTypes).
+        // Sorting is necessary for the reason given above.
+        foreach ($filters as &$filter) {
+            if (array_key_exists('subTypes', $filter)) {
+                usort($filter['subTypes'], [$this, 'compareFilterArraysForSortingPurposes']);
+            }
+        }
 
         return $filters;
+    }
+
+    /**
+     * @param $filterA
+     * @param $filterB
+     * @return int
+     */
+    public static function compareFilterArraysForSortingPurposes($filterA, $filterB): int
+    {
+        return strnatcmp($filterA["title"], $filterB["title"]);
     }
 }

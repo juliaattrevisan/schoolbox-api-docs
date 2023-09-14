@@ -36,6 +36,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $datePart      = $this->buildDateExpression();
         $creatorPart   = $this->buildCreatorExpression();
         $folderPart    = $this->buildFolderExpression();
+        $havingParts   = [];
 
         // Apply filter
         if ($filter->types) {
@@ -46,9 +47,20 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 }
             );
             if (!empty($subTypes)) {
-                $bindings     = Builder::getBindings($subTypes, $this->getType());
-                $whereParts[] = "$typePart IN ({$bindings->getPlaceholder()})";
-                $params       = array_merge($params, $bindings->getParams());
+                $bindings = Builder::getBindings($subTypes, $this->getType());
+
+                // Why introduce a HAVING clause?
+                // ------------------------------
+                // Variable `type` is the result of an expression, and so will not be available in the WHERE clause.
+                // It will be available in the HAVING clause however, so let's put it there instead.
+                // (Note `type` comes from the SELECT clause, defined in this function below).
+                // We ought to be able to use the expression itself in the WHERE clause, like this:
+                //    Example: $whereParts = "$typePart IN ({$bindings->getPlaceholder()})";
+                // But that does not produce expected results for unknown reasons.  So we introduce a HAVING clause.
+                // @see https://github.com/alaress/schoolbox/pull/28994
+                $havingParts[] = "`type` IN ({$bindings->getPlaceholder()})";
+
+                $params = array_merge($params, $bindings->getParams());
             } elseif (!in_array($this->getType(), $filter->types)) {
                 // there are no relevant types in this filter
                 return null;
@@ -107,18 +119,18 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             $params['cursorId']        = $cursor->id;
         }
 
-        $where = implode(' AND ', $whereParts);
-
         // Build query and params
         $from = $this->buildFromStatement();
-        $query = "
-            SELECT DISTINCT
+        $query = (
+            "SELECT DISTINCT
                 $idPart        AS id,
                 $titlePart     AS title,
                 $typePart      AS type,
                 $relevancePart AS relevance
-            $from
-            WHERE $where";
+            $from" .
+            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') .
+            ((count($havingParts) > 0) ? "\nHAVING " . implode(' AND ', $havingParts) : '')
+        );
 
         // Build order parts
         $orderParts = [];
@@ -126,7 +138,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             $orderParts[] = "$relevancePart DESC";
         }
         $orderParts[] = "$titlePart ASC";
-        $orderParts[] = "$typePart ASC";
+        $orderParts[] = "`type` ASC";
         $orderParts[] = "$idPart ASC";
         $query .= ' ORDER BY ' . implode(', ', $orderParts);
         $query .= ' LIMIT :limit';

@@ -20,7 +20,11 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\CreatedBy;
+use Schoolbox\Mapper\Traits\Model\DeletedBy;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
@@ -51,6 +55,12 @@ use function preg_match;
  */
 class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel
 {
+    use CreatedAtDate;
+    use CreatedBy;
+    use UpdatedAtDate;
+    use UpdatedBy;
+    use DeletedBy; // Note that DeletedAtDate is used in the base class.
+
     use Node\Traits\HasCurriculumNodes;
     use CreateCollection;
 

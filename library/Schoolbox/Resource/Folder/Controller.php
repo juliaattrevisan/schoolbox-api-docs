@@ -359,8 +359,14 @@ class Controller extends BaseController
             ->setParent($parent)
             ->setCodes(new GenericCollection(Code\Model::class))
             ->setYearLevels(new GenericCollection(YearLevel\Model::class))
-            ->setCurriculumNodes(new GenericCollection(Curriculum\Node\Model::class));
-        $this->postUpdateFolder($newFolder);
+            ->setCurriculumNodes(new GenericCollection(Curriculum\Node\Model::class))
+            ->setCreatedBy($this->getUser()->getId());
+
+        try {
+            $this->postUpdateFolder($newFolder);
+        } catch (Router\Exception\RouteNotFound | MapperException $e) {
+            throw new SchoolboxException("Folder is unable to be updated", 0, $e);
+        }
     }
 
 
@@ -537,6 +543,8 @@ class Controller extends BaseController
 
         // update role permission
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
+
+        $folder->setUpdatedBy($user->getId());
 
         // Save folder (also persists class-codes + year-level joins)
         $this->folderMapper->save($folder);

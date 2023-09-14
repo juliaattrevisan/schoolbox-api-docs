@@ -12,7 +12,6 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use Alaress;
 use Alaress\Redis;
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
@@ -108,7 +107,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasTable('folder');
 
         $this->uses('inherit', self::TYPE_BOOLEAN);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('created_by', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses('deleted_by', self::TYPE_INTEGER);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('updated_by', self::TYPE_INTEGER);
+
         $this->uses('colour', self::TYPE_COLOR);
 
         // Joins:
@@ -219,6 +224,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteUnitSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
     }
 
 
@@ -233,7 +239,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *                                  course folder, or within a unit
      * @throws Exception                if the folder has a parent, but it
      *                                  doesn't exist
-     *
      */
     public function validateCourse(Model $folder, ?Model $previous = null): void
     {
@@ -1816,7 +1821,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Delete folder and children
      *
      * @param int $id
-     * @param \Schoolbox\User $deletor
+     * @param User $deletor
      * @throws SchoolboxException
      */
     public function deleteFolder($id, $deletor)
@@ -1867,11 +1872,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param int $source
      * @param int $destination
-     * @param \Schoolbox\User $mover
+     * @param User $mover
      * @throws SchoolboxException
      * @throws MapperException
      */
-    public function moveFolder($source, $destination, $mover)
+    public function moveFolder(int $source, int $destination, User $mover): void
     {
         $errorMapper = ErrorMapper::getInstance();
 
@@ -1941,7 +1946,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
         }
 
-        $folderMapper->save($movedFolder->setParent($parentFolder));
+        $folderMapper->save($movedFolder->setParent($parentFolder)->setUpdatedBy($this->getSessionUser()->getId()));
     }
 
 
@@ -2426,5 +2431,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $folderCodesWithCampusCode,
             $folderCodesWithCampusCodeUntrimmed
         );
+    }
+
+    /**
+     * @param Model $folder
+     * @return void
+     * @throws Exception
+     */
+    protected function softDeleteFields(Model $folder): void
+    {
+        /* Remember who deleted this thing, in a dirty doubletap
+         */
+        $folder->setDeletedBy($this->getSessionUser()->getId());
+        $this->save($folder);
     }
 }
