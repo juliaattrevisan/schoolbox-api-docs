@@ -28,7 +28,6 @@ export enum ResultTypes {
     PAGE_UNIT = "page.unit",
     PAGE_FOLDER = "page.folder",
     PAGE_GROUP = "page.group",
-    PAGE_OTHER = "page.other",
     TEXTBOX = "textbox",
     TILE = "tile",
     USER = "user",

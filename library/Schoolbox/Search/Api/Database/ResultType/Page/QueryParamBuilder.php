@@ -92,7 +92,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * unit: pages with a related unit specification
      * * class: pages with a class code
      * * homepage: pages with no class code, but a homepage
-     * * other: pages without a homepage
+     * * folder: pages without a homepage
      */
     protected function buildTypeExpression(): string
     {
@@ -108,7 +108,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     NVL2(
                         fc.code,
                         'class',
-                        NVL2(hc.template, 'homepage', 'other')
+                        NVL2(hc.template, 'homepage', 'folder')
                     )
                 )
             )
