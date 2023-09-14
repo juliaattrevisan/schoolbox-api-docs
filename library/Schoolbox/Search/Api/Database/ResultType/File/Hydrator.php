@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\File;
 
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File;
@@ -36,6 +37,7 @@ class Hydrator extends BaseHydrator
     public function __construct(
         private File\Mapper $fileMapper,
         private Access $access,
+        private PrefixGenerator $prefixGenerator
     ) {
     }
 
@@ -93,7 +95,7 @@ class Hydrator extends BaseHydrator
                         $file->getFolder(),
                         null,
                         // Image? show thumbnail, otherwise show mimetype thumb
-                        null,
+                        $this->prefixGenerator->generate() .'/images/mime/'. $file->getMimetype()->getIconFile(),
                         'file',
                         $file->getDescription(),
                         // Should this be modified by instead?
