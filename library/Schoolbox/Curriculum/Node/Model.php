@@ -24,6 +24,7 @@ class Model implements ISoftDeletable, JsonSerializable
     use Traits\Model\Id;
     use Traits\Model\CreatedAtDate;
     use Traits\Model\DeletedAtDate;
+    use Traits\Model\Uuid;
 
     /**
      * This node's parent (if there is one)
@@ -294,6 +295,7 @@ class Model implements ISoftDeletable, JsonSerializable
             'reference'   => $this->getReference(),
             'children'    => $this->getChildren(),
             'breadcrumb'  => $this->buildBreadcrumb(' > '),
+            'uuid'        => $this->getUuid(),
         ];
     }
 }
