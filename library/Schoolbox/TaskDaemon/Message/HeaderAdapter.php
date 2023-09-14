@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\TaskDaemon\Message;
 
+use Enqueue\Redis\RedisMessage;
 use Interop\Queue\Message;
 
 /**
@@ -21,26 +22,6 @@ use Interop\Queue\Message;
  */
 class HeaderAdapter
 {
-    /**
-     * Custom message header: dictates the number of seconds in the future which
-     * this message is to be processed.
-     *
-     * If both this and `HEADER_PROCESS_AT` are set: `HEADER_PROCESS_AT` takes
-     * precedence.
-     */
-    public const HEADER_DELAY = 'x-taskd-delay';
-
-    /**
-     * Custom message header: dictates the timestamp at which this message
-     * should be processed.
-     *
-     * If this is in the future: delay processing until this time is reached,
-     * otherwise process immediately.
-     *
-     * If both this and `HEADER_DELAY` are set: this header takes precedence.
-     */
-    public const HEADER_PROCESS_AT = 'x-taskd-process-at';
-
     /**
      * Custom message header: dictates how many attempts have been made to send
      * this message.
@@ -57,19 +38,9 @@ class HeaderAdapter
     public const HEADER_MAX_ATTEMPTS = 'x-taskd-max-attempts';
 
     /**
-     * Extract the value of the delay header out of the message.
-     *
-     * @param Message $message
-     * @return float|null The number of seconds to delay the processing of the
-     *                    message, or null if no delay header exists.
-     */
-    public function getDelay(Message $message): ?float
-    {
-        return filter_var($message->getHeader(self::HEADER_DELAY), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-    }
-
-    /**
      * Set the value of the delay header in the message.
+     *
+     * Currently only supported in Redis queues.
      *
      * @param Message    $message
      * @param float|null $delay   The number of seconds to delay the message, or
@@ -77,31 +48,9 @@ class HeaderAdapter
      */
     public function setDelay(Message $message, ?float $delay): void
     {
-        $message->setHeader(self::HEADER_DELAY, $delay);
-    }
-
-    /**
-     * Extract the value of the process-at header out of the message.
-     *
-     * @param Message $message
-     * @return float|null The timestamp at which to process the message, or null
-     *                    if no such header exists.
-     */
-    public function getProcessAt(Message $message): ?float
-    {
-        return filter_var($message->getHeader(self::HEADER_PROCESS_AT), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-    }
-
-    /**
-     * Set the value of the process-at header in the message.
-     *
-     * @param Message    $message
-     * @param float|null $processAt The timestamp at which to process the
-     *                              message, or null if processing immediately.
-     */
-    public function setProcessAt(Message $message, ?float $processAt): void
-    {
-        $message->setHeader(self::HEADER_PROCESS_AT, $processAt);
+        if ($message instanceof RedisMessage) {
+            $message->setDeliveryDelay(isset($delay) ? (int)($delay * 1000) : null);
+        }
     }
 
     /**

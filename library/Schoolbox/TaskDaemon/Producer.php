@@ -43,12 +43,10 @@ class Producer
     /**
      * Send the message to the task daemon.
      *
-     * @param Message                  $message     The message to send
-     * @param Alaress_Date_Format|null $processAt   If set: send at this time
-     * @param float|null               $delay       If set: delay send by this
-     *                                              many seconds
-     * @param int|null                 $maxAttempts If set: override the max
-     *                                              attempts by this amount
+     * @param Message    $message     The message to send
+     * @param float|null $delay       If set: delay send by this many seconds
+     * @param int|null   $maxAttempts If set: override the max attempts by this
+     *                                amount
      * @return void
      * @throws Exception                   if the context's provider fails to
      *                                     send the message due to some internal
@@ -59,14 +57,10 @@ class Producer
      */
     public function send(
         Message $message,
-        ?Alaress_Date_Format $processAt = null,
         ?float $delay = null,
         ?int $maxAttempts = null,
     ): void {
         $enqueueMessage = $this->context->createMessage($this->messageSerializer->serialize($message));
-        if (isset($processAt)) {
-            $this->headerAdapter->setProcessAt($enqueueMessage, $processAt->getUnixTimeStamp());
-        }
         if (isset($delay)) {
             $this->headerAdapter->setDelay($enqueueMessage, $delay);
         }
