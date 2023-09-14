@@ -351,7 +351,7 @@ HELP;
                 /* Announce what we're doing
                  */
                 $this->getLogger()->info(sprintf(
-                    'Processing "%s" (assessment_id: %s, assess_id: %s)',
+                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
                     $legacyQuiz['title'],
                     $legacyQuiz['assessment_id'],
                     $legacyQuiz['assess_id']
@@ -399,7 +399,7 @@ HELP;
                 /* Actually do it
                  */
                 if ($this->perform()) {
-                    $this->getLogger()->info('Importing into Learnosity. This might take a while.');
+                    $this->getLogger()->debug('Importing into Learnosity. This might take a while.');
 
                     $start = microtime(true);
 
@@ -447,7 +447,7 @@ HELP;
                     $timing[] = $end - $start;
                 }
 
-                $this->getLogger()->info('Finished.');
+                $this->getLogger()->info('Done.');
                 $this->getLogger()->info('');
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
