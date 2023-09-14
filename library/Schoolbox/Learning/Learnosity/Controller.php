@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
@@ -803,6 +804,7 @@ class Controller extends Base
      * @throws Exception
      * @throws RouteNotFound
      * @throws ValidationException
+     * @throws InvalidColumnException
      * @throws \JsonException
      * @throws \RuntimeException
      */
