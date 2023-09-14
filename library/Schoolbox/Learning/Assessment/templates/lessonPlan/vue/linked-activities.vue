@@ -104,7 +104,6 @@ window.Vue.onMounted(() => {
             >
                 <linked-activities-item
                     :activity="activity"
-                    :course-assessments="props.courseAssessments"
                     :is-instructor="isInstructor"
                     :return-url="returnUrl"
                 ></linked-activities-item>

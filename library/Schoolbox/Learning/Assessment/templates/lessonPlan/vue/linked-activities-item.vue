@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
-import { CourseAssessments, Activity } from "./linkedActivitiesTypes";
+import { Activity } from "./linkedActivitiesTypes";
 
 interface Props {
     activity: Activity;
-    courseAssessments: CourseAssessments;
     isInstructor: boolean;
     returnUrl: string;
 }
@@ -15,24 +14,13 @@ const props = defineProps<Props>();
 const store = useLinkedActivitiesStore();
 
 /**
- * Get the title of the course that the activity belongs to
- * Will also include the project title if the activity is part of a project
- * @param { Activity } activity The activity to get the course title for
- * @returns { string } Course title with project title if applicable
+ * Get the name of the unit that the activity belongs to
+ * Will also include the project name if the activity is part of a project
+ * @param { Activity } activity The activity to get the meta for
+ * @returns { string } Unit name with project name if applicable
  */
-function getActivityCourseTitle(activity: Activity): string {
-    const selectedUnit = props.courseAssessments.units.find((unit) =>
-        unit.assessments.some(
-            (assessment) =>
-                assessment.id === activity.id || (assessment.assessments && assessment.assessments[activity.id])
-        )
-    );
-
-    const selectedProject =
-        selectedUnit &&
-        selectedUnit.assessments.find((assessment) => assessment.assessments && assessment.assessments[activity.id]);
-
-    return (selectedUnit ? selectedUnit.title : "") + (selectedProject ? ` | ${selectedProject.title}` : "");
+function getActivityMeta(activity: Activity): string {
+    return activity.unit + (activity.projectName ? ` | ${activity.projectName}` : "");
 }
 
 /**
@@ -58,7 +46,7 @@ function handleUnlinkClick() {
             <span v-else class="title">{{ activity.title }}</span>
         </h3>
         <p class="meta">
-            {{ getActivityCourseTitle(activity) }}
+            {{ getActivityMeta(activity) }}
         </p>
         <p class="meta">Due {{ activity.closeAtFormatted }}</p>
     </div>
