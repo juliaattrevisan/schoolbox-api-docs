@@ -22,6 +22,7 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
+use Schoolbox\Mapper\Traits\Model\DeletedBy;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 use Schoolbox\Resource;
@@ -51,14 +52,15 @@ use function preg_match;
  *
  * @package Schoolbox\Resource\Folder
  * @method null|Model getParent()
+ * @method null|int setDeletedBy()
  */
 class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel
 {
-    // Note that DeletedAtDate is used in the base class.
     use CreatedAtDate;
     use CreatedBy;
     use UpdatedAtDate;
     use UpdatedBy;
+    use DeletedBy; // Note that DeletedAtDate is used in the base class.
 
     use Node\Traits\HasCurriculumNodes;
     use CreateCollection;
@@ -128,29 +130,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @var GenericCollection<IAssessable>
      */
     private $assessables;
-
-    /**
-     * @var ?User
-     */
-    private ?User $deletedBy = null;
-
-    /**
-     * @return ?User
-     */
-    public function getDeletedBy(): ?User
-    {
-        return $this->deletedBy;
-    }
-
-    /**
-     * @param User $deleter
-     * @return static
-     */
-    public function setDeletedBy(User $deleter): self
-    {
-        $this->deletedBy = $deleter;
-        return $this;
-    }
 
     /**
      * Does this category have a homepage?

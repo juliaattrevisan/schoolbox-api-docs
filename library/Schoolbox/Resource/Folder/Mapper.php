@@ -18,7 +18,6 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use PDO;
 use PDOException;
@@ -111,10 +110,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('created_by', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses('deleted_by', self::TYPE_INTEGER);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('updated_by', self::TYPE_INTEGER);
-
-        $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
 
         $this->uses('colour', self::TYPE_COLOR);
 
@@ -2444,7 +2442,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         /* Remember who deleted this thing, in a dirty doubletap
          */
-        $folder->setDeletedBy($this->getSessionUser());
+        $folder->setDeletedBy($this->getSessionUser()->getId());
         $this->save($folder);
     }
 }
