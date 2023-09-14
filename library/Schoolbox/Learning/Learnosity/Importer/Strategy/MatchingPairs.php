@@ -52,12 +52,13 @@ class MatchingPairs implements IStrategy
 
         /* Randomise whatever this was
          */
-        shuffle($correctAnswers);
+        $possibleAnswers = $correctAnswers;
+        shuffle($possibleAnswers);
 
         return [
             'instant_feedback' => false,
             'max_length' => 250,
-            'possible_responses' => $correctAnswers,
+            'possible_responses' => $possibleAnswers,
             'stimulus' => $question['question'],
             'stimulus_list' => $stimulusList,
             'type' => $this->getLearnosityEquivalent(),
