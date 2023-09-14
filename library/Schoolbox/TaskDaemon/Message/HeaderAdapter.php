@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\TaskDaemon\Message;
 
-use Enqueue\Redis\RedisMessage;
 use Interop\Queue\Message;
 
 /**
@@ -25,14 +24,37 @@ class HeaderAdapter
     /**
      * Custom message header: dictates the number of seconds in the future which
      * this message is to be processed.
+     *
+     * If both this and `HEADER_PROCESS_AT` are set: `HEADER_PROCESS_AT` takes
+     * precedence.
      */
-    public const HEADER_DELAY = 'delay';
+    public const HEADER_DELAY = 'x-taskd-delay';
+
+    /**
+     * Custom message header: dictates the timestamp at which this message
+     * should be processed.
+     *
+     * If this is in the future: delay processing until this time is reached,
+     * otherwise process immediately.
+     *
+     * If both this and `HEADER_DELAY` are set: this header takes precedence.
+     */
+    public const HEADER_PROCESS_AT = 'x-taskd-process-at';
+
+    /**
+     * Custom message header: dictates how many attempts have been made to send
+     * this message.
+     *
+     * The Redis message variant supports attempts natively via a custom header,
+     * but this header is removed upon rejecting and re-queueing the message.
+     */
+    public const HEADER_ATTEMPTS = 'x-taskd-attempts';
 
     /**
      * Custom message header: overrides the maximum number of attempts which may
      * be made to process a message.
      */
-    public const HEADER_MAX_ATTEMPTS = 'max-attempts';
+    public const HEADER_MAX_ATTEMPTS = 'x-taskd-max-attempts';
 
     /**
      * Extract the value of the delay header out of the message.
@@ -56,6 +78,30 @@ class HeaderAdapter
     public function setDelay(Message $message, ?float $delay): void
     {
         $message->setHeader(self::HEADER_DELAY, $delay);
+    }
+
+    /**
+     * Extract the value of the process-at header out of the message.
+     *
+     * @param Message $message
+     * @return float|null The timestamp at which to process the message, or null
+     *                    if no such header exists.
+     */
+    public function getProcessAt(Message $message): ?float
+    {
+        return filter_var($message->getHeader(self::HEADER_PROCESS_AT), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * Set the value of the process-at header in the message.
+     *
+     * @param Message    $message
+     * @param float|null $processAt The timestamp at which to process the
+     *                              message, or null if processing immediately.
+     */
+    public function setProcessAt(Message $message, ?float $processAt): void
+    {
+        $message->setHeader(self::HEADER_PROCESS_AT, $processAt);
     }
 
     /**
@@ -87,21 +133,28 @@ class HeaderAdapter
     /**
      * Extract the amount of attempts at processing out of the message.
      *
-     * Only the Redis message implementation supports attempt count so far
-     * (`\Enqueue\Redis\RedisMessage::getAttempts`): other implementations will
-     * return null.
-     *
-     * Also, no setter exists: attempt counts are handled within Enqueue.
-     *
      * @param Message $message
      * @return int|null The number of attempts at processing the message, or
      *                  null if unknown.
      */
     public function getAttempts(Message $message): ?int
     {
-        if (!$message instanceof RedisMessage) {
-            return null;
-        }
-        return $message->getAttempts();
+        return filter_var($message->getHeader(self::HEADER_ATTEMPTS), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * Increment the number of attempts which have been made to send this
+     * message.
+     *
+     * The number of attempts should not be set directly: it should only be
+     * incremented.
+     *
+     * @param Message $message
+     * @return void
+     */
+    public function incrementAttempts(Message $message): void
+    {
+        $attempts = $this->getAttempts($message) ?? 1;
+        $message->setHeader(self::HEADER_ATTEMPTS, $attempts + 1);
     }
 }
