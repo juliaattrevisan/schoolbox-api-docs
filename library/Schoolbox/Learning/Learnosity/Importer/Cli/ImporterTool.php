@@ -81,6 +81,12 @@ class ImporterTool extends CliTool\App
     /**
      * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
      * This is the default mechanism by which to mass-import everything
+     *
+     * TODO Potentially load the most recent quizzes first, and the oldest quizzes last
+     *  so that schools can still keep going while this imports in the background.
+     *
+     * TODO Alternatively/additionally you can ignore quizzes that fulfil some set of
+     *  conditions, minimising the size of the dataset.
      */
     private const QUERY_LEGACY_QUIZ_IDS = "
         SELECT assess_id
