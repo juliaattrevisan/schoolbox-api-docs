@@ -101,7 +101,7 @@ class Module extends BaseModule
                 new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
-                new Database\ResultType\ForumPost\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -150,7 +150,7 @@ class Module extends BaseModule
                     $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
                 ),
-                new Database\ResultType\ForumPost\Hydrator(
+                new Database\ResultType\Forum\Hydrator(
                     $mapperFactory->get(PostMapper::class),
                     Access::getInstance(),
                 ),

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api\Database\ResultType\ForumPost;
+namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress\Html\ToText;
 use Schoolbox\Permission\Access\Access;
@@ -28,7 +28,7 @@ class Hydrator extends BaseHydrator
     /**
      * Base type for this type of result.
      */
-    public const BASE_TYPE = 'forumPost';
+    public const BASE_TYPE = 'forum';
 
     /**
      * Constructor

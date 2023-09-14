@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Search\Api\Database\ResultType\ForumPost;
+namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
@@ -31,7 +31,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Build WHERE params such that
      * * deleted posts are never fetched
      * * hidden posts _are_ fetched (as whether the viewer can view the post will be determined in the hydrator)
-     * * posts whose body contains `$keyword` are fetched
+     * * the search returns:
+     *    * for each thread whose title contains the keyword, or contains at least one posts that contains the keyword:
+     *       * the most recent post that contains the keyword, or
+     *       * if no posts contain the keyword, the most recent post.
      *
      * @param string $keyword
      * @return array
@@ -39,10 +42,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildBaseWhereParams(string $keyword): array
     {
         $whereParts         = [
-            'p.deleted="false"', // The type of forumPost.deleted is enum('true', 'false').
+            'fp.deleted="false"', // The type of forumPost.deleted is enum('true', 'false').
         ];
         $keywordSearchParts = [
-            'p.body LIKE :postKeywordLike',
+            'ft.title LIKE :postKeywordLike',
+            'fp.body LIKE :postKeywordLike',
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
@@ -65,7 +69,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return $this->buildLinearDecayExpression(
             ':postNow',
-            'p.modified',
+            'fp.modified',
             7,
             56,
         );
@@ -109,7 +113,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(): string
     {
-        return "'forumPost'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**
@@ -119,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(): string
     {
-        return 'p.postID';
+        return 'fp.postID';
     }
 
     /**
@@ -129,7 +133,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildDateExpression(): ?string
     {
-        return 'p.modified';
+        return 'fp.modified';
     }
 
     /**
@@ -139,7 +143,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(): ?string
     {
-        return 'p.userID';
+        return 'fp.userID';
     }
 
     /**
@@ -160,8 +164,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildFromStatement(): string
     {
         return '
-            FROM forumPost p
-            INNER JOIN forumThread pt ON pt.threadID = p.threadID
+            FROM forumThread ft
+            LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
         ';
     }
 }
