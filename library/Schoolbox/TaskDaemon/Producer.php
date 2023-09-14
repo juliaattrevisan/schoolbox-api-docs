@@ -59,7 +59,7 @@ class Producer
      */
     public function send(
         Message $message,
-        ?Alaress_Date_Format $processAt,
+        ?Alaress_Date_Format $processAt = null,
         ?float $delay = null,
         ?int $maxAttempts = null,
     ): void {
