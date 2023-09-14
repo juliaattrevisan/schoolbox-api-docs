@@ -12,7 +12,7 @@ trait CreatedBy
     /**
      * @var int|null
      */
-    protected ?int $createdBy;
+    protected ?int $createdBy = null;
 
     /**
      * @return int|null
