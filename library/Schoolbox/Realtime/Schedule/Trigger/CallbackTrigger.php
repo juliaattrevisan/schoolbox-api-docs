@@ -15,7 +15,6 @@ use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 
 class CallbackTrigger extends AbstractTrigger implements InstantTriggerInterface
 {
-
     /** @var callable */
     protected $callback;
 
