@@ -107,7 +107,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(): string
     {
-        return "'badge'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**

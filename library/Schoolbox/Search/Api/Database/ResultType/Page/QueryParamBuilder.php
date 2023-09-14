@@ -99,7 +99,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         // NVL2: if param 1 is not null returns param 2, otherwise param 3 (https://mariadb.com/kb/en/nvl2/)
         return "CONCAT(
-            'page.',
+            '" . Hydrator::BASE_TYPE . ".',
             NVL2(
                 cs.id,
                 'course',

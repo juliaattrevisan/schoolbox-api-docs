@@ -108,7 +108,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(): string
     {
-        return "'tile'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**

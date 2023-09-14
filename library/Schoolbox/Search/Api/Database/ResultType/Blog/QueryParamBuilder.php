@@ -81,11 +81,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * @return string
+     */
+    protected function getType(): string
+    {
+        return Hydrator::BASE_TYPE;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function buildTypeExpression(): string
     {
-        return "'blog'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**
@@ -121,14 +129,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             FROM blog b
             JOIN folder f ON b.folder_id = f.id
         ';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getType(): string
-    {
-        return Hydrator::BASE_TYPE;
     }
 
     /**

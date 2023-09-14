@@ -82,11 +82,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * @return string
+     */
+    protected function getType(): string
+    {
+        return Hydrator::BASE_TYPE;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function buildTypeExpression(): string
     {
-        return "'event'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**
@@ -123,14 +131,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             LEFT JOIN event_folder evf ON e.id = evf.event_id
             LEFT JOIN folder       f   ON evf.folder_id = f.id
         ';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getType(): string
-    {
-        return Hydrator::BASE_TYPE;
     }
 
     /**

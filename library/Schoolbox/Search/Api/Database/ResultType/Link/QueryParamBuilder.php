@@ -109,7 +109,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(): string
     {
-        return "'link'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**

@@ -119,7 +119,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // derived from a similar list in
         // `\Schoolbox\Resource\File\Mapper::findForFolders`
         return "CONCAT(
-            'file.',
+            '" . Hydrator::BASE_TYPE . ".',
             IF(
                 LOCATE('pdf', aft.mime)
                 OR LOCATE('msword', aft.mime)

@@ -116,7 +116,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(): string
     {
-        return "CONCAT('user.', r.group_type)";
+        return "CONCAT('" . Hydrator::BASE_TYPE . ".', r.group_type)";
     }
 
     /**
