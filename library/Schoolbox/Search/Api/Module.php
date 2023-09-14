@@ -120,6 +120,7 @@ class Module extends BaseModule
                 new Database\ResultType\File\Hydrator(
                     $mapperFactory->get(FileMapper::class),
                     Access::getInstance(),
+                    new PrefixGenerator($this->getConfig()),
                 ),
                 new Database\ResultType\Event\Hydrator(
                     $mapperFactory->get(UserMapper::class),

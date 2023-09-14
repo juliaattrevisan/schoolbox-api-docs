@@ -107,15 +107,15 @@ class Controller extends Base
         ];
 
         $pagesFoldersSubTypes = [
-            ["title" => "Current " . $rosettaStone->translate("class", false, true), "value" => "page.class"],
-            ["title" => "Folder"  , "value" => "page.folder"  ],
-            ["title" => "Group"   , "value" => "page.group"   ],
-            ["title" => "Homepage", "value" => "page.homepage"],
+            ["title" => "Current " . $rosettaStone->translate("class", true, true), "value" => "page.class"],
+            ["title" => "Folders"  , "value" => "page.folder"  ],
+            ["title" => "Groups"   , "value" => "page.group"   ],
+            ["title" => "Homepages", "value" => "page.homepage"],
         ];
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $pagesFoldersSubTypes[] = ["title" => "Course", "value" => "page.course"];
-            $pagesFoldersSubTypes[] = ["title" => $rosettaStone->translate("unit", false, true), "value" => "page.unit"];
+            $pagesFoldersSubTypes[] = ["title" => "Courses", "value" => "page.course"];
+            $pagesFoldersSubTypes[] = ["title" => $rosettaStone->translate("unit", true, true), "value" => "page.unit"];
         }
 
         $filters[] = [
