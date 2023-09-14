@@ -30,11 +30,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Build WHERE params such that
      * * deleted posts are never fetched
-     * * hidden posts _are_ fetched (as whether the viewer can view the post will be determined in the hydrator)
      * * the search returns:
-     *    * for each thread whose title contains the keyword, or contains at least one posts that contains the keyword:
-     *       * the most recent post that contains the keyword, or
-     *       * if no posts contain the keyword, the most recent post.
+     *    * each thread whose title contains the keyword, or among whose posts is at least one post that contains the keyword.
      *
      * @param string $keyword
      * @return array
@@ -43,6 +40,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         $whereParts         = [
             'fp.deleted="false"', // The type of forumPost.deleted is enum('true', 'false').
+            'ft.deleted="false"', // The type of forumThread.deleted is enum('true', 'false').
         ];
         $keywordSearchParts = [
             'ft.title LIKE :postKeywordLike',
@@ -95,7 +93,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleExpression(): string
     {
-        return '""'; // Not sure what to do here, but returning a blank string for now.
+        return 'ft.title';
     }
 
     /**
@@ -157,8 +155,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * Forum posts are fetched from the `forumPost` table.
-     *
+     * The object to return for forum search results is the thread.
+     * The hydration step will find the appropriate post for each matching thread.
+     * The appropriate post will be:
+     *  * the most recent post that contains the keyword, or
+     *  * the most recent post (if no post contains the keyword)
      * @return string
      */
     protected function buildFromStatement(): string
