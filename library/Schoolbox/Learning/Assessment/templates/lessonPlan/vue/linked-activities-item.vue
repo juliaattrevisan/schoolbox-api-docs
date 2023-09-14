@@ -51,7 +51,7 @@ function handleUnlinkClick() {
         <p class="meta">Due {{ activity.closeAtFormatted }}</p>
     </div>
     <nav v-if="isInstructor">
-        <a class="icon-unlink no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
+        <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
     </nav>
 </template>
 
