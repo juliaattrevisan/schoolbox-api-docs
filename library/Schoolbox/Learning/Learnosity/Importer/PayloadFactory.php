@@ -141,8 +141,13 @@ class PayloadFactory
 
         if ((int)$legacyQuiz['duration']) {
             /* If a duration was set, configure it similarly
+             *
+             * Legacy quiz used -1 to mean "No Duration" but in learnosity, this is achieved
+             * by using zero. A bug in learnosity's api allows you to compel an activity
+             * to have -1 as a duration which ended up equating to -1hr59min lol
+             * https://help.learnosity.com/hc/en-us/requests/23267
              */
-            $struct['data']['config']['time']['max_time'] = (int)$legacyQuiz['duration'];
+            $struct['data']['config']['time']['max_time'] = max((int)$legacyQuiz['duration'], 0);
 
             /* Warn users when 60 seconds remains
              */
