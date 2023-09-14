@@ -10,7 +10,6 @@
 namespace Schoolbox\Realtime\Schedule\Trigger\Compressed;
 
 use Alaress\Scheduler\Event\EventInterface;
-use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\InstantTriggerInterface;
 
@@ -20,16 +19,16 @@ class CompressedTrigger implements InstantTriggerInterface
     protected ?string $serial;
 
     /**
-     * @param TriggerInterface $trigger
+     * @param InstantTriggerInterface $trigger
      */
-    public function __construct(private TriggerInterface $trigger)
+    public function __construct(private InstantTriggerInterface $trigger)
     {
     }
 
     /**
-     * @return TriggerInterface
+     * @return InstantTriggerInterface
      */
-    public function extractTrigger(): TriggerInterface
+    public function extractTrigger(): InstantTriggerInterface
     {
         return $this->trigger;
     }
