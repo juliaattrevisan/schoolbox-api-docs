@@ -91,6 +91,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * course: pages with a related course specification
      * * unit: pages with a related unit specification
      * * class: pages with a class code
+     * * group: pages with a user group
      * * homepage: pages with no class code, but a homepage
      * * folder: pages without a homepage
      */
@@ -108,7 +109,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     NVL2(
                         fc.code,
                         'class',
-                        NVL2(hc.template, 'homepage', 'folder')
+                        NVL2(
+                            ug.cid,
+                            'group',
+                            NVL2(hc.template, 'homepage', 'folder')
+                        )
                     )
                 )
             )
@@ -166,6 +171,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
             LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
             LEFT JOIN homepage_config hc ON f.id = hc.cid
+            LEFT JOIN userGroups ug ON f.id = ug.cid
         ";
     }
 }
