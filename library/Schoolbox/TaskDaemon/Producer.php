@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\TaskDaemon;
 
+use Alaress_Date_Format;
 use Interop\Queue\Context;
 use Interop\Queue\Exception;
 use Interop\Queue\Exception\InvalidDestinationException;
@@ -42,11 +43,12 @@ class Producer
     /**
      * Send the message to the task daemon.
      *
-     * @param Message    $message     The message to send
-     * @param float|null $delay       If set: delay the sending of the message
-     *                                by this many seconds.
-     * @param int|null   $maxAttempts If set: override the maximum number of
-     *                                attempts by this amount.
+     * @param Message                  $message     The message to send
+     * @param Alaress_Date_Format|null $processAt   If set: send at this time
+     * @param float|null               $delay       If set: delay send by this
+     *                                              many seconds
+     * @param int|null                 $maxAttempts If set: override the max
+     *                                              attempts by this amount
      * @return void
      * @throws Exception                   if the context's provider fails to
      *                                     send the message due to some internal
@@ -55,9 +57,16 @@ class Producer
      *                                     invalid destination
      * @throws InvalidMessageException     if an invalid message is specified
      */
-    public function send(Message $message, ?float $delay = null, ?int $maxAttempts = null): void
-    {
+    public function send(
+        Message $message,
+        ?Alaress_Date_Format $processAt,
+        ?float $delay = null,
+        ?int $maxAttempts = null,
+    ): void {
         $enqueueMessage = $this->context->createMessage($this->messageSerializer->serialize($message));
+        if (isset($processAt)) {
+            $this->headerAdapter->setProcessAt($enqueueMessage, $processAt->getUnixTimeStamp());
+        }
         if (isset($delay)) {
             $this->headerAdapter->setDelay($enqueueMessage, $delay);
         }
