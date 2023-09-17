@@ -1168,12 +1168,6 @@ class ProjectTest extends TestCase
      */
     private function countSubAssessmentsRecursiveProjectModel(ProjectModel $projectModel): int
     {
-        /* Collections might start of being null instead, for whatever reason
-         */
-        if (null === $projectModel->getAssessments()) {
-            $projectModel->setAssessments(new GenericCollection(AssessmentModel::class));
-        }
-
         $count = $projectModel->getAssessments()->count();
         foreach ($projectModel->getAssessments() as $subAssessment) {
             $subObject = $subAssessment->getSubObject();
@@ -1193,13 +1187,6 @@ class ProjectTest extends TestCase
      */
     private function countSubAssessmentsRecursiveProjectObject(Project $projectObject): int
     {
-        /* Collections might start of being null instead, for whatever reason
-         */
-        /** @phpstan-ignore-next-line - the assessable list may be null */
-        if (null === $projectObject->getAssessables()) {
-            $projectObject->setAssessables(new GenericCollection(IAssessable::class));
-        }
-
         $count = $projectObject->getAssessables()->count();
         foreach ($projectObject->getAssessables() as $subAssessable) {
             if ($subAssessable instanceof Project) {
@@ -1319,19 +1306,14 @@ class ProjectTest extends TestCase
     public function providerLinearDomainProjectTree(): array
     {
         $p1 = (new Project())->setId(1)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p2 = (new Project())->setId(2)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p3 = (new Project())->setId(3)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p4 = (new Project())->setId(4)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p5 = (new Project())->setId(5)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         $p1->getAssessables()[2] = $p2;
@@ -1365,19 +1347,14 @@ class ProjectTest extends TestCase
     public function providerBranchedDomainProjectTree(): array
     {
         $p1 = (new Project())->setId(1)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p2 = (new Project())->setId(2)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p3 = (new Project())->setId(3)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p4 = (new Project())->setId(4)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p5 = (new Project())->setId(5)
-                             ->setAssessables(new GenericCollection(IAssessable::class))
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         // #2 and #3 are children of #1
