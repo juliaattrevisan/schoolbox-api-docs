@@ -121,7 +121,18 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(): string
     {
-        return 'fp.postID';
+        // TODO: Figure out how to avoid repeating this subquery when getting id, date, and creator.
+        return (
+            '(
+                # Select the postID of the most recent post in the thread whose body contains the keyword,
+                # otherwise the most recent post.
+                SELECT postID
+                FROM  forumPost AS fp2
+                WHERE fp2.threadID=ft.threadID
+                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
+                LIMIT 1
+             )'
+        );
     }
 
     /**
@@ -131,7 +142,18 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildDateExpression(): ?string
     {
-        return 'fp.modified';
+        // TODO: Figure out how to avoid repeating this subquery when getting id, date, and creator.
+        return (
+            '(
+                # Select the modified date of the most recent post in the thread whose body contains the keyword,
+                # otherwise the most recent post.
+                SELECT modified
+                FROM  forumPost AS fp2
+                WHERE fp2.threadID=ft.threadID
+                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
+                LIMIT 1
+             )'
+        );
     }
 
     /**
@@ -141,11 +163,22 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(): ?string
     {
-        return 'fp.userID';
+        // TODO: Figure out how to avoid repeating this subquery when getting id, date, and creator.
+        return (
+            '(
+                # Select the userID of the most recent post in the thread whose body contains the keyword,
+                # otherwise the most recent post.
+                SELECT userID
+                FROM  forumPost AS fp2
+                WHERE fp2.threadID=ft.threadID
+                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
+                LIMIT 1
+             )'
+        );
     }
 
     /**
-     * Forum posts do not have a title.
+     * Forum posts do not have a folder.
      *
      * @return string|null
      */
