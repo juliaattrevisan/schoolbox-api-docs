@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Toast from "@schoolboxVue/components/toast.vue";
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
 import { PageTemplate, CourseTemplate, Role, Permissions } from "./courseBuilderTypes";
 import CourseBuilderRows from "./course-builder-rows.vue";
@@ -17,17 +18,9 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const store = useCourseBuilderStore();
+const toastEl = window.Vue.ref<typeof Toast>();
 
-window.Vue.onMounted(() => {
-    store.init(
-        props.courseTemplates,
-        props.coursePermissions,
-        props.unitPermissions,
-        props.courseInherit,
-        props.unitInherit
-    );
-});
+const store = useCourseBuilderStore();
 
 const newRowAmount = window.Vue.ref(0);
 
@@ -43,10 +36,28 @@ function onAddNewRow() {
         unitTemplate: props.availableTemplates[0],
     });
 }
+
+/**
+ * Save the changes to the course builder
+ */
+async function saveChanges() {
+    await store.saveChanges();
+}
+
+window.Vue.onMounted(() => {
+    store.init(
+        props.courseTemplates,
+        props.coursePermissions,
+        props.unitPermissions,
+        props.courseInherit,
+        props.unitInherit,
+        toastEl
+    );
+});
 </script>
 
 <template>
-    <form action="/adminv2/course-builder/save" method="post">
+    <form action="/adminv2/course-builder/save" method="post" @submit.prevent="saveChanges">
         <div class="small-12 island">
             <section>
                 <div class="list-container">
@@ -80,6 +91,8 @@ function onAddNewRow() {
         </div>
         <button class="submit" type="submit">Save Changes</button>
     </form>
+
+    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped></style>

@@ -47,12 +47,12 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                     </div>
                     <div class="small-12 medium-5 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
-                        <input v-model="courseTemplate.name" />
+                        <input v-model="courseTemplate.name" required />
                     </div>
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Selected Course Page Template:</strong>
                         <div class="select-wrapper">
-                            <select v-model="courseTemplate.courseTemplate">
+                            <select v-model="courseTemplate.courseTemplate" required>
                                 <option
                                     v-for="availableTemplate in props.availableTemplates"
                                     :key="availableTemplate.id"
@@ -66,7 +66,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Selected Unit Page Template:</strong>
                         <div class="select-wrapper">
-                            <select v-model="courseTemplate.unitTemplate">
+                            <select v-model="courseTemplate.unitTemplate" required>
                                 <option
                                     v-for="availableTemplate in props.availableTemplates"
                                     :key="availableTemplate.id"
