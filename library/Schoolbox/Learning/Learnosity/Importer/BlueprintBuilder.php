@@ -276,6 +276,8 @@ class BlueprintBuilder
 
         return [
             'activityLearnosityReference' => $activityStruct['reference'],
+            'quizId' => $legacyQuiz['assess_id'],
+            'assessmentId' => $legacyQuiz['assessment_id'],
             'payloadSequence' => $payloadSequence,
         ];
     }
@@ -489,5 +491,56 @@ class BlueprintBuilder
             'activityLearnosityReference' => $activityStruct['reference'],
             'payloadSequence' => $payloadSequence,
         ];
+    }
+
+
+    /**
+     * Combine the various strata (features, questions, items, activities) of
+     * each $blueprint into one mega-blueprint grouped by their corresponding kind.
+     *
+     * @param array $blueprints
+     * @return array
+     */
+    public function align(array $blueprints): array
+    {
+        /* Combined strata of features, questions, items, activities, associations
+         */
+        $consolidated = [
+            '/itembank/features' => [
+                'endpoint' => '/itembank/features',
+                'payload' => [
+                    'features' => []
+                ]
+            ],
+            '/itembank/questions' => [
+
+            ],
+            '/itembank/items' => [],
+            '/itembank/activities' => [],
+            'associations' => []
+        ];
+
+        foreach ($blueprints as $blueprint) {
+            foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+                $endpoint = $payloadSequence['endpoint'];
+
+                if ('/itembank/features' === $endpoint) {
+                    $consolidated[$endpoint]['payload']['features'] = array_merge($consolidated[$endpoint]['payload']['features'], $payloadSequence['payload']['features']);
+                } elseif ('/itembank/questions' === $endpoint) {
+
+                }
+
+            }
+
+            $consolidated['associations'][] = [
+                'quizId' => $blueprint['quizId'],
+                'assessmentId' => $blueprint['assesssmentId'],
+                'activityLaernosityReference' => $blueprint['activityLearnosityReference']
+            ];
+
+            print_r($blueprint);
+        }
+
+        return $consolidated;
     }
 }

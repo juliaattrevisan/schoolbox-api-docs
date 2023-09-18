@@ -357,9 +357,9 @@ HELP;
              *
              * For now, chunk 5 quizzes at a time
              */
-            $batchLegacyQuizIds = array_chunk($legacyQuizIds, 5);
+            $batchIds = array_chunk($legacyQuizIds, 5);
 
-            foreach ($batchLegacyQuizIds as $batchSet) {
+            foreach ($batchIds as $batchSet) {
                 $blueprints = [];
 
                 foreach ($batchSet as $legacyQuizId) {
@@ -413,12 +413,6 @@ HELP;
                         continue;
                     }
 
-                    /* Optionally show array payloads
-                     */
-                    if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
-                        print_r($blueprint);
-                    }
-
                     /* Load it up into a mini-stack
                      */
                     $blueprints[] = $blueprint;
@@ -428,70 +422,79 @@ HELP;
                  * all the features get combined, all the questions get combined,
                  * all the items get combined and all the activities get combined.
                  */
+                $blueprints = $blueprintBuilder->align($blueprints);
 
                 /* Send it as batches of features, questions, items, activities
                  * and just...hope/presumed that everything worked out
                  */
-            }
 
-
-
-            foreach ($legacyQuizIds as $legacyQuizId) {
-
-                /* Actually do it
+                /* Optionally show array payloads
                  */
-                if ($this->perform()) {
-                    $this->getLogger()->debug('Importing into Learnosity. This might take a while.');
-
-                    $start = microtime(true);
-
-                    /* Iterate and bombard Learnosity with api requests pewpewpew
-                     */
-                    foreach ($blueprint['payloadSequence'] as $data) {
-                        $this->getLogger()->debug(sprintf(
-                            '%s: transmitting payload (size: %s) to learnosity...',
-                            $data['endpoint'],
-                            $data['count']
-                        ));
-
-                        /* Skip zero-sized payloads; learnosity hates that
-                         *
-                         * (alternatively capture exception but probably not helpful most of the time)
-                         *
-                         * The main way this has happened to me is when you create a quiz
-                         * using learnosity, then artificially reset its learnosity_reference
-                         * to null, then try to reimport that back into learnosity - this is
-                         * an exceedingly particular scenario that shouldn't happen organically.
-                         *
-                         * Or, there's just an empty section somehow.
-                         */
-                        if ($data['count'] > 0) {
-                            $api->dataSetRequest($data['endpoint'], $data['payload']);
-                        }
-                    }
-
-                    /* Associate the learnosity reference back to our legacy quiz
-                     */
-                    $this->getLogger()->info(sprintf(
-                        'Associating legacy quiz with learnosity_reference %s',
-                        $blueprint['activityLearnosityReference']
-                    ));
-
-                    $this->associateStatement->execute([
-                        'learnosityReference' => $blueprint['activityLearnosityReference'],
-                        'assessId' => $legacyQuizId
-                    ]);
-
-                    $end = microtime(true);
-
-                    /* Capture metrics
-                     */
-                    $timing[] = $end - $start;
+                if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+                    print_r($blueprints);
                 }
 
-                $this->getLogger()->info('Done.');
-                $this->getLogger()->info('');
+
             }
+
+
+
+//            foreach ($legacyQuizIds as $legacyQuizId) {
+//
+//                /* Actually do it
+//                 */
+//                if ($this->perform()) {
+//                    $this->getLogger()->debug('Importing into Learnosity. This might take a while.');
+//
+//                    $start = microtime(true);
+//
+//                    /* Iterate and bombard Learnosity with api requests pewpewpew
+//                     */
+//                    foreach ($blueprint['payloadSequence'] as $data) {
+//                        $this->getLogger()->debug(sprintf(
+//                            '%s: transmitting payload (size: %s) to learnosity...',
+//                            $data['endpoint'],
+//                            $data['count']
+//                        ));
+//
+//                        /* Skip zero-sized payloads; learnosity hates that
+//                         *
+//                         * (alternatively capture exception but probably not helpful most of the time)
+//                         *
+//                         * The main way this has happened to me is when you create a quiz
+//                         * using learnosity, then artificially reset its learnosity_reference
+//                         * to null, then try to reimport that back into learnosity - this is
+//                         * an exceedingly particular scenario that shouldn't happen organically.
+//                         *
+//                         * Or, there's just an empty section somehow.
+//                         */
+//                        if ($data['count'] > 0) {
+//                            $api->dataSetRequest($data['endpoint'], $data['payload']);
+//                        }
+//                    }
+//
+//                    /* Associate the learnosity reference back to our legacy quiz
+//                     */
+//                    $this->getLogger()->info(sprintf(
+//                        'Associating legacy quiz with learnosity_reference %s',
+//                        $blueprint['activityLearnosityReference']
+//                    ));
+//
+//                    $this->associateStatement->execute([
+//                        'learnosityReference' => $blueprint['activityLearnosityReference'],
+//                        'assessId' => $legacyQuizId
+//                    ]);
+//
+//                    $end = microtime(true);
+//
+//                    /* Capture metrics
+//                     */
+//                    $timing[] = $end - $start;
+//                }
+//
+//                $this->getLogger()->info('Done.');
+//                $this->getLogger()->info('');
+//            }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
