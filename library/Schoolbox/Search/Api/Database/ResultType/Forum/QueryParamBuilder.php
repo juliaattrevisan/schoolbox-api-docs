@@ -171,6 +171,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
+     * Note regarding performance
+     * --------------------------
+     * Creating this subquery for each of buildIdExpression(), buildDateExpression(), and buildCreatorExpression() will
+     * result in a near-identical subquery repeated multiple times in the query that is eventually run.
+     * I could not figure out a way to remove the repetition of subqueries.  If this is found to be inefficient, we can
+     * revisit.
+     *
      * @param string $columnToSelect
      * @return string
      */
@@ -182,7 +189,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . '
                 FROM  forumPost AS fp2
                 WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp2.modified DESC
+                ORDER BY LOCATE(:postKeywordLike, fp2.body)>0 DESC, fp2.modified DESC
                 LIMIT 1
              )'
         );
