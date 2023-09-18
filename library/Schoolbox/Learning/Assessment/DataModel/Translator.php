@@ -106,38 +106,37 @@ class Translator
     /**
      * Translates an assessment DomainObject to a DataModel
      *
-     * We need a mechanism to prevent projects transforming their children, who each transform their parent, Ad infinitum.
-     * We need to ensure logically unique instances are respected, and also aim to translate assessments once only.
-     * By always translating from root down, we can achieve order-N^2 for a theoretical order-N problem. We will
-     * need a secondary cache to achieve order-N translation of random assessment collections that contain projects.
-     * // TODO see SA-5744.
-     *
-     * Translating up the object graph is problematic. It requires placing the current assessment in its parent context's assessment
-     * collection at the same index. This becomes a N^2 operation, and N^3 for collections containing projects (bad).
-     * Translating down the graph is order-N, and N^2 for collections containing projects.
-     *
-     * For now, we do need to re-transform relationships & properties even if entity is cached because those relationships may have changed
-     *
-     * @param IAssessable $domainObject
+     * @param IAssessable $domainObject The domain object to translate.
+     * @param int         $depth        The current depth of translation.
+     *                                  This translator will translate the context project of `$domainObject`
+     *                                  recursively: if it translates more than `$this->maxProjectLevels` down, this
+     *                                  will detect a cyclic graph and raise a `LogicException`.
      * @return IAssessableDataModel
      *
      * @throws UnexpectedValueException If assessment does not have a context
      * @throws LogicException If cyclic graph detected
      */
-    public function translateToDataModel(IAssessable $domainObject): IAssessableDataModel
+    public function translateToDataModel(IAssessable $domainObject, int $depth = 1): IAssessableDataModel
     {
-        // Always translate from top-down.
-        // This means we can always iterate a project's subAssessments in order(N) time.
-        $rootAssessable = $domainObject;
-        $levelsClimbed  = 0;
-        while ($rootAssessable->getContext() instanceof Project) {
-            $levelsClimbed++;
-            if ($levelsClimbed > $this->maxProjectLevels) {
-                throw new LogicException("Unable to find root project after $levelsClimbed iterations. You have a cycle or too many project nesting levels");
-            }
-            $rootAssessable = $rootAssessable->getContext();
+        if ($depth > $this->maxProjectLevels) {
+            throw new LogicException("Unable to find root project after $depth iterations. You have a cycle or too many project nesting levels");
         }
-        $this->translateToDataModelRecursive($rootAssessable);
+
+        // Is `$domainObject` within a project?
+        // If so, translate the project first so that `$domainObject` has access
+        // to its fully-realised project
+        $context = $domainObject->getContext();
+        if ($context instanceof Project) {
+            if (!isset($this->dataModelCache[spl_object_hash($context)])) {
+                $this->translateToDataModel($context, $depth + 1);
+            }
+        }
+
+        /* Ignore the random andy logic about $rootAssessable
+         * and just translate this $domainObject like we wanted
+         */
+        $this->translateToDataModelRecursive($domainObject);
+
         // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->dataModelCache[spl_object_hash($domainObject)];
     }
@@ -146,27 +145,38 @@ class Translator
     /**
      * Translates the data model to a domain model.
      *
-     * @param IAssessableDataModel $dataModel
+     * @param IAssessableDataModel $dataModel The data model to translate.
+     * @param int                  $depth     The current depth of translation.
+     *                                        This translator will translate the context project of `dataModel`
+     *                                        recursively: if it translates more than `$this->maxProjectLevels` down,
+     *                                        this will detect a cyclic graph and raise a `LogicException`.
      * @return IAssessable
      * @throws UnexpectedValueException if $dataModel wasn't able to be translated
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
      */
-    public function translateToDomainModel(IAssessableDataModel $dataModel): IAssessable
+    public function translateToDomainModel(IAssessableDataModel $dataModel, int $depth = 1): IAssessable
     {
-        // Always translate from top-down.
-        // This means we can always iterate a project's subAssessments in order(N) time.
-        $root = $dataModel;
-        $levelsClimbed  = 0;
-        while ($root->getAssessmentModel() instanceof AssessmentModel && $root->getAssessmentModel()->getContextProject() instanceof ProjectModel) {
-            $levelsClimbed++;
-            if ($levelsClimbed > $this->maxProjectLevels) {
-                throw new LogicException("Unable to find root project after $levelsClimbed iterations. You have a cycle or too many project nesting levels");
-            }
-            $root = $root->getAssessmentModel()->getContextProject();
+        if ($depth > $this->maxProjectLevels) {
+            throw new LogicException("Unable to find root project after $depth iterations. You have a cycle or too many project nesting levels");
         }
-        $this->translateToDomainModelRecursive($root);
+
+        // Is `$dataModel` within a project?
+        // If so, translate the project first so that `$dataModel` has access to
+        // its fully-realised project
+        $assessmentModel = $dataModel->getAssessmentModel();
+        if (!$assessmentModel instanceof AssessmentModel) {
+            throw new UnexpectedValueException('$dataModel has no assessment model');
+        }
+        $context = $assessmentModel->getAssessmentContext();
+        if ($context instanceof ProjectModel) {
+            if (!isset($this->domainObjectCache[spl_object_hash($context)])) {
+                $this->translateToDomainModel($context, $depth + 1);
+            }
+        }
+
+        $this->translateToDomainModelRecursive($dataModel);
         // If this line throws a NPE, most likely your model graph is missing the relationship from root to this node.
         return $this->domainObjectCache[spl_object_hash($dataModel)];
     }
@@ -318,6 +328,7 @@ class Translator
             if (!$dataModel->getAssessments()) {
                 $dataModel->setAssessments(new GenericCollection(AssessmentModel::class));
             }
+
             foreach ($domainObject->getAssessables() as $idx => $domainChild) {
                 $subAssessmentModel = $this->translateToDataModelRecursive($domainChild, $depth + 1)->getAssessmentModel();
                 $subAssessmentModel->setContextProject($dataModel);
