@@ -103,8 +103,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A link's type is always 'link'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string

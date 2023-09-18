@@ -105,8 +105,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A forum post's type is always 'forumPost'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string
@@ -155,11 +153,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The object to return for forum search results is the thread.
-     * The hydration step will find the appropriate post for each matching thread.
-     * The appropriate post will be:
+     * The object to return for forum search results is the post that is the most appropriate post for a given matching
+     * thread.
+     *
+     * A thread matches the search if:
+     *  * the thread title contains the keyword OR
+     *  * any post within the thread contains the keyword.
+     *
+     * The most appropriate post for any matching thread is:
      *  * the most recent post that contains the keyword, or
      *  * the most recent post (if no post contains the keyword)
+     *
      * @return string
      */
     protected function buildFromStatement(): string

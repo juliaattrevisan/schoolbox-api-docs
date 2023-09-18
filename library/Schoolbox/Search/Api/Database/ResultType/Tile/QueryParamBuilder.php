@@ -102,8 +102,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A tile's type is always 'tile'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string

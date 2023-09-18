@@ -118,7 +118,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The type of a news result is simply "news".
+     * @return string
      */
     protected function buildTypeExpression(): string
     {

@@ -101,8 +101,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A badge's type is always 'badge'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string

@@ -102,8 +102,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A textbox's type is always 'Textbox'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string
