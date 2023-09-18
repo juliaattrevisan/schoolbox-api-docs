@@ -121,18 +121,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(): string
     {
-        // TODO: Figure out how to avoid repeating this subquery when getting id, date, and creator.
-        return (
-            '(
-                # Select the postID of the most recent post in the thread whose body contains the keyword,
-                # otherwise the most recent post.
-                SELECT postID
-                FROM  forumPost AS fp2
-                WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
-                LIMIT 1
-             )'
-        );
+        return $this->getSubqueryForMostRelevantPostInThread('postID');
     }
 
     /**
@@ -142,18 +131,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildDateExpression(): ?string
     {
-        // TODO: Figure out how to avoid repeating this subquery when getting id, date, and creator.
-        return (
-            '(
-                # Select the modified date of the most recent post in the thread whose body contains the keyword,
-                # otherwise the most recent post.
-                SELECT modified
-                FROM  forumPost AS fp2
-                WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
-                LIMIT 1
-             )'
-        );
+        return $this->getSubqueryForMostRelevantPostInThread('modified');
     }
 
     /**
@@ -163,18 +141,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(): ?string
     {
-        // TODO: Figure out how to avoid repeating this subquery when getting id, date, and creator.
-        return (
-            '(
-                # Select the userID of the most recent post in the thread whose body contains the keyword,
-                # otherwise the most recent post.
-                SELECT userID
-                FROM  forumPost AS fp2
-                WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
-                LIMIT 1
-             )'
-        );
+        return $this->getSubqueryForMostRelevantPostInThread('userID');
     }
 
     /**
@@ -201,5 +168,23 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             FROM forumThread ft
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
         ';
+    }
+
+    /**
+     * @param string $columnToSelect
+     * @return string
+     */
+    private function getSubqueryForMostRelevantPostInThread(string $columnToSelect): string
+    {
+        return (
+            '(
+                # Select from the most recent post in the thread whose body contains the keyword, otherwise the most recent post.
+                SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . '
+                FROM  forumPost AS fp2
+                WHERE fp2.threadID=ft.threadID
+                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
+                LIMIT 1
+             )'
+        );
     }
 }

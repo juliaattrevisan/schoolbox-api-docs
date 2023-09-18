@@ -214,6 +214,14 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             LEAST($max, GREATEST($relevanceUnrestrictedSql, 0))
             AS DECIMAL(2, 2)
         )";
+
+        // Note regarding testing
+        // ----------------------
+        // The SQL used above can be tested by getting the generated SQL, substituting a range of values for
+        // $absDateDiff, and then copying and pasting to a MySQL command-line.  Like so:
+        // SELECT CAST(LEAST(1, GREATEST(-(1 / (56 - 7)) * (0 - 7) + 1, 0)) AS DECIMAL(2, 2)) AS relevance;
+        // SELECT CAST(LEAST(1, GREATEST(-(1 / (56 - 7)) * (1 - 7) + 1, 0)) AS DECIMAL(2, 2)) AS relevance;
+        // SELECT CAST(LEAST(1, GREATEST(-(1 / (56 - 7)) * (2 - 7) + 1, 0)) AS DECIMAL(2, 2)) AS relevance;
     }
 
 
