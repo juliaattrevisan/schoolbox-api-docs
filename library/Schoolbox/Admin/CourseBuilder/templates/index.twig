@@ -28,6 +28,15 @@
 
     <div class="admin-content">
         {# Config page contents #}
+        <div class="small-12 island">
+            <div id="course-builder-container">
+                <course-builder
+                    :course-templates = '{{ courseTemplates |json_encode }}'
+                    :available-templates = '{{ availableTemplates |json_encode }}'
+                />
+            </div>
+            <script src="{{ CDN_PREFIX }}/js/bundle/courseBuilder.js?v={{ config.site_version }}"></script>
+        </div>
 <pre>
     {{ courseTemplates|json_encode }}
 </pre>
