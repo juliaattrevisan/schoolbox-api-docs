@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
-import { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
+import { PageTemplate, CourseTemplate, Role, Permissions } from "./courseBuilderTypes";
 import CourseBuilderRows from "./course-builder-rows.vue";
+import CourseBuilderAccessCourse from "./course-builder-access-course.vue";
+import CourseBuilderAccessUnit from "./course-builder-access-unit.vue";
 
 interface Props {
     courseTemplates: CourseTemplate[];
     availableTemplates: PageTemplate[];
+    coursePermissions: Permissions;
+    unitPermissions: Permissions;
+    courseInherit: boolean;
+    unitInherit: boolean;
+    roles: Role[];
 }
 
 const props = defineProps<Props>();
@@ -13,7 +20,13 @@ const props = defineProps<Props>();
 const store = useCourseBuilderStore();
 
 window.Vue.onMounted(() => {
-    store.init(props.courseTemplates);
+    store.init(
+        props.courseTemplates,
+        props.coursePermissions,
+        props.unitPermissions,
+        props.courseInherit,
+        props.unitInherit
+    );
 });
 
 const newRowAmount = window.Vue.ref(0);
@@ -33,69 +46,40 @@ function onAddNewRow() {
 </script>
 
 <template>
-    <section>
-        <div class="list-container">
-            <header class="list-header actions-small-1">
-                <div class="list-item">
-                    <label class="small-12 medium-1 column">ID</label>
-                    <label class="small-12 medium-5 column required">Template Name</label>
-                    <label class="small-12 medium-3 column required">Selected Course Page Template</label>
-                    <label class="small-12 medium-3 column required">Selected Unit Page Template</label>
+    <form action="/adminv2/course-builder/save" method="post">
+        <div class="small-12 island">
+            <section>
+                <div class="list-container">
+                    <header class="list-header actions-small-1">
+                        <div class="list-item">
+                            <label class="small-12 medium-1 column">ID</label>
+                            <label class="small-12 medium-5 column required">Template Name</label>
+                            <label class="small-12 medium-3 column required">Selected Course Page Template</label>
+                            <label class="small-12 medium-3 column required">Selected Unit Page Template</label>
+                        </div>
+                    </header>
+                    <course-builder-rows :available-templates="props.availableTemplates" />
+                    <div class="component-action">
+                        <section>
+                            <a class="button" @click.prevent="onAddNewRow">Add New Template</a>
+                        </section>
+                    </div>
                 </div>
-            </header>
-            <course-builder-rows :available-templates="props.availableTemplates" />
-            <div class="component-action">
-                <section>
-                    <a class="button" @click.prevent="onAddNewRow">Add New Template</a>
-                </section>
-            </div>
+            </section>
         </div>
-    </section>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th class="required">Template Name</th>
-            <th class="required">Selected Course Page Template</th>
-            <th class="required">Selected Unit Page Template</th>
-            <th>Delete</th>
-        </tr>
-        <tr v-for="courseTemplate in store.courseTemplates" :key="courseTemplate.id">
-            <td>{{ courseTemplate.id }}</td>
-            <td>{{ courseTemplate.name }}</td>
-            <td>{{ courseTemplate.courseTemplate.name }}</td>
-            <td>{{ courseTemplate.unitTemplate.name }}</td>
-            <td><a href="#" class="icon-delete" title="Delete Row"></a></td>
-        </tr>
-        <!-- <tr>
-            <td>NEW</td>
-            <td><input></td>
-            <td>
-                <select name="courseTemplate">
-                    {% for template in availableTemplates %}
-                        <option value="{{ template.id }}">{{ template.name }}</option>
-                    {% endfor %}
-                </select>
-            </td>
-            <td>
-                <select name="unitTemplate">
-                    {% for template in availableTemplates %}
-                        <option value="{{ template.id }}">{{ template.name }}</option>
-                    {% endfor %}
-                </select>
-            </td>
-            <td>Save?</td>
-        </tr> -->
-    </table>
+
+        <div class="small-12 medium-6 island">
+            <section>
+                <course-builder-access-course :roles="props.roles" />
+            </section>
+        </div>
+        <div class="small-12 medium-6 island">
+            <section>
+                <course-builder-access-unit :roles="props.roles" />
+            </section>
+        </div>
+        <button class="submit" type="submit">Save Changes</button>
+    </form>
 </template>
 
-<style scoped>
-.list-item-container {
-    transition: opacity 0.3s ease-out;
-}
-
-.delete-row-button {
-    width: 40px;
-    height: 40px;
-    margin: 0px 8px 0px 0px;
-}
-</style>
+<style scoped></style>

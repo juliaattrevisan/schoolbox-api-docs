@@ -9,3 +9,17 @@ export type CourseTemplate = {
     courseTemplate: PageTemplate;
     unitTemplate: PageTemplate;
 };
+
+export type Role = {
+    id: number;
+    type: string;
+    name: string;
+    student: boolean;
+    staff: boolean;
+    parent: boolean;
+    guest: boolean;
+};
+
+export type Permissions = {
+    [roleId: string]: -1 | 0 | 1 | 2;
+};

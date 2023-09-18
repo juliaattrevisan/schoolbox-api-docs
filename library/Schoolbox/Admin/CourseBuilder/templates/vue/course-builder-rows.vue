@@ -77,7 +77,12 @@ async function onRowLeave(element: Element, done: () => void) {
                 <nav>
                     <a
                         class="delete-row-button icon-delete"
-                        title="Delete Row"
+                        :class="{ disabled: store.courseTemplates.length === 1 }"
+                        :title="
+                            store.courseTemplates.length === 1
+                                ? 'You must have at least one template'
+                                : 'Delete Template'
+                        "
                         @click.prevent="store.deleteCourseTemplate(courseTemplate)"
                     ></a>
                 </nav>
@@ -86,4 +91,14 @@ async function onRowLeave(element: Element, done: () => void) {
     </transition-group>
 </template>
 
-<style scoped></style>
+<style scoped>
+.list-item-container {
+    transition: opacity 0.3s ease-out;
+}
+
+.delete-row-button {
+    width: 40px;
+    height: 40px;
+    margin: 0px 8px 0px 0px;
+}
+</style>

@@ -98,8 +98,8 @@ class Controller extends Base
                 'unitPermissions' => $unitPermissions,
                 'availableTemplates' => $templates,
                 'courseTemplates'   => $this->courseTemplateMapper->findAll()->reindex()->map(new ModelToArray()),
-                'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
+                'courseInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                'unitInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
             ],
         );
     }
