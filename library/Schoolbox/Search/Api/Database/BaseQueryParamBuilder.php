@@ -224,7 +224,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         // SELECT CAST(LEAST(1, GREATEST(-(1 / (56 - 7)) * (2 - 7) + 1, 0)) AS DECIMAL(2, 2)) AS relevance;
     }
 
-
     /**
      * Build the base set of WHERE parts and their params.
      *
