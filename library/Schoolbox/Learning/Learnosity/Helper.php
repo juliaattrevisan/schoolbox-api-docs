@@ -13,15 +13,32 @@ use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
 
 /**
- * A shortcut to simple operations that involve
- * multiple steps
+ * A shortcut to simple operations that involve multiple steps
+ *
+ * Sometimes items are in an Archived state but its activities
+ * are in a Published state, making the whole thing unable to
+ * archive due to a bug in Learnosity.
  */
 class Helper
 {
     /**
+     * The "published" state of an Activity/Item
+     */
+    public const LEARNOSITY_ITEM_STATUS_PUBLISHED = 'published';
+
+
+    /**
+     * The "unpublished" state of an Activity/Item
+     */
+    public const LEARNOSITY_ITEM_STATUS_UNPUBLISHED = 'unpublished';
+
+
+    /**
+     * The "archived" state of an Activity/Item
+     *
      * Softdeleting is equivalent to Learnosity's "archiving"
      */
-    private const LEARNOSITY_ITEM_STATUS_ARCHIVED = 'archived';
+    public const LEARNOSITY_ITEM_STATUS_ARCHIVED = 'archived';
 
 
     /**
@@ -49,6 +66,35 @@ class Helper
      */
     public function archive(string $learnosityReference): void
     {
+        $this->changeState($learnosityReference, self::LEARNOSITY_ITEM_STATUS_ARCHIVED);
+    }
+
+
+    /**
+     * Restore an Activity to Published state
+     *
+     * @param string $learnosityReference
+     * @return void
+     * @throws ValidationException
+     * @throws \RuntimeException
+     */
+    public function restore(string $learnosityReference): void
+    {
+        $this->changeState($learnosityReference, self::LEARNOSITY_ITEM_STATUS_PUBLISHED);
+    }
+
+
+    /**
+     * Change the state of an Activity and all its Items inside to $status
+     *
+     * @param string $learnosityReference
+     * @param string $status
+     * @return void
+     * @throws ValidationException
+     * @throws \RuntimeException
+     */
+    public function changeState(string $learnosityReference, string $status): void
+    {
         /* List of Items
          */
         $activities = $this->api->dataGetRequest('/itembank/activities', [
@@ -66,15 +112,19 @@ class Helper
         /* $activities['data'] is a one-element stack in this usage
          */
         foreach ($activities['data'] as $activity) {
+            /* Note that sometimes you get an error message like this from Learnosity
+             * due to a bug in their system: https://help.learnosity.com/hc/requests/23138
+             */
+
             /* Shank the activity into the Archived state
              */
             $updatedActivity = $activity;
-            $updatedActivity['status'] = self::LEARNOSITY_ITEM_STATUS_ARCHIVED;
+            $updatedActivity['status'] = $status;
             $activityPayload['activities'][] = $updatedActivity;
 
             $activityArchiveResult = $this->api->dataSetRequest('/itembank/activities', $activityPayload);
 
-            /* Then shank its items into the Archived state
+            /* Then shank its items into the $status state
              */
             $itemReferences = [];
 
@@ -86,7 +136,7 @@ class Helper
                 }
             }
 
-            /* Get all the items' details so we can archive it
+            /* Get all the items' details so we can change their status
              * and all its related pieces
              *
              * Even thought he activity didn't have items in it,
@@ -101,7 +151,7 @@ class Helper
             /* No items? No trabajo
              */
             if (\count($itemReferences)) {
-                /* Archive all the items collated in $references
+                /* Change status for all the items collated in $references
                  * If this is empty, it returns ALL ITEMS which isn't what you want.
                  */
                 $items = $this->api->dataGetRequest('/itembank/items', ['references' => $itemReferences]);
@@ -112,12 +162,13 @@ class Helper
 
                 foreach ($items['data'] as $item) {
                     $this->logger?->debug(sprintf(
-                        'Setting item %s status to archived',
-                        $item['reference']
+                        'Setting item %s status to %s in payload',
+                        $item['reference'],
+                        $status
                     ));
 
                     $updatedItem = $item;
-                    $updatedItem['status'] = 'archived';
+                    $updatedItem['status'] = $status;
 
                     $itemsPayload['items'][] = $updatedItem;
                 }
@@ -125,7 +176,8 @@ class Helper
                 /* Shank them into the Archived state
                  */
                 $this->logger?->debug(sprintf(
-                    'Archiving items for activity %s',
+                    'Update items to status %s for activity %s',
+                    $status,
                     $activity['reference']
                 ));
 

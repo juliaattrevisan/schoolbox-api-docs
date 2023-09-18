@@ -7,10 +7,14 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Lumberjack\Logger;
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\User;
 
@@ -76,16 +80,24 @@ class Overwriter
 
         // Delete quiz constituents and rubric
         $this->deleteDueWorkRubric($updatedDestination);
-        $this->deleteQuizConstituents($updatedDestination);
+
+        /* Remove this quiz from Learnosity entirely,
+         * and orphan it intentionally into an archived state
+         */
+         $this->deleteQuizConstituents($updatedDestination);
+
+        /* Cloning a quiz means we need the new Learnosity Reference identifier
+         * that can only really be obtained after sending it to Learnosity; we
+         * store the Learnosity Reference in the $assessment itself, thus making
+         * Learnosity content cloning have a sequential dependency here.
+         */
+        $this->replicateQuizConstituents($source, $updatedDestination);
 
         // Save
         $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
 
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $updatedDestination);
-
-        // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($source, $updatedDestination);
 
         return $updatedDestination;
     }
@@ -105,7 +117,13 @@ class Overwriter
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
         }
-        $this->quizMapper->copyQuizConstituents($source->getId(), $destination->getId());
+
+        /* Clone an existing Learnosity Activity
+         * Get the cloned activity's Learnosity Reference
+         * Assign this new Learnosity Reference to $destination's instance
+         * Save it
+         */
+        $this->quizMapper->copyQuizConstituents($source, $destination);
     }
 
     /**
@@ -114,13 +132,34 @@ class Overwriter
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws \DomainException
+     * @throws ValidationException
+     * @throws \RuntimeException
      */
     private function deleteQuizConstituents(IAssessable $assessment): void
     {
         if (!$assessment instanceof Quiz) {
             return;
         }
-        $this->quizMapper->deleteQuizConstituents($assessment->getId());
+
+        /* $destination (spec) gets overwritten by $source (impl)
+         * so we need to orphan its existing quiz thing
+         */
+        $api = new Api(
+            $_SERVER['SERVER_NAME'],
+            $this->quizMapper->getConfigLoader()->get('learnosity_consumer_key'),
+            $this->quizMapper->getConfigLoader()->get('learnosity_consumer_secret'),
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+        );
+
+        /* FIXME Temporarily disabled due to https://help.learnosity.com/hc/en-us/requests/23138
+         *  Uncomment whent hat bug has been resolved. This was intended to archive the old version
+         *  of the quiz and then use the new version of the quiz. Disabling this means you have an
+         *  orphaned quiz that's published and available for people to use, which isn't ideal
+         */
+        // (new Helper($api))->archive($assessment->getLearnosityReference());
+
+//        $this->quizMapper->deleteQuizConstituents($assessment->getId());
     }
 
     /**

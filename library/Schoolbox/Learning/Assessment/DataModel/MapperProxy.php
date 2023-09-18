@@ -1324,6 +1324,12 @@ class MapperProxy
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
+
+            /* Randomly need to do this, to save it into the assess table
+             * Otherwise it retains the old identifier lol
+             */
+            $subObject->setLearnosityReference($assessable->getLearnosityReference());
+
             QuizMapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);

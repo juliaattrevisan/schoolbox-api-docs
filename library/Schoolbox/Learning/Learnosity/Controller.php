@@ -85,9 +85,7 @@ class Controller extends Base
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
 
-        /* TODO replace with actual course and unit identifiers from the course workflow
-         */
-        $tags = $tagFactory->produce('25745286-8883-4fe4-98e6-39201c931ab2', 'f0fd5b1a-9e07-47c8-9434-af0dc57dfd35', $assessment->getContext()->getFolder()->getCodeString());
+        $tags = $tagFactory->produceFromAssessment($assessment);
 
         $payload = [
             'config' => [
@@ -259,20 +257,20 @@ class Controller extends Base
         $payload = [
             /* Our internal Quiz implementation id, it seems?
              */
-            'activity_id'          => (string)$assessment->getId(),
+            'activity_id' => (string)$assessment->getId(),
             /* The quiz and its questions
              */
             'activity_template_id' => $quiz->getLearnosityReference(),
-            "config"               => [
+            "config" => [
                 "configuration" => [
-                    "idle_timeout"          => [
+                    "idle_timeout" => [
                         "interval" => 300
                     ],
                     'onsubmit_redirect_url' => false,
                     'onsave_redirect_url' => false,
                 ],
-                "navigation"    => [
-                    "auto_save"  => [
+                "navigation" => [
+                    "auto_save" => [
                         "save_interval_duration" => 300
                     ],
                     "show_intro" => false,
@@ -282,7 +280,7 @@ class Controller extends Base
                  *
                  * Perhaps more useful: https://reference.learnosity.com/items-api/initialization/config.regions
                  */
-                'regions'       => [
+                'regions' => [
                     'top-left' => [
                         ['type' => 'title_element'],
                     ],
@@ -317,38 +315,38 @@ class Controller extends Base
                 ],
                 /* This is our Quiz title, I guess
                  */
-                "title"         => $assessment->getTitle(),
-                "subtitle"      => ''
+                "title" => $assessment->getTitle(),
+                "subtitle" => ''
             ],
             /* Enable livestreaming lol
              */
             'events' => false,
             /* This is our Quiz title, I guess
              */
-            'name'                 => $assessment->getTitle(),
-            'rendering_type'       => 'assess',
+            'name' => $assessment->getTitle(),
+            'rendering_type' => 'assess',
             /* An "attempt identifier", I think
              */
-            'session_id'           => $attempt->getLearnosityReference(),
+            'session_id' => $attempt->getLearnosityReference(),
             /* This saves attempt results into Learnosity servers, enabling reporting etc.
              * You can use 'local_practice' to preview a quiz.
              * You can use 'feedback' to grade an attempt with feedback etc.
              */
-            'type'                 => 'submit_practice',
+            'type' => 'submit_practice',
             /* A uniquely-identifying string for us, I think
              */
-            'user_id'              => (string)$this->getUser()->getId(),
+            'user_id' => (string)$this->getUser()->getId(),
         ];
 
         $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
-            'initOptions'         => $this->api->initOptions('items', $payload),
-            'assessment'          => $assessment,
-            'attemptId'           => $attempt->getId(),
+            'initOptions' => $this->api->initOptions('items', $payload),
+            'assessment' => $assessment,
+            'attemptId' => $attempt->getId(),
             /* Save results locally
              */
-            'completionUrl'       => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
+            'completionUrl' => $this->router->getGenerator()->generate('learnosity.postCompleteAttempt', [
                 'assessmentId' => $assessment->getId(),
-                'studentId'    => $student->getId(),
+                'studentId' => $student->getId(),
             ]),
             /* Redirect to here when we are ready
              */

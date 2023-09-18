@@ -91,17 +91,22 @@ class Replicator
             $newAssessment->setSequence($sequence);
         }
 
+        /* Cloning a quiz means we need the new Learnosity Reference identifier
+         * that can only really be obtained after sending it to Learnosity; we
+         * store the Learnosity Reference in the $assessment itself, thus making
+         * Learnosity content cloning have a sequential dependency here.
+         */
+        $this->replicateQuizConstituents($source, $newAssessment);
+
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
         $destinationContext->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $newAssessment);
 
-        // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($source, $newAssessment);
-
         return $newAssessment;
     }
+
 
     /**
      * Copy any quiz sections, questions and solutions to `$destination` from
@@ -110,15 +115,22 @@ class Replicator
      * @param IAssessable $source
      * @param IAssessable $destination
      * @return void
-     * @throws \InvalidArgumentException If Destination Quiz already has Sections
+     * @throws \DomainException
      */
     private function replicateQuizConstituents(IAssessable $source, IAssessable $destination): void
     {
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
         }
-        $this->quizMapper->copyQuizConstituents($source->getId(), $destination->getId());
+
+        /* Clone an existing Learnosity Activity
+         * Get the cloned activity's Learnosity Reference
+         * Assign this new Learnosity Reference to $destination's instance
+         * Save it
+         */
+        $this->quizMapper->copyQuizConstituents($source, $destination);
     }
+
 
     /**
      * Copy the rubric from `$source` into `$destination`.

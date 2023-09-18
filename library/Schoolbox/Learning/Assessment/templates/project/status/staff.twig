@@ -131,11 +131,10 @@ Data:
                         {% import '@learningAssessment/project/macro/icon.twig' as icon %}
                         {% set exportRoute = routeLookupIfAuthorized('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% if assessable is quiz %}
-                            {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
                             {% set viewRoute = (assessment.baseContext is unitSpecification) ? modifyRoute : routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
                         {% else %}
-                            {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
                             {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
                         {% endif %}
                         {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
@@ -172,7 +171,16 @@ Data:
                                         {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
                                         {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
                                         {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
-                                        {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
+
+                                        {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
+                                        {% if assessable is quiz %}
+                                            {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessable.id}) %}
+                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.assessment }}">Modify Quiz</a></li>
+                                            <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.assessment }} contents">Modify Contents</a></li>
+                                        {% else %}
+                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                                        {% endif %}
+
                                         {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>{% endif %}
                                     </ul>
                                 {% endif %}

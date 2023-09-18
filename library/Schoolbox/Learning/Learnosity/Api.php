@@ -147,6 +147,7 @@ class Api
      * @param string $actionType
      * @return mixed
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     private function dataRequest(string $endpoint, array $payload, string $actionType): mixed
@@ -172,10 +173,13 @@ class Api
          * The place where the json response would be contains some random text string instead
          */
         if (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
+            $errorPayload = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
             throw new \RuntimeException(sprintf(
-                '%s %s: HTTP %s %s',
+                "%s %s: %s.\n\nHTTP %s %s",
                 $actionType,
                 $url,
+                $errorPayload['meta']['message'],
                 $response->getStatusCode(),
                 $response->getBody()
             ));

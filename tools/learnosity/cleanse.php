@@ -8,7 +8,6 @@
 
 declare(strict_types=1);
 
-use Alaress\Lumberjack\Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
@@ -28,6 +27,12 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    /**
+     * Learnosity has some strict requirements about where api requests originate
+     */
+    private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
+
+
     /**
      * --help
      *
@@ -100,8 +105,13 @@ HELP;
         /* Don't have access to $_SERVER superglobal here
          * TODO Maybe make this into a cli arg if you use this outside of vagrant
          */
-        $serverName = 'vagrant.dev.schoolbox.cloud';
+        $serverName = self::DEFAULT_SERVER_NAME;
 
+        /* Skip updating the list of $exclusions if you provided them
+         *
+         * Useful when you've spent ages making an important quiz(zes) but you want to
+         * archive everything else except those.
+         */
         $exclusions = explode(',', $this->getOpt(self::OPT_LONG_EXCLUSIONS) ?? '');
 
         /* Initialise dependencies
@@ -115,55 +125,81 @@ HELP;
 
         $helper = (new Helper($api, $this->getLogger()));
 
-        /* Cleanses everything except references in $exclusions
+        /* Update everything except references in $exclusions
          */
-        $activityReferences = explode(',', $this->getOpt(self::OPT_LONG_REFERENCE) ?? '');
+        $activityReferences = array_values(array_filter(explode(',', $this->getOpt(self::OPT_LONG_REFERENCE) ?? '')));
 
-        $activities = $api->dataGetRequest('/itembank/activities', [
-            'references' => $activityReferences,
-            'status' => [
-                /* This is meant to be default behaviour, but it's broken in Learnosity
+        /* This is meant to be default behaviour, but it's broken in Learnosity
+         */
+        $currentStates = [
+            Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
+            Helper::LEARNOSITY_ITEM_STATUS_UNPUBLISHED
+        ];
+
+        try {
+            $activities = $api->dataGetRequest('/itembank/activities', [
+                'references' => $activityReferences,
+                'status' => $currentStates
+            ]);
+
+            /* No activities? No trabajo
+             */
+            if (!\count($activities['data'])) {
+                $this->getLogger()->info(sprintf(
+                    'No Learnosity Activities in state [%s] found: nothing to do. Exiting',
+                    implode(', ', $currentStates)
+                ));
+            }
+
+            foreach ($activities['data'] as $activity) {
+                $activityReference = $activity['reference'];
+
+                $this->getLogger()->info(sprintf(
+                    'Processing %s',
+                    $activityReference
+                ));
+
+                /* Skip over exclusions (used when you have meticulously
+                 * hand-crafted a quiz for showcase purposes and you don't
+                 * want to lose it, for example)
                  */
-                'published', 'unpublished'
-            ]
-        ]);
+                if (in_array($activity['reference'], $exclusions, true)) {
+                    $this->getLogger()->info(sprintf(
+                        'Skipped %s - is in exclusions list',
+                        $activityReference
+                    ));
 
-        foreach ($activities['data'] as $activity) {
-            $activityReference = $activity['reference'];
+                    continue;
+                }
 
-            $this->getLogger()->info(sprintf(
-                'Processing %s',
-                $activityReference
-            ));
+                /* Schoolbox devs only: mass soft-deleted data that we may have spawned
+                 * There's no convenient way except to slap in identifiers yourself
+                 *
+                 * Note that sometimes you get an error message like this from Learnosity
+                 * due to a bug in their system: https://help.learnosity.com/hc/requests/23138
+                 *
+                    set https://data.learnosity.com/v2023.2.LTS/itembank/activities: HTTP 400                                          [   ]
+                    {"meta":{"status":false,"timestamp":1694059871,"code":30002,"message":"Item(s)
+                    4b69cb62-9f20-48cf-91eb-d1ecefc4194b not published (Organisation 1013). Please publish Item(s) first. for
+                    Activity
+                    2db3cd8d-9449-4b99-8906-8d3da7d52bd3","request_uuid":"1aeda5bf-03b5-47e8-a2e7-3bf23d38510f","versions":{"requeste
+                    d":"v2023.2.LTS","mapped":"v1.60","concrete":"v1.60.4"}},"data":[]}
+                 */
+                try {
+                    $helper->archive($activityReference);
 
-            /* Skip over exclusions (used when you have meticulously
-             * hand-crafted a quiz for showcase purposes and you don't
-             * want to lose it, for example)
-             */
-            if (in_array($activity['reference'], $exclusions, true)) {
-                $this->getLogger()->info(sprintf(
-                    'Skipped %s - is in exclusions list',
-                    $activityReference
-                ));
+                    $this->getLogger()->info(sprintf(
+                        'Archived %s',
+                        $activityReference
+                    ));
+                } catch (\RuntimeException $e) {
+                    $this->getLogger()->warning($e->getMessage());
+                }
 
-                continue;
+                $this->getLogger()->info('');
             }
-
-            /* Schoolbox devs only: mass soft-deleted data that we may have spawned
-             * There's no convenient way except to slap in identifiers yourself
-             */
-            try {
-                $helper->archive($activityReference);
-
-                $this->getLogger()->info(sprintf(
-                    'Archived %s',
-                    $activityReference
-                ));
-            } catch (\RuntimeException $e) {
-                $this->getLogger()->warning($e->getMessage());
-            }
-
-            $this->getLogger()->info('');
+        } catch (\RuntimeException $e) {
+            $this->getLogger()->warning($e->getMessage());
         }
     }
 

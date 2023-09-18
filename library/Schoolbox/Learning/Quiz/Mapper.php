@@ -8,13 +8,18 @@
 
 namespace Schoolbox\Learning\Quiz;
 
+use Alaress\Lumberjack\Logger;
+use LearnositySdk\Exceptions\ValidationException;
 use PDO;
 use PDOStatement;
+use Ramsey\Uuid\Uuid;
 use Schoolbox;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -218,55 +223,100 @@ class Mapper extends BaseMapper
      *
      * For now, this call will throw an exception if the destination Quiz already has Sections.
      *
-     * @param int $sourceAssessmentId
-     * @param int $destinationAssessmentId
+     * @param IAssessable $source
+     * @param IAssessable $destination
      * @return bool
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
-     * @throws BaseMapper\Exception\Deleted
      * @throws \DomainException
-     * @throws \InvalidArgumentException If Destination Quiz already has Sections
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws ValidationException
+     * @throws \RuntimeException
      */
-    public function copyQuizConstituents($sourceAssessmentId, $destinationAssessmentId)
+    public function copyQuizConstituents(IAssessable $source, IAssessable $destination): bool
     {
-        $sectionMapper = $this->getJoinMapper('sections');
-        $questionMapper = QuizQuestionMapper::getInstance();
-        $solutionMapper = QuizSolutionMapper::getInstance();
+        $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
+        $learnosityConsumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
 
-        /** @var Model $sourceQuiz */
-        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
-        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
+        $api = new Api(
+            $_SERVER['SERVER_NAME'],
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
+            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+        );
 
-        foreach ($sourceQuiz->getSections() as $section) {
-            $questions = $questionMapper->findByColumn('section_id', $section->getId());
-            $section->setQuestions($questions);
-        }
+        /* Clone a Learnosity Reference in Learnosity land
+         */
+        $oldLearnosityReference = $source->getLearnosityReference();
 
-        /** @var Model $destinationQuiz */
-        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
+        /* Get the new learnosity reference and return that
+         *
+         * TODO We could either Poll Learnosity to find out when it's cloned,
+         *  or assign a random uuidv4() arbitrarily, and use that instead...
+         *  ...and hope that Learnosity is okay with it
+         */
+        $newLearnosityReference = (string)Uuid::uuid4();
 
-        // Ensure that we don't clobber destination Sections
-        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
-        if ($destinationQuiz->getSections()->count()) {
-            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
-        }
+        /* Make a massive assumption that this _just worked_
+         * You could lean on the polling system to find out when this cloning has finished,
+         * or just blindly assume the uuidv4() was unique
+         *
+         * TODO make this safer
+         */
+        $response = $api->dataSetRequest('/itembank/activities/duplicate', [
+            'activities' => [
+                [
+                    'reference' => $oldLearnosityReference,
+                    'new_reference' => $newLearnosityReference
+                ]
+            ]
+        ]);
 
-        // Clone and Save Sections, Questions + Solutions
-        foreach ($sourceQuiz->getSections() as $section) {
-            $clonedSection = clone $section;
-            $clonedSection->setQuiz($destinationQuiz);
-            $destinationQuiz->getSections()->add($clonedSection);
-            $sectionMapper->save($clonedSection);
+        /* FIXME projects need some special treatment of some kind,
+         *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
+         *  which won't have a Learnosity Reference field...weird behaviours
+         *  But Why?
+         */
+        $destination->setLearnosityReference($newLearnosityReference);
 
-            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
-                $questionMapper->save($clonedQuestion);
-                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
-                    $solutionMapper->save($clonedQuestion->getSolution());
-                }
-            }
-        }
+        /* TODO Also redefine the tags in the cloned thing...but how?
+         *  You don't know when it finishes the cloning.
+         */
+
+//        $sectionMapper = $this->getJoinMapper('sections');
+//        $questionMapper = QuizQuestionMapper::getInstance();
+//        $solutionMapper = QuizSolutionMapper::getInstance();
+//
+//        /** @var Model $sourceQuiz */
+//        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
+//        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
+//
+//        foreach ($sourceQuiz->getSections() as $section) {
+//            $questions = $questionMapper->findByColumn('section_id', $section->getId());
+//            $section->setQuestions($questions);
+//        }
+//
+//        /** @var Model $destinationQuiz */
+//        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
+//
+//        // Ensure that we don't clobber destination Sections
+//        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
+//        if ($destinationQuiz->getSections()->count()) {
+//            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
+//        }
+//
+//        // Clone and Save Sections, Questions + Solutions
+//        foreach ($sourceQuiz->getSections() as $section) {
+//            $clonedSection = clone $section;
+//            $clonedSection->setQuiz($destinationQuiz);
+//            $destinationQuiz->getSections()->add($clonedSection);
+//            $sectionMapper->save($clonedSection);
+//
+//            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
+//                $questionMapper->save($clonedQuestion);
+//                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
+//                    $solutionMapper->save($clonedQuestion->getSolution());
+//                }
+//            }
+//        }
+
         return true;
     }
 
