@@ -190,7 +190,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . '
                 FROM  forumPost AS fp2
                 WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE(:postKeyword, fp2.body)>0 DESC, fp2.modified DESC
+                ORDER BY LOCATE(:postKeyword, fp2.body)>0 DESC, fp2.modified DESC, fp2.postID ASC
+                # NOTE: Order by "fp2.postID ASC" above is necessary so that consistent results are returned each time
+                #       the query runs given that fp2.modified may not be unique.
                 LIMIT 1
              )'
         );
