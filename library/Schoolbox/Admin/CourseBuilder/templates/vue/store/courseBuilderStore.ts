@@ -66,11 +66,21 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      */
     function getSaveAllFormData() {
         const formData = new FormData();
+        formData.append("templates", JSON.stringify(courseTemplates.value));
         formData.append("unitInherit", unitInherit.value ? "1" : "0");
         formData.append("courseInherit", courseInherit.value ? "1" : "0");
-        formData.append("coursePermissions", JSON.stringify(coursePermissions.value));
-        formData.append("unitPermissions", JSON.stringify(unitPermissions.value));
-        formData.append("templates", JSON.stringify(courseTemplates.value));
+
+        // Remove any permissions that are -1 (i.e. not set)
+        formData.append(
+            "coursePermissions",
+            JSON.stringify(Object.fromEntries(Object.entries(coursePermissions.value).filter((entry) => entry[1] >= 0)))
+        );
+
+        formData.append(
+            "unitPermissions",
+            JSON.stringify(Object.fromEntries(Object.entries(unitPermissions.value).filter((entry) => entry[1] >= 0)))
+        );
+
         return formData;
     }
 
@@ -94,7 +104,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                 toastEl.value.timeout("Save successful", true, 2000);
 
                 // reload the page to get the new data
-                window.location.reload();
+                // window.location.reload();
             } else {
                 const responseText = await response.text();
                 toastEl.value.timeout(responseText, false, 2000);
