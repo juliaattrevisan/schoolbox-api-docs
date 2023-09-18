@@ -182,7 +182,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . '
                 FROM  forumPost AS fp2
                 WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp.modified DESC
+                ORDER BY LOCATE("%ea%", fp2.body)>0 DESC, fp2.modified DESC
                 LIMIT 1
              )'
         );
