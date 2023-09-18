@@ -49,6 +49,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
             'postNow'         => Alaress_Date_Format::now()->getDatabase(),
+            'postKeyword'     => $this->quoter->escapeForLike($keyword),
             'postKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
@@ -189,7 +190,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . '
                 FROM  forumPost AS fp2
                 WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE(:postKeywordLike, fp2.body)>0 DESC, fp2.modified DESC
+                ORDER BY LOCATE(:postKeyword, fp2.body)>0 DESC, fp2.modified DESC
                 LIMIT 1
              )'
         );
