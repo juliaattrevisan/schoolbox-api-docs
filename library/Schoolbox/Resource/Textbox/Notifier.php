@@ -15,6 +15,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Component_Instance;
+use Component_InstanceMapper;
 use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -225,9 +226,11 @@ class Notifier extends ResourceNotifier
             return false;
         }
         foreach ($components as $component) {
-            $configs = $component->getConfig()->indexBy('key');
-            $collapsed = (int)$configs->offsetGet('collapse')?->getValue() === 1;
-            $noTitle = (int)$configs->offsetGet('showComponentTitle')?->getValue() === 0;
+            // Need to fetch entire component as config isn't hydrated otherwise
+            $componentWithConfig = Component_InstanceMapper::getInstance()->findByInstanceId($component->getId());
+            $configs             = $componentWithConfig->getConfig()->indexBy('key');
+            $collapsed           = (int)$configs->offsetGet('collapse')?->getValue() === 1;
+            $noTitle             = (int)$configs->offsetGet('showComponentTitle')?->getValue() === 0;
             /** @var Component_Instance $component */
             if ($component->getIdentifier() === $resource->getCategory()->getId() && !($collapsed && $noTitle)) {
                 return true;
