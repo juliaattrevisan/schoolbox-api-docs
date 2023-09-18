@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\ModelToArray as ModelToArray;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\HomepageTemplateMapper;
 
 class Controller extends Base
@@ -40,29 +41,42 @@ class Controller extends Base
     }
 
     /**
+     * Retrieves the permission for a given role and page
+     *
+     * @param Role $role The role for which to retrieve the permission
+     * @param string $page The page (e.g., "course" or "unit") for which to retrieve the permission
+     *
+     * @return int The permission value associated with the specified role and page; returns -1 if no permission is found
+     */
+    private function getPermission($role, $page)
+    {
+        try {
+            $permission = $this->courseConfigMapper->findOneByColumnList(
+                [
+                    "role_id" => $role->getId(),
+                    "page" => $page,
+                ]
+            );
+            return $permission->getPermission();
+        } catch (Exception\NotFound) {
+            return -1;
+        }
+    }
+
+    /**
      * Show options
      */
     public function getIndex()
     {
+        $roles = $this->roleMapper->findAll();
 
         // Get default permissions for course and unit pages
+        $coursePermissions = [];
+        $unitPermissions = [];
 
-        $permissions = [];
-        $permissions['course'] = [];
-        $permissions['unit'] = [];
-
-        $coursePermissions = $this->courseConfigMapper->findByColumn("page", "course");
-
-        foreach ($coursePermissions as $permission) {
-            $permissions['course'][$permission->getRoleId()] = [];
-            $permissions['course'][$permission->getRoleId()][$permission->getPermission()] = 'checked';
-        }
-
-        $unitPermissions = $this->courseConfigMapper->findByColumn("page", "unit");
-
-        foreach ($unitPermissions as $permission) {
-            $permissions['unit'][$permission->getRoleId()] = [];
-            $permissions['unit'][$permission->getRoleId()][$permission->getPermission()] = 'checked';
+        foreach ($roles as $role) {
+            $coursePermissions[$role->getId()] = $this->getPermission($role, 'course');
+            $unitPermissions[$role->getId()] = $this->getPermission($role, 'unit');
         }
 
         $templates = [];
@@ -79,8 +93,9 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminCourseBuilder.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminCourseBuilder.getIndex')),
-                'roles' => $this->roleMapper->findAll(),
-                'permissions' => $permissions,
+                'roles' => $roles,
+                'coursePermissions' => $coursePermissions,
+                'unitPermissions' => $unitPermissions,
                 'availableTemplates' => $templates,
                 'courseTemplates'   => $this->courseTemplateMapper->findAll()->reindex()->map(new ModelToArray()),
                 'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
