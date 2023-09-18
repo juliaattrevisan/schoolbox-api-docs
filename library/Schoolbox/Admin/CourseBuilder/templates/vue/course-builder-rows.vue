@@ -30,6 +30,10 @@ async function onRowLeave(element: Element, done: () => void) {
     await slideUp(element);
     done();
 }
+
+const existingCourseTemplateCount = window.Vue.computed(() => {
+    return store.courseTemplates.filter((courseTemplate) => courseTemplate.id >= 0).length;
+});
 </script>
 
 <template>
@@ -77,12 +81,8 @@ async function onRowLeave(element: Element, done: () => void) {
                 <nav>
                     <a
                         class="delete-row-button icon-delete"
-                        :class="{ disabled: store.courseTemplates.length === 1 }"
-                        :title="
-                            store.courseTemplates.length === 1
-                                ? 'You must have at least one template'
-                                : 'Delete Template'
-                        "
+                        :class="{ disabled: existingCourseTemplateCount === 1 && courseTemplate.id >= 0 }"
+                        title="Delete Template"
                         @click.prevent="store.deleteCourseTemplate(courseTemplate)"
                     ></a>
                 </nav>
