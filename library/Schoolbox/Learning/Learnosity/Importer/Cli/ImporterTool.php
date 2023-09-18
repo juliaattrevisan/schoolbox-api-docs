@@ -347,60 +347,96 @@ HELP;
                 otherwise something went wrong and this row is still a candidate for import
         */
         try {
-            foreach ($legacyQuizIds as $legacyQuizId) {
-                $this->refreshLock($lock);
 
-                /* Get the legacy quiz's contents
-                 */
-                $legacyQuiz = $this->getQuiz($legacyQuizId);
+            /* $legacyQuizIds is a bunch of identifiers
+             *
+             * We can perhaps minimise more Learnosity requests by batching $blueprints
+             * which typically represent a single quiz. There's a limit on the number of
+             * quizzes, but there's also a limit on number of features/questions/items
+             * which isn't particularly obvious
+             *
+             * For now, chunk 5 quizzes at a time
+             */
+            $batchLegacyQuizIds = array_chunk($legacyQuizIds, 5);
 
-                /* Announce what we're doing
-                 */
-                $this->getLogger()->info(sprintf(
-                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                    $legacyQuiz['title'],
-                    $legacyQuiz['assessment_id'],
-                    $legacyQuiz['assess_id']
-                ));
+            foreach ($batchLegacyQuizIds as $batchSet) {
+                $blueprints = [];
 
-                /* If this doesn't have an assessment_id, idk what this is,
-                 * because you can't get here anymore.
-                 */
-                if ('' === trim((string)$legacyQuiz['assessment_id'])) {
-                    $this->getLogger()->warning(sprintf(
-                        'Missing assessment_id; skipping'
-                    ));
-
-                    continue;
-                }
-
-                /* Make the overall Learnosity payloads which we then send later with
-                 * a little postprocessing to put things into the exactly correct format.
-                 * Learnosity is really particular about such things.
-                 */
-                try {
-                    /* Choose which construction style you want
+                foreach ($batchSet as $legacyQuizId) {
+                    /* Do all the stuff it used to do to produce a $blueprint
                      */
-                    if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                        $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
-                    } else {
-                        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-                    }
-                } catch (\DomainException $e) {
-                    $this->getLogger()->warning($e->getMessage());
-                    $this->getLogger()->warning(sprintf(
-                        'Skipping assess_id %s',
+                    $this->refreshLock($lock);
+
+                    /* Get the legacy quiz's contents
+                     */
+                    $legacyQuiz = $this->getQuiz($legacyQuizId);
+
+                    /* Announce what we're doing
+                     */
+                    $this->getLogger()->info(sprintf(
+                        'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                        $legacyQuiz['title'],
+                        $legacyQuiz['assessment_id'],
                         $legacyQuiz['assess_id']
                     ));
 
-                    continue;
+                    /* If this doesn't have an assessment_id, idk what this is,
+                     * because you can't get here anymore.
+                     */
+                    if ('' === trim((string)$legacyQuiz['assessment_id'])) {
+                        $this->getLogger()->warning(sprintf(
+                            'Missing assessment_id; skipping'
+                        ));
+
+                        continue;
+                    }
+
+                    /* Make the overall Learnosity payloads which we then send later with
+                     * a little postprocessing to put things into the exactly correct format.
+                     * Learnosity is really particular about such things.
+                     */
+                    try {
+                        /* Choose which construction style you want
+                         */
+                        if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
+                            $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
+                        } else {
+                            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+                        }
+                    } catch (\DomainException $e) {
+                        $this->getLogger()->warning($e->getMessage());
+                        $this->getLogger()->warning(sprintf(
+                            'Skipping assess_id %s',
+                            $legacyQuiz['assess_id']
+                        ));
+
+                        continue;
+                    }
+
+                    /* Optionally show array payloads
+                     */
+                    if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+                        print_r($blueprint);
+                    }
+
+                    /* Load it up into a mini-stack
+                     */
+                    $blueprints[] = $blueprint;
                 }
 
-                /* Optionally show array payloads
+                /* Stack them up by their various strata -
+                 * all the features get combined, all the questions get combined,
+                 * all the items get combined and all the activities get combined.
                  */
-                if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
-                    print_r($blueprint);
-                }
+
+                /* Send it as batches of features, questions, items, activities
+                 * and just...hope/presumed that everything worked out
+                 */
+            }
+
+
+
+            foreach ($legacyQuizIds as $legacyQuizId) {
 
                 /* Actually do it
                  */
