@@ -513,7 +513,18 @@ class BlueprintBuilder
                 ]
             ],
             '/itembank/questions' => [
-
+                'endpoint' => '/itembank/questions',
+                'payload' => [
+                    'meta' => [
+                        'user' => [
+                            /* FIXME replace with actual author somehow, or just assume a system user
+                             *  I'm not really sure this is ever shown to an end user
+                             */
+                            'id' => 'vagrant_1'
+                        ]
+                    ],
+                    'questions' => []
+                ]
             ],
             '/itembank/items' => [],
             '/itembank/activities' => [],
@@ -527,7 +538,7 @@ class BlueprintBuilder
                 if ('/itembank/features' === $endpoint) {
                     $consolidated[$endpoint]['payload']['features'] = array_merge($consolidated[$endpoint]['payload']['features'], $payloadSequence['payload']['features']);
                 } elseif ('/itembank/questions' === $endpoint) {
-
+                    $consolidated[$endpoint]['payload']['questions'] = array_merge($consolidated[$endpoint]['payload']['questions'], $payloadSequence['payload']['questions']);
                 }
 
             }
