@@ -44,7 +44,7 @@ class Exact implements IStrategy
         $answer = $question['_answers'][0]['answer'];
 
         return [
-            'case_sensitive' => true,
+            'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
             'stimulus' => $question['question'],
