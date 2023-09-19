@@ -139,7 +139,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         $orderParts[] = "$titlePart ASC";
         $orderParts[] = "`type` ASC";
-        $orderParts[] = "$idPart ASC";
+        $orderParts[] = "$idPart DESC";
         $query .= ' ORDER BY ' . implode(', ', $orderParts);
         $query .= ' LIMIT :limit';
 
