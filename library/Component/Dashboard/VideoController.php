@@ -151,69 +151,69 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             'video_pending_comment_block' => ''
         ));
 
-            foreach ($this->outputList as $video) {
-                $this->setVar(
-                    array(
-                        'VIDEO_LIST_ID'        => $video->getFile()->getId(),
-                        'VIDEO_LIST_TITLE'     => Scrub::text($video->getFile()->getTitle()),
-                        'VIDEO_LIST_DURATION'  => $video->getDuration() >= 3600 ? gmdate('H:i:s', $video->getDuration()) : gmdate('i:s', $video->getDuration()),
-                        'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
-                        'VIDEO_LIST_POSTER'    => $video->getFile()->getOwner()->getFullName(),
-                    )
-                );
+        foreach ($this->outputList as $video) {
+            $this->setVar(
+                array(
+                    'VIDEO_LIST_ID'        => $video->getFile()->getId(),
+                    'VIDEO_LIST_TITLE'     => Scrub::text($video->getFile()->getTitle()),
+                    'VIDEO_LIST_DURATION'  => $video->getDuration() >= 3600 ? gmdate('H:i:s', $video->getDuration()) : gmdate('i:s', $video->getDuration()),
+                    'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
+                    'VIDEO_LIST_POSTER'    => $video->getFile()->getOwner()->getFullName(),
+                )
+            );
 
-                $comment = Scrub::text($video->getFile()->getDescription());
+            $comment = Scrub::text($video->getFile()->getDescription());
 
-                if ($video->getStatus() === "completed" && $this->isVisibleToCurrentUser($video)) {
-                    if (strlen($comment)) {
-                        $this->setVar(array(
-                            'VIDEO_LIST_COMMENT' => $comment
-                        ));
+            if ($video->getStatus() === "completed" && $this->isVisibleToCurrentUser($video)) {
+                if (strlen($comment)) {
+                    $this->setVar(array(
+                        'VIDEO_LIST_COMMENT' => $comment
+                    ));
 
-                        $this->parse('video_list_comment_block', 'video_list_comment');
-                    } else {
-                        $this->setVar(array(
-                            'video_list_comment_block' => ''
-                        ));
-                    }
-
-                    // Owner name and optional link
-                    if ($video->getFile()->getOwner()->isDeleted()) {
-                        $this->setVar('owner_exists_block', '');
-                        $this->parse('owner_deleted_block', 'owner_deleted');
-                    } else {
-                        $this->parse('owner_exists_block', 'owner_exists');
-                        $this->setVar('owner_deleted_block', '');
-                    }
-
-                    $this->parse('video_list_block', 'video_list', true);
+                    $this->parse('video_list_comment_block', 'video_list_comment');
                 } else {
-                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                        if (strlen($comment)) {
-                            $this->setVar(array(
-                                'VIDEO_PENDING_COMMENT' => $comment
-                            ));
-
-                            $this->parse('video_pending_comment_block', 'video_pending_comment');
-                        } else {
-                            $this->setVar(array(
-                                'video_pending_comment_block' => ''
-                            ));
-                        }
-
-                        $this->setVar('VIDEO_LIST_STATUS', strtolower($video->getStatus()));
-
-                        $this->parse('video_pending_list_block', 'video_pending_list', true);
-                    }
+                    $this->setVar(array(
+                        'video_list_comment_block' => ''
+                    ));
                 }
 
-                /* Clear children after parsing out the parent
-                 */
-                $this->setVar(array(
-                    'video_list_comment_block' => '',
-                    'video_pending_comment_block' => ''
-                ));
+                // Owner name and optional link
+                if ($video->getFile()->getOwner()->isDeleted()) {
+                    $this->setVar('owner_exists_block', '');
+                    $this->parse('owner_deleted_block', 'owner_deleted');
+                } else {
+                    $this->parse('owner_exists_block', 'owner_exists');
+                    $this->setVar('owner_deleted_block', '');
+                }
+
+                $this->parse('video_list_block', 'video_list', true);
+            } else {
+                if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                    if (strlen($comment)) {
+                        $this->setVar(array(
+                            'VIDEO_PENDING_COMMENT' => $comment
+                        ));
+
+                        $this->parse('video_pending_comment_block', 'video_pending_comment');
+                    } else {
+                        $this->setVar(array(
+                            'video_pending_comment_block' => ''
+                        ));
+                    }
+
+                    $this->setVar('VIDEO_LIST_STATUS', strtolower($video->getStatus()));
+
+                    $this->parse('video_pending_list_block', 'video_pending_list', true);
+                }
             }
+
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar(array(
+                'video_list_comment_block' => '',
+                'video_pending_comment_block' => ''
+            ));
+        }
 
         if (is_object($this->defaultVideo) && $this->defaultVideo->getStatus() === 'completed') {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
