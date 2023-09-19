@@ -28,14 +28,21 @@ class HeaderAdapter
      *
      * The Redis message variant supports attempts natively via a custom header,
      * but this header is removed upon rejecting and re-queueing the message.
+     *
+     * The Redis and custom attempt header refer to slightly different concepts:
+     * * the Redis attempt header is incremented whenever a message is not
+     *   acknowledged within a given time frame
+     * * the custom attempt header is incremented whenever a message is added
+     *   back to the queue (e.g. when its job raised an error, or is still
+     *   pending)
      */
-    public const HEADER_ATTEMPTS = 'x-taskd-attempts';
+    private const HEADER_ATTEMPTS = 'x-taskd-attempts';
 
     /**
      * Custom message header: overrides the maximum number of attempts which may
      * be made to process a message.
      */
-    public const HEADER_MAX_ATTEMPTS = 'x-taskd-max-attempts';
+    private const HEADER_MAX_ATTEMPTS = 'x-taskd-max-attempts';
 
     /**
      * Set the value of the delay header in the message.
