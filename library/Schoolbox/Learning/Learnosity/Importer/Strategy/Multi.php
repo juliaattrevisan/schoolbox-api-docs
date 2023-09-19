@@ -58,10 +58,16 @@ class Multi implements IStrategy
             }
         }
 
+        /* Randomise option order
+         * This was a configuration setting in legacy quiz
+         */
+        $shuffleOptions = (bool)($question['config']['randomiseOptionOrder'] ?? false);
+
         return [
             'instant_feedback' => false,
             'multiple_responses' => true,
             'options' => $options,
+            'shuffle_options' => $shuffleOptions,
             'stimulus' => $question['question'],
             'type' => $this->getLearnosityEquivalent(),
             'ui_style' => [
