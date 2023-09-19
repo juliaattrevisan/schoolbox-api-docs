@@ -70,8 +70,6 @@ class Multi implements IStrategy
                  */
                 'choice_label' => 'lower-alpha',
                 'type' => 'block'
-                /* TODO This might be the place where you specify the enumeration style
-                 */
             ],
             'validation' => [
                 'automarkable' => true,
