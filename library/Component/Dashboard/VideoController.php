@@ -151,9 +151,6 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             'video_pending_comment_block' => ''
         ));
 
-        if (count($this->outputList)) {
-            $j = 0;
-
             foreach ($this->outputList as $video) {
                 $this->setVar(
                     array(
@@ -217,7 +214,6 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                     'video_pending_comment_block' => ''
                 ));
             }
-        }
 
         if (is_object($this->defaultVideo) && $this->defaultVideo->getStatus() === 'completed') {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
