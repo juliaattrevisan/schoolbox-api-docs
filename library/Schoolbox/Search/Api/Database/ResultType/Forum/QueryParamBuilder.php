@@ -179,8 +179,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * --------------------------
      * Creating this subquery for each of buildIdExpression(), buildDateExpression(), and buildCreatorExpression() will
      * result in a near-identical subquery repeated multiple times in the query that is eventually run.
-     * I could not figure out a way to remove the repetition of subqueries.  If this is found to be inefficient, we can
-     * revisit.
+     * A way to remove the repeated subqueries is demonstrated in https://github.com/alaress/schoolbox/pull/28981.
+     * The current method is good enough for now.
      *
      * @param string $columnToSelect
      * @return string
