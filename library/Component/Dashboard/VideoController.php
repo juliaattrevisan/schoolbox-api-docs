@@ -151,6 +151,14 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             'video_pending_comment_block' => ''
         ));
 
+        /* Number of videos that were shown in the list
+         *
+         * Because the visibility check is done in the iteration we won't know how many videos from
+         * $outputList were actually shown to the user; it could be none (at which point this function
+         * should return false).
+         */
+        $numVideosListed = 0;
+
         foreach ($this->outputList as $video) {
             $this->setVar(
                 array(
@@ -187,6 +195,8 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                 }
 
                 $this->parse('video_list_block', 'video_list', true);
+
+                $numVideosListed++;
             } else {
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     if (strlen($comment)) {
@@ -204,6 +214,8 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                     $this->setVar('VIDEO_LIST_STATUS', strtolower($video->getStatus()));
 
                     $this->parse('video_pending_list_block', 'video_pending_list', true);
+
+                    $numVideosListed++;
                 }
             }
 
@@ -213,6 +225,10 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                 'video_list_comment_block' => '',
                 'video_pending_comment_block' => ''
             ));
+        }
+
+        if ($numVideosListed === 0 && ($this->getContentPermission() < UserAccess::ACCESS_WRITE)) {
+            return false;
         }
 
         if (is_object($this->defaultVideo) && $this->defaultVideo->getStatus() === 'completed') {
