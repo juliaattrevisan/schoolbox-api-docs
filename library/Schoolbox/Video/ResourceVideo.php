@@ -26,7 +26,7 @@ class ResourceVideo
     /** @var int */
     protected $duration;
 
-    /** @var File\IFile */
+    /** @var File\Model */
     protected $file;
 
     /** @var Storage\Model */
@@ -164,18 +164,18 @@ class ResourceVideo
     }
 
     /**
-     * @return File\IFile
+     * @return File\Model
      */
-    public function getFile()
+    public function getFile(): File\Model
     {
         return $this->file;
     }
 
     /**
-     * @param File\IFile $file
+     * @param File\Model $file
      * @return self
      */
-    public function setFile($file)
+    public function setFile(File\Model $file)
     {
         $this->file = $file;
         return $this;
