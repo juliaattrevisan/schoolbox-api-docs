@@ -98,7 +98,7 @@ class Hydrator extends BaseHydrator
                             self::BASE_TYPE . '.course'    => 'course',
                             self::BASE_TYPE . '.unit'      => 'unit',
                             self::BASE_TYPE . '.class'     => 'teacher',
-                            self::BASE_TYPE . '.homepage'  => 'homepage',
+                            self::BASE_TYPE . '.homepage'  => 'home',
                             default                        => 'folder',
                         },
                         null,
