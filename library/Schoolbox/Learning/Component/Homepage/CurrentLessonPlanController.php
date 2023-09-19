@@ -57,14 +57,6 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
         $student        = $this->getUser();
 
-        /**
-         * If parent role, or user has no subjects
-         * exit early
-         */
-        if ($student->getRole()->isParent()) {
-            return false;
-        }
-
         $lessonPlanMapper     = LessonPlanMapper::getInstance();
         $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
