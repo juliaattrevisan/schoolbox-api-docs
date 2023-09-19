@@ -113,6 +113,7 @@ class ContextLookup
         SELECT code
         FROM folder_code
         WHERE folder_id = :id
+        AND deleted_at IS NULL
     ';
 
 
