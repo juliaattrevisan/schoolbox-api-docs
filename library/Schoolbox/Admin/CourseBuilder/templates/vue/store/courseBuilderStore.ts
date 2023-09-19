@@ -9,6 +9,8 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
     const courseInherit = window.Vue.ref<boolean>(false);
     const unitInherit = window.Vue.ref<boolean>(false);
 
+    const courseTemplateToDelete = window.Vue.ref<CourseTemplate | null>(null); // The course template to delete, when set - the delete modal will open
+
     const saveIsProcessing = window.Vue.ref<boolean>(false);
     const saveStatus = window.Vue.ref<string>("Save Changes");
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
@@ -50,14 +52,29 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
     }
 
     /**
-     * Deletes a specific course template in the store
+     * Deletes the currently selected course template
      * @param { CourseTemplate } courseTemplate - the course template to delete
      */
-    function deleteCourseTemplate(courseTemplate: CourseTemplate) {
+    async function deleteCourseTemplate(courseTemplate: CourseTemplate) {
+        if (courseTemplate.id >= 0) {
+            toastEl.value.activate("Deleting...");
+            const response = await fetch(`/adminv2/course-builder/delete/${courseTemplate.id}`, { method: "DELETE" });
+
+            if (!response.ok) {
+                const responseText = await response.text();
+                toastEl.value.timeout(responseText, false, 2000);
+                return;
+            }
+
+            toastEl.value.timeout("Deleted", true, 2000);
+        }
+
         const index = courseTemplates.value.findIndex((ct) => ct.id === courseTemplate.id);
         if (index !== -1) {
             courseTemplates.value.splice(index, 1);
         }
+
+        courseTemplateToDelete.value = null;
     }
 
     /**
@@ -104,7 +121,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                 toastEl.value.timeout("Save successful", true, 2000);
 
                 // reload the page to get the new data
-                // window.location.reload();
+                window.location.reload();
             } else {
                 const responseText = await response.text();
                 toastEl.value.timeout(responseText, false, 2000);
@@ -126,6 +143,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         unitPermissions,
         courseInherit,
         unitInherit,
+        courseTemplateToDelete,
         updateCourseTemplate,
         deleteCourseTemplate,
         saveChanges,

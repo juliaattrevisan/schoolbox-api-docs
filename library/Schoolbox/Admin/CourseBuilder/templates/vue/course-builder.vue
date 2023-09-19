@@ -5,6 +5,7 @@ import { PageTemplate, CourseTemplate, Role, Permissions } from "./courseBuilder
 import CourseBuilderRows from "./course-builder-rows.vue";
 import CourseBuilderAccessCourse from "./course-builder-access-course.vue";
 import CourseBuilderAccessUnit from "./course-builder-access-unit.vue";
+import CourseBuilderDeleteModal from "./course-builder-delete-modal.vue";
 
 interface Props {
     courseTemplates: CourseTemplate[];
@@ -91,6 +92,8 @@ window.Vue.onMounted(() => {
         </div>
         <button class="submit" type="submit">Save Changes</button>
     </form>
+
+    <course-builder-delete-modal />
 
     <toast ref="toastEl"></toast>
 </template>

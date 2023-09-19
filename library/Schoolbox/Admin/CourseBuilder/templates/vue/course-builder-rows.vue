@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
-import { PageTemplate } from "./courseBuilderTypes";
+import { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
 
 interface Props {
     availableTemplates: PageTemplate[];
@@ -29,6 +29,18 @@ async function onRowEnter(element: Element, done: () => void) {
 async function onRowLeave(element: Element, done: () => void) {
     await slideUp(element);
     done();
+}
+
+/**
+ * Trigger the deletetion process for a course template
+ * @param {CourseTemplate} courseTemplate - the course template to delete
+ */
+async function onDeleteClicked(courseTemplate: CourseTemplate) {
+    if (courseTemplate.id >= 0) {
+        store.courseTemplateToDelete = courseTemplate;
+    } else {
+        await store.deleteCourseTemplate(courseTemplate);
+    }
 }
 
 const existingCourseTemplateCount = window.Vue.computed(() => {
@@ -83,7 +95,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         class="delete-row-button icon-delete"
                         :class="{ disabled: existingCourseTemplateCount === 1 && courseTemplate.id >= 0 }"
                         title="Delete Template"
-                        @click.prevent="store.deleteCourseTemplate(courseTemplate)"
+                        @click.prevent="onDeleteClicked(courseTemplate)"
                     ></a>
                 </nav>
             </div>
