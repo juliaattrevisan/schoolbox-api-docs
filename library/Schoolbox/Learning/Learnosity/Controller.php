@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
@@ -75,6 +76,7 @@ class Controller extends Base
      * @throws ValidationException
      * @throws \DomainException Thrown when site_school_code is empty string
      * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function getContent(IAssessable $assessment): void
     {
@@ -84,6 +86,13 @@ class Controller extends Base
          * not when authorApp initialises for the first time
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+
+        if ('' === (string)$assessment->getLearnosityReference()) {
+            throw new \RuntimeException(sprintf(
+                'Assessment %s is not in learnosity; try importing it with the cli tool',
+                $assessment->getId()
+            ));
+        }
 
         $tags = $tagFactory->produceFromAssessment($assessment);
 
@@ -104,6 +113,9 @@ class Controller extends Base
                     'reference' => [
                         'show' => false,
                     ],
+                    /* Hide the "Source" tab
+                     */
+                    'source' => false,
                     /* Tags are only spawned upon clicking Save, not before
                      */
                     'tags_on_create' => $tags
@@ -758,7 +770,8 @@ class Controller extends Base
 
         /* Get the new result back from learnosity
          *
-         * FIXME This occurs too quickly. We refetch the session score before
+         * FIXME Add Polling Mechanism
+         *  This occurs too quickly. We refetch the session score before
          *  Learnosity had a chance to finish updating it, so we always get
          *  the old value back.
          *
@@ -792,6 +805,7 @@ class Controller extends Base
      * @throws Exception
      * @throws RouteNotFound
      * @throws ValidationException
+     * @throws InvalidColumnException
      * @throws \JsonException
      * @throws \RuntimeException
      */
@@ -806,7 +820,11 @@ class Controller extends Base
          *
          * TODO What was supposed to happen for multiple attempts in a horizontal marking context?
          */
-        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
+        $pb = $this->attemptMapper->getPredicateBuilder()
+            ->equals('assess_id', $quiz->getId())
+            ->notNull('learnosity_reference');
+
+        $attempts = $this->attemptMapper->findByPredicates($pb, [
             'order' => [
                 'finish' => 'desc'
             ]
@@ -905,37 +923,53 @@ class Controller extends Base
             'references' => [
                 $quiz->getLearnosityReference()
             ]
-        ])['data'][0]['data']['items'];
+        ])['data'][0]['data']['items'] ?? null;
 
-        /* Find a list of Learnosity Items (questions) available in this quiz
-         * This includes more info about each item
+        /* $itemReferences is null when you try to horizontal mark a non-learnosity quiz.
+         * This shouldn't happen except during dev, since our importer would have shanked
+         * everything into learnosity's db
          */
-        $items = $this->api->dataGetRequest('itembank/items', [
-            'references' => array_column($itemReferences, 'id')
-        ])['data'];
-
-        /* Consolidate reference and titles into an in-order lookup
-         * (because $items is in some non-sequenced order)
-         */
-        foreach ($itemReferences as &$itemReference) {
-            $reference = $itemReference['reference'];
-
-            /* Find it in the set of $items
+        if (null !== $itemReferences) {
+            /* Find a list of Learnosity Items (questions) available in this quiz
+             * This includes more info about each item
              */
-            foreach ($items as $item) {
-                if ($reference === $item['reference']) {
-                    $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
-                    $itemReference['title'] = $title;
+            $items = $this->api->dataGetRequest('itembank/items', [
+                'references' => array_column($itemReferences, 'id')
+            ])['data'];
+
+            /* Consolidate reference and titles into an in-order lookup
+             * (because $items is in some non-sequenced order)
+             */
+            foreach ($itemReferences as &$itemReference) {
+                /* FIXME Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                 *  we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                 */
+                if (!is_array($itemReference)) {
+                    $itemReference = [
+                        'reference' => $itemReference,
+                        'id' => $itemReference
+                    ];
+                }
+
+                $reference = $itemReference['reference'];
+
+                /* Find it in the set of $items
+                 */
+                foreach ($items as $item) {
+                    if ($reference === $item['reference']) {
+                        $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
+                        $itemReference['title'] = $title;
+                    }
                 }
             }
-        }
 
-        unset($itemReference);
+            unset($itemReference);
+        }
 
         /* Obtain their scores from Learnosity
          */
         $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => array_values($sessions)
+            'session_id' => array_values(array_filter($sessions))
         ])['data'];
 
         /* Reforge it into a generic set of tuples
@@ -1163,10 +1197,19 @@ class Controller extends Base
                     ]
                 ],
                 'activity_edit' => [
-                    'title' => [
-                        'show' => true,
-                        'show_reference' => true
-                    ]
+                    'item' => [
+                        'title' => [
+                            'show' => true
+                        ]
+                    ],
+                    'item_search' => [
+                        'title' => [
+                            'show' => true,
+                        ],
+                    ],
+                    'reference' => [
+                        'show' => false,
+                    ],
                 ]
             ],
             'user' => [

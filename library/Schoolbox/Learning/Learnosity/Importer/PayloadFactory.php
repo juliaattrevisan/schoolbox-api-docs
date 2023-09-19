@@ -1,0 +1,250 @@
+<?php
+
+/**
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Learnosity\Importer;
+
+use Ramsey\Uuid\Uuid;
+use Schoolbox\Learning\Learnosity\Helper;
+use Schoolbox\Learning\Learnosity\Importer\Strategy\Factory;
+
+/**
+ * Spawns a Learnosity-friendly payload structure for Activities,
+ * Items, etc. based on the data provided.
+ */
+class PayloadFactory
+{
+    public const LEARNOSITY_PAYLOAD_ACTIVITY = 'activity';
+    public const LEARNOSITY_PAYLOAD_ITEM = 'item';
+
+    public const LEARNOSITY_PAYLOAD_SECTION_FEATURE = 'sectionFeature';
+    public const LEARNOSITY_PAYLOAD_QUESTION = 'question';
+
+
+    /**
+     * Constructor.
+     *
+     * @param Factory $strategyFactory
+     */
+    public function __construct(private Strategy\Factory $strategyFactory)
+    {
+    }
+
+
+    /**
+     * Spawns a Learnosity-friendly payload structure for Activities,
+     * Items, etc. based on the data provided.
+     *
+     * @param string $type
+     * @param array $data
+     * @param array|null $tags
+     * @return array
+     * @throws \DomainException
+     */
+    public function produce(string $type, array $data, ?array $tags): array
+    {
+        return match ($type) {
+            self::LEARNOSITY_PAYLOAD_ACTIVITY => $this->setupActivityNode($data, $tags),
+            self::LEARNOSITY_PAYLOAD_ITEM => $this->setupItemNode($data, $tags),
+            self::LEARNOSITY_PAYLOAD_SECTION_FEATURE => $this->setupSectionFeatureNode($data, $tags),
+            self::LEARNOSITY_PAYLOAD_QUESTION => $this->setupQuestionNode($data),
+            default => [],
+        };
+    }
+
+
+    /**
+     * Set up a payload for a single activity
+     *
+     * @param array $legacyQuiz
+     * @param array $tags
+     * @return array
+     */
+    private function setupActivityNode(array $legacyQuiz, array $tags): array
+    {
+        $struct = [
+            'data' => [
+                'config' => [
+                    /* TODO dedupe this with the other implementation, I suppose
+                     *  Not sure where it would go though
+                     */
+                    'regions' => [
+                        'top-left' => [
+                            ['type' => 'title_element'],
+                        ],
+                        'top-right' => [
+                            ['type' => 'itemcount_element'],
+                            ['type' => 'pause_button'],
+                            ['type' => 'reading_timer_element'],
+                            ['type' => 'timer_element'],
+                        ],
+                        'items' => [
+                            ['type' => 'progress_element'],
+                            ['type' => 'slider_element']
+                        ],
+                        'right' => [
+                            ['type' => 'save_button'],
+                            ['type' => 'reviewscreen_button'],
+                            ['type' => 'resource_button'],
+                            ['type' => 'accessibility_button'],
+                            ['type' => 'flagitem_button'],
+                            ['type' => 'masking_button'],
+                            ['type' => 'verticaltoc_element'],
+                        ],
+                        'bottom-left' => [
+                            [
+                                'type' => 'previous_button',
+                                'show_label_option' => true
+                            ],
+                        ],
+                        'bottom-right' => [
+                            ['type' => 'next_button'],
+                        ]
+                    ],
+                    /* Time (duration)
+                     */
+                    'time' => [
+                        /* Force submission when time expires
+                         * TODO may be controversial but seems desired, since it minimises
+                         *  the quantity of "unfinalised attempts"
+                         */
+                        'limit_type' => 'hard',
+                        /* Show countdown timer
+                         * TODO may be controversial (stressful)
+                         */
+                        'countdown_option' => true
+                    ]
+                ],
+                /* Fill in after the fact
+                 */
+                'items' => [],
+                'rendering_type' => 'assess'
+            ],
+            /* A unique uuid in learnosity land that we can arbitrarily assign here
+             */
+            'reference' => (string)Uuid::uuid4(),
+            /* Always spawn in PUBLISHED state
+             */
+            'status' => Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
+            /* Tags
+             */
+            'tags' => $tags,
+            /* The name of the quiz
+             */
+            'title' => $legacyQuiz['title'],
+        ];
+
+        if ((int)$legacyQuiz['duration']) {
+            /* If a duration was set, configure it similarly
+             *
+             * Legacy quiz used -1 to mean "No Duration" but in learnosity, this is achieved
+             * by using zero. A bug in learnosity's api allows you to compel an activity
+             * to have -1 as a duration which ended up equating to -1hr59min lol
+             * https://help.learnosity.com/hc/en-us/requests/23267
+             */
+            $struct['data']['config']['time']['max_time'] = max((int)$legacyQuiz['duration'], 0);
+
+            /* Warn users when 60 seconds remains
+             */
+            $struct['data']['config']['time']['warning_time'] = 60;
+        }
+
+        return $struct;
+    }
+
+
+    /**
+     * Set up a payload for a single item
+     * (this will be vaguely synonymous with our legacy Section idea)
+     *
+     * @param array $section
+     * @param array $tags
+     * @return array
+     */
+    private function setupItemNode(array $section, array $tags): array
+    {
+        return [
+            /* This decides where a feature/question appears in a layout
+             */
+            'definition' => [
+                'widgets' => []
+            ],
+            /* Features and Questions are indexed separately
+             */
+            'features' => [],
+            'questions' => [],
+            /* A unique uuid in learnosity land that we can arbitrarily assign here
+             */
+            'reference' => (string)Uuid::uuid4(),
+            /* Always spawn in PUBLISHED state
+             */
+            'status' => Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
+            /* Tags
+             * TODO Fill in with some derived values about courses and units and classcodes
+             */
+            'tags' => $tags,
+            /* The name of the quiz
+             */
+            'title' => $section['title'],
+        ];
+    }
+
+
+    /**
+     * Optional section Description
+     *
+     * If it was more than an empty string, make a placeholder Passage thing
+     * Otherwise skip it; there's nothing to say
+     */
+    private function setupSectionFeatureNode(array $section, array $tags): array
+    {
+        if ('' !== trim((string)$section['description'])) {
+            return [
+                'data' => [
+                    'content' => $section['description'],
+                    'heading' => $section['title'],
+                    'type' => 'sharedpassage',
+                ],
+                'reference' => (string)UUid::uuid4(),
+                'type' => 'sharedpassage',
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * Set up a payload for a Question that lives in an Item.
+     * $question comes with $answers too, from our db
+     *
+     * @param array $question
+     * @return array
+     * @throws \DomainException
+     */
+    private function setupQuestionNode(array $question): array
+    {
+        $strategy = $this->strategyFactory->produce($question['type_id']);
+
+        /* Unknown question type
+         */
+        if (null === $strategy) {
+            throw new \DomainException(sprintf(
+                'Unknown/unsupported question type %s in StrategyFactory when processing question %s in section_id %s',
+                $question['type_id'],
+                $question['question_id'],
+                $question['section_id']
+            ));
+        }
+
+        return [
+            'data' => $strategy->convert($question),
+            'type' => $strategy->getLearnosityEquivalent(),
+            'reference' => (string)UUid::uuid4(),
+        ];
+    }
+}

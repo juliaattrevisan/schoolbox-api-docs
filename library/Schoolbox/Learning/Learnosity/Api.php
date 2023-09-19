@@ -13,6 +13,7 @@ use Alaress\Lumberjack\Logger;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Request\DataApi;
 use LearnositySdk\Request\Init;
+use Psr\Log\LoggerInterface;
 
 /**
  * Generates API calls to Learnosity.
@@ -39,7 +40,7 @@ class Api
         private string $serverName,
         #[\SensitiveParameter] private string $consumerKey,
         #[\SensitiveParameter] private string $consumerSecret,
-        private ?Logger $logger = null
+        private ?LoggerInterface $logger = null
     ) {
         /* If not set, I guess loudly announce it
          */
