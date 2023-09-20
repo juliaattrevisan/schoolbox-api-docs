@@ -44,6 +44,56 @@ class BlueprintBuilder
 
 
     /**
+     * Combined strata of features, questions, items, activities, associations
+     */
+    public const INITIAL_CONSOLIDATION = [
+        self::ENDPOINT_FEATURES => [
+            'endpoint' => self::ENDPOINT_FEATURES,
+            'payload' => [
+                'features' => []
+            ],
+            'count' => 0,
+        ],
+        self::ENDPOINT_QUESTIONS => [
+            'endpoint' => self::ENDPOINT_QUESTIONS,
+            'payload' => [
+                'meta' => [
+                    'user' => [
+                        /* FIXME replace with actual author somehow, or just assume a system user
+                         *  I'm not really sure this is ever shown to an end user
+                         */
+                        'id' => self::DEFAULT_AUTHOR
+                    ]
+                ],
+                'questions' => []
+            ],
+            'count' => 0,
+        ],
+        self::ENDPOINT_ITEMS => [
+            'endpoint' => self::ENDPOINT_ITEMS,
+            'payload' => [
+                'items' => []
+            ],
+            'count' => 0,
+        ],
+        self::ENDPOINT_ACTIVITIES => [
+            'endpoint' => self::ENDPOINT_ACTIVITIES,
+            'payload' => [
+                'activities' => []
+            ],
+            'count' => 0,
+        ],
+        self::ENDPOINT_ASSOCIATIONS => [
+            'endpoint' => self::ENDPOINT_ASSOCIATIONS,
+            'payload' => [
+                'associations' => []
+            ],
+            'count' => 0,
+        ]
+    ];
+
+
+    /**
      * A generic author identifier attributed to each and every question
      * since we're aligning the strata of all questions from every quiz.
      *
@@ -526,90 +576,47 @@ class BlueprintBuilder
      * Combine the various strata (features, questions, items, activities) of
      * each $blueprint into one mega-blueprint grouped by their corresponding kind.
      *
-     * @param array $blueprints
+     * @param array $previousConsolidation
+     * @param array $blueprint
      * @return array
      */
-    public function align(array $blueprints): array
+    public function align(array $previousConsolidation, array $blueprint): array
     {
+        /* Add to this thing
+         */
+        $consolidated = $previousConsolidation;
+
         /* Combined strata of features, questions, items, activities, associations
          */
-        $consolidated = [
-            self::ENDPOINT_FEATURES => [
-                'endpoint' => self::ENDPOINT_FEATURES,
-                'payload' => [
-                    'features' => []
-                ],
-                'count' => 0,
-            ],
-            self::ENDPOINT_QUESTIONS => [
-                'endpoint' => self::ENDPOINT_QUESTIONS,
-                'payload' => [
-                    'meta' => [
-                        'user' => [
-                            /* FIXME replace with actual author somehow, or just assume a system user
-                             *  I'm not really sure this is ever shown to an end user
-                             */
-                            'id' => self::DEFAULT_AUTHOR
-                        ]
-                    ],
-                    'questions' => []
-                ],
-                'count' => 0,
-            ],
-            self::ENDPOINT_ITEMS => [
-                'endpoint' => self::ENDPOINT_ITEMS,
-                'payload' => [
-                    'items' => []
-                ],
-                'count' => 0,
-            ],
-            self::ENDPOINT_ACTIVITIES => [
-                'endpoint' => self::ENDPOINT_ACTIVITIES,
-                'payload' => [
-                    'activities' => []
-                ],
-                'count' => 0,
-            ],
-            self::ENDPOINT_ASSOCIATIONS => [
-                'endpoint' => self::ENDPOINT_ASSOCIATIONS,
-                'payload' => [
-                    'associations' => []
-                ],
-                'count' => 0,
-            ]
+        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+            $endpoint = $payloadSequence['endpoint'];
+
+            /* Update payloads and counts
+             */
+            if (self::ENDPOINT_FEATURES === $endpoint) {
+                $consolidated[$endpoint]['payload']['features'] = array_merge($consolidated[$endpoint]['payload']['features'], $payloadSequence['payload']['features']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['features']);
+            } elseif (self::ENDPOINT_QUESTIONS === $endpoint) {
+                $consolidated[$endpoint]['payload']['questions'] = array_merge($consolidated[$endpoint]['payload']['questions'], $payloadSequence['payload']['questions']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['questions']);
+            } elseif (self::ENDPOINT_ITEMS === $endpoint) {
+                $consolidated[$endpoint]['payload']['items'] = array_merge($consolidated[$endpoint]['payload']['items'], $payloadSequence['payload']['items']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['items']);
+            } elseif (self::ENDPOINT_ACTIVITIES === $endpoint) {
+                $consolidated[$endpoint]['payload']['activities'] = array_merge($consolidated[$endpoint]['payload']['activities'], $payloadSequence['payload']['activities']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['activities']);
+            }
+        }
+
+        /* We need to do this in schoolbox land after the fact
+         */
+        $consolidated[self::ENDPOINT_ASSOCIATIONS]['payload']['associations'][] = [
+            'quizId' => $blueprint['quizId'],
+            'assessmentId' => $blueprint['assessmentId'],
+            'activityLearnosityReference' => $blueprint['activityLearnosityReference']
         ];
 
-        foreach ($blueprints as $blueprint) {
-            foreach ($blueprint['payloadSequence'] as $payloadSequence) {
-                $endpoint = $payloadSequence['endpoint'];
-
-                /* Update payloads and counts
-                 */
-                if (self::ENDPOINT_FEATURES === $endpoint) {
-                    $consolidated[$endpoint]['payload']['features'] = array_merge($consolidated[$endpoint]['payload']['features'], $payloadSequence['payload']['features']);
-                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['features']);
-                } elseif (self::ENDPOINT_QUESTIONS === $endpoint) {
-                    $consolidated[$endpoint]['payload']['questions'] = array_merge($consolidated[$endpoint]['payload']['questions'], $payloadSequence['payload']['questions']);
-                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['questions']);
-                } elseif (self::ENDPOINT_ITEMS === $endpoint) {
-                    $consolidated[$endpoint]['payload']['items'] = array_merge($consolidated[$endpoint]['payload']['items'], $payloadSequence['payload']['items']);
-                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['items']);
-                } elseif (self::ENDPOINT_ACTIVITIES === $endpoint) {
-                    $consolidated[$endpoint]['payload']['activities'] = array_merge($consolidated[$endpoint]['payload']['activities'], $payloadSequence['payload']['activities']);
-                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['activities']);
-                }
-            }
-
-            /* We need to do this in schoolbox land after the fact
-             */
-            $consolidated[self::ENDPOINT_ASSOCIATIONS]['payload']['associations'][] = [
-                'quizId' => $blueprint['quizId'],
-                'assessmentId' => $blueprint['assessmentId'],
-                'activityLearnosityReference' => $blueprint['activityLearnosityReference']
-            ];
-
-            $consolidated[self::ENDPOINT_ASSOCIATIONS]['count']++;
-        }
+        $consolidated[self::ENDPOINT_ASSOCIATIONS]['count']++;
 
         return $consolidated;
     }

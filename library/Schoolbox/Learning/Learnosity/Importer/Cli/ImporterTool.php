@@ -318,7 +318,8 @@ HELP;
          */
         $metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
         $timing = [];
-        $numImported = 0;
+        $numQuizzesImported = 0;
+        $numBatches = 0;
 
         /* Precompile queries
          */
@@ -399,6 +400,8 @@ HELP;
              * quizzes, but there's also a limit on number of features/questions/items
              * which isn't particularly obvious
              */
+            $consolidatedBlueprint = null;
+
             foreach ($legacyQuizIds as $legacyQuizId) {
                 /* Do all the stuff it used to do to produce a $blueprint
                  */
@@ -408,41 +411,181 @@ HELP;
                  */
                 $legacyQuiz = $this->getQuiz($legacyQuizId);
 
-                /* Build the blueprint
+                /* Announce what we're doing
                  */
-                $blueprint = [];
+                $this->getLogger()->info(sprintf(
+                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                    $legacyQuiz['title'],
+                    $legacyQuiz['assessment_id'],
+                    $legacyQuiz['assess_id']
+                ));
+
+                /* If this doesn't have an assessment_id, idk what this is,
+                 * because you can't get here anymore.
+                 */
+                if ('' === trim((string)$legacyQuiz['assessment_id'])) {
+                    $this->getLogger()->warning(sprintf(
+                        'Missing assessment_id; skipping'
+                    ));
+
+                    continue;
+                }
+
+                /* Make the overall Learnosity payloads which we then send later with
+                 * a little postprocessing to put things into the exactly correct format.
+                 * Learnosity is really particular about such things.
+                 */
+                try {
+                    /* Choose which construction style you want
+                     */
+                    if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
+                        $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
+                    } else {
+                        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+                    }
+                } catch (\DomainException $e) {
+                    $this->getLogger()->warning($e->getMessage());
+                    $this->getLogger()->warning(sprintf(
+                        'Skipping assess_id %s',
+                        $legacyQuiz['assess_id']
+                    ));
+
+                    continue;
+                }
 
                 /* Consolidate 1 quiz to start with
-                 */
-
-                /* Inspect $legacyQuiz to see what is inside, aiming to cram as many
-                 * Features, Questions and Items per payload, as Learnosity allows.
                  *
-                 * This is all about minimising the number of Learnosity API calls
-                 * dynamically based on the content we're trying to cram in to each
-                 * payload; see their API docs for limits (also indexed as consts at
-                 * the top of this file)
+                 * Stack them up by their various strata -
+                 * all the features get combined, all the questions get combined,
+                 * all the items get combined and all the activities get combined.
                  */
-                $numFeatures = 0;
-                $numQuestions = 0;
-                $numItems = 0;
-                $numActivities = 0;
+                if (null === $consolidatedBlueprint) {
+                    $consolidatedBlueprint = $blueprintBuilder->align(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
+                    $numQuizzesImported++;
+
+                    $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
+
+                    continue;
+                }
 
                 /* Fetch the next quiz and perform a similar inspection
                  * If adding it allows all payloads to be under their limit,
                  * keep repeating this process until $nextQuiz causes one
                  * of the payloads to exceed the limit
                  */
+                $canConsolidate = $this->canConsolidate($consolidatedBlueprint, $blueprint);
 
-                /* Send the current consolidated blueprint up to Learnosity
-                 */
+                if ($canConsolidate) {
+                    $consolidatedBlueprint = $blueprintBuilder->align($consolidatedBlueprint, $blueprint);
+                    $numQuizzesImported++;
 
-                /* Make the next $consolidatedPayload start with $nextQuiz
-                 */
+                    $this->getLogger()->debug('Consolidating quiz and continuing onwards');
 
-                /* Rinse and repeat until all is done
+                    continue;
+                }
+
+                /* We've got a full $consolidatedBlueprints; we can't add another
+                 * Start doing some real work with Learnosity
                  */
+                $this->getLogger()->debug('Consolidation full; transmitting existing consolidation and setting this quiz for next consolidation');
+
+                /* Accumulate some basic metrics
+                 */
+                $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
+
+                /* Optionally show array payloads
+                 */
+                if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+                    print_r($consolidatedBlueprint);
+                }
+
+                /* When perform mode is on, actually send it as batches of features, questions,
+                 * items, activities and just...hope/presumed that everything worked out
+                 */
+                if ($this->perform()) {
+                    $this->getLogger()->info(sprintf(
+                        'Importing %s consolidated quizzes into Learnosity. This might take a while.',
+                        $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
+                    ));
+
+                    /* Iterate and bombard Learnosity with api requests pewpewpew
+                     */
+                    $batchStart = microtime(true);
+
+                    $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
+
+                    $batchEnd = microtime(true);
+
+                    /* Capture overall metrics
+                     */
+                    $timing[] = $batchEnd - $batchStart;
+                }
+
+                /* Log counts as we progress
+                 */
+                $numQuizzesImported++;
+                $numBatches++;
+
+                $this->getLogger()->info(sprintf(
+                    'Batch %s done.',
+                    $numBatches
+                ));
+
+                $this->getLogger()->info('');
+
+                /* Make the next $consolidatedBlueprint start with $blueprint
+                 * Rinse and repeat until all is done
+                 */
+                $consolidatedBlueprint = $blueprintBuilder->align(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
             }
+
+            /* Remainder data
+             * Transmit the last consolidated payload
+             */
+            $this->getLogger()->debug('Transmitting final consolidated remainder');
+
+            /* Accumulate some basic metrics
+             */
+            $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
+
+            /* Optionally show array payloads
+             */
+            if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+                print_r($consolidatedBlueprint);
+            }
+
+            /* When perform mode is on, actually send it as batches of features, questions,
+             * items, activities and just...hope/presumed that everything worked out
+             */
+            if ($this->perform()) {
+                $this->getLogger()->info(sprintf(
+                    'Importing %s consolidated quizzes into Learnosity. This might take a while.',
+                    $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
+                ));
+
+                /* Iterate and bombard Learnosity with api requests pewpewpew
+                 */
+                $batchStart = microtime(true);
+
+                $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
+
+                $batchEnd = microtime(true);
+
+                /* Capture overall metrics
+                 */
+                $timing[] = $batchEnd - $batchStart;
+            }
+
+            /* Log counts as we progress
+             */
+            $numBatches++;
+
+            $this->getLogger()->info(sprintf(
+                'Batch %s done.',
+                $numBatches
+            ));
+
+            $this->getLogger()->info('');
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
@@ -461,7 +604,7 @@ HELP;
 
         /* Report some metrics
          */
-        if (!$numImported) {
+        if (!$numQuizzesImported) {
             $this->getLogger()->info('No quizzes imported; none found. Exiting.');
             return;
         }
@@ -480,16 +623,23 @@ HELP;
             round($totalDuration)
         ));
 
+        /* Number of quizzes imported
+         */
+        $this->getLogger()->info(sprintf(
+            '    Number of quizzes imported: %s',
+            $numQuizzesImported
+        ));
+
         /* Number of batches used
          */
         $this->getLogger()->info(sprintf(
             '    Number of batches used: %s',
-            \count($batchSets)
+            $numBatches
         ));
 
         $this->getLogger()->info(sprintf(
-            '    Quizzes per batch: %s',
-            self::DEFAULT_BATCH_SIZE
+            '    Average quizzes per batch: %s',
+            number_format($numQuizzesImported / $numBatches, 2)
         ));
 
         $this->getLogger()->info('');
@@ -499,8 +649,8 @@ HELP;
              */
             $this->getLogger()->info(sprintf(
                 '    Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
-                $numImported,
-                round(array_sum($timing) / $numImported)
+                $numQuizzesImported,
+                round(array_sum($timing) / $numQuizzesImported)
             ));
 
             $this->getLogger()->info('');
@@ -674,6 +824,63 @@ HELP;
         }
 
         return $answer['answer'];
+    }
+
+
+    /**
+     * Decide if $blueprint can fit onto the already-consolidated stack $consolidated
+     *
+     * @param array $consolidated
+     * @param array $blueprint
+     * @return bool
+     */
+    private function canConsolidate(array $consolidated, array $blueprint): bool
+    {
+        /* Inspect $legacyQuiz to see what is inside, aiming to cram as many
+         * Features, Questions and Items per payload, as Learnosity allows.
+         *
+         * This is all about minimising the number of Learnosity API calls
+         * dynamically based on the content we're trying to cram in to each
+         * payload; see their API docs for limits (also indexed as consts at
+         * the top of this file)
+         */
+        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+            if (BlueprintBuilder::ENDPOINT_FEATURES === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_FEATURES]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ($sum >= self::LEARNOSITY_MAX_FEATURES) {
+                    return false;
+                }
+            }
+
+            if (BlueprintBuilder::ENDPOINT_QUESTIONS === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_QUESTIONS]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ($sum >= self::LEARNOSITY_MAX_QUESTIONS) {
+                    return false;
+                }
+            }
+
+            if (BlueprintBuilder::ENDPOINT_ITEMS === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_ITEMS]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ($sum >= self::LEARNOSITY_MAX_ITEMS) {
+                    return false;
+                }
+            }
+
+            if (BlueprintBuilder::ENDPOINT_ACTIVITIES === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_ACTIVITIES]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ($sum >= self::LEARNOSITY_MAX_ACTIVITIES) {
+                    return false;
+                }
+            }
+        }
+
+        /* I guess we can keep consolidating
+         */
+        return true;
     }
 
 
