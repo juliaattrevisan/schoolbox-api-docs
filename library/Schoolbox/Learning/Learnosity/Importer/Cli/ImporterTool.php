@@ -784,7 +784,7 @@ HELP;
             if (BlueprintBuilder::ENDPOINT_FEATURES === $payloadSequence['endpoint']) {
                 $sum = ($consolidated[BlueprintBuilder::ENDPOINT_FEATURES]['count'] ?? 0) + $payloadSequence['count'];
 
-                if ($sum >= self::LEARNOSITY_MAX_FEATURES) {
+                if ((int)$sum >= self::LEARNOSITY_MAX_FEATURES) {
                     return false;
                 }
             }
@@ -792,7 +792,7 @@ HELP;
             if (BlueprintBuilder::ENDPOINT_QUESTIONS === $payloadSequence['endpoint']) {
                 $sum = ($consolidated[BlueprintBuilder::ENDPOINT_QUESTIONS]['count'] ?? 0) + $payloadSequence['count'];
 
-                if ($sum >= self::LEARNOSITY_MAX_QUESTIONS) {
+                if ((int)$sum >= self::LEARNOSITY_MAX_QUESTIONS) {
                     return false;
                 }
             }
@@ -800,7 +800,7 @@ HELP;
             if (BlueprintBuilder::ENDPOINT_ITEMS === $payloadSequence['endpoint']) {
                 $sum = ($consolidated[BlueprintBuilder::ENDPOINT_ITEMS]['count'] ?? 0) + $payloadSequence['count'];
 
-                if ($sum >= self::LEARNOSITY_MAX_ITEMS) {
+                if ((int)$sum >= self::LEARNOSITY_MAX_ITEMS) {
                     return false;
                 }
             }
@@ -808,7 +808,7 @@ HELP;
             if (BlueprintBuilder::ENDPOINT_ACTIVITIES === $payloadSequence['endpoint']) {
                 $sum = ($consolidated[BlueprintBuilder::ENDPOINT_ACTIVITIES]['count'] ?? 0) + $payloadSequence['count'];
 
-                if ($sum >= self::LEARNOSITY_MAX_ACTIVITIES) {
+                if ((int)$sum >= self::LEARNOSITY_MAX_ACTIVITIES) {
                     return false;
                 }
             }
