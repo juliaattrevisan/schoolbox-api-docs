@@ -172,11 +172,6 @@ class Team implements IStrategy
                 $args['updatedBefore'] = $updatedBefore;
             }
 
-            $this->log->debug(sprintf(
-                "teams api request GET: %s Args: %s",
-                $endpoint,
-                json_encode($args)
-            ));
             $teams = $this->api->retrieve('GET', $endpoint, $args);
 
             foreach ($teams['data'] as $teamData) {
@@ -190,11 +185,6 @@ class Team implements IStrategy
                  */
                 $teamActivityId = (int)$teamData['activity']['id'];
                 $teamActivity = $teamData['activity']['name'] ?? '';
-                $this->log->debug(sprintf(
-                    "teamActivity: %s, teamActivityId: %s",
-                    $teamActivity,
-                    $teamActivityId
-                                  ));
 
                 /* Division identifiers
                  */
@@ -202,23 +192,11 @@ class Team implements IStrategy
                 $teamCategory = $teamData['category']['name'] ?? '';
                 $teamSubcategoryId = $teamData['subcategory']['id'] ?? '';
                 $teamSubcategory = $teamData['subcategory']['name'] ?? '';
-                $this->log->debug(sprintf(
-                                      "teamCategory: %s, teamCategoryId: %s, teamSubCategory: %s, teamSubCategoryId: %s",
-                                      $teamCategory,
-                                      $teamCategoryId,
-                                      $teamSubcategory,
-                                      $teamSubcategoryId
-                                  ));
 
                 /* Team identifiers
                  */
                 $teamId = (int)$teamData['id'];
                 $teamName = $teamData['name'];
-                $this->log->debug(sprintf(
-                                      "teamName: %s, teamId: %s",
-                                      $teamName,
-                                      $teamId
-                                  ));
 
                 /* Assemble a proxy representation of a "division" which is an amalgamation
                  * of Clipboard categories' and Clipboard subcategories' ids. This is synonymous
@@ -290,10 +268,6 @@ class Team implements IStrategy
 
                 /* If the --membership flag was set, ram in students and staff relationships too
                  */
-                $this->log->debug(sprintf(
-                    "Count of students in the team: %s",
-                    count($teamData['students'] ?? [])
-                ));
                 if ($this->membership) {
                     $this->importMemberships($userLookup, $positionLookup, $division, $team, $teamData);
                 }

@@ -245,12 +245,6 @@ class Sessions implements IStrategy
                 $args['updatedBefore'] = $updatedBefore;
             }
 
-            $this->log->debug(sprintf(
-                                  "sessions api request GET: %s Args: %s",
-                                  $endpoint,
-                                  json_encode($args)
-                              ));
-
             $sessions = $this->api->retrieve('GET', $endpoint, $args);
 
             /* Store metadata for custom fields: their types and their labels
@@ -398,10 +392,9 @@ class Sessions implements IStrategy
                         ->setFinishAt($finishAt);
 
                     $this->log->debug(sprintf(
-                        '%s matchup %s (%s) on %s, at venue %s',
+                        '%s matchup %s on %s, at venue %s',
                         $action,
                         $matchup->getDisplayName(),
-                        $matchup->getExternalId(),
                         $matchup->getStartAt()->getDatabase(),
                         null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
                     ));
