@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
@@ -228,6 +229,17 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Some meaningful stats to show at the end of the import
+     *
+     * @var array
+     */
+    private array $timing = [];
+    private array $metrics = [];
+    private int $numBatches = 0;
+    private int $numQuizzesImported = 0;
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -316,10 +328,7 @@ HELP;
 
         /* Capture basic metrics
          */
-        $metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
-        $timing = [];
-        $numQuizzesImported = 0;
-        $numBatches = 0;
+        $this->metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
 
         /* Precompile queries
          */
@@ -462,7 +471,7 @@ HELP;
                      */
                     if (null === $consolidatedBlueprint) {
                         $consolidatedBlueprint = $blueprintBuilder->align(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
-                        $numQuizzesImported++;
+                        $this->numQuizzesImported++;
 
                         $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
 
@@ -478,7 +487,7 @@ HELP;
 
                     if ($canConsolidate) {
                         $consolidatedBlueprint = $blueprintBuilder->align($consolidatedBlueprint, $blueprint);
-                        $numQuizzesImported++;
+                        $this->numQuizzesImported++;
 
                         $this->getLogger()->debug('Consolidating quiz and continuing onwards');
 
@@ -490,48 +499,9 @@ HELP;
                      */
                     $this->getLogger()->debug('Consolidation full; transmitting existing consolidation and setting this quiz for next consolidation');
 
-                    /* Accumulate some basic metrics
+                    /* Send it
                      */
-                    $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
-
-                    /* Optionally show array payloads
-                     */
-                    if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
-                        print_r($consolidatedBlueprint);
-                    }
-
-                    /* When perform mode is on, actually send it as batches of features, questions,
-                     * items, activities and just...hope/presumed that everything worked out
-                     */
-                    if ($this->perform()) {
-                        $this->getLogger()->info(sprintf(
-                            'Importing %s consolidated quizzes into Learnosity. This might take a while.',
-                            $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
-                        ));
-
-                        /* Iterate and bombard Learnosity with api requests pewpewpew
-                         */
-                        $batchStart = microtime(true);
-
-                        $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
-
-                        $batchEnd = microtime(true);
-
-                        /* Capture overall metrics
-                         */
-                        $timing[] = $batchEnd - $batchStart;
-                    }
-
-                    /* Log counts as we progress
-                     */
-                    $numBatches++;
-
-                    $this->getLogger()->info(sprintf(
-                        'Batch %s done.',
-                        $numBatches
-                    ));
-
-                    $this->getLogger()->info('');
+                    $this->transmitFacade($api, $consolidatedBlueprint);
 
                     /* Make the next $consolidatedBlueprint start with $blueprint
                      * Rinse and repeat until all is done
@@ -540,7 +510,7 @@ HELP;
 
                     /* Log counts as we progress
                      */
-                    $numQuizzesImported++;
+                    $this->numQuizzesImported++;
                 }
 
                 /* Remainder data
@@ -548,48 +518,9 @@ HELP;
                  */
                 $this->getLogger()->debug('Transmitting final consolidated remainder');
 
-                /* Accumulate some basic metrics
+                /* Send it
                  */
-                $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
-
-                /* Optionally show array payloads
-                 */
-                if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
-                    print_r($consolidatedBlueprint);
-                }
-
-                /* When perform mode is on, actually send it as batches of features, questions,
-                 * items, activities and just...hope/presumed that everything worked out
-                 */
-                if ($this->perform()) {
-                    $this->getLogger()->info(sprintf(
-                        'Importing %s consolidated quizzes into Learnosity. This might take a while.',
-                        $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
-                    ));
-
-                    /* Iterate and bombard Learnosity with api requests pewpewpew
-                     */
-                    $batchStart = microtime(true);
-
-                    $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
-
-                    $batchEnd = microtime(true);
-
-                    /* Capture overall metrics
-                     */
-                    $timing[] = $batchEnd - $batchStart;
-                }
-
-                /* Log counts as we progress
-                 */
-                $numBatches++;
-
-                $this->getLogger()->info(sprintf(
-                    'Batch %s done.',
-                    $numBatches
-                ));
-
-                $this->getLogger()->info('');
+                $this->transmitFacade($api, $consolidatedBlueprint);
             } catch (\Alaress\Lock\LockRefreshException $e) {
                 /* Lock TTL expired; just leave politely
                  */
@@ -609,7 +540,7 @@ HELP;
 
         /* Report some metrics
          */
-        if (!$numQuizzesImported) {
+        if (!$this->numQuizzesImported) {
             $this->getLogger()->info('No quizzes imported; none found. Exiting.');
             return;
         }
@@ -632,19 +563,19 @@ HELP;
          */
         $this->getLogger()->info(sprintf(
             '    Number of quizzes imported: %s',
-            $numQuizzesImported
+            $this->numQuizzesImported
         ));
 
         /* Number of batches used
          */
         $this->getLogger()->info(sprintf(
             '    Number of batches used: %s',
-            $numBatches
+            $this->numBatches
         ));
 
         $this->getLogger()->info(sprintf(
             '    Average quizzes per batch: %s',
-            number_format($numQuizzesImported / $numBatches, 2)
+            number_format($this->numQuizzesImported / $this->numBatches, 2)
         ));
 
         $this->getLogger()->info('');
@@ -654,14 +585,14 @@ HELP;
              */
             $this->getLogger()->info(sprintf(
                 '    Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
-                $numQuizzesImported,
-                round(array_sum($timing) / $numQuizzesImported)
+                $this->numQuizzesImported,
+                round(array_sum($this->timing) / $this->numQuizzesImported)
             ));
 
             $this->getLogger()->info('');
         }
 
-        foreach ($metrics as $endpoint => $data) {
+        foreach ($this->metrics as $endpoint => $data) {
             $this->getLogger()->info(sprintf(
                 '    %s: %s objects sent (approx. %s seconds total)',
                 $endpoint,
@@ -893,16 +824,69 @@ HELP;
      * Get some quantities of each endpoint we used
      *
      * @param array $consolidatedBlueprint
-     * @param array $metrics
-     * @return array
      */
-    private function accumulateMetrics(array $consolidatedBlueprint, array $metrics): array
+    private function accumulateMetrics(array $consolidatedBlueprint): void
     {
         foreach (self::ENDPOINT_INDEX as $type) {
-            $metrics[$type]['count'] += $consolidatedBlueprint[$type]['count'];
+            $this->metrics[$type]['count'] += $consolidatedBlueprint[$type]['count'];
+        }
+    }
+
+
+    /**
+     * A wrapper around transmit() that also does some metrics and logging
+     *
+     * @param Api $api
+     * @param array $consolidatedBlueprint
+     * @return void
+     * @throws ValidationException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     */
+    private function transmitFacade(Api $api, array $consolidatedBlueprint): void
+    {
+        /* Accumulate some basic metrics
+         */
+        $this->accumulateMetrics($consolidatedBlueprint);
+
+        /* Optionally show array payloads
+         */
+        if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+            print_r($consolidatedBlueprint);
         }
 
-        return $metrics;
+        /* When perform mode is on, actually send it as batches of features, questions,
+         * items, activities and just...hope/presumed that everything worked out
+         */
+        if ($this->perform()) {
+            $this->getLogger()->info(sprintf(
+                'Importing %s consolidated quizzes into Learnosity. This might take a while.',
+                $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
+            ));
+
+            /* Iterate and bombard Learnosity with api requests pewpewpew
+             */
+            $batchStart = microtime(true);
+
+            $this->transmit($api, $consolidatedBlueprint);
+
+            $batchEnd = microtime(true);
+
+            /* Capture overall metrics
+             */
+            $this->timing[] = $batchEnd - $batchStart;
+        }
+
+        /* Log counts as we progress
+         */
+        $this->numBatches++;
+
+        $this->getLogger()->info(sprintf(
+            'Batch %s done.',
+            $this->numBatches
+        ));
+
+        $this->getLogger()->info('');
     }
 
 
@@ -911,13 +895,12 @@ HELP;
      *
      * @param Api $api
      * @param array $consolidatedBlueprint
-     * @param array $metrics
-     * @return array
-     * @throws \LearnositySdk\Exceptions\ValidationException
+     * @return void
+     * @throws ValidationException
      * @throws \PDOException
      * @throws \RuntimeException
      */
-    private function transmit(Api $api, array $consolidatedBlueprint, array $metrics): array
+    private function transmit(Api $api, array $consolidatedBlueprint): void
     {
         foreach ($consolidatedBlueprint as $endpoint => $data) {
             $endpointStart = microtime(true);
@@ -965,11 +948,10 @@ HELP;
              */
             $endpointEnd = microtime(true);
 
-            $metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
+            $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
         }
-
-        return $metrics;
     }
+
 
     /**
      * FIXME Decide whether this script must be run as root
