@@ -129,7 +129,7 @@ class BlueprintBuilder
             if (!empty($feature)) {
                 $this->logger->debug(sprintf(
                     'Built blueprint for feature "%s" (section_id: %s) with learnosity_reference %s',
-                    \TextFormatter::cutSentence($section['title'], 64),
+                    trim(\TextFormatter::cutSentence($section['title'], 64)),
                     $section['section_id'],
                     $feature['reference']
                 ));
