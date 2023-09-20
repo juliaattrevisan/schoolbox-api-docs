@@ -531,7 +531,8 @@ class BlueprintBuilder
                 'endpoint' => self::ENDPOINT_FEATURES,
                 'payload' => [
                     'features' => []
-                ]
+                ],
+                'count' => 0,
             ],
             self::ENDPOINT_QUESTIONS => [
                 'endpoint' => self::ENDPOINT_QUESTIONS,
@@ -545,7 +546,8 @@ class BlueprintBuilder
                         ]
                     ],
                     'questions' => []
-                ]
+                ],
+                'count' => 0,
             ],
             self::ENDPOINT_ITEMS => [],
             self::ENDPOINT_ACTIVITIES => [],
@@ -556,12 +558,15 @@ class BlueprintBuilder
             foreach ($blueprint['payloadSequence'] as $payloadSequence) {
                 $endpoint = $payloadSequence['endpoint'];
 
+                /* Update payloads and counts
+                 */
                 if (self::ENDPOINT_FEATURES === $endpoint) {
                     $consolidated[$endpoint]['payload']['features'] = array_merge($consolidated[$endpoint]['payload']['features'], $payloadSequence['payload']['features']);
+                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['features']);
                 } elseif (self::ENDPOINT_QUESTIONS === $endpoint) {
                     $consolidated[$endpoint]['payload']['questions'] = array_merge($consolidated[$endpoint]['payload']['questions'], $payloadSequence['payload']['questions']);
+                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['questions']);
                 }
-
             }
 
             $consolidated['associations'][] = [
