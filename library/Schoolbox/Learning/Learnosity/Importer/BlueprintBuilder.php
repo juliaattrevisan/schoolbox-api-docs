@@ -35,12 +35,12 @@ class BlueprintBuilder
 
 
     /**
-     * Endpoint index
+     * Learnosity endpoint index
      */
-    private const ENDPOINT_FEATURES = '/itembank/features';
-    private const ENDPOINT_QUESTIONS = '/itembank/questions';
-    private const ENDPOINT_ITEMS = '/itembank/items';
-    private const ENDPOINT_ACTIVITIES = '/itembank/activities';
+    public const ENDPOINT_FEATURES = '/itembank/features';
+    public const ENDPOINT_QUESTIONS = '/itembank/questions';
+    public const ENDPOINT_ITEMS = '/itembank/items';
+    public const ENDPOINT_ACTIVITIES = '/itembank/activities';
 
 
     /**
@@ -570,7 +570,13 @@ class BlueprintBuilder
                 ],
                 'count' => 0,
             ],
-            'associations' => []
+            self::ENDPOINT_ASSOCIATIONS => [
+                'endpoint' => self::ENDPOINT_ASSOCIATIONS,
+                'payload' => [
+                    'associations' => []
+                ],
+                'count' => 0,
+            ]
         ];
 
         foreach ($blueprints as $blueprint) {
@@ -596,11 +602,13 @@ class BlueprintBuilder
 
             /* We need to do this in schoolbox land after the fact
              */
-            $consolidated['associations'][] = [
+            $consolidated[self::ENDPOINT_ASSOCIATIONS]['payload']['associations'][] = [
                 'quizId' => $blueprint['quizId'],
                 'assessmentId' => $blueprint['assessmentId'],
                 'activityLearnosityReference' => $blueprint['activityLearnosityReference']
             ];
+
+            $consolidated[self::ENDPOINT_ASSOCIATIONS]['count']++;
         }
 
         return $consolidated;

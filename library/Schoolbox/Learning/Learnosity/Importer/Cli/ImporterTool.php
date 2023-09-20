@@ -187,6 +187,18 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * A list of endpoints (both ours and Learnosity's) for metrics
+     */
+    private const ENDPOINT_INDEX = [
+        BlueprintBuilder::ENDPOINT_FEATURES,
+        BlueprintBuilder::ENDPOINT_QUESTIONS,
+        BlueprintBuilder::ENDPOINT_ITEMS,
+        BlueprintBuilder::ENDPOINT_ACTIVITIES,
+        BlueprintBuilder::ENDPOINT_ASSOCIATIONS
+    ];
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -275,6 +287,7 @@ HELP;
 
         /* Capture basic metrics
          */
+        $metrics = array_fill_keys(self::ENDPOINT_INDEX, 0);
         $timing = [];
         $numImported = 0;
 
@@ -435,6 +448,10 @@ HELP;
                     print_r($consolidatedBlueprint);
                 }
 
+                /* Accumulate some basic metrics
+                 */
+                $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
+
                 /* When perform mode is on, actually send it as batches of features, questions,
                  * items, activities and just...hope/presumed that everything worked out
                  */
@@ -519,7 +536,6 @@ HELP;
                 $numImported,
                 round(array_sum($timing) / $numImported)
             ));
-        } else {
         }
 
         /* Announce conclusion
@@ -679,6 +695,23 @@ HELP;
         }
 
         return $answer['answer'];
+    }
+
+
+    /**
+     * Get some quantities of each endpoint we used
+     *
+     * @param array $consolidatedBlueprint
+     * @param array $metrics
+     * @return array
+     */
+    private function accumulateMetrics(array $consolidatedBlueprint, array $metrics): array
+    {
+        foreach (self::ENDPOINT_INDEX as $type) {
+            $metrics[$type] += $consolidatedBlueprint[$type]['count'];
+        }
+
+        return $metrics;
     }
 
 
