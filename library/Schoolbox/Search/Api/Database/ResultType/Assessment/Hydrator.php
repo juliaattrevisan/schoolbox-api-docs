@@ -124,12 +124,23 @@ class Hydrator extends BaseHydrator
                         $match->type,
                         $match->relevance,
                         $assessment->getUpdatedAt(),
-                        $folder?->getId(),
+                        match ($match->type) {
+                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory()->getId(),
+                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder()->getId(),
+                            default => $folder?->getId(),
+                        },
                         null,
                         null,
                         AssessmentType::getIconClassSuffixForType($match->type),
                         $assessment->getDescription(),
-                        null,
+                        match ($match->type) { // Get creatorId depending on type.
+                            AssessmentType::TYPE_DUE_WORK => $assessment->getDueWork()->getOwner()->getId(),
+                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getUser()->getId(),
+                            AssessmentType::TYPE_TASK => $assessment->getTask()->getOwner()->getId(),
+                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getOwner()->getId(),
+                            AssessmentType::TYPE_LTI_ASSESSMENT => null,
+                            AssessmentType::TYPE_LESSON_PLAN => $assessment->getLessonPlan()->getCreatedBy()->getId()
+                        },
                         $context, // Context: assessment's folder
                         [],
                     );
