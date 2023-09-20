@@ -61,6 +61,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             null,
             [],
             null,
+            null,
+            null,
         );
 
         $producer->send($message);
