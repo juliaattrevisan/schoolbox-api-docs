@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
@@ -109,12 +110,12 @@ class Hydrator extends BaseHydrator
                         $match->id,
                         $assessment->getTitle(),
                         match ($match->type) {
-                            self::BASE_TYPE . '.dueWork' => '',
-                            self::BASE_TYPE . '.lessonPlan' => '',
-                            self::BASE_TYPE . '.project' => '',
-                            self::BASE_TYPE . '.lti' => '',
-                            self::BASE_TYPE . '.task' => '',
-                            self::BASE_TYPE . '.quiz' => (
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_DUE_WORK => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LESSON_PLAN => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_PROJECT => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LTI_ASSESSMENT => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_TASK => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_QUIZ => (
                                 $this->buildBaseUrl()
                                      ->withPath("/learning/quiz/intro/{$assessment->getId()}")
                                      ->__toString()
@@ -127,12 +128,12 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         match ($match->type) {
-                            self::BASE_TYPE . '.dueWork' => 'due-work',
-                            self::BASE_TYPE . '.lessonPlan' => 'lesson-plan',
-                            self::BASE_TYPE . '.project' => 'project',
-                            self::BASE_TYPE . '.lti' => 'lti',
-                            self::BASE_TYPE . '.task' => 'task',
-                            self::BASE_TYPE . '.quiz' => 'quiz'
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_DUE_WORK => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LESSON_PLAN => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_PROJECT => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LTI_ASSESSMENT => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_TASK => '',
+                            self::BASE_TYPE . '.' . AssessmentType::TYPE_QUIZ => (
                         },
                         $assessment->getDescription(),
                         null,

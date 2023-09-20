@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
 /**
@@ -125,12 +126,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             CONCAT(
                 '" . Hydrator::BASE_TYPE . ".',
                 COALESCE(
-                    IF(task.id, 'task', NULL),
-                    IF(assess.assessment_id, 'quiz', NULL),
-                    IF(lti_assessment.assessment_id, 'lti', NULL),
-                    IF(submission_box.id, 'dueWork', NULL),
-                    IF(project.id, 'project', NULL),
-                    IF(lesson_plan.id, 'lessonPlan', NULL)
+                    IF(task.id, '" . AssessmentType::TYPE_TASK . "', NULL),
+                    IF(assess.assessment_id, '" . AssessmentType::TYPE_QUIZ . "', NULL),
+                    IF(lti_assessment.assessment_id, '" . AssessmentType::TYPE_LTI_ASSESSMENT . "', NULL),
+                    IF(submission_box.id, '" . AssessmentType::TYPE_DUE_WORK . "', NULL),
+                    IF(project.id, '" . AssessmentType::TYPE_PROJECT . "', NULL),
+                    IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL)
                 )
             )
         ";

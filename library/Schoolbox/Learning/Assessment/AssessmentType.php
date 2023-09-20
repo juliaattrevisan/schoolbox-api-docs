@@ -34,11 +34,11 @@ class AssessmentType implements IType
 
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
-    const TYPE_PROJECT = 'project';
-    const TYPE_DUE_WORK = 'dueWork';
-    const TYPE_TASK = 'task';
-    const TYPE_QUIZ = 'quiz';
-    const TYPE_LTI_ASSESSMENT = 'lti';
+    public const TYPE_PROJECT = 'project';
+    public const TYPE_DUE_WORK = 'dueWork';
+    public const TYPE_TASK = 'task';
+    public const TYPE_QUIZ = 'quiz';
+    public const TYPE_LTI_ASSESSMENT = 'lti';
     public const TYPE_LESSON_PLAN = 'lessonPlan';
 
     /**
