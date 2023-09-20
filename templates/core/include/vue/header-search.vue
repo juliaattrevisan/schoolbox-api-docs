@@ -215,6 +215,7 @@ function formatPortrait(id: string) {
                     :key="i"
                     :class="`c-card c-card--link c-card--border-end ${i === arrowCounter ? 'c-card--active' : ''}`"
                     :href="paths.userPage + result.id"
+                    :data-test="`header-search-user-result-link-${result.formattedName}`"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
