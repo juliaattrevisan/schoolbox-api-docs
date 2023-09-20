@@ -392,102 +392,158 @@ HELP;
                 if successful, update the learnosity_reference so we know it ended up in learnosity
                 otherwise something went wrong and this row is still a candidate for import
         */
-        try {
-            /* $legacyQuizIds is a bunch of identifiers
-             *
-             * We can perhaps minimise more Learnosity requests by batching $blueprints
-             * which typically represent a single quiz. There's a limit on the number of
-             * quizzes, but there's also a limit on number of features/questions/items
-             * which isn't particularly obvious
-             */
-            $consolidatedBlueprint = null;
-
-            foreach ($legacyQuizIds as $legacyQuizId) {
-                /* Do all the stuff it used to do to produce a $blueprint
+        if (\count($legacyQuizIds)) {
+            try {
+                /* $legacyQuizIds is a bunch of identifiers
+                 *
+                 * We can perhaps minimise more Learnosity requests by batching $blueprints
+                 * which typically represent a single quiz. There's a limit on the number of
+                 * quizzes, but there's also a limit on number of features/questions/items
+                 * which isn't particularly obvious
                  */
-                $this->refreshLock($lock);
+                $consolidatedBlueprint = null;
 
-                /* Get the legacy quiz's contents
-                 */
-                $legacyQuiz = $this->getQuiz($legacyQuizId);
-
-                /* Announce what we're doing
-                 */
-                $this->getLogger()->info(sprintf(
-                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                    $legacyQuiz['title'],
-                    $legacyQuiz['assessment_id'],
-                    $legacyQuiz['assess_id']
-                ));
-
-                /* If this doesn't have an assessment_id, idk what this is,
-                 * because you can't get here anymore.
-                 */
-                if ('' === trim((string)$legacyQuiz['assessment_id'])) {
-                    $this->getLogger()->warning(sprintf(
-                        'Missing assessment_id; skipping'
-                    ));
-
-                    continue;
-                }
-
-                /* Make the overall Learnosity payloads which we then send later with
-                 * a little postprocessing to put things into the exactly correct format.
-                 * Learnosity is really particular about such things.
-                 */
-                try {
-                    /* Choose which construction style you want
+                foreach ($legacyQuizIds as $legacyQuizId) {
+                    /* Do all the stuff it used to do to produce a $blueprint
                      */
-                    if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                        $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
-                    } else {
-                        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-                    }
-                } catch (\DomainException $e) {
-                    $this->getLogger()->warning($e->getMessage());
-                    $this->getLogger()->warning(sprintf(
-                        'Skipping assess_id %s',
+                    $this->refreshLock($lock);
+
+                    /* Get the legacy quiz's contents
+                     */
+                    $legacyQuiz = $this->getQuiz($legacyQuizId);
+
+                    /* Announce what we're doing
+                     */
+                    $this->getLogger()->info(sprintf(
+                        'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                        $legacyQuiz['title'],
+                        $legacyQuiz['assessment_id'],
                         $legacyQuiz['assess_id']
                     ));
 
-                    continue;
-                }
+                    /* If this doesn't have an assessment_id, idk what this is,
+                     * because you can't get here anymore.
+                     */
+                    if ('' === trim((string)$legacyQuiz['assessment_id'])) {
+                        $this->getLogger()->warning(sprintf(
+                            'Missing assessment_id; skipping'
+                        ));
 
-                /* Consolidate 1 quiz to start with
-                 *
-                 * Stack them up by their various strata -
-                 * all the features get combined, all the questions get combined,
-                 * all the items get combined and all the activities get combined.
-                 */
-                if (null === $consolidatedBlueprint) {
+                        continue;
+                    }
+
+                    /* Make the overall Learnosity payloads which we then send later with
+                     * a little postprocessing to put things into the exactly correct format.
+                     * Learnosity is really particular about such things.
+                     */
+                    try {
+                        /* Choose which construction style you want
+                         */
+                        if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
+                            $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
+                        } else {
+                            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+                        }
+                    } catch (\DomainException $e) {
+                        $this->getLogger()->warning($e->getMessage());
+                        $this->getLogger()->warning(sprintf(
+                            'Skipping assess_id %s',
+                            $legacyQuiz['assess_id']
+                        ));
+
+                        continue;
+                    }
+
+                    /* Consolidate 1 quiz to start with
+                     *
+                     * Stack them up by their various strata -
+                     * all the features get combined, all the questions get combined,
+                     * all the items get combined and all the activities get combined.
+                     */
+                    if (null === $consolidatedBlueprint) {
+                        $consolidatedBlueprint = $blueprintBuilder->align(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
+                        $numQuizzesImported++;
+
+                        $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
+
+                        continue;
+                    }
+
+                    /* Fetch the next quiz and perform a similar inspection
+                     * If adding it allows all payloads to be under their limit,
+                     * keep repeating this process until $nextQuiz causes one
+                     * of the payloads to exceed the limit
+                     */
+                    $canConsolidate = $this->canConsolidate($consolidatedBlueprint, $blueprint);
+
+                    if ($canConsolidate) {
+                        $consolidatedBlueprint = $blueprintBuilder->align($consolidatedBlueprint, $blueprint);
+                        $numQuizzesImported++;
+
+                        $this->getLogger()->debug('Consolidating quiz and continuing onwards');
+
+                        continue;
+                    }
+
+                    /* We've got a full $consolidatedBlueprints; we can't add another
+                     * Start doing some real work with Learnosity
+                     */
+                    $this->getLogger()->debug('Consolidation full; transmitting existing consolidation and setting this quiz for next consolidation');
+
+                    /* Accumulate some basic metrics
+                     */
+                    $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
+
+                    /* Optionally show array payloads
+                     */
+                    if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+                        print_r($consolidatedBlueprint);
+                    }
+
+                    /* When perform mode is on, actually send it as batches of features, questions,
+                     * items, activities and just...hope/presumed that everything worked out
+                     */
+                    if ($this->perform()) {
+                        $this->getLogger()->info(sprintf(
+                            'Importing %s consolidated quizzes into Learnosity. This might take a while.',
+                            $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
+                        ));
+
+                        /* Iterate and bombard Learnosity with api requests pewpewpew
+                         */
+                        $batchStart = microtime(true);
+
+                        $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
+
+                        $batchEnd = microtime(true);
+
+                        /* Capture overall metrics
+                         */
+                        $timing[] = $batchEnd - $batchStart;
+                    }
+
+                    /* Log counts as we progress
+                     */
+                    $numQuizzesImported++;
+                    $numBatches++;
+
+                    $this->getLogger()->info(sprintf(
+                        'Batch %s done.',
+                        $numBatches
+                    ));
+
+                    $this->getLogger()->info('');
+
+                    /* Make the next $consolidatedBlueprint start with $blueprint
+                     * Rinse and repeat until all is done
+                     */
                     $consolidatedBlueprint = $blueprintBuilder->align(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
-                    $numQuizzesImported++;
-
-                    $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
-
-                    continue;
                 }
 
-                /* Fetch the next quiz and perform a similar inspection
-                 * If adding it allows all payloads to be under their limit,
-                 * keep repeating this process until $nextQuiz causes one
-                 * of the payloads to exceed the limit
+                /* Remainder data
+                 * Transmit the last consolidated payload
                  */
-                $canConsolidate = $this->canConsolidate($consolidatedBlueprint, $blueprint);
-
-                if ($canConsolidate) {
-                    $consolidatedBlueprint = $blueprintBuilder->align($consolidatedBlueprint, $blueprint);
-                    $numQuizzesImported++;
-
-                    $this->getLogger()->debug('Consolidating quiz and continuing onwards');
-
-                    continue;
-                }
-
-                /* We've got a full $consolidatedBlueprints; we can't add another
-                 * Start doing some real work with Learnosity
-                 */
-                $this->getLogger()->debug('Consolidation full; transmitting existing consolidation and setting this quiz for next consolidation');
+                $this->getLogger()->debug('Transmitting final consolidated remainder');
 
                 /* Accumulate some basic metrics
                  */
@@ -523,7 +579,6 @@ HELP;
 
                 /* Log counts as we progress
                  */
-                $numQuizzesImported++;
                 $numBatches++;
 
                 $this->getLogger()->info(sprintf(
@@ -532,69 +587,16 @@ HELP;
                 ));
 
                 $this->getLogger()->info('');
-
-                /* Make the next $consolidatedBlueprint start with $blueprint
-                 * Rinse and repeat until all is done
+            } catch (\Alaress\Lock\LockRefreshException $e) {
+                /* Lock TTL expired; just leave politely
                  */
-                $consolidatedBlueprint = $blueprintBuilder->align(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
-            }
-
-            /* Remainder data
-             * Transmit the last consolidated payload
-             */
-            $this->getLogger()->debug('Transmitting final consolidated remainder');
-
-            /* Accumulate some basic metrics
-             */
-            $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
-
-            /* Optionally show array payloads
-             */
-            if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
-                print_r($consolidatedBlueprint);
-            }
-
-            /* When perform mode is on, actually send it as batches of features, questions,
-             * items, activities and just...hope/presumed that everything worked out
-             */
-            if ($this->perform()) {
-                $this->getLogger()->info(sprintf(
-                    'Importing %s consolidated quizzes into Learnosity. This might take a while.',
-                    $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
-                ));
-
-                /* Iterate and bombard Learnosity with api requests pewpewpew
+                return;
+            } catch (\Exception $e) {
+                /* Some other random death
                  */
-                $batchStart = microtime(true);
-
-                $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
-
-                $batchEnd = microtime(true);
-
-                /* Capture overall metrics
-                 */
-                $timing[] = $batchEnd - $batchStart;
+                $this->getLogger()->warning($e->getMessage());
+                return;
             }
-
-            /* Log counts as we progress
-             */
-            $numBatches++;
-
-            $this->getLogger()->info(sprintf(
-                'Batch %s done.',
-                $numBatches
-            ));
-
-            $this->getLogger()->info('');
-        } catch (\Alaress\Lock\LockRefreshException $e) {
-            /* Lock TTL expired; just leave politely
-             */
-            return;
-        } catch (\Exception $e) {
-            /* Some other random death
-             */
-            $this->getLogger()->warning($e->getMessage());
-            return;
         }
 
         /* Capture overall time spent importing
