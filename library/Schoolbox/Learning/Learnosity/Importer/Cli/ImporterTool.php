@@ -276,6 +276,7 @@ HELP;
         /* Capture basic metrics
          */
         $timing = [];
+        $numImported = 0;
 
         /* Precompile queries
          */
@@ -416,6 +417,10 @@ HELP;
                     /* Load it up into a mini-stack
                      */
                     $blueprints[] = $blueprint;
+
+                    /* Number of quizzes we built
+                     */
+                    $numImported++;
                 }
 
                 /* Stack them up by their various strata -
@@ -504,8 +509,6 @@ HELP;
          * Timing stats only available in perform mode
          */
         if ($this->perform()) {
-            $numImported = \count($timing);
-
             if (!$numImported) {
                 $this->getLogger()->info('No quizzes imported; none found. Exiting.');
                 return;
@@ -516,6 +519,7 @@ HELP;
                 $numImported,
                 round(array_sum($timing) / $numImported)
             ));
+        } else {
         }
 
         /* Announce conclusion
