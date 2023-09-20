@@ -123,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return "
             CONCAT(
-                'assessment.',
+                '" . Hydrator::BASE_TYPE . ".',
                 COALESCE(
                     IF(task.id, 'task', NULL),
                     IF(assess.assessment_id, 'quiz', NULL),

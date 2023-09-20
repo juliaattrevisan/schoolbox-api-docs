@@ -88,14 +88,12 @@ class Hydrator extends BaseHydrator
 //                } elseif ($assessment instanceof QuizModel) {
 //                    // ...
                 if ($assessment instanceof AssessmentModel) {
-                    $quiz = &$assessment;
-
                     $folder = $assessment->getContextFolder();
 
                     if ($folder !== null) {
                         // Check if user has access to quiz's folder
-                        $quizAccess = $this->access->getFolderAccess($viewer, $quiz->getContextFolder()->getId());
-                        if ($quizAccess < UserAccess::ACCESS_READ) {
+                        $assessmentAccess = $this->access->getFolderAccess($viewer, $assessment->getContextFolder()->getId());
+                        if ($assessmentAccess < UserAccess::ACCESS_READ) {
                             return null;
                         }
                     }
@@ -109,20 +107,36 @@ class Hydrator extends BaseHydrator
                     return new FullResult(
                         $match,
                         $match->id,
-                        $quiz->getTitle(),
-                        $this->buildBaseUrl()
-                             ->withPath("/learning/quiz/{$quiz->getId()}")
-                             ->__toString(),
+                        $assessment->getTitle(),
+                        match ($match->type) {
+                            self::BASE_TYPE . '.dueWork' => '',
+                            self::BASE_TYPE . '.lessonPlan' => '',
+                            self::BASE_TYPE . '.project' => '',
+                            self::BASE_TYPE . '.lti' => '',
+                            self::BASE_TYPE . '.task' => '',
+                            self::BASE_TYPE . '.quiz' => (
+                                $this->buildBaseUrl()
+                                     ->withPath("/learning/quiz/intro/{$assessment->getId()}")
+                                     ->__toString()
+                            ),
+                        },
                         $match->type,
                         $match->relevance,
-                        $quiz->getUpdatedAt(),
+                        $assessment->getUpdatedAt(),
                         $folder?->getId(),
                         null,
                         null,
-                        'quiz',
-                        $quiz->getDescription(),
+                        match ($match->type) {
+                            self::BASE_TYPE . '.dueWork' => 'due-work',
+                            self::BASE_TYPE . '.lessonPlan' => 'lesson-plan',
+                            self::BASE_TYPE . '.project' => 'project',
+                            self::BASE_TYPE . '.lti' => 'lti',
+                            self::BASE_TYPE . '.task' => 'task',
+                            self::BASE_TYPE . '.quiz' => 'quiz'
+                        },
+                        $assessment->getDescription(),
                         null,
-                        $context, // Context: quiz's folder
+                        $context, // Context: assessment's folder
                         [],
                     );
                 }
