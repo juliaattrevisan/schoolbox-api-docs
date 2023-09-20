@@ -501,7 +501,7 @@ HELP;
 
                     /* Send it
                      */
-                    $this->transmitFacade($api, $consolidatedBlueprint);
+                    $this->transmit($api, $consolidatedBlueprint);
 
                     /* Make the next $consolidatedBlueprint start with $blueprint
                      * Rinse and repeat until all is done
@@ -520,7 +520,7 @@ HELP;
 
                 /* Send it
                  */
-                $this->transmitFacade($api, $consolidatedBlueprint);
+                $this->transmit($api, $consolidatedBlueprint);
             } catch (\Alaress\Lock\LockRefreshException $e) {
                 /* Lock TTL expired; just leave politely
                  */
@@ -834,7 +834,7 @@ HELP;
 
 
     /**
-     * A wrapper around transmit() that also does some metrics and logging
+     * Sends data to Learnosity and returns updated metrics
      *
      * @param Api $api
      * @param array $consolidatedBlueprint
@@ -843,7 +843,7 @@ HELP;
      * @throws \PDOException
      * @throws \RuntimeException
      */
-    private function transmitFacade(Api $api, array $consolidatedBlueprint): void
+    private function transmit(Api $api, array $consolidatedBlueprint): void
     {
         /* Accumulate some basic metrics
          */
@@ -868,7 +868,54 @@ HELP;
              */
             $batchStart = microtime(true);
 
-            $this->transmit($api, $consolidatedBlueprint);
+            foreach ($consolidatedBlueprint as $endpoint => $data) {
+                $endpointStart = microtime(true);
+
+                /* Associate the learnosity reference back to our legacy quiz
+                 */
+                if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
+                    foreach ($data['payload']['associations'] as $association) {
+                        $this->getLogger()->info(sprintf(
+                            'Associating legacy quiz (assessment_id: %s, assess_id: %s) with learnosity_reference %s',
+                            $association['assessmentId'],
+                            $association['quizId'],
+                            $association['activityLearnosityReference']
+                        ));
+
+                        $this->associateStatement->execute([
+                            'learnosityReference' => $association['activityLearnosityReference'],
+                            'assessId' => $association['quizId']
+                        ]);
+                    }
+                } else {
+                    $this->getLogger()->debug(sprintf(
+                        '%s: transmitting payload (size: %s) to Learnosity...',
+                        $data['endpoint'],
+                        $data['count']
+                    ));
+
+                    /* Skip zero-sized payloads; Learnosity hates that
+                     *
+                     * (alternatively capture exception but probably not helpful most of the time)
+                     *
+                     * The main way this has happened to me is when you create a quiz
+                     * using Learnosity, then artificially reset its learnosity_reference
+                     * to null, then try to reimport that back into Learnosity - this is
+                     * an exceedingly particular scenario that shouldn't happen organically.
+                     *
+                     * Or, there's just an empty section somehow.
+                     */
+                    if ($data['count'] > 0) {
+                        $api->dataSetRequest($data['endpoint'], $data['payload']);
+                    }
+                }
+
+                /* Capture endpoint-specific durations
+                 */
+                $endpointEnd = microtime(true);
+
+                $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
+            }
 
             $batchEnd = microtime(true);
 
@@ -887,69 +934,6 @@ HELP;
         ));
 
         $this->getLogger()->info('');
-    }
-
-
-    /**
-     * Sends data to Learnosity and returns updated metrics
-     *
-     * @param Api $api
-     * @param array $consolidatedBlueprint
-     * @return void
-     * @throws ValidationException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     */
-    private function transmit(Api $api, array $consolidatedBlueprint): void
-    {
-        foreach ($consolidatedBlueprint as $endpoint => $data) {
-            $endpointStart = microtime(true);
-
-            /* Associate the learnosity reference back to our legacy quiz
-             */
-            if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
-                foreach ($data['payload']['associations'] as $association) {
-                    $this->getLogger()->info(sprintf(
-                        'Associating legacy quiz (assessment_id: %s, assess_id: %s) with learnosity_reference %s',
-                        $association['assessmentId'],
-                        $association['quizId'],
-                        $association['activityLearnosityReference']
-                    ));
-
-                    $this->associateStatement->execute([
-                        'learnosityReference' => $association['activityLearnosityReference'],
-                        'assessId' => $association['quizId']
-                    ]);
-                }
-            } else {
-                $this->getLogger()->debug(sprintf(
-                    '%s: transmitting payload (size: %s) to Learnosity...',
-                    $data['endpoint'],
-                    $data['count']
-                ));
-
-                /* Skip zero-sized payloads; Learnosity hates that
-                 *
-                 * (alternatively capture exception but probably not helpful most of the time)
-                 *
-                 * The main way this has happened to me is when you create a quiz
-                 * using Learnosity, then artificially reset its learnosity_reference
-                 * to null, then try to reimport that back into Learnosity - this is
-                 * an exceedingly particular scenario that shouldn't happen organically.
-                 *
-                 * Or, there's just an empty section somehow.
-                 */
-                if ($data['count'] > 0) {
-                    $api->dataSetRequest($data['endpoint'], $data['payload']);
-                }
-            }
-
-            /* Capture endpoint-specific durations
-             */
-            $endpointEnd = microtime(true);
-
-            $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
-        }
     }
 
 
