@@ -494,10 +494,12 @@ HELP;
                         continue;
                     }
 
+                    $this->getLogger()->info('Consolidation full; this quiz goes into next batch.');
+
                     /* We've got a full $consolidatedBlueprints; we can't add another
                      * Start doing some real work with Learnosity
                      */
-                    $this->getLogger()->debug('Consolidation full; transmitting existing consolidation and setting this quiz for next consolidation');
+                    $this->getLogger()->debug('Transmitting existing consolidation and setting this quiz for next consolidation');
 
                     /* Send it
                      */
@@ -876,10 +878,10 @@ HELP;
                 if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
                     foreach ($data['payload']['associations'] as $association) {
                         $this->getLogger()->info(sprintf(
-                            'Associating legacy quiz (assessment_id: %s, assess_id: %s) with learnosity_reference %s',
+                            'Associating quiz (assessment_id: %s, assess_id: %s) with %s...',
                             $association['assessmentId'],
                             $association['quizId'],
-                            $association['activityLearnosityReference']
+                            substr($association['activityLearnosityReference'], 0, 13)
                         ));
 
                         $this->associateStatement->execute([
