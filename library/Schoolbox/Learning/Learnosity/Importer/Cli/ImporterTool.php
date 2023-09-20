@@ -501,19 +501,22 @@ HELP;
         }
 
         /* Report some metrics
+         * Timing stats only available in perform mode
          */
-        $numImported = \count($timing);
+        if ($this->perform()) {
+            $numImported = \count($timing);
 
-        if (!$numImported) {
-            $this->getLogger()->info('No quizzes imported; none found. Exiting.');
-            return;
+            if (!$numImported) {
+                $this->getLogger()->info('No quizzes imported; none found. Exiting.');
+                return;
+            }
+
+            $this->getLogger()->info(sprintf(
+                'Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
+                $numImported,
+                round(array_sum($timing) / $numImported)
+            ));
         }
-
-        $this->getLogger()->info(sprintf(
-            'Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
-            $numImported,
-            round(array_sum($timing) / $numImported)
-        ));
 
         /* Announce conclusion
          */
