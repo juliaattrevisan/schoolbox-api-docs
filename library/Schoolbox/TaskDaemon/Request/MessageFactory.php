@@ -57,6 +57,8 @@ class MessageFactory
      * @param array       $params
      * @param string|null $callbackUrl
      * @param array|null  $callbackParams
+     * @param string|null $failureCallbackUrl
+     * @param array|null  $failureCallbackParams
      * @param User|null   $effector
      * @return Message
      */
@@ -65,6 +67,8 @@ class MessageFactory
         array $params,
         ?string $callbackUrl,
         ?array $callbackParams,
+        ?string $failureCallbackUrl,
+        ?array $failureCallbackParams,
         ?User $effector
     ): Message {
         // Convert the instance to an intermediary format
@@ -80,6 +84,8 @@ class MessageFactory
             $this->instance->getSchoolCode(),
             $callbackUrl,
             $callbackParams,
+            $failureCallbackUrl,
+            $failureCallbackParams,
             $effector ? $this->tokenBuilder->generate($effector) : null,
         );
     }

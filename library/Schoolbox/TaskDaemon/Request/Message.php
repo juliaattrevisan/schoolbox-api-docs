@@ -91,7 +91,7 @@ class Message
 
     /**
      * If provided: the task daemon will use this as an authorization token
-     * when calling `$callbackUrl`.
+     * when calling `$callbackUrl` and `$failureCallbackUrl`.
      */
     private ?string $callbackToken;
 
@@ -114,6 +114,10 @@ class Message
      * @param string            $schoolCode
      * @param string|null       $callbackUrl
      * @param array|null        $callbackParams
+     * @param string|null       $failureCallbackUrl    If provided: the task daemon will call this URL after the task
+     *                                                 has failed.
+     * @param array|null        $failureCallbackParams If provided: the task daemon will use these params as the body of
+     *                                                 the request to `$failureCallbackUrl`, in JSON-encoded format.
      * @param string|null       $callbackToken
      */
     public function __construct(
@@ -128,6 +132,8 @@ class Message
         string $schoolCode,
         ?string $callbackUrl,
         ?array $callbackParams,
+        private ?string $failureCallbackUrl,
+        private ?array $failureCallbackParams,
         #[SensitiveParameter] ?string $callbackToken
     ) {
         $this->task           = $task;
@@ -222,6 +228,22 @@ class Message
     public function getCallbackParams(): ?array
     {
         return $this->callbackParams;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFailureCallbackUrl(): ?string
+    {
+        return $this->failureCallbackUrl;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getFailureCallbackParams(): ?array
+    {
+        return $this->failureCallbackParams;
     }
 
     /**

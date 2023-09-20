@@ -53,6 +53,15 @@ class MessageSerializer
             ];
         }
 
+        $failureCallback = $message->getFailureCallbackUrl();
+        if (isset($failureCallback)) {
+            $return['task']['failureCallback'] = [
+                'url'    => $failureCallback,
+                'params' => $message->getFailureCallbackParams(),
+                'token'  => $message->getCallbackToken(),
+            ];
+        }
+
         return json_encode($return);
     }
 }

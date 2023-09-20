@@ -164,6 +164,8 @@ abstract class BaseMessageFactory
             $this->instance->getSchoolCode(),
             $this->callbackUrl,
             $this->callbackParams,
+            $this->failureCallbackUrl,
+            $this->failureCallbackParams,
             $token,
         );
     }
