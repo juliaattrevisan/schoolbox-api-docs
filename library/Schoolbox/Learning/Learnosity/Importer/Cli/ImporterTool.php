@@ -35,34 +35,6 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * Maximum number of Activities per payload
-     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
-     */
-    private const LEARNOSITY_MAX_ACTIVITIES = 50;
-
-
-    /**
-     * Maximum number of Items per payload
-     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
-     */
-    private const LEARNOSITY_MAX_ITEMS = 50;
-
-
-    /**
-     * Maximum number of Questions per payload
-     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
-     */
-    private const LEARNOSITY_MAX_QUESTIONS = 50;
-
-
-    /**
-     * Maximum number of Features per payload
-     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setFeatures
-     */
-    private const LEARNOSITY_MAX_FEATURES = 50;
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -483,7 +455,7 @@ HELP;
                      * keep repeating this process until $nextQuiz causes one
                      * of the payloads to exceed the limit
                      */
-                    $canConsolidate = $this->canConsolidate($consolidatedBlueprint, $blueprint);
+                    $canConsolidate = $blueprintBuilder->canConsolidate($consolidatedBlueprint, $blueprint);
 
                     if ($canConsolidate) {
                         $consolidatedBlueprint = $blueprintBuilder->consolidate($consolidatedBlueprint, $blueprint);
@@ -764,61 +736,7 @@ HELP;
     }
 
 
-    /**
-     * Decide if $blueprint can fit onto the already-consolidated stack $consolidated
-     *
-     * @param array $consolidated
-     * @param array $blueprint
-     * @return bool
-     */
-    private function canConsolidate(array $consolidated, array $blueprint): bool
-    {
-        /* Inspect $legacyQuiz to see what is inside, aiming to cram as many
-         * Features, Questions and Items per payload, as Learnosity allows.
-         *
-         * This is all about minimising the number of Learnosity API calls
-         * dynamically based on the content we're trying to cram in to each
-         * payload; see their API docs for limits (also indexed as consts at
-         * the top of this file)
-         */
-        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
-            if (BlueprintBuilder::ENDPOINT_FEATURES === $payloadSequence['endpoint']) {
-                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_FEATURES]['count'] ?? 0) + $payloadSequence['count'];
 
-                if ((int)$sum >= self::LEARNOSITY_MAX_FEATURES) {
-                    return false;
-                }
-            }
-
-            if (BlueprintBuilder::ENDPOINT_QUESTIONS === $payloadSequence['endpoint']) {
-                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_QUESTIONS]['count'] ?? 0) + $payloadSequence['count'];
-
-                if ((int)$sum >= self::LEARNOSITY_MAX_QUESTIONS) {
-                    return false;
-                }
-            }
-
-            if (BlueprintBuilder::ENDPOINT_ITEMS === $payloadSequence['endpoint']) {
-                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_ITEMS]['count'] ?? 0) + $payloadSequence['count'];
-
-                if ((int)$sum >= self::LEARNOSITY_MAX_ITEMS) {
-                    return false;
-                }
-            }
-
-            if (BlueprintBuilder::ENDPOINT_ACTIVITIES === $payloadSequence['endpoint']) {
-                $sum = ($consolidated[BlueprintBuilder::ENDPOINT_ACTIVITIES]['count'] ?? 0) + $payloadSequence['count'];
-
-                if ((int)$sum >= self::LEARNOSITY_MAX_ACTIVITIES) {
-                    return false;
-                }
-            }
-        }
-
-        /* I guess we can keep consolidating
-         */
-        return true;
-    }
 
 
     /**
