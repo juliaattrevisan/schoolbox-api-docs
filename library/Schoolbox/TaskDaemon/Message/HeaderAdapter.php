@@ -23,26 +23,30 @@ use Interop\Queue\Message;
 class HeaderAdapter
 {
     /**
-     * Custom message header: dictates how many attempts have been made to send
-     * this message.
+     * Custom message header: dictates how many times this message has been
+     * added back to the queue.
      *
-     * The Redis message variant supports attempts natively via a custom header,
-     * but this header is removed upon rejecting and re-queueing the message.
-     *
-     * The Redis and custom attempt header refer to slightly different concepts:
-     * * the Redis attempt header is incremented whenever a message is not
-     *   acknowledged within a given time frame
-     * * the custom attempt header is incremented whenever a message is added
-     *   back to the queue (e.g. when its job raised an error, or is still
-     *   pending)
+     * This custom header and the Redis attempts header refer to slightly
+     * different concepts:
+     * * the Redis attempt header is automatically incremented whenever a
+     *   message is neither acknowledged nor rejected before the redelivery
+     *   delay is reached:
+     *   @see \Schoolbox\TaskDaemon\Environment::ENV_VAR_REDELIVERY_DELAY
+     * * this custom header is manually incremented whenever a message is added
+     *   back to its queue
+     *   (e.g. when its job raised an error, or is still pending)
      */
-    private const HEADER_ATTEMPTS = 'x-taskd-attempts';
+    private const HEADER_REQUEUES = 'x-taskd-requeues';
 
     /**
-     * Custom message header: overrides the maximum number of attempts which may
-     * be made to process a message.
+     * Custom message header: overrides the maximum number of times a message
+     * may be requeued before it is rejected.
+     *
+     * If not provided: this is equal to the task daemon's default, as
+     * configured in the max attempts environment variable:
+     * @see \Schoolbox\TaskDaemon\Environment::ENV_VAR_MAX_ATTEMPTS
      */
-    private const HEADER_MAX_ATTEMPTS = 'x-taskd-max-attempts';
+    private const HEADER_MAX_REQUEUES = 'x-taskd-max-requeues';
 
     /**
      * Set the value of the delay header in the message.
@@ -61,56 +65,73 @@ class HeaderAdapter
     }
 
     /**
-     * Extract the max attempts out of the message.
+     * Retrieve the number of times this message has been redelivered: a message
+     * will be redelivered if it is delivered but neither acknowledged nor
+     * rejected before the redelivery delay is reached.
+     *
+     * Currently only supported in Redis queues; also, the Redis queue concept
+     * "attempt" has been renamed to "redelivery" here, to disambiguate from
+     * requeues.
      *
      * @param Message $message
-     * @return int|null The max number of attempts to process the message, or
-     *                  null to fall back to the task daemon's default
-     *                  (`\Schoolbox\TaskDaemon\Environment::getMaxAttempts`).
+     * @return int|null
      */
-    public function getMaxAttempts(Message $message): ?int
+    public function getRedeliveries(Message $message): ?int
     {
-        return filter_var($message->getHeader(self::HEADER_MAX_ATTEMPTS), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        return $message instanceof RedisMessage
+            ? $message->getAttempts()
+            : null;
     }
 
     /**
-     * Set the value of the max attempts header in the message.
+     * Extract the max requeues out of the message.
+     *
+     * @param Message $message
+     * @return int|null The max number of attempts to process the message, or
+     *                  null to fall back to the task daemon's default.
+     */
+    public function getMaxRequeues(Message $message): ?int
+    {
+        return filter_var($message->getHeader(self::HEADER_MAX_REQUEUES), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * Set the value of the max requeues header in the message.
      *
      * @param Message  $message
      * @param int|null $maxAttempts The max number of attempts to process the
      *                              message, or null to fall back to the task
      *                              daemon's default.
      */
-    public function setMaxAttempts(Message $message, ?int $maxAttempts): void
+    public function setMaxRequeues(Message $message, ?int $maxAttempts): void
     {
-        $message->setHeader(self::HEADER_MAX_ATTEMPTS, $maxAttempts);
+        $message->setHeader(self::HEADER_MAX_REQUEUES, $maxAttempts);
     }
 
     /**
-     * Extract the amount of attempts at processing out of the message.
+     * Extract the amount of times this message has been requeued.
      *
      * @param Message $message
      * @return int|null The number of attempts at processing the message, or
      *                  null if unknown.
      */
-    public function getAttempts(Message $message): ?int
+    public function getRequeues(Message $message): ?int
     {
-        return filter_var($message->getHeader(self::HEADER_ATTEMPTS), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        return filter_var($message->getHeader(self::HEADER_REQUEUES), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
     }
 
     /**
-     * Increment the number of attempts which have been made to send this
-     * message.
+     * Increment the number of requeues of this message.
      *
-     * The number of attempts should not be set directly: it should only be
+     * The number of requeues should not be set directly: it should only be
      * incremented.
      *
      * @param Message $message
      * @return void
      */
-    public function incrementAttempts(Message $message): void
+    public function incrementRequeues(Message $message): void
     {
-        $attempts = $this->getAttempts($message) ?? 1;
-        $message->setHeader(self::HEADER_ATTEMPTS, $attempts + 1);
+        $attempts = $this->getRequeues($message) ?? 1;
+        $message->setHeader(self::HEADER_REQUEUES, $attempts + 1);
     }
 }
