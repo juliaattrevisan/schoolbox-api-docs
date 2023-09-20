@@ -76,6 +76,7 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($assessments, $viewer) {
                 $assessment = $assessments->getBy('id', $match->id);
 
+// Might need later.
 //                if ($assessment instanceof DueWorkModel) {
 //                    // ...
 //                } elseif ($assessment instanceof LessonPlanModel) {
@@ -90,6 +91,14 @@ class Hydrator extends BaseHydrator
 //                    // ...
                 if ($assessment instanceof AssessmentModel) {
                     $folder = $assessment->getContextFolder();
+
+// Might need later.
+//                    $assessmentContext = $assessment->getAssessmentContext();
+//                    $contextProject = $assessment->getContextProject();
+//                    $dueWork = $assessment->getDueWork();
+//                    $lessonPlan = $assessment->getLessonPlan();
+//                    $project = $assessment->getProject();
+//                    $quiz = $assessment->getQuiz();
 
                     if ($folder !== null) {
                         // Check if user has access to quiz's folder
@@ -109,18 +118,9 @@ class Hydrator extends BaseHydrator
                         $match,
                         $match->id,
                         $assessment->getTitle(),
-                        match ($match->type) {
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_DUE_WORK => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LESSON_PLAN => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_PROJECT => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LTI_ASSESSMENT => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_TASK => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_QUIZ => (
-                                $this->buildBaseUrl()
-                                     ->withPath("/learning/quiz/intro/{$assessment->getId()}")
-                                     ->__toString()
-                            ),
-                        },
+                        $this->buildBaseUrl()
+                             ->withPath("/learning/assessments/{$assessment->getId()}")
+                             ->__toString(),
                         $match->type,
                         $match->relevance,
                         $assessment->getUpdatedAt(),
