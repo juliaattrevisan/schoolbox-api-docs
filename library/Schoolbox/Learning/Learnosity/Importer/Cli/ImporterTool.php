@@ -294,7 +294,7 @@ HELP;
 
         /* Capture basic metrics
          */
-        $metrics = array_fill_keys(self::ENDPOINT_INDEX, 0);
+        $metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
         $timing = [];
         $numImported = 0;
 
@@ -570,7 +570,7 @@ HELP;
                 $this->getLogger()->info(sprintf(
                     '    %s: %s calls',
                     $endpoint,
-                    $data
+                    $data['count']
                 ));
             }
 
@@ -747,7 +747,7 @@ HELP;
     private function accumulateMetrics(array $consolidatedBlueprint, array $metrics): array
     {
         foreach (self::ENDPOINT_INDEX as $type) {
-            $metrics[$type] += $consolidatedBlueprint[$type]['count'];
+            $metrics[$type]['count'] += $consolidatedBlueprint[$type]['count'];
         }
 
         return $metrics;
