@@ -94,6 +94,8 @@ class BlueprintBuilder
 
 
     /**
+     * TODO What is this supposed to be, then
+     *
      * A generic author identifier attributed to each and every question
      * since we're aligning the strata of all questions from every quiz.
      *
