@@ -45,7 +45,7 @@ class Producer
      *
      * @param Message    $message     The message to send
      * @param float|null $delay       If set: delay send by this many seconds
-     * @param int|null   $maxAttempts If set: override the max attempts by this
+     * @param int|null   $maxRequeues If set: override the max requeues by this
      *                                amount
      * @return void
      * @throws Exception                   if the context's provider fails to
@@ -58,14 +58,14 @@ class Producer
     public function send(
         Message $message,
         ?float $delay = null,
-        ?int $maxAttempts = null,
+        ?int $maxRequeues = null,
     ): void {
         $enqueueMessage = $this->context->createMessage($this->messageSerializer->serialize($message));
         if (isset($delay)) {
             $this->headerAdapter->setDelay($enqueueMessage, $delay);
         }
-        if (isset($maxAttempts)) {
-            $this->headerAdapter->setMaxAttempts($enqueueMessage, $maxAttempts);
+        if (isset($maxRequeues)) {
+            $this->headerAdapter->setMaxRequeues($enqueueMessage, $maxRequeues);
         }
         $this->context->createProducer()->send(
             $this->context->createQueue($this->queueName),
