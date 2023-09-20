@@ -34,6 +34,34 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Maximum number of Activities per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+     */
+    private const LEARNOSITY_MAX_ACTIVITIES = 50;
+
+
+    /**
+     * Maximum number of Items per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+     */
+    private const LEARNOSITY_MAX_ITEMS = 50;
+
+
+    /**
+     * Maximum number of Questions per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+     */
+    private const LEARNOSITY_MAX_QUESTIONS = 50;
+
+
+    /**
+     * Maximum number of Features per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setFeatures
+     */
+    private const LEARNOSITY_MAX_FEATURES = 50;
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
