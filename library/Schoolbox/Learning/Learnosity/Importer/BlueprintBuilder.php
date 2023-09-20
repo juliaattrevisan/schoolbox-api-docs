@@ -549,8 +549,20 @@ class BlueprintBuilder
                 ],
                 'count' => 0,
             ],
-            self::ENDPOINT_ITEMS => [],
-            self::ENDPOINT_ACTIVITIES => [],
+            self::ENDPOINT_ITEMS => [
+                'endpoint' => self::ENDPOINT_ITEMS,
+                'payload' => [
+                    'items' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_ACTIVITIES => [
+                'endpoint' => self::ENDPOINT_ACTIVITIES,
+                'payload' => [
+                    'activities' => []
+                ],
+                'count' => 0,
+            ],
             'associations' => []
         ];
 
@@ -566,9 +578,17 @@ class BlueprintBuilder
                 } elseif (self::ENDPOINT_QUESTIONS === $endpoint) {
                     $consolidated[$endpoint]['payload']['questions'] = array_merge($consolidated[$endpoint]['payload']['questions'], $payloadSequence['payload']['questions']);
                     $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['questions']);
+                } elseif (self::ENDPOINT_ITEMS === $endpoint) {
+                    $consolidated[$endpoint]['payload']['items'] = array_merge($consolidated[$endpoint]['payload']['items'], $payloadSequence['payload']['items']);
+                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['items']);
+                } elseif (self::ENDPOINT_ACTIVITIES === $endpoint) {
+                    $consolidated[$endpoint]['payload']['activities'] = array_merge($consolidated[$endpoint]['payload']['activities'], $payloadSequence['payload']['activities']);
+                    $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['activities']);
                 }
             }
 
+            /* We need to do this in schoolbox land after the fact
+             */
             $consolidated['associations'][] = [
                 'quizId' => $blueprint['quizId'],
                 'assessmentId' => $blueprint['assessmentId'],
