@@ -524,7 +524,6 @@ HELP;
 
                     /* Log counts as we progress
                      */
-                    $numQuizzesImported++;
                     $numBatches++;
 
                     $this->getLogger()->info(sprintf(
@@ -538,6 +537,10 @@ HELP;
                      * Rinse and repeat until all is done
                      */
                     $consolidatedBlueprint = $blueprintBuilder->align(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
+
+                    /* Log counts as we progress
+                     */
+                    $numQuizzesImported++;
                 }
 
                 /* Remainder data
