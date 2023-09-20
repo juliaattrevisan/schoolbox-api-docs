@@ -470,7 +470,7 @@ HELP;
                      * all the items get combined and all the activities get combined.
                      */
                     if (null === $consolidatedBlueprint) {
-                        $consolidatedBlueprint = $blueprintBuilder->consolidate(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
+                        $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
                         $this->numQuizzesImported++;
 
                         $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
@@ -508,7 +508,7 @@ HELP;
                     /* Make the next $consolidatedBlueprint start with $blueprint
                      * Rinse and repeat until all is done
                      */
-                    $consolidatedBlueprint = $blueprintBuilder->consolidate(BlueprintBuilder::INITIAL_CONSOLIDATION, $blueprint);
+                    $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
 
                     /* Log counts as we progress
                      */

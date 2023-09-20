@@ -46,51 +46,7 @@ class BlueprintBuilder
     /**
      * Combined strata of features, questions, items, activities, associations
      */
-    public const INITIAL_CONSOLIDATION = [
-        self::ENDPOINT_FEATURES => [
-            'endpoint' => self::ENDPOINT_FEATURES,
-            'payload' => [
-                'features' => []
-            ],
-            'count' => 0,
-        ],
-        self::ENDPOINT_QUESTIONS => [
-            'endpoint' => self::ENDPOINT_QUESTIONS,
-            'payload' => [
-                'meta' => [
-                    'user' => [
-                        /* FIXME replace with actual author somehow, or just assume a system user
-                         *  I'm not really sure this is ever shown to an end user
-                         */
-                        'id' => self::DEFAULT_AUTHOR
-                    ]
-                ],
-                'questions' => []
-            ],
-            'count' => 0,
-        ],
-        self::ENDPOINT_ITEMS => [
-            'endpoint' => self::ENDPOINT_ITEMS,
-            'payload' => [
-                'items' => []
-            ],
-            'count' => 0,
-        ],
-        self::ENDPOINT_ACTIVITIES => [
-            'endpoint' => self::ENDPOINT_ACTIVITIES,
-            'payload' => [
-                'activities' => []
-            ],
-            'count' => 0,
-        ],
-        self::ENDPOINT_ASSOCIATIONS => [
-            'endpoint' => self::ENDPOINT_ASSOCIATIONS,
-            'payload' => [
-                'associations' => []
-            ],
-            'count' => 0,
-        ]
-    ];
+    private array $initialConsolidation;
 
 
     /**
@@ -104,7 +60,7 @@ class BlueprintBuilder
      * This means we lose the original authorship identifiers, although this
      * only appears in an audit trail that our users won't ever see afaict
      */
-    private const DEFAULT_AUTHOR = 'vagrant_1';
+    private string $defaultAuthor;
 
 
     /**
@@ -123,6 +79,55 @@ class BlueprintBuilder
         private ContextLookup $contextLookup,
         private LoggerInterface $logger
     ) {
+        $this->defaultAuthor = sprintf('%s_v23_migration', $this->schoolCode);
+
+        /* Contains a dynamic property, so it can't be a class const anymore
+         */
+        $this->initialConsolidation = [
+            self::ENDPOINT_FEATURES => [
+                'endpoint' => self::ENDPOINT_FEATURES,
+                'payload' => [
+                    'features' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_QUESTIONS => [
+                'endpoint' => self::ENDPOINT_QUESTIONS,
+                'payload' => [
+                    'meta' => [
+                        'user' => [
+                            /* FIXME replace with actual author somehow, or just assume a system user
+                             *  I'm not really sure this is ever shown to an end user
+                             */
+                            'id' => $this->defaultAuthor
+                        ]
+                    ],
+                    'questions' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_ITEMS => [
+                'endpoint' => self::ENDPOINT_ITEMS,
+                'payload' => [
+                    'items' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_ACTIVITIES => [
+                'endpoint' => self::ENDPOINT_ACTIVITIES,
+                'payload' => [
+                    'activities' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_ASSOCIATIONS => [
+                'endpoint' => self::ENDPOINT_ASSOCIATIONS,
+                'payload' => [
+                    'associations' => []
+                ],
+                'count' => 0,
+            ]
+        ];
     }
 
 
@@ -575,8 +580,24 @@ class BlueprintBuilder
 
 
     /**
-     * Combine the various strata (features, questions, items, activities) of
-     * each $blueprint into one mega-blueprint grouped by their corresponding kind.
+     * Create a new consolidation of blueprints.
+     *
+     * Alias/shortcut, since the initial consolidation payload contains a derived
+     * value (author identifier) which cannot be declared in a class const
+     *
+     * @param array $blueprint
+     * @return array
+     */
+
+    public function consolidateNew(array $blueprint): array
+    {
+        return $this->consolidate($this->initialConsolidation, $blueprint);
+    }
+
+
+    /**
+     * Combine the various strata (features, questions, items, activities) of each
+     * $blueprint into one existing mega-blueprint grouped by their corresponding kind.
      *
      * @param array $previousConsolidation
      * @param array $blueprint
