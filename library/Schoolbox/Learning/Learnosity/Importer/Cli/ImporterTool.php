@@ -34,13 +34,6 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * Number of quizzes to group up for batch transmission to Learnosity,
-     * which aims to reduce the quantity of API requests we make
-     */
-    private const DEFAULT_BATCH_SIZE = 2;
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -377,111 +370,50 @@ HELP;
              * which typically represent a single quiz. There's a limit on the number of
              * quizzes, but there's also a limit on number of features/questions/items
              * which isn't particularly obvious
-             *
-             * For now, chunk 10 quizzes at a time
              */
-            $batchSets = array_chunk($legacyQuizIds, self::DEFAULT_BATCH_SIZE);
-
-            foreach ($batchSets as $batchSet) {
-                $blueprints = [];
-
-                foreach ($batchSet as $legacyQuizId) {
-                    /* Do all the stuff it used to do to produce a $blueprint
-                     */
-                    $this->refreshLock($lock);
-
-                    /* Get the legacy quiz's contents
-                     */
-                    $legacyQuiz = $this->getQuiz($legacyQuizId);
-
-                    /* Announce what we're doing
-                     */
-                    $this->getLogger()->info(sprintf(
-                        'Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                        $legacyQuiz['title'],
-                        $legacyQuiz['assessment_id'],
-                        $legacyQuiz['assess_id']
-                    ));
-
-                    /* If this doesn't have an assessment_id, idk what this is,
-                     * because you can't get here anymore.
-                     */
-                    if ('' === trim((string)$legacyQuiz['assessment_id'])) {
-                        $this->getLogger()->warning(sprintf(
-                            'Missing assessment_id; skipping'
-                        ));
-
-                        continue;
-                    }
-
-                    /* Make the overall Learnosity payloads which we then send later with
-                     * a little postprocessing to put things into the exactly correct format.
-                     * Learnosity is really particular about such things.
-                     */
-                    try {
-                        /* Choose which construction style you want
-                         */
-                        if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                            $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
-                        } else {
-                            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-                        }
-                    } catch (\DomainException $e) {
-                        $this->getLogger()->warning($e->getMessage());
-                        $this->getLogger()->warning(sprintf(
-                            'Skipping assess_id %s',
-                            $legacyQuiz['assess_id']
-                        ));
-
-                        continue;
-                    }
-
-                    /* Load it up into a mini-stack
-                     */
-                    $blueprints[] = $blueprint;
-
-                    /* Number of quizzes we built
-                     */
-                    $numImported++;
-                }
-
-                /* Stack them up by their various strata -
-                 * all the features get combined, all the questions get combined,
-                 * all the items get combined and all the activities get combined.
+            foreach ($legacyQuizIds as $legacyQuizId) {
+                /* Do all the stuff it used to do to produce a $blueprint
                  */
-                $consolidatedBlueprint = $blueprintBuilder->align($blueprints);
+                $this->refreshLock($lock);
 
-                /* Optionally show array payloads
+                /* Get the legacy quiz's contents
                  */
-                if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
-                    print_r($consolidatedBlueprint);
-                }
+                $legacyQuiz = $this->getQuiz($legacyQuizId);
 
-                /* Accumulate some basic metrics
+                /* Build the blueprint
                  */
-                $metrics = $this->accumulateMetrics($consolidatedBlueprint, $metrics);
+                $blueprint = [];
 
-                /* When perform mode is on, actually send it as batches of features, questions,
-                 * items, activities and just...hope/presumed that everything worked out
+                /* Consolidate 1 quiz to start with
                  */
-                if ($this->perform()) {
-                    $this->getLogger()->debug('Importing into Learnosity. This might take a while.');
 
-                    /* Iterate and bombard Learnosity with api requests pewpewpew
-                     */
-                    $batchStart = microtime(true);
+                /* Inspect $legacyQuiz to see what is inside, aiming to cram as many
+                 * Features, Questions and Items per payload, as Learnosity allows.
+                 *
+                 * This is all about minimising the number of Learnosity API calls
+                 * dynamically based on the content we're trying to cram in to each
+                 * payload; see their API docs for limits (also indexed as consts at
+                 * the top of this file)
+                 */
+                $numFeatures = 0;
+                $numQuestions = 0;
+                $numItems = 0;
+                $numActivities = 0;
 
-                    $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
+                /* Fetch the next quiz and perform a similar inspection
+                 * If adding it allows all payloads to be under their limit,
+                 * keep repeating this process until $nextQuiz causes one
+                 * of the payloads to exceed the limit
+                 */
 
-                    $batchEnd = microtime(true);
+                /* Send the current consolidated blueprint up to Learnosity
+                 */
 
-                    /* Capture overall metrics
-                     */
-                    $timing[] = $batchEnd - $batchStart;
-                }
+                /* Make the next $consolidatedPayload start with $nextQuiz
+                 */
 
-                $this->getLogger()->info('Done.');
-                $this->getLogger()->info('');
+                /* Rinse and repeat until all is done
+                 */
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
