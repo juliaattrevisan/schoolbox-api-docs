@@ -660,7 +660,7 @@ HELP;
 
         foreach ($metrics as $endpoint => $data) {
             $this->getLogger()->info(sprintf(
-                '    %s: %s calls (approx. %s seconds total)',
+                '    %s: %s objects sent (approx. %s seconds total)',
                 $endpoint,
                 $data['count'],
                 number_format($data['duration'], 3)
