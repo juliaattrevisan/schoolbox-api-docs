@@ -18,136 +18,56 @@ use SensitiveParameter;
 class Message
 {
     /**
-     * The ID of the Schoolbox instance.
-     */
-    private string $instanceId;
-
-    /**
-     * The host name of the Schoolbox instance.
-     *
-     * Along with `$domain` forms a fully-qualified domain name for the
-     * Schoolbox instance: `${hostname}.${domain}`.
-     */
-    private string $hostName;
-
-    /**
-     * The domain name on which the Schoolbox instance is hosted.
-     *
-     * Along with `$hostname` forms a fully-qualified domain name for the
-     * Schoolbox instance: `${hostname}.${domain}`.
-     */
-    private string $domain;
-
-    /**
-     * The version of the Schoolbox platform which the instance is running.
-     *
-     * Required because the task daemon may need to run a task differently
-     * depending on Schoolbox version.
-     */
-    private string $version;
-
-    /**
-     * The type of instance this is:
-     * * prod: Production instance (currently contains live data)
-     * * stg: Staging instance (no live data: used for testing by customers
-     *   and Schoolbox staff)
-     * * dev: Development instance (former type for staging instances: should
-     *   be obsolete)
-     * * trial: Trial instance (for evaluation use by prospect customers)
-     */
-    private string $type;
-
-    /**
-     * A unique human-readable identifier for the organisation which owns the
-     * Schoolbox instance.
-     *
-     * This will be the same for all of an organisation's instances.
-     */
-    private string $schoolCode;
-
-    /**
-     * The name of the task to run.
-     */
-    private string $task;
-
-    /**
-     * Parameters for the task to run.
-     */
-    private array $params;
-
-    /**
-     * If provided: the task daemon will call this URL after the task has
-     * completed.
-     */
-    private ?string $callbackUrl;
-
-    /**
-     * If provided: the task daemon will use these params as the body of the
-     * request to `$callbackUrl`.
-     *
-     * Currently, these params are always passed as JSON.
-     */
-    private ?array $callbackParams;
-
-    /**
-     * If provided: the task daemon will use this as an authorization token
-     * when calling `$callbackUrl` and `$failureCallbackUrl`.
-     */
-    private ?string $callbackToken;
-
-    /**
-     * The time at which the task was sent to the task daemon.
-     */
-    private DateTimeInterface $timestamp;
-
-    /**
      * Constructor
      *
-     * @param string            $task
-     * @param array             $params
-     * @param DateTimeInterface $timestamp
-     * @param string            $instanceId
-     * @param string            $hostName
-     * @param string            $domain
-     * @param string            $version
-     * @param string            $type
-     * @param string            $schoolCode
-     * @param string|null       $callbackUrl
-     * @param array|null        $callbackParams
+     * @param string            $task                  The name of the task to run.
+     * @param array             $params                Parameters for the task to run.
+     * @param DateTimeInterface $timestamp             The time at which the task was sent to the task daemon.
+     * @param string            $instanceId            The ID of the Schoolbox instance.
+     * @param string            $hostName              The host name of the Schoolbox instance.
+     *                                                 Along with `$domain` forms a fully-qualified domain name for the
+     *                                                 Schoolbox instance: `${hostname}.${domain}`.
+     * @param string            $domain                The domain name on which the Schoolbox instance is hosted.
+     * @param string $version                          The version of the Schoolbox platform which the instance is
+     *                                                 running: required because the task daemon may need to run a task
+     *                                                 differently depending on Schoolbox version.
+     * @param string            $type                  The type of instance this is:
+     *                                                 * prod: Production instance (currently contains live data)
+     *                                                 * stg: Staging instance (no live data: used for testing by
+     *                                                   customers and Schoolbox staff)
+     *                                                 * dev: Development instance (former type for staging instances:
+     *                                                   should be obsolete)
+     *                                                 * trial: Trial instance (for evaluation by prospect customers)
+     * @param string            $schoolCode            A unique human-readable identifier for the organisation which
+     *                                                 owns the Schoolbox instance.
+     *                                                 This will be the same for all of an organisation's instances.
+     * @param string|null       $callbackUrl           If provided: the task daemon will call this URL after the task
+     *                                                 has completed.
+     * @param array|null        $callbackParams        If provided: the task daemon will use these params as the body of
+     *                                                 the request to `$callbackUrl`, in JSON-encoded format.
      * @param string|null       $failureCallbackUrl    If provided: the task daemon will call this URL after the task
      *                                                 has failed.
      * @param array|null        $failureCallbackParams If provided: the task daemon will use these params as the body of
      *                                                 the request to `$failureCallbackUrl`, in JSON-encoded format.
-     * @param string|null       $callbackToken
+     * @param string|null       $callbackToken         If provided: the task daemon will use this as an authorization
+     *                                                 token when calling `$callbackUrl` and `$failureCallbackUrl`.
      */
     public function __construct(
-        string $task,
-        array $params,
-        DateTimeInterface $timestamp,
-        string $instanceId,
-        string $hostName,
-        string $domain,
-        string $version,
-        string $type,
-        string $schoolCode,
-        ?string $callbackUrl,
-        ?array $callbackParams,
+        private string $task,
+        private array $params,
+        private DateTimeInterface $timestamp,
+        private string $instanceId,
+        private string $hostName,
+        private string $domain,
+        private string $version,
+        private string $type,
+        private string $schoolCode,
+        private ?string $callbackUrl,
+        private ?array $callbackParams,
         private ?string $failureCallbackUrl,
         private ?array $failureCallbackParams,
-        #[SensitiveParameter] ?string $callbackToken
+        #[SensitiveParameter] private ?string $callbackToken
     ) {
-        $this->task           = $task;
-        $this->params         = $params;
-        $this->timestamp      = $timestamp;
-        $this->instanceId     = $instanceId;
-        $this->hostName       = $hostName;
-        $this->domain         = $domain;
-        $this->version        = $version;
-        $this->type           = $type;
-        $this->schoolCode     = $schoolCode;
-        $this->callbackUrl    = $callbackUrl;
-        $this->callbackParams = $callbackParams;
-        $this->callbackToken  = $callbackToken;
     }
 
     /**
