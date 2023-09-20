@@ -545,7 +545,7 @@ class BlueprintBuilder
 
             $consolidated['associations'][] = [
                 'quizId' => $blueprint['quizId'],
-                'assessmentId' => $blueprint['assesssmentId'],
+                'assessmentId' => $blueprint['assessmentId'],
                 'activityLaernosityReference' => $blueprint['activityLearnosityReference']
             ];
 
