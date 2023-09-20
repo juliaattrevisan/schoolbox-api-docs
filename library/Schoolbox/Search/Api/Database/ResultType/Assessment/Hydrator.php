@@ -14,12 +14,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanModel;
-use Schoolbox\Learning\Assessment\Lti\Model as LtiModel;
-use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizModel;
-use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -76,29 +70,8 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($assessments, $viewer) {
                 $assessment = $assessments->getBy('id', $match->id);
 
-// Might need later.
-//                if ($assessment instanceof DueWorkModel) {
-//                    // ...
-//                } elseif ($assessment instanceof LessonPlanModel) {
-//                    // ...
-//                } elseif ($assessment instanceof ProjectModel) {
-//                    // ...
-//                } elseif ($assessment instanceof LtiModel) {
-//                    // ...
-//                } elseif ($assessment instanceof TaskModel) {
-//                    // ...
-//                } elseif ($assessment instanceof QuizModel) {
-//                    // ...
                 if ($assessment instanceof AssessmentModel) {
                     $folder = $assessment->getContextFolder();
-
-// Might need later.
-//                    $assessmentContext = $assessment->getAssessmentContext();
-//                    $contextProject = $assessment->getContextProject();
-//                    $dueWork = $assessment->getDueWork();
-//                    $lessonPlan = $assessment->getLessonPlan();
-//                    $project = $assessment->getProject();
-//                    $quiz = $assessment->getQuiz();
 
                     if ($folder !== null) {
                         // Check if user has access to quiz's folder
