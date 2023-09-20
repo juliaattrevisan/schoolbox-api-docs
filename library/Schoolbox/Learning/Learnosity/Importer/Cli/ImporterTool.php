@@ -479,7 +479,9 @@ HELP;
                         if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
                             foreach ($data['payload']['associations'] as $association) {
                                 $this->getLogger()->info(sprintf(
-                                    'Associating legacy quiz with learnosity_reference %s',
+                                    'Associating legacy quiz (assessment_id: %s, assess_id: %s) with learnosity_reference %s',
+                                    $association['assessmentId'],
+                                    $association['quizId'],
                                     $association['activityLearnosityReference']
                                 ));
 
@@ -500,8 +502,8 @@ HELP;
                              * (alternatively capture exception but probably not helpful most of the time)
                              *
                              * The main way this has happened to me is when you create a quiz
-                             * using learnosity, then artificially reset its learnosity_reference
-                             * to null, then try to reimport that back into learnosity - this is
+                             * using Learnosity, then artificially reset its learnosity_reference
+                             * to null, then try to reimport that back into Learnosity - this is
                              * an exceedingly particular scenario that shouldn't happen organically.
                              *
                              * Or, there's just an empty section somehow.
