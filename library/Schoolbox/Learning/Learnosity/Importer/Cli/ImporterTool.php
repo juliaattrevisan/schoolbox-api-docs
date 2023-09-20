@@ -382,7 +382,6 @@ HELP;
              */
             $batchSets = array_chunk($legacyQuizIds, self::DEFAULT_BATCH_SIZE);
 
-$batchSets = [$batchSets[0]];
             foreach ($batchSets as $batchSet) {
                 $blueprints = [];
 
