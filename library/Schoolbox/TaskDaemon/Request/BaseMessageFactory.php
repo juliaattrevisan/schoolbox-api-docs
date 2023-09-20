@@ -21,14 +21,24 @@ use Schoolbox\User;
 abstract class BaseMessageFactory
 {
     /**
-     * Callback URL, if this task invocation has one.
+     * Callback URL upon success, if this task invocation has one.
      */
     private ?string $callbackUrl = null;
 
     /**
-     * Callback params, if this task invocation has any.
+     * Callback params upon success, if this task invocation has any.
      */
     private ?array $callbackParams = null;
+
+    /**
+     * Callback URL upon failure, if this task invocation has one.
+     */
+    private ?string $failureCallbackUrl = null;
+
+    /**
+     * Callback params upon failure, if this task invocation has any.
+     */
+    private ?array $failureCallbackParams = null;
 
     /**
      * The user invoking the task, if there is one.
@@ -78,6 +88,37 @@ abstract class BaseMessageFactory
     {
         $clone = clone $this;
         $clone->callbackParams = $callbackParams;
+        return $clone;
+    }
+
+    /**
+     * Set a callback URL for this call to taskd.
+     *
+     * This URL will be called when taskd fails to complete.
+     *
+     * @param string|null $failureCallbackUrl
+     * @return static
+     */
+    public function setFailureCallbackUrl(?string $failureCallbackUrl): static
+    {
+        $clone = clone $this;
+        $clone->failureCallbackUrl = $failureCallbackUrl;
+        return $clone;
+    }
+
+    /**
+     * Set parameters to the callback URL for this call to taskd.
+     *
+     * These parameters will be added to the call to the callback URL when taskd
+     * fails to complete.
+     *
+     * @param array|null $failureCallbackParams
+     * @return static
+     */
+    public function setFailureCallbackParams(?array $failureCallbackParams): static
+    {
+        $clone = clone $this;
+        $clone->failureCallbackParams = $failureCallbackParams;
         return $clone;
     }
 
