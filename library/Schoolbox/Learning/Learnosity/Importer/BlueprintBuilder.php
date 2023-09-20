@@ -28,6 +28,27 @@ use Schoolbox\Learning\Learnosity\TagFactory;
 class BlueprintBuilder
 {
     /**
+     * Endpoint index
+     */
+    private const ENDPOINT_FEATURES = '/itembank/features';
+    private const ENDPOINT_QUESTIONS = '/itembank/questions';
+    private const ENDPOINT_ITEMS = '/itembank/items';
+    private const ENDPOINT_ACTIVITIES = '/itembank/activities';
+
+
+    /**
+     * A generic author identifier attributed to each and every question
+     * since we're aligning the strata of all questions from every quiz.
+     *
+     * Learnosity wants you to give a particular author to a set of questions,
+     * not to an individual question, in the itembank/questions endpoint.
+     * This means we lose the original authorship identifiers, although this
+     * only appears in an audit trail that our users won't ever see afaict
+     */
+    private const DEFAULT_AUTHOR = 'vagrant_1';
+
+
+    /**
      * Constructor
      *
      * @param string $schoolCode
@@ -506,28 +527,28 @@ class BlueprintBuilder
         /* Combined strata of features, questions, items, activities, associations
          */
         $consolidated = [
-            '/itembank/features' => [
-                'endpoint' => '/itembank/features',
+            self::ENDPOINT_FEATURES => [
+                'endpoint' => self::ENDPOINT_FEATURES,
                 'payload' => [
                     'features' => []
                 ]
             ],
-            '/itembank/questions' => [
-                'endpoint' => '/itembank/questions',
+            self::ENDPOINT_QUESTIONS => [
+                'endpoint' => self::ENDPOINT_QUESTIONS,
                 'payload' => [
                     'meta' => [
                         'user' => [
                             /* FIXME replace with actual author somehow, or just assume a system user
                              *  I'm not really sure this is ever shown to an end user
                              */
-                            'id' => 'vagrant_1'
+                            'id' => self::DEFAULT_AUTHOR
                         ]
                     ],
                     'questions' => []
                 ]
             ],
-            '/itembank/items' => [],
-            '/itembank/activities' => [],
+            self::ENDPOINT_ITEMS => [],
+            self::ENDPOINT_ACTIVITIES => [],
             'associations' => []
         ];
 
@@ -535,9 +556,9 @@ class BlueprintBuilder
             foreach ($blueprint['payloadSequence'] as $payloadSequence) {
                 $endpoint = $payloadSequence['endpoint'];
 
-                if ('/itembank/features' === $endpoint) {
+                if (self::ENDPOINT_FEATURES === $endpoint) {
                     $consolidated[$endpoint]['payload']['features'] = array_merge($consolidated[$endpoint]['payload']['features'], $payloadSequence['payload']['features']);
-                } elseif ('/itembank/questions' === $endpoint) {
+                } elseif (self::ENDPOINT_QUESTIONS === $endpoint) {
                     $consolidated[$endpoint]['payload']['questions'] = array_merge($consolidated[$endpoint]['payload']['questions'], $payloadSequence['payload']['questions']);
                 }
 
@@ -546,10 +567,8 @@ class BlueprintBuilder
             $consolidated['associations'][] = [
                 'quizId' => $blueprint['quizId'],
                 'assessmentId' => $blueprint['assessmentId'],
-                'activityLaernosityReference' => $blueprint['activityLearnosityReference']
+                'activityLearnosityReference' => $blueprint['activityLearnosityReference']
             ];
-
-            print_r($blueprint);
         }
 
         return $consolidated;
