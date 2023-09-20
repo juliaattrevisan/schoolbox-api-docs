@@ -574,6 +574,11 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         /** Remove unsightly margin from bottom of capability/indicator **/
         margin-bottom: 0;
     }
+    .capability, .indicator {
+        p {
+            white-space: pre-wrap;
+        }
+    }
 
     .mark {
         white-space: nowrap;
