@@ -17,6 +17,7 @@ use Interop\Queue\Exception\InvalidMessageException;
 use Schoolbox\TaskDaemon\Message\HeaderAdapter;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\TaskDaemon\Request\MessageSerializer;
+use Schoolbox\TaskDaemon\Task\Status;
 
 /**
  * Wrapper around task daemon message sending.
@@ -59,6 +60,9 @@ class Producer
         Message $message,
         ?float $delay = null,
         ?int $maxRequeues = null,
+        ?float $testErrorRate = null,
+        ?Status $testErrorStatus = null,
+        ?array $testErrorPayload = null,
     ): void {
         $enqueueMessage = $this->context->createMessage($this->messageSerializer->serialize($message));
         if (isset($delay)) {
@@ -66,6 +70,15 @@ class Producer
         }
         if (isset($maxRequeues)) {
             $this->headerAdapter->setMaxRequeues($enqueueMessage, $maxRequeues);
+        }
+        if (isset($testErrorRate)) {
+            $this->headerAdapter->setTestErrorRate($enqueueMessage, $testErrorRate);
+        }
+        if (isset($testErrorStatus)) {
+            $this->headerAdapter->setTestErrorStatus($enqueueMessage, $testErrorStatus);
+        }
+        if (isset($testErrorPayload)) {
+            $this->headerAdapter->setTestErrorPayload($enqueueMessage, $testErrorPayload);
         }
         $this->context->createProducer()->send(
             $this->context->createQueue($this->queueName),

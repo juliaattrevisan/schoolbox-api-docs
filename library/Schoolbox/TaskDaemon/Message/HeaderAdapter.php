@@ -11,6 +11,7 @@ namespace Schoolbox\TaskDaemon\Message;
 
 use Enqueue\Redis\RedisMessage;
 use Interop\Queue\Message;
+use Schoolbox\TaskDaemon\Task\Status;
 
 /**
  * Adapter class for getting and setting custom message headers on the base
@@ -47,6 +48,30 @@ class HeaderAdapter
      * @see \Schoolbox\TaskDaemon\Environment::ENV_VAR_MAX_ATTEMPTS
      */
     private const HEADER_MAX_REQUEUES = 'x-taskd-max-requeues';
+
+    /**
+     * Custom message header: a chance (from 0 to 1) that the message, instead
+     * of running, will raise an error.
+     *
+     * By default, this is 0 for no chance.
+     */
+    private const HEADER_TEST_ERROR_RATE = 'x-taskd-test-error-rate';
+
+    /**
+     * Custom message header: if raising an error due to
+     * `HEADER_TEST_ERROR_RATE`, raise this type of error.
+     *
+     * Should be a `\Schoolbox\TaskDaemon\Task\Status` value.
+     */
+    private const HEADER_TEST_ERROR_STATUS = 'x-taskd-test-error-status';
+
+    /**
+     * Custom message header: if raising an error due to
+     * `HEADER_TEST_ERROR_RATE`, raise this payload in the error.
+     *
+     * Should be a json-encoded array.
+     */
+    private const HEADER_TEST_ERROR_PAYLOAD = 'x-taskd-test-error-payload';
 
     /**
      * Set the value of the delay header in the message.
@@ -133,5 +158,92 @@ class HeaderAdapter
     {
         $attempts = $this->getRequeues($message) ?? 1;
         $message->setHeader(self::HEADER_REQUEUES, $attempts + 1);
+    }
+
+    /**
+     * Extract the test error rate.
+     *
+     * @param Message $message
+     * @return float
+     */
+    public function getTestErrorRate(Message $message): float
+    {
+        return filter_var(
+            $message->getHeader(self::HEADER_TEST_ERROR_RATE),
+            FILTER_VALIDATE_FLOAT,
+            FILTER_NULL_ON_FAILURE,
+        ) ?? 0;
+    }
+
+    /**
+     * Set the test error rate.
+     *
+     * @param Message $message
+     * @param float   $testErrorRate
+     * @return void
+     */
+    public function setTestErrorRate(Message $message, float $testErrorRate): void
+    {
+        $message->setHeader(self::HEADER_TEST_ERROR_RATE, $testErrorRate);
+    }
+
+    /**
+     * Extract the test error status.
+     *
+     * @param Message $message
+     * @return Status|null
+     */
+    public function getTestErrorStatus(Message $message): ?Status
+    {
+        $status = $message->getHeader(self::HEADER_TEST_ERROR_STATUS);
+        if (is_string($status)) {
+            return Status::tryFrom($status);
+        }
+        return null;
+    }
+
+    /**
+     * Set the test error status.
+     *
+     * @param Message     $message
+     * @param Status|null $testErrorStatus
+     * @return void
+     */
+    public function setTestErrorStatus(Message $message, ?Status $testErrorStatus): void
+    {
+        $message->setHeader(self::HEADER_TEST_ERROR_STATUS, $testErrorStatus?->value);
+    }
+
+    /**
+     * Extract the test error payload.
+     *
+     * @param Message $message
+     * @return array|null
+     */
+    public function getTestErrorPayload(Message $message): ?array
+    {
+        $encodedPayload = $message->getHeader(self::HEADER_TEST_ERROR_PAYLOAD);
+        if (isset($encodedPayload)) {
+            $decodedPayload = json_decode($encodedPayload, true);
+            if (is_array($decodedPayload)) {
+                return $decodedPayload;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Set the test error payload.
+     *
+     * @param Message    $message
+     * @param array|null $testErrorPayload
+     * @return void
+     */
+    public function setTestErrorPayload(Message $message, ?array $testErrorPayload): void
+    {
+        $message->setHeader(
+            self::HEADER_TEST_ERROR_STATUS,
+            isset($testErrorPayload) ? json_encode($testErrorPayload) : null,
+        );
     }
 }
