@@ -554,12 +554,23 @@ HELP;
         $this->getLogger()->info('Learnosity Migration Summary');
         $this->getLogger()->info('');
 
-        /* Total time spent here
-         */
-        $this->getLogger()->info(sprintf(
-            '    Total time spent importing: approx. %s seconds',
-            round($totalDuration)
-        ));
+        if ($this->perform()) {
+            /* Total time spent here
+             */
+            $this->getLogger()->info(sprintf(
+                '    Total time spent importing: approx. %s seconds',
+                round($totalDuration)
+            ));
+
+            /* Timing stats only available in perform mode
+             */
+            $this->getLogger()->info(sprintf(
+                '    Average time taken per quiz: approx. %s seconds',
+                round(array_sum($this->timing) / $this->numQuizzesImported)
+            ));
+
+            $this->getLogger()->info('');
+        }
 
         /* Number of quizzes imported
          */
@@ -581,18 +592,6 @@ HELP;
         ));
 
         $this->getLogger()->info('');
-
-        if ($this->perform()) {
-            /* Timing stats only available in perform mode
-             */
-            $this->getLogger()->info(sprintf(
-                '    Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
-                $this->numQuizzesImported,
-                round(array_sum($this->timing) / $this->numQuizzesImported)
-            ));
-
-            $this->getLogger()->info('');
-        }
 
         foreach ($this->metrics as $endpoint => $data) {
             $this->getLogger()->info(sprintf(
