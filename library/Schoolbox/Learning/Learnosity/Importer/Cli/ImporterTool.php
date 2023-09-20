@@ -87,10 +87,10 @@ class ImporterTool extends CliTool\App
 
     /**
      * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
-     * This is the default mechanism by which to mass-import everything
+     * This is the default mechanism by which to mass-import everything.
      *
-     * TODO Potentially load the most recent quizzes first, and the oldest quizzes last
-     *  so that schools can still keep going while this imports in the background.
+     * The ORDER BY clause loads the most recent quizzes first, and the oldest quizzes last
+     * so that schools can still keep going while this imports in the background.
      *
      * TODO Alternatively/additionally you can ignore quizzes that fulfil some set of
      *  conditions, minimising the size of the dataset.
@@ -101,6 +101,7 @@ class ImporterTool extends CliTool\App
         WHERE deleted_at IS NULL
         AND availability = 'assess'
         AND learnosity_reference IS NULL
+        ORDER BY created_at DESC
     ";
 
 
@@ -370,7 +371,6 @@ HELP;
                 otherwise something went wrong and this row is still a candidate for import
         */
         try {
-
             /* $legacyQuizIds is a bunch of identifiers
              *
              * We can perhaps minimise more Learnosity requests by batching $blueprints
@@ -467,58 +467,11 @@ HELP;
                 if ($this->perform()) {
                     $this->getLogger()->debug('Importing into Learnosity. This might take a while.');
 
-                    $batchStart = microtime(true);
-
                     /* Iterate and bombard Learnosity with api requests pewpewpew
                      */
-                    foreach ($consolidatedBlueprint as $endpoint => $data) {
-                        $endpointStart = microtime(true);
+                    $batchStart = microtime(true);
 
-                        /* Associate the learnosity reference back to our legacy quiz
-                         */
-                        if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
-                            foreach ($data['payload']['associations'] as $association) {
-                                $this->getLogger()->info(sprintf(
-                                    'Associating legacy quiz (assessment_id: %s, assess_id: %s) with learnosity_reference %s',
-                                    $association['assessmentId'],
-                                    $association['quizId'],
-                                    $association['activityLearnosityReference']
-                                ));
-
-                                $this->associateStatement->execute([
-                                    'learnosityReference' => $association['activityLearnosityReference'],
-                                    'assessId' => $association['quizId']
-                                ]);
-                            }
-                        } else {
-                            $this->getLogger()->debug(sprintf(
-                                '%s: transmitting payload (size: %s) to Learnosity...',
-                                $data['endpoint'],
-                                $data['count']
-                            ));
-
-                            /* Skip zero-sized payloads; Learnosity hates that
-                             *
-                             * (alternatively capture exception but probably not helpful most of the time)
-                             *
-                             * The main way this has happened to me is when you create a quiz
-                             * using Learnosity, then artificially reset its learnosity_reference
-                             * to null, then try to reimport that back into Learnosity - this is
-                             * an exceedingly particular scenario that shouldn't happen organically.
-                             *
-                             * Or, there's just an empty section somehow.
-                             */
-                            if ($data['count'] > 0) {
-                                $api->dataSetRequest($data['endpoint'], $data['payload']);
-                            }
-                        }
-
-                        /* Capture endpoint-specific durations
-                         */
-                        $endpointEnd = microtime(true);
-
-                        $metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
-                    }
+                    $metrics = $this->transmit($api, $consolidatedBlueprint, $metrics);
 
                     $batchEnd = microtime(true);
 
@@ -780,6 +733,71 @@ HELP;
         return $metrics;
     }
 
+
+    /**
+     * Sends data to Learnosity and returns updated metrics
+     *
+     * @param Api $api
+     * @param array $consolidatedBlueprint
+     * @param array $metrics
+     * @return array
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     */
+    private function transmit(Api $api, array $consolidatedBlueprint, array $metrics): array
+    {
+        foreach ($consolidatedBlueprint as $endpoint => $data) {
+            $endpointStart = microtime(true);
+
+            /* Associate the learnosity reference back to our legacy quiz
+             */
+            if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
+                foreach ($data['payload']['associations'] as $association) {
+                    $this->getLogger()->info(sprintf(
+                        'Associating legacy quiz (assessment_id: %s, assess_id: %s) with learnosity_reference %s',
+                        $association['assessmentId'],
+                        $association['quizId'],
+                        $association['activityLearnosityReference']
+                    ));
+
+                    $this->associateStatement->execute([
+                        'learnosityReference' => $association['activityLearnosityReference'],
+                        'assessId' => $association['quizId']
+                    ]);
+                }
+            } else {
+                $this->getLogger()->debug(sprintf(
+                    '%s: transmitting payload (size: %s) to Learnosity...',
+                    $data['endpoint'],
+                    $data['count']
+                ));
+
+                /* Skip zero-sized payloads; Learnosity hates that
+                 *
+                 * (alternatively capture exception but probably not helpful most of the time)
+                 *
+                 * The main way this has happened to me is when you create a quiz
+                 * using Learnosity, then artificially reset its learnosity_reference
+                 * to null, then try to reimport that back into Learnosity - this is
+                 * an exceedingly particular scenario that shouldn't happen organically.
+                 *
+                 * Or, there's just an empty section somehow.
+                 */
+                if ($data['count'] > 0) {
+                    $api->dataSetRequest($data['endpoint'], $data['payload']);
+                }
+            }
+
+            /* Capture endpoint-specific durations
+             */
+            $endpointEnd = microtime(true);
+
+            $metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
+        }
+
+        return $metrics;
+    }
 
     /**
      * FIXME Decide whether this script must be run as root
