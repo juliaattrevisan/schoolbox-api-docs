@@ -357,9 +357,9 @@ HELP;
              *
              * For now, chunk 5 quizzes at a time
              */
-            $batchIds = array_chunk($legacyQuizIds, 5);
+            $batchSets = array_chunk($legacyQuizIds, 5);
 
-            foreach ($batchIds as $batchSet) {
+            foreach ($batchSets as $batchSet) {
                 $blueprints = [];
 
                 foreach ($batchSet as $legacyQuizId) {
