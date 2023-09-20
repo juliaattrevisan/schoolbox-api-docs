@@ -181,4 +181,14 @@ class Message
     {
         return $this->timestamp;
     }
+
+    /**
+     * Helper method for retrieving the fully-qualified domain name.
+     *
+     * @return string
+     */
+    public function getFullyQualifiedDomainName(): string
+    {
+        return $this->hostName . '.' . $this->domain;
+    }
 }
