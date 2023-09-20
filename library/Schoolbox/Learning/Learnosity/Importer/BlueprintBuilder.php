@@ -28,6 +28,13 @@ use Schoolbox\Learning\Learnosity\TagFactory;
 class BlueprintBuilder
 {
     /**
+     * This isn't an actual Learnosity endpoint but it's used to indicate
+     * when we need to associate a Learnosity quiz with our legacy ones.
+     */
+    public const ENDPOINT_ASSOCIATIONS = 'associations';
+
+
+    /**
      * Endpoint index
      */
     private const ENDPOINT_FEATURES = '/itembank/features';
