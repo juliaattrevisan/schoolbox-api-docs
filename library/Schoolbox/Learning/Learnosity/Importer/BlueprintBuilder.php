@@ -582,7 +582,7 @@ class BlueprintBuilder
      * @param array $blueprint
      * @return array
      */
-    public function align(array $previousConsolidation, array $blueprint): array
+    public function consolidate(array $previousConsolidation, array $blueprint): array
     {
         /* Add to this thing
          */
