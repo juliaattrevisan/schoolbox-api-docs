@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
@@ -140,5 +141,24 @@ class AssessmentType implements IType
         }
 
         return $list;
+    }
+
+    /**
+     * Return the part of the icon class after 'icon-'.  E.g. for 'icon-due-work', return 'due-work'.
+     *
+     * @param $type
+     * @return string
+     */
+    public static function getIconClassSuffixForType($type): string
+    {
+        return match ($type) {
+            self::TYPE_DUE_WORK => 'due-work',
+            self::TYPE_QUIZ => 'quiz',
+            self::TYPE_TASK => 'task',
+            self::TYPE_PROJECT => 'project',
+            self::TYPE_LTI_ASSESSMENT => 'lti',
+            self::TYPE_LESSON_PLAN => 'lesson-plan',
+            default => throw new InvalidArgumentException("Expected valid assessment type, received '$type'."),
+        };
     }
 }

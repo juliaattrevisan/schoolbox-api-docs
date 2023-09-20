@@ -127,14 +127,7 @@ class Hydrator extends BaseHydrator
                         $folder?->getId(),
                         null,
                         null,
-                        match ($match->type) {
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_DUE_WORK => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LESSON_PLAN => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_PROJECT => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_LTI_ASSESSMENT => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_TASK => '',
-                            self::BASE_TYPE . '.' . AssessmentType::TYPE_QUIZ => (
-                        },
+                        AssessmentType::getIconClassSuffixForType($match->type),
                         $assessment->getDescription(),
                         null,
                         $context, // Context: assessment's folder
