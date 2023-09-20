@@ -34,6 +34,13 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Number of quizzes to group up for batch transmission to Learnosity,
+     * which aims to reduce the quantity of API requests we make
+     */
+    private const DEFAULT_BATCH_SIZE = 10;
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -369,9 +376,9 @@ HELP;
              * quizzes, but there's also a limit on number of features/questions/items
              * which isn't particularly obvious
              *
-             * For now, chunk 5 quizzes at a time
+             * For now, chunk 10 quizzes at a time
              */
-            $batchSets = array_chunk($legacyQuizIds, 5);
+            $batchSets = array_chunk($legacyQuizIds, self::DEFAULT_BATCH_SIZE);
 
             foreach ($batchSets as $batchSet) {
                 $blueprints = [];
@@ -523,19 +530,51 @@ HELP;
         }
 
         /* Report some metrics
-         * Timing stats only available in perform mode
          */
-        if ($this->perform()) {
-            if (!$numImported) {
-                $this->getLogger()->info('No quizzes imported; none found. Exiting.');
-                return;
-            }
+        if (!$numImported) {
+            $this->getLogger()->info('No quizzes imported; none found. Exiting.');
+            return;
+        }
 
+        /* Endpoint usage
+         */
+        $this->getLogger()->info('');
+        $this->getLogger()->info('');
+        $this->getLogger()->info('Learnosity Migration Summary');
+        $this->getLogger()->info('');
+
+        /* Number of batches used
+         */
+        $this->getLogger()->info(sprintf(
+            '    Number of batches used: %s',
+            \count($batchSets)
+        ));
+
+        $this->getLogger()->info(sprintf(
+            '    Quizzes per batch: %s',
+            self::DEFAULT_BATCH_SIZE
+        ));
+
+        $this->getLogger()->info('');
+
+        if ($this->perform()) {
+            /* Timing stats only available in perform mode
+             */
             $this->getLogger()->info(sprintf(
-                'Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
+                '    Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
                 $numImported,
                 round(array_sum($timing) / $numImported)
             ));
+        } else {
+            foreach ($metrics as $endpoint => $data) {
+                $this->getLogger()->info(sprintf(
+                    '    %s: %s calls',
+                    $endpoint,
+                    $data
+                ));
+            }
+
+            $this->getLogger()->info('');
         }
 
         /* Announce conclusion
