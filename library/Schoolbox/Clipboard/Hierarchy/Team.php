@@ -33,7 +33,7 @@ class Team implements IStrategy
     /**
      * Short-circuit to prevent infinite loops
      */
-    private const MAX_CALLS = 250;
+    private const MAX_CALLS = 150;
 
 
     /**
