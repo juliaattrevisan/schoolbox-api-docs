@@ -37,7 +37,7 @@ class ImporterTool extends CliTool\App
      * Number of quizzes to group up for batch transmission to Learnosity,
      * which aims to reduce the quantity of API requests we make
      */
-    private const DEFAULT_BATCH_SIZE = 10;
+    private const DEFAULT_BATCH_SIZE = 2;
 
 
     /**
@@ -331,6 +331,8 @@ HELP;
         $this->getLogger()->info('Learnosity Migration.');
         $this->getLogger()->info('');
 
+        $overallStart = microtime(true);
+
         /*
             foreach $quiz in $quizzes
                 $this->refreshLock();
@@ -380,6 +382,7 @@ HELP;
              */
             $batchSets = array_chunk($legacyQuizIds, self::DEFAULT_BATCH_SIZE);
 
+$batchSets = [$batchSets[0]];
             foreach ($batchSets as $batchSet) {
                 $blueprints = [];
 
@@ -465,15 +468,17 @@ HELP;
                 if ($this->perform()) {
                     $this->getLogger()->debug('Importing into Learnosity. This might take a while.');
 
-                    $start = microtime(true);
+                    $batchStart = microtime(true);
 
                     /* Iterate and bombard Learnosity with api requests pewpewpew
                      */
                     foreach ($consolidatedBlueprint as $endpoint => $data) {
+                        $endpointStart = microtime(true);
+
                         /* Associate the learnosity reference back to our legacy quiz
                          */
                         if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
-                            foreach ($data as $association) {
+                            foreach ($data['payload']['associations'] as $association) {
                                 $this->getLogger()->info(sprintf(
                                     'Associating legacy quiz with learnosity_reference %s',
                                     $association['activityLearnosityReference']
@@ -506,13 +511,19 @@ HELP;
                                 $api->dataSetRequest($data['endpoint'], $data['payload']);
                             }
                         }
+
+                        /* Capture endpoint-specific durations
+                         */
+                        $endpointEnd = microtime(true);
+
+                        $metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
                     }
 
-                    $end = microtime(true);
+                    $batchEnd = microtime(true);
 
-                    /* Capture metrics
+                    /* Capture overall metrics
                      */
-                    $timing[] = $end - $start;
+                    $timing[] = $batchEnd - $batchStart;
                 }
 
                 $this->getLogger()->info('Done.');
@@ -529,6 +540,11 @@ HELP;
             return;
         }
 
+        /* Capture overall time spent importing
+         */
+        $overallEnd = microtime(true);
+        $totalDuration = $overallEnd - $overallStart;
+
         /* Report some metrics
          */
         if (!$numImported) {
@@ -542,6 +558,13 @@ HELP;
         $this->getLogger()->info('');
         $this->getLogger()->info('Learnosity Migration Summary');
         $this->getLogger()->info('');
+
+        /* Total time spent here
+         */
+        $this->getLogger()->info(sprintf(
+            '    Total time spent importing: approx. %s seconds',
+            round($totalDuration)
+        ));
 
         /* Number of batches used
          */
@@ -565,17 +588,20 @@ HELP;
                 $numImported,
                 round(array_sum($timing) / $numImported)
             ));
-        } else {
-            foreach ($metrics as $endpoint => $data) {
-                $this->getLogger()->info(sprintf(
-                    '    %s: %s calls',
-                    $endpoint,
-                    $data['count']
-                ));
-            }
 
             $this->getLogger()->info('');
         }
+
+        foreach ($metrics as $endpoint => $data) {
+            $this->getLogger()->info(sprintf(
+                '    %s: %s calls (approx. %s seconds total)',
+                $endpoint,
+                $data['count'],
+                number_format($data['duration'], 3)
+            ));
+        }
+
+        $this->getLogger()->info('');
 
         /* Announce conclusion
          */
