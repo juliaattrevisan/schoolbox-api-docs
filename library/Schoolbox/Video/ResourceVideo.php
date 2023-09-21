@@ -26,7 +26,7 @@ class ResourceVideo
     /** @var int */
     protected $duration;
 
-    /** @var File\Model */
+    /** @var File\IFile */
     protected $file;
 
     /** @var Storage\Model */
