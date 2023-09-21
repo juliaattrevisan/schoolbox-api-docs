@@ -71,11 +71,23 @@ class Hydrator extends BaseHydrator
                 $assessment = $assessments->getBy('id', $match->id);
 
                 if ($assessment instanceof AssessmentModel) {
-                    $folder = $assessment->getContextFolder();
+                    // Note $match->type will be something like 'assessment.dueWork'.
+                    $matchTypeTokens = explode('.', $match->type);
+                    $assessmentType = $matchTypeTokens[1];
+
+                    $folder = match ($assessmentType) {
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_TASK,
+                        AssessmentType::TYPE_LTI_ASSESSMENT,
+                        AssessmentType::TYPE_LESSON_PLAN => $assessment->getContextUnitImplementation()?->getFolder(),
+                        AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory(),
+                        AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder(),
+                        default => $assessment->getContextFolder()
+                    };
 
                     if ($folder !== null) {
-                        // Check if user has access to assessment's folder
-                        $assessmentAccess = $this->access->getFolderAccess($viewer, $assessment->getContextFolder()->getId());
+                        // Check if user has access to assessment's context folder
+                        $assessmentAccess = $this->access->getFolderAccess($viewer, $folder?->getId());
                         if ($assessmentAccess < UserAccess::ACCESS_READ) {
                             return null;
                         }
@@ -83,21 +95,11 @@ class Hydrator extends BaseHydrator
 
                     // Checklist
                     //  * dueWork - results appear, not nested in folders
-                    //  * lessonPlan - TODO: get results to display
+                    //  * lessonPlan - results appear, not nested in folders
                     //  * lti - TODO: get results to display
                     //  * project - TODO: get results to display
                     //  * quiz - results appear, nested in folders - DONE.
                     //  * task - results appear, not nested in folders.
-
-                    $context = [];
-
-                    if ($folder !== null) {
-                        $context = [$folder];
-                    }
-
-                    // Note $match->type will be something like 'assessment.dueWork'.
-                    $matchTypeTokens = explode('.', $match->type);
-                    $assessmentType = $matchTypeTokens[1];
 
                     return new FullResult(
                         $match,
@@ -109,11 +111,7 @@ class Hydrator extends BaseHydrator
                         $match->type,
                         $match->relevance,
                         $assessment->getUpdatedAt(),
-                        match ($assessmentType) {
-                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory(), // Note $folder will be null for quizzes.
-                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder(),
-                            default => $folder,
-                        },
+                        $folder,
                         null,
                         null,
                         AssessmentType::getIconClassSuffixForType($assessmentType),
@@ -126,7 +124,7 @@ class Hydrator extends BaseHydrator
                             AssessmentType::TYPE_LTI_ASSESSMENT => null,
                             AssessmentType::TYPE_LESSON_PLAN => $assessment->getLessonPlan()->getCreatedBy()
                         },
-                        $context, // Context: assessment's folder
+                        (($folder !== null) ? [$folder] : []), // Context.
                         [],
                     );
                 }
