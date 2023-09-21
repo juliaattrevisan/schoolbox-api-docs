@@ -60,6 +60,7 @@ window.Vue.onMounted(() => {
 <template>
     <form action="/adminv2/course-builder/save" method="post" @submit.prevent="saveChanges">
         <div class="small-12 island">
+            <h2 class="subheader">Course Templates</h2>
             <section>
                 <div class="list-container">
                     <header class="list-header actions-small-1">
@@ -81,11 +82,13 @@ window.Vue.onMounted(() => {
         </div>
 
         <div class="small-12 medium-6 island">
+            <h2 class="subheader">Course Page Permissions</h2>
             <section>
                 <course-builder-access-course :roles="props.roles" />
             </section>
         </div>
         <div class="small-12 medium-6 island">
+            <h2 class="subheader">Unit page Permissions</h2>
             <section>
                 <course-builder-access-unit :roles="props.roles" />
             </section>

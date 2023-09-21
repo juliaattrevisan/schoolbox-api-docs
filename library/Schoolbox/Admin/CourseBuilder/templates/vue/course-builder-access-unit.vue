@@ -14,9 +14,6 @@ const store = useCourseBuilderStore();
 <template>
     <fieldset class="content">
         <div class="columns">
-            <label>Unit Default Access Permissions</label>
-        </div>
-        <div class="columns">
             <input
                 id="unitInherit"
                 v-model="store.unitInherit"
