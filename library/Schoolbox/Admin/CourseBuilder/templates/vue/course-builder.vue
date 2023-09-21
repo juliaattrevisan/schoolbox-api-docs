@@ -67,8 +67,8 @@ window.Vue.onMounted(() => {
                         <div class="list-item">
                             <label class="small-12 medium-1 column">ID</label>
                             <label class="small-12 medium-5 column required">Template Name</label>
-                            <label class="small-12 medium-3 column required">Selected Course Page Template</label>
-                            <label class="small-12 medium-3 column required">Selected Unit Page Template</label>
+                            <label class="small-12 medium-3 column required">Course Page Template</label>
+                            <label class="small-12 medium-3 column required">Unit Page Template</label>
                         </div>
                     </header>
                     <course-builder-rows :available-templates="props.availableTemplates" />

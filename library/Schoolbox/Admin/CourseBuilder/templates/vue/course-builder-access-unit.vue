@@ -22,7 +22,7 @@ const store = useCourseBuilderStore();
                 value="1"
                 data-checkbox-unit-inherit
             />
-            <label for="unitInherit" class="checkbox-label">Inherit permissions from the course's parent folder</label>
+            <label for="unitInherit" class="checkbox-label">Inherit permissions from the unit's parent folder</label>
         </div>
     </fieldset>
     <table v-if="!store.unitInherit">
