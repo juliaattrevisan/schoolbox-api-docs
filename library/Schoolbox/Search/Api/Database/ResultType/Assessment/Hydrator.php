@@ -84,7 +84,7 @@ class Hydrator extends BaseHydrator
                     $context = [];
 
                     if ($folder !== null) {
-                        $context = $folder->getId();
+                        $context = [$folder];
                     }
 
                     // Note $match->type will be something like 'assessment.dueWork'.
@@ -102,9 +102,9 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $assessment->getUpdatedAt(),
                         match ($assessmentType) {
-                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory()->getId(),
-                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder()->getId(),
-                            default => $folder?->getId(),
+                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory(),
+                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder(),
+                            default => $folder,
                         },
                         null,
                         null,
