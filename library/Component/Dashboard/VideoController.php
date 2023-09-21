@@ -237,7 +237,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             return false;
         }
 
-        if (is_object($this->defaultVideo) && $this->defaultVideo->getStatus() === 'completed') {
+        if ($this->defaultVideo->getStatus() === 'completed') {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
             $this->parse('default_video_block', 'default_video');
         } else {
