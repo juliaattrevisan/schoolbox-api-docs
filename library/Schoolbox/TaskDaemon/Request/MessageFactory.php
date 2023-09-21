@@ -72,6 +72,7 @@ class MessageFactory
         ?User $effector
     ): Message {
         // Convert the instance to an intermediary format
+        $token = $effector ? $this->tokenBuilder->generate($effector) : null;
         return new Message(
             $task,
             $params,
@@ -84,9 +85,10 @@ class MessageFactory
             $this->instance->getSchoolCode(),
             $callbackUrl,
             $callbackParams,
+            $token,
             $failureCallbackUrl,
             $failureCallbackParams,
-            $effector ? $this->tokenBuilder->generate($effector) : null,
+            $token,
         );
     }
 }

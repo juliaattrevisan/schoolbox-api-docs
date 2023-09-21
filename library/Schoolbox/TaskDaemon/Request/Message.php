@@ -45,12 +45,14 @@ class Message
      *                                                 has completed.
      * @param array|null        $callbackParams        If provided: the task daemon will use these params as the body of
      *                                                 the request to `$callbackUrl`, in JSON-encoded format.
+     * @param string|null       $callbackToken         If provided: the task daemon will use this as an authorization
+     *                                                 token when calling `$callbackUrl`.
      * @param string|null       $failureCallbackUrl    If provided: the task daemon will call this URL after the task
      *                                                 has failed.
      * @param array|null        $failureCallbackParams If provided: the task daemon will use these params as the body of
      *                                                 the request to `$failureCallbackUrl`, in JSON-encoded format.
-     * @param string|null       $callbackToken         If provided: the task daemon will use this as an authorization
-     *                                                 token when calling `$callbackUrl` and `$failureCallbackUrl`.
+     * @param string|null       $failureCallbackToken  If provided: the task daemon will use this as an authorization
+     *                                                 token when calling `$failureCallbackUrl`.
      */
     public function __construct(
         private string $task,
@@ -64,9 +66,10 @@ class Message
         private string $schoolCode,
         private ?string $callbackUrl,
         private ?array $callbackParams,
+        #[SensitiveParameter] private ?string $callbackToken,
         private ?string $failureCallbackUrl,
         private ?array $failureCallbackParams,
-        #[SensitiveParameter] private ?string $callbackToken
+        #[SensitiveParameter] private ?string $failureCallbackToken,
     ) {
     }
 
@@ -153,6 +156,14 @@ class Message
     /**
      * @return string|null
      */
+    public function getCallbackToken(): ?string
+    {
+        return $this->callbackToken;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getFailureCallbackUrl(): ?string
     {
         return $this->failureCallbackUrl;
@@ -169,9 +180,9 @@ class Message
     /**
      * @return string|null
      */
-    public function getCallbackToken(): ?string
+    public function getFailureCallbackToken(): ?string
     {
-        return $this->callbackToken;
+        return $this->failureCallbackToken;
     }
 
     /**
