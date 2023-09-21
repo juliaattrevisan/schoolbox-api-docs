@@ -116,7 +116,7 @@ class Controller extends Base
         $this->courseConfigMapper->deleteByColumn('page', 'unit');
 
         // Add course permissions back
-        foreach ($this->requestPost->get('course_group', []) as $roleId => $permission) {
+        foreach (json_decode($this->requestPost->get('coursePermissions', ''), true) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('course');
             $model->setPermission($permission);
@@ -125,7 +125,7 @@ class Controller extends Base
         }
 
         // Add unit permissions back
-        foreach ($this->requestPost->get('unit_group', []) as $roleId => $permission) {
+        foreach (json_decode($this->requestPost->get('unitPermissions', ''), true) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('unit');
             $model->setPermission($permission);
