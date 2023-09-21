@@ -29,6 +29,24 @@ function isUnitOpen(unit: Unit): boolean {
     return window.dayjs().isBetween(window.dayjs(unit.openDate), window.dayjs(unit.closeDate));
 }
 
+/**
+ * Check if the unit is open or if there are any selected activites inside the unit
+ * @param {Unit} unit The unit to check
+ * @returns {boolean} True if the unit is open or if there are any selected activites inside the unit
+ */
+function isUnitOpenOrHasLinked(unit: Unit): boolean {
+    if (isUnitOpen(unit)) {
+        return true;
+    }
+
+    // If any assessment inside the unit is inside store.selectedActivities, then show as open
+    return unit.assessments.some((assessment) => {
+        return store.selectedActivities.some((selectedActivity) => {
+            return selectedActivity.id === assessment.id;
+        });
+    });
+}
+
 const returnUrl = window.Vue.computed(() => {
     return window.btoa(window.location.pathname);
 });
@@ -144,7 +162,7 @@ window.Vue.onMounted(() => {
                     <li
                         v-for="unit in sortedUnitsByDate"
                         :key="unit.id"
-                        :class="isUnitOpen(unit) ? 'expanded' : 'collapsed'"
+                        :class="isUnitOpenOrHasLinked(unit) ? 'expanded' : 'collapsed'"
                     >
                         <div class="actions-small-1">
                             <div class="list-item">
@@ -152,9 +170,11 @@ window.Vue.onMounted(() => {
                                     <h3>
                                         <a
                                             class="expand-link"
-                                            :class="isUnitOpen(unit) ? 'icon-up-arrow' : 'icon-down-arrow'"
+                                            :class="isUnitOpenOrHasLinked(unit) ? 'icon-up-arrow' : 'icon-down-arrow'"
                                             :data-collapser="'collap-unit-' + unit.id"
-                                            :data-interaction-state="isUnitOpen(unit) ? 'expanded' : 'collapsed'"
+                                            :data-interaction-state="
+                                                isUnitOpenOrHasLinked(unit) ? 'expanded' : 'collapsed'
+                                            "
                                         ></a>
                                         {{ unit.title }}
                                     </h3>
@@ -165,8 +185,8 @@ window.Vue.onMounted(() => {
                             </div>
                         </div>
                         <div
-                            :class="{ hide: !isUnitOpen(unit) }"
-                            :data-collapse-state="isUnitOpen(unit) ? 'uncollapsed' : 'collapsed'"
+                            :class="{ hide: !isUnitOpenOrHasLinked(unit) }"
+                            :data-collapse-state="isUnitOpenOrHasLinked(unit) ? 'uncollapsed' : 'collapsed'"
                             :data-collapsable="'collap-unit-' + unit.id"
                         >
                             <ul class="information-list card-selectable threaded" data-task-list>
