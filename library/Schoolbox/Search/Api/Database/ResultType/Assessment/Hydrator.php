@@ -85,7 +85,7 @@ class Hydrator extends BaseHydrator
                         throw new \LogicException('No folder found for assessment ' . $assessment->getId());
                     }
 
-                    // Check if user has access to assessment's context folder
+                    // If the user does not have access to the assessment's folder, do not show the search result.
                     $assessmentAccess = $this->access->getFolderAccess($viewer, $folder->getId());
                     if ($assessmentAccess < UserAccess::ACCESS_READ) {
                         return null;
