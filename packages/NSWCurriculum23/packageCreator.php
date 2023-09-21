@@ -87,7 +87,7 @@ $subjectFiles = [
     'English' => ['English' => 'NSW English Curriculum - 2023.csv'],
     'Mathematics' => ['Mathematics' => 'NSW Mathematics Curriculum - 2023.csv'],
 
-    'Technology' => ['Technological and Applied Studies (TAS)' => 'NSW Computing Technology Curriculum - 2023.csv'],
+    'Technological and Applied Studies' => ['Technological and Applied Studies (TAS)' => 'NSW Computing Technology Curriculum - 2023.csv'],
     'Languages' => ['Languages' => 'NSW Languages Curriculum - 2023.csv'],
 ];
 

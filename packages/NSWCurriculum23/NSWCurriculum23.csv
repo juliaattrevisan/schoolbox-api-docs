@@ -309,7 +309,7 @@ id,curriculum_node_parent_id,name,code,order,description,uuid
 310,309,"applies deductive reasoning to prove circle theorems and solve related problems (Path: Ext)",MA5-CIR-P-01,0,,5476e385-e2ef-462f-893f-72f5916b5139
 311,252,"Introduction to networks (Path)",,0,,1dea3fcd-fe5f-478b-bc6a-65b40bbd0edd
 312,311,"solves problems involving the characteristics of graphs/networks, planar graphs and Eulerian trails and circuits (Path: Stn)",MA5-NET-P-01,0,,ca09b069-116d-4d66-86fb-d67c2a70ad38
-313,1,Technology,,0,,a0ae3448-d105-4c67-9443-df34f71a47b5
+313,1,Technological and Applied Studies,,0,,a0ae3448-d105-4c67-9443-df34f71a47b5
 314,313,"Computing Technology",,0,,481cd8e2-7987-4a9a-83ca-d0f4609fe298
 315,314,"Stage 4",,0,,47f5d129-a864-4991-9b6e-9e751731a202
 316,315,"in Stage 4 teachers may adjust the Stage 5 outcomes as appropriate to the needs of students in Years 7 and 8",CT4-ADJ-01,0,,04f3eef6-7ac8-4582-9dac-9fec53e991d6
