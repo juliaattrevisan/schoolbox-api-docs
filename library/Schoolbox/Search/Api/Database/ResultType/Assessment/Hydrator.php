@@ -74,12 +74,20 @@ class Hydrator extends BaseHydrator
                     $folder = $assessment->getContextFolder();
 
                     if ($folder !== null) {
-                        // Check if user has access to quiz's folder
+                        // Check if user has access to assessment's folder
                         $assessmentAccess = $this->access->getFolderAccess($viewer, $assessment->getContextFolder()->getId());
                         if ($assessmentAccess < UserAccess::ACCESS_READ) {
                             return null;
                         }
                     }
+
+                    // Checklist
+                    //  * dueWork - results appear, not nested in folders - TODO: html tags appear in results
+                    //  * lessonPlan - TODO: get results to display
+                    //  * lti - TODO: get results to display
+                    //  * project - TODO: get results to display
+                    //  * quiz - results appear, nested in folders - DONE.
+                    //  * task - results appear, not nested in folders.
 
                     $context = [];
 
@@ -102,7 +110,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $assessment->getUpdatedAt(),
                         match ($assessmentType) {
-                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory(),
+                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory(), // Note $folder will be null for quizzes.
                             AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder(),
                             default => $folder,
                         },
