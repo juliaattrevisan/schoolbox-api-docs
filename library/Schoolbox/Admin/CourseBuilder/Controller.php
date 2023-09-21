@@ -41,29 +41,6 @@ class Controller extends Base
     }
 
     /**
-     * Retrieves the permission for a given role and page
-     *
-     * @param Role $role The role for which to retrieve the permission
-     * @param string $page The page (e.g., "course" or "unit") for which to retrieve the permission
-     *
-     * @return int The permission value associated with the specified role and page; returns -1 if no permission is found
-     */
-    private function getPermission($role, $page)
-    {
-        try {
-            $permission = $this->courseConfigMapper->findOneByColumnList(
-                [
-                    "role_id" => $role->getId(),
-                    "page" => $page,
-                ]
-            );
-            return $permission->getPermission();
-        } catch (Exception\NotFound) {
-            return -1;
-        }
-    }
-
-    /**
      * Show options
      */
     public function getIndex()
@@ -74,9 +51,14 @@ class Controller extends Base
         $coursePermissions = [];
         $unitPermissions = [];
 
+        // Cache the existing perms, to reduce hitting the db too many times
+        $existingPerms = $this->courseConfigMapper->findAll()->groupBy('page');
+
         foreach ($roles as $role) {
-            $coursePermissions[$role->getId()] = $this->getPermission($role, 'course');
-            $unitPermissions[$role->getId()] = $this->getPermission($role, 'unit');
+            $course = $existingPerms->offsetGet('course');
+            $unit = $existingPerms->offsetGet('unit');
+            $coursePermissions[$role->getId()] = $course->getBy('roleId', $role->getId())?->getPermission() ?? -1;
+            $unitPermissions[$role->getId()] = $unit->getBy('roleId', $role->getId())?->getPermission() ?? -1;
         }
 
         $templates = [];
