@@ -82,7 +82,7 @@ class Hydrator extends BaseHydrator
                     }
 
                     // Checklist
-                    //  * dueWork - results appear, not nested in folders - TODO: html tags appear in results
+                    //  * dueWork - results appear, not nested in folders
                     //  * lessonPlan - TODO: get results to display
                     //  * lti - TODO: get results to display
                     //  * project - TODO: get results to display
@@ -117,7 +117,7 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         AssessmentType::getIconClassSuffixForType($assessmentType),
-                        $assessment->getDescription(),
+                        strip_tags($assessment->getDescription()),
                         match ($assessmentType) { // Get creatorId depending on type.
                             AssessmentType::TYPE_DUE_WORK => $assessment->getDueWork()->getOwner(),
                             AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getUser(),
