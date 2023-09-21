@@ -46,7 +46,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
      */
     private function isVisibleToCurrentUser(ResourceVideo $video): bool
     {
-        if (!($video instanceof File\Model)) {
+        if (!($video->getFile() instanceof File\Model)) {
             return false;
         }
 
@@ -105,7 +105,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                 if (
                     $video->isComplete()
-                    && $video instanceof File\Model
+                    && $video->getFile() instanceof File\Model
                     && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()
                     && $this->isVisibleToCurrentUser($video)
                 ) {
