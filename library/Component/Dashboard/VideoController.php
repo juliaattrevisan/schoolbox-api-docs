@@ -8,6 +8,7 @@
 
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File;
 use Schoolbox\Video\ResourceVideo;
 
 class Component_Dashboard_VideoController extends Component_Dashboard_ControllerAbstract
@@ -45,6 +46,10 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
      */
     private function isVisibleToCurrentUser(ResourceVideo $video): bool
     {
+        if (!($video instanceof File\Model)) {
+            return false;
+        }
+
         // Read access users should not be able to see hidden videos.
         return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
     }
@@ -100,6 +105,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                 if (
                     $video->isComplete()
+                    && $video instanceof File\Model
                     && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()
                     && $this->isVisibleToCurrentUser($video)
                 ) {
