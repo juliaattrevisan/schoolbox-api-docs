@@ -45,7 +45,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         $keywordSearchParts = [
             // Tiles without a title should not appear in search results (AC for SA-8841).
             'TRIM(t.title_text)<>"" AND t.title_text LIKE :tileKeywordLike',
-            't.link LIKE :tileKeywordLike',
+            'TRIM(t.title_text)<>"" AND t.link LIKE :tileKeywordLike',
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
