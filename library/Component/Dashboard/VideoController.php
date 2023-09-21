@@ -8,6 +8,7 @@
 
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File;
 use Schoolbox\Video\ResourceVideo;
 
 class Component_Dashboard_VideoController extends Component_Dashboard_ControllerAbstract
@@ -18,9 +19,9 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
     protected $outputList;
 
     /**
-     * @var \Schoolbox\Video\ResourceVideo|null
+     * @var \Schoolbox\Video\ResourceVideo
      */
-    protected ?ResourceVideo $defaultVideo = null;
+    protected $defaultVideo;
 
     /**
      * Source category for this component.
@@ -45,8 +46,12 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
      */
     private function isVisibleToCurrentUser(ResourceVideo $video): bool
     {
+        if (!($video->getFile() instanceof File\Model)) {
+            return false;
+        }
+
         // Read access users should not be able to see hidden videos.
-        return !$video->getFile()->isHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
+        return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
     }
 
     /**
@@ -100,6 +105,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                 if (
                     $video->isComplete()
+                    && $video->getFile() instanceof File\Model
                     && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()
                     && $this->isVisibleToCurrentUser($video)
                 ) {
@@ -231,7 +237,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             return false;
         }
 
-        if (is_object($this->defaultVideo) && $this->defaultVideo->getStatus() === 'completed') {
+        if ($this->defaultVideo->getStatus() === 'completed') {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
             $this->parse('default_video_block', 'default_video');
         } else {
