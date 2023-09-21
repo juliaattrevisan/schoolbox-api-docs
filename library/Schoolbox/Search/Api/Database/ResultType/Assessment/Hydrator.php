@@ -87,6 +87,10 @@ class Hydrator extends BaseHydrator
                         $context = $folder->getId();
                     }
 
+                    // Note $match->type will be something like 'assessment.dueWork'.
+                    $matchTypeTokens = explode('.', $match->type);
+                    $assessmentType = $matchTypeTokens[1];
+
                     return new FullResult(
                         $match,
                         $match->id,
@@ -97,22 +101,22 @@ class Hydrator extends BaseHydrator
                         $match->type,
                         $match->relevance,
                         $assessment->getUpdatedAt(),
-                        match ($match->type) {
+                        match ($assessmentType) {
                             AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory()->getId(),
                             AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder()->getId(),
                             default => $folder?->getId(),
                         },
                         null,
                         null,
-                        AssessmentType::getIconClassSuffixForType($match->type),
+                        AssessmentType::getIconClassSuffixForType($assessmentType),
                         $assessment->getDescription(),
-                        match ($match->type) { // Get creatorId depending on type.
-                            AssessmentType::TYPE_DUE_WORK => $assessment->getDueWork()->getOwner()->getId(),
-                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getUser()->getId(),
-                            AssessmentType::TYPE_TASK => $assessment->getTask()->getOwner()->getId(),
-                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getOwner()->getId(),
+                        match ($assessmentType) { // Get creatorId depending on type.
+                            AssessmentType::TYPE_DUE_WORK => $assessment->getDueWork()->getOwner(),
+                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getUser(),
+                            AssessmentType::TYPE_TASK => $assessment->getTask()->getOwner(),
+                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getOwner(),
                             AssessmentType::TYPE_LTI_ASSESSMENT => null,
-                            AssessmentType::TYPE_LESSON_PLAN => $assessment->getLessonPlan()->getCreatedBy()->getId()
+                            AssessmentType::TYPE_LESSON_PLAN => $assessment->getLessonPlan()->getCreatedBy()
                         },
                         $context, // Context: assessment's folder
                         [],
