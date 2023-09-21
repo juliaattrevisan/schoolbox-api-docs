@@ -18,9 +18,9 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
     protected $outputList;
 
     /**
-     * @var \Schoolbox\Video\ResourceVideo|null
+     * @var \Schoolbox\Video\ResourceVideo
      */
-    protected ?ResourceVideo $defaultVideo = null;
+    protected $defaultVideo;
 
     /**
      * Source category for this component.

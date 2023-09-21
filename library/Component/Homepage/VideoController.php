@@ -19,9 +19,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     protected $outputList;
 
     /**
-     * @var ResourceVideo|null
+     * @var ResourceVideo
      */
-    protected ?ResourceVideo $defaultVideo = null;
+    protected $defaultVideo;
 
     /**
      * Available sort fields for this component.
