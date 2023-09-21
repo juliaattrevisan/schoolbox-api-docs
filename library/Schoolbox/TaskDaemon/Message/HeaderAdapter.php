@@ -55,7 +55,7 @@ class HeaderAdapter
      *
      * By default, this is 0 for no chance.
      */
-    private const HEADER_TEST_ERROR_RATE = 'x-taskd-test-error-rate';
+    private const HEADER_TEST_ERROR_CHANCE = 'x-taskd-test-error-chance';
 
     /**
      * Custom message header: if raising an error due to
@@ -161,30 +161,30 @@ class HeaderAdapter
     }
 
     /**
-     * Extract the test error rate.
+     * Extract the test error chance.
      *
      * @param Message $message
      * @return float
      */
-    public function getTestErrorRate(Message $message): float
+    public function getTestErrorChance(Message $message): float
     {
         return filter_var(
-            $message->getHeader(self::HEADER_TEST_ERROR_RATE),
+            $message->getHeader(self::HEADER_TEST_ERROR_CHANCE),
             FILTER_VALIDATE_FLOAT,
             FILTER_NULL_ON_FAILURE,
         ) ?? 0;
     }
 
     /**
-     * Set the test error rate.
+     * Set the test error chance.
      *
      * @param Message $message
-     * @param float   $testErrorRate
+     * @param float   $testErrorChance
      * @return void
      */
-    public function setTestErrorRate(Message $message, float $testErrorRate): void
+    public function setTestErrorChance(Message $message, float $testErrorChance): void
     {
-        $message->setHeader(self::HEADER_TEST_ERROR_RATE, $testErrorRate);
+        $message->setHeader(self::HEADER_TEST_ERROR_CHANCE, $testErrorChance);
     }
 
     /**

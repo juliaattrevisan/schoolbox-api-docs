@@ -44,10 +44,21 @@ class Producer
     /**
      * Send the message to the task daemon.
      *
-     * @param Message    $message     The message to send
-     * @param float|null $delay       If set: delay send by this many seconds
-     * @param int|null   $maxRequeues If set: override the max requeues by this
-     *                                amount
+     * @param Message     $message          The message to send
+     * @param float|null  $delay            If set: delay send by this many
+     *                                      seconds
+     * @param int|null    $maxRequeues      If set: override the max requeues by
+     *                                      this amount
+     * @param float|null $testErrorChance   If set: the task daemon randomly
+     *                                      raises an error instead of running
+     *                                      its task.
+     *                                      (0: no chance, 1: 100% chance)
+     * @param Status|null $testErrorStatus  If raising an error due to
+     *                                      `$testErrorChance`: have the task
+     *                                      return this status.
+     * @param array|null $testErrorPayload  If raising an error due to
+     *                                      `$testErrorChance`: have the task
+     *                                      return this payload.
      * @return void
      * @throws Exception                   if the context's provider fails to
      *                                     send the message due to some internal
@@ -60,7 +71,7 @@ class Producer
         Message $message,
         ?float $delay = null,
         ?int $maxRequeues = null,
-        ?float $testErrorRate = null,
+        ?float $testErrorChance = null,
         ?Status $testErrorStatus = null,
         ?array $testErrorPayload = null,
     ): void {
@@ -71,8 +82,8 @@ class Producer
         if (isset($maxRequeues)) {
             $this->headerAdapter->setMaxRequeues($enqueueMessage, $maxRequeues);
         }
-        if (isset($testErrorRate)) {
-            $this->headerAdapter->setTestErrorRate($enqueueMessage, $testErrorRate);
+        if (isset($testErrorChance)) {
+            $this->headerAdapter->setTestErrorChance($enqueueMessage, $testErrorChance);
         }
         if (isset($testErrorStatus)) {
             $this->headerAdapter->setTestErrorStatus($enqueueMessage, $testErrorStatus);
