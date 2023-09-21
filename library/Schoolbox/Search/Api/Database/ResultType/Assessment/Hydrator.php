@@ -97,7 +97,7 @@ class Hydrator extends BaseHydrator
                     //  * lti - TODO: get results to display
                     //  * project - results appear, nested in folders - DONE.
                     //  * quiz - results appear, nested in folders - DONE.
-                    //  * task - results appear, not nested in folders.
+                    //  * task - results appear, nested in folders - DONE.
 
                     return new FullResult(
                         $match,
