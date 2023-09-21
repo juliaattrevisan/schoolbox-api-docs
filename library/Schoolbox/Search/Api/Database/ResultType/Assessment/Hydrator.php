@@ -75,29 +75,27 @@ class Hydrator extends BaseHydrator
                     $matchTypeTokens = explode('.', $match->type);
                     $assessmentType = $matchTypeTokens[1];
 
-                    $folder = match ($assessmentType) {
-                        AssessmentType::TYPE_DUE_WORK,
-                        AssessmentType::TYPE_TASK,
-                        AssessmentType::TYPE_LTI_ASSESSMENT,
-                        AssessmentType::TYPE_LESSON_PLAN => $assessment->getContextUnitImplementation()?->getFolder(),
-                        AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getCategory(),
-                        AssessmentType::TYPE_PROJECT => $assessment->getProject()->getFolder(),
-                        default => $assessment->getContextFolder()
-                    };
+                    $folder = (
+                        ($assessment->getContextUnitImplementation() !== null)
+                        ? $assessment->getContextUnitImplementation()->getFolder()
+                        : $assessment->getContextUnitSpecification()?->getFolder()
+                    );
 
-                    if ($folder !== null) {
-                        // Check if user has access to assessment's context folder
-                        $assessmentAccess = $this->access->getFolderAccess($viewer, $folder?->getId());
-                        if ($assessmentAccess < UserAccess::ACCESS_READ) {
-                            return null;
-                        }
+                    if ($folder === null) {
+                        throw new \LogicException('No folder found for assessment ' . $assessment->getId());
+                    }
+
+                    // Check if user has access to assessment's context folder
+                    $assessmentAccess = $this->access->getFolderAccess($viewer, $folder->getId());
+                    if ($assessmentAccess < UserAccess::ACCESS_READ) {
+                        return null;
                     }
 
                     // Checklist
-                    //  * dueWork - results appear, not nested in folders
-                    //  * lessonPlan - results appear, not nested in folders
+                    //  * dueWork - results appear, nested in folders - DONE.
+                    //  * lessonPlan - results appear, nested in folders - DONE.
                     //  * lti - TODO: get results to display
-                    //  * project - TODO: get results to display
+                    //  * project - results appear, nested in folders - DONE.
                     //  * quiz - results appear, nested in folders - DONE.
                     //  * task - results appear, not nested in folders.
 
@@ -124,7 +122,7 @@ class Hydrator extends BaseHydrator
                             AssessmentType::TYPE_LTI_ASSESSMENT => null,
                             AssessmentType::TYPE_LESSON_PLAN => $assessment->getLessonPlan()->getCreatedBy()
                         },
-                        (($folder !== null) ? [$folder] : []), // Context.
+                        [$folder],
                         [],
                     );
                 }
