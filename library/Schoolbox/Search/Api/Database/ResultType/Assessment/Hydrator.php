@@ -75,11 +75,15 @@ class Hydrator extends BaseHydrator
                     $matchTypeTokens = explode('.', $match->type);
                     $assessmentType = $matchTypeTokens[1];
 
-                    $folder = (
-                        ($assessment->getContextUnitImplementation() !== null)
-                        ? $assessment->getContextUnitImplementation()->getFolder()
-                        : $assessment->getContextUnitSpecification()?->getFolder()
-                    );
+                    if ($assessmentType === 'lti') {
+                        $folder = $assessment->getLtiAssessment()->getAssessmentModel()->getAssessmentContext()->getFolder();
+                    } else {
+                        $folder = (
+                            ($assessment->getContextUnitImplementation() !== null)
+                            ? $assessment->getContextUnitImplementation()->getFolder()
+                            : $assessment->getContextUnitSpecification()?->getFolder()
+                        );
+                    }
 
                     if ($folder === null) {
                         throw new \LogicException('No folder found for assessment ' . $assessment->getId());
@@ -94,7 +98,7 @@ class Hydrator extends BaseHydrator
                     // Checklist
                     //  * dueWork - results appear, nested in folders - DONE.
                     //  * lessonPlan - results appear, nested in folders - DONE.
-                    //  * lti - TODO: get results to display
+                    //  * lti - results appear, nested in folders - DONE.
                     //  * project - results appear, nested in folders - DONE.
                     //  * quiz - results appear, nested in folders - DONE.
                     //  * task - results appear, nested in folders - DONE.
