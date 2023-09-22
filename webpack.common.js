@@ -168,6 +168,7 @@ module.exports = {
         usageSpecific: "./library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js",
         emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
         loadLayout: "./www/static/js/masonry/layout/loadLayout.ts",
+        courseBuilder: "./library/Schoolbox/Admin/CourseBuilder/templates/vue/courseBuilder.ts",
 
         //Vue component to display data in a table
         dataTable: "./vue/components/dataTable/dataTable.ts",

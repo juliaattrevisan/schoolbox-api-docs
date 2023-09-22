@@ -185,6 +185,10 @@ Usage:
                 /* Toggle button availability
                  */
                 toggleSaveCourse();
+
+                /* Ensure the template selection stays disabled after the initial selection
+                */
+                document.querySelector('select[name="template"]').disabled = true;
             },
 
             validateOptions: {
@@ -330,7 +334,7 @@ Usage:
                             />
                     </div>
 
-                    <div class="small-6 column">
+                    <div class="small-4 column">
                         {% include '@course/sub/sourceSelector.twig' with {
                             courseSpec: courseSpec,
                         } only %}
@@ -342,7 +346,30 @@ Usage:
                         </div>
                     {% endif %}
 
-                    <div class="small-6 column">
+                    <div class="small-4 column">
+                        <label class="required" for="template">
+                            Course Template
+                        </label>
+                        {% if courseSpec %}
+                            {% if courseSpec.template %}
+                                <input value="{{ courseSpec.template.name }}" disabled>
+                            {% else %}
+                                <input value="No Template Selected" disabled>
+                            {% endif %}
+                        {% else %}
+                            <select name="template" required {% if courseSpec or templates.count == 1%}disabled{% endif %}>
+                                {% if templates.count > 1 %}
+                                {% for template in templates %}
+                                    <option value="{{ template.id }}">{{ template.name }}</option>
+                                {% endfor %}
+                                {% else %}
+                                    <option value="{{ templates.first.id }}" selected>{{ templates.first.name }}</option>
+                                {% endif %}
+                            </select>
+                        {% endif %}
+                    </div>
+
+                    <div class="small-4 column">
                         <label for="subjectCode">
                             {{ locale.subject.proper }} Code
                             <input id="subjectCode" type="text" name="subjectCode" size="40" value="{{ courseSpec.subjectCode ?? '' }}" maxlength="20" />

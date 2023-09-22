@@ -1876,11 +1876,6 @@ parameters:
 			path: library/Schoolbox/API/Translator/ArrayToModel/Base.php
 
 		-
-			message: "#^Property Schoolbox\\\\Admin\\\\CourseBuilder\\\\Controller\\:\\:\\$folderMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/CourseBuilder/Controller.php
-
-		-
 			message: "#^Binary operation \"\\*\" between string and 1024 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Home/Controller.php

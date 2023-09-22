@@ -10,39 +10,36 @@
 
 namespace Schoolbox\Admin\CourseBuilder;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\Mapper as BaseMapper;
 
 class Module extends BaseModule
 {
     protected $basename = 'adminCourseBuilder';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutes(string $basePath)
+    protected function registerRoutes(): void
     {
-        $this->addGetRoute('getIndex', $basePath, "{/tab}");
-        $this->addPostRoute('postSave', $basePath, "/save");
-    }
+        $perms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser()
+        );
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
+        $loadTemplate = function (array $params) {
+            return $this->preloadTemplate($params);
+        };
 
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        $this->register('GET', "", 'getIndex', $perms);
+        $this->register('POST', "/save", 'postSave', $perms);
+        $this->register('DELETE', "/delete/{templateId:\d+}", 'deleteTmpl', $perms, $loadTemplate);
     }
 
     /**
@@ -55,7 +52,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(HomepageTemplateMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
-            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getCourseTemplateMapper(),
         );
     }
 
@@ -65,5 +62,31 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /**
+     * @return CourseTemplateMapper
+     */
+    private function getCourseTemplateMapper(): CourseTemplateMapper
+    {
+        return $this->getMapperFactory()->get(CourseTemplateMapper::class);
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
+    private function preloadTemplate(array $params): array
+    {
+        if (!\array_key_exists('templateId', $params)) {
+            throw new \UnexpectedValueException("No 'templateId' found in route params");
+        } else {
+            try {
+                $preload['template'] = $this->getCourseTemplateMapper()->findById($params['templateId']);
+            } catch (BaseMapper\Exception $e) {
+                throw new InvalidPath('Course Template Not Found', 0, $e);
+            }
+        }
+        return $preload;
     }
 }

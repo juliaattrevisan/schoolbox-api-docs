@@ -13,48 +13,15 @@ namespace Schoolbox\Admin\CourseBuilder;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
+use Schoolbox\Assessment\Course\Template\ModelToArray as ModelToArray;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends Base
 {
-    /**
-     * A ConfigMapper instance
-     *
-     * @var ConfigMapper
-     */
-    private $configMapper;
-
-    /**
-     * A CourseConfigMapper instance
-     *
-     * @var CourseConfigMapper
-     */
-    private $courseConfigMapper;
-
-    /**
-     * A HomepageTemplateMapper instance
-     *
-     * @var HomepageTemplateMapper
-     */
-    private $homepageTemplateMapper;
-
-    /**
-     * A RoleMapper instance
-     *
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-    /**
-     * A FolderMapper instance
-     *
-     * @var FolderMapper
-     */
-    private $folderMapper;
-
     /**
      * Constructor
      *
@@ -62,48 +29,44 @@ class Controller extends Base
      * @param CourseConfigMapper     $courseConfigMapper
      * @param HomepageTemplateMapper $homepageTemplateMapper
      * @param RoleMapper             $roleMapper
-     * @param FolderMapper           $folderMapper
+     * @param CourseTemplateMapper   $courseTemplateMapper
      */
     public function __construct(
-        ConfigMapper $configMapper,
-        CourseConfigMapper $courseConfigMapper,
-        HomepageTemplateMapper $homepageTemplateMapper,
-        RoleMapper $roleMapper,
-        FolderMapper $folderMapper
+        private ConfigMapper $configMapper,
+        private CourseConfigMapper $courseConfigMapper,
+        private HomepageTemplateMapper $homepageTemplateMapper,
+        private RoleMapper $roleMapper,
+        private CourseTemplateMapper $courseTemplateMapper
     ) {
-        $this->configMapper = $configMapper;
-        $this->courseConfigMapper = $courseConfigMapper;
-        $this->homepageTemplateMapper = $homepageTemplateMapper;
-        $this->roleMapper = $roleMapper;
-        $this->folderMapper = $folderMapper;
     }
 
     /**
      * Show options
-     *
-     * @param string $tab
      */
-    public function getIndex($tab = '')
+    public function getIndex()
     {
+        $roles = $this->roleMapper->findAll();
 
         // Get default permissions for course and unit pages
+        $coursePermissions = [];
+        $unitPermissions = [];
 
-        $permissions = [];
-        $permissions['course'] = [];
-        $permissions['unit'] = [];
+        // Cache the existing perms, to reduce hitting the db too many times
+        $existingPerms = $this->courseConfigMapper->findAll()->groupBy('page');
 
-        $coursePermissions = $this->courseConfigMapper->findByColumn("page", "course");
-
-        foreach ($coursePermissions as $permission) {
-            $permissions['course'][$permission->getRoleId()] = [];
-            $permissions['course'][$permission->getRoleId()][$permission->getPermission()] = 'checked';
+        foreach ($roles as $role) {
+            $course = $existingPerms->offsetGet('course');
+            $unit = $existingPerms->offsetGet('unit');
+            $coursePermissions[$role->getId()] = $course->getBy('roleId', $role->getId())?->getPermission() ?? -1;
+            $unitPermissions[$role->getId()] = $unit->getBy('roleId', $role->getId())?->getPermission() ?? -1;
         }
 
-        $unitPermissions = $this->courseConfigMapper->findByColumn("page", "unit");
-
-        foreach ($unitPermissions as $permission) {
-            $permissions['unit'][$permission->getRoleId()] = [];
-            $permissions['unit'][$permission->getRoleId()][$permission->getPermission()] = 'checked';
+        $templates = [];
+        foreach ($this->homepageTemplateMapper->findAll()->sortBy("name", "asc") as $template) {
+            $templates[] = [
+                'id'   => $template->getId(),
+                'name' => $template->getName(),
+            ];
         }
 
         // Render this thing out
@@ -112,14 +75,13 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminCourseBuilder.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminCourseBuilder.getIndex')),
-                'tab' => $tab != '' ? $tab : 'course',
-                'roles' => $this->roleMapper->findAll(),
-                'permissions' => $permissions,
-                'templates' => $this->homepageTemplateMapper->findAll()->sortBy("name", "asc"),
-                'courseTemplate' => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
-                'unitTemplate' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
-                'courseInherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                'unitInherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
+                'roles' => $roles,
+                'coursePermissions' => $coursePermissions,
+                'unitPermissions' => $unitPermissions,
+                'availableTemplates' => $templates,
+                'courseTemplates'   => $this->courseTemplateMapper->findAll()->reindex()->map(new ModelToArray()),
+                'courseInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                'unitInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
             ],
         );
     }
@@ -132,13 +94,11 @@ class Controller extends Base
     public function postSave()
     {
         // Blow away old permissions, could probably be more graceful and update
-
         $this->courseConfigMapper->deleteByColumn('page', 'course');
         $this->courseConfigMapper->deleteByColumn('page', 'unit');
 
         // Add course permissions back
-
-        foreach ($this->requestPost->get('course_group', []) as $roleId => $permission) {
+        foreach (json_decode($this->requestPost->get('coursePermissions', ''), true) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('course');
             $model->setPermission($permission);
@@ -147,8 +107,7 @@ class Controller extends Base
         }
 
         // Add unit permissions back
-
-        foreach ($this->requestPost->get('unit_group', []) as $roleId => $permission) {
+        foreach (json_decode($this->requestPost->get('unitPermissions', ''), true) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('unit');
             $model->setPermission($permission);
@@ -156,18 +115,28 @@ class Controller extends Base
             $this->courseConfigMapper->save($model);
         }
 
-        // Update default page templates
-
-        $courseTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_course_page_template');
-        $courseTemplate->setValue($this->requestPost['courseTemplate']);
-        $this->configMapper->save($courseTemplate);
-
-        $unitTemplate = $this->configMapper->findOneByColumn('name', 'course_builder_default_unit_page_template');
-        $unitTemplate->setValue($this->requestPost['unitTemplate']);
-        $this->configMapper->save($unitTemplate);
+        // Update course templates
+        $templates = $this->courseTemplateMapper->createCollection();
+        // get list of all posted template groups
+        foreach (json_decode($this->getRequestPost()->get('templates', ''), true) as $templateGroup) {
+            // iterate over template groups
+            // if id is larger than 1 then grab that from the db and update that entry
+            if (1 <= $templateGroup['id']) {
+                $template = $this->courseTemplateMapper->findById($templateGroup['id']);
+            } else {
+                // if id is less than 1 then spawn a new entry and set the values
+                $template = $this->courseTemplateMapper->createModel();
+            }
+            // set the new values
+            $template->setName($templateGroup['name']);
+            $template->setCourseTemplate($this->homepageTemplateMapper->findById($templateGroup['courseTemplate']));
+            $template->setUnitTemplate($this->homepageTemplateMapper->findById($templateGroup['unitTemplate']));
+            $templates->add($template);
+        }
+        // save the template groups
+        $this->courseTemplateMapper->save($templates);
 
         // Update default inheritance
-
         $courseTemplate = $this->configMapper->findOneByColumn("name", "course_builder_default_course_page_inherit");
         $courseTemplate->setValue((string)(int)$this->requestPost->get('courseInherit'));
         $this->configMapper->save($courseTemplate);
@@ -176,8 +145,31 @@ class Controller extends Base
         $unitTemplate->setValue((string)(int)$this->requestPost->get('unitInherit'));
         $this->configMapper->save($unitTemplate);
 
-        // Send them back to the admin page
+        // Success, just return nothing. no errors occurred...
+        $this->response = $this->responseEmpty();
+    }
 
-        $this->response = $this->redirectAfterPost('/adminv2/course-builder/' . $this->requestPost["tab"]);
+    /**
+     * Soft delete the selected course template.
+     * This does nothing to the courses that are using this template.
+     * But will prevent any future courses from using this template.
+     *
+     * @api DELETE /adminv2/course-builder/delete/{templateId:\d+}
+     *
+     * @param $template
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function deleteTmpl($template): void
+    {
+        // ensure there is still 1 option left...
+        if (1 === $this->courseTemplateMapper->countAll()) {
+            $this->sendJsonError('Must have 1 Course Template available', 409);
+            return; //exit early
+        }
+
+        //Purge the template
+        $this->courseTemplateMapper->delete($template);
+        $this->response = $this->responseEmpty();
     }
 }

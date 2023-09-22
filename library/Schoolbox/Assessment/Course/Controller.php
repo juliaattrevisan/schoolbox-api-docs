@@ -14,6 +14,7 @@ use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Resource\Folder\Ancestry;
 use UnexpectedValueException;
 use Schoolbox\Application;
@@ -43,7 +44,6 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
-use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\YearLevel;
 
@@ -59,77 +59,32 @@ class Controller extends Base\Base
      */
     private const TAB = 'course';
 
-    /** @var FolderMapper */
-    private $folderMapper;
-
-    /**  @var CourseSpecificationMapper */
-    private $courseSpecificationMapper;
-
-    /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var UnitSpecificationMapper */
-    private $unitSpecificationMapper;
-
-    /** @var UnitImplementationMapper */
-    private $unitImplementationMapper;
-
-    /** @var  HomepageTemplateMapper */
-    private $homepageTemplateMapper;
-
-    /** @var CourseConfigMapper */
-    private $courseConfigMapper;
-
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
-
-    /** @var Access */
-    private $access;
-
-    /** @var AssessmentMapper */
-    private $assessmentMapper;
-
-    /** @var CurriculumNodeMapper */
-    private $curriculumNodeMapper;
-
-
     /**
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param UnitSpecificationMapper    $unitSpecificationMapper
-     * @param UnitImplementationMapper   $unitImplementationMapper
-     * @param FolderMapper               $folderMapper
-     * @param HomepageTemplateMapper     $homepageTemplateMapper
-     * @param Access                     $access
-     * @param CourseConfigMapper         $courseConfigMapper
-     * @param UserAccessMapper           $userAccessMapper
-     * @param AssessmentMapper           $assessmentMapper
-     * @param CurriculumNodeMapper       $curriculumNodeMapper
+     * @param AssessmentMapperProxy     $assessmentMapperProxy
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper   $unitSpecificationMapper
+     * @param UnitImplementationMapper  $unitImplementationMapper
+     * @param FolderMapper              $folderMapper
+     * @param Access                    $access
+     * @param CourseConfigMapper        $courseConfigMapper
+     * @param UserAccessMapper          $userAccessMapper
+     * @param AssessmentMapper          $assessmentMapper
+     * @param CurriculumNodeMapper      $curriculumNodeMapper
+     * @param CourseTemplateMapper      $courseTemplateMapper
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        CourseSpecificationMapper $courseSpecificationMapper,
-        UnitSpecificationMapper $unitSpecificationMapper,
-        UnitImplementationMapper $unitImplementationMapper,
-        FolderMapper $folderMapper,
-        HomepageTemplateMapper $homepageTemplateMapper,
-        Access $access,
-        CourseConfigMapper $courseConfigMapper,
-        UserAccessMapper $userAccessMapper,
-        AssessmentMapper $assessmentMapper,
-        CurriculumNodeMapper $curriculumNodeMapper
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private CourseSpecificationMapper $courseSpecificationMapper,
+        private UnitSpecificationMapper $unitSpecificationMapper,
+        private UnitImplementationMapper $unitImplementationMapper,
+        private FolderMapper $folderMapper,
+        private Access $access,
+        private CourseConfigMapper $courseConfigMapper,
+        private UserAccessMapper $userAccessMapper,
+        private AssessmentMapper $assessmentMapper,
+        private CurriculumNodeMapper $curriculumNodeMapper,
+        private CourseTemplateMapper $courseTemplateMapper,
     ) {
-        $this->assessmentMapperProxy      = $assessmentMapperProxy;
-        $this->courseSpecificationMapper  = $courseSpecificationMapper;
-        $this->unitSpecificationMapper    = $unitSpecificationMapper;
-        $this->unitImplementationMapper   = $unitImplementationMapper;
-        $this->folderMapper               = $folderMapper;
-        $this->homepageTemplateMapper     = $homepageTemplateMapper;
-        $this->access                     = $access;
-        $this->courseConfigMapper         = $courseConfigMapper;
-        $this->userAccessMapper           = $userAccessMapper;
-        $this->assessmentMapper           = $assessmentMapper;
-        $this->curriculumNodeMapper       = $curriculumNodeMapper;
     }
 
 
@@ -267,6 +222,13 @@ class Controller extends Base\Base
                 $course = $deletedCourse->setDeletedAt(null);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $course = $this->courseSpecificationMapper->createModel();
+                // give the course the default template of initial `1: Default` or if that doesn't exist, the first non deleted entry...
+                try {
+                    $template = $this->courseTemplateMapper->findById(CourseTemplateMapper::INITIAL_DEFAULT);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $template = $this->courseTemplateMapper->findAll()->first();
+                }
+                $course->setTemplate($template);
             }
             $course->setFolder($courseFolder);
         }
@@ -406,6 +368,7 @@ class Controller extends Base\Base
         $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
+                'templates'         => $this->courseTemplateMapper->findAll(),
                 'courseSpec'        => $courseSpec,
                 'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 'folderAccess'      => $folderAccess,
@@ -428,10 +391,10 @@ class Controller extends Base\Base
      */
     public function newCourse(?string $name): void
     {
-
         $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
+                'templates'          => $this->courseTemplateMapper->findAll(),
                 'courseSpec'         => null,
                 'courseName'         => $name ? urldecode($name) : null,
                 'curriculumEnabled'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
@@ -477,12 +440,8 @@ class Controller extends Base\Base
         try {
             $this->validateCourseData(trim($post['name']), (int)trim($post['parent']), null);
 
-            $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
-            if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
-                $templateID = HomepageTemplate::HOMEPAGE_NONE;
-            } else {
-                $templateID = (int)$templateID;
-            }
+            // Template
+            $template = $this->courseTemplateMapper->findById($post['template']);
 
             // Create new CourseFolder
             $courseFolder = $this->persistFolder(
@@ -490,7 +449,7 @@ class Controller extends Base\Base
                 (int)trim($post['parent']),
                 array_filter(explode(',', $post['curriculumCodes'][0] ?? '')),
                 $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                $templateID,
+                $template->getCourseTemplate()->getId(),
                 $rolePermissions,
                 false,
                 []
@@ -498,7 +457,8 @@ class Controller extends Base\Base
 
             $courseSpec = $this->courseSpecificationMapper->createModel()
                 ->setFolder($courseFolder)
-                ->setSubjectCode(trim($post->get('subjectCode', '')));
+                ->setSubjectCode(trim($post->get('subjectCode', '')))
+                ->setTemplate($template);
 
             $courseFolder->setCourseSpecification($courseSpec);
 
@@ -798,20 +758,12 @@ class Controller extends Base\Base
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
-            $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
-
-            if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
-                $templateID = HomepageTemplate::HOMEPAGE_NONE;
-            } else {
-                $templateID = (int)$templateID;
-            }
-
             $folder = $this->persistFolder(
                 $name,
                 $courseSpec->getFolder()->getId(),
                 [],
                 $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                $templateID,
+                $courseSpec->getTemplate()->getUnitTemplate()->getId(),
                 $rolePermissions,
                 false,
                 []

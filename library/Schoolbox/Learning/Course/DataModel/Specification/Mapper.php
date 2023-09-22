@@ -16,6 +16,7 @@ use Schoolbox\Learning\Course\DataModel\AbstractCourseMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\HomepageConfig;
 
@@ -48,6 +49,7 @@ class Mapper extends AbstractCourseMapper
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
         $this->uses('subject_code', self::TYPE_STRING);
         $this->uses('uuid', self::TYPE_STRING);
+        $this->joins('template_id', CourseTemplateMapper::class, 'id', null, null, null, 'template');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -73,9 +75,11 @@ class Mapper extends AbstractCourseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('folder', 'f')},
-                {$this->getJoinColumnString('folder.homepages', 'fh')}
+                {$this->getJoinColumnString('folder.homepages', 'fh')},
+                {$this->getJoinColumnString('template', 'tmpl')}
             FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('folder', '', 'f', true)}
+            LEFT  JOIN {$this->getJoinSql('template', '', 'tmpl', true)}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
         ";
     }
@@ -98,6 +102,9 @@ class Mapper extends AbstractCourseMapper
             /** @var HomepageConfig $homepage */
             $homepage = $this->hydrateJoin($row, 'folder.homepages', 'fh');
             $folder->setHomepage($homepage);
+            /** @var null|\Schoolbox\Assessment\Course\Template\Model $template */
+            $template = $this->hydrateJoin($row, 'template', 'tmpl');
+            $model->setTemplate($template);
             $model->setFolder($folder);
 
             // Add

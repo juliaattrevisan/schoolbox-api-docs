@@ -24,6 +24,7 @@ class Create extends Request
         $this->setFormParam('parent', '');
         $this->setFormParam('curriculumCodes[0]', '');
         $this->setFormParam('part1', 1);
+        $this->setFormParam('template', 1);
     }
 
     public function setName(string $name): void
