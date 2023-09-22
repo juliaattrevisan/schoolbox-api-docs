@@ -93,7 +93,9 @@ window.Vue.onMounted(() => {
                 <course-builder-access-unit :roles="props.roles" />
             </section>
         </div>
-        <button class="submit" type="submit">Save Changes</button>
+        <div class="small-12 column">
+            <button class="submit" type="submit">Save Changes</button>
+        </div>
     </form>
 
     <course-builder-delete-modal />
