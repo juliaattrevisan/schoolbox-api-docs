@@ -584,7 +584,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
             $api = new Api(
-                $_SERVER['SERVER_NAME'],
+                (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
                 $this->getConfigLoader()->get('learnosity_consumer_key'),
                 $this->getConfigLoader()->get('learnosity_consumer_secret'),
                 new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')

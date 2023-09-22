@@ -236,7 +236,7 @@ class Mapper extends BaseMapper
         $learnosityConsumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
 
         $api = new Api(
-            $_SERVER['SERVER_NAME'],
+            (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
             $learnosityConsumerKey,
             $learnosityConsumerSecret,
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')

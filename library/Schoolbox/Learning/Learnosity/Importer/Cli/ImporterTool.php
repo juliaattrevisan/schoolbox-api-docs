@@ -275,7 +275,7 @@ HELP;
         /* Initialise dependencies
          */
         $api = new Api(
-            $serverName,
+            (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified()->getHost(),
             $this->getConfig()->get('learnosity_consumer_key'),
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger()
