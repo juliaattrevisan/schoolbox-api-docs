@@ -27,20 +27,3 @@ VALUES (
     'settings',
     (SELECT MAX(sequence)+1 FROM `config` c)
 );
-
--- Add new config
--- This might not have been needed after all
-
-# INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
-# VALUES (
-#     'learnosity_author_id',
-#     'Learnosity Author Identifier',
-#     'Learnosity Author Identifier',
-#     (SELECT id FROM lu_config_field WHERE field = 'input'),
-#     (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
-#     'true',
-#     'false',
-#     'false',
-#     'settings',
-#     (SELECT MAX(sequence)+1 FROM `config` c)
-# );
