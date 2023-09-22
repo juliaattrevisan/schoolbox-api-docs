@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -89,6 +90,10 @@ class Hydrator extends BaseHydrator
                         throw new \LogicException('No folder found for assessment ' . $assessment->getId());
                     }
 
+                    if (!$this->assessmentIsViewableByUser($assessment, $assessmentType, $folder, $viewer)) {
+                        return null;
+                    }
+
                     // If the user does not have access to the assessment's folder, do not show the search result.
                     $assessmentAccess = $this->access->getFolderAccess($viewer, $folder->getId());
                     if ($assessmentAccess < UserAccess::ACCESS_READ) {
@@ -138,5 +143,61 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    /**
+     * @param AssessmentModel $assessment
+     * @param string $assessmentType
+     * @param FolderModel $assessmentFolder
+     * @param User $user
+     * @return bool
+     */
+    private function assessmentIsViewableByUser(AssessmentModel $assessment, string $assessmentType, FolderModel $assessmentFolder, User $user): bool
+    {
+        // 1st attempt at filtering assessments to those students should see.
+        // TODO: Find out if there is a better way.
+
+        $userRole = $user->getRole();
+
+        if ($userRole->isStudent()) {
+            // Students should only see assessments that have reached their open date (AC for SA-16014).
+            if ($assessment->getOpenDate()->isPast()) {
+                return false;
+            }
+
+            $folderId = $assessmentFolder->getId();
+
+            // Should only see assessments in their own classes/groups (AC for SA-16014).
+            $folderIsInSubjectCollection = false;
+            foreach ($user->getSubjectCollection() as $subject) {
+                if ($folderId === $subject['id']) {
+                    $folderIsInSubjectCollection = true;
+                }
+            }
+//            $folderIsInGroupCollection = false;
+//            foreach ($user->getGroupCollection() as $group) {
+//                if ($folderId === $group['id']) {
+//                    $folderIsInGroupCollection = true;
+//                }
+//            }
+//            if (!$folderIsInSubjectCollection && !$folderIsInGroupCollection) {
+//                return false;
+//            }
+
+            // Students should only see assessments that they have not been excluded from (AC for SA-16014).
+            // TODO: Find whether user is a participant somehow depending on $assessmentType?
+            //       Then if user is not a participant, return false?
+            // $userParticipant = $assessment->getParticipantIfExtant();
+            // if ($userParticipant === null) {
+            //     // User is not participant in assessment.
+            //     return false;
+            // }
+        } elseif ($userRole->isStaff()) {
+             // Staff should see assessments in their own classes (AC for SA-16014).
+             // Staff should see assessments in units that they have permission to access (AC for SA-16014).
+             return true;
+         }
+
+        return true;
     }
 }
