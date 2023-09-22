@@ -131,11 +131,12 @@ class Session extends BaseSession
      */
     public function isSessionIpAddressValid(): bool
     {
-        $authSession       = $this->getSegment(null);
-        $sessionIpMismatch = $this->config->get('track_ip')
-            && $authSession->get('ip') !== \Session::getIP();
-        if ($sessionIpMismatch) {
-            return false;
+        $authSession = $this->getSegment(null);
+        if ($this->config->get('track_ip')) {
+            $sessionIpAddress = $authSession->get('ip');
+            if ($sessionIpAddress && $sessionIpAddress !== \Session::getIP()) {
+                return false;
+            }
         }
         return true;
     }
