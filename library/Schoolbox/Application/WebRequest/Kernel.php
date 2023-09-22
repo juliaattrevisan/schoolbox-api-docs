@@ -265,6 +265,17 @@ class Kernel extends WebKernelAbstract
             /** @var \Alaress\Session\Session $session */
             $session = $this->di->get('session');
 
+            // Trigger a redirect to the login page
+            if (!$session->isSessionIdValid()) {
+                $session->destroy();
+                throw new Unauthenticated();
+            }
+
+            if (!$session->isSessionIpAddressValid()) {
+                $session->destroy();
+                throw new Unauthenticated();
+            }
+
             // Do authorization here
             // TODO Inject user getter into authorizer, and use it to determine:
             // * if user is there
