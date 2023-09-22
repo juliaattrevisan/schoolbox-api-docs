@@ -736,9 +736,6 @@ HELP;
     }
 
 
-
-
-
     /**
      * Get some quantities of each endpoint we used
      *
