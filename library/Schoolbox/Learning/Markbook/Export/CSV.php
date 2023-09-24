@@ -131,12 +131,14 @@ class CSV extends AbstractCSV
      * @param Markbook                        $markbook
      * @param GenericCollection               $students
      * @param GenericCollection               $participants
+     * @param bool                            $showDrafts
      */
     private function writeStudents(
         GenericCollection $sortedAssessments,
         Markbook $markbook,
         GenericCollection $students,
         GenericCollection $participants,
+        bool $showDrafts,
     ): void {
         $rank = [];
         if ($this->viewRank) {
@@ -148,14 +150,19 @@ class CSV extends AbstractCSV
                 $student->getExternalId(),
                 $student->getFirstname(),
                 $student->getLastname(),
-                $markbook->getStudentStatistics()[$student->getId()]['weightedMean'],
+                $this->extractDraftOrPublishedValue(
+                    $markbook->getStudentStatistics()[$student->getId()],
+                    $showDrafts,
+                    'weightedMean',
+                    'draftWeightedMean',
+                ),
             ];
             if ($this->viewRank) {
                 $studentRowHeaders[] = $rank[$student->getId()] ?? '';
             }
 
             $studentRow = [];
-            foreach ($sortedAssessments as $assessmentId => $assessment) {
+            foreach ($sortedAssessments as $assessment) {
                 $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId);
             }
             $this->exportRow($studentRowHeaders, $studentRow);
