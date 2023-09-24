@@ -161,7 +161,7 @@ class Hydrator extends BaseHydrator
 
         if ($userRole->isStudent()) {
             // Students should only see assessments that have reached their open date (AC for SA-16014).
-            if ($assessment->getOpenDate()->isPast()) {
+            if ($assessment->getOpenDate() === null || $assessment->getOpenDate()->isFuture()) {
                 return false;
             }
 
