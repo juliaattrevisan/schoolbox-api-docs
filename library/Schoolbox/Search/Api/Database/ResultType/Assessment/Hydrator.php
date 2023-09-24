@@ -165,6 +165,14 @@ class Hydrator extends BaseHydrator
                 return false;
             }
 
+            $impl = $assessment->getContextUnitImplementation();
+
+            // TODO: Figure out how to tell whether a student is involved in a folder/class/group from here.
+            // May be useful:
+            //$impl->getFolder()->isGroup();
+            //$impl->getFolder()->isClass();
+            //IsInvolvedInClass()
+
             $folderId = $assessmentFolder->getId();
 
             // Should only see assessments in their own classes/groups (AC for SA-16014).
