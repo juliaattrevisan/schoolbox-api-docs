@@ -304,8 +304,16 @@ class Controller extends Base
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
+        // Are drafts shown?
+        // Note that the markbook does not have a draft weighted average:
+        // this will not change.
+        $showDrafts  = (bool)($filtersArray['showDrafts'] ?? false);
         $csvExporter = new Export\CSV((bool)$this->getConfigLoader()->get('view_rank'));
-        $csvExporter->export($markbook, sprintf('%s - Class Markbook.csv', $folder->getName()));
+        $csvExporter->export(
+            $markbook,
+            (($showDrafts ? 'Draft - ' : '') . sprintf('%s - Class Markbook.csv', $folder->getName())),
+            $showDrafts,
+        );
         exit;
     }
 

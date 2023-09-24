@@ -24,9 +24,14 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
-     * @inheritdoc
+     * Export this markbook as a CSV.
+    /**
+     * @param Markbook $markbook   The markbook to export.
+     * @param string   $filename   The filename for the CSV export.
+     * @param bool     $showDrafts Should draft marks be shown in the export?
+     * @return void
      */
-    public function export(Markbook $markbook, string $filename): void
+    public function export(Markbook $markbook, string $filename, bool $showDrafts): void
     {
         $this->initExport($filename);
 
@@ -35,7 +40,7 @@ class CSV extends AbstractCSV
         $sortedAssessments = $this->getSortedAssessments($markbook);
 
         $this->writeHeader($sortedAssessments);
-        $this->writeWeightedMean($sortedAssessments, $markbook);
+        $this->writeWeightedMean($sortedAssessments, $markbook, $showDrafts);
         $this->writeStudents($sortedAssessments, $markbook, $students, $participants);
 
         $this->closeExport();
@@ -96,8 +101,10 @@ class CSV extends AbstractCSV
      *
      * @param GenericCollection|IAssessable[] $sortedAssessments
      * @param Markbook                        $markbook
+     * @param bool                            $showDrafts
+     * @return void
      */
-    private function writeWeightedMean(GenericCollection $sortedAssessments, Markbook $markbook): void
+    private function writeWeightedMean(GenericCollection $sortedAssessments, Markbook $markbook, bool $showDrafts): void
     {
         // Average row
         $averageRowHeaders = [
@@ -111,7 +118,7 @@ class CSV extends AbstractCSV
         }
         $averageRow        = [];
         foreach ($sortedAssessments as $assessment) {
-            $averageRow = $this->addAverage($averageRow, $markbook, $assessment);
+            $averageRow = $this->addAverage($averageRow, $markbook, $assessment, $showDrafts);
         }
         $this->exportRow($averageRowHeaders, $averageRow);
     }
@@ -158,11 +165,21 @@ class CSV extends AbstractCSV
      * @param string[]    $row
      * @param Markbook    $markbook
      * @param IAssessable $assessment
+     * @param bool        $showDrafts If true: display a draft if it's there,
+     *                                otherwise show only the non-draft mean
      * @return string[]
+     * @return array
      */
-    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment): array
+    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment, bool $showDrafts): array
     {
-        $row[] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
+        $stats = $markbook->getAssessmentStatistics()[$assessment->getId()];
+        $mean  = null;
+        if ($showDrafts) {
+            if (isset($stats['draftMean'])) {
+                $mean = $stats['draftMean'] . ' (draft)';
+            }
+        }
+        $row[] = ($mean ?? $stats['mean']);
         if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = '';
         }
