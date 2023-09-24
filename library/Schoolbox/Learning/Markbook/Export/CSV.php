@@ -163,7 +163,7 @@ class CSV extends AbstractCSV
 
             $studentRow = [];
             foreach ($sortedAssessments as $assessment) {
-                $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId);
+                $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId, $showDrafts);
             }
             $this->exportRow($studentRowHeaders, $studentRow);
         }
@@ -205,10 +205,16 @@ class CSV extends AbstractCSV
      * @param GenericCollection|GenericCollection[]|Participant[][] $participants Indexed by assessment.id, then user.id
      * @param IAssessable                                           $assessment
      * @param int                                                   $userId
+     * @param bool                                                  $showDrafts
      * @return string[]
      */
-    private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId): array
-    {
+    private function addParticipant(
+        array $row,
+        GenericCollection $participants,
+        IAssessable $assessment,
+        int $userId,
+        bool $showDrafts,
+    ): array {
         if (
             $participants[$assessment->getId()] instanceof Collection
             && $participants[$assessment->getId()][$userId] instanceof Participant
