@@ -41,7 +41,7 @@ class CSV extends AbstractCSV
 
         $this->writeHeader($sortedAssessments);
         $this->writeWeightedMean($sortedAssessments, $markbook, $showDrafts);
-        $this->writeStudents($sortedAssessments, $markbook, $students, $participants);
+        $this->writeStudents($sortedAssessments, $markbook, $students, $participants, $showDrafts);
 
         $this->closeExport();
     }
@@ -132,8 +132,12 @@ class CSV extends AbstractCSV
      * @param GenericCollection               $students
      * @param GenericCollection               $participants
      */
-    private function writeStudents(GenericCollection $sortedAssessments, Markbook $markbook, GenericCollection $students, GenericCollection $participants): void
-    {
+    private function writeStudents(
+        GenericCollection $sortedAssessments,
+        Markbook $markbook,
+        GenericCollection $students,
+        GenericCollection $participants,
+    ): void {
         $rank = [];
         if ($this->viewRank) {
             $rank = $markbook->getRanking();
@@ -173,13 +177,7 @@ class CSV extends AbstractCSV
     private function addAverage(array $row, Markbook $markbook, IAssessable $assessment, bool $showDrafts): array
     {
         $stats = $markbook->getAssessmentStatistics()[$assessment->getId()];
-        $mean  = null;
-        if ($showDrafts) {
-            if (isset($stats['draftMean'])) {
-                $mean = $stats['draftMean'] . ' (draft)';
-            }
-        }
-        $row[] = ($mean ?? $stats['mean']);
+        $row[] = $this->extractDraftOrPublishedValue($stats, $showDrafts, 'mean', 'draftMean');
         if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = '';
         }
@@ -238,5 +236,32 @@ class CSV extends AbstractCSV
             }
         }
         return $row;
+    }
+
+    /**
+     * Extract a draft or published value from `$stats`.
+     *
+     * If `$showDrafts`: extract `$stats[$draftKey]`, and add a "draft" suffix:
+     * otherwise, extract `$stats[$publishedKey]`.
+     *
+     *
+     * @param array  $stats
+     * @param bool   $showDrafts
+     * @param string $publishedKey
+     * @param string $draftKey
+     * @return string
+     */
+    private function extractDraftOrPublishedValue(
+        array $stats,
+        bool $showDrafts,
+        string $publishedKey,
+        string $draftKey,
+    ): string {
+        if ($showDrafts) {
+            if (isset($stats[$draftKey])) {
+                return $stats[$draftKey] . ' (draft)';
+            }
+        }
+        return (string)($stats[$publishedKey] ?? '');
     }
 }
