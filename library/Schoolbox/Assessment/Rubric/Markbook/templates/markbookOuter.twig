@@ -66,6 +66,37 @@
     <script type="text/javascript">
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function() {
+                const showDrafts = function () {
+                    $("[data-draft-mark]").show();
+                    $("[data-actual-mark]").hide();
+                };
+                const hideDrafts = function () {
+                    $("[data-draft-mark]").hide();
+                    $("[data-actual-mark]").show();
+                }
+                const changeDownloadHref = function (hrefId, showDrafts) {
+                    let downloadLink = document.getElementById(hrefId);
+                    if (downloadLink && 'href' in downloadLink) {
+                        let downloadUrl = new URL(downloadLink.href);
+                        if (showDrafts) {
+                            downloadUrl.searchParams.set('showDrafts', '1');
+                        } else {
+                            downloadUrl.searchParams.delete('showDrafts');
+                        }
+                        downloadLink.href = downloadUrl;
+                    }
+                };
+                $(document).on('change', '#show-drafts', function () {
+                    if ($(this).prop("checked")) {
+                        showDrafts();
+                        changeDownloadHref('download-points', true);
+                        changeDownloadHref('download-descriptors', true);
+                    } else {
+                        hideDrafts();
+                        changeDownloadHref('download-points', false);
+                        changeDownloadHref('download-descriptors', false);
+                    }
+                });
                 $("#show-drafts").click(function () {
                     if ($(this).is(":checked")) {
                         $("[data-draft-mark]").show();
