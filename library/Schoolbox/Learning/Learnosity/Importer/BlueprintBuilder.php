@@ -401,6 +401,8 @@ class BlueprintBuilder
      * This maintains our legacy idea of "sections" which are interpreted
      * as analogous to Learnosity Items
      *
+     * @deprecated
+     *
      * @param array $legacyQuiz
      * @return array|array[]
      * @throws \DomainException
