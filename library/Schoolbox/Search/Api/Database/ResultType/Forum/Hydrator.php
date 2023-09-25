@@ -86,7 +86,7 @@ class Hydrator extends BaseHydrator
                     return new FullResult(
                         $match,
                         $match->id,
-                        "Post on thread: '{$postThread->getTitle()}'",
+                        $postThread->getTitle(),
                         $this->buildBaseUrl()
                              ->withPath("/forum/thread/{$post->getThread()->getId()}")
                              ->withFragment("{$post->getId()}")
