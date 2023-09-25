@@ -92,10 +92,6 @@ class Hydrator extends BaseHydrator
                     $assessmentType = $matchTypeTokens[1];
                     $folder = $assessment->getBaseContext()->getFolder();
 
-                    if ($folder === null) {
-                        throw new \LogicException('No folder found for assessment ' . $assessment->getId());
-                    }
-
                     return new FullResult(
                         $match,
                         $match->id,
