@@ -102,7 +102,7 @@ class Csv extends AbstractCSV
 
         $this->exportHeader();
         foreach ($this->assessments as $assessmentId => $assessment) {
-            $this->exportAssessment($assessmentId, $assessment);
+            $this->exportAssessment($assessmentId, $assessment, $showDrafts);
         }
         $this->exportOverallMarks();
 
@@ -146,8 +146,9 @@ class Csv extends AbstractCSV
      *
      * @param int   $assessmentId
      * @param array $assessment
+     * @param bool  $showDrafts
      */
-    private function exportAssessment(int $assessmentId, array $assessment): void
+    private function exportAssessment(int $assessmentId, array $assessment, bool $showDrafts): void
     {
         $assessmentName = $assessment['name'];
         foreach ($assessment['capabilities'] as $capabilityId => $capability) {
@@ -155,7 +156,7 @@ class Csv extends AbstractCSV
 
             // Output capability marks only if this assessment uses them
             if ($assessment['isMarkPerCapability']) {
-                $capabilityMarks = $this->retrieveAssessmentCapabilityMarks($assessmentId, $capabilityId);
+                $capabilityMarks = $this->retrieveAssessmentCapabilityMarks($assessmentId, $capabilityId, $showDrafts);
                 $this->exportRow(
                     [$assessmentName, $capabilityName, $this->translator->translateSentence('({:rubricGroup} mark)')],
                     $capabilityMarks
@@ -166,7 +167,7 @@ class Csv extends AbstractCSV
             foreach ($capability['indicators'] as $indicatorId => $indicator) {
                 $this->exportRow(
                     [$assessmentName, $capabilityName, $indicator['name']],
-                    $this->retrieveAssessmentIndicatorMarks($assessmentId, $capabilityId, $indicatorId)
+                    $this->retrieveAssessmentIndicatorMarks($assessmentId, $capabilityId, $indicatorId, $showDrafts)
                 );
             }
         }
@@ -205,11 +206,12 @@ class Csv extends AbstractCSV
     /**
      * Retrieve the capability marks for this assessment out of student data.
      *
-     * @param int $assessmentId
-     * @param int $capabilityId
+     * @param int  $assessmentId
+     * @param int  $capabilityId
+     * @param bool $showDrafts
      * @return array
      */
-    private function retrieveAssessmentCapabilityMarks(int $assessmentId, int $capabilityId): array
+    private function retrieveAssessmentCapabilityMarks(int $assessmentId, int $capabilityId, bool $showDrafts): array
     {
         $capabilityMarks = [];
         foreach ($this->students as $studentId => $student) {
@@ -227,13 +229,18 @@ class Csv extends AbstractCSV
     /**
      * Retrieve the indicator marks for this assessment out of student data.
      *
-     * @param int $assessmentId
-     * @param int $capabilityId
-     * @param int $indicatorId
+     * @param int  $assessmentId
+     * @param int  $capabilityId
+     * @param int  $indicatorId
+     * @param bool $showDrafts
      * @return array
      */
-    private function retrieveAssessmentIndicatorMarks(int $assessmentId, int $capabilityId, int $indicatorId): array
-    {
+    private function retrieveAssessmentIndicatorMarks(
+        int $assessmentId,
+        int $capabilityId,
+        int $indicatorId,
+        bool $showDrafts,
+    ): array {
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
             if (empty($this->exclusions[$assessmentId][$studentId])) {
