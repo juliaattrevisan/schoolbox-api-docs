@@ -14,6 +14,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
 use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
+use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -70,12 +71,6 @@ class ImporterTool extends CliTool\App
     private const OPT_LONG_PRESERVE_SECTIONS = 'preserve-sections';
 
 
-    /**
-     * Learnosity has some strict requirements about where api requests originate
-     */
-    private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
-
-
     /* For prepared statements
      */
 
@@ -116,54 +111,6 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * Get a particular schoolbox.assess row
-     */
-    private const QUERY_QUIZ = "
-        SELECT *
-        FROM assess
-        WHERE deleted_at IS NULL
-        AND availability = 'assess'
-        AND assess_id = :assessId
-    ";
-
-
-    /**
-     * Get the sections in a particular schoolbox.assess
-     */
-    private const QUERY_SECTION = '
-        SELECT *
-        FROM assess_section
-        WHERE deleted_at IS NULL
-        AND assess_id = :assessId
-        ORDER BY sequence ASC
-    ';
-
-
-    /**
-     * Get the questions in a particular schoolbox.assess_section
-     */
-    private const QUERY_QUESTION = '
-        SELECT *
-        FROM assess_question
-        WHERE deleted_at IS NULL
-        AND section_id = :sectionId
-        ORDER BY sequence ASC
-    ';
-
-
-    /**
-     * Get the answers in a particular schoolbox.assess_question
-     */
-    private const QUERY_ANSWER = '
-        SELECT *
-        FROM assess_answer
-        WHERE deleted_at IS NULL
-        AND question_id = :questionId
-        ORDER BY sequence ASC
-    ';
-
-
-    /**
      * Associate a newly-imported learnosity quiz with the legacy one
      */
     private const QUERY_ASSOCIATE_LEARNOSITY = '
@@ -181,10 +128,6 @@ class ImporterTool extends CliTool\App
      */
     private \PDOStatement $legacyQuizIdsStatement;
     private \PDOStatement $legacyQuizIdStatement;
-    private \PDOStatement $quizStatement;
-    private \PDOStatement $sectionsStatement;
-    private \PDOStatement $questionStatement;
-    private \PDOStatement $answerStatement;
     private \PDOStatement $associateStatement;
 
 
@@ -265,14 +208,12 @@ HELP;
             return;
         }
 
-        /* Don't have access to $_SERVER superglobal here
-         * TODO Maybe make this into a cli arg if you use this outside of vagrant
+        /* Used to segregate each school's data; used in tags and author identifiers
          */
-        $serverName = self::DEFAULT_SERVER_NAME;
-
         $schoolCode = $this->getConfig()->get('site_school_code');
 
         /* Initialise dependencies
+         * Note: we on't have access to $_SERVER superglobal here
          */
         $api = new Api(
             (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified()->getHost(),
@@ -280,6 +221,10 @@ HELP;
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger()
         );
+
+        /* Used to manufacture an array containing all the legacy quiz's contents
+         */
+        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal());
 
         /* Generates sets of tags for Activities' and Items' assignations
          */
@@ -306,10 +251,6 @@ HELP;
          */
         $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
         $this->legacyQuizIdStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_ID);
-        $this->quizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUIZ);
-        $this->sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
-        $this->questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
-        $this->answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
         $this->associateStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
 
         /* Obtain data set.
@@ -391,7 +332,7 @@ HELP;
 
                     /* Get the legacy quiz's contents
                      */
-                    $legacyQuiz = $this->getQuiz($legacyQuizId);
+                    $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
 
                     /* Announce what we're doing
                      */
@@ -625,118 +566,6 @@ HELP;
 
 
     /**
-     * Get a quiz that:
-     *     * is not deleted
-     *     * is not yet in learnosity
-     *
-     * @param int $assessId
-     * @return array
-     * @throws \JsonException
-     * @throws \PDOException
-     */
-    private function getQuiz(int $assessId): array
-    {
-        $this->quizStatement->execute([
-            'assessId' => $assessId
-        ]);
-
-        /* Final stack
-         */
-        $quizRow = $this->quizStatement->fetch(\PDO::FETCH_ASSOC);
-        $quizRow['_sections'] = [];
-
-        /* Get its sections
-         */
-        $this->sectionsStatement->execute([
-            'assessId' => $quizRow['assess_id']
-        ]);
-
-        while ($sectionRow = $this->sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $sectionRow['_questions'] = [];
-
-            /* Get each section's questions
-             */
-            $this->questionStatement->execute([
-                'sectionId' => $sectionRow['section_id']
-            ]);
-
-            while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $questionRow['_answers'] = [];
-
-                /* Decompile config
-                 */
-                $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
-
-                /* Get each question's answers
-                 */
-                $this->answerStatement->execute([
-                    'questionId' => $questionRow['question_id']
-                ]);
-
-                while ($answerRow = $this->answerStatement->fetch(\PDO::FETCH_ASSOC)) {
-                    $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
-
-                    $questionRow['_answers'][] = $answerRow;
-                }
-
-                $sectionRow['_questions'][] = $questionRow;
-            }
-
-            $quizRow['_sections'][] = $sectionRow;
-        }
-
-        return $quizRow;
-    }
-
-
-    /**
-     * Question Configurations hid some settings which we can use in Learnosity Land
-     *
-     * @param array $question
-     * @return mixed
-     * @throws \JsonException
-     */
-    private function decompileQuestionConfig(array $question): mixed
-    {
-        if ('' !== (string)$question['config']) {
-            return json_decode($question['config'], true, 512, JSON_THROW_ON_ERROR);
-        }
-
-        return $question['config'];
-    }
-
-
-    /**
-     * Certain question types were supposed to have serialized answers
-     * These were never really treated like a codec and the handlers
-     * are intertwined with phplibs, which is annoying
-     *
-     * @param array $question
-     * @param array $answer
-     * @return mixed
-     */
-    private function decompileAnswer(array $question, array $answer): mixed
-    {
-        /* Quiz only uses types 2, 4 and 5
-         * (6,8,9,10,17 are all Survey)
-         */
-        $serializedAnswers = [
-            Strategy\Multi::QUESTION_TYPE_ID,
-            Strategy\MatchingPairs::QUESTION_TYPE_ID,
-            Strategy\Radio::QUESTION_TYPE_ID,
-        ];
-
-        if (in_array($question['type_id'], $serializedAnswers, false)) {
-            return unserialize($answer['answer'], [
-                'allowed_classes' => true
-            ]);
-        }
-
-        return $answer['answer'];
-    }
-
-
-    /**
      * Get some quantities of each endpoint we used
      *
      * @param array $consolidatedBlueprint
@@ -756,6 +585,7 @@ HELP;
      * @param array $consolidatedBlueprint
      * @return void
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
      */

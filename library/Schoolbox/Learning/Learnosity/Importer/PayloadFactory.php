@@ -78,6 +78,7 @@ class PayloadFactory
      * string and:
      *     * removes html
      *     * truncates to 150-char limit
+     *     * aggressively removes whitespaces
      *
      * I think all titles are subjected to this limit secretly
      *
@@ -86,7 +87,10 @@ class PayloadFactory
      */
     public function produceTitle(string $title): string
     {
-        return mb_substr(strip_tags($title), 0, self::LEARNOSITY_MAX_TITLE_LENGTH);
+        /* TODO sometimes htmlentities are here, might have to translate them
+         *  from &#039; and &amp; into their actual literal symbols
+         */
+        return trim(mb_substr(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH));
     }
 
 
