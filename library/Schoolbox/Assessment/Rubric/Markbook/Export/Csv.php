@@ -90,9 +90,13 @@ class Csv extends AbstractCSV
 
 
     /**
-     * @inheritdoc
+     * Export this markbook as a CSV.
+     *
+     * @param string $filename   The filename for the CSV export.
+     * @param bool   $showDrafts Should draft marks be shown in the export?
+     * @return void
      */
-    public function export(string $filename): void
+    public function export(string $filename, bool $showDrafts): void
     {
         $this->initExport($filename);
 
