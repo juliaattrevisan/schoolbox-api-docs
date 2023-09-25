@@ -83,7 +83,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($assessments, $viewer) {
+            function (RawResult $match) use ($assessments) {
                 $assessment = $assessments->getBy('id', $match->id);
 
                 if ($assessment instanceof IAssessable) {
