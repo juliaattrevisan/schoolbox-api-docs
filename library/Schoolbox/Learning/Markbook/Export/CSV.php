@@ -24,6 +24,12 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
+     * A suffix for all fields in the CSV which are a draft value, or are
+     * calculated from values which contain one or more drafts values.
+     */
+    private const DRAFT_SUFFIX = ' (draft)';
+
+    /**
      * Export this markbook as a CSV.
     /**
      * @param Markbook $markbook   The markbook to export.
@@ -221,32 +227,36 @@ class CSV extends AbstractCSV
             && !$participants[$assessment->getId()][$userId]->isExcluded()
         ) {
             $participant = $participants[$assessment->getId()][$userId];
+            $feedback    = $participant->getAuthoritativeFeedback(!$showDrafts);
+            if ($feedback) {
+                $suffix           = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
+                $humanReadableMark = $feedback->getHumanReadableMark();
+                if ($this->hasTotalMarkColumn($assessment)) {
+                    $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
+                    $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
+                } else {
+                    $row[] = $humanReadableMark . $suffix;
+                }
+                if ($this->hasNormalizedMarkColumn($assessment)) {
+                    $row[] = $feedback->getNormalisedMark() . $suffix;
+                }
+                if ($this->hasCommentColumn($assessment)) {
+                    $row[] = $feedback->getComment() . $suffix;
+                }
+                return $row;
+            }
+        }
 
-            $humanReadableMark = $participant->getHumanReadableMark(true);
-
-            if ($this->hasTotalMarkColumn($assessment)) {
-                $row[] = $this->parseNumerator($humanReadableMark);
-                $row[] = $this->parseDenominator($humanReadableMark);
-            } else {
-                $row[] = $humanReadableMark;
-            }
-            if ($this->hasNormalizedMarkColumn($assessment)) {
-                $row[] = $participant->getNormalisedMark(true);
-            }
-            if ($this->hasCommentColumn($assessment)) {
-                $row[] = $this->retrieveCommentField($assessment, $participant->getUser());
-            }
-        } else {
+        // Fallback if nothing to display
+        $row[] = '';
+        if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = '';
-            if ($this->hasTotalMarkColumn($assessment)) {
-                $row[] = '';
-            }
-            if ($this->hasNormalizedMarkColumn($assessment)) {
-                $row[] = '';
-            }
-            if ($this->hasCommentColumn($assessment)) {
-                $row[] = '';
-            }
+        }
+        if ($this->hasNormalizedMarkColumn($assessment)) {
+            $row[] = '';
+        }
+        if ($this->hasCommentColumn($assessment)) {
+            $row[] = '';
         }
         return $row;
     }
@@ -272,7 +282,7 @@ class CSV extends AbstractCSV
     ): string {
         if ($showDrafts) {
             if (isset($stats[$draftKey])) {
-                return $stats[$draftKey] . ' (draft)';
+                return $stats[$draftKey] . self::DRAFT_SUFFIX;
             }
         }
         return (string)($stats[$publishedKey] ?? '');
