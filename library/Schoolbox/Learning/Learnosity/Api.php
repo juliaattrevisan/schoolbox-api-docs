@@ -24,7 +24,21 @@ use Psr\Log\LoggerInterface;
  */
 class Api
 {
-    private const DATA_API_HOST = 'https://data.learnosity.com/v2023.2.LTS/';
+    /**
+     * From Kit, 25/9/2023
+     * Use the Oregon West area for writes, specifically.
+     *
+     * "Some services, such as Authoring, do not support regions; therefore, their endpoints
+     * do not include a region. For Item Authoring endpoints these will point to the Oregon
+     * region. All content creation (writes) should go through the Data API - Oregon West
+     * endpoint. For reads, you should use the region that your consumer is set up in (for
+     * lower latency and hence maximum speed). Note: the region used to read should always
+     * match the consumer’s region, not the end user’s region."
+     *
+     * https://help.learnosity.com/hc/en-us/articles/360000754798-What-Regions-and-Endpoints-Should-I-Use-#us-west-oregon
+     */
+    private const DATA_API_HOST_READ = 'https://data-au.learnosity.com/v2023.2.LTS/';
+    private const DATA_API_HOST_WRITE = 'https://data-or.learnosity.com/v2023.2.LTS/';
 
 
     /**
@@ -104,7 +118,7 @@ class Api
      */
     public function dataGetRequest(string $endpoint, array $payload): mixed
     {
-        return $this->dataRequest($endpoint, $payload, 'get');
+        return $this->dataRequest(self::DATA_API_HOST_READ, $endpoint, $payload, 'get');
     }
 
 
@@ -119,7 +133,7 @@ class Api
      */
     public function dataSetRequest(string $endpoint, array $payload): mixed
     {
-        return $this->dataRequest($endpoint, $payload, 'set');
+        return $this->dataRequest(self::DATA_API_HOST_WRITE, $endpoint, $payload, 'set');
     }
 
 
@@ -133,7 +147,7 @@ class Api
      */
     public function dataUpdateRequest(string $endpoint, array $payload): mixed
     {
-        return $this->dataRequest($endpoint, $payload, 'update');
+        return $this->dataRequest(self::DATA_API_HOST_WRITE, $endpoint, $payload, 'update');
     }
 
 
@@ -143,6 +157,7 @@ class Api
      * $actionType corresponds to Action Type in their docs;
      * Learnosity is *not* a RESTful api.
      *
+     * @param string $host
      * @param string $endpoint
      * @param array $payload
      * @param string $actionType
@@ -151,11 +166,11 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    private function dataRequest(string $endpoint, array $payload, string $actionType): mixed
+    private function dataRequest(string $host, string $endpoint, array $payload, string $actionType): mixed
     {
         /* Strip slashes, to prevent typos
          */
-        $url = self::DATA_API_HOST . trim($endpoint, '/');
+        $url = $host . trim($endpoint, '/');
 
         $response = (new DataApi())->request(
             $url,

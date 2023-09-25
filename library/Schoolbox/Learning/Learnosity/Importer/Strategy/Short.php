@@ -47,7 +47,7 @@ class Short implements IStrategy
             'stimulus' => $question['question'],
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
-                'automarkable' => true,
+                'automarkable' => false,
                 'scoring_type' => 'exactMatch',
                 'valid_response' => [
                     'value' =>  $answer,
