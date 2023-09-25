@@ -113,11 +113,19 @@ class CSV extends AbstractCSV
                 $studentAverageMark = '-';
 
                 if (isset($studentAverageMarks[$student->getId()])) {
-                    /* There isn't a published feedback
-                     * Nothing to show; exit early
-                     */
+                    $hrMark  = $studentAverageMarks[$student->getId()]['published']['hr'] ?? null;
+                    $isDraft = false;
+                    if ($showDrafts) {
+                        if (isset($studentAverageMarks[$student->getId()]['any']['hr'])) {
+                            $hrMark  = $studentAverageMarks[$student->getId()]['any']['hr'];
+                            $isDraft = true;
+                        }
+                    }
                     if (isset($studentAverageMarks[$student->getId()]['published']['hr'])) {
-                        $studentAverageMark = $studentAverageMarks[$student->getId()]['published']['hr'];
+                        $studentAverageMark = $hrMark;
+                        if ($isDraft) {
+                            $studentAverageMark .= self::DRAFT_SUFFIX;
+                        }
                     }
                 }
 
