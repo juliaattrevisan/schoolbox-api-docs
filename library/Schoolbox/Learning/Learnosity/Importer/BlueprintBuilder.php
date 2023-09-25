@@ -42,6 +42,7 @@ class BlueprintBuilder
     public const ENDPOINT_ITEMS = '/itembank/items';
     public const ENDPOINT_ACTIVITIES = '/itembank/activities';
 
+
     /**
      * Maximum number of Activities per payload
      * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
@@ -289,7 +290,7 @@ class BlueprintBuilder
                  * from the question text we offered (good luck to those who
                  * only had an image as their question, though.)
                  */
-                $itemStruct['title'] = strip_tags($question['question']);
+                $itemStruct['title'] = $this->payloadFactory->produceTitle($question['question']);
 
                 /* Activity payload needs to know this reference
                  */

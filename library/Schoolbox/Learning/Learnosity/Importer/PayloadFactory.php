@@ -19,11 +19,25 @@ use Schoolbox\Learning\Learnosity\Importer\Strategy\Factory;
  */
 class PayloadFactory
 {
+    /**
+     * Arbitrary consts used in a match() clause
+     */
     public const LEARNOSITY_PAYLOAD_ACTIVITY = 'activity';
     public const LEARNOSITY_PAYLOAD_ITEM = 'item';
 
     public const LEARNOSITY_PAYLOAD_SECTION_FEATURE = 'sectionFeature';
     public const LEARNOSITY_PAYLOAD_QUESTION = 'question';
+
+
+    /**
+     * A somewhat undocumented limit that, if exceeded, results in http 500 and error code 22001 (undocumented)
+     * https://help.learnosity.com/hc/en-us/requests/23332
+     *
+     * This is the only reference such a limit exists, but it's not in the Data API or Items API docs
+     * and it doesn't mention anything about error 22001...
+     * https://help.learnosity.com/hc/en-us/articles/360000754998-Enabling-and-Configuring-Item-Titles-in-the-Author-API
+     */
+    private const LEARNOSITY_MAX_TITLE_LENGTH = 150;
 
 
     /**
@@ -55,6 +69,24 @@ class PayloadFactory
             self::LEARNOSITY_PAYLOAD_QUESTION => $this->setupQuestionNode($data),
             default => [],
         };
+    }
+
+
+    /**
+     * Learnosity has an undocumented 150-char limit resulting in error 22001 if exceeded
+     * There's no real convenient place for this, but this method takes an arbitrary $title
+     * string and:
+     *     * removes html
+     *     * truncates to 150-char limit
+     *
+     * I think all titles are subjected to this limit secretly
+     *
+     * @param string $title
+     * @return string
+     */
+    public function produceTitle(string $title): string
+    {
+        return mb_substr(strip_tags($title), 0, self::LEARNOSITY_MAX_TITLE_LENGTH);
     }
 
 
@@ -136,7 +168,7 @@ class PayloadFactory
             'tags' => $tags,
             /* The name of the quiz
              */
-            'title' => $legacyQuiz['title'],
+            'title' => $this->produceTitle($legacyQuiz['title']),
         ];
 
         if ((int)$legacyQuiz['duration']) {
@@ -189,7 +221,7 @@ class PayloadFactory
             'tags' => $tags,
             /* The name of the quiz
              */
-            'title' => $section['title'],
+            'title' => $this->produceTitle($section['title']),
         ];
     }
 
