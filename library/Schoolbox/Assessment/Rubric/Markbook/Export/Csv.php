@@ -188,7 +188,7 @@ class Csv extends AbstractCSV
 
             // Output capability marks only if they are to be shown
             if ($capability['show']) {
-                $capabilityMarks = $this->retrieveOverallCapabilityMarks($capability);
+                $capabilityMarks = $this->retrieveOverallCapabilityMarks($capability, $showDrafts);
                 $this->exportRow(
                     [$overallHeader, $capabilityName, $this->translator->translateSentence('({:rubricGroup} mark)')],
                     $capabilityMarks
@@ -199,7 +199,7 @@ class Csv extends AbstractCSV
             foreach ($capability['indicators'] as $indicator) {
                 $this->exportRow(
                     [$overallHeader, $capabilityName, $indicator['name']],
-                    $this->retrieveOverallIndicatorMarks($indicator)
+                    $this->retrieveOverallIndicatorMarks($indicator, $showDrafts)
                 );
             }
         }
@@ -284,13 +284,19 @@ class Csv extends AbstractCSV
      * Retrieve the capability marks out of overall data.
      *
      * @param array $capability
+     * @param bool  $showDrafts
      * @return array
      */
-    private function retrieveOverallCapabilityMarks(array $capability): array
+    private function retrieveOverallCapabilityMarks(array $capability, bool $showDrafts): array
     {
         $capabilityMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'] ?? null;
+            $capabilityMarks[$studentId] = $this->extractDraftOrPublishedValue(
+                $capability['marks'][$studentId] ?? [],
+                $showDrafts,
+                'humanReadable',
+                'latestHumanReadable',
+            );
         }
         return $capabilityMarks;
     }
@@ -300,13 +306,19 @@ class Csv extends AbstractCSV
      * Retrieve the indicator marks out of overall data.
      *
      * @param array $indicator
+     * @param bool  $showDrafts
      * @return array
      */
-    private function retrieveOverallIndicatorMarks(array $indicator): array
+    private function retrieveOverallIndicatorMarks(array $indicator, bool $showDrafts): array
     {
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'] ?? null;
+            $indicatorMarks[$studentId] = $this->extractDraftOrPublishedValue(
+                $indicator['marks'][$studentId] ?? [],
+                $showDrafts,
+                'humanReadable',
+                'latestHumanReadable',
+            );
         }
         return $indicatorMarks;
     }

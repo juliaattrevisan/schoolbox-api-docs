@@ -254,31 +254,4 @@ class CSV extends AbstractCSV
         }
         return $row;
     }
-
-    /**
-     * Extract a draft or published value from `$stats`.
-     *
-     * If `$showDrafts`: extract `$stats[$draftKey]`, and add a "draft" suffix:
-     * otherwise, extract `$stats[$publishedKey]`.
-     *
-     *
-     * @param array  $stats
-     * @param bool   $showDrafts
-     * @param string $publishedKey
-     * @param string $draftKey
-     * @return string
-     */
-    private function extractDraftOrPublishedValue(
-        array $stats,
-        bool $showDrafts,
-        string $publishedKey,
-        string $draftKey,
-    ): string {
-        if ($showDrafts) {
-            if (isset($stats[$draftKey])) {
-                return $stats[$draftKey] . self::DRAFT_SUFFIX;
-            }
-        }
-        return (string)($stats[$publishedKey] ?? '');
-    }
 }
