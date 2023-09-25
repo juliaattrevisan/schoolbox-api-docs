@@ -25,23 +25,43 @@ Usage:
     <script type="text/javascript">
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function () {
-                $("#show-drafts").click(function () {
+                const showDrafts = function () {
+                    $("[data-draft-mark]").show();
+                    $("[data-actual-mark]").hide();
+                    $("[data-student-average]").each(function (idx, elem) {
+                        let $elem = $(elem);
+                        $elem.removeClass($elem.attr('data-off-class'));
+                        $elem.addClass($elem.attr('data-on-class'));
+                    });
+                };
+                const hideDrafts = function () {
+                    $("[data-draft-mark]").hide();
+                    $("[data-actual-mark]").show();
+                    $("[data-student-average]").each(function (idx, elem) {
+                        let $elem = $(elem);
+                        $elem.removeClass($elem.attr('data-on-class'));
+                        $elem.addClass($elem.attr('data-off-class'));
+                    });
+                }
+                const changeDownloadHref = function (hrefId, showDrafts) {
+                    let downloadLink = document.getElementById(hrefId);
+                    if (downloadLink && 'href' in downloadLink) {
+                        let downloadUrl = new URL(downloadLink.href);
+                        if (showDrafts) {
+                            downloadUrl.searchParams.set('showDrafts', '1');
+                        } else {
+                            downloadUrl.searchParams.delete('showDrafts');
+                        }
+                        downloadLink.href = downloadUrl;
+                    }
+                };
+                $(document).on('change', '#show-drafts', function () {
                     if ($(this).is(":checked")) {
-                        $("[data-draft-mark]").show();
-                        $("[data-actual-mark]").hide();
-                        $("[data-student-average]").each(function(idx, elem){
-                            var $elem = $(elem);
-                            $elem.removeClass($elem.attr('data-off-class'));
-                            $elem.addClass($elem.attr('data-on-class'));
-                        });
+                        showDrafts();
+                        changeDownloadHref('download-spreadsheet', true);
                     } else {
-                        $("[data-draft-mark]").hide();
-                        $("[data-actual-mark]").show();
-                        $("[data-student-average]").each(function(idx, elem){
-                            var $elem = $(elem);
-                            $elem.removeClass($elem.attr('data-on-class'));
-                            $elem.addClass($elem.attr('data-off-class'));
-                        });
+                        hideDrafts();
+                        changeDownloadHref('download-spreadsheet', false);
                     }
                 });
 
