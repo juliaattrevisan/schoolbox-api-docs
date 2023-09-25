@@ -44,13 +44,13 @@ class Numeric implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $answer = $question['_answers'][0]['answer'];
+        $answer = trim($question['_answers'][0]['answer']);
 
         return [
             'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
-            'stimulus' => $question['question'],
+            'stimulus' => trim($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
                 'automarkable' => true,

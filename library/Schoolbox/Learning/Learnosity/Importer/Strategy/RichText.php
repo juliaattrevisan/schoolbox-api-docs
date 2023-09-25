@@ -39,7 +39,7 @@ class RichText implements IStrategy
             /* Apparently the upper limit is 100,000
              */
             'max_length' => 99999,
-            'stimulus' => $question['question'],
+            'stimulus' => trim($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
                 'max_score' => (float)$question['marks']

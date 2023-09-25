@@ -60,7 +60,7 @@ class Fillgap implements IStrategy
             'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
-            'stimulus' => $question['question'],
+            'stimulus' => trim($question['question']),
             'template' => $answer,
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [

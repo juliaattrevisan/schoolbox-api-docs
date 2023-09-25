@@ -203,11 +203,14 @@ class PayloadFactory
      */
     private function setupSectionFeatureNode(array $section, array $tags): array
     {
-        if ('' !== trim((string)$section['description'])) {
+        $description = trim((string)$section['description']);
+        $title = trim((string)$section['title']);
+
+        if ('' !== $description) {
             return [
                 'data' => [
-                    'content' => $section['description'],
-                    'heading' => $section['title'],
+                    'content' => $description,
+                    'heading' => $title,
                     'type' => 'sharedpassage',
                 ],
                 'reference' => (string)UUid::uuid4(),

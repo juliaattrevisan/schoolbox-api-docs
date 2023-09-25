@@ -46,8 +46,8 @@ class MatchingPairs implements IStrategy
         $correctAnswers = [];
 
         foreach ($possibleAnswers as $possibleAnswer) {
-            $stimulusList[] = $possibleAnswer->answerLeft;
-            $correctAnswers[] = $possibleAnswer->answerRight;
+            $stimulusList[] = trim($possibleAnswer->answerLeft);
+            $correctAnswers[] = trim($possibleAnswer->answerRight);
         }
 
         /* Randomise whatever this was
@@ -59,7 +59,7 @@ class MatchingPairs implements IStrategy
             'instant_feedback' => false,
             'max_length' => 250,
             'possible_responses' => $possibleAnswers,
-            'stimulus' => $question['question'],
+            'stimulus' => trim($question['question']),
             'stimulus_list' => $stimulusList,
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
