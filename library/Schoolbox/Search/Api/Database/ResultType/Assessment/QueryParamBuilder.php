@@ -107,15 +107,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleExpression(): string
     {
-        // TODO: Can we do better than hard-coding titles below?
+        // This finds the title text to search.  Tasks, projects, and lesson_plans get their titles from assessment.title.
         return "
             COALESCE(
-                IF(task.id, 'Task', NULL),
+                IF(task.id, assessment.title, NULL),
                 IF(assess.assessment_id, assess.title, NULL),
                 IF(lti_assessment.assessment_id, lti_assessment.lti_assessment_title, NULL),
                 IF(submission_box.id, submission_box.name, NULL),
-                IF(project.id, 'Project', NULL),
-                IF(lesson_plan.id, 'Lesson Plan', NULL)
+                IF(project.id, assessment.title, NULL),
+                IF(lesson_plan.id, assessment.title, NULL)
             )
         ";
     }
