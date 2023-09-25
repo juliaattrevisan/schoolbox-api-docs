@@ -45,12 +45,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
              folder.deleted_at IS NULL AND
              project.deleted_at IS NULL AND
              course_implementation.deleted_at IS NULL AND
-#             course_implementation_folder.deleted_at IS NULL AND
              course_unit_implementation.deleted_at IS NULL AND
              course_specification.deleted_at IS NULL AND
-#             course_specification_folder.deleted_at IS NULL AND
              course_unit_specification.deleted_at IS NULL AND
-#             course_unit_specification_folder.deleted_at IS NULL AND
              task.deleted_at IS NULL AND
              assess.deleted_at IS NULL AND
              lesson_plan.deleted_at IS NULL
@@ -200,24 +197,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             LEFT JOIN course_implementation ON (
                 mv_assessment_relation.course_implementation_id = course_implementation.id
             )
-#            LEFT JOIN folder course_implementation_folder ON (
-#                course_implementation.folder_id = course_implementation_folder.id
-#            )
             LEFT JOIN course_unit_implementation ON (
                 mv_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
             )
             LEFT JOIN course_specification ON (
                 mv_assessment_relation.course_specification_id = course_specification.id
             )
-#            LEFT JOIN folder course_specification_folder ON (
-#                course_specification.folder_id = course_specification_folder.id
-#            )
             LEFT JOIN course_unit_specification ON (
                 mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
             )
-#            LEFT JOIN folder course_unit_specification_folder ON (
-#                course_unit_specification.folder_id = course_unit_specification_folder.id
-#            )
             LEFT JOIN lti_assessment ON (
                 assessment.id = lti_assessment.assessment_id
             )
