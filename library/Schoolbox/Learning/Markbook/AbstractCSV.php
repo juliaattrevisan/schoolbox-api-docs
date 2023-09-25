@@ -22,6 +22,11 @@ use Schoolbox\User;
  */
 class AbstractCSV
 {
+    /**
+     * A suffix for all fields in the CSV which are a draft value, or are
+     * calculated from values which contain one or more drafts values.
+     */
+    protected const DRAFT_SUFFIX = ' (draft)';
 
     /**
      * @var resource

@@ -104,7 +104,7 @@ class Csv extends AbstractCSV
         foreach ($this->assessments as $assessmentId => $assessment) {
             $this->exportAssessment($assessmentId, $assessment, $showDrafts);
         }
-        $this->exportOverallMarks();
+        $this->exportOverallMarks($showDrafts);
 
         $this->closeExport();
     }
@@ -176,10 +176,13 @@ class Csv extends AbstractCSV
 
     /**
      * Export overall mark rows for this CSV.
+     *
+     * @param bool $showDrafts
+     * @return void
      */
-    private function exportOverallMarks(): void
+    private function exportOverallMarks(bool $showDrafts): void
     {
-        foreach ($this->overallMarks as $capabilityId => $capability) {
+        foreach ($this->overallMarks as $capability) {
             $overallHeader  = '(overall)';
             $capabilityName = $capability['name'];
 
@@ -193,7 +196,7 @@ class Csv extends AbstractCSV
             }
 
             // Output indicator marks
-            foreach ($capability['indicators'] as $indicatorId => $indicator) {
+            foreach ($capability['indicators'] as $indicator) {
                 $this->exportRow(
                     [$overallHeader, $capabilityName, $indicator['name']],
                     $this->retrieveOverallIndicatorMarks($indicator)
@@ -216,7 +219,13 @@ class Csv extends AbstractCSV
         $capabilityMarks = [];
         foreach ($this->students as $studentId => $student) {
             if (empty($this->exclusions[$assessmentId][$studentId])) {
-                $studentMark = "\xA0" . ($student['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '');
+                $studentMark = $student['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] ?? '';
+                if ($showDrafts) {
+                    if (isset($student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'])) {
+                        $studentMark = $student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] . self::DRAFT_SUFFIX;
+                    }
+                }
+                $studentMark = "\xA0" . $studentMark;
             } else {
                 $studentMark = '(excluded)';
             }
@@ -244,11 +253,21 @@ class Csv extends AbstractCSV
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
             if (empty($this->exclusions[$assessmentId][$studentId])) {
-                $result = $student['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId] ?? null;
+                $result      = $student['assessmentsPublished'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId] ?? null;
+                $isDraftMark = false;
+                if ($showDrafts) {
+                    if (isset($student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId])) {
+                        $result      = $student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId];
+                        $isDraftMark = true;
+                    }
+                }
                 if (is_array($result)) {
                     $studentMark = $this->descriptorsOnly && ($result['humanReadableMark'] ?? null)
                         ? ("\xA0" . $result['humanReadableMark'])
                         : $result['selectedDescriptorText'];
+                    if ($isDraftMark) {
+                        $studentMark .= self::DRAFT_SUFFIX;
+                    }
                 } else {
                     $studentMark = '';
                 }

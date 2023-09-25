@@ -24,12 +24,6 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
-     * A suffix for all fields in the CSV which are a draft value, or are
-     * calculated from values which contain one or more drafts values.
-     */
-    private const DRAFT_SUFFIX = ' (draft)';
-
-    /**
      * Export this markbook as a CSV.
      *
      * @param Markbook $markbook   The markbook to export.
