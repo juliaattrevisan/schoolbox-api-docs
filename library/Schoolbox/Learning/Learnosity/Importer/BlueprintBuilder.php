@@ -77,20 +77,6 @@ class BlueprintBuilder
 
 
     /**
-     * TODO What is this supposed to be, then
-     *
-     * A generic author identifier attributed to each and every question
-     * since we're aligning the strata of all questions from every quiz.
-     *
-     * Learnosity wants you to give a particular author to a set of questions,
-     * not to an individual question, in the itembank/questions endpoint.
-     * This means we lose the original authorship identifiers, although this
-     * only appears in an audit trail that our users won't ever see afaict
-     */
-    private string $defaultAuthor;
-
-
-    /**
      * Constructor
      *
      * @param string $schoolCode
@@ -106,7 +92,15 @@ class BlueprintBuilder
         private ContextLookup $contextLookup,
         private LoggerInterface $logger
     ) {
-        $this->defaultAuthor = sprintf('%s_v23_migration', $this->schoolCode);
+        /* A generic author identifier attributed to each and every question
+         * since we're aligning the strata of all questions from every quiz.
+         *
+         * Learnosity wants you to give a particular author to a set of questions,
+         * not to an individual question, in the itembank/questions endpoint.
+         * This means we lose the original authorship identifiers, although this
+         * only appears in an audit trail that our users won't ever see afaict
+         */
+        $defaultAuthor = sprintf('%s_v23_migration', $this->schoolCode);
 
         /* Contains a dynamic property, so it can't be a class const anymore
          */
@@ -126,7 +120,7 @@ class BlueprintBuilder
                             /* FIXME replace with actual author somehow, or just assume a system user
                              *  I'm not really sure this is ever shown to an end user
                              */
-                            'id' => $this->defaultAuthor
+                            'id' => $defaultAuthor
                         ]
                     ],
                     'questions' => []
