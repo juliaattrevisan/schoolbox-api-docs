@@ -185,7 +185,6 @@ class PayloadFactory
              */
             'status' => Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED,
             /* Tags
-             * TODO Fill in with some derived values about courses and units and classcodes
              */
             'tags' => $tags,
             /* The name of the quiz

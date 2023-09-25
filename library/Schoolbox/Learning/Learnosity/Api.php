@@ -17,10 +17,6 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Generates API calls to Learnosity.
- *
- * FIXME at the moment it just generates initOptions for their
- * embedded javascript app, but might expand to facilitate the
- * other endpoints as needed.
  */
 class Api
 {
@@ -114,6 +110,7 @@ class Api
      * @param array $payload
      * @return mixed
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function dataGetRequest(string $endpoint, array $payload): mixed
@@ -129,6 +126,7 @@ class Api
      * @param array $payload
      * @return mixed
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function dataSetRequest(string $endpoint, array $payload): mixed
@@ -141,9 +139,11 @@ class Api
      * Alias for ActionType "update" endpoints
      *
      * @param string $endpoint
-     * @param array  $payload
+     * @param array $payload
      * @return mixed
      * @throws ValidationException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function dataUpdateRequest(string $endpoint, array $payload): mixed
     {
