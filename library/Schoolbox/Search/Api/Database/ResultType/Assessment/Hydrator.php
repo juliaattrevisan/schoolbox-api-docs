@@ -22,7 +22,7 @@ use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\User;
 
 /**
- * Hydrator for link results.
+ * Hydrator for assessment results.
  */
 class Hydrator extends BaseHydrator
 {
@@ -56,7 +56,7 @@ class Hydrator extends BaseHydrator
      */
     public function hydrate(string $keyword, array $matches, User $viewer): array
     {
-        // Find all links that match $matches.
+        // Find all assessments that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
 
         $ids = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
@@ -64,10 +64,10 @@ class Hydrator extends BaseHydrator
             return [];
         }
 
-        // Find the matching links.
+        // Find the matching assessments.
         $assessments = $this->assessmentMapperProxy->findAllByIds($ids);
 
-        // Permissions:
+        // Permissions (from AC of SA-16014):
         //    Students
         //     - Should only see assessments in their own classes/groups
         //     - Should only see assessments that they have not been excluded from
