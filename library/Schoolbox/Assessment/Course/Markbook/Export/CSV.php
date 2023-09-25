@@ -23,11 +23,13 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
-     * Exports
+     * Export the course markbook
+     *
      * @param CourseMarkbook $courseMarkbook
      * @param string         $filename
+     * @param bool           $showDrafts
      */
-    public function export(CourseMarkbook $courseMarkbook, string $filename): void
+    public function export(CourseMarkbook $courseMarkbook, string $filename, bool $showDrafts): void
     {
         $this->initExport($filename);
         $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
