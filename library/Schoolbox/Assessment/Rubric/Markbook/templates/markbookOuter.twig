@@ -7,6 +7,7 @@
 
 {% set reportContentId = 'rubric-markbook-content' %}
 
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
 <script>
     $(function() {
         $('#{{ reportContentId }}').on('filterContentLoaded', function() {
@@ -66,46 +67,7 @@
     <script type="text/javascript">
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function() {
-                const showDrafts = function () {
-                    $("[data-draft-mark]").show();
-                    $("[data-actual-mark]").hide();
-                };
-                const hideDrafts = function () {
-                    $("[data-draft-mark]").hide();
-                    $("[data-actual-mark]").show();
-                }
-                const changeDownloadHref = function (hrefId, showDrafts) {
-                    let downloadLink = document.getElementById(hrefId);
-                    if (downloadLink && 'href' in downloadLink) {
-                        let downloadUrl = new URL(downloadLink.href);
-                        if (showDrafts) {
-                            downloadUrl.searchParams.set('showDrafts', '1');
-                        } else {
-                            downloadUrl.searchParams.delete('showDrafts');
-                        }
-                        downloadLink.href = downloadUrl;
-                    }
-                };
-                $(document).on('change', '#show-drafts', function () {
-                    if ($(this).prop("checked")) {
-                        showDrafts();
-                        changeDownloadHref('download-points', true);
-                        changeDownloadHref('download-descriptors', true);
-                    } else {
-                        hideDrafts();
-                        changeDownloadHref('download-points', false);
-                        changeDownloadHref('download-descriptors', false);
-                    }
-                });
-                $("#show-drafts").click(function () {
-                    if ($(this).is(":checked")) {
-                        $("[data-draft-mark]").show();
-                        $("[data-actual-mark]").hide();
-                    } else {
-                        $("[data-draft-mark]").hide();
-                        $("[data-actual-mark]").show();
-                    }
-                });
+                $.marksheetToggleDrafts('#show-drafts');
 
                 // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
                 // menu or right notifications window.  Also we cannot listen for resize events on the container,

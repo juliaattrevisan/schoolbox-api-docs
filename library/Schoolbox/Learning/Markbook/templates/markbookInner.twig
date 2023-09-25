@@ -37,7 +37,7 @@
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">Report</li>
         <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExportForClass', {folder: folder, folderId: folder.id}) }}?{{ queryArgs }}'
-               id="download-spreadsheet"
+               data-download-spreadsheet
                class='icon-download'>Download Spreadsheet</a>
     </ul>
 </div>
