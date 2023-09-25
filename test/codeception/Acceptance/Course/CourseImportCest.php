@@ -27,6 +27,18 @@ class CourseImportCest
         $i->loginAsAdmin();
     }
 
+    /**
+     * Deleting data is about to start so it does not get impacted by other tests already executed
+     *
+     * @param AcceptanceTester $i
+     */
+    public function beforeSuite(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at so data does not impact the tests");
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Course Import Folder%"]);
+        $i->updateInDatabase('folder_code', ['deleted_at' => "2022-01-15 11:22:34"], ['code like' => "test%"]);
+    }
+
 
     /**
      * @param AcceptanceTester $i
@@ -92,7 +104,8 @@ class CourseImportCest
         $importCourseIntoClass->tickAssessmentCheckbox('151');
         $i->amGoingTo('click button Import, navigate to the homepage and check that Romeo and Juliet unit is presented in the page');
         $importCourseIntoClass->clickSubmit('Import');
-        $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => 'Automation Course Import Folder1']);
+        sleep(3);
+        $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => 'Automation Course Import Folder1','deleted_at' => null]);
         $i->amOnPage('/homepage/' . $folder_id);
         $i->canSee('Romeo and Juliet');
     }
@@ -109,6 +122,7 @@ class CourseImportCest
     public function copyActivityIntoClass(AcceptanceTester $i)
     {
         $courseModify = new CourseModify($i);
+        $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => 'Automation Course Import Folder1','deleted_at' => null]);
         $i->amGoingTo('navigate to Year 9 English Modify course page');
         $i->amOnPage($courseModify->getURL(6));
         $i->amGoingTo('click the arrow to expand Romeo and Juliet unit');
@@ -116,7 +130,9 @@ class CourseImportCest
         $i->amGoingTo('click the export icon for Romeo and Juliet Key Quote Activity');
         $courseModify->clickExportIcon(52);
         $i->amGoingTo('tick the checkbox');
-        $i->executeJS("var clickCheckBox = document.getElementById('import-94');
+        $courseImplementationId = $i->grabFromDatabase('course_implementation', 'id', ['folder_id' => $folder_id]);
+        $importId = $i->grabFromDatabase('course_unit_implementation', 'id', ['course_implementation_id' => $courseImplementationId]);
+        $i->executeJS("var clickCheckBox = document.getElementById('import-$importId');
         clickCheckBox.click();");
         $i->amGoingTo('click export the selected classes button');
         $i->clickWithLeftButton(['css' => 'input[type=submit]']);
@@ -124,7 +140,7 @@ class CourseImportCest
         $i->amGoingTo('click the export icon for Present a scene of Romeo and Juliet');
         $courseModify->clickExportIcon(146);
         $i->amGoingTo('tick the checkbox');
-        $i->executeJS("var clickCheckBox = document.getElementById('import-94');
+        $i->executeJS("var clickCheckBox = document.getElementById('import-$importId');
         clickCheckBox.click();");
         $i->amGoingTo('click export the selected classes button');
         $i->clickWithLeftButton(['css' => 'input[type=submit]']);
@@ -132,13 +148,12 @@ class CourseImportCest
         $i->amGoingTo('click the export icon for Post-Unit Quiz');
         $courseModify->clickExportIcon(151);
         $i->amGoingTo('tick the checkbox');
-        $i->executeJS("var clickCheckBox = document.getElementById('import-94');
+        $i->executeJS("var clickCheckBox = document.getElementById('import-$importId');
         clickCheckBox.click();");
         $i->amGoingTo('click export the selected classes button');
         $i->clickWithLeftButton(['css' => 'input[type=submit]']);
 
         $i->amGoingTo('navigate to the class homepage to check if the assessments are presented in the course outline');
-        $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => 'Automation Course Import Folder1']);
         $i->amOnPage('/homepage/' . $folder_id);
         $i->canSee('Romeo and Juliet Key Quote Activity');
         $i->canSee('Present a scene of Romeo and Juliet');
