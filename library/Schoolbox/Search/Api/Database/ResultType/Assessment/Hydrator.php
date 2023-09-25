@@ -84,7 +84,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($assessments) {
+            function (RawResult $match) use ($assessments, $keyword) {
                 $assessment = $assessments->getBy('id', $match->id);
 
                 if ($assessment instanceof IAssessable) {
@@ -92,6 +92,7 @@ class Hydrator extends BaseHydrator
                     $matchTypeTokens = explode('.', $match->type);
                     $assessmentType = $matchTypeTokens[1];
                     $folder = $assessment->getBaseContext()->getFolder();
+                    $assessmentDesc = $assessment->getDescription();
 
                     return new FullResult(
                         $match,
@@ -107,7 +108,7 @@ class Hydrator extends BaseHydrator
                         null,
                         null,
                         AssessmentType::getIconClassSuffixForType($assessmentType),
-                        strip_tags($assessment->getDescription()),
+                        $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
                         $assessment->getCreator(),
                         [$folder],
                         [],
