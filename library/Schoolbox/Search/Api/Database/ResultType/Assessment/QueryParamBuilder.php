@@ -107,7 +107,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleExpression(): string
     {
-        // This finds the title text to search.  Tasks, projects, and lesson_plans get their titles from assessment.title.
         return "
             COALESCE(
                 IF(task.id, assessment.title, NULL),
