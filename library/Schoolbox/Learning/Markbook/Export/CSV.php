@@ -31,7 +31,7 @@ class CSV extends AbstractCSV
 
     /**
      * Export this markbook as a CSV.
-    /**
+     *
      * @param Markbook $markbook   The markbook to export.
      * @param string   $filename   The filename for the CSV export.
      * @param bool     $showDrafts Should draft marks be shown in the export?
