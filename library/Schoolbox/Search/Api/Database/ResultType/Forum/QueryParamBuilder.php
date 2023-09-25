@@ -188,16 +188,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     private function getSubqueryForMostRelevantPostInThread(string $columnToSelect): string
     {
         return (
+            // Select from the most recent post in the thread whose body contains the keyword, otherwise the most recent post.
             '(
-                # Select from the most recent post in the thread whose body contains the keyword, otherwise the most recent post.
                 SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . '
                 FROM  forumPost AS fp2
                 WHERE fp2.threadID=ft.threadID
                 ORDER BY LOCATE(:postKeyword, fp2.body)>0 DESC, fp2.modified DESC, fp2.postID ASC
-                # NOTE: Order by "fp2.postID ASC" above is necessary so that consistent results are returned each time
-                #       the query runs given that fp2.modified may not be unique.
                 LIMIT 1
              )'
+            // NOTE: Order by "fp2.postID ASC" above is necessary so that consistent results are returned each time
+            //       the query runs given that fp2.modified may not be unique.
         );
     }
 }
