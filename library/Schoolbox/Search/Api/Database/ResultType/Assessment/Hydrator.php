@@ -96,14 +96,6 @@ class Hydrator extends BaseHydrator
                         throw new \LogicException('No folder found for assessment ' . $assessment->getId());
                     }
 
-                    // Checklist
-                    //  * dueWork - results appear, nested in folders - DONE.
-                    //  * lessonPlan - results appear, nested in folders - DONE.
-                    //  * lti - results appear, nested in folders - DONE.
-                    //  * project - results appear, nested in folders - DONE.
-                    //  * quiz - results appear, nested in folders - DONE.
-                    //  * task - results appear, nested in folders - DONE.
-
                     return new FullResult(
                         $match,
                         $match->id,
