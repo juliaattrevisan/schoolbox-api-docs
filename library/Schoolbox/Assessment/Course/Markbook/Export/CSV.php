@@ -43,11 +43,19 @@ class CSV extends AbstractCSV
         foreach ($assessmentSpecs as $assessmentSpec) {
             $mark = '';
             if (key_exists($assessmentSpec->getId(), $courseAverages)) {
-                /* There isn't a published feedback
-                 * Nothing to show; exit early
-                 */
-                if (isset($courseAverages[$assessmentSpec->getId()]['published'])) {
-                    $mark = sprintf("%6.2f %%", $courseAverages[$assessmentSpec->getId()]['published']);
+                $normMark = $courseAverages[$assessmentSpec->getId()]['published'] ?? null;
+                $isDraft  = false;
+                if ($showDrafts) {
+                    if (isset($courseAverages[$assessmentSpec->getId()]['any'])) {
+                        $normMark = $courseAverages[$assessmentSpec->getId()]['any'];
+                        $isDraft  = true;
+                    }
+                }
+                if (isset($normMark)) {
+                    $mark = sprintf("%6.2f %%", $normMark);
+                    if ($isDraft) {
+                        $mark .= self::DRAFT_SUFFIX;
+                    }
                 }
             }
             $courseAverageData = $this->appendData($courseAverageData, $assessmentSpec, $mark);
