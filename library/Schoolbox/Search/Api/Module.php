@@ -17,7 +17,7 @@ use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -88,6 +88,10 @@ class Module extends BaseModule
         /** @var ArticleResolver $articleResolver */
         $articleResolver = $this->injector->get('commsNewsArticleResolver');
 
+        // Need an assessment mapper proxy
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->injector->get('assessmentDataSource');
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -151,7 +155,7 @@ class Module extends BaseModule
                     Access::getInstance(),
                 ),
                 new Database\ResultType\Assessment\Hydrator(
-                    $mapperFactory->get(AssessmentMapper::class),
+                    $assessmentMapperProxy,
                     Access::getInstance(),
                 ),
             ),

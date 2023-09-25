@@ -9,12 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
+use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -33,11 +34,11 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param AssessmentMapper $assessmentMapper Used to fetch assessments for hydration.
-     * @param Access           $access           Used to determine if the current user may view this page.
+     * @param AssessmentMapperProxy $assessmentMapperProxy Used to fetch assessments for hydration.
+     * @param Access $access Used to determine if the current user may view this page.
      */
     public function __construct(
-        private AssessmentMapper $assessmentMapper,
+        private AssessmentMapperProxy $assessmentMapperProxy,
         private Access $access,
     ) {
     }
@@ -64,40 +65,35 @@ class Hydrator extends BaseHydrator
         }
 
         // Find the matching links.
-        $assessments = $this->assessmentMapper->findByColumn('id', $ids);
+        $assessments = $this->assessmentMapperProxy->findAllByIds($ids);
+
+        // Permissions:
+        //    Students
+        //     - Should only see assessments in their own classes/groups
+        //     - Should only see assessments that they have not been excluded from
+        //     - Should only see assessments that have reached there open date
+        //    Staff
+        //     - Should see assessments in their own classes
+        //     - Should see assessments in units that they have permission to access
+        // The Visibility class is relied on to check the above conditions.
+        $mutator = new AssessmentListMutator($viewer, new Visibility($this->access), Alaress_Date_Format::now(), true);
+        $assessments = $assessments
+            ->map([$mutator, 'map'])
+            ->filter([$mutator, 'filter']);
 
         // And map to a full result.
         $fullResults = array_map(
             function (RawResult $match) use ($assessments, $viewer) {
                 $assessment = $assessments->getBy('id', $match->id);
 
-                if ($assessment instanceof AssessmentModel) {
+                if ($assessment instanceof IAssessable) {
                     // Note $match->type will be something like 'assessment.dueWork'.
                     $matchTypeTokens = explode('.', $match->type);
                     $assessmentType = $matchTypeTokens[1];
-
-                    if ($assessmentType === 'lti') {
-                        $folder = $assessment->getLtiAssessment()->getAssessmentModel()->getAssessmentContext()->getFolder();
-                    } else {
-                        $folder = (
-                            ($assessment->getContextUnitImplementation() !== null)
-                            ? $assessment->getContextUnitImplementation()->getFolder()
-                            : $assessment->getContextUnitSpecification()?->getFolder()
-                        );
-                    }
+                    $folder = $assessment->getBaseContext()->getFolder();
 
                     if ($folder === null) {
                         throw new \LogicException('No folder found for assessment ' . $assessment->getId());
-                    }
-
-                    if (!$this->assessmentIsViewableByUser($assessment, $assessmentType, $folder, $viewer)) {
-                        return null;
-                    }
-
-                    // If the user does not have access to the assessment's folder, do not show the search result.
-                    $assessmentAccess = $this->access->getFolderAccess($viewer, $folder->getId());
-                    if ($assessmentAccess < UserAccess::ACCESS_READ) {
-                        return null;
                     }
 
                     // Checklist
@@ -123,14 +119,7 @@ class Hydrator extends BaseHydrator
                         null,
                         AssessmentType::getIconClassSuffixForType($assessmentType),
                         strip_tags($assessment->getDescription()),
-                        match ($assessmentType) { // Get creatorId depending on type.
-                            AssessmentType::TYPE_DUE_WORK => $assessment->getDueWork()->getOwner(),
-                            AssessmentType::TYPE_QUIZ => $assessment->getQuiz()->getUser(),
-                            AssessmentType::TYPE_TASK => $assessment->getTask()->getOwner(),
-                            AssessmentType::TYPE_PROJECT => $assessment->getProject()->getOwner(),
-                            AssessmentType::TYPE_LTI_ASSESSMENT => null,
-                            AssessmentType::TYPE_LESSON_PLAN => $assessment->getLessonPlan()->getCreatedBy()
-                        },
+                        $assessment->getCreator(),
                         [$folder],
                         [],
                     );
@@ -143,69 +132,5 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
-    }
-
-    /**
-     * @param AssessmentModel $assessment
-     * @param string $assessmentType
-     * @param FolderModel $assessmentFolder
-     * @param User $user
-     * @return bool
-     */
-    private function assessmentIsViewableByUser(AssessmentModel $assessment, string $assessmentType, FolderModel $assessmentFolder, User $user): bool
-    {
-        // 1st attempt at filtering assessments to those students should see.
-        // TODO: Find out if there is a better way.
-
-        $userRole = $user->getRole();
-
-        if ($userRole->isStudent()) {
-            // Students should only see assessments that have reached their open date (AC for SA-16014).
-            if ($assessment->getOpenDate() === null || $assessment->getOpenDate()->isFuture()) {
-                return false;
-            }
-
-            $impl = $assessment->getContextUnitImplementation();
-
-            // TODO: Figure out how to tell whether a student is involved in a folder/class/group from here.
-            // May be useful:
-            //$impl->getFolder()->isGroup();
-            //$impl->getFolder()->isClass();
-            //IsInvolvedInClass()
-
-            $folderId = $assessmentFolder->getId();
-
-            // Should only see assessments in their own classes/groups (AC for SA-16014).
-            $folderIsInSubjectCollection = false;
-            foreach ($user->getSubjectCollection() as $subject) {
-                if ($folderId === $subject['id']) {
-                    $folderIsInSubjectCollection = true;
-                }
-            }
-//            $folderIsInGroupCollection = false;
-//            foreach ($user->getGroupCollection() as $group) {
-//                if ($folderId === $group['id']) {
-//                    $folderIsInGroupCollection = true;
-//                }
-//            }
-//            if (!$folderIsInSubjectCollection && !$folderIsInGroupCollection) {
-//                return false;
-//            }
-
-            // Students should only see assessments that they have not been excluded from (AC for SA-16014).
-            // TODO: Find whether user is a participant somehow depending on $assessmentType?
-            //       Then if user is not a participant, return false?
-            // $userParticipant = $assessment->getParticipantIfExtant();
-            // if ($userParticipant === null) {
-            //     // User is not participant in assessment.
-            //     return false;
-            // }
-        } elseif ($userRole->isStaff()) {
-             // Staff should see assessments in their own classes (AC for SA-16014).
-             // Staff should see assessments in units that they have permission to access (AC for SA-16014).
-             return true;
-         }
-
-        return true;
     }
 }
