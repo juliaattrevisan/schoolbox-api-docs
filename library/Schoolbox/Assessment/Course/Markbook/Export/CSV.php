@@ -84,11 +84,19 @@ class CSV extends AbstractCSV
                 $mark           = '';
                 $assessmentImpl = $classAssessments->offsetGet($assessmentSpec->getId());
                 if ($assessmentImpl && key_exists($assessmentImpl->getId(), $classAverages)) {
-                    /* There isn't a published feedback
-                     * Nothing to show; exit early
-                     */
-                    if (isset($classAverages[$assessmentImpl->getId()]['published'])) {
-                        $mark = sprintf("%6.2f %%", $classAverages[$assessmentImpl->getId()]['published']);
+                    $normMark = $classAverages[$assessmentImpl->getId()]['published'] ?? null;
+                    $isDraft  = false;
+                    if ($showDrafts) {
+                        if (isset($classAverages[$assessmentImpl->getId()]['any'])) {
+                            $normMark = $classAverages[$assessmentImpl->getId()]['any'];
+                            $isDraft  = true;
+                        }
+                    }
+                    if (isset($normMark)) {
+                        $mark = sprintf("%6.2f %%", $normMark);
+                        if ($isDraft) {
+                            $mark .= self::DRAFT_SUFFIX;
+                        }
                     }
                 }
                 $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark);
