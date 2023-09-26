@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress\Html\ToText;
+use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Forum\Post as PostModel;
@@ -70,9 +71,10 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($posts, $viewer, $keyword) {
                 $post = $posts->getBy('id', $match->id);
-                $postThread = $post->getThread();
-                $postFolder = $postThread->getCategory();
                 if ($post instanceof PostModel) {
+                    $postThread = $post->getThread();
+                    $postFolder = $postThread->getCategory();
+
                     // Check if user has access to post's folder
                     try {
                         $postAccess = $this->access->getFolderAccess($viewer, $postFolder->getId());
@@ -95,7 +97,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $post->getModified(),
                         $postFolder,
-                        $postThread->getTitle(), // Meta.  Context line for the search result.
+                        $post->getOwner()->getFullName(),
                         null,
                         'forum',
                         $this->truncateAroundKeyword($keyword, $postBody) ?? $this->truncate($postBody),
