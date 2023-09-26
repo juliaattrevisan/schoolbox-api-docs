@@ -8,7 +8,7 @@ import { useFilterDateRangeStore, EMPTY_DATE } from "./store/spFilterDateRangeSt
 const filterDateRangeStore = useFilterDateRangeStore();
 
 /**
- * Clear the stard date if the filters have been reset
+ * Clear the start date if the filters have been reset
  */
 window.Vue.watch(
     () => filterDateRangeStore.startDate,
@@ -37,7 +37,7 @@ window.Vue.watch(
  * @returns {string} - The formatted date
  */
 function getDateFormatted(date: string) {
-    return window.dayjs(date, "DD/MM/YYYY").format();
+    return window.dayjs(date, "DD/MM/YYYY hh:mm:ss").format();
 }
 
 /**
@@ -53,10 +53,16 @@ function initDatePickers() {
         }
     });
     $("#sp-start-date-input").on("change", (event) => {
-        filterDateRangeStore.startDate = getDateFormatted((event.currentTarget as HTMLInputElement).value);
+        filterDateRangeStore.startDate = getDateFormatted(
+            // Add 00:00:00 to ensure that date range is inclusive.
+            `${(event.currentTarget as HTMLInputElement).value} 00:00:00`
+        );
     });
     $("#sp-end-date-input").on("change", (event) => {
-        filterDateRangeStore.endDate = getDateFormatted((event.currentTarget as HTMLInputElement).value);
+        filterDateRangeStore.endDate = getDateFormatted(
+            // Add 23:59:59 to ensure that date range is inclusive.
+            `${(event.currentTarget as HTMLInputElement).value} 23:59:59`
+        );
     });
 }
 
