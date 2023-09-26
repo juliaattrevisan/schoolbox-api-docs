@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress\Html\ToText;
-use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Forum\Post as PostModel;
 use Schoolbox\Forum\PostMapper;
+use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
@@ -35,10 +35,12 @@ class Hydrator extends BaseHydrator
      * Constructor
      *
      * @param PostMapper $postMapper Used to fetch forum posts for hydration.
-     * @param Access     $access     Used to determine if the current user may view this page.
+     * @param ThreadMapper $threadMapper Used to check whether a thread is a component.
+     * @param Access $access Used to determine if the current user may view this page.
      */
     public function __construct(
         private PostMapper $postMapper,
+        private ThreadMapper $threadMapper,
         private Access $access,
     ) {
     }
@@ -71,43 +73,47 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($posts, $viewer, $keyword) {
                 $post = $posts->getBy('id', $match->id);
-                if ($post instanceof PostModel) {
-                    $postThread = $post->getThread();
-                    $postFolder = $postThread->getCategory();
-
-                    // Check if user has access to post's folder
-                    try {
-                        $postAccess = $this->access->getFolderAccess($viewer, $postFolder->getId());
-                    } catch (MapperException) {
-                        $postAccess = 0;
-                    }
-                    if ($postAccess < UserAccess::ACCESS_READ) {
-                        return null;
-                    }
-                    $postBody = (new ToText($post->getBody()))->getText();
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $postThread->getTitle(),
-                        $this->buildBaseUrl()
-                             ->withPath("/forum/thread/{$post->getThread()->getId()}")
-                             ->withFragment("{$post->getId()}")
-                             ->__toString(),
-                        $match->type,
-                        $match->relevance,
-                        $post->getModified(),
-                        $postFolder,
-                        $post->getOwner()->getFullName(),
-                        null,
-                        'forum',
-                        $this->truncateAroundKeyword($keyword, $postBody) ?? $this->truncate($postBody),
-                        $post->getOwner(),
-                        [$postFolder], // Context: post's folder
-                        [],
-                    );
+                if (!($post instanceof PostModel)) {
+                    return null;
                 }
 
-                return null;
+                $postThread = $post->getThread();
+                $threadFolder = $postThread->getCategory();
+
+                if (!$this->threadMapper->isComponent($threadFolder->getId())) {
+                    return null;
+                }
+
+                // Check if user has access to post's folder
+                try {
+                    $postAccess = $this->access->getFolderAccess($viewer, $threadFolder->getId());
+                } catch (MapperException) {
+                    $postAccess = 0;
+                }
+                if ($postAccess < UserAccess::ACCESS_READ) {
+                    return null;
+                }
+                $postBody = (new ToText($post->getBody()))->getText();
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $postThread->getTitle(),
+                    $this->buildBaseUrl()
+                         ->withPath("/forum/thread/{$post->getThread()->getId()}")
+                         ->withFragment("{$post->getId()}")
+                         ->__toString(),
+                    $match->type,
+                    $match->relevance,
+                    $post->getModified(),
+                    $threadFolder,
+                    $post->getOwner()->getFullName(),
+                    null,
+                    'forum',
+                    $this->truncateAroundKeyword($keyword, $postBody) ?? $this->truncate($postBody),
+                    $post->getOwner(),
+                    [$threadFolder], // Context: post's folder
+                    [],
+                );
             },
             $matches
         );

@@ -18,6 +18,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Forum\PostMapper;
+use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -152,6 +153,7 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Forum\Hydrator(
                     $mapperFactory->get(PostMapper::class),
+                    $mapperFactory->get(ThreadMapper::class),
                     Access::getInstance(),
                 ),
             ),
