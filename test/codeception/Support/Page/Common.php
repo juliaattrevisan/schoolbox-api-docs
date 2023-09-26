@@ -148,12 +148,12 @@ class Common
     }
 
     /**
-     * click a section in the search results:
+     * click a checkbox in the search results:
      * all, file, folder, textbox
      */
-    public function clickSearchResultsSection(string $tabOption): void
+    public function clickSearchTypeCheckbox(string $type): void
     {
-        $this->tester->click('a[data-section="' . $tabOption . '"]');
+        $this->tester->click('label[for="' . $type . '"]');
     }
 
     /**
