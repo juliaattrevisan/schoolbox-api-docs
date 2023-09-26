@@ -8,6 +8,7 @@ export type CourseTemplate = {
     name: string;
     courseTemplate: PageTemplate;
     unitTemplate: PageTemplate;
+    nameHasValidationError?: true;
 };
 
 export type Role = {

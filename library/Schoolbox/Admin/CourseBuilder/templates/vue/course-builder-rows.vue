@@ -43,6 +43,14 @@ async function onDeleteClicked(courseTemplate: CourseTemplate) {
     }
 }
 
+/**
+ * Clear the validation error for a course
+ * @param {CourseTemplate} courseTemplate - the course template to clear the validation error for
+ */
+function clearNameValidationError(courseTemplate: CourseTemplate) {
+    courseTemplate.nameHasValidationError = undefined;
+}
+
 const existingCourseTemplateCount = window.Vue.computed(() => {
     return store.courseTemplates.filter((courseTemplate) => courseTemplate.id >= 0).length;
 });
@@ -59,7 +67,15 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                     </div>
                     <div class="small-12 medium-5 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
-                        <input v-model="courseTemplate.name" maxlength="50" required />
+                        <input
+                            v-model="courseTemplate.name"
+                            maxlength="50"
+                            required
+                            @input="clearNameValidationError(courseTemplate)"
+                        />
+                        <label v-if="courseTemplate.nameHasValidationError" class="error"
+                            >This field is required.</label
+                        >
                     </div>
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Course Page Template:</strong>
