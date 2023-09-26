@@ -210,7 +210,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
     {
         $isNotEmpty = false;
 
-        foreach ($data[$this->prefix . $data['question_id']] as $answer) {
+        foreach (($data[$this->prefix . $data['question_id']] ?? []) as $answer) {
             if ($answer != '') {
                 $isNotEmpty = true;
             }
