@@ -100,6 +100,48 @@ class Session extends BaseSession
     }
 
     /**
+     * Is this a valid session ID?
+     *
+     * If not: this session should be thrown out, and you should be given a new
+     * session ID.
+     *
+     * @return bool
+     */
+    public function isSessionIdValid(): bool
+    {
+        /**
+         * session_id is provided by phpfunc
+         *
+         * @phpstan-ignore-next-line
+         * @noinspection PhpUndefinedMethodInspection
+         */
+        $sessionId = $this->phpfunc->session_id();
+        return !empty(trim($sessionId));
+    }
+
+    /**
+     * Is the current session's IP address valid?
+     *
+     * It will be, unless:
+     * * `config.track_ip` is on, and;
+     * * the current IP address does not match the IP address the session was
+     *   created with
+     *
+     * @return bool
+     */
+    public function isSessionIpAddressValid(): bool
+    {
+        $authSession = $this->getSegment(null);
+        if ($this->config->get('track_ip')) {
+            $sessionIpAddress = $authSession->get('ip');
+            if ($sessionIpAddress && $sessionIpAddress !== \Session::getIP()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Override to set cookie params as an array, thus allowing the `samesite`
      * option to be set.
      *

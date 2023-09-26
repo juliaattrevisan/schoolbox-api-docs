@@ -265,6 +265,20 @@ class Kernel extends WebKernelAbstract
             /** @var \Alaress\Session\Session $session */
             $session = $this->di->get('session');
 
+            // Invalid session ID or IP address mismatch:
+            // unauthenticate, thus sending back to the login page.
+            // If there's a remember, this will kick in on the login page, thus
+            // sending the user back to the dashboard.
+            if (!$session->isSessionIdValid()) {
+                $session->destroy();
+                throw new Unauthenticated();
+            }
+
+            if (!$session->isSessionIpAddressValid()) {
+                $session->destroy();
+                throw new Unauthenticated();
+            }
+
             // Do authorization here
             // TODO Inject user getter into authorizer, and use it to determine:
             // * if user is there
