@@ -84,7 +84,8 @@ class LegacyQuizBuilder
      *
      * @param IConnector $db
      */
-    public function __construct(IConnector $db) {
+    public function __construct(IConnector $db)
+    {
         $this->quizStatement = $db->prepare(self::QUERY_QUIZ);
         $this->sectionsStatement = $db->prepare(self::QUERY_SECTION);
         $this->questionStatement = $db->prepare(self::QUERY_QUESTION);
