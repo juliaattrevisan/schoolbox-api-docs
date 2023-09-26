@@ -102,6 +102,7 @@ class TextboxCest
         $i->amGoingTo("Add a new component in the homepage");
         $homepage->addComponent(Homepage::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION, 'Text Box');
         $i->amGoingTo("Enter content into the new component");
+        $i->waitForElement('i.icon-textbox');
         $layout   = Homepage::ELEMENT_COMPONENT_LAYOUT_TOP;
         $position = 1;
         $homepage->clickComponentEmptyStateLink($layout, $position);
@@ -142,7 +143,7 @@ class TextboxCest
      * @param AcceptanceTester     $i
      * @param Homepage             $homepage
      * @param Homepage\TextboxForm $textboxForm
-     * @depends createTextbox
+
      * @throws Exception
      */
     public function textboxVisibility(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
@@ -155,28 +156,40 @@ class TextboxCest
         $i->amGoingTo("As Jack Coles search for a  textbox and ensure it is presented in the search results grid");
         $i->impersonate('Jack Coles');
         $common->search('Jana Reed');
-        $common->clickSearchResultsSection('textbox');
-        $i->canSee('Jana Reed', 'ul.action-list');
-        $i->canSee('Third Text Box', 'ul.action-list');
+        $i->click('Clear all filters');
+        $common->clickSearchTypeCheckbox('textbox');
+        $i->click('Apply filters and search');
+        $i->waitForElementVisible('div.alert-box');
+        $i->canSee('Jana Reed', 'mark');
+        $i->canSee('Third Text Box');
         $common->search('Test');
-        $common->clickSearchResultsSection('textbox');
-        $i->canSee('Second Text Box', 'ul.action-list');
-        $i->canSee('Test', 'ul.action-list');
-        $i->canSee('Test Text Box Title', 'ul.action-list');
-        $i->canSee('I am textbox content', 'ul.action-list');
+        $i->click('Clear all filters');
+        $common->clickSearchTypeCheckbox('textbox');
+        $i->click('Apply filters and search');
+        $i->waitForElementVisible('div.alert-box');
+        $i->canSee('Second Text Box', '//h6/a');
+        $i->canSee('Test', 'mark');
+        $i->canSee('Test Text Box Title', '//h6/a');
+        $i->canSee('I am textbox content', '//article/p');
 
         $i->amGoingTo("As Jana Reed search for a  textbox and check whether it is presented in the search results grid or not");
         $i->impersonate('Jana Reed');
         $common->search('Jana Reed');
-        $common->clickSearchResultsSection('textbox');
-        $i->cantSee('Jana Reed', 'ul.action-list');
-        $i->cantSee('Third Text Box', 'ul.action-list');
+        $i->click('Clear all filters');
+        $common->clickSearchTypeCheckbox('textbox');
+        $i->click('Apply filters and search');
+        $i->waitForElementVisible('div.alert-box');
+        $i->cantSee('Jana Reed', 'mark');
+        $i->cantSee('Third Text Box', '//h6/a');
         $common->search('Test');
-        $common->clickSearchResultsSection('textbox');
-        $i->cantSee('Second Text Box', 'ul.action-list');
-        $i->cantSee('Testx', 'ul.action-list');
-        $i->canSee('Test Text Box Title', 'ul.action-list');
-        $i->canSee('I am textbox content', 'ul.action-list');
+        $i->click('Clear all filters');
+        $common->clickSearchTypeCheckbox('textbox');
+        $i->click('Apply filters and search');
+        $i->waitForElementVisible('div.alert-box');
+        $i->cantSee('Second Text Box', '//h6/a');
+        $i->cantSee('Test', 'mark');
+        $i->canSee('Test Text Box Title', '//h6/a');
+        $i->canSee('I am textbox content', '//article/p');
 
         $i->amGoingTo("As Jack Coles navigate to the Test TextBox Homepage");
         $i->impersonate('Jack Coles');
@@ -198,10 +211,13 @@ class TextboxCest
         $i->amGoingTo("As Jana Reed search for textboxes and check whether its is presented or not");
         $i->impersonate('Jana Reed');
         $common->search('Jamal');
-        $common->clickSearchResultsSection('textbox');
-        $i->canSee('Jamal to be presented', 'ul.action-list');
+        $i->click('Clear all filters');
+        $common->clickSearchTypeCheckbox('textbox');
+        $i->click('Apply filters and search');
+        $i->canSee('Jamal to be presented', '//article/p');
         $common->search('Jana');
-        $i->cantSee('Text Boxes');
+        $i->click('Apply filters and search');
+        $i->canSee('No results for');
         $i->amGoingTo("Navigate to the Test TextBox Homepage to check whether the textbox is presented or not");
         $i->amOnPage('/homepage/' . $homepageId);
         $i->canSee('Jamal to be presented');
