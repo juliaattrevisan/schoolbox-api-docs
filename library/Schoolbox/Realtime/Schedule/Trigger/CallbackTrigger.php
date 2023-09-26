@@ -13,9 +13,8 @@ use Alaress\Scheduler\Event\EventInterface;
 use Alaress\Scheduler\Trigger\AbstractTrigger;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 
-class CallbackTrigger extends AbstractTrigger
+class CallbackTrigger extends AbstractTrigger implements InstantTriggerInterface
 {
-
     /** @var callable */
     protected $callback;
 
@@ -57,5 +56,13 @@ class CallbackTrigger extends AbstractTrigger
     public function getCallbacks()
     {
         return $this->notifier->retrieveCallbacks($this->label);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getModuleNotifier()
+    {
+        return $this->notifier;
     }
 }
