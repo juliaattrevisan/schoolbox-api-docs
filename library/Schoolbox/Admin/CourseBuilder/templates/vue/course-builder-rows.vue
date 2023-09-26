@@ -59,7 +59,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                     </div>
                     <div class="small-12 medium-5 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
-                        <input v-model="courseTemplate.name" required />
+                        <input v-model="courseTemplate.name" maxlength="50" required />
                     </div>
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Course Page Template:</strong>
