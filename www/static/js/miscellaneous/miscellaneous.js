@@ -140,15 +140,11 @@ $(function () {
     function updateTopNavItems() {
         var topMenuItemWidth = $("#top-menu > li").width();
 
-        // All the possible things to remove from the #top-menu width
-        var profileWidth = $("#profile-drop").is(":visible") ? document.getElementById("profile-drop").offsetWidth : 0;
-        var searchWidth = $("#search").is(":visible") ? document.getElementById("search").offsetWidth : 0;
-        var notificationsWidth =
-            $("#notifications").is(":visible") && $("#message-list").not(":visible")
-                ? document.getElementById("notifications").offsetWidth
-                : 0;
-        // ^ have to check that the notfications bar isn't docked as well, if it is- it's not part of the #top-menu width
-        var extraWidth = profileWidth + searchWidth + notificationsWidth;
+        // Determine how much space is required for the icons on the right of the top nav
+        // The search bar is always visible and furthest to the left, so we can use it to determine the width
+        // Other icons such as the profile menu and notifications can be revealed and hidden based on other conditions, so we can't use them
+        const searchStyle = window.getComputedStyle(document.getElementById("search"));
+        const extraWidth = parseInt(searchStyle.right) + parseInt(searchStyle.width);
 
         // A separator used to break up the menu items from the profile menu that appears above it in mobile.
         const sideNavSeparator = document.querySelector("li[data-sidenav-separator]");
