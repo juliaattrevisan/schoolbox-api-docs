@@ -68,7 +68,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return $this->buildLinearDecayExpression(
             ':postNow',
-            'fp.modified',
+            $this->getSubqueryForMostRelevantPostInThread('modified'),
             7,
             56,
         );
