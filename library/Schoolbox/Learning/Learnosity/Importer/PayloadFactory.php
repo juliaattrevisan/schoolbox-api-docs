@@ -87,10 +87,7 @@ class PayloadFactory
      */
     public function produceTitle(string $title): string
     {
-        /* TODO sometimes htmlentities are here, might have to translate them
-         *  from &#039; and &amp; into their actual literal symbols
-         */
-        return trim(mb_substr(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH));
+        return trim(html_entity_decode(mb_substr(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
     }
 
 
