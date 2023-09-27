@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
@@ -1043,6 +1044,77 @@ class Controller extends Base\Base
                     $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId);
                 }
                 $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
+            }
+        }
+
+        // After all assessments are imported: link/unlink lesson plans.
+        // This must be done after creating all impl assessments: only then is
+        // it known which linked assessments actually exist.
+        foreach ($courseImpls as $courseImpl) {
+            $this->linkLessonPlanAssessments($courseImpl);
+        }
+    }
+
+    /**
+     * Link lesson plans within the given course implementation.
+     *
+     * Any links which exist on the spec lesson plan will be preserved in the
+     * implementation:
+     * * the implementation lesson plan will contain links to the implementation
+     *   of the linked spec assessment, but only if it exists
+     * * if no implementation of the linked spec assessment exists, the link
+     *   will not be created (as there's nothing to link to)
+     * * any existing links in any implementation lesson plans will be deleted
+     *
+     * This assumes that only lesson plan links between assessments within the
+     * same course implementation can be created.
+     *
+     * @param CourseImplementation\Model $courseImpl
+     * @return void
+     * @throws Deleted|MapperException if somehow the save of a link fails?
+     */
+    private function linkLessonPlanAssessments(CourseImplementation\Model $courseImpl): void
+    {
+        // Find all spec assessments, and impl assessments with a spec
+        $implAssessments = $this->assessmentMapperProxy->createCollection();
+        $specAssessments = $this->assessmentMapperProxy->createCollection();
+        foreach ($courseImpl->getUnits() as $unitImpl) {
+            foreach ($unitImpl->getAssessables() as $implAssessment) {
+                $specAssessment = $implAssessment->getSpecificationAssessment();
+                if ($specAssessment) {
+                    $specAssessments[$specAssessment->getId()] = $specAssessment;
+                    $implAssessments[$specAssessment->getId()] = $implAssessment;
+                }
+            }
+        }
+
+        // Now: link implementation assessments
+        $linkedAssessmentMapper = Assessment\LessonPlan\LinkedAssessments\Mapper::getInstance();
+        foreach ($implAssessments as $implAssessment) {
+            if (
+                $implAssessment->getSpecificationAssessment()
+                && $implAssessment instanceof LessonPlan\Model
+            ) {
+                // First: delete any existing links
+                foreach ($implAssessment->getLinkedAssessments() as $linkedAssessment) {
+                    $linkedAssessmentMapper->deleteLink($implAssessment, $linkedAssessment);
+                }
+                $implAssessment->setLinkedAssessments($this->assessmentMapperProxy->createCollection());
+
+                // Then: find the impls for the linked spec assessments,
+                // and create the links
+                $specAssessment = $specAssessments[$implAssessment->getSpecificationAssessment()->getId()] ?? null;
+                if ($specAssessment instanceof LessonPlan\Model) {
+                    foreach ($specAssessment->getLinkedAssessments() as $linkedSpecAssessment) {
+                        $linkedImplAssessment = $implAssessments[$linkedSpecAssessment->getId()] ?? null;
+                        if ($linkedImplAssessment) {
+                            $implAssessment->getLinkedAssessments()[$linkedImplAssessment->getId()] = $linkedImplAssessment;
+                        }
+                    }
+                    foreach ($implAssessment->getLinkedAssessments() as $linkedAssessment) {
+                        $linkedAssessmentMapper->saveLink($implAssessment, $linkedAssessment);
+                    }
+                }
             }
         }
     }
