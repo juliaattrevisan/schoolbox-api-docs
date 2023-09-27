@@ -22,33 +22,17 @@ use Schoolbox\User;
 class Replicator
 {
     /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentMapperProxy;
-
-    /**
-     * @var QuizMapper
-     */
-    private $quizMapper;
-
-    /**
-     * @var RubricDataSource
-     */
-    private $rubricMapper;
-
-    /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param QuizMapper            $quizMapper
-     * @param RubricDataSource      $rubricMapper
+     * @param AssessmentMapperProxy            $assessmentMapperProxy
+     * @param QuizMapper                       $quizMapper
+     * @param RubricDataSource                 $rubricMapper
+     * @param LessonPlan\Activities\Replicator $lessonPlanReplicator
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        QuizMapper $quizMapper,
-        RubricDataSource $rubricMapper
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private QuizMapper $quizMapper,
+        private RubricDataSource $rubricMapper,
+        private LessonPlan\Activities\Replicator $lessonPlanReplicator
     ) {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->quizMapper = $quizMapper;
-        $this->rubricMapper = $rubricMapper;
     }
 
 
@@ -104,7 +88,8 @@ class Replicator
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $newAssessment);
 
-        // TODO copy lesson plan linked activities, before or after syncing project?
+        // Copy lesson plan activities
+        $this->replicateLessonPlanActivities($source, $newAssessment);
 
         return $newAssessment;
     }
@@ -147,5 +132,20 @@ class Replicator
             return;
         }
         $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
+    }
+
+    /**
+     * Copy lesson plan linked activities from `$source` into `$destination`.
+     *
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @return void
+     */
+    private function replicateLessonPlanActivities(IAssessable $source, IAssessable $destination): void
+    {
+        if (!($source instanceof LessonPlan\Model && $destination instanceof LessonPlan\Model)) {
+            return;
+        }
+        $this->lessonPlanReplicator->replicate($source, $destination);
     }
 }

@@ -12,6 +12,8 @@ use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Course\Import\ImportFactory;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LessonPlanLinkedAssessmentsMapper;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -120,7 +122,8 @@ HELP;
                 new Replicator(
                     $this->getDi()->get('assessmentDataSource'),
                     QuizMapper::getInstance(),
-                    RubricDataSource::getInstance()
+                    RubricDataSource::getInstance(),
+                    new LessonPlanActivitiesReplicator(LessonPlanLinkedAssessmentsMapper::getInstance()),
                 ),
                 CourseImplementationMapper::getInstance(),
                 UnitImplementationMapper::getInstance(),

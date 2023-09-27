@@ -30,7 +30,9 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LessonPlanLinkedAssessmentsMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
@@ -532,6 +534,9 @@ class Module extends BaseModule
             $assessmentDataSource,
             $this->getMapperFactory()->get(QuizMapper::class),
             $this->getMapperFactory()->get(RubricDataSource::class),
+            new LessonPlanActivitiesReplicator(
+                $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
+            ),
         );
 
         switch ($className) {

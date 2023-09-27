@@ -86,10 +86,14 @@ class Module extends \Alaress\Module\Module
      */
     public function buildController(): Base
     {
+        $lessonPlanActivitiesReplicator = new LessonPlanActivitiesReplicator(
+            $this->getMapperFactory()->get(LinkedAssessmentsMapper::class)
+        );
         $replicator = new Replicator(
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(QuizMapper::class),
             $this->getMapperFactory()->get(RubricDataSource::class),
+            $lessonPlanActivitiesReplicator,
         );
         $importFactory = new ImportFactory(
             $this->injector->get('assessmentDataSource'),
@@ -112,9 +116,7 @@ class Module extends \Alaress\Module\Module
             $importFactory,
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
-            new LessonPlanActivitiesReplicator(
-                $this->getMapperFactory()->get(LinkedAssessmentsMapper::class)
-            ),
+            $lessonPlanActivitiesReplicator,
         );
     }
 
