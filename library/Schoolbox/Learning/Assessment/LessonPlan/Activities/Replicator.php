@@ -14,14 +14,30 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * Replicates lesson plan assessments into another lesson plan.
+ */
 class Replicator
 {
+    /**
+     * Constructor
+     *
+     * @param LinkedAssessmentsMapper $linkedAssessmentsMapper Required for saving linked assessments.
+     */
     public function __construct(private LinkedAssessmentsMapper $linkedAssessmentsMapper)
     {
     }
 
-
+    /**
+     * Replicate linked assessments in `$source` into `$destination`.
+     *
+     * @param Model $source
+     * @param Model $destination
+     * @return void
+     * @throws MapperException if somehow the save of a link failed?
+     */
     public function replicate(Model $source, Model $destination): void
     {
         // Find the linked assessments, and group them by source assessment ID
@@ -50,31 +66,29 @@ class Replicator
                 $this->linkedAssessmentsMapper->deleteLink($destination, $allDestinationAssessments[$sourceAssessmentId]);
             }
         }
-
-//        foreach ($destinationLinkedAssessments as $destinationLinkedAssessmentId => $destinationLinkedAssessment) {
-//            if (isset($allSourceAssessments[$destinationLinkedAssessmentId])) {
-//                if (!isset($destinationLinkedAssessments[]))
-//            }
-//        }
     }
 
     /**
-     * @param Model $assessment
+     * Extract linked assessments from `$lessonPlan`, and key them by:
+     * * their ID, if `$lessonPlan` is a spec
+     * * their spec assessment's ID, if `$lessonPlan` is an implementation
+     *
+     * @param Model $lessonPlan
      * @return array<int, IAssessable>
      */
-    private function extractLinkedAssessments(Model $assessment): array
+    private function extractLinkedAssessments(Model $lessonPlan): array
     {
         $linkedAssessments = [];
-        if ($assessment->isSpecification()) {
-            foreach ($assessment->getLinkedAssessments() as $linkedAssessment) {
+        if ($lessonPlan->isSpecification()) {
+            foreach ($lessonPlan->getLinkedAssessments() as $linkedAssessment) {
                 /** @var IAssessable $linkedAssessment */
                 if ($linkedAssessment->isSpecification()) {
                     $linkedAssessments[$linkedAssessment->getId()] = $linkedAssessment;
                 }
             }
-        } elseif ($assessment->isImplementation()) {
+        } elseif ($lessonPlan->isImplementation()) {
             // Must be an implementation
-            foreach ($assessment->getLinkedAssessments() as $linkedAssessment) {
+            foreach ($lessonPlan->getLinkedAssessments() as $linkedAssessment) {
                 /** @var IAssessable $linkedAssessment */
                 if ($linkedAssessment->isImplementation() && $linkedAssessment->getSpecificationAssessment()) {
                     $linkedAssessments[$linkedAssessment->getSpecificationAssessment()->getId()] = $linkedAssessment;
@@ -85,13 +99,18 @@ class Replicator
     }
 
     /**
-     * @param Model $assessment
+     * Extract all assessment within the same course as `$lessonPlan`, and key
+     * them by:
+     * * their ID, if `$lessonPlan` is a spec
+     * * their spec assessment's ID, if `$lessonPlan` is an implementation
+     *
+     * @param Model $lessonPlan
      * @return array<int, IAssessable>
      */
-    private function extractContextAssessments(Model $assessment): array
+    private function extractContextAssessments(Model $lessonPlan): array
     {
         $contextAssessments = [];
-        $context            = $assessment->getContext();
+        $context            = $lessonPlan->getContext();
         if ($context instanceof Specification\Unit\Model) {
             // Unit spec: key assessments by assessment ID
             foreach ($context->getCourse()->getUnits() as $unit) {
