@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Converts a Schoolbox "Multiple Choice (Multiple Answer)" question into its Learnosity equivalent
  * https://reference.learnosity.com/questions-api/questiontypes#mcq
  */
-class Multi implements IStrategy
+class Multi extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -68,7 +68,7 @@ class Multi implements IStrategy
             'multiple_responses' => true,
             'options' => $options,
             'shuffle_options' => $shuffleOptions,
-            'stimulus' => trim($question['question']),
+            'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'ui_style' => [
                 /* An undocumented setting as per https://help.learnosity.com/hc/en-us/requests/23242

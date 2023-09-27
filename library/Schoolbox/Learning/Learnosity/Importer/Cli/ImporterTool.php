@@ -217,8 +217,12 @@ HELP;
         /* Initialise dependencies
          * Note: we on't have access to $_SERVER superglobal here
          */
+        $server = (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified();
+        $serverName = $server->getHost();
+        $domain = (string)$server;
+
         $api = new Api(
-            (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified()->getHost(),
+            $serverName,
             $this->getConfig()->get('learnosity_consumer_key'),
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger()
@@ -238,7 +242,7 @@ HELP;
 
         /* Generates payload array structs
          */
-        $payloadFactory = new PayloadFactory(new Strategy\Factory());
+        $payloadFactory = new PayloadFactory(new Strategy\Factory($domain));
 
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity

@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Converts a Schoolbox "Short Answer" question into its Learnosity equivalent
  * https://reference.learnosity.com/questions-api/questiontypes#shorttext
  */
-class Short implements IStrategy
+class Short extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -50,7 +50,7 @@ class Short implements IStrategy
             'metadata' => [
                 'sample_answer' => $answer
             ],
-            'stimulus' => trim($question['question']),
+            'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
                 'automarkable' => false,

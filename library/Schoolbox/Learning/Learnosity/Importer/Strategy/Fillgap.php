@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Converts a Schoolbox "Fillgap (Cloze Exercise)" question into its Learnosity equivalent
  * https://reference.learnosity.com/questions-api/questiontypes#clozetext
  */
-class Fillgap implements IStrategy
+class Fillgap extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -60,7 +60,7 @@ class Fillgap implements IStrategy
             'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
-            'stimulus' => trim($question['question']),
+            'stimulus' => $this->produceQuestionText($question['question']),
             'template' => $answer,
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [

@@ -16,7 +16,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Circumstantially almost identical to Short, main difference being the strictness
  * of its marking
  */
-class Exact implements IStrategy
+class Exact extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -47,7 +47,7 @@ class Exact implements IStrategy
             'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
-            'stimulus' => trim($question['question']),
+            'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
                 'automarkable' => true,

@@ -19,7 +19,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Learnosity, you'd use one of the Math Formula question types, not a
  * weird variant of Short Answer.
  */
-class Numeric implements IStrategy
+class Numeric extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -50,7 +50,7 @@ class Numeric implements IStrategy
             'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
-            'stimulus' => trim($question['question']),
+            'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
                 'automarkable' => true,
