@@ -100,7 +100,8 @@ class Overwriter
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $updatedDestination);
 
-        // TODO copy lesson plan linked activities, before or after syncing project?
+        // Copy lesson plan activities
+        $this->replicateLessonPlanActivities($source, $updatedDestination);
 
         return $updatedDestination;
     }
