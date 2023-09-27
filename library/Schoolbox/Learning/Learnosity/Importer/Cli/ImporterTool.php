@@ -189,11 +189,13 @@ that is:
  * not already in learnosity (ie. assess.learnosity_reference is null) 
 
 Use --blueprint option in either mode to show the array struct we intended to send to Learnosity
-dumped to the cli. This is useful for manual inspection before committing to a --perform  
+dumped to the cli. This is useful for manual inspection before committing to a --perform
 
-Usage: import.php [--assessment <assessmentId>] [--perform]
-Example: import.php --assessment 123456 --perform
-Example: import.php --assessment 123456 --blueprint
+As usual, verbose mode tells you all the debugging-level info about what the algorithm does.  
+
+Usage: import.php [--assessment <assessmentId>] [--perform] [-vvv]
+Example: import.php --assessment=123456 --perform
+Example: import.php --assessment=123456 --blueprint -vvv
 
 HELP;
             return;
@@ -215,7 +217,7 @@ HELP;
         $schoolCode = $this->getConfig()->get('site_school_code');
 
         /* Initialise dependencies
-         * Note: we on't have access to $_SERVER superglobal here
+         * Note: we don't have access to $_SERVER superglobal here
          */
         $server = (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified();
         $serverName = $server->getHost();
