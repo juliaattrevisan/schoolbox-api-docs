@@ -14,7 +14,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\User;
 
@@ -24,14 +23,16 @@ use Schoolbox\User;
 class Overwriter
 {
     /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param QuizMapper            $quizMapper
-     * @param RubricDataSource      $rubricMapper
+     * @param AssessmentMapperProxy            $assessmentMapperProxy
+     * @param QuizMapper                       $quizMapper
+     * @param RubricDataSource                 $rubricMapper
+     * @param LessonPlan\Activities\Replicator $lessonPlanActivitiesReplicator
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private QuizMapper $quizMapper,
-        private RubricDataSource $rubricMapper
+        private RubricDataSource $rubricMapper,
+        private LessonPlan\Activities\Replicator $lessonPlanActivitiesReplicator,
     ) {
     }
 
@@ -192,5 +193,20 @@ class Overwriter
             return;
         }
         $this->rubricMapper->deleteRubric($assessment->getId());
+    }
+
+    /**
+     * Copy lesson plan linked activities from `$source` into `$destination`.
+     *
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @return void
+     */
+    private function replicateLessonPlanActivities(IAssessable $source, IAssessable $destination): void
+    {
+        if (!($source instanceof LessonPlan\Model && $destination instanceof LessonPlan\Model)) {
+            return;
+        }
+        $this->lessonPlanActivitiesReplicator->replicate($source, $destination);
     }
 }

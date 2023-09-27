@@ -96,20 +96,22 @@ class Module extends \Alaress\Module\Module
      */
     public function buildController(): Base
     {
+        $lessonPlanActivitiesReplicator = new LessonPlanActivitiesReplicator(
+            $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
+        );
         return new Controller(
             $this->getAssessmentDataSource(),
             new Replicator(
                 $this->getAssessmentDataSource(),
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(RubricDataSource::class),
-                new LessonPlanActivitiesReplicator(
-                    $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
-                ),
+                $lessonPlanActivitiesReplicator,
             ),
             new Overwriter(
                 $this->getAssessmentDataSource(),
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(RubricDataSource::class),
+                $lessonPlanActivitiesReplicator,
             ),
         );
     }
