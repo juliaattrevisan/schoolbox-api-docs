@@ -97,6 +97,8 @@ class Model extends AbstractAssessment
 
     /**
      * Assessments that are linked to this lesson plan
+     *
+     * @var GenericCollection<IAssessable>|null
      */
     private ?GenericCollection $linkedAssessments = null;
 
@@ -535,7 +537,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @param GenericCollection|null $linkedAssessments
+     * @param GenericCollection<IAssessable>|null $linkedAssessments
      */
     public function setLinkedAssessments(?GenericCollection $linkedAssessments): self
     {
@@ -544,7 +546,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return GenericCollection|null
+     * @return GenericCollection<IAssessable>|null
      */
     public function getLinkedAssessments(): ?GenericCollection
     {
