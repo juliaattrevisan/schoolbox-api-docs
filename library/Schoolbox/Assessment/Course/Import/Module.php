@@ -19,6 +19,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course;
@@ -86,17 +87,20 @@ class Module extends \Alaress\Module\Module
      */
     public function buildController(): Base
     {
+        /** @var AssessmentDataSource $assessmentDataSource */
+        $assessmentDataSource           = $this->injector->get('assessmentDataSource');
         $lessonPlanActivitiesReplicator = new LessonPlanActivitiesReplicator(
-            $this->getMapperFactory()->get(LinkedAssessmentsMapper::class)
+            $this->getMapperFactory()->get(LinkedAssessmentsMapper::class),
+            $assessmentDataSource,
         );
         $replicator = new Replicator(
-            $this->injector->get('assessmentDataSource'),
+            $assessmentDataSource,
             $this->getMapperFactory()->get(QuizMapper::class),
             $this->getMapperFactory()->get(RubricDataSource::class),
             $lessonPlanActivitiesReplicator,
         );
         $importFactory = new ImportFactory(
-            $this->injector->get('assessmentDataSource'),
+            $assessmentDataSource,
             $replicator,
             $this->getMapperFactory()->get(CourseImplementationMapper::class),
             $this->getMapperFactory()->get(UnitImplementationMapper::class),
@@ -114,7 +118,7 @@ class Module extends \Alaress\Module\Module
             // not a mapper, but has getInstance, so does work
             $this->getMapperFactory()->get(Access::class),
             $importFactory,
-            $this->injector->get('assessmentDataSource'),
+            $assessmentDataSource,
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $lessonPlanActivitiesReplicator,
         );

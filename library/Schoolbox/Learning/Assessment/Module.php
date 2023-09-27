@@ -536,6 +536,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RubricDataSource::class),
             new LessonPlanActivitiesReplicator(
                 $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
+                $assessmentDataSource,
             ),
         );
 

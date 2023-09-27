@@ -1556,7 +1556,8 @@ abstract class Kernel
                                 [
                                     'linkedAssessmentsMapper' => $mapperFactory->getLazy(
                                         \Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class,
-                                    )
+                                    ),
+                                    'assessmentDataSource'    => $di->lazyGet('assessmentDataSource'),
                                 ]
                             ),
                         ]

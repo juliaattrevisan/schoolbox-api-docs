@@ -13,6 +13,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Course\Import\ImportFactory;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LessonPlanLinkedAssessmentsMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -112,18 +113,23 @@ HELP;
 
         $defaultDueTime = $this->getConfig()->get('lms_duetime_default');
 
-        $result        = (new \Schoolbox\Assessment\Course\Import\CsvImporter(
+        /** @var AssessmentDataSource $assessmentDataSource */
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+        $result               = (new \Schoolbox\Assessment\Course\Import\CsvImporter(
             FolderMapper::getInstance(),
             UserMapper::getInstance(),
             CourseImplementationMapper::getInstance(),
             UnitSpecificationMapper::getInstance(),
             new ImportFactory(
-                $this->getDi()->get('assessmentDataSource'),
+                $assessmentDataSource,
                 new Replicator(
-                    $this->getDi()->get('assessmentDataSource'),
+                    $assessmentDataSource,
                     QuizMapper::getInstance(),
                     RubricDataSource::getInstance(),
-                    new LessonPlanActivitiesReplicator(LessonPlanLinkedAssessmentsMapper::getInstance()),
+                    new LessonPlanActivitiesReplicator(
+                        LessonPlanLinkedAssessmentsMapper::getInstance(),
+                        $assessmentDataSource,
+                    ),
                 ),
                 CourseImplementationMapper::getInstance(),
                 UnitImplementationMapper::getInstance(),
@@ -131,7 +137,7 @@ HELP;
                 Component_ConfigDefinitionMapper::getInstance(),
                 Component_ConfigMapper::getInstance(),
             ),
-            $this->getDi()->get('assessmentDataSource')
+            $assessmentDataSource,
         ))->import(fopen($file, 'r'), $defaultDueTime, $this->perform());
 
         $this->getLogger()->info(count($result) . ' combinations of unit & class ' . ($this->perform() ? 'are' : 'will be') . ' imported');
