@@ -19,6 +19,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -111,7 +112,9 @@ class Module extends \Alaress\Module\Module
             $importFactory,
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
-            $this->getMapperFactory()->get(LinkedAssessmentsMapper::class),
+            new LessonPlanActivitiesReplicator(
+                $this->getMapperFactory()->get(LinkedAssessmentsMapper::class)
+            ),
         );
     }
 

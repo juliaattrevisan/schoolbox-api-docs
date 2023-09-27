@@ -81,7 +81,7 @@ class Controller extends Base\Base
         ImportFactory $importFactory,
         Assessment\MapperProxy $assessmentMapperProxy,
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
-        private Assessment\LessonPlan\LinkedAssessments\Mapper $linkedAssessmentsMapper,
+        private LessonPlan\Activities\Replicator $lessonPlanActivitiesReplicator,
     ) {
         $this->unitSpecificationMapper         = $unitSpecificationMapper;
         $this->unitImplementationMapper        = $unitImplementationMapper;
@@ -1051,8 +1051,6 @@ class Controller extends Base\Base
         // After all assessments are imported: link/unlink lesson plans.
         // This must be done after creating all impl assessments: only then is
         // it known which linked assessments actually exist.
-        $lessonPlanAssessmentReplicator = new LessonPlan\Activities\Replicator($this->linkedAssessmentsMapper);
-
         // For some reason, the unit impl contains two copies of the same
         // assessment: ensure it is not copied twice.
         $replicatedAssessmentIds = [];
@@ -1067,7 +1065,7 @@ class Controller extends Base\Base
                     $replicatedAssessmentIds[$implAssessment->getId()] = true;
                     $specAssessment = $implAssessment->getSpecificationAssessment();
                     if ($specAssessment instanceof LessonPlan\Model) {
-                        $lessonPlanAssessmentReplicator->replicate($specAssessment, $implAssessment);
+                        $this->lessonPlanActivitiesReplicator->replicate($specAssessment, $implAssessment);
                     }
                 }
             }
