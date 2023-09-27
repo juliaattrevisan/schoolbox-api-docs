@@ -98,6 +98,7 @@ class Module extends \Alaress\Module\Module
     {
         $lessonPlanActivitiesReplicator = new LessonPlanActivitiesReplicator(
             $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
+            $this->getAssessmentDataSource(),
         );
         return new Controller(
             $this->getAssessmentDataSource(),

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Project;
@@ -26,9 +27,13 @@ class Replicator
      * Constructor
      *
      * @param LinkedAssessmentsMapper $linkedAssessmentsMapper Required for saving linked assessments.
+     * @param AssessmentDataSource    $assessmentDataSource    Required for fetching all assessments in the course the
+     *                                                         replicated lesson plan is in.
      */
-    public function __construct(private LinkedAssessmentsMapper $linkedAssessmentsMapper)
-    {
+    public function __construct(
+        private LinkedAssessmentsMapper $linkedAssessmentsMapper,
+        private AssessmentDataSource $assessmentDataSource,
+    ) {
     }
 
     /**
@@ -130,34 +135,60 @@ class Replicator
         $context            = $lessonPlan->getContext();
         if ($context instanceof Specification\Unit\Model) {
             // Unit spec: key assessments by assessment ID
-            foreach ($context->getCourse()->getUnits() as $unit) {
-                foreach ($unit->getAssessables() as $unitAssessment) {
-                    $contextAssessments[$unitAssessment->getId()] = $unitAssessment;
-                    if ($unitAssessment instanceof Project) {
-                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
-                            $contextAssessments[$projectAssessment->getId()] = $projectAssessment;
-                        }
+            // Load the entire course and all of its assessments
+            $unitAssessments = $this->assessmentDataSource->findAllByCourseSpecificationId($context->getCourse()->getId());
+            foreach ($unitAssessments as $unitAssessment) {
+                $contextAssessments[$unitAssessment->getId()] = $unitAssessment;
+                if ($unitAssessment instanceof Project) {
+                    foreach ($unitAssessment->getAssessables() as $projectAssessment) {
+                        $contextAssessments[$projectAssessment->getId()] = $projectAssessment;
                     }
                 }
             }
+
+//            foreach ($context->getCourse()->getUnits() as $unit) {
+//                foreach ($unit->getAssessables() as $unitAssessment) {
+//                    $contextAssessments[$unitAssessment->getId()] = $unitAssessment;
+//                    if ($unitAssessment instanceof Project) {
+//                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
+//                            $contextAssessments[$projectAssessment->getId()] = $projectAssessment;
+//                        }
+//                    }
+//                }
+//            }
         } elseif ($context instanceof Implementation\Unit\Model) {
             // Unit impl: key assessments by spec assessment ID
             // (don't care about impl assessments not in a spec)
-            foreach ($context->getCourse()->getUnits() as $unit) {
-                foreach ($unit->getAssessables() as $unitAssessment) {
-                    if ($unitAssessment->getSpecificationAssessment()) {
-                        $contextAssessments[$unitAssessment->getSpecificationAssessment()->getId()] = $unitAssessment;
-                    }
-                    if ($unitAssessment instanceof Project) {
-                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
-                            if ($projectAssessment->getSpecificationAssessment()) {
-                                $contextAssessments[$projectAssessment->getSpecificationAssessment()->getId()]
-                                    = $projectAssessment;
-                            }
+            $unitAssessments = $this->assessmentDataSource->findAllByCourseImplementationId($context->getCourse()->getId());
+            foreach ($unitAssessments as $unitAssessment) {
+                if ($unitAssessment->getSpecificationAssessment()) {
+                    $contextAssessments[$unitAssessment->getSpecificationAssessment()->getId()] = $unitAssessment;
+                }
+                if ($unitAssessment instanceof Project) {
+                    foreach ($unitAssessment->getAssessables() as $projectAssessment) {
+                        if ($projectAssessment->getSpecificationAssessment()) {
+                            $contextAssessments[$projectAssessment->getSpecificationAssessment()->getId()]
+                                = $projectAssessment;
                         }
                     }
                 }
             }
+
+//            foreach ($context->getCourse()->getUnits() as $unit) {
+//                foreach ($unit->getAssessables() as $unitAssessment) {
+//                    if ($unitAssessment->getSpecificationAssessment()) {
+//                        $contextAssessments[$unitAssessment->getSpecificationAssessment()->getId()] = $unitAssessment;
+//                    }
+//                    if ($unitAssessment instanceof Project) {
+//                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
+//                            if ($projectAssessment->getSpecificationAssessment()) {
+//                                $contextAssessments[$projectAssessment->getSpecificationAssessment()->getId()]
+//                                    = $projectAssessment;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         }
         return $contextAssessments;
     }
