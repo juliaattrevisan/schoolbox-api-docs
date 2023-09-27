@@ -80,7 +80,8 @@ class Controller extends Base\Base
         Access $access,
         ImportFactory $importFactory,
         Assessment\MapperProxy $assessmentMapperProxy,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        private Assessment\LessonPlan\LinkedAssessments\Mapper $linkedAssessmentsMapper,
     ) {
         $this->unitSpecificationMapper         = $unitSpecificationMapper;
         $this->unitImplementationMapper        = $unitImplementationMapper;
@@ -1089,7 +1090,6 @@ class Controller extends Base\Base
         }
 
         // Now: link implementation assessments
-        $linkedAssessmentMapper = Assessment\LessonPlan\LinkedAssessments\Mapper::getInstance();
         foreach ($implAssessments as $implAssessment) {
             if (
                 $implAssessment->getSpecificationAssessment()
@@ -1097,7 +1097,7 @@ class Controller extends Base\Base
             ) {
                 // First: delete any existing links
                 foreach ($implAssessment->getLinkedAssessments() as $linkedAssessment) {
-                    $linkedAssessmentMapper->deleteLink($implAssessment, $linkedAssessment);
+                    $this->linkedAssessmentsMapper->deleteLink($implAssessment, $linkedAssessment);
                 }
                 $implAssessment->setLinkedAssessments($this->assessmentMapperProxy->createCollection());
 
@@ -1112,7 +1112,7 @@ class Controller extends Base\Base
                         }
                     }
                     foreach ($implAssessment->getLinkedAssessments() as $linkedAssessment) {
-                        $linkedAssessmentMapper->saveLink($implAssessment, $linkedAssessment);
+                        $this->linkedAssessmentsMapper->saveLink($implAssessment, $linkedAssessment);
                     }
                 }
             }
