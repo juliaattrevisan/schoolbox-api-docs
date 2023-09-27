@@ -775,6 +775,41 @@ class MapperProxy
 
 
     /**
+     * Finds all assessables for a course specification.
+     *
+     * This method does not load participants, because assessments in a course
+     * spec do not have participants.
+     *
+     * @param int   $courseSpecId
+     * @param array $options
+     * @return GenericCollection<IAssessable>
+     */
+    public function findAllByCourseSpecificationId(int $courseSpecId, array $options = []): GenericCollection
+    {
+        $builder = $this->convertOptionsToPredicateBuilder($options, false)
+                        ->equals('usc.id', $courseSpecId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+    }
+
+
+    /**
+     * Finds all assessables for a course implementation.
+     *
+     * This method does not load participants or the rubric grid.
+     *
+     * @param int   $courseImplId
+     * @param array $options
+     * @return GenericCollection<IAssessable>
+     */
+    public function findAllByCourseImplementationId(int $courseImplId, array $options = []): GenericCollection
+    {
+        $builder = $this->convertOptionsToPredicateBuilder($options, false)
+                        ->equals('uic.id', $courseImplId);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+    }
+
+
+    /**
      * Finds all assessables for a unit implementation.
      *
      * This method loads participants, responses and feedback.
