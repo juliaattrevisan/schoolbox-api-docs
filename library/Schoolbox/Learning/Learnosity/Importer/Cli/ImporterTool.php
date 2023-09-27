@@ -90,6 +90,7 @@ class ImporterTool extends CliTool\App
         WHERE deleted_at IS NULL
         AND availability = 'assess'
         AND learnosity_reference IS NULL
+        AND external_id IS NULL
         ORDER BY created_at DESC
     ";
 
@@ -105,6 +106,7 @@ class ImporterTool extends CliTool\App
         SELECT assess_id
         FROM assess
         WHERE deleted_at IS NULL
+        AND external_id IS NULL
         AND availability = 'assess'
         AND assessment_id = :assessmentId
     ";
