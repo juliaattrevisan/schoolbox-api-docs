@@ -229,6 +229,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveFields(Model $lessonPlan): void
     {
+        // TODO delete fields which are not in the `$lessonPlan` model
         /* TODO This might not work once we delink joins
          */
         $this->cascadeJoin('lessonPlanField', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getFields());

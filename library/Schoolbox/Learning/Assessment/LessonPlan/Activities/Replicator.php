@@ -59,6 +59,8 @@ class Replicator
         $destinationLinkedAssessments = $this->extractLinkedAssessments($destination);
 
         // Find ALL assessments within the source and destination course context
+        // TODO need to ensure the course spec and impl are fully hydrated:
+        //      could use the assessment mapper proxy to fetch assessments?
         $allSourceAssessments      = $this->extractContextAssessments($source);
         $allDestinationAssessments = $this->extractContextAssessments($destination);
 
