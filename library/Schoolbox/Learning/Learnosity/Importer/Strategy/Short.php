@@ -44,6 +44,12 @@ class Short implements IStrategy
             'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
+            /* Correct Answer doesn't show in the ui unless automarkable:true
+             * You can perhaps put it in here as an alternative
+             */
+            'metadata' => [
+                'sample_answer' => $answer
+            ],
             'stimulus' => trim($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
