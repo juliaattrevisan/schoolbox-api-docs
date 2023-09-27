@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\LessonPlan\Activities;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -130,6 +131,11 @@ class Replicator
             foreach ($context->getCourse()->getUnits() as $unit) {
                 foreach ($unit->getAssessables() as $unitAssessment) {
                     $contextAssessments[$unitAssessment->getId()] = $unitAssessment;
+                    if ($unitAssessment instanceof Project) {
+                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
+                            $contextAssessments[$projectAssessment->getId()] = $projectAssessment;
+                        }
+                    }
                 }
             }
         } elseif ($context instanceof Implementation\Unit\Model) {
@@ -139,6 +145,14 @@ class Replicator
                 foreach ($unit->getAssessables() as $unitAssessment) {
                     if ($unitAssessment->getSpecificationAssessment()) {
                         $contextAssessments[$unitAssessment->getSpecificationAssessment()->getId()] = $unitAssessment;
+                    }
+                    if ($unitAssessment instanceof Project) {
+                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
+                            if ($projectAssessment->getSpecificationAssessment()) {
+                                $contextAssessments[$projectAssessment->getSpecificationAssessment()->getId()]
+                                    = $projectAssessment;
+                            }
+                        }
                     }
                 }
             }
