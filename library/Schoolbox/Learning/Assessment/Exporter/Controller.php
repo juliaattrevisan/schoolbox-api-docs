@@ -519,6 +519,8 @@ class Controller extends BaseController
             $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
         }
 
+        // TODO copy lesson plan linked activities, before or after syncing project?
+
         return $assessmentImpl;
     }
 

@@ -104,6 +104,8 @@ class Replicator
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $newAssessment);
 
+        // TODO copy lesson plan linked activities, before or after syncing project?
+
         return $newAssessment;
     }
 

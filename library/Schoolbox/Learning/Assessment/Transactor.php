@@ -219,6 +219,7 @@ class Transactor
                 $projectAssessments = $originalAssessment->getAssessables();
                 foreach ($projectAssessments as $projectAssessment) {
                     $this->replicator->replicateInNewContext($projectAssessment, $this->assessment, $currentUser);
+                    // TODO copy lesson plan linked activities, before or after syncing project?
                 }
             }
             $this->assessmentMapperProxy->delete($originalAssessment);
