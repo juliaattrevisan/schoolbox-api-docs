@@ -1052,20 +1052,26 @@ class Controller extends Base\Base
         // This must be done after creating all impl assessments: only then is
         // it known which linked assessments actually exist.
         $lessonPlanAssessmentReplicator = new LessonPlan\Activities\Replicator($this->linkedAssessmentsMapper);
+
+        // For some reason, the unit impl contains two copies of the same
+        // assessment: ensure it is not copied twice.
+        $replicatedAssessmentIds = [];
+
+        // Anyway: start linking lesson plans
         foreach ($courseImpls as $courseImpl) {
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $implAssessment) {
+                    if (isset($replicatedAssessmentIds[$implAssessment->getId()])) {
+                        continue;
+                    }
+                    $replicatedAssessmentIds[$implAssessment->getId()] = true;
                     $specAssessment = $implAssessment->getSpecificationAssessment();
                     if ($specAssessment instanceof LessonPlan\Model) {
                         $lessonPlanAssessmentReplicator->replicate($specAssessment, $implAssessment);
-//                        $specAssessments[$specAssessment->getId()] = $specAssessment;
-//                        $implAssessments[$specAssessment->getId()] = $implAssessment;
                     }
                 }
             }
-//            $this->linkLessonPlanAssessments($courseImpl);
         }
-        throw new \Exception('bbbb');
     }
 
     /**
