@@ -33,6 +33,19 @@ class Replicator
     /**
      * Replicate linked assessments in `$source` into `$destination`.
      *
+     * If exporting a course or single assessment into a class: `$source` will
+     * be a spec assessment, and `$destination` will be an implementation of
+     * `$source`.
+     *
+     * If importing a class assessment into a course: `$source` will be an
+     * implementation, and `$destination` will be `$source`'s spec assessment.
+     *
+     * Either way:
+     * * if a linked assessment from `$source` exists in `$destination`'s
+     *   course context: link the destination copy
+     * * if an assessment exists in `$source`'s context but is no longer linked
+     *   in `$destination`: remove the link from `$destination`
+     *
      * @param Model $source
      * @param Model $destination
      * @return void
@@ -57,7 +70,8 @@ class Replicator
         }
 
         // Find equivalent assessment in source.
-        // If it exists in source but is not linked: remove from destination.
+        // If it exists in destination but is not linked: remove from
+        // destination.
         foreach ($allSourceAssessments as $sourceAssessmentId => $sourceAssessment) {
             if (
                 isset($allDestinationAssessments[$sourceAssessmentId])
