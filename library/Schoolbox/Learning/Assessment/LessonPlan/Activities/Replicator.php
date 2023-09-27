@@ -50,7 +50,7 @@ class Replicator
      * * if a linked assessment from `$source` exists in `$destination`'s
      *   course context: link the destination copy
      * * if an assessment exists in `$source`'s context but is no longer linked
-     *   in `$destination`: remove the link from `$destination`
+     *   in `$source`: unlink the destination copy
      *
      * @param Model $source
      * @param Model $destination
@@ -60,12 +60,9 @@ class Replicator
     public function replicate(Model $source, Model $destination): void
     {
         // Find the linked assessments, and group them by source assessment ID
-        $sourceLinkedAssessments      = $this->extractLinkedAssessments($source);
-        $destinationLinkedAssessments = $this->extractLinkedAssessments($destination);
+        $sourceLinkedAssessments = $this->extractLinkedAssessments($source);
 
         // Find ALL assessments within the source and destination course context
-        // TODO need to ensure the course spec and impl are fully hydrated:
-        //      could use the assessment mapper proxy to fetch assessments?
         $allSourceAssessments      = $this->extractContextAssessments($source);
         $allDestinationAssessments = $this->extractContextAssessments($destination);
 
@@ -145,17 +142,6 @@ class Replicator
                     }
                 }
             }
-
-//            foreach ($context->getCourse()->getUnits() as $unit) {
-//                foreach ($unit->getAssessables() as $unitAssessment) {
-//                    $contextAssessments[$unitAssessment->getId()] = $unitAssessment;
-//                    if ($unitAssessment instanceof Project) {
-//                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
-//                            $contextAssessments[$projectAssessment->getId()] = $projectAssessment;
-//                        }
-//                    }
-//                }
-//            }
         } elseif ($context instanceof Implementation\Unit\Model) {
             // Unit impl: key assessments by spec assessment ID
             // (don't care about impl assessments not in a spec)
@@ -173,22 +159,6 @@ class Replicator
                     }
                 }
             }
-
-//            foreach ($context->getCourse()->getUnits() as $unit) {
-//                foreach ($unit->getAssessables() as $unitAssessment) {
-//                    if ($unitAssessment->getSpecificationAssessment()) {
-//                        $contextAssessments[$unitAssessment->getSpecificationAssessment()->getId()] = $unitAssessment;
-//                    }
-//                    if ($unitAssessment instanceof Project) {
-//                        foreach ($unitAssessment->getAssessables() as $projectAssessment) {
-//                            if ($projectAssessment->getSpecificationAssessment()) {
-//                                $contextAssessments[$projectAssessment->getSpecificationAssessment()->getId()]
-//                                    = $projectAssessment;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
         }
         return $contextAssessments;
     }
