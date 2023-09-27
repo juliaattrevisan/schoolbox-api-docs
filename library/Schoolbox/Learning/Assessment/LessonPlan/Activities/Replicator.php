@@ -78,12 +78,12 @@ class Replicator
         }
 
         // Find equivalent assessment in source.
-        // If it exists in destination but is not linked: remove from
-        // destination.
+        // If it exists in destination but is not linked in the source:
+        // remove from destination.
         foreach ($allSourceAssessments as $sourceAssessmentId => $sourceAssessment) {
             if (
                 isset($allDestinationAssessments[$sourceAssessmentId])
-                && !isset($destinationLinkedAssessments[$sourceAssessmentId])
+                && !isset($sourceLinkedAssessments[$sourceAssessmentId])
             ) {
                 $this->linkedAssessmentsMapper->deleteLink($destination, $allDestinationAssessments[$sourceAssessmentId]);
             }
