@@ -534,10 +534,6 @@ class Module extends BaseModule
             $assessmentDataSource,
             $this->getMapperFactory()->get(QuizMapper::class),
             $this->getMapperFactory()->get(RubricDataSource::class),
-            new LessonPlanActivitiesReplicator(
-                $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
-                $assessmentDataSource,
-            ),
         );
 
         switch ($className) {
