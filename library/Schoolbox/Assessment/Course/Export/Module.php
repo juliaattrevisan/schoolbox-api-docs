@@ -114,6 +114,7 @@ class Module extends \Alaress\Module\Module
                 $this->getMapperFactory()->get(RubricDataSource::class),
                 $lessonPlanActivitiesReplicator,
             ),
+            $lessonPlanActivitiesReplicator,
         );
     }
 

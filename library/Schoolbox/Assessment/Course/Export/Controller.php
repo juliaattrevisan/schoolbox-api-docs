@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course\Export;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -30,14 +31,17 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param AssessmentDataSource $assessmentDataSource Required for updating existing assessment
-     * @param Replicator           $replicator           Required for replicating assessments
-     * @param Overwriter           $overwriter           Required for overwriting assessments
+     * @param AssessmentDataSource           $assessmentDataSource           Required for updating existing assessment
+     * @param Replicator                     $replicator                     Required for replicating assessments
+     * @param Overwriter                     $overwriter                     Required for overwriting assessments
+     * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator Required for replicating linked activities
+     *                                                                       within lesson plans
      */
     public function __construct(
         private AssessmentDataSource $assessmentDataSource,
         private Replicator $replicator,
         private Overwriter $overwriter,
+        private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
     ) {
     }
 

@@ -162,6 +162,10 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $lessonPlanActivitiesReplicator = new LessonPlanActivitiesReplicator(
+            $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
+            $this->getAssessmentMapperProxy(),
+        );
         return new Controller(
             $this->getMapperFactory()->get(Access::class),
             $this->getAssessmentMapperProxy(),
@@ -171,13 +175,11 @@ class Module extends BaseModule
                 $this->getAssessmentMapperProxy(),
                 $this->getQuizMapper(),
                 $this->getMapperFactory()->get(RubricDataSource::class),
-                new LessonPlanActivitiesReplicator(
-                    $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
-                    $this->getAssessmentMapperProxy(),
-                ),
+                $lessonPlanActivitiesReplicator,
             ),
             $this->injector->get('filters.assessmentIdFinder'),
-            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
+            $lessonPlanActivitiesReplicator,
         );
     }
 
