@@ -106,13 +106,11 @@ class Module extends \Alaress\Module\Module
                 $this->getAssessmentDataSource(),
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(RubricDataSource::class),
-                $lessonPlanActivitiesReplicator,
             ),
             new Overwriter(
                 $this->getAssessmentDataSource(),
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(RubricDataSource::class),
-                $lessonPlanActivitiesReplicator,
             ),
             $lessonPlanActivitiesReplicator,
         );

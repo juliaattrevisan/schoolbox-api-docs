@@ -97,7 +97,6 @@ class Module extends \Alaress\Module\Module
             $assessmentDataSource,
             $this->getMapperFactory()->get(QuizMapper::class),
             $this->getMapperFactory()->get(RubricDataSource::class),
-            $lessonPlanActivitiesReplicator,
         );
         $importFactory = new ImportFactory(
             $assessmentDataSource,

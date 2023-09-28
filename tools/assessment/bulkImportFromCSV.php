@@ -114,6 +114,7 @@ HELP;
         $defaultDueTime = $this->getConfig()->get('lms_duetime_default');
 
         /** @var AssessmentDataSource $assessmentDataSource */
+        // TODO does this need lesson plan replicator?
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
         $result               = (new \Schoolbox\Assessment\Course\Import\CsvImporter(
             FolderMapper::getInstance(),
@@ -126,10 +127,6 @@ HELP;
                     $assessmentDataSource,
                     QuizMapper::getInstance(),
                     RubricDataSource::getInstance(),
-                    new LessonPlanActivitiesReplicator(
-                        LessonPlanLinkedAssessmentsMapper::getInstance(),
-                        $assessmentDataSource,
-                    ),
                 ),
                 CourseImplementationMapper::getInstance(),
                 UnitImplementationMapper::getInstance(),
