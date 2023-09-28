@@ -323,6 +323,8 @@ class Controller extends BaseController
                 $datesObjects['due'],
                 $datesObjects['late'] ?? $datesObjects['due']
             );
+
+            // TODO copy lesson plan linked activities, after each implementation is synced
         }
 
         /** @var UnitSpecification\Model $unitSpec */
@@ -433,6 +435,8 @@ class Controller extends BaseController
             }
         }
 
+        // TODO copy lesson plan linked activities, after entire course is synced
+
         $this->redirectToReturnUrlIfSetOrFallbackUrl($fallbackReturnUrl);
     }
 
@@ -518,8 +522,6 @@ class Controller extends BaseController
             $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
             $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
         }
-
-        // TODO copy lesson plan linked activities, before or after syncing project?
 
         return $assessmentImpl;
     }

@@ -144,7 +144,7 @@ class Controller extends Base
             $this->syncProjectActivities($implAssessment, $specAssessment);
         }
 
-        // TODO copy lesson plan linked activities, before or after syncing project?
+        // TODO copy lesson plan linked activities, after projects are synced
 
         return $specAssessment;
     }
@@ -170,7 +170,7 @@ class Controller extends Base
             $this->syncProjectActivities($implAssessment, $updatedSpecAssessment);
         }
 
-        // TODO copy lesson plan linked activities, before or after syncing project?
+        // TODO copy lesson plan linked activities, after projects are synced
 
         return $updatedSpecAssessment;
     }
