@@ -101,15 +101,12 @@ class Replicator
         if ($lessonPlan->isSpecification()) {
             foreach ($lessonPlan->getLinkedAssessments() as $linkedAssessment) {
                 /** @var IAssessable $linkedAssessment */
-                if ($linkedAssessment->isSpecification()) {
-                    $linkedAssessments[$linkedAssessment->getId()] = $linkedAssessment;
-                }
+                $linkedAssessments[$linkedAssessment->getId()] = $linkedAssessment;
             }
         } elseif ($lessonPlan->isImplementation()) {
-            // Must be an implementation
             foreach ($lessonPlan->getLinkedAssessments() as $linkedAssessment) {
                 /** @var IAssessable $linkedAssessment */
-                if ($linkedAssessment->isImplementation() && $linkedAssessment->getSpecificationAssessment()) {
+                if ($linkedAssessment->getSpecificationAssessment()) {
                     $linkedAssessments[$linkedAssessment->getSpecificationAssessment()->getId()] = $linkedAssessment;
                 }
             }
