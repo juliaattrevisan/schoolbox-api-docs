@@ -22,16 +22,14 @@ use Schoolbox\User;
 class Replicator
 {
     /**
-     * @param AssessmentMapperProxy            $assessmentMapperProxy
-     * @param QuizMapper                       $quizMapper
-     * @param RubricDataSource                 $rubricMapper
-     * @param LessonPlan\Activities\Replicator $lessonPlanReplicator
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param QuizMapper            $quizMapper
+     * @param RubricDataSource      $rubricMapper
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private QuizMapper $quizMapper,
         private RubricDataSource $rubricMapper,
-        private LessonPlan\Activities\Replicator $lessonPlanReplicator
     ) {
     }
 
@@ -88,9 +86,6 @@ class Replicator
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $newAssessment);
 
-        // Copy lesson plan activities
-        $this->replicateLessonPlanActivities($source, $newAssessment);
-
         return $newAssessment;
     }
 
@@ -132,20 +127,5 @@ class Replicator
             return;
         }
         $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
-    }
-
-    /**
-     * Copy lesson plan linked activities from `$source` into `$destination`.
-     *
-     * @param IAssessable $source
-     * @param IAssessable $destination
-     * @return void
-     */
-    private function replicateLessonPlanActivities(IAssessable $source, IAssessable $destination): void
-    {
-        if (!($source instanceof LessonPlan\Model && $destination instanceof LessonPlan\Model)) {
-            return;
-        }
-        $this->lessonPlanReplicator->replicate($source, $destination);
     }
 }

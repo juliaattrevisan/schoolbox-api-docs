@@ -23,16 +23,14 @@ use Schoolbox\User;
 class Overwriter
 {
     /**
-     * @param AssessmentMapperProxy            $assessmentMapperProxy
-     * @param QuizMapper                       $quizMapper
-     * @param RubricDataSource                 $rubricMapper
-     * @param LessonPlan\Activities\Replicator $lessonPlanActivitiesReplicator
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param QuizMapper            $quizMapper
+     * @param RubricDataSource      $rubricMapper
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private QuizMapper $quizMapper,
         private RubricDataSource $rubricMapper,
-        private LessonPlan\Activities\Replicator $lessonPlanActivitiesReplicator,
     ) {
     }
 
@@ -99,9 +97,6 @@ class Overwriter
 
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $updatedDestination);
-
-        // Copy lesson plan activities
-        $this->replicateLessonPlanActivities($source, $updatedDestination);
 
         return $updatedDestination;
     }
@@ -194,20 +189,5 @@ class Overwriter
             return;
         }
         $this->rubricMapper->deleteRubric($assessment->getId());
-    }
-
-    /**
-     * Copy lesson plan linked activities from `$source` into `$destination`.
-     *
-     * @param IAssessable $source
-     * @param IAssessable $destination
-     * @return void
-     */
-    private function replicateLessonPlanActivities(IAssessable $source, IAssessable $destination): void
-    {
-        if (!($source instanceof LessonPlan\Model && $destination instanceof LessonPlan\Model)) {
-            return;
-        }
-        $this->lessonPlanActivitiesReplicator->replicate($source, $destination);
     }
 }
