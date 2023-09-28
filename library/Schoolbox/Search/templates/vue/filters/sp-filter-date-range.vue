@@ -32,37 +32,16 @@ window.Vue.watch(
 );
 
 /**
- * Formats the date picker date to ISO8601 format
- * @param {string} date - The date to format
- * @returns {string} - The formatted date
- */
-function getDateFormatted(date: string) {
-    return window.dayjs(date, "DD/MM/YYYY hh:mm:ss").format();
-}
-
-/**
  * [data-datepicker-vue] is used to avoid using the attach within
  * www/static/js/alaress-datetime-picker/attacher.datepicker.js as it may be
  * called when the component is not mounted yet.
  */
 function initDatePickers() {
     $("[data-datepicker-vue]").each(function attachAlaressDatePicker() {
-        const $dateinput = $(this);
-        if ($dateinput.attr("data-datepicker-id") === undefined) {
-            $dateinput.alaressDateTimePicker();
+        const $dateInput = $(this);
+        if ($dateInput.attr("data-datepicker-id") === undefined) {
+            $dateInput.alaressDateTimePicker();
         }
-    });
-    $("#sp-start-date-input").on("change", (event) => {
-        filterDateRangeStore.startDate = getDateFormatted(
-            // Add 00:00:00 to ensure that date range is inclusive.
-            `${(event.currentTarget as HTMLInputElement).value} 00:00:00`
-        );
-    });
-    $("#sp-end-date-input").on("change", (event) => {
-        filterDateRangeStore.endDate = getDateFormatted(
-            // Add 23:59:59 to ensure that date range is inclusive.
-            `${(event.currentTarget as HTMLInputElement).value} 23:59:59`
-        );
     });
 }
 
@@ -80,7 +59,7 @@ window.Vue.onMounted(() => {
             data-datepicker-vue
             data-datepicker-buttontext
             data-datesync-enddate="#sp-end-date-input"
-            :data-datepicker-initial-value="filterDateRangeStore.startDate"
+            :value="filterDateRangeStore.startDate"
         />
     </div>
     <div class="l-flex-col">
@@ -91,7 +70,7 @@ window.Vue.onMounted(() => {
             data-datepicker-vue
             data-datepicker-buttontext
             data-datesync-startdate="#sp-start-date-input"
-            :data-datepicker-initial-value="filterDateRangeStore.endDate"
+            :value="filterDateRangeStore.endDate"
         />
     </div>
 </template>
