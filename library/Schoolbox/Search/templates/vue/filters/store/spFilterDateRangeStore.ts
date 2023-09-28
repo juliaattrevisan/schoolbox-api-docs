@@ -8,8 +8,8 @@ export const EMPTY_DATE = ""; // the value to use when the date is not set
 export const INVALID_DATE = "Invalid Date"; // the string dayjs returns when a date is not valid
 
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
-    const startDate = window.Vue.ref(window.dayjs().subtract(1, "year").format("MM--DD--YYYY"));
-    const endDate = window.Vue.ref(window.dayjs().format("MM--DD--YYYY"));
+    const startDate = window.Vue.ref(window.dayjs().subtract(1, "year").format(window.dateDisplayFormats.dayjs));
+    const endDate = window.Vue.ref(window.dayjs().format(window.dateDisplayFormats.dayjs));
 
     /**
      * Is the start date filter set
