@@ -20,6 +20,41 @@
             searching: false
         });
     });
+
+    // This is the maximum date range period
+    // (enforced to limit the amount of data the report can generate, and hence avoid timeout errors).
+    const DATE_RANGE_PERIOD_MAX_NUMBER = 3;
+    const DATE_RANGE_PERIOD_MAX_UNIT = 'month';
+
+    /**
+     * Ensure that the date range period never exceeds DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT.
+     */
+    function onChangeDate(changedDateName)
+    {
+        const $startDate = $('#startDate');
+        const $endDate = $('#endDate');
+        const dateFormat = window.dateDisplayFormats.dayjs;
+
+        let startDateObj = window.dayjs($startDate.val(), dateFormat);
+        let endDateObj = window.dayjs($endDate.val(), dateFormat);
+
+        switch (changedDateName) {
+            case 'start':
+                // If the new value of startDate plus the period is after endDate, set endDate to startDate plus the period.
+                let startDatePlusPeriodObj = startDateObj.add(DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
+                if (startDatePlusPeriodObj.isAfter(endDateObj)) {
+                    $endDate.val(startDatePlusPeriodObj.format(dateFormat));
+                }
+                break;
+            case 'end':
+                // If the new value of endDate minus the period is before startDate, set startDate to endDate minus the period.
+                let endDateMinusPeriodObj = endDateObj.add(-DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
+                if (endDateMinusPeriodObj.isBefore(startDateObj)) {
+                    $startDate.val(endDateMinusPeriodObj.format(dateFormat));
+                }
+                break;
+        }
+    }
 </script>
 <!-- END custom_head -->
 
@@ -67,13 +102,13 @@
                     <div class="small-12 large-6 columns">
                         <label>
                             From
-                            <input data-datepicker type='text' name="start" value="{{ search.start.getLocalShort() }}" />
+                            <input data-datepicker type='text' name="start" id="startDate" value="{{ search.start.getLocalShort() }}" onchange="onChangeDate('start')" />
                         </label>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label>
                             To
-                            <input data-datepicker type='text' name="end" value="{{ search.end.getLocalShort() }}" />
+                            <input data-datepicker type='text' name="end" id="endDate" value="{{ search.end.getLocalShort() }}" onchange="onChangeDate('end')" />
                         </label>
                     </div>
                 </fieldset>
