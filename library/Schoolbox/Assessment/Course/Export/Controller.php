@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -148,7 +149,11 @@ class Controller extends Base
             $this->syncProjectActivities($implAssessment, $specAssessment);
         }
 
-        // TODO copy lesson plan linked activities, after projects are synced
+        // Replicate lesson plan linked activities only after assessment and
+        // project have been overwritten.
+        if ($implAssessment instanceof LessonPlan && $specAssessment instanceof LessonPlan) {
+            $this->lessonPlanActivitiesReplicator->replicate($implAssessment, $specAssessment);
+        }
 
         return $specAssessment;
     }
@@ -174,7 +179,13 @@ class Controller extends Base
             $this->syncProjectActivities($implAssessment, $updatedSpecAssessment);
         }
 
-        // TODO copy lesson plan linked activities, after projects are synced
+        // Replicate lesson plan linked activities only after assessment and
+        // project have been overwritten.
+        // This guarantees all assessments are created, and thus that all links
+        // can be created.
+        if ($implAssessment instanceof LessonPlan && $specAssessment instanceof LessonPlan) {
+            $this->lessonPlanActivitiesReplicator->replicate($implAssessment, $updatedSpecAssessment);
+        }
 
         return $updatedSpecAssessment;
     }

@@ -20,6 +20,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
@@ -317,7 +318,7 @@ class Controller extends BaseController
                 $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
             }
 
-            $this->exportToNewContext(
+            $newAssessmentImpl = $this->exportToNewContext(
                 $assessment,
                 $assessmentImpl->getContext(),
                 $assessmentImpl->getId() ? $assessmentImpl->getSequence() : null,
@@ -327,7 +328,11 @@ class Controller extends BaseController
                 $datesObjects['late'] ?? $datesObjects['due']
             );
 
-            // TODO copy lesson plan linked activities, after each implementation is synced
+            // Replicate lesson plan linked activities only after assessment and
+            // project have been overwritten.
+            if ($assessment instanceof LessonPlan && $newAssessmentImpl instanceof LessonPlan) {
+                $this->lessonPlanActivitiesReplicator->replicate($assessment, $newAssessmentImpl);
+            }
         }
 
         /** @var UnitSpecification\Model $unitSpec */
@@ -425,8 +430,9 @@ class Controller extends BaseController
             $unitImplNew->setDueDate($closeDateAlaress);
             $this->unitImplementationMapper->save($unitImplNew);
 
+            $implSpecAssessmentPairs = [];
             foreach ($this->assessmentDataSource->findAllByUnitSpecificationId($unitSpec->getId()) as $unitSpecAssessment) {
-                $this->exportToNewContext(
+                $newAssessmentImpl = $this->exportToNewContext(
                     $unitSpecAssessment,
                     $unitImplNew,
                     null,
@@ -435,10 +441,18 @@ class Controller extends BaseController
                     $closeDateAlaress,
                     $closeDateAlaress
                 );
+                $implSpecAssessmentPairs[] = [$newAssessmentImpl, $unitSpecAssessment];
+            }
+
+            // Replicate lesson plan linked activities only after assessment and
+            // project have been overwritten.
+            foreach ($implSpecAssessmentPairs as $pair) {
+                [$newAssessmentImpl, $unitSpecAssessment] = $pair;
+                if ($unitSpecAssessment instanceof LessonPlan && $newAssessmentImpl instanceof LessonPlan) {
+                    $this->lessonPlanActivitiesReplicator->replicate($unitSpecAssessment, $newAssessmentImpl);
+                }
             }
         }
-
-        // TODO copy lesson plan linked activities, after entire course is synced
 
         $this->redirectToReturnUrlIfSetOrFallbackUrl($fallbackReturnUrl);
     }
