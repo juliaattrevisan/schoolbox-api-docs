@@ -44,12 +44,10 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         return {
             date: {
                 ...(hasStartDate.value && {
-                    from: dayjs(startDate.value, dateDisplayFormats.dayjs)
-                        .startOf("day")
-                        .format("YYYY-MM-DDTHH:mm:ssZ"), // TODO: Should be able to look this up from somewhere.
+                    from: dayjs(startDate.value, dateDisplayFormats.dayjs).startOf("day").format(),
                 }),
                 ...(hasEndDate.value && {
-                    to: dayjs(endDate.value, dateDisplayFormats.dayjs).endOf("day").format("YYYY-MM-DDTHH:mm:ssZ"), // TODO: Should be able to look this up from somewhere.
+                    to: dayjs(endDate.value, dateDisplayFormats.dayjs).endOf("day").format(),
                 }),
             },
         };
