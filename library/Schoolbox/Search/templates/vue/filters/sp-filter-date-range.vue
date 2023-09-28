@@ -60,6 +60,7 @@ window.Vue.onMounted(() => {
             data-datepicker-buttontext
             data-datesync-enddate="#sp-end-date-input"
             :value="filterDateRangeStore.startDate"
+            :data-datepicker-initial="filterDateRangeStore.startDate"
         />
     </div>
     <div class="l-flex-col">
@@ -71,6 +72,7 @@ window.Vue.onMounted(() => {
             data-datepicker-buttontext
             data-datesync-startdate="#sp-start-date-input"
             :value="filterDateRangeStore.endDate"
+            :data-datepicker-initial="filterDateRangeStore.endDate"
         />
     </div>
 </template>
