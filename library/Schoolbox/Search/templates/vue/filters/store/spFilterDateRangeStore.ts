@@ -44,9 +44,11 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         return {
             date: {
                 ...(hasStartDate.value && {
+                    // Add '00:00:00' time here to ensure date range is inclusive of the start date.
                     from: window.dayjs(startDate.value, window.dateDisplayFormats.dayjs).startOf("day").format(),
                 }),
                 ...(hasEndDate.value && {
+                    // Add '23:59:59' time here to ensure date range is inclusive of the end date.
                     to: window.dayjs(endDate.value, window.dateDisplayFormats.dayjs).endOf("day").format(),
                 }),
             },
