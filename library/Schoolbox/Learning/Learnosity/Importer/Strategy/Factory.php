@@ -35,7 +35,7 @@ class Factory
      * @return IStrategy|null
      */
     public function produce(int $typeId): ?IStrategy
-    {;
+    {
         return match ($typeId) {
             Short::QUESTION_TYPE_ID => new Short($this->domain),
             Exact::QUESTION_TYPE_ID => new Exact($this->domain),
