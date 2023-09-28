@@ -225,9 +225,13 @@ class Transactor
                     $this->replicator->replicateInNewContext($projectAssessment, $this->assessment, $currentUser);
                 }
             }
-            $this->assessmentMapperProxy->delete($originalAssessment);
 
-            // TODO determine if relocation requires recreate of lesson plan links
+            // Replicate lesson plan links
+            if ($originalAssessment instanceof LessonPlan && $this->assessment instanceof LessonPlan) {
+                $this->lessonPlanActivitiesReplicator->replicate($originalAssessment, $this->assessment);
+            }
+
+            $this->assessmentMapperProxy->delete($originalAssessment);
             $relocated = true;
         }
 
