@@ -113,6 +113,51 @@ class Replicator
                 }
             }
         }
+
+        // Project importation:
+        // figure out which assessment in the destination corresponds to the
+        // source, and then replicate any links.
+        if ($source instanceof Project && $destination instanceof Project) {
+            foreach ($destination->getAssessables() as $destinationAssessment) {
+                $sourceAssessment = $this->extractProjectSourceLessonPlan($destinationAssessment, $source);
+                if ($sourceAssessment) {
+                    $this->replicate($sourceAssessment, $destinationAssessment);
+                }
+            }
+        }
+    }
+
+    /**
+     * Extract the lesson plan in `$source` which corresponds to
+     * `$destinationAssessment`, if there is one.
+     *
+     * * if `$destinationAssessment` has a spec assessment, this will be the
+     *   corresponding spec in `$source`
+     * * if `$destinationAssessment` is a spec assessment, this will be the
+     *   corresponding implementation in `$source`
+     *
+     * @param IAssessable $destinationAssessment
+     * @param Project     $source
+     * @return Model|null
+     */
+    private function extractProjectSourceLessonPlan(IAssessable $destinationAssessment, Project $source): ?Model
+    {
+        if ($destinationAssessment instanceof Model) {
+            return null;
+        }
+
+        foreach ($source->getAssessables() as $sourceAssessment) {
+            if (!$sourceAssessment instanceof Model) {
+                continue;
+            }
+            if ($sourceAssessment->getSpecificationAssessment()?->getId() === $destinationAssessment->getId()) {
+                return $sourceAssessment;
+            }
+            if ($sourceAssessment->getId() === $destinationAssessment->getSpecificationAssessment()?->getId()) {
+                return $sourceAssessment;
+            }
+        }
+        return null;
     }
 
     /**
