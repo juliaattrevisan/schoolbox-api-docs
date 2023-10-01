@@ -198,7 +198,7 @@ class Replicator
      */
     private function extractContextAssessments(IAssessable $assessment): array
     {
-        $context = $assessment->getContext();
+        $context = $assessment->getBaseContext();
 
         // Unit spec: key assessments by assessment ID
         // Load the entire course and all of its assessments.
