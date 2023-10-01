@@ -72,37 +72,45 @@ class Replicator
      * * if an assessment exists in `$source`'s context but is no longer linked
      *   in `$source`: unlink the destination copy
      *
-     * @param Model $source
-     * @param Model $destination
+     * @param IAssessable $source
+     * @param IAssessable $destination
      * @return void
      * @throws MapperException if somehow the save of a link failed?
      */
-    public function replicate(Model $source, Model $destination): void
+    public function replicate(IAssessable $source, IAssessable $destination): void
     {
-        // Find the linked assessments, and group them by source assessment ID
-        $sourceLinkedAssessments = $this->extractLinkedAssessments($source);
-
         // Find ALL assessments within the source and destination course context
         $allSourceAssessments      = $this->extractContextAssessments($source);
         $allDestinationAssessments = $this->extractContextAssessments($destination);
 
-        // Find equivalent assessment in destination.
-        // If it exists there, create a link in the destination.
-        foreach ($sourceLinkedAssessments as $sourceLinkedAssessmentId => $sourceLinkedAssessment) {
-            if (isset($allDestinationAssessments[$sourceLinkedAssessmentId])) {
-                $this->linkedAssessmentsMapper->saveLink($destination, $allDestinationAssessments[$sourceLinkedAssessmentId]);
-            }
-        }
+        if ($source instanceof Model && $destination instanceof Model) {
+            // Find the linked assessments, and group them by source assessment ID
+            $sourceLinkedAssessments = $this->extractLinkedAssessments($source);
 
-        // Find equivalent assessment in source.
-        // If it exists in destination but is not linked in the source:
-        // remove from destination.
-        foreach ($allSourceAssessments as $sourceAssessmentId => $sourceAssessment) {
-            if (
-                isset($allDestinationAssessments[$sourceAssessmentId])
-                && !isset($sourceLinkedAssessments[$sourceAssessmentId])
-            ) {
-                $this->linkedAssessmentsMapper->deleteLink($destination, $allDestinationAssessments[$sourceAssessmentId]);
+            // Find equivalent assessment in destination.
+            // If it exists there, create a link in the destination.
+            foreach ($sourceLinkedAssessments as $sourceLinkedAssessmentId => $sourceLinkedAssessment) {
+                if (isset($allDestinationAssessments[$sourceLinkedAssessmentId])) {
+                    $this->linkedAssessmentsMapper->saveLink(
+                        $destination,
+                        $allDestinationAssessments[$sourceLinkedAssessmentId],
+                    );
+                }
+            }
+
+            // Find equivalent assessment in source.
+            // If it exists in destination but is not linked in the source:
+            // remove from destination.
+            foreach ($allSourceAssessments as $sourceAssessmentId => $sourceAssessment) {
+                if (
+                    isset($allDestinationAssessments[$sourceAssessmentId])
+                    && !isset($sourceLinkedAssessments[$sourceAssessmentId])
+                ) {
+                    $this->linkedAssessmentsMapper->deleteLink(
+                        $destination,
+                        $allDestinationAssessments[$sourceAssessmentId],
+                    );
+                }
             }
         }
     }
