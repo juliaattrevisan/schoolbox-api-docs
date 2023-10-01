@@ -330,9 +330,7 @@ class Controller extends BaseController
 
             // Replicate lesson plan linked activities only after assessment and
             // project have been overwritten.
-            if ($assessment instanceof LessonPlan && $newAssessmentImpl instanceof LessonPlan) {
-                $this->lessonPlanActivitiesReplicator->replicate($assessment, $newAssessmentImpl);
-            }
+            $this->lessonPlanActivitiesReplicator->replicate($assessment, $newAssessmentImpl);
         }
 
         /** @var UnitSpecification\Model $unitSpec */
@@ -448,9 +446,7 @@ class Controller extends BaseController
             // project have been overwritten.
             foreach ($implSpecAssessmentPairs as $pair) {
                 [$newAssessmentImpl, $unitSpecAssessment] = $pair;
-                if ($unitSpecAssessment instanceof LessonPlan && $newAssessmentImpl instanceof LessonPlan) {
-                    $this->lessonPlanActivitiesReplicator->replicate($unitSpecAssessment, $newAssessmentImpl);
-                }
+                $this->lessonPlanActivitiesReplicator->replicate($unitSpecAssessment, $newAssessmentImpl);
             }
         }
 

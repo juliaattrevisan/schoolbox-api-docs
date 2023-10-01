@@ -151,9 +151,7 @@ class Controller extends Base
 
         // Replicate lesson plan linked activities only after assessment and
         // project have been overwritten.
-        if ($implAssessment instanceof LessonPlan && $specAssessment instanceof LessonPlan) {
-            $this->lessonPlanActivitiesReplicator->replicate($implAssessment, $specAssessment);
-        }
+        $this->lessonPlanActivitiesReplicator->replicate($implAssessment, $specAssessment);
 
         return $specAssessment;
     }
@@ -183,9 +181,7 @@ class Controller extends Base
         // project have been overwritten.
         // This guarantees all assessments are created, and thus that all links
         // can be created.
-        if ($implAssessment instanceof LessonPlan && $specAssessment instanceof LessonPlan) {
-            $this->lessonPlanActivitiesReplicator->replicate($implAssessment, $updatedSpecAssessment);
-        }
+        $this->lessonPlanActivitiesReplicator->replicate($implAssessment, $updatedSpecAssessment);
 
         return $updatedSpecAssessment;
     }

@@ -227,9 +227,7 @@ class Transactor
             }
 
             // Replicate lesson plan links
-            if ($originalAssessment instanceof LessonPlan && $this->assessment instanceof LessonPlan) {
-                $this->lessonPlanActivitiesReplicator->replicate($originalAssessment, $this->assessment);
-            }
+            $this->lessonPlanActivitiesReplicator->replicate($originalAssessment, $this->assessment);
 
             $this->assessmentMapperProxy->delete($originalAssessment);
             $relocated = true;
