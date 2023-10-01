@@ -115,18 +115,18 @@ class Replicator
     }
 
     /**
-     * Extract all assessment within the same course as `$lessonPlan`, and key
+     * Extract all assessments within the same course as `$assessment`, and key
      * them by:
-     * * their ID, if `$lessonPlan` is a spec
-     * * their spec assessment's ID, if `$lessonPlan` is an implementation
+     * * their ID, if `$assessment` is a spec
+     * * their spec assessment's ID, if `$assessment` is an implementation
      *
-     * @param Model $lessonPlan
+     * @param IAssessable $assessment
      * @return array<int, IAssessable>
      */
-    private function extractContextAssessments(Model $lessonPlan): array
+    private function extractContextAssessments(IAssessable $assessment): array
     {
         $contextAssessments = [];
-        $context            = $lessonPlan->getContext();
+        $context            = $assessment->getContext();
         if ($context instanceof Specification\Unit\Model) {
             // Unit spec: key assessments by assessment ID
             // Load the entire course and all of its assessments
