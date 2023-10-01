@@ -24,6 +24,26 @@ use Schoolbox\Mapper\Exception as MapperException;
 class Replicator
 {
     /**
+     * Cache of assessments by course spec.
+     *
+     * Used to avoid unnecessary double-fetching of the same assessments for the
+     * course of a project and its activities.
+     *
+     * @var array<int, array<int, IAssessable>>
+     */
+    private array $courseSpecAssessmentCache = [];
+
+    /**
+     * Cache of assessments by course implementation.
+     *
+     * Used to avoid unnecessary double-fetching of the same assessments for the
+     * course of a project and its activities.
+     *
+     * @var array<int, array<int, IAssessable>>
+     */
+    private array $courseImplAssessmentCache = [];
+
+    /**
      * Constructor
      *
      * @param LinkedAssessmentsMapper $linkedAssessmentsMapper Required for saving linked assessments.
@@ -125,38 +145,53 @@ class Replicator
      */
     private function extractContextAssessments(IAssessable $assessment): array
     {
-        $contextAssessments = [];
-        $context            = $assessment->getContext();
+        $context = $assessment->getContext();
+
+        // Unit spec: key assessments by assessment ID
+        // Load the entire course and all of its assessments.
         if ($context instanceof Specification\Unit\Model) {
-            // Unit spec: key assessments by assessment ID
-            // Load the entire course and all of its assessments
-            $unitAssessments = $this->assessmentDataSource->findAllByCourseSpecificationId($context->getCourse()->getId());
-            foreach ($unitAssessments as $unitAssessment) {
-                $contextAssessments[$unitAssessment->getId()] = $unitAssessment;
-                if ($unitAssessment instanceof Project) {
-                    foreach ($unitAssessment->getAssessables() as $projectAssessment) {
-                        $contextAssessments[$projectAssessment->getId()] = $projectAssessment;
+            $courseSpecId = $context->getCourse()->getId();
+            if (isset($this->courseSpecAssessmentCache[$courseSpecId])) {
+                return $this->courseSpecAssessmentCache[$courseSpecId];
+            }
+            foreach ($this->assessmentDataSource->findAllByCourseSpecificationId($courseSpecId) as $courseSpecAssessment) {
+                $this->courseSpecAssessmentCache[$courseSpecId] ??= [];
+                $this->courseSpecAssessmentCache[$courseSpecId][$courseSpecAssessment->getId()] = $courseSpecAssessment;
+                if ($courseSpecAssessment instanceof Project) {
+                    foreach ($courseSpecAssessment->getAssessables() as $projectAssessment) {
+                        $this->courseSpecAssessmentCache[$courseSpecId][$projectAssessment->getId()] = $projectAssessment;
                     }
                 }
             }
-        } elseif ($context instanceof Implementation\Unit\Model) {
-            // Unit impl: key assessments by spec assessment ID
-            // (don't care about impl assessments not in a spec)
-            $unitAssessments = $this->assessmentDataSource->findAllByCourseImplementationId($context->getCourse()->getId());
-            foreach ($unitAssessments as $unitAssessment) {
-                if ($unitAssessment->getSpecificationAssessment()) {
-                    $contextAssessments[$unitAssessment->getSpecificationAssessment()->getId()] = $unitAssessment;
+            return $this->courseSpecAssessmentCache[$courseSpecId];
+        }
+
+        // Unit impl: key assessments by spec assessment ID
+        // (don't care about impl assessments not in a spec)
+        if ($context instanceof Implementation\Unit\Model) {
+            $courseImplId = $context->getCourse()->getId();
+            if (isset($this->courseImplAssessmentCache[$courseImplId])) {
+                return $this->courseImplAssessmentCache[$courseImplId];
+            }
+            foreach ($this->assessmentDataSource->findAllByCourseImplementationId($courseImplId) as $courseImplAssessment) {
+                $this->courseImplAssessmentCache[$courseImplId] ??= [];
+                if ($courseImplAssessment->getSpecificationAssessment()) {
+                    $this->courseImplAssessmentCache[$courseImplId][$courseImplAssessment->getSpecificationAssessment()->getId()]
+                        = $courseImplAssessment;
                 }
-                if ($unitAssessment instanceof Project) {
-                    foreach ($unitAssessment->getAssessables() as $projectAssessment) {
+                if ($courseImplAssessment instanceof Project) {
+                    foreach ($courseImplAssessment->getAssessables() as $projectAssessment) {
                         if ($projectAssessment->getSpecificationAssessment()) {
-                            $contextAssessments[$projectAssessment->getSpecificationAssessment()->getId()]
+                            $this->courseImplAssessmentCache[$courseImplId][$projectAssessment->getSpecificationAssessment()->getId()]
                                 = $projectAssessment;
                         }
                     }
                 }
             }
+            return $this->courseImplAssessmentCache[$courseImplId];
         }
-        return $contextAssessments;
+
+        // Neither of the above: return nothing
+        return [];
     }
 }
