@@ -1051,20 +1051,13 @@ class Controller extends Base\Base
         // After all assessments are imported: link/unlink lesson plans.
         // This must be done after creating all impl assessments: only then is
         // it known which linked assessments actually exist.
-        // For some reason, the unit impl contains two copies of the same
-        // assessment: ensure it is not copied twice.
-        $replicatedAssessmentIds = [];
-
-        // Anyway: start linking lesson plans
         foreach ($courseImpls as $courseImpl) {
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $implAssessment) {
-                    if (isset($replicatedAssessmentIds[$implAssessment->getId()])) {
-                        continue;
-                    }
-                    $replicatedAssessmentIds[$implAssessment->getId()] = true;
-                    $specAssessment = $implAssessment->getSpecificationAssessment();
-                    $this->lessonPlanActivitiesReplicator->replicate($specAssessment, $implAssessment);
+                    $this->lessonPlanActivitiesReplicator->replicate(
+                        $implAssessment->getSpecificationAssessment(),
+                        $implAssessment,
+                    );
                 }
             }
         }
