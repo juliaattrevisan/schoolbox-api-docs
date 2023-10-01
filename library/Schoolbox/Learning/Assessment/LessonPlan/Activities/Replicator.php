@@ -142,7 +142,7 @@ class Replicator
      */
     private function extractProjectSourceLessonPlan(IAssessable $destinationAssessment, Project $source): ?Model
     {
-        if ($destinationAssessment instanceof Model) {
+        if (!$destinationAssessment instanceof Model) {
             return null;
         }
 
