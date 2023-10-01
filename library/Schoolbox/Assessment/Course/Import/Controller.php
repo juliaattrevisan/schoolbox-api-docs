@@ -1064,8 +1064,25 @@ class Controller extends Base\Base
                     }
                     $replicatedAssessmentIds[$implAssessment->getId()] = true;
                     $specAssessment = $implAssessment->getSpecificationAssessment();
-                    if ($specAssessment instanceof LessonPlan\Model) {
+                    if ($specAssessment instanceof LessonPlan\Model && $implAssessment instanceof LessonPlan\Model) {
                         $this->lessonPlanActivitiesReplicator->replicate($specAssessment, $implAssessment);
+                    }
+
+                    // Sync projects as well
+                    // TODO inject this into replicate
+                    if ($specAssessment instanceof Project && $implAssessment instanceof Project) {
+                        foreach ($implAssessment->getAssessables() as $projectImplAssessment) {
+                            $projectSpecAssessment = $projectImplAssessment->getSpecificationAssessment();
+                            if (
+                                $projectSpecAssessment instanceof LessonPlan\Model
+                                && $projectImplAssessment instanceof LessonPlan\Model
+                            ) {
+                                $this->lessonPlanActivitiesReplicator->replicate(
+                                    $projectSpecAssessment,
+                                    $projectImplAssessment,
+                                );
+                            }
+                        }
                     }
                 }
             }
