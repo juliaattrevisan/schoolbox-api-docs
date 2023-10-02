@@ -753,7 +753,9 @@ class Controller extends BaseController
         try {
             return $this->homepageTemplateMapper->findById($templateId);
         } catch (MapperException\Deleted $e) {
-            return $e->getDeletedObject();
+            /* @var HomepageTemplate $deleted */
+            $deleted = $e->getDeletedObject();
+            return $deleted;
         } catch (MapperException $e) {
             throw new RangeException("Invalid template ID specified", 0, $e);
         }
