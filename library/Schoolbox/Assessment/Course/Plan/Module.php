@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -64,7 +65,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getAssessmentMapperProxy(),
-            $this->getRubricIndicatorMapper()
+            $this->getRubricIndicatorMapper(),
+            $this->getNodeMapper()
         );
     }
 
@@ -114,5 +116,13 @@ class Module extends BaseModule
     private function getRubricIndicatorMapper()
     {
         return $this->getMapperFactory()->get(RubricIndicatorMapper::class);
+    }
+
+    /**
+     * @return NodeMapper
+     */
+    private function getNodeMapper()
+    {
+        return $this->getMapperFactory()->get(NodeMapper::class);
     }
 }

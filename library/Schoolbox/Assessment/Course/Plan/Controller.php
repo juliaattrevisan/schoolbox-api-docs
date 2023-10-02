@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Plan;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
@@ -18,6 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
@@ -30,7 +32,7 @@ class Controller extends Base
      * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      */
-    public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper)
+    public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper, private Node\Mapper $nodeMapper)
     {
     }
 
@@ -99,8 +101,54 @@ class Controller extends Base
             $unitOut['activities'] = $assessments->map($unitAssessmentsTranslator);
 
             // curriculum
-            // build 
-            $unitOut['curriculumCodes'] = [];
+            // build curriculum data
+            $curriculumNodes = $this->nodeMapper->createCollection();
+            $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
+//            foreach ($unit->getFolder()->getCurriculumNodes() as $node) {
+//                if (!$node->getEnabled() || '' === $node->getCode()) {
+//                    continue;
+//                }
+//                $this->nodeMapper->loadDescendants($node);
+//                $curriculumNodes->add($node);
+//            }
+
+            foreach ($unitOut['rubricCapabilities'] as $rubric) {
+                $this->extractCurricNodes($curriculumNodes, $rubric);
+//                foreach ($rubric->getCurriculumNodes() as $node) {
+//                    if (!$node->getEnabled() || '' === $node->getCode()) {
+//                        continue;
+//                    }
+//                    $this->nodeMapper->loadDescendants($node);
+//                    $curriculumNodes->add($node);
+//                }
+            }
+
+            foreach ($assessments as $assessment) {
+                $this->extractCurricNodes($curriculumNodes, $assessment);
+//                foreach ($assessment->getCurriculumNodes() as $node) {
+//                    if (!$node->getEnabled() || '' === $node->getCode()) {
+//                        continue;
+//                    }
+//                    $this->nodeMapper->loadDescendants($node);
+//                    $curriculumNodes->add($node);
+//                }
+            }
+
+            // make sure that the node or node's ancestors do not already in the list
+            // to avoid same hierarchy appears twice in the component
+            $selectedNodeIds = $curriculumNodes->getPropertyValues('id');
+            foreach ($curriculumNodes as $offset => $node) {
+                $this->nodeMapper->loadAncestors($node);
+                $ancestorIds = $this->getAllAncestorIds($node);
+                $diff        = array_diff($ancestorIds, $selectedNodeIds);
+                if (count($diff) !== count($ancestorIds)) {
+                    $curriculumNodes->offsetUnset($offset);
+                }
+            }
+
+            Node\Mapper::sortNodes($curriculumNodes, 0);
+
+            $unitOut['curriculumCodes'] = $curriculumNodes;
 
             $units[] = $unitOut;
         }
@@ -108,5 +156,38 @@ class Controller extends Base
         $this->response = $this->responseAsJson($units);
     return;
 //        $this->response = $this->responseFromTemplate('@coursePlan/index.twig', ['course' => $course, 'units' => $units], 'Unit Planner');
+    }
+
+    /**
+     * Find all ancestor ids to remove duplicates
+     * @param Node\Model $node
+     * @return array
+     */
+    private function getAllAncestorIds(Node\Model $node): array
+    {
+        $parentIds = [];
+        if ($node->getParent() instanceof Node\Model) {
+            $parentIds   = $this->getAllAncestorIds($node->getParent());
+            $parentIds[] = $node->getParent()->getId();
+        }
+        return $parentIds;
+    }
+
+    /**
+     * Extract nodes from an object that has curriculum nodes
+     *
+     * @param Collection $curriculumNodes The collection to inject the identified nodes into
+     * @param object     $object The object to extract the nodes out of. This should use the HasCurriculumNodes trait
+     * @return void
+     */
+    private function extractCurricNodes(Collection $curriculumNodes, object $object): void
+    {
+        foreach ($object->getCurriculumNodes() as $node) {
+            if (!$node->getEnabled() || '' === $node->getCode()) {
+                continue;
+            }
+            $this->nodeMapper->loadDescendants($node);
+            $curriculumNodes->add($node);
+        }
     }
 }
