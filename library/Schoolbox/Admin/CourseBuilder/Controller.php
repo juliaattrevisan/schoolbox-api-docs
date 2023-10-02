@@ -62,10 +62,11 @@ class Controller extends Base
         }
 
         $templates = [];
-        foreach ($this->homepageTemplateMapper->findAll()->sortBy("name", "asc") as $template) {
+        foreach ($this->homepageTemplateMapper->findAll(['deleted' => true])->sortBy("name", "asc") as $template) {
             $templates[] = [
-                'id'   => $template->getId(),
-                'name' => $template->getName(),
+                'id'        => $template->getId(),
+                'name'      => $template->getName(),
+                'deleted'   => $template->isDeleted(),
             ];
         }
 

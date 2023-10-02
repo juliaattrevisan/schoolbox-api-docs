@@ -68,7 +68,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                 <option
                                     v-for="availableTemplate in props.availableTemplates"
                                     :key="availableTemplate.id"
-                                    :value="availableTemplate"
+                                    :value="availableTemplate.name"
                                 >
                                     {{ availableTemplate.name }}
                                 </option>
@@ -82,7 +82,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                 <option
                                     v-for="availableTemplate in props.availableTemplates"
                                     :key="availableTemplate.id"
-                                    :value="availableTemplate"
+                                    :value="availableTemplate.name"
                                 >
                                     {{ availableTemplate.name }}
                                 </option>
