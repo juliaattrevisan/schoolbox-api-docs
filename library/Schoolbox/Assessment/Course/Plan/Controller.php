@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Course\Plan;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
@@ -29,8 +30,9 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param AssessmentMapperProxy $assessmentMapper
+     * @param RubricIndicatorMapper $rubricIndicatorMapper
+     * @param Mapper                $nodeMapper
      */
     public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper, private Node\Mapper $nodeMapper)
     {
@@ -41,7 +43,7 @@ class Controller extends Base
      * Get the Course/Unit Planner
      *
      * @param CourseSpecification $course
-     * @throws Error
+     * @throws Error|MapperException
      */
     public function getPlan(CourseSpecification $course): void
     {
@@ -104,36 +106,19 @@ class Controller extends Base
             // build curriculum data
             $curriculumNodes = $this->nodeMapper->createCollection();
             $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
-//            foreach ($unit->getFolder()->getCurriculumNodes() as $node) {
-//                if (!$node->getEnabled() || '' === $node->getCode()) {
-//                    continue;
-//                }
-//                $this->nodeMapper->loadDescendants($node);
-//                $curriculumNodes->add($node);
-//            }
 
             foreach ($unitOut['rubricCapabilities'] as $rubric) {
                 $this->extractCurricNodes($curriculumNodes, $rubric);
-//                foreach ($rubric->getCurriculumNodes() as $node) {
-//                    if (!$node->getEnabled() || '' === $node->getCode()) {
-//                        continue;
-//                    }
-//                    $this->nodeMapper->loadDescendants($node);
-//                    $curriculumNodes->add($node);
-//                }
             }
 
             foreach ($assessments as $assessment) {
                 $this->extractCurricNodes($curriculumNodes, $assessment);
-//                foreach ($assessment->getCurriculumNodes() as $node) {
-//                    if (!$node->getEnabled() || '' === $node->getCode()) {
-//                        continue;
-//                    }
-//                    $this->nodeMapper->loadDescendants($node);
-//                    $curriculumNodes->add($node);
-//                }
             }
 
+            /**
+             * Duped code from library/Schoolbox/Curriculum/Component/CurriculumOverviewController.php
+             * as we are needing the same tree format as that component.
+             */
             // make sure that the node or node's ancestors do not already in the list
             // to avoid same hierarchy appears twice in the component
             $selectedNodeIds = $curriculumNodes->getPropertyValues('id');
