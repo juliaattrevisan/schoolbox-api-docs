@@ -93,11 +93,24 @@ class Hydrator extends BaseHydrator
                 if ($postAccess < UserAccess::ACCESS_READ) {
                     return null;
                 }
+
+                $db = $this->threadMapper->getDatabase();
+                $nMatchingPostsInThread = $db->executeQuery(
+                    'SELECT COUNT(*)
+                         FROM forumPost
+                         WHERE threadID=?
+                         AND deleted="false"
+                         AND body LIKE ?',
+                         [$postThread->getId(), "%{$keyword}%"]
+                )->fetchColumn();
+
                 $postBody = (new ToText($post->getBody()))->getText();
                 return new FullResult(
                     $match,
                     $match->id,
-                    $postThread->getTitle(),
+                    $postThread->getTitle() . (
+                        " ($nMatchingPostsInThread matching post" . (($nMatchingPostsInThread === 1) ? "": "s") . " in this thread)"
+                    ),
                     $this->buildBaseUrl()
                          ->withPath("/forum/thread/{$postThread->getId()}")
                          ->withFragment("{$post->getId()}")
