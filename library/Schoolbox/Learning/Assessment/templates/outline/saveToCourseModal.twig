@@ -50,6 +50,26 @@
                     {% endfor %}
                 </ul>
             {% endif %}
+            {% if (assessment.assessables | filter(a => a is lessonPlan)) is not empty %}
+                {% if assessment is lessonPlan %}
+                    <p>
+                        As this project contains lesson plans,
+                        their linked activity set will be <strong>replaced</strong>:
+                    </p>
+                    <ul>
+                        <li>
+                            Any linked activities in lesson plans will be
+                            <strong>added to</strong> the course project lesson
+                            plans
+                        </li>
+                        <li>
+                            Any activities unlinked from lesson plans will be
+                            <strong>removed from</strong> the course project
+                            lesson plans, unless they were not imported at all
+                        </li>
+                    </ul>
+                {% endif %}
+            {% endif %}
         {% endif %}
         {% if assessment is lessonPlan %}
             <p>
