@@ -22,6 +22,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Curriculum;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -730,11 +731,11 @@ class Controller extends BaseController
      *
      * @param Model $model
      * @param int   $templateId
-     * @return HomepageTemplate
+     * @return HomepageTemplate|ISoftDeletable
      * @throws MapperException
      * @throws RangeException
      */
-    private function buildHomepageTemplate(Model $model, int $templateId): HomepageTemplate
+    private function buildHomepageTemplate(Model $model, int $templateId): HomepageTemplate|ISoftDeletable
     {
         if ($templateId === HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
             return $this->homepageTemplateMapper->getKeepExistingHomepageTemplate();
@@ -753,9 +754,7 @@ class Controller extends BaseController
         try {
             return $this->homepageTemplateMapper->findById($templateId);
         } catch (MapperException\Deleted $e) {
-            /* @var HomepageTemplate $deleted */
-            $deleted = $e->getDeletedObject();
-            return $deleted;
+            return $e->getDeletedObject();
         } catch (MapperException $e) {
             throw new RangeException("Invalid template ID specified", 0, $e);
         }
