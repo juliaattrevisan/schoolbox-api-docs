@@ -3,7 +3,6 @@
  * A filter type
  */
 
-import { last } from "lodash";
 import { useFilterTypesStore, FilterType } from "./store/spFilterTypesStore";
 
 interface Props {
@@ -13,7 +12,6 @@ const props = defineProps<Props>();
 
 const filterTypesStore = useFilterTypesStore();
 const isOpen = window.Vue.ref(false); // whether the sub type are shown
-const subTypeValues = props.type.subTypes?.map((subType) => subType.value); // the values of the sub types to check against
 
 /**
  * To show/hide the sub types when selected

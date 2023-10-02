@@ -22,7 +22,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     const isActive = window.Vue.computed(() => activeTypes.value.length > 0);
 
     /**
-     * Add a type to the active types
+     * Add a parent type to the active types
      * @param {FilterType} type - the parent type
      */
     function addType(type: FilterType) {
@@ -32,7 +32,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     }
 
     /**
-     * Remove a type from the active types
+     * Remove a parent type from the active types
      * @param {FilterType} type - the parent type
      */
     function removeType(type: FilterType) {
