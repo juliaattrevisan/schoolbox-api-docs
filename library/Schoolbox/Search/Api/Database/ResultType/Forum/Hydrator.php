@@ -110,7 +110,7 @@ class Hydrator extends BaseHydrator
                     $match,
                     $match->id,
                     $postThread->getTitle() . (
-                        " ($nMatchingPostsInThread matching post" . (($nMatchingPostsInThread === 1) ? "": "s") . " in this thread)"
+                        " ($nMatchingPostsInThread matching post" . (($nMatchingPostsInThread === 1) ? "" : "s") . " in this thread)"
                     ),
                     $this->buildBaseUrl()
                          ->withPath("/forum/thread/{$postThread->getId()}")
