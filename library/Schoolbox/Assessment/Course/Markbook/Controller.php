@@ -183,13 +183,18 @@ class Controller extends WebController\Base
         $this->extendExecutionTime();
 
         $queryArgs = $this->requestQuery->getArrayCopy();
-        [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+        [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
 
         $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
         $csvExporter = new CSV((bool)$this->getConfigLoader()->get('view_rank'));
-        $csvExporter->export($courseMarkbook, $courseSpec->getTitle() . ' - Markbook.csv');
+        $showDrafts  = (bool)($queryArgs['showDrafts'] ?? false);
+        $csvExporter->export(
+            $courseMarkbook,
+            ($showDrafts ? 'Draft - ' : '') . $courseSpec->getTitle() . ' - Markbook.csv',
+            $showDrafts,
+        );
         exit;
     }
 

@@ -23,11 +23,13 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
-     * Exports
+     * Export the course markbook
+     *
      * @param CourseMarkbook $courseMarkbook
      * @param string         $filename
+     * @param bool           $showDrafts
      */
-    public function export(CourseMarkbook $courseMarkbook, string $filename): void
+    public function export(CourseMarkbook $courseMarkbook, string $filename, bool $showDrafts): void
     {
         $this->initExport($filename);
         $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
@@ -41,11 +43,19 @@ class CSV extends AbstractCSV
         foreach ($assessmentSpecs as $assessmentSpec) {
             $mark = '';
             if (key_exists($assessmentSpec->getId(), $courseAverages)) {
-                /* There isn't a published feedback
-                 * Nothing to show; exit early
-                 */
-                if (isset($courseAverages[$assessmentSpec->getId()]['published'])) {
-                    $mark = sprintf("%6.2f %%", $courseAverages[$assessmentSpec->getId()]['published']);
+                $normMark = $courseAverages[$assessmentSpec->getId()]['published'] ?? null;
+                $isDraft  = false;
+                if ($showDrafts) {
+                    if (isset($courseAverages[$assessmentSpec->getId()]['any'])) {
+                        $normMark = $courseAverages[$assessmentSpec->getId()]['any'];
+                        $isDraft  = true;
+                    }
+                }
+                if (isset($normMark)) {
+                    $mark = sprintf("%6.2f %%", $normMark);
+                    if ($isDraft) {
+                        $mark .= self::DRAFT_SUFFIX;
+                    }
                 }
             }
             $courseAverageData = $this->appendData($courseAverageData, $assessmentSpec, $mark);
@@ -74,11 +84,19 @@ class CSV extends AbstractCSV
                 $mark           = '';
                 $assessmentImpl = $classAssessments->offsetGet($assessmentSpec->getId());
                 if ($assessmentImpl && key_exists($assessmentImpl->getId(), $classAverages)) {
-                    /* There isn't a published feedback
-                     * Nothing to show; exit early
-                     */
-                    if (isset($classAverages[$assessmentImpl->getId()]['published'])) {
-                        $mark = sprintf("%6.2f %%", $classAverages[$assessmentImpl->getId()]['published']);
+                    $normMark = $classAverages[$assessmentImpl->getId()]['published'] ?? null;
+                    $isDraft  = false;
+                    if ($showDrafts) {
+                        if (isset($classAverages[$assessmentImpl->getId()]['any'])) {
+                            $normMark = $classAverages[$assessmentImpl->getId()]['any'];
+                            $isDraft  = true;
+                        }
+                    }
+                    if (isset($normMark)) {
+                        $mark = sprintf("%6.2f %%", $normMark);
+                        if ($isDraft) {
+                            $mark .= self::DRAFT_SUFFIX;
+                        }
                     }
                 }
                 $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark);
@@ -95,11 +113,19 @@ class CSV extends AbstractCSV
                 $studentAverageMark = '-';
 
                 if (isset($studentAverageMarks[$student->getId()])) {
-                    /* There isn't a published feedback
-                     * Nothing to show; exit early
-                     */
+                    $hrMark  = $studentAverageMarks[$student->getId()]['published']['hr'] ?? null;
+                    $isDraft = false;
+                    if ($showDrafts) {
+                        if (isset($studentAverageMarks[$student->getId()]['any']['hr'])) {
+                            $hrMark  = $studentAverageMarks[$student->getId()]['any']['hr'];
+                            $isDraft = true;
+                        }
+                    }
                     if (isset($studentAverageMarks[$student->getId()]['published']['hr'])) {
-                        $studentAverageMark = $studentAverageMarks[$student->getId()]['published']['hr'];
+                        $studentAverageMark = $hrMark;
+                        if ($isDraft) {
+                            $studentAverageMark .= self::DRAFT_SUFFIX;
+                        }
                     }
                 }
 
@@ -129,7 +155,14 @@ class CSV extends AbstractCSV
 
                     if (isset($studentMarks[$class->getId()][$assessmentSpec->getId()][$student->getId()])) {
                         // Due work and Quiz
-                        $assessmentData = $this->appendStudentMarks($assessmentData, $assessmentSpec, $assessmentImpl, $studentMarks[$class->getId()][$assessmentSpec->getId()][$student->getId()], $student);
+                        $assessmentData = $this->appendStudentMarks(
+                            $assessmentData,
+                            $assessmentSpec,
+                            $assessmentImpl,
+                            $studentMarks[$class->getId()][$assessmentSpec->getId()][$student->getId()],
+                            $student,
+                            $showDrafts,
+                        );
                     } elseif (isset($studentTaskProgresses[$class->getId()][$assessmentSpec->getId()][$student->getId()])) {
                         // Task
                         switch ($studentTaskProgresses[$class->getId()][$assessmentSpec->getId()][$student->getId()]) {
@@ -188,29 +221,41 @@ class CSV extends AbstractCSV
      * @param IAssessable $assessmentImpl
      * @param array       $currentMark
      * @param User        $student
+     * @param bool        $showDrafts
      * @return array
      */
-    private function appendStudentMarks(array $row, IAssessable $assessment, IAssessable $assessmentImpl, array $currentMark, User $student): array
-    {
-        /* There isn't a published feedback
-         * Nothing to show; exit early
-         */
-        if (!isset($currentMark['published'])) {
+    private function appendStudentMarks(
+        array $row,
+        IAssessable $assessment,
+        IAssessable $assessmentImpl,
+        array $currentMark,
+        User $student,
+        bool $showDrafts,
+    ): array {
+        $mark    = $currentMark['published'] ?? null;
+        $isDraft = false;
+        if ($showDrafts) {
+            if (isset($currentMark['draft'])) {
+                $mark    = $currentMark['draft'];
+                $isDraft = true;
+            }
+        }
+        if (!isset($mark)) {
             return [];
         }
-
-        $humanReadableMark = $currentMark['published']['hr'];
+        $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
+        $humanReadableMark = $mark['hr'];
         if ($this->hasTotalMarkColumn($assessment)) {
-            $row[] = $this->parseNumerator($humanReadableMark);
-            $row[] = $this->parseDenominator($humanReadableMark);
+            $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
+            $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
         } else {
-            $row[] = $humanReadableMark;
+            $row[] = $humanReadableMark . $suffix;
         }
         if ($this->hasNormalizedMarkColumn($assessment)) {
-            $row[] = $currentMark['published']['norm'];
+            $row[] = $mark['norm'] . $suffix;
         }
         if ($this->hasCommentColumn($assessment)) {
-            $row[] = $this->retrieveCommentField($assessmentImpl, $student);
+            $row[] = $this->retrieveCommentField($assessmentImpl, $student) . $suffix;
         }
         return $row;
     }

@@ -25,25 +25,7 @@ Usage:
     <script type="text/javascript">
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function () {
-                $("#show-drafts").click(function () {
-                    if ($(this).is(":checked")) {
-                        $("[data-draft-mark]").show();
-                        $("[data-actual-mark]").hide();
-                        $("[data-student-average]").each(function(idx, elem){
-                            var $elem = $(elem);
-                            $elem.removeClass($elem.attr('data-off-class'));
-                            $elem.addClass($elem.attr('data-on-class'));
-                        });
-                    } else {
-                        $("[data-draft-mark]").hide();
-                        $("[data-actual-mark]").show();
-                        $("[data-student-average]").each(function(idx, elem){
-                            var $elem = $(elem);
-                            $elem.removeClass($elem.attr('data-on-class'));
-                            $elem.addClass($elem.attr('data-off-class'));
-                        });
-                    }
-                });
+                $.marksheetToggleDrafts('#show-drafts');
 
                 // Note that we cannot use window.resize here because we must respond to the pinning of the left nav
                 // menu or right notifications window.  Also we cannot listen for resize events on the container,

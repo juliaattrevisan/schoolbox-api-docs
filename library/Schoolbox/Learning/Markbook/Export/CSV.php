@@ -24,9 +24,14 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
-     * @inheritdoc
+     * Export this markbook as a CSV.
+     *
+     * @param Markbook $markbook   The markbook to export.
+     * @param string   $filename   The filename for the CSV export.
+     * @param bool     $showDrafts Should draft marks be shown in the export?
+     * @return void
      */
-    public function export(Markbook $markbook, string $filename): void
+    public function export(Markbook $markbook, string $filename, bool $showDrafts): void
     {
         $this->initExport($filename);
 
@@ -35,8 +40,8 @@ class CSV extends AbstractCSV
         $sortedAssessments = $this->getSortedAssessments($markbook);
 
         $this->writeHeader($sortedAssessments);
-        $this->writeWeightedMean($sortedAssessments, $markbook);
-        $this->writeStudents($sortedAssessments, $markbook, $students, $participants);
+        $this->writeWeightedMean($sortedAssessments, $markbook, $showDrafts);
+        $this->writeStudents($sortedAssessments, $markbook, $students, $participants, $showDrafts);
 
         $this->closeExport();
     }
@@ -96,8 +101,10 @@ class CSV extends AbstractCSV
      *
      * @param GenericCollection|IAssessable[] $sortedAssessments
      * @param Markbook                        $markbook
+     * @param bool                            $showDrafts
+     * @return void
      */
-    private function writeWeightedMean(GenericCollection $sortedAssessments, Markbook $markbook): void
+    private function writeWeightedMean(GenericCollection $sortedAssessments, Markbook $markbook, bool $showDrafts): void
     {
         // Average row
         $averageRowHeaders = [
@@ -111,7 +118,7 @@ class CSV extends AbstractCSV
         }
         $averageRow        = [];
         foreach ($sortedAssessments as $assessment) {
-            $averageRow = $this->addAverage($averageRow, $markbook, $assessment);
+            $averageRow = $this->addAverage($averageRow, $markbook, $assessment, $showDrafts);
         }
         $this->exportRow($averageRowHeaders, $averageRow);
     }
@@ -124,9 +131,15 @@ class CSV extends AbstractCSV
      * @param Markbook                        $markbook
      * @param GenericCollection               $students
      * @param GenericCollection               $participants
+     * @param bool                            $showDrafts
      */
-    private function writeStudents(GenericCollection $sortedAssessments, Markbook $markbook, GenericCollection $students, GenericCollection $participants): void
-    {
+    private function writeStudents(
+        GenericCollection $sortedAssessments,
+        Markbook $markbook,
+        GenericCollection $students,
+        GenericCollection $participants,
+        bool $showDrafts,
+    ): void {
         $rank = [];
         if ($this->viewRank) {
             $rank = $markbook->getRanking();
@@ -137,15 +150,20 @@ class CSV extends AbstractCSV
                 $student->getExternalId(),
                 $student->getFirstname(),
                 $student->getLastname(),
-                $markbook->getStudentStatistics()[$student->getId()]['weightedMean'],
+                $this->extractDraftOrPublishedValue(
+                    $markbook->getStudentStatistics()[$student->getId()],
+                    $showDrafts,
+                    'weightedMean',
+                    'draftWeightedMean',
+                ),
             ];
             if ($this->viewRank) {
                 $studentRowHeaders[] = $rank[$student->getId()] ?? '';
             }
 
             $studentRow = [];
-            foreach ($sortedAssessments as $assessmentId => $assessment) {
-                $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId);
+            foreach ($sortedAssessments as $assessment) {
+                $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId, $showDrafts);
             }
             $this->exportRow($studentRowHeaders, $studentRow);
         }
@@ -158,11 +176,15 @@ class CSV extends AbstractCSV
      * @param string[]    $row
      * @param Markbook    $markbook
      * @param IAssessable $assessment
+     * @param bool        $showDrafts If true: display a draft if it's there,
+     *                                otherwise show only the non-draft mean
      * @return string[]
+     * @return array
      */
-    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment): array
+    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment, bool $showDrafts): array
     {
-        $row[] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
+        $stats = $markbook->getAssessmentStatistics()[$assessment->getId()];
+        $row[] = $this->extractDraftOrPublishedValue($stats, $showDrafts, 'mean', 'draftMean');
         if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = '';
         }
@@ -183,42 +205,52 @@ class CSV extends AbstractCSV
      * @param GenericCollection|GenericCollection[]|Participant[][] $participants Indexed by assessment.id, then user.id
      * @param IAssessable                                           $assessment
      * @param int                                                   $userId
+     * @param bool                                                  $showDrafts
      * @return string[]
      */
-    private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId): array
-    {
+    private function addParticipant(
+        array $row,
+        GenericCollection $participants,
+        IAssessable $assessment,
+        int $userId,
+        bool $showDrafts,
+    ): array {
         if (
             $participants[$assessment->getId()] instanceof Collection
             && $participants[$assessment->getId()][$userId] instanceof Participant
             && !$participants[$assessment->getId()][$userId]->isExcluded()
         ) {
             $participant = $participants[$assessment->getId()][$userId];
+            $feedback    = $participant->getAuthoritativeFeedback(!$showDrafts);
+            if ($feedback) {
+                $suffix           = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
+                $humanReadableMark = $feedback->getHumanReadableMark();
+                if ($this->hasTotalMarkColumn($assessment)) {
+                    $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
+                    $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
+                } else {
+                    $row[] = $humanReadableMark . $suffix;
+                }
+                if ($this->hasNormalizedMarkColumn($assessment)) {
+                    $row[] = $feedback->getNormalisedMark() . $suffix;
+                }
+                if ($this->hasCommentColumn($assessment)) {
+                    $row[] = $feedback->getComment() . $suffix;
+                }
+                return $row;
+            }
+        }
 
-            $humanReadableMark = $participant->getHumanReadableMark(true);
-
-            if ($this->hasTotalMarkColumn($assessment)) {
-                $row[] = $this->parseNumerator($humanReadableMark);
-                $row[] = $this->parseDenominator($humanReadableMark);
-            } else {
-                $row[] = $humanReadableMark;
-            }
-            if ($this->hasNormalizedMarkColumn($assessment)) {
-                $row[] = $participant->getNormalisedMark(true);
-            }
-            if ($this->hasCommentColumn($assessment)) {
-                $row[] = $this->retrieveCommentField($assessment, $participant->getUser());
-            }
-        } else {
+        // Fallback if nothing to display
+        $row[] = '';
+        if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = '';
-            if ($this->hasTotalMarkColumn($assessment)) {
-                $row[] = '';
-            }
-            if ($this->hasNormalizedMarkColumn($assessment)) {
-                $row[] = '';
-            }
-            if ($this->hasCommentColumn($assessment)) {
-                $row[] = '';
-            }
+        }
+        if ($this->hasNormalizedMarkColumn($assessment)) {
+            $row[] = '';
+        }
+        if ($this->hasCommentColumn($assessment)) {
+            $row[] = '';
         }
         return $row;
     }

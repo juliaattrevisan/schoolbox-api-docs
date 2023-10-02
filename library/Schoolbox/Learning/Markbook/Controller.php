@@ -303,9 +303,13 @@ class Controller extends Base
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
-
-        $csvExporter = new Export\CSV((bool)$this->getConfigLoader()->get('view_rank'));
-        $csvExporter->export($markbook, sprintf('%s - Class Markbook.csv', $folder->getName()));
+        $showDrafts    = (bool)($filtersArray['showDrafts'] ?? false);
+        $csvExporter   = new Export\CSV((bool)$this->getConfigLoader()->get('view_rank'));
+        $csvExporter->export(
+            $markbook,
+            (($showDrafts ? 'Draft - ' : '') . sprintf('%s - Class Markbook.csv', $folder->getName())),
+            $showDrafts,
+        );
         exit;
     }
 
