@@ -40,11 +40,17 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
      * @returns {object} - the date range filter data
      */
     function getFormData() {
-        // only add from and to if they are set
+        // Only add from and to if they are set.
         return {
             date: {
-                ...(hasStartDate.value && { from: startDate.value }),
-                ...(hasEndDate.value && { to: endDate.value }),
+                ...(hasStartDate.value && {
+                    // Add '00:00:00' time here to ensure date range is inclusive of the start date.
+                    from: window.dayjs(startDate.value).startOf("day").format(),
+                }),
+                ...(hasEndDate.value && {
+                    // Add '23:59:59' time here to ensure date range is inclusive of the end date.
+                    to: window.dayjs(endDate.value).endOf("day").format(),
+                }),
             },
         };
     }
