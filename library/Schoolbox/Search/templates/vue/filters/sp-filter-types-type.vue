@@ -3,6 +3,7 @@
  * A filter type
  */
 
+import { last } from "lodash";
 import { useFilterTypesStore, FilterType } from "./store/spFilterTypesStore";
 
 interface Props {
@@ -12,6 +13,7 @@ const props = defineProps<Props>();
 
 const filterTypesStore = useFilterTypesStore();
 const isOpen = window.Vue.ref(false); // whether the sub type are shown
+const subTypeValues = props.type.subTypes?.map((subType) => subType.value); // the values of the sub types to check against
 
 /**
  * To show/hide the sub types when selected
@@ -61,6 +63,14 @@ window.Vue.watch(
         // if all of the sub types are selected, select the parent type
         if (props.type.subTypes.every((subType) => newActiveTypes.includes(subType.value))) {
             filterTypesStore.addType(props.type);
+            return;
+        }
+        // if the parent is selected, and none of the sub types are selected, deselect the parent
+        if (
+            newActiveTypes.includes(props.type.value) &&
+            props.type.subTypes.every((subType) => !newActiveTypes.includes(subType.value))
+        ) {
+            filterTypesStore.removeType(props.type);
         }
     }
 );
