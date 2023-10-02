@@ -61,6 +61,14 @@ window.Vue.watch(
         // if all of the sub types are selected, select the parent type
         if (props.type.subTypes.every((subType) => newActiveTypes.includes(subType.value))) {
             filterTypesStore.addType(props.type);
+            return;
+        }
+        // if the parent is selected, and none of the sub types are selected, deselect the parent
+        if (
+            newActiveTypes.includes(props.type.value) &&
+            props.type.subTypes.every((subType) => !newActiveTypes.includes(subType.value))
+        ) {
+            filterTypesStore.removeType(props.type);
         }
     }
 );

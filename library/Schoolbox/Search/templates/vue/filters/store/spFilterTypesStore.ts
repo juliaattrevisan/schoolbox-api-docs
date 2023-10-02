@@ -22,12 +22,22 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     const isActive = window.Vue.computed(() => activeTypes.value.length > 0);
 
     /**
-     * When a parent type is selected, add all the sub types as well
+     * Add a parent type to the active types
      * @param {FilterType} type - the parent type
      */
     function addType(type: FilterType) {
         if (!activeTypes.value.includes(type.value)) {
             activeTypes.value.push(type.value);
+        }
+    }
+
+    /**
+     * Remove a parent type from the active types
+     * @param {FilterType} type - the parent type
+     */
+    function removeType(type: FilterType) {
+        if (activeTypes.value.includes(type.value)) {
+            activeTypes.value = activeTypes.value.filter((activeType) => activeType !== type.value);
         }
     }
 
@@ -75,6 +85,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
         activeTypes,
         isExpanded,
         addType,
+        removeType,
         addSubTypes,
         removeSubTypes,
         isActive,
