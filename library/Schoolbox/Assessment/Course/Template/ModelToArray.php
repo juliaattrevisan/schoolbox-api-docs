@@ -25,12 +25,14 @@ class ModelToArray
             'id'                => $courseTemplate->getId(),
             'name'              => $courseTemplate->getName(),
             'courseTemplate'    => [
-                'id'    => $courseTemplate->getCourseTemplate()->getId(),
-                'name'  => $courseTemplate->getCourseTemplate()->getName(),
+                'id'        => $courseTemplate->getCourseTemplate()->getId(),
+                'name'      => $courseTemplate->getCourseTemplate()->getName(),
+                'deleted'   => $courseTemplate->getCourseTemplate()->isDeleted(),
             ],
             'unitTemplate'      => [
-                'id'    => $courseTemplate->getUnitTemplate()->getId(),
-                'name'  => $courseTemplate->getUnitTemplate()->getName(),
+                'id'        => $courseTemplate->getUnitTemplate()->getId(),
+                'name'      => $courseTemplate->getUnitTemplate()->getName(),
+                'deleted'   => $courseTemplate->getUnitTemplate()->isDeleted(),
             ],
         ];
     }
