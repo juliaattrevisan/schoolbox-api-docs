@@ -51,6 +51,23 @@
                 </ul>
             {% endif %}
         {% endif %}
+        {% if assessment is lessonPlan %}
+            <p>
+                As this {{ locale.translate('assessment') }} is a lesson plan,
+                its linked activity set will also be <strong>replaced</strong>:
+            </p>
+            <ul>
+                <li>
+                    Any linked activities in this lesson plan will be
+                    <strong>added to</strong> the course's lesson plan
+                </li>
+                <li>
+                    Any activities unlinked from this lesson plan will be
+                    <strong>removed from</strong> the course's lesson plan,
+                    unless they were not imported at all
+                </li>
+            </ul>
+        {% endif %}
         <p>
             Any other imports of the original {{ locale.translate('assessment') }} will
             <strong>not</strong> be updated.
