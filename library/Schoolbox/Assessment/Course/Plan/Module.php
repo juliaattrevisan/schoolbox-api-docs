@@ -15,7 +15,11 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -59,8 +63,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(UserMapper::class)
+            $this->getAssessmentMapperProxy(),
+            $this->getRubricIndicatorMapper()
         );
     }
 
@@ -86,8 +90,29 @@ class Module extends BaseModule
         ];
     }
 
+    /**
+     * @return CourseSpecificationMapper
+     */
     private function getCourseSpecificationMapper()
     {
         return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
+    }
+
+    /**
+     * @return object|AssessmentMapperProxy
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->injector->get('assessmentDataSource');
+    }
+
+    /**
+     * @return RubricIndicatorMapper
+     */
+    private function getRubricIndicatorMapper()
+    {
+        return $this->getMapperFactory()->get(RubricIndicatorMapper::class);
     }
 }
