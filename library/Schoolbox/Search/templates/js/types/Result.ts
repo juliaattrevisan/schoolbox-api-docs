@@ -29,14 +29,6 @@ export type Result = {
     icon?: string;
     _links: {
         subResults?: string; // url to load further results froms
-        stream?: string; // when the result is a stream, this is the url to load the stream from
-        data?: [];
-        metadata?: {
-            cursor: {
-                current: string;
-                next: string;
-            };
-        };
     };
     _subResults?: Results; // further results within the result
 };
