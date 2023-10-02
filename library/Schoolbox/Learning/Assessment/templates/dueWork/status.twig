@@ -288,7 +288,7 @@
  # Massive javascript hulk
  #}
 {% block scripts %}
-    {% if not readonly and assessment.context is unitImplementation %}
+    {% if not readonly and assessment.isImplementation %}
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
 
