@@ -12,11 +12,14 @@
 
 namespace Schoolbox\Resource;
 
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class HomepageTemplate
+class HomepageTemplate implements ISoftDeletable
 {
-    use Id;
+    use ModelTrait\Id;
+    use ModelTrait\DeletedAtDate;
+
 
     /**
      * These are default column widths for homepage templates
