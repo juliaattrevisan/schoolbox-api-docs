@@ -7,6 +7,7 @@ import { Result } from "../../js/types/Result";
 import SpResultsResultImage from "./sp-results-result-image.vue";
 import SpResultsResultTitle from "./sp-results-result-title.vue";
 import SpResultsResultMeta from "./sp-results-result-meta.vue";
+import SpResultsResultActions from "./sp-results-result-actions.vue";
 import SpResultsResultDescription from "./sp-results-result-description.vue";
 
 interface Props {
@@ -21,10 +22,11 @@ const props = defineProps<Props>();
         <div class="l-flex-col l-gap-s l-pad-m">
             <div class="l-flex-row l-gap-s">
                 <sp-results-result-image :result="props.subResult" :is-sub-result="true" />
-                <div class="l-flex-col l-flex--justify-center f-no-margins">
+                <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                     <sp-results-result-title :result="props.subResult" :is-sub-result="true" />
                     <sp-results-result-meta :result="props.subResult" :is-sub-result="true" />
                 </div>
+                <sp-results-result-actions :result="props.subResult" />
             </div>
             <sp-results-result-description v-if="props.subResult.description" :result="props.subResult" />
         </div>

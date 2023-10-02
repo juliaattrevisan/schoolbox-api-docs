@@ -8,6 +8,7 @@ import { Result } from "../../js/types/Result";
 import SpResultsResultImage from "./sp-results-result-image.vue";
 import SpResultsResultTitle from "./sp-results-result-title.vue";
 import SpResultsResultMeta from "./sp-results-result-meta.vue";
+import SpResultsResultActions from "./sp-results-result-actions.vue";
 import SpResultsResultDescription from "./sp-results-result-description.vue";
 import SpResultsSubResults from "./sp-results-sub-results.vue";
 
@@ -48,6 +49,7 @@ const hasSubResults = window.Vue.computed(() => {
                         <sp-results-result-title :result="props.result" />
                         <sp-results-result-meta :result="props.result" />
                     </div>
+                    <sp-results-result-actions :result="props.result" />
                 </div>
                 <sp-results-result-description v-if="props.result.description" :result="result" />
             </div>
