@@ -28,9 +28,6 @@ $dbUserRead     = null;
 $dbPassRead     = null;
 if (PHP_SAPI === 'cli') {
     // CLI invocation.
-    // TODO figure out how instance ID is determined for daemons which may
-    //      service multiple instances:
-    //      this cannot be determined at execution time
     $instanceOpt = getopt('', ['instance:']);
     $instanceId  = $instanceOpt['instance'] ?? (getenv('INSTANCE_ID', true) ?: null);
 
