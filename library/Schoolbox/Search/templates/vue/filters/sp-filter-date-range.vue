@@ -37,7 +37,7 @@ window.Vue.watch(
  * @returns {string} - The formatted date
  */
 function getDateFormatted(date: string) {
-    return window.dayjs(date, "DD/MM/YYYY").format();
+    return window.dayjs(date, window.dateDisplayFormats.dayjs).format();
 }
 
 /**
