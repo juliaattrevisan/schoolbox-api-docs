@@ -97,11 +97,11 @@ class Hydrator extends BaseHydrator
                 $db = $this->threadMapper->getDatabase();
                 $nMatchingPostsInThread = $db->executeQuery(
                     'SELECT COUNT(*)
-                         FROM forumPost
-                         WHERE threadID=?
-                         AND deleted="false"
-                         AND body LIKE ?',
-                         [$postThread->getId(), "%{$keyword}%"]
+                    FROM forumPost
+                    WHERE threadID=?
+                    AND deleted="false"
+                    AND body LIKE ?',
+                    [$postThread->getId(), "%{$keyword}%"]
                 )->fetchColumn();
 
                 $postBody = (new ToText($post->getBody()))->getText();
