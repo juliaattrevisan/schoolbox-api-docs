@@ -172,12 +172,12 @@ class Replicator
     {
         $linkedAssessments = [];
         if ($lessonPlan->isSpecification()) {
-            foreach ($lessonPlan->getLinkedAssessments() as $linkedAssessment) {
+            foreach (($lessonPlan->getLinkedAssessments() ?? []) as $linkedAssessment) {
                 /** @var IAssessable $linkedAssessment */
                 $linkedAssessments[$linkedAssessment->getId()] = $linkedAssessment;
             }
         } elseif ($lessonPlan->isImplementation()) {
-            foreach ($lessonPlan->getLinkedAssessments() as $linkedAssessment) {
+            foreach (($lessonPlan->getLinkedAssessments() ?? []) as $linkedAssessment) {
                 /** @var IAssessable $linkedAssessment */
                 if ($linkedAssessment->getSpecificationAssessment()) {
                     $linkedAssessments[$linkedAssessment->getSpecificationAssessment()->getId()] = $linkedAssessment;
