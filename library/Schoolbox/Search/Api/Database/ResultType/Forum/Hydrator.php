@@ -96,6 +96,7 @@ class Hydrator extends BaseHydrator
 
                 $db = $this->threadMapper->getDatabase();
                 $nMatchingPostsInThread = $db->executeQuery(
+                    // TODO: Get where clause from Forum\QueryParamBuilder->buildBaseWhereParams() somehow.
                     'SELECT COUNT(*)
                     FROM forumPost
                     WHERE threadID=?
