@@ -97,7 +97,7 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword) {
                 $assessment = $assessments->getBy('id', $match->id);
 
-                // Assessment -> Creator is not hydrated, so get from $assessmentCreators instead.
+                // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
                 $assessmentCreator = $assessmentCreatorById[$assessment->getCreator()->getId()];
 
                 if ($assessment instanceof IAssessable) {
