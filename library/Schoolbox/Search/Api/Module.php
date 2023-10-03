@@ -156,6 +156,7 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Assessment\Hydrator(
                     $assessmentMapperProxy,
+                    $mapperFactory->get(UserMapper::class),
                     Access::getInstance(),
                 ),
             ),

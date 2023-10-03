@@ -20,6 +20,7 @@ use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Hydrator for assessment results.
@@ -35,10 +36,12 @@ class Hydrator extends BaseHydrator
      * Constructor
      *
      * @param AssessmentMapperProxy $assessmentMapperProxy Used to fetch assessments for hydration.
+     * @param UserMapper $userMapper Used to hydrate assessment creators.
      * @param Access $access Used to determine if the current user may view this page.
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
+        private UserMapper $userMapper,
         private Access $access,
     ) {
     }
@@ -82,10 +85,20 @@ class Hydrator extends BaseHydrator
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter']);
 
+        // Note creator is not hydrated in $assessments, so get assessment creators separately.
+        $creatorIds = [];
+        foreach ($assessments as $assessment) {
+            $creatorIds[] = $assessment->getCreator()->getId();
+        }
+        $assessmentCreatorById = $this->userMapper->findByColumn('id', $creatorIds)->indexBy('id');
+
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($assessments, $keyword) {
+            function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword) {
                 $assessment = $assessments->getBy('id', $match->id);
+
+                // Assessment -> Creator is not hydrated, so get from $assessmentCreators instead.
+                $assessmentCreator = $assessmentCreatorById[$assessment->getCreator()->getId()];
 
                 if ($assessment instanceof IAssessable) {
                     // Note $match->type will be something like 'assessment.dueWork'.
@@ -105,11 +118,11 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $assessment->getUpdatedAt(),
                         $folder,
-                        null,
+                        'Creator: ' . $assessmentCreator->getFullName(),
                         null,
                         AssessmentType::getIconClassSuffixForType($assessmentType),
                         $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
-                        $assessment->getCreator(),
+                        $assessmentCreator,
                         [$folder],
                         [],
                     );
