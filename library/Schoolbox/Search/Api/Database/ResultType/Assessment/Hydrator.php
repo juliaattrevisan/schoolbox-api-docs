@@ -85,6 +85,10 @@ class Hydrator extends BaseHydrator
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter']);
 
+        if (count($assessments) === 0) {
+            return [];
+        }
+
         // Note creator is not hydrated in $assessments, so get assessment creators separately.
         $creatorIds = [];
         foreach ($assessments as $assessment) {
