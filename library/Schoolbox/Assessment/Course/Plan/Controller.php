@@ -203,6 +203,10 @@ class Controller extends Base
         if (!method_exists($object, 'getCurriculumNodes')) {
             throw new SchoolboxException(sprintf("Object: %s does not have the `getCurriculumNodes` function.", get_class($object)));
         }
+        // if there are no curriculum nodes, then just exit
+        if (null === $object->getCurriculumNodes()) {
+            return;
+        }
         foreach ($object->getCurriculumNodes() as $node) {
             if (!$node->getEnabled() || '' === $node->getCode()) {
                 continue;
