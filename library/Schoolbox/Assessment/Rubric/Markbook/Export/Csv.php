@@ -225,7 +225,7 @@ class Csv extends AbstractCSV
                         $studentMark = $student['assessmentsLatest'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] . self::DRAFT_SUFFIX;
                     }
                 }
-                $studentMark = "\xA0" . $studentMark;
+                $studentMark = self::EXCEL_PREFIX . $studentMark;
             } else {
                 $studentMark = '(excluded)';
             }
@@ -263,7 +263,7 @@ class Csv extends AbstractCSV
                 }
                 if (is_array($result)) {
                     $studentMark = $this->descriptorsOnly && ($result['humanReadableMark'] ?? null)
-                        ? ("\xA0" . $result['humanReadableMark'])
+                        ? (self::EXCEL_PREFIX . $result['humanReadableMark'])
                         : $result['selectedDescriptorText'];
                     if ($isDraftMark) {
                         $studentMark .= self::DRAFT_SUFFIX;
