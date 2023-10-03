@@ -19,8 +19,17 @@ class LearningMomentPhotoCest
     {
         $i->logout();
         $i->loginAsAdmin();
-        $learningMoments = new LearningMoments($i);
-        $i->amOnPage($learningMoments->getStudentProfilePage(25));
+    }
+
+    /**
+     * Deleting data is about to start so it does not get impacted by other tests already executed
+     *
+     * @param AcceptanceTester $i
+     */
+    public function beforeSuite(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at so data does not impact the tests");
+        $i->updateInDatabase('evidence', ['deleted_at' => "2022-01-15 11:22:34"], ['body like' => "%his is a learning moment%"]);
     }
 
     /**
@@ -37,6 +46,7 @@ class LearningMomentPhotoCest
     public function testLearningMomentPhoto(AcceptanceTester $i): void
     {
         $learningMoments = new LearningMoments($i);
+        $i->amOnPage($learningMoments->getStudentProfilePage(25));
         $i->amGoingTo('share a photo learning moment');
         $learningMoments->clickShareLearningMomentLink();
         $learningMoments->clickTakeAPhoto();
@@ -110,7 +120,8 @@ class LearningMomentPhotoCest
         $learningMoments->clickSubmit();
         $i->amGoingTo('checking the learning moment is presented in the student activity feed and getting it updated');
         $i->waitForText('This is a learning moments test to be modified');
-        $learningMoments->clickDropdownMenu(3);
+        $evidenceId = $i->grabFromDatabase('evidence', 'id', ['deleted_at' => null, 'body like' => '%his is a learning moments test to be modified%', 'user_id' => 45]);
+        $learningMoments->clickDropdownMenu($evidenceId);
         $learningMoments->clickModifySubmenu();
         $i->fillCkEditorById('evidence-body', 'This is a learning moments test to be modified updated');
         $learningMoments->deletePhotoEvidence();
@@ -179,12 +190,13 @@ class LearningMomentPhotoCest
         $learningMoments->confirmDeletePhoto();
         sleep(2);
         $learningMoments->clickTakeAPhotoEvidence();
-        $i->fillCkEditorById('evidence-body', 'This is a learning moment test to get deleted');
+        $i->fillCkEditorById('evidence-body', 'This is a learning moments test to get deleted');
         $learningMoments->clickSubmit();
         $i->amGoingTo('checking the learning moment is presented in the student activity feed');
-        $i->waitForText('This is a learning moment test to get deleted');
+        $i->waitForText('This is a learning moments test to get deleted');
         $i->amGoingTo('deleting the learning moment');
-        $learningMoments->clickDropdownMenu(5);
+        $evidenceId = $i->grabFromDatabase('evidence', 'id', ['deleted_at' => null, 'body like' => "%his is a learning moments test to get deleted%", 'user_id' => 29]);
+        $learningMoments->clickDropdownMenu($evidenceId);
         $learningMoments->clickLearningMomentDeleteButton();
         sleep(2);
         $i->click(Locator::lastElement('a.button.submit'));

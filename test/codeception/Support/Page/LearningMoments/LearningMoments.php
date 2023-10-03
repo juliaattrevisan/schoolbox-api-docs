@@ -143,12 +143,12 @@ class LearningMoments
         $this->tester->click(self::COMMENT_SUBMIT_BUTTON);
     }
     /**
-     * click the 3-dot dropdown menu
-     * @param int $studentId
+     * click the 3-dot dropdown menu by passing its evidence
+     * @param int $evidenceId
      */
-    public function clickDropdownMenu(int $studentId): void
+    public function clickDropdownMenu(int $evidenceId): void
     {
-        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-evidence-' . $studentId . ']', '[data-test=wc-actions-dropdown-evidence-' . $studentId . '-dropdown-button]');
+        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-evidence-' . $evidenceId . ']', '[data-test=wc-actions-dropdown-evidence-' . $evidenceId . '-dropdown-button]');
     }
 
     /**
