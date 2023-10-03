@@ -76,7 +76,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The relevance of a assessment is its updated_at time.
+     * Use due_date as the relevancy.
+     * Items due today should appear closer to the top than items due 6 months from now.
+     * Note 'specification' assessments don't have a due_date, so we fall back to updated_at.
      *
      * @return string
      */
@@ -84,10 +86,22 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return $this->buildLinearDecayExpression(
             ':assessmentNow',
-            'assessment.updated_at',
+            'COALESCE(assessment.due_date, assessment.updated_at)',
             7,
             56,
         );
+    }
+
+    /**
+     * Use due_date for the date range filter.
+     * Items due within the specified date range should appear regardless of created_at or updated_at.
+     * Note 'specification' assessments don't have a due_date, so we fall back to updated_at.
+     *
+     * @return string
+     */
+    protected function buildDateExpression(): string
+    {
+        return 'COALESCE(assessment.due_date, assessment.updated_at)';
     }
 
     /**
@@ -153,14 +167,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildIdExpression(): string
     {
         return 'assessment.id';
-    }
-
-    /**
-     * @return string|null
-     */
-    protected function buildDateExpression(): ?string
-    {
-        return 'assessment.updated_at';
     }
 
     /**
