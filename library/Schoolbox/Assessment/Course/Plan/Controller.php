@@ -152,14 +152,6 @@ class Controller extends Base
             Node\Mapper::sortNodes($curriculumNodes, 0);
 
             $unitOut['curriculumCodes'] = $curriculumNodes;
-            $unitOut['curriculumCodesHTML'] = $this->responseFactory->twig->render(
-                '@curriculum/component/curriculumOverview.twig',
-                [
-                    'context'           => ['id' => 0],
-                    'nodes'             => $curriculumNodes,
-                    'curriculumTagging' => true,
-                ]
-            );
 
             $units[] = $unitOut;
         }

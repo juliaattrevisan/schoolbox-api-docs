@@ -37,7 +37,7 @@ class Factory implements ResponseFactoryInterface
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
         private StreamFactoryInterface $streamFactory,
-        public Environment $twig,
+        private Environment $twig,
         private array $dataGenerators = [],
     ) {
     }
