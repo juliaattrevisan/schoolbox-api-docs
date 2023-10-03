@@ -112,7 +112,46 @@ class Controller extends Base
             /**
              * text boxes
              */
-            $textboxes = $textboxMapper->findUsage($unit->getFolder()->getId());
+            $textboxes = [
+                'Learning Outcomes' => null,
+                'Success Criteria' => null,
+                'Outcomes' => null,
+                'extras' => 0
+            ];
+            // fetch all for the folder
+            $statement = $textboxMapper->getDatabase()->prepareQuery("
+                SELECT
+                    `ccih`.value as `componentHeading`,
+                    `textBox`.`textboxID` as `textboxID`,
+                    `textBox`.`heading` as `textboxHeading`,
+                    `textBox`.`body` as `textboxBody`
+                FROM component_definition cd
+                         INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
+                         INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
+                         LEFT JOIN component_config_instance ccih ON ccih.component_instance_id = ci.id
+                         INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+                         LEFT JOIN component_config_definition ccdh ON  ccih.component_config_definition_id = ccdh.id
+                         INNER JOIN textBox ON cci.value = textBox.textBoxID
+                         INNER JOIN folder f ON ci.identifier = f.id
+                WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+                  AND ccd.`key` = 'textbox'
+                  AND ccdh.`key` = 'componentname'
+                  AND textBox.deleted_at IS NULL
+                  AND f.deleted_at IS NULL
+                  AND textBox.categoryID = :folderId
+                GROUP BY textBox.textBoxID, f.id
+                ORDER BY textBox.textBoxID
+            ");
+            $statement->execute(['folderId' => $unit->getFolder()->getId()]);
+            while ($row = $statement->fetch()) {
+                // Check if the textbox exists in plan?
+                if (array_key_exists($row['textboxHeading'], $textboxes)) {
+                    $textboxes[$row['textboxHeading']] = Scrub::html($row['textboxBody']);
+                } else {
+                    //increase the extra textboxes by 1
+                    $textboxes['extras']++;
+                }
+            }
             $unitOut['textboxes'] = $textboxes;
 
             // activities
