@@ -1,3 +1,14 @@
-<pre>
-    {{ units|json_encode }}
-</pre>
+{# Add your own javascript, validation etc. #}
+{# Use pantry for styling #}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Unit Planner - {{ course.title }}</h1>
+        <section class="content">
+            <pre>
+                {{ units |json_encode }}
+            </pre>
+        </section>
+    </div>
+</div>
+
