@@ -1166,7 +1166,7 @@ class Profile implements IStrategy
             $payload = $this->api->retrieveDocument($nextUrl);
 
             foreach ($payload['data'] as $staff) {
-                $externalId = (string)$staff['attributes']['staffCode'];
+                $externalId = trim((string)$staff['attributes']['staffCode']);
 
                 /* Only import data for externalIds in $watchlist, if provided
                  */
@@ -1188,14 +1188,14 @@ class Profile implements IStrategy
 
                 $building = '';
                 $campusName = '';
-                $category = (string)$staff['attributes']['employmentClassification'];
+                $category = trim((string)$staff['attributes']['employmentClassification']);
                 $department = '';
-                $email = (string)$staff['relationships']['person']['data']['attributes']['email'];
-                $lastname = (string)$staff['relationships']['person']['data']['attributes']['lastName'];
-                $positionTitle = (string)$staff['attributes']['jobTitle'];
+                $email = trim((string)$staff['relationships']['person']['data']['attributes']['email']);
+                $lastname = trim((string)$staff['relationships']['person']['data']['attributes']['lastName']);
+                $positionTitle = trim((string)($staff['attributes']['jobTitle'] ?? ''));
                 $room = '';
-                $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
-                $username = (string)$staff['attributes']['timetableCode'];
+                $title = trim((string)$staff['relationships']['person']['data']['attributes']['title']);
+                $username = trim((string)$staff['attributes']['timetableCode']);
 
                 /* Employment status/dates
                  */
@@ -1259,8 +1259,8 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                $firstname = (string)$staffPayload['data']['attributes']['firstName'];
-                $lastname = (string)$staffPayload['data']['attributes']['lastName'];
+                $firstname = trim((string)$staffPayload['data']['attributes']['firstName']);
+                $lastname = trim((string)$staffPayload['data']['attributes']['lastName']);
 
                 $this->log->debug(sprintf(
                     'Secondary api inspection at %s for phone numbers belonging to %s',
