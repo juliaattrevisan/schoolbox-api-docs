@@ -19,6 +19,8 @@
             paging: false,
             searching: false
         });
+
+        onChangeDate('start'); // In case the initial dates are ever set too far apart.
     });
 
     // This is the maximum date range period
@@ -40,16 +42,16 @@
 
         switch (changedDateName) {
             case 'start':
-                // If the new value of startDate plus the period is after endDate, set endDate to startDate plus the period.
+                // If the new value of startDate plus the period is before endDate, set endDate to startDate plus the period.
                 let startDatePlusPeriodObj = startDateObj.add(DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
-                if (startDatePlusPeriodObj.isAfter(endDateObj)) {
+                if (startDatePlusPeriodObj.isBefore(endDateObj)) {
                     $endDate.val(startDatePlusPeriodObj.format(dateFormat));
                 }
                 break;
             case 'end':
-                // If the new value of endDate minus the period is before startDate, set startDate to endDate minus the period.
+                // If the new value of endDate minus the period is after startDate, set startDate to endDate minus the period.
                 let endDateMinusPeriodObj = endDateObj.add(-DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
-                if (endDateMinusPeriodObj.isBefore(startDateObj)) {
+                if (endDateMinusPeriodObj.isAfter(startDateObj)) {
                     $startDate.val(endDateMinusPeriodObj.format(dateFormat));
                 }
                 break;
