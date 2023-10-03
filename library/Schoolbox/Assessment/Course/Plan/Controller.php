@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Plan;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\ModelToArray as IndicatorModelToArray;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -18,11 +19,13 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as RubricIndicatorModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Scrub;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -50,6 +53,7 @@ class Controller extends Base
         // TODO: Inject the things...
         $textboxMapper = TextboxMapper::getInstance();
         $unitAssessmentsTranslator = new UnitAssessments($this->routeGenerator, $this->getUser());
+        $indicatorMap = new IndicatorModelToArray();
         $units = [];
         /**
          * for each unit, generate the data...
@@ -88,8 +92,22 @@ class Controller extends Base
                 'homepage' => "/homepage/" . $unit->getFolder()->getId(),
             ];
 
+            $unitOut['rubricCapabilities'] = [];
             // grab rubric info
-            $unitOut['rubricCapabilities'] = $this->rubricIndicatorMapper->findForFolder($unit->getFolder()->getId());
+            $rubrics = $this->rubricIndicatorMapper->findForFolder($unit->getFolder()->getId());
+            $rubric = $rubrics->groupByCallback(function (RubricIndicatorModel $rubric) {
+                return $rubric->getCapability()->getName();
+            });
+
+            // parse each rubric group and jsonify each of them
+            foreach ($rubric as $group => $indicators) {
+                $unitOut['rubricCapabilities'][] = [
+                    'id' => $indicators->first()->getCapability()->getId(),
+                    'name' => Scrub::markdown($indicators->first()->getCapability()->getName()),
+                    'indicators' => $indicators->map($indicatorMap)
+                ];
+            }
+
 
             /**
              * text boxes
@@ -107,7 +125,7 @@ class Controller extends Base
             $curriculumNodes = $this->nodeMapper->createCollection();
             $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
 
-            foreach ($unitOut['rubricCapabilities'] as $rubric) {
+            foreach ($rubrics as $rubric) {
                 $this->extractCurricNodes($curriculumNodes, $rubric);
             }
 
