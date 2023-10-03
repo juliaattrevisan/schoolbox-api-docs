@@ -125,10 +125,31 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             COALESCE(
                 IF(task.id, assessment.title, NULL),
                 IF(assess.assessment_id, assess.title, NULL),
-                IF(lti_assessment.assessment_id, lti_assessment.lti_assessment_title, NULL),
                 IF(submission_box.id, submission_box.name, NULL),
                 IF(project.id, assessment.title, NULL),
-                IF(lesson_plan.id, assessment.title, NULL)
+                IF(lesson_plan.id, assessment.title, NULL),
+                IF(lti_assessment.assessment_id, lti_assessment.lti_assessment_title, NULL)
+            )
+        ";
+    }
+
+    /**
+     * Assessments have creators (except lti_assessments), but they are set on the tables below assessment.
+     * The creator probably should be specified in the `assessment` table, but moving all those fields up one level might be a bit hard.
+     *
+     * @return string
+     */
+    protected function buildCreatorExpression(): string
+    {
+        // All second-level db tables have a creator field except lti_assessment.
+        return "
+            COALESCE(
+                IF(task.id, task.user_id, NULL),
+                IF(assess.assessment_id, assess.user_id, NULL),
+                IF(submission_box.id, submission_box.owner, NULL),
+                IF(project.id, project.owner_id, NULL),
+                IF(lesson_plan.id, lesson_plan.created_by, NULL),
+                IF(lti_assessment.assessment_id, NULL, NULL)
             )
         ";
     }
@@ -170,17 +191,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    protected function buildCreatorExpression(): ?string
-    {
-        return null; // No assessment.created_by column.
-    }
-
-    /**
-     * @return string|null
-     */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(): string
     {
         return 'mv_assessment_relation.folder_id';
     }
