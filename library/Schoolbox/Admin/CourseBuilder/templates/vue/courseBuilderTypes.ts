@@ -1,6 +1,7 @@
 export type PageTemplate = {
     id: number;
     name: string;
+    deleted: boolean;
 };
 
 export type CourseTemplate = {

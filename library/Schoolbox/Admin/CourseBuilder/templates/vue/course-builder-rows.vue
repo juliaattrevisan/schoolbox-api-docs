@@ -65,13 +65,15 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         <strong class="hide-for-medium-up">Course Page Template:</strong>
                         <div class="select-wrapper">
                             <select v-model="courseTemplate.courseTemplate" required>
+                              <template v-for="availableTemplate in props.availableTemplates">
                                 <option
-                                    v-for="availableTemplate in props.availableTemplates"
+                                    v-if="!availableTemplate.deleted || courseTemplate.courseTemplate.id === availableTemplate.id"
                                     :key="availableTemplate.id"
                                     :value="availableTemplate"
                                 >
-                                    {{ availableTemplate.name }}
+                                    {{ availableTemplate.name }} <template v-if="availableTemplate.deleted">(Deleted)</template>
                                 </option>
+                              </template>
                             </select>
                         </div>
                     </div>
@@ -79,13 +81,15 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         <strong class="hide-for-medium-up">Unit Page Template:</strong>
                         <div class="select-wrapper">
                             <select v-model="courseTemplate.unitTemplate" required>
+                              <template v-for="availableTemplate in props.availableTemplates">
                                 <option
-                                    v-for="availableTemplate in props.availableTemplates"
+                                    v-if="!availableTemplate.deleted || courseTemplate.unitTemplate.id === availableTemplate.id"
                                     :key="availableTemplate.id"
                                     :value="availableTemplate"
                                 >
-                                    {{ availableTemplate.name }}
+                                    {{ availableTemplate.name }} <template v-if="availableTemplate.deleted">(Deleted)</template>
                                 </option>
+                              </template>
                             </select>
                         </div>
                     </div>

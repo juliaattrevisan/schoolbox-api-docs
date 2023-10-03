@@ -1,4 +1,4 @@
-#create table
+# create table
 create table courseTemplates
 (
     id               int(11) unsigned auto_increment,
@@ -13,6 +13,10 @@ create table courseTemplates
     constraint unitTemplates_homepageTemplate_id_fk2
         foreign key (unitTemplateId) references homepageTemplate (id)
 );
+
+# allow homepage templates to be deleted and not break the whole system...
+alter table homepageTemplate
+    add deleted_at datetime null;
 
 # copy config to new table
 INSERT INTO courseTemplates (id, name, courseTemplateId, unitTemplateId) VALUE
