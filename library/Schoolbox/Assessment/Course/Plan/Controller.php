@@ -146,7 +146,10 @@ class Controller extends Base
             while ($row = $statement->fetch()) {
                 // Check if the textbox exists in plan?
                 if (array_key_exists($row['textboxHeading'], $textboxes)) {
-                    $textboxes[$row['textboxHeading']] = Scrub::html($row['textboxBody']);
+                    $textboxes[$row['textboxHeading']] = [
+                        'id' => $row['textboxID'],
+                        'body' => Scrub::html($row['textboxBody'])
+                    ];
                 } else {
                     //increase the extra textboxes by 1
                     $textboxes['extras']++;
