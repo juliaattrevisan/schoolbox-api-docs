@@ -97,6 +97,41 @@ $app = new class extends CliTool\App {
             'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
             'summative_report'  => 'SELECT count(*) FROM summative_report WHERE deleted_at is null',
 
+            // Quiz info
+            'quiz_sections_count'   => 'SELECT assess.assess_id, assessment_id, COUNT(*) AS numSections
+                                        FROM assess
+                                        INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                                        where assess.deleted_at is null
+                                        and assess_section.deleted_at is null
+                                        GROUP BY assess.assess_id
+                                        ORDER BY numSections desc',
+            'quiz_question_count'   => 'select distinct count(*) as numQuestions
+                                        from assess
+                                        inner join assess_section on assess.assess_id = assess_section.assess_id
+                                        inner join assess_question on assess_section.section_id = assess_question.section_id
+                                        where assess.deleted_at is null
+                                        and assess_section.deleted_at is null
+                                        and assess_question.deleted_at is null
+                                        group by assess.assess_id
+                                        order by numQuestions desc',
+            'quiz_random'           => 'SELECT (100 * numRandomised.num / numSections.num) AS percentage,
+                                        concat(numRandomised.num, \'/\', numSections.num) AS ratio
+                                        FROM
+                                        # number of randomised sections
+                                        (select distinct count(*) as num
+                                        from assess
+                                        inner join assess_section on assess.assess_id = assess_section.assess_id
+                                        where random != 0
+                                        and assess.deleted_at is null
+                                        and assess_section.deleted_at is null) AS numRandomised
+                                        INNER JOIN
+                                        # number of non-deleted sections in non-deleted quizzes
+                                        (select count(*) as num
+                                        from assess
+                                        inner join assess_section on assess.assess_id = assess_section.assess_id
+                                        and assess.deleted_at is null
+                                        and assess_section.deleted_at is null) AS numSections',
+
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
             'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE deleted = "false"',
