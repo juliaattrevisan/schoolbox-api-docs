@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Converts a Schoolbox "Rich Text" question into its Learnosity equivalent
  * https://reference.learnosity.com/questions-api/questiontypes#longtextV2
  */
-class RichText implements IStrategy
+class RichText extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -39,7 +39,7 @@ class RichText implements IStrategy
             /* Apparently the upper limit is 100,000
              */
             'max_length' => 99999,
-            'stimulus' => $question['question'],
+            'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
                 'max_score' => (float)$question['marks']

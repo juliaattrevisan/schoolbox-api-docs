@@ -194,6 +194,17 @@
                             let score = responseScores[learnosityReferenceTuple].score;
                             let maxScore = responseScores[learnosityReferenceTuple].max;
 
+                            /* Some questions have a sample answer
+                             * If it does, inject that too
+                             */
+                            let sampleAnswerHtml = '';
+
+                            if (element.metadata.sample_answer) {
+                                sampleAnswerHtml = '<label>Sample Answer</label><div>' +
+                                    element.metadata.sample_answer +
+                                    '</div></label>';
+                            }
+
                             /* Containers into which we inject things
                              */
                             let container = report.querySelector(`[data-reference="${learnosityReference}"]`);
@@ -210,6 +221,7 @@
 
                             guts.innerHTML = '' +
                                 '<div class="sb-custom-score" style="display:none" data-reference="' + learnosityReference + '">' +
+                                sampleAnswerHtml +
                                 '<label>Customise score</label>' +
                                 '<input id="' + inputId + '" name="' + inputName + '" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +

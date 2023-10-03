@@ -28,6 +28,56 @@ use Schoolbox\Learning\Learnosity\TagFactory;
 class BlueprintBuilder
 {
     /**
+     * This isn't an actual Learnosity endpoint but it's used to indicate
+     * when we need to associate a Learnosity quiz with our legacy ones.
+     */
+    public const ENDPOINT_ASSOCIATIONS = 'associations';
+
+
+    /**
+     * Learnosity endpoint index
+     */
+    public const ENDPOINT_FEATURES = '/itembank/features';
+    public const ENDPOINT_QUESTIONS = '/itembank/questions';
+    public const ENDPOINT_ITEMS = '/itembank/items';
+    public const ENDPOINT_ACTIVITIES = '/itembank/activities';
+
+
+    /**
+     * Maximum number of Activities per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+     */
+    private const LEARNOSITY_MAX_ACTIVITIES = 50;
+
+
+    /**
+     * Maximum number of Items per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+     */
+    private const LEARNOSITY_MAX_ITEMS = 50;
+
+
+    /**
+     * Maximum number of Questions per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+     */
+    private const LEARNOSITY_MAX_QUESTIONS = 50;
+
+
+    /**
+     * Maximum number of Features per payload
+     * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setFeatures
+     */
+    private const LEARNOSITY_MAX_FEATURES = 50;
+
+
+    /**
+     * Combined strata of features, questions, items, activities, associations
+     */
+    private array $initialConsolidation;
+
+
+    /**
      * Constructor
      *
      * @param string $schoolCode
@@ -43,6 +93,63 @@ class BlueprintBuilder
         private ContextLookup $contextLookup,
         private LoggerInterface $logger
     ) {
+        /* A generic author identifier attributed to each and every question
+         * since we're aligning the strata of all questions from every quiz.
+         *
+         * Learnosity wants you to give a particular author to a set of questions,
+         * not to an individual question, in the itembank/questions endpoint.
+         * This means we lose the original authorship identifiers, although this
+         * only appears in an audit trail that our users won't ever see afaict
+         */
+        $defaultAuthor = sprintf('%s_v23_migration', $this->schoolCode);
+
+        /* Contains a dynamic property, so it can't be a class const anymore
+         */
+        $this->initialConsolidation = [
+            self::ENDPOINT_FEATURES => [
+                'endpoint' => self::ENDPOINT_FEATURES,
+                'payload' => [
+                    'features' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_QUESTIONS => [
+                'endpoint' => self::ENDPOINT_QUESTIONS,
+                'payload' => [
+                    'meta' => [
+                        'user' => [
+                            /* FIXME replace with actual author somehow, or just assume a system user
+                             *  I'm not really sure this is ever shown to an end user
+                             */
+                            'id' => $defaultAuthor
+                        ]
+                    ],
+                    'questions' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_ITEMS => [
+                'endpoint' => self::ENDPOINT_ITEMS,
+                'payload' => [
+                    'items' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_ACTIVITIES => [
+                'endpoint' => self::ENDPOINT_ACTIVITIES,
+                'payload' => [
+                    'activities' => []
+                ],
+                'count' => 0,
+            ],
+            self::ENDPOINT_ASSOCIATIONS => [
+                'endpoint' => self::ENDPOINT_ASSOCIATIONS,
+                'payload' => [
+                    'associations' => []
+                ],
+                'count' => 0,
+            ]
+        ];
     }
 
 
@@ -101,7 +208,7 @@ class BlueprintBuilder
             if (!empty($feature)) {
                 $this->logger->debug(sprintf(
                     'Built blueprint for feature "%s" (section_id: %s) with learnosity_reference %s',
-                    \TextFormatter::cutSentence($section['title'], 64),
+                    trim(\TextFormatter::cutSentence($section['title'], 64)),
                     $section['section_id'],
                     $feature['reference']
                 ));
@@ -183,7 +290,7 @@ class BlueprintBuilder
                  * from the question text we offered (good luck to those who
                  * only had an image as their question, though.)
                  */
-                $itemStruct['title'] = strip_tags($question['question']);
+                $itemStruct['title'] = $this->payloadFactory->produceTitle($question['question']);
 
                 /* Activity payload needs to know this reference
                  */
@@ -276,6 +383,8 @@ class BlueprintBuilder
 
         return [
             'activityLearnosityReference' => $activityStruct['reference'],
+            'quizId' => $legacyQuiz['assess_id'],
+            'assessmentId' => $legacyQuiz['assessment_id'],
             'payloadSequence' => $payloadSequence,
         ];
     }
@@ -286,6 +395,8 @@ class BlueprintBuilder
      *
      * This maintains our legacy idea of "sections" which are interpreted
      * as analogous to Learnosity Items
+     *
+     * @deprecated
      *
      * @param array $legacyQuiz
      * @return array|array[]
@@ -489,5 +600,128 @@ class BlueprintBuilder
             'activityLearnosityReference' => $activityStruct['reference'],
             'payloadSequence' => $payloadSequence,
         ];
+    }
+
+
+    /**
+     * Create a new consolidation of blueprints.
+     *
+     * Alias/shortcut, since the initial consolidation payload contains a derived
+     * value (author identifier) which cannot be declared in a class const
+     *
+     * @param array $blueprint
+     * @return array
+     */
+
+    public function consolidateNew(array $blueprint): array
+    {
+        return $this->consolidate($this->initialConsolidation, $blueprint);
+    }
+
+
+    /**
+     * Combine the various strata (features, questions, items, activities) of each
+     * $blueprint into one existing mega-blueprint grouped by their corresponding kind.
+     *
+     * @param array $previousConsolidation
+     * @param array $blueprint
+     * @return array
+     */
+    public function consolidate(array $previousConsolidation, array $blueprint): array
+    {
+        /* Add to this thing
+         */
+        $consolidated = $previousConsolidation;
+
+        /* Combined strata of features, questions, items, activities, associations
+         */
+        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+            $endpoint = $payloadSequence['endpoint'];
+
+            /* Update payloads and counts
+             */
+            if (self::ENDPOINT_FEATURES === $endpoint) {
+                $consolidated[$endpoint]['payload']['features'] = array_merge($consolidated[$endpoint]['payload']['features'], $payloadSequence['payload']['features']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['features']);
+            } elseif (self::ENDPOINT_QUESTIONS === $endpoint) {
+                $consolidated[$endpoint]['payload']['questions'] = array_merge($consolidated[$endpoint]['payload']['questions'], $payloadSequence['payload']['questions']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['questions']);
+            } elseif (self::ENDPOINT_ITEMS === $endpoint) {
+                $consolidated[$endpoint]['payload']['items'] = array_merge($consolidated[$endpoint]['payload']['items'], $payloadSequence['payload']['items']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['items']);
+            } elseif (self::ENDPOINT_ACTIVITIES === $endpoint) {
+                $consolidated[$endpoint]['payload']['activities'] = array_merge($consolidated[$endpoint]['payload']['activities'], $payloadSequence['payload']['activities']);
+                $consolidated[$endpoint]['count'] += \count($payloadSequence['payload']['activities']);
+            }
+        }
+
+        /* We need to do this in schoolbox land after the fact
+         */
+        $consolidated[self::ENDPOINT_ASSOCIATIONS]['payload']['associations'][] = [
+            'quizId' => $blueprint['quizId'],
+            'assessmentId' => $blueprint['assessmentId'],
+            'activityLearnosityReference' => $blueprint['activityLearnosityReference']
+        ];
+
+        $consolidated[self::ENDPOINT_ASSOCIATIONS]['count']++;
+
+        return $consolidated;
+    }
+
+
+    /**
+     * Decide if $blueprint can fit onto the already-consolidated stack $consolidated
+     *
+     * @param array $consolidated
+     * @param array $blueprint
+     * @return bool
+     */
+    public function canConsolidate(array $consolidated, array $blueprint): bool
+    {
+        /* Inspect $legacyQuiz to see what is inside, aiming to cram as many
+         * Features, Questions and Items per payload, as Learnosity allows.
+         *
+         * This is all about minimising the number of Learnosity API calls
+         * dynamically based on the content we're trying to cram in to each
+         * payload; see their API docs for limits (also indexed as consts at
+         * the top of this file)
+         */
+        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+            if (self::ENDPOINT_FEATURES === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[self::ENDPOINT_FEATURES]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ((int)$sum >= self::LEARNOSITY_MAX_FEATURES) {
+                    return false;
+                }
+            }
+
+            if (self::ENDPOINT_QUESTIONS === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[self::ENDPOINT_QUESTIONS]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ((int)$sum >= self::LEARNOSITY_MAX_QUESTIONS) {
+                    return false;
+                }
+            }
+
+            if (self::ENDPOINT_ITEMS === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[self::ENDPOINT_ITEMS]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ((int)$sum >= self::LEARNOSITY_MAX_ITEMS) {
+                    return false;
+                }
+            }
+
+            if (self::ENDPOINT_ACTIVITIES === $payloadSequence['endpoint']) {
+                $sum = ($consolidated[self::ENDPOINT_ACTIVITIES]['count'] ?? 0) + $payloadSequence['count'];
+
+                if ((int)$sum >= self::LEARNOSITY_MAX_ACTIVITIES) {
+                    return false;
+                }
+            }
+        }
+
+        /* I guess we can keep consolidating
+         */
+        return true;
     }
 }

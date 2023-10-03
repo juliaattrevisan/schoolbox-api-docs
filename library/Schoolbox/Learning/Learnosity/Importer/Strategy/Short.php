@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Converts a Schoolbox "Short Answer" question into its Learnosity equivalent
  * https://reference.learnosity.com/questions-api/questiontypes#shorttext
  */
-class Short implements IStrategy
+class Short extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -38,13 +38,19 @@ class Short implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $answer = $question['_answers'][0]['answer'];
+        $answer = trim($question['_answers'][0]['answer']);
 
         return [
             'case_sensitive' => false,
             'instant_feedback' => false,
             'max_length' => 250,
-            'stimulus' => $question['question'],
+            /* Correct Answer doesn't show in the ui unless automarkable:true
+             * You can perhaps put it in here as an alternative
+             */
+            'metadata' => [
+                'sample_answer' => $answer
+            ],
+            'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
                 'automarkable' => false,

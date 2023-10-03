@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
  * Converts a Schoolbox "Matching Pairs" question into its Learnosity equivalent
  * https://reference.learnosity.com/questions-api/questiontypes#association
  */
-class MatchingPairs implements IStrategy
+class MatchingPairs extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
@@ -46,8 +46,8 @@ class MatchingPairs implements IStrategy
         $correctAnswers = [];
 
         foreach ($possibleAnswers as $possibleAnswer) {
-            $stimulusList[] = $possibleAnswer->answerLeft;
-            $correctAnswers[] = $possibleAnswer->answerRight;
+            $stimulusList[] = trim($possibleAnswer->answerLeft);
+            $correctAnswers[] = trim($possibleAnswer->answerRight);
         }
 
         /* Randomise whatever this was
@@ -59,7 +59,7 @@ class MatchingPairs implements IStrategy
             'instant_feedback' => false,
             'max_length' => 250,
             'possible_responses' => $possibleAnswers,
-            'stimulus' => $question['question'],
+            'stimulus' => $this->produceQuestionText($question['question']),
             'stimulus_list' => $stimulusList,
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [

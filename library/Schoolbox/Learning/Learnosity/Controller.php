@@ -47,6 +47,7 @@ class Controller extends Base
      * Controller constructor.
      */
     public function __construct(
+        \Schoolbox\Url\Factory $urlFactory,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -59,7 +60,7 @@ class Controller extends Base
          * I don't have a convenient means to access SERVER_NAME except like this, sadly
          */
         $this->api = new Api(
-            $_SERVER['SERVER_NAME'],
+            $urlFactory->buildFullyQualified()->getHost(),
             $this->learnosityConsumerKey,
             $this->learnosityConsumerSecret,
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')

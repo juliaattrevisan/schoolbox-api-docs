@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
 use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
+use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -69,21 +71,15 @@ class ImporterTool extends CliTool\App
     private const OPT_LONG_PRESERVE_SECTIONS = 'preserve-sections';
 
 
-    /**
-     * Learnosity has some strict requirements about where api requests originate
-     */
-    private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
-
-
     /* For prepared statements
      */
 
     /**
      * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
-     * This is the default mechanism by which to mass-import everything
+     * This is the default mechanism by which to mass-import everything.
      *
-     * TODO Potentially load the most recent quizzes first, and the oldest quizzes last
-     *  so that schools can still keep going while this imports in the background.
+     * The ORDER BY clause loads the most recent quizzes first, and the oldest quizzes last
+     * so that schools can still keep going while this imports in the background.
      *
      * TODO Alternatively/additionally you can ignore quizzes that fulfil some set of
      *  conditions, minimising the size of the dataset.
@@ -94,6 +90,8 @@ class ImporterTool extends CliTool\App
         WHERE deleted_at IS NULL
         AND availability = 'assess'
         AND learnosity_reference IS NULL
+        AND external_id IS NULL
+        ORDER BY created_at DESC
     ";
 
 
@@ -108,57 +106,10 @@ class ImporterTool extends CliTool\App
         SELECT assess_id
         FROM assess
         WHERE deleted_at IS NULL
+        AND external_id IS NULL
         AND availability = 'assess'
         AND assessment_id = :assessmentId
     ";
-
-
-    /**
-     * Get a particular schoolbox.assess row
-     */
-    private const QUERY_QUIZ = "
-        SELECT *
-        FROM assess
-        WHERE deleted_at IS NULL
-        AND availability = 'assess'
-        AND assess_id = :assessId
-    ";
-
-
-    /**
-     * Get the sections in a particular schoolbox.assess
-     */
-    private const QUERY_SECTION = '
-        SELECT *
-        FROM assess_section
-        WHERE deleted_at IS NULL
-        AND assess_id = :assessId
-        ORDER BY sequence ASC
-    ';
-
-
-    /**
-     * Get the questions in a particular schoolbox.assess_section
-     */
-    private const QUERY_QUESTION = '
-        SELECT *
-        FROM assess_question
-        WHERE deleted_at IS NULL
-        AND section_id = :sectionId
-        ORDER BY sequence ASC
-    ';
-
-
-    /**
-     * Get the answers in a particular schoolbox.assess_question
-     */
-    private const QUERY_ANSWER = '
-        SELECT *
-        FROM assess_answer
-        WHERE deleted_at IS NULL
-        AND question_id = :questionId
-        ORDER BY sequence ASC
-    ';
 
 
     /**
@@ -179,11 +130,30 @@ class ImporterTool extends CliTool\App
      */
     private \PDOStatement $legacyQuizIdsStatement;
     private \PDOStatement $legacyQuizIdStatement;
-    private \PDOStatement $quizStatement;
-    private \PDOStatement $sectionsStatement;
-    private \PDOStatement $questionStatement;
-    private \PDOStatement $answerStatement;
     private \PDOStatement $associateStatement;
+
+
+    /**
+     * A list of endpoints (both ours and Learnosity's) for metrics
+     */
+    private const ENDPOINT_INDEX = [
+        BlueprintBuilder::ENDPOINT_FEATURES,
+        BlueprintBuilder::ENDPOINT_QUESTIONS,
+        BlueprintBuilder::ENDPOINT_ITEMS,
+        BlueprintBuilder::ENDPOINT_ACTIVITIES,
+        BlueprintBuilder::ENDPOINT_ASSOCIATIONS
+    ];
+
+
+    /**
+     * Some meaningful stats to show at the end of the import
+     *
+     * @var array
+     */
+    private array $timing = [];
+    private array $metrics = [];
+    private int $numBatches = 0;
+    private int $numQuizzesImported = 0;
 
 
     /**
@@ -219,11 +189,13 @@ that is:
  * not already in learnosity (ie. assess.learnosity_reference is null) 
 
 Use --blueprint option in either mode to show the array struct we intended to send to Learnosity
-dumped to the cli. This is useful for manual inspection before committing to a --perform  
+dumped to the cli. This is useful for manual inspection before committing to a --perform
 
-Usage: import.php [--assessment <assessmentId>] [--perform]
-Example: import.php --assessment 123456 --perform
-Example: import.php --assessment 123456 --blueprint
+As usual, verbose mode tells you all the debugging-level info about what the algorithm does.  
+
+Usage: import.php [--assessment <assessmentId>] [--perform] [-vvv]
+Example: import.php --assessment=123456 --perform
+Example: import.php --assessment=123456 --blueprint -vvv
 
 HELP;
             return;
@@ -240,21 +212,27 @@ HELP;
             return;
         }
 
-        /* Don't have access to $_SERVER superglobal here
-         * TODO Maybe make this into a cli arg if you use this outside of vagrant
+        /* Used to segregate each school's data; used in tags and author identifiers
          */
-        $serverName = self::DEFAULT_SERVER_NAME;
-
         $schoolCode = $this->getConfig()->get('site_school_code');
 
         /* Initialise dependencies
+         * Note: we don't have access to $_SERVER superglobal here
          */
+        $server = (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified();
+        $serverName = $server->getHost();
+        $domain = (string)$server;
+
         $api = new Api(
             $serverName,
             $this->getConfig()->get('learnosity_consumer_key'),
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger()
         );
+
+        /* Used to manufacture an array containing all the legacy quiz's contents
+         */
+        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal());
 
         /* Generates sets of tags for Activities' and Items' assignations
          */
@@ -266,7 +244,7 @@ HELP;
 
         /* Generates payload array structs
          */
-        $payloadFactory = new PayloadFactory(new Strategy\Factory());
+        $payloadFactory = new PayloadFactory(new Strategy\Factory($domain));
 
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
@@ -275,16 +253,12 @@ HELP;
 
         /* Capture basic metrics
          */
-        $timing = [];
+        $this->metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
 
         /* Precompile queries
          */
         $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
         $this->legacyQuizIdStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_ID);
-        $this->quizStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUIZ);
-        $this->sectionsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_SECTION);
-        $this->questionStatement = $this->getDatabaseInternal()->prepare(self::QUERY_QUESTION);
-        $this->answerStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ANSWER);
         $this->associateStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
 
         /* Obtain data set.
@@ -309,6 +283,8 @@ HELP;
          */
         $this->getLogger()->info('Learnosity Migration.');
         $this->getLogger()->info('');
+
+        $overallStart = microtime(true);
 
         /*
             foreach $quiz in $quizzes
@@ -346,141 +322,208 @@ HELP;
                 if successful, update the learnosity_reference so we know it ended up in learnosity
                 otherwise something went wrong and this row is still a candidate for import
         */
-        try {
-            foreach ($legacyQuizIds as $legacyQuizId) {
-                $this->refreshLock($lock);
-
-                /* Get the legacy quiz's contents
+        if (\count($legacyQuizIds)) {
+            try {
+                /* $legacyQuizIds is a bunch of identifiers
+                 *
+                 * We can perhaps minimise more Learnosity requests by batching $blueprints
+                 * which typically represent a single quiz. There's a limit on the number of
+                 * quizzes, but there's also a limit on number of features/questions/items
+                 * which isn't particularly obvious
                  */
-                $legacyQuiz = $this->getQuiz($legacyQuizId);
+                $consolidatedBlueprint = null;
 
-                /* Announce what we're doing
-                 */
-                $this->getLogger()->info(sprintf(
-                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                    $legacyQuiz['title'],
-                    $legacyQuiz['assessment_id'],
-                    $legacyQuiz['assess_id']
-                ));
-
-                /* If this doesn't have an assessment_id, idk what this is,
-                 * because you can't get here anymore.
-                 */
-                if ('' === trim((string)$legacyQuiz['assessment_id'])) {
-                    $this->getLogger()->warning(sprintf(
-                        'Missing assessment_id; skipping'
-                    ));
-
-                    continue;
-                }
-
-                /* Make the overall Learnosity payloads which we then send later with
-                 * a little postprocessing to put things into the exactly correct format.
-                 * Learnosity is really particular about such things.
-                 */
-                try {
-                    /* Choose which construction style you want
+                foreach ($legacyQuizIds as $legacyQuizId) {
+                    /* Do all the stuff it used to do to produce a $blueprint
                      */
-                    if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                        $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
-                    } else {
-                        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-                    }
-                } catch (\DomainException $e) {
-                    $this->getLogger()->warning($e->getMessage());
-                    $this->getLogger()->warning(sprintf(
-                        'Skipping assess_id %s',
+                    $this->refreshLock($lock);
+
+                    /* Get the legacy quiz's contents
+                     */
+                    $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
+
+                    /* Announce what we're doing
+                     */
+                    $this->getLogger()->info(sprintf(
+                        'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                        $legacyQuiz['title'],
+                        $legacyQuiz['assessment_id'],
                         $legacyQuiz['assess_id']
                     ));
 
-                    continue;
-                }
-
-                /* Optionally show array payloads
-                 */
-                if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
-                    print_r($blueprint);
-                }
-
-                /* Actually do it
-                 */
-                if ($this->perform()) {
-                    $this->getLogger()->debug('Importing into Learnosity. This might take a while.');
-
-                    $start = microtime(true);
-
-                    /* Iterate and bombard Learnosity with api requests pewpewpew
+                    /* If this doesn't have an assessment_id, idk what this is,
+                     * because you can't get here anymore.
                      */
-                    foreach ($blueprint['payloadSequence'] as $data) {
-                        $this->getLogger()->debug(sprintf(
-                            '%s: transmitting payload (size: %s) to learnosity...',
-                            $data['endpoint'],
-                            $data['count']
+                    if ('' === trim((string)$legacyQuiz['assessment_id'])) {
+                        $this->getLogger()->warning(sprintf(
+                            'Missing assessment_id; skipping'
                         ));
 
-                        /* Skip zero-sized payloads; learnosity hates that
-                         *
-                         * (alternatively capture exception but probably not helpful most of the time)
-                         *
-                         * The main way this has happened to me is when you create a quiz
-                         * using learnosity, then artificially reset its learnosity_reference
-                         * to null, then try to reimport that back into learnosity - this is
-                         * an exceedingly particular scenario that shouldn't happen organically.
-                         *
-                         * Or, there's just an empty section somehow.
-                         */
-                        if ($data['count'] > 0) {
-                            $api->dataSetRequest($data['endpoint'], $data['payload']);
-                        }
+                        continue;
                     }
 
-                    /* Associate the learnosity reference back to our legacy quiz
+                    /* Make the overall Learnosity payloads which we then send later with
+                     * a little postprocessing to put things into the exactly correct format.
+                     * Learnosity is really particular about such things.
                      */
-                    $this->getLogger()->info(sprintf(
-                        'Associating legacy quiz with learnosity_reference %s',
-                        $blueprint['activityLearnosityReference']
-                    ));
+                    try {
+                        /* Choose which construction style you want
+                         */
+                        if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
+                            $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
+                        } else {
+                            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+                        }
+                    } catch (\DomainException $e) {
+                        $this->getLogger()->warning($e->getMessage());
+                        $this->getLogger()->warning(sprintf(
+                            'Skipping assess_id %s',
+                            $legacyQuiz['assess_id']
+                        ));
 
-                    $this->associateStatement->execute([
-                        'learnosityReference' => $blueprint['activityLearnosityReference'],
-                        'assessId' => $legacyQuizId
-                    ]);
+                        continue;
+                    }
 
-                    $end = microtime(true);
-
-                    /* Capture metrics
+                    /* Consolidate 1 quiz to start with
+                     *
+                     * Stack them up by their various strata -
+                     * all the features get combined, all the questions get combined,
+                     * all the items get combined and all the activities get combined.
                      */
-                    $timing[] = $end - $start;
+                    if (null === $consolidatedBlueprint) {
+                        $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
+                        $this->numQuizzesImported++;
+
+                        $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
+
+                        continue;
+                    }
+
+                    /* Fetch the next quiz and perform a similar inspection
+                     * If adding it allows all payloads to be under their limit,
+                     * keep repeating this process until $nextQuiz causes one
+                     * of the payloads to exceed the limit
+                     */
+                    $canConsolidate = $blueprintBuilder->canConsolidate($consolidatedBlueprint, $blueprint);
+
+                    if ($canConsolidate) {
+                        $consolidatedBlueprint = $blueprintBuilder->consolidate($consolidatedBlueprint, $blueprint);
+                        $this->numQuizzesImported++;
+
+                        $this->getLogger()->debug('Consolidating quiz and continuing onwards');
+
+                        continue;
+                    }
+
+                    $this->getLogger()->info('Consolidation full; this quiz goes into next batch.');
+
+                    /* We've got a full $consolidatedBlueprints; we can't add another
+                     * Start doing some real work with Learnosity
+                     */
+                    $this->getLogger()->debug('Transmitting existing consolidation and setting this quiz for next consolidation');
+
+                    /* Send it
+                     */
+                    $this->transmit($api, $consolidatedBlueprint);
+
+                    /* Make the next $consolidatedBlueprint start with $blueprint
+                     * Rinse and repeat until all is done
+                     */
+                    $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
+
+                    /* Log counts as we progress
+                     */
+                    $this->numQuizzesImported++;
                 }
 
-                $this->getLogger()->info('Done.');
-                $this->getLogger()->info('');
+                /* Remainder data
+                 * Transmit the last consolidated payload
+                 */
+                $this->getLogger()->debug('Transmitting final consolidated remainder');
+
+                /* Send it
+                 */
+                $this->transmit($api, $consolidatedBlueprint);
+            } catch (\Alaress\Lock\LockRefreshException $e) {
+                /* Lock TTL expired; just leave politely
+                 */
+                return;
+            } catch (\Exception $e) {
+                /* Some other random death
+                 */
+                $this->getLogger()->warning($e->getMessage());
+                return;
             }
-        } catch (\Alaress\Lock\LockRefreshException $e) {
-            /* Lock TTL expired; just leave politely
-             */
-            return;
-        } catch (\Exception $e) {
-            /* Some other random death
-             */
-            $this->getLogger()->warning($e->getMessage());
-            return;
         }
+
+        /* Capture overall time spent importing
+         */
+        $overallEnd = microtime(true);
+        $totalDuration = $overallEnd - $overallStart;
 
         /* Report some metrics
          */
-        $numImported = \count($timing);
-
-        if (!$numImported) {
+        if (!$this->numQuizzesImported) {
             $this->getLogger()->info('No quizzes imported; none found. Exiting.');
             return;
         }
 
+        /* Endpoint usage
+         */
+        $this->getLogger()->info('');
+        $this->getLogger()->info('');
+        $this->getLogger()->info('Learnosity Migration Summary');
+        $this->getLogger()->info('');
+
+        if ($this->perform()) {
+            /* Total time spent here
+             */
+            $this->getLogger()->info(sprintf(
+                '    Total time spent importing: approx. %s seconds',
+                round($totalDuration)
+            ));
+
+            /* Timing stats only available in perform mode
+             */
+            $this->getLogger()->info(sprintf(
+                '    Average time taken per quiz: approx. %s seconds',
+                round(array_sum($this->timing) / $this->numQuizzesImported)
+            ));
+
+            $this->getLogger()->info('');
+        }
+
+        /* Number of quizzes imported
+         */
         $this->getLogger()->info(sprintf(
-            'Number of quizzes imported: %s. Average time taken per quiz: approx. %s seconds',
-            $numImported,
-            round(array_sum($timing) / $numImported)
+            '    Number of quizzes imported: %s',
+            $this->numQuizzesImported
         ));
+
+        /* Number of batches used
+         */
+        $this->getLogger()->info(sprintf(
+            '    Number of batches used: %s',
+            $this->numBatches
+        ));
+
+        $this->getLogger()->info(sprintf(
+            '    Average quizzes per batch: %s',
+            number_format($this->numQuizzesImported / $this->numBatches, 2)
+        ));
+
+        $this->getLogger()->info('');
+
+        foreach ($this->metrics as $endpoint => $data) {
+            $this->getLogger()->info(sprintf(
+                '    %s: %s objects sent (approx. %s seconds total)',
+                $endpoint,
+                $data['count'],
+                number_format($data['duration'], 3)
+            ));
+        }
+
+        $this->getLogger()->info('');
 
         /* Announce conclusion
          */
@@ -531,114 +574,120 @@ HELP;
 
 
     /**
-     * Get a quiz that:
-     *     * is not deleted
-     *     * is not yet in learnosity
+     * Get some quantities of each endpoint we used
      *
-     * @param int $assessId
-     * @return array
+     * @param array $consolidatedBlueprint
+     */
+    private function accumulateMetrics(array $consolidatedBlueprint): void
+    {
+        foreach (self::ENDPOINT_INDEX as $type) {
+            $this->metrics[$type]['count'] += $consolidatedBlueprint[$type]['count'];
+        }
+    }
+
+
+    /**
+     * Sends data to Learnosity and returns updated metrics
+     *
+     * @param Api $api
+     * @param array $consolidatedBlueprint
+     * @return void
+     * @throws ValidationException
      * @throws \JsonException
      * @throws \PDOException
+     * @throws \RuntimeException
      */
-    private function getQuiz(int $assessId): array
+    private function transmit(Api $api, array $consolidatedBlueprint): void
     {
-        $this->quizStatement->execute([
-            'assessId' => $assessId
-        ]);
-
-        /* Final stack
+        /* Accumulate some basic metrics
          */
-        $quizRow = $this->quizStatement->fetch(\PDO::FETCH_ASSOC);
-        $quizRow['_sections'] = [];
+        $this->accumulateMetrics($consolidatedBlueprint);
 
-        /* Get its sections
+        /* Optionally show array payloads
          */
-        $this->sectionsStatement->execute([
-            'assessId' => $quizRow['assess_id']
-        ]);
+        if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+            print_r($consolidatedBlueprint);
+        }
 
-        while ($sectionRow = $this->sectionsStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $sectionRow['_questions'] = [];
+        /* When perform mode is on, actually send it as batches of features, questions,
+         * items, activities and just...hope/presumed that everything worked out
+         */
+        if ($this->perform()) {
+            $this->getLogger()->info(sprintf(
+                'Importing %s consolidated quizzes into Learnosity. This might take a while.',
+                $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
+            ));
 
-            /* Get each section's questions
+            /* Iterate and bombard Learnosity with api requests pewpewpew
              */
-            $this->questionStatement->execute([
-                'sectionId' => $sectionRow['section_id']
-            ]);
+            $batchStart = microtime(true);
 
-            while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $questionRow['_answers'] = [];
+            foreach ($consolidatedBlueprint as $endpoint => $data) {
+                $endpointStart = microtime(true);
 
-                /* Decompile config
+                /* Associate the learnosity reference back to our legacy quiz
                  */
-                $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
+                if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
+                    foreach ($data['payload']['associations'] as $association) {
+                        $this->getLogger()->info(sprintf(
+                            'Associating quiz (assessment_id: %s, assess_id: %s) with %s...',
+                            $association['assessmentId'],
+                            $association['quizId'],
+                            substr($association['activityLearnosityReference'], 0, 13)
+                        ));
 
-                /* Get each question's answers
-                 */
-                $this->answerStatement->execute([
-                    'questionId' => $questionRow['question_id']
-                ]);
+                        $this->associateStatement->execute([
+                            'learnosityReference' => $association['activityLearnosityReference'],
+                            'assessId' => $association['quizId']
+                        ]);
+                    }
+                } else {
+                    $this->getLogger()->debug(sprintf(
+                        '%s: transmitting payload (size: %s) to Learnosity...',
+                        $data['endpoint'],
+                        $data['count']
+                    ));
 
-                while ($answerRow = $this->answerStatement->fetch(\PDO::FETCH_ASSOC)) {
-                    $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
-
-                    $questionRow['_answers'][] = $answerRow;
+                    /* Skip zero-sized payloads; Learnosity hates that
+                     *
+                     * (alternatively capture exception but probably not helpful most of the time)
+                     *
+                     * The main way this has happened to me is when you create a quiz
+                     * using Learnosity, then artificially reset its learnosity_reference
+                     * to null, then try to reimport that back into Learnosity - this is
+                     * an exceedingly particular scenario that shouldn't happen organically.
+                     *
+                     * Or, there's just an empty section somehow.
+                     */
+                    if ($data['count'] > 0) {
+                        $api->dataSetRequest($data['endpoint'], $data['payload']);
+                    }
                 }
 
-                $sectionRow['_questions'][] = $questionRow;
+                /* Capture endpoint-specific durations
+                 */
+                $endpointEnd = microtime(true);
+
+                $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
             }
 
-            $quizRow['_sections'][] = $sectionRow;
+            $batchEnd = microtime(true);
+
+            /* Capture overall metrics
+             */
+            $this->timing[] = $batchEnd - $batchStart;
         }
 
-        return $quizRow;
-    }
-
-
-    /**
-     * Question Configurations hid some settings which we can use in Learnosity Land
-     *
-     * @param array $question
-     * @return mixed
-     * @throws \JsonException
-     */
-    private function decompileQuestionConfig(array $question): mixed
-    {
-        if ('' !== (string)$question['config']) {
-            return json_decode($question['config'], true, 512, JSON_THROW_ON_ERROR);
-        }
-
-        return $question['config'];
-    }
-
-
-    /**
-     * Certain question types were supposed to have serialized answers
-     * These were never really treated like a codec and the handlers
-     * are intertwined with phplibs, which is annoying
-     *
-     * @param array $question
-     * @param array $answer
-     * @return mixed
-     */
-    private function decompileAnswer(array $question, array $answer): mixed
-    {
-        /* Quiz only uses types 2, 4 and 5
-         * (6,8,9,10,17 are all Survey)
+        /* Log counts as we progress
          */
-        $serializedAnswers = [
-            Strategy\Multi::QUESTION_TYPE_ID,
-            Strategy\MatchingPairs::QUESTION_TYPE_ID,
-            Strategy\Radio::QUESTION_TYPE_ID,
-        ];
+        $this->numBatches++;
 
-        if (in_array($question['type_id'], $serializedAnswers, false)) {
-            return unserialize($answer['answer'], [
-                'allowed_classes' => true
-            ]);
-        }
+        $this->getLogger()->info(sprintf(
+            'Batch %s done.',
+            $this->numBatches
+        ));
 
-        return $answer['answer'];
+        $this->getLogger()->info('');
     }
 
 

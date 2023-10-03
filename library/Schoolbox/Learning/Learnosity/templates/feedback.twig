@@ -84,12 +84,24 @@
                         let score = attemptScores[learnosityReferenceTuple].score;
                         let maxScore = attemptScores[learnosityReferenceTuple].max;
 
+                        /* Some questions have a sample answer
+                         * If it does, inject that too
+                         */
+                        let sampleAnswerHtml = '';
+
+                        if (element.metadata.sample_answer) {
+                            sampleAnswerHtml = '<label>Sample Answer</label><div>' +
+                                element.metadata.sample_answer +
+                                '</div></label>';
+                        }
+
                         /* Containers into which we inject things
                          */
                         let container = $('[data-reference="' + learnosityReference + '"]');
 
                         container.append('' +
                             '<div class="sb-custom-score">' +
+                                sampleAnswerHtml +
                                 '<label>Customise score</label>' +
                                 '<input name="scores[' + learnosityReferenceTuple + ']" type="number" value="' + score + '">' +
                                 '<label>Comment</label>' +

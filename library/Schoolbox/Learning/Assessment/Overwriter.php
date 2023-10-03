@@ -146,7 +146,7 @@ class Overwriter
          * so we need to orphan its existing quiz thing
          */
         $api = new Api(
-            $_SERVER['SERVER_NAME'],
+            (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified()->getHost(),
             $this->quizMapper->getConfigLoader()->get('learnosity_consumer_key'),
             $this->quizMapper->getConfigLoader()->get('learnosity_consumer_secret'),
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
