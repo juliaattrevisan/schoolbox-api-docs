@@ -29,6 +29,16 @@ class AbstractCSV
     protected const DRAFT_SUFFIX = ' (draft)';
 
     /**
+     * A prefix for human-readable mark fields in the CSV, designed to prevent
+     * date-like human-readable marks from being rendered as date values when
+     * viewing in Excel.
+     *
+     * Yes, this is not a valid UTF-8 character: it still makes Excel behave
+     * sort-of as expected.
+     */
+    protected const EXCEL_PREFIX = "\xA0";
+
+    /**
      * @var resource
      */
     protected $fp;
