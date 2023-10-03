@@ -137,7 +137,6 @@ class Controller extends Base
             $curriculumNodes = $this->nodeMapper->createCollection();
             $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
 
-            $this->extractCurricNodes($curriculumNodes, $rubrics);
             foreach ($rubrics as $rubric) {
                 $this->extractCurricNodes($curriculumNodes, $rubric);
             }
