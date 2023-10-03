@@ -115,7 +115,7 @@ class Controller extends Base
                 'eventTypes'  => $this->eventTypeMapper->findAll(),
                 'inContext'   =>  $inContext,
             ],
-            'Assessment Calendar',
+            'Learning Activities',
             $pageTitle
         );
     }
