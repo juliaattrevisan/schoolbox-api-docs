@@ -79,6 +79,12 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+    /**
+     * Preloads the course so we can extract the units and course info
+     * @param array $params
+     * @return array
+     * @throws NotFound
+     */
     private function preloadCourse(array $params): array
     {
         try {
@@ -95,17 +101,17 @@ class Module extends BaseModule
     /**
      * @return CourseSpecificationMapper
      */
-    private function getCourseSpecificationMapper()
+    private function getCourseSpecificationMapper(): CourseSpecificationMapper
     {
         return $this->getMapperFactory()->get(CourseSpecificationMapper::class);
     }
 
     /**
-     * @return object|AssessmentMapperProxy
+     * @return AssessmentMapperProxy
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected function getAssessmentMapperProxy()
+    protected function getAssessmentMapperProxy(): AssessmentMapperProxy
     {
         return $this->injector->get('assessmentDataSource');
     }
@@ -113,7 +119,7 @@ class Module extends BaseModule
     /**
      * @return RubricIndicatorMapper
      */
-    private function getRubricIndicatorMapper()
+    private function getRubricIndicatorMapper(): RubricIndicatorMapper
     {
         return $this->getMapperFactory()->get(RubricIndicatorMapper::class);
     }
@@ -121,7 +127,7 @@ class Module extends BaseModule
     /**
      * @return NodeMapper
      */
-    private function getNodeMapper()
+    private function getNodeMapper(): NodeMapper
     {
         return $this->getMapperFactory()->get(NodeMapper::class);
     }

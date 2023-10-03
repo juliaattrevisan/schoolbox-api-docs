@@ -11,20 +11,16 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Plan;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\ModelToArray as IndicatorModelToArray;
 use Schoolbox\Collection;
-use Schoolbox\Curriculum\Node\Mapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as RubricIndicatorModel;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Curriculum\Node;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Scrub;
 use Twig\Error\Error;
 
@@ -35,7 +31,7 @@ class Controller extends Base
      *
      * @param AssessmentMapperProxy $assessmentMapper
      * @param RubricIndicatorMapper $rubricIndicatorMapper
-     * @param Mapper                $nodeMapper
+     * @param Node\Mapper           $nodeMapper
      */
     public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper, private Node\Mapper $nodeMapper)
     {
@@ -50,8 +46,6 @@ class Controller extends Base
      */
     public function getPlan(CourseSpecification $course): void
     {
-        // TODO: Inject the things...
-        $textboxMapper = TextboxMapper::getInstance();
         $unitAssessmentsTranslator = new UnitAssessments($this->routeGenerator, $this->getUser());
         $indicatorMap = new IndicatorModelToArray();
         $units = [];
@@ -59,32 +53,6 @@ class Controller extends Base
          * for each unit, generate the data...
          */
         foreach ($course->getUnits() as $unit) {
-            /**
-             * { // UNIT
-             * "id": 6,
-             * "title": "Romeo and Juliet",
-             * "url": "/homepage/88",
-             * "learningOutcomes": "",
-             * "successCriteria": "",
-             * "outcomes": "",
-             * "activities": [
-             * {
-             * "id": 446,
-             * "title": "due work 1",
-             * "assessmentType": "dueWork",
-             * "course": "Year 9 English",
-             * "unit": "Romeo and Juliet",
-             * "projectName": "Project 1",
-             * "_links": {
-             * "status": "\/learning\/assessments\/446\/13"
-             * },
-             * "assessments": null
-             * }
-             * ],
-             * "rubricCapabilities": "",
-             * "curriculumCodes": ""
-             * }
-             */
             // unit title / info
             $unitOut = [
                 'id' => $unit->getId(),
@@ -108,9 +76,8 @@ class Controller extends Base
                 ];
             }
 
-
             /**
-             * text boxes
+             * 'Standard' Unit textbox collection, with an `extra` to keep track of the count of additional textboxes that don't match the other titles
              */
             $textboxes = [
                 'Learning Outcomes' => null,
@@ -119,7 +86,7 @@ class Controller extends Base
                 'extras' => 0
             ];
             // fetch all for the folder
-            $statement = $textboxMapper->getDatabase()->prepareQuery("
+            $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
                 SELECT
                     `ccih`.value as `componentHeading`,
                     `textBox`.`textboxID` as `textboxID`,
@@ -144,14 +111,17 @@ class Controller extends Base
             ");
             $statement->execute(['folderId' => $unit->getFolder()->getId()]);
             while ($row = $statement->fetch()) {
-                // Check if the textbox exists in plan?
+                // Check if the textbox should exist in the plan?
                 if (array_key_exists($row['textboxHeading'], $textboxes)) {
+                    // NOTE: This is all based on component titles (which don't need to be unique),
+                    // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                     $textboxes[$row['textboxHeading']] = [
                         'id' => $row['textboxID'],
                         'body' => Scrub::html($row['textboxBody'])
                     ];
                 } else {
-                    //increase the extra textboxes by 1
+                    // increase the extra textboxes by 1
+                    // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
                     $textboxes['extras']++;
                 }
             }
@@ -163,10 +133,11 @@ class Controller extends Base
             $unitOut['activities'] = $assessments->map($unitAssessmentsTranslator);
 
             // curriculum
-            // build curriculum data
+            // collate curriculum data
             $curriculumNodes = $this->nodeMapper->createCollection();
             $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
 
+            $this->extractCurricNodes($curriculumNodes, $rubrics);
             foreach ($rubrics as $rubric) {
                 $this->extractCurricNodes($curriculumNodes, $rubric);
             }
@@ -195,17 +166,18 @@ class Controller extends Base
 
             $unitOut['curriculumCodes'] = $curriculumNodes;
 
+            // add this units data to the whole course units collection.
             $units[] = $unitOut;
         }
 
 
-        $this->response = $this->responseAsJson($units);
-    return;
-//        $this->response = $this->responseFromTemplate('@coursePlan/index.twig', ['course' => $course, 'units' => $units], 'Unit Planner');
+        $this->response = $this->responseFromTemplate('@coursePlan/index.twig', ['course' => $course, 'units' => $units], 'Unit Planner');
     }
 
     /**
      * Find all ancestor ids to remove duplicates
+     * Dupe of \Schoolbox\Curriculum\Component\CurriculumOverviewController::getAllAncestorIds
+     *
      * @param Node\Model $node
      * @return array
      */
@@ -228,6 +200,10 @@ class Controller extends Base
      */
     private function extractCurricNodes(Collection $curriculumNodes, object $object): void
     {
+        // ensure the object we are attempting to extract curriculum codes actually has the required function.
+        if (!method_exists($object, 'getCurriculumNodes')) {
+            throw new SchoolboxException(sprintf("Object: %s does not have the `getCurriculumNodes` function.", get_class($object)));
+        }
         foreach ($object->getCurriculumNodes() as $node) {
             if (!$node->getEnabled() || '' === $node->getCode()) {
                 continue;
