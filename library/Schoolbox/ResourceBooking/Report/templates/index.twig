@@ -42,16 +42,16 @@
 
         switch (changedDateName) {
             case 'start':
-                // If the new value of startDate plus the period is before endDate, set endDate to startDate plus the period.
+                // If end date is too far ahead of start date, fix end date.
                 let startDatePlusPeriodObj = startDateObj.add(DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
-                if (startDatePlusPeriodObj.isBefore(endDateObj)) {
+                if (endDateObj.isAfter(startDatePlusPeriodObj)) {
                     $endDate.val(startDatePlusPeriodObj.format(dateFormat));
                 }
                 break;
             case 'end':
-                // If the new value of endDate minus the period is after startDate, set startDate to endDate minus the period.
+                // If start date is too far behind end date, fix start date.
                 let endDateMinusPeriodObj = endDateObj.add(-DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
-                if (endDateMinusPeriodObj.isAfter(startDateObj)) {
+                if (startDateObj.isBefore(endDateMinusPeriodObj)) {
                     $startDate.val(endDateMinusPeriodObj.format(dateFormat));
                 }
                 break;
