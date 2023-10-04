@@ -36,6 +36,13 @@ class Controller extends Base
 
 
     /**
+     * Users are prompted to do something after this many seconds of inactivity
+     *
+     */
+    private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT = 300;
+
+
+    /**
      * Learnosity API instance is the same for everything afaict
      *
      * @var Api
@@ -277,13 +284,22 @@ class Controller extends Base
             "config" => [
                 "configuration" => [
                     "idle_timeout" => [
-                        "interval" => 300
+                        "interval" => self::LEARNOSITY_ATTEMPT_IDLE_TIMEOUT
                     ],
                     'onsubmit_redirect_url' => false,
-                    'onsave_redirect_url' => false,
+                    /* You were idle too long. Go back to the intro if Learnosity
+                     * saves your session ahd kicks you out, I guess? At least it
+                     * can prompt you to Resume Quiz from there.
+                     */
+                    'onsave_redirect_url' => $this->router->getGenerator()->generate('learnosity.getIntro', [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId' => $student->getId(),
+                    ]),
                 ],
                 "navigation" => [
                     "auto_save" => [
+                        /* TODO Decide on this value and const it
+                         */
                         "save_interval_duration" => 300
                     ],
                     "show_intro" => false,
