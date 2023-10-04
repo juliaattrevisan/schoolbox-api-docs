@@ -128,6 +128,13 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
 
         /** @var \Schoolbox\Fixtures\Matchup\Model $matchup */
         foreach ($matchups as $matchup) {
+            /* Unknown dates; skip
+             * Presumably this is TBD for Fixtures
+             */
+            if ((null === $matchup->getStartAt()) || (null === $matchup->getFinishAt())) {
+                continue;
+            }
+
             $instance = new \Calendar\Event\Type\Fixtures\Event();
 
             /* Venues are now optional in matchups
