@@ -11,6 +11,8 @@ namespace Schoolbox\Application\Login\Oidc;
 
 use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Redis\Cache\ItemPool;
+use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Web\Controller\Base;
 
 /**
@@ -38,6 +40,12 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->injector->get('httpClient'), new Base64());
+        $codec = new Base64();
+        $cache = new ItemPool(
+            $this->injector->get('redis.cache'),
+            $codec,
+            new KeyGenerator('oidc', INSTANCE_ID),
+        );
+        return new Controller($this->injector->get('httpClient'), $codec);
     }
 }

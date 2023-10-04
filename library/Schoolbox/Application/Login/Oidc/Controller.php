@@ -18,6 +18,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OpenIDConnectClient\OpenIDConnectProvider;
+use Psr\SimpleCache\CacheInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
@@ -32,11 +33,16 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Client $httpClient Required for querying OIDC discovery URL
-     * @param ICodec $codec      Required for encoding/decoding state
+     * @param Client         $httpClient Required for querying discovery URL
+     * @param ICodec         $codec      Required for encoding/decoding state
+     * @param CacheInterface $cache      Required for caching discovery response
+     *                                   and keys
      */
-    public function __construct(private Client $httpClient, private ICodec $codec)
-    {
+    public function __construct(
+        private Client $httpClient,
+        private ICodec $codec,
+        private CacheInterface $cache,
+    ) {
     }
 
     /**
