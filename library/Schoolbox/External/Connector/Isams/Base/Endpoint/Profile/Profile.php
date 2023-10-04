@@ -24,6 +24,7 @@ use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Role;
 use UnexpectedValueException;
 
 /**
@@ -335,7 +336,7 @@ class Profile implements IStrategy
                     $this->baseProfileMapper->save($studentBaseProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
+                $this->rememberError(Role::STUDENT, $externalId, $e->getMessage());
             }
 
             /* Fish out a staff member via their user code
@@ -467,7 +468,7 @@ class Profile implements IStrategy
                     $this->studentProfileMapper->save($studentProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
+                $this->rememberError(Role::STUDENT, $externalId, $e->getMessage());
             }
         }
     }
@@ -987,7 +988,7 @@ class Profile implements IStrategy
                     $this->parentProfileMapper->save($parentProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
+                $this->rememberError(Role::PARENT, $externalId, $e->getMessage());
             }
 
             /* Log it
@@ -1013,7 +1014,7 @@ class Profile implements IStrategy
                     $this->relationshipMapper->save($relationship);
                 }
             } catch (\Exception $e) {
-                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
+                $this->rememberError(Role::PARENT, $externalId, $e->getMessage());
             }
 
             /* Accumulate messages
@@ -1094,7 +1095,7 @@ class Profile implements IStrategy
                     $this->baseProfileMapper->save($staffBaseProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
+                $this->rememberError(Role::STAFF, $externalId, $e->getMessage());
             }
 
             /* Concat all the position titles, I guess
@@ -1177,7 +1178,7 @@ class Profile implements IStrategy
                     $this->staffProfileMapper->save($staffProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
+                $this->rememberError(Role::STAFF, $externalId, $e->getMessage());
             }
         }
     }
@@ -1221,12 +1222,12 @@ class Profile implements IStrategy
     /**
      * Pile this error message into a stack, indexed by (strat, externalId) tuples
      *
-     * @param string $method
+     * @param string $roleType
      * @param string $externalId
      * @param string $message
      * @return void
      */
-    private function rememberError(string $method, string $externalId, string $message): void
+    private function rememberError(string $roleType, string $externalId, string $message): void
     {
         $this->log->warning(sprintf(
             'externalId %s encountered problems processing: %s',
@@ -1238,7 +1239,7 @@ class Profile implements IStrategy
          */
         $key = sprintf(
             '%s %s',
-            explode('::', $method)[1],
+            $roleType,
             $externalId
         );
 
