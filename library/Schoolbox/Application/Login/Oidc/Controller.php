@@ -99,7 +99,14 @@ class Controller extends Base
      */
     public function postReceiveAuthorizationResponse(): void
     {
-        // TODO check oauth2state
+        // check oauth2state
+        $requestState = $this->requestQuery->get('state');
+        $sessionState = $this->session->get('oauth2state');
+        if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
+            $this->session->set('oauth2state', null);
+            $this->sendError('Invalid oAuth state');
+            return;
+        }
 
         // client id / secret gets passed via Basic auth
         $accessToken = $this->buildOidcProvider()->getAccessToken(
