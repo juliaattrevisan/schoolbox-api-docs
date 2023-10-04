@@ -36,7 +36,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         :aria-expanded="isOpen"
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
-        :data-test="`wc-actions-dropdown-${props.contentId}-button`"
+        :data-test="`sbx-actions-dropdown-${props.contentId}-button`"
         @click.prevent="onButtonSelected"
     >
         <!-- when an alternative icon should be used -->

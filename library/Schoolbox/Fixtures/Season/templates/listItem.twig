@@ -17,7 +17,7 @@
         {% if not currentSeason.isArchived %}
             <a href="{{ routeLookup('sportsfixturesSeason.getModifyForm', {entityId: currentSeason.id}) }}" class="icon-modify" title="Modify"></a>
         {% endif %}
-        <wc-actions-dropdown content-id="sportsfixtures-season-{{ currentSeason.getId() }}-actions"></wc-actions-dropdown>
+        <sbx-actions-dropdown content-id="sportsfixtures-season-{{ currentSeason.getId() }}-actions"></sbx-actions-dropdown>
     </nav>
 
     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-season-{{ currentSeason.getId() }}-actions">

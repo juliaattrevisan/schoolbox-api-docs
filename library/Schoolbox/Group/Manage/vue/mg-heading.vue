@@ -70,7 +70,7 @@ function onDisbandSelected() {
             <h1>Manage Group</h1>
         </div>
         <nav v-if="store.hasLoadedOk && settingsStore.isAccessSaved">
-            <wc-actions-dropdown content-id="tab-control"></wc-actions-dropdown>
+            <sbx-actions-dropdown content-id="tab-control"></sbx-actions-dropdown>
         </nav>
         <ul id="tab-control" class="f-dropdown" data-dropdown-content>
             <li>

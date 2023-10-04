@@ -3,7 +3,7 @@
     {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
     {% set routeGetAudiences = routeLookupIfAuthorized('pastoralAudience.getAudiences') %}
 
-    <wc-actions-dropdown content-id="header-options"></wc-actions-dropdown>
+    <sbx-actions-dropdown content-id="header-options"></sbx-actions-dropdown>
 </nav>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
     {% if routeReportBuilder %}

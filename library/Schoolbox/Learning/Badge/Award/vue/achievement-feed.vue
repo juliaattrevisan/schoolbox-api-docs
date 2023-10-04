@@ -232,10 +232,10 @@ export default {
                                 </div>
                                 <template v-if="hasTot(award)">
                                     <nav>
-                                        <wc-actions-dropdown
+                                        <sbx-actions-dropdown
                                             :content-id="generateIdentifier(award)"
-                                            :data-test="`wc-actions-dropdown-${generateIdentifier(award)}`"
-                                        ></wc-actions-dropdown>
+                                            :data-test="`sbx-actions-dropdown-${generateIdentifier(award)}`"
+                                        ></sbx-actions-dropdown>
                                     </nav>
                                     <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
                                         <!-- Only show Withdraw button if you can actually do it

@@ -29,7 +29,7 @@
         </div>
         {% if USER.getRole.isStaff == true %}
             <nav>
-                <wc-actions-dropdown content-id="class-options{{ class.id }}"></wc-actions-dropdown>
+                <sbx-actions-dropdown content-id="class-options{{ class.id }}"></sbx-actions-dropdown>
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
                 <li><a href="{{ routeLookup('learning.getClassListPage', {folderId: class.id, folder: class}) }}" class="icon-class-list">Class List</a></li>
@@ -76,7 +76,7 @@
         {% set gradesRoute = routeLookupIfAuthorized('learningGrades.getGradesForSubject', { viewee: USER, userId: USER.id, term: term, termCode: term.code, subject: class, subjectId: class.id }) %}
         {% if USER.getRole.isStudent == true and gradesRoute %}
             <nav>
-                <wc-actions-dropdown content-id="class-options{{ class.id }}"></wc-actions-dropdown>
+                <sbx-actions-dropdown content-id="class-options{{ class.id }}"></sbx-actions-dropdown>
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
                 <li><a href="{{ gradesRoute }}" class="icon-approve">{{ locale.grades.properPlural }}</a></li>

@@ -52,7 +52,7 @@ class DueWorkInitialCest
         $this->homepageUrl = $i->getCurrentUrl();
 
         $i->amGoingTo('Add few members into the homepage');
-        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-tab-control]', '[data-test=sbx-actions-dropdown-tab-control-button]');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $i->waitForText("Manage Group", 5);
         $i->clickWithLeftButton('#search-text');
@@ -123,7 +123,7 @@ class DueWorkInitialCest
         $currentURL = $i->getCurrentUrl();
         $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
         $i->amOnUrl($this->homepageUrl);
-        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-duework-options' . $assessmentID . ']', '[data-test=wc-actions-dropdown-duework-options' . $assessmentID . '-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-duework-options' . $assessmentID . ']', '[data-test=sbx-actions-dropdown-duework-options' . $assessmentID . '-button]');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-delete');
         $i->click('div.reveal-modal.open a.button.submit');
     }
@@ -185,11 +185,11 @@ class DueWorkInitialCest
         $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
         $i->amOnUrl($this->homepageUrl);
         $i->amGoingTo('Select View Status of the Due work');
-        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-duework-options' . $assessmentID . ']', '[data-test=wc-actions-dropdown-duework-options' . $assessmentID . '-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-duework-options' . $assessmentID . ']', '[data-test=sbx-actions-dropdown-duework-options' . $assessmentID . '-button]');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         sleep(1);
         $i->amGoingTo('Select View and grade submission of the Due work');
-        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-feedback-options-6]', '[data-test=wc-actions-dropdown-feedback-options-6-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-feedback-options-6]', '[data-test=sbx-actions-dropdown-feedback-options-6-button]');
         $i->click('a.icon-task');
         $i->canSee('Grading Test Due Work');
     }
@@ -211,10 +211,10 @@ class DueWorkInitialCest
         $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
         $i->amOnUrl($this->homepageUrl);
         $i->amGoingTo('Select View Status of the Due work');
-        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-duework-options' . $assessmentID . ']', '[data-test=wc-actions-dropdown-duework-options' . $assessmentID . '-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-duework-options' . $assessmentID . ']', '[data-test=sbx-actions-dropdown-duework-options' . $assessmentID . '-button]');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         $i->amGoingTo('Select View and grade submission of the Due work');
-        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-feedback-options-6]', '[data-test=wc-actions-dropdown-feedback-options-6-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-feedback-options-6]', '[data-test=sbx-actions-dropdown-feedback-options-6-button]');
         $i->click('a.icon-task');
         $i->fillField('textarea[name=comment]', 'Not bad, but you should work on your spelling.');
         $i->fillField('input[name=mark]', '65');

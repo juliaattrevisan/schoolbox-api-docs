@@ -31,7 +31,7 @@
             {% set routeRecordDelete = routeLookupIfAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
 
             {% if linkedStudents is defined and linkedStudents|length %}
-                <wc-actions-dropdown content-id="linked-students">
+                <sbx-actions-dropdown content-id="linked-students">
                     <div slot="icon">
                         <svg
                             version="1.2"
@@ -52,7 +52,7 @@
                             <path d="m12 8c0 0.6-0.4 1-1 1h-6c-0.6 0-1-0.4-1-1 0-0.6 0.4-1 1-1h6c0.6 0 1 0.4 1 1z" />
                         </svg>
                     </div>
-                </wc-actions-dropdown>
+                </sbx-actions-dropdown>
             {% endif %}
 
             {% if routeRecordDelete %}

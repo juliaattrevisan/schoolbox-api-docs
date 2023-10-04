@@ -704,7 +704,7 @@
                                 {% endfor %}
                                 {% if teacherIdsToEmail|length > 0 %}
                                 <nav>
-                                    <wc-actions-dropdown content-id="email-teachers-{{ groupIdentifier }}"></wc-actions-dropdown>
+                                    <sbx-actions-dropdown content-id="email-teachers-{{ groupIdentifier }}"></sbx-actions-dropdown>
                                 </nav>
                                 <ul class="f-dropdown" data-dropdown-content id="email-teachers-{{ groupIdentifier }}">
                                     <li>
@@ -810,7 +810,7 @@
                                         {% block folderListItemActions %}
                                         {% if hasTeachersWithEmail and canEmailStaff %}
                                             <nav>
-                                                <wc-actions-dropdown content-id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}"></wc-actions-dropdown>
+                                                <sbx-actions-dropdown content-id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}"></sbx-actions-dropdown>
                                             </nav>
                                             <ul id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" class="f-dropdown" data-dropdown-content>
                                                 {% for teacher in subject.teachers %}
@@ -906,7 +906,7 @@
                                     </div>
                                     {% if hasOwnersWithEmail and canEmailStaff %}
                                         <nav>
-                                            <wc-actions-dropdown content-id="group-options-{{ groupKey }}"></wc-actions-dropdown>
+                                            <sbx-actions-dropdown content-id="group-options-{{ groupKey }}"></sbx-actions-dropdown>
                                         </nav>
                                         <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
                                             {% for owner in group.owners %}

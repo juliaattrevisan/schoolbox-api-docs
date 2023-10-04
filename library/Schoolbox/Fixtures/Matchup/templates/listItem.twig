@@ -25,7 +25,7 @@
         {%- if not currentMatch.season.isArchived -%}
             <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: currentMatch.id}) }}" class="icon-modify" title="Modify"></a>
         {%- endif -%}
-        <wc-actions-dropdown content-id="sportsfixtures-match-{{ currentMatch.getId() }}-actions"></wc-actions-dropdown>
+        <sbx-actions-dropdown content-id="sportsfixtures-match-{{ currentMatch.getId() }}-actions"></sbx-actions-dropdown>
     </nav>
     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-match-{{ currentMatch.getId() }}-actions">
         <li><a href="{{ routeLookup('sportsfixturesMatch.deleteEntity', {entityId: currentMatch.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentMatch.id }}">Delete</a></li>

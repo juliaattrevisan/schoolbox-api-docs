@@ -45,7 +45,7 @@
 
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
     <nav>
-        <wc-actions-dropdown content-id="header-options"></wc-actions-dropdown>
+        <sbx-actions-dropdown content-id="header-options"></sbx-actions-dropdown>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li><a class="icon-modify" href="{{ modifyRoute }}">Modify Quiz</a></li>

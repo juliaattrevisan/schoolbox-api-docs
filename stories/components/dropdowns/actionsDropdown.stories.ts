@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import WcActionsDropdown from "@schoolboxVue/components/dropdown/wc-actions-dropdown.ce.vue";
+import SbxActionsDropdown from "@schoolboxVue/components/dropdown/sbx-actions-dropdown.ce.vue";
 
 /**
  * Storybook meta data, any default properties that are passed into every story
  * https://storybook.js.org/docs/vue/writing-stories/introduction
  */
 const meta: Meta<typeof WcActionsDropdown> = {
-    component: WcActionsDropdown,
+    component: SbxActionsDropdown,
     decorators: [
         () => ({
             template: `
@@ -19,22 +19,22 @@ const meta: Meta<typeof WcActionsDropdown> = {
     title: "Components/Dropdowns/Actions Dropdown",
 };
 export default meta;
-type Story = StoryObj<typeof WcActionsDropdown>;
+type Story = StoryObj<typeof SbxActionsDropdown>;
 
 /**
  * Shows the dropdown sitting in different regions of the viewport, which will determine which direction the dropdown opens.
  */
 export const Default: Story = {
     render: () => ({
-        components: { WcActionsDropdown },
+        components: { SbxActionsDropdown },
         template: `
             <div id="container" class="l-flex-col l-flex--justify-space" style="height: 600px;">
                 <div class="l-flex-row l-flex--justify-space">
                     <div content-id="dropdown-1">
-                        <wc-actions-dropdown content-id="dropdown-1"></wc-actions-dropdown>
+                        <sbx-actions-dropdown content-id="dropdown-1"></sbx-actions-dropdown>
                     </div>
                     <div content-id="dropdown-2">
-                        <wc-actions-dropdown content-id="dropdown-2">
+                        <sbx-actions-dropdown content-id="dropdown-2">
                             <template #icon>
                                 <svg
                                     version="1.2"
@@ -55,15 +55,15 @@ export const Default: Story = {
                                     <path d="m12 8c0 0.6-0.4 1-1 1h-6c-0.6 0-1-0.4-1-1 0-0.6 0.4-1 1-1h6c0.6 0 1 0.4 1 1z" />
                                 </svg>
                             </template>
-                        </wc-actions-dropdown>
+                        </sbx-actions-dropdown>
                     </div>
                 </div>
                 <div class="l-flex-row l-flex--justify-space">
                     <div content-id="dropdown-3">
-                        <wc-actions-dropdown content-id="dropdown-3" button-text="Modify Participation"></wc-actions-dropdown>
+                        <sbx-actions-dropdown content-id="dropdown-3" button-text="Modify Participation"></sbx-actions-dropdown>
                     </div>
                     <div content-id="dropdown-4">
-                        <wc-actions-dropdown content-id="dropdown-4"></wc-actions-dropdown>
+                        <sbx-actions-dropdown content-id="dropdown-4"></sbx-actions-dropdown>
                     </div>
                 </div>
             </div>

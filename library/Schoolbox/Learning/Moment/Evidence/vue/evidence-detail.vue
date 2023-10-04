@@ -139,7 +139,7 @@ export default {
                     <div class="actions-small-1">
                         <nav>
                             <template v-if="evidence._links.delete">
-                                <wc-actions-dropdown content-id="header-options"></wc-actions-dropdown>
+                                <sbx-actions-dropdown content-id="header-options"></sbx-actions-dropdown>
                             </template>
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>

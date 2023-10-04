@@ -82,7 +82,7 @@ class ParticipationPlanCest
         $homepageUrl = $i->getCurrentUrl();
 
         $i->amGoingTo('Add Jack Coles, Eden Reed and Jana Reed into the group via manage group page');
-        $i->clickElementInWebComponent('[data-test=wc-actions-dropdown-tab-control]', '[data-test=wc-actions-dropdown-tab-control-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-tab-control]', '[data-test=sbx-actions-dropdown-tab-control-button]');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $manageGroup->search($teacher);
         $manageGroup->selectUser(22);
