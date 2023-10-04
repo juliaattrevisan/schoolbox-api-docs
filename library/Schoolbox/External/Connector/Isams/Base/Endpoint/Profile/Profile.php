@@ -1204,7 +1204,7 @@ class Profile implements IStrategy
                     $externalId
                 ));
 
-                foreach ($messages as $message) {
+                foreach ($messages as $message => $val) {
                     $this->log->info(sprintf(
                         '        %s',
                         $message
@@ -1243,10 +1243,12 @@ class Profile implements IStrategy
             $externalId
         );
 
-        if (!isset($this->errors[$key])) {
-            $this->errors[$key] = [];
-        }
-
-        $this->errors[$key][] = $message;
+        /* Uniquify error messages that occur multiple times
+         *
+         * Can happen when a parent has multiple students and the parent
+         * records get updated for each student, for example, thus experiencing
+         * the same issue multiple times
+         */
+        $this->errors[$key][$message] = true;
     }
 }
