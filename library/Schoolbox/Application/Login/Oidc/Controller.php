@@ -67,6 +67,7 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
      * @throws ControllerException
+     * @throws InvalidArgumentException
      */
     public function getAuthorization(): void
     {
@@ -89,6 +90,7 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
      * @throws ControllerException
+     * @throws InvalidArgumentException
      */
     public function postAuthorization(): void
     {
@@ -103,6 +105,7 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\Base64DecodeException
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
+     * @throws InvalidArgumentException
      */
     private function sendAuthorizationRequest(): void
     {
@@ -140,6 +143,7 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
      * @throws ControllerException
+     * @throws InvalidArgumentException
      */
     private function receiveAuthorizationResponse(string $code): void
     {
@@ -184,6 +188,7 @@ class Controller extends Base
      * @throws GuzzleException                          if the request to either the OIDC provider's discovery or JWKS
      *                                                  URIs failed
      * @throws RouteNotFound                            if somehow the route to the redirect URI wasn't found?
+     * @throws InvalidArgumentException                 if somehow the cache couldn't be set or get?
      */
     private function buildOidcProvider(): OpenIDConnectProvider
     {
@@ -210,12 +215,7 @@ class Controller extends Base
             );
             $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
             $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
-            try {
-                $this->cache->set('oidcConfig', $oidcConfig, self::OIDC_DISCOVERY_CACHE_TTL);
-            } catch (InvalidArgumentException) {
-                // Somehow this couldn't be cached:
-                // I'd say this should be logged somewhere.
-            }
+            $this->cache->set('oidcConfig', $oidcConfig, self::OIDC_DISCOVERY_CACHE_TTL);
         }
 
         // Now, download and parse the public keys
@@ -225,11 +225,7 @@ class Controller extends Base
             $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
             $jwkConverter      = new JWKToPEM\JWKConverter();
             $publicKey         = $jwkConverter->multipleToPEM($jwks['keys']);
-            try {
-                $this->cache->set('publicKey', $publicKey, self::OIDC_PUBLIC_KEY_CACHE_TTL);
-            } catch (InvalidArgumentException) {
-                // Again, this should be logged somewhere
-            }
+            $this->cache->set('publicKey', $publicKey, self::OIDC_PUBLIC_KEY_CACHE_TTL);
         }
 
         return new OpenIDConnectProvider(
