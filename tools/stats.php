@@ -98,13 +98,13 @@ $app = new class extends CliTool\App {
             'summative_report'  => 'SELECT count(*) FROM summative_report WHERE deleted_at is null',
 
             // Quiz info
-            'quiz_sections_count'   => 'SELECT assess.assess_id, assessment_id, COUNT(*) AS numSections
-                                        FROM assess
-                                        INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
-                                        where assess.deleted_at is null
-                                        and assess_section.deleted_at is null
-                                        GROUP BY assess.assess_id
-                                        ORDER BY numSections desc',
+            'quiz_sections_count'   => 'SELECT COUNT(*) from (SELECT COUNT(*) AS numSections
+                                          FROM assess
+                                                   INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                                          where assess.deleted_at is null
+                                            and assess_section.deleted_at is null
+                                          GROUP BY assess.assess_id
+                                          having numSections > 1) as moreThan1;',
             'quiz_question_count'   => 'select distinct count(*) as numQuestions
                                         from assess
                                         inner join assess_section on assess.assess_id = assess_section.assess_id
@@ -114,7 +114,7 @@ $app = new class extends CliTool\App {
                                         and assess_question.deleted_at is null
                                         group by assess.assess_id
                                         order by numQuestions desc',
-            'quiz_random'           => 'SELECT (100 * numRandomised.num / numSections.num) AS percentage,
+            'quiz_random'           => 'SELECT
                                         concat(numRandomised.num, \'/\', numSections.num) AS ratio
                                         FROM
                                         # number of randomised sections
