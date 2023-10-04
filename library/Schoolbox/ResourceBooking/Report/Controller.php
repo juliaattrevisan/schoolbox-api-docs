@@ -21,7 +21,7 @@ class Controller extends Base
     /**
      * The default maximum reporting period for resource bookings
      */
-    protected const MAX_REPORTING_PERIOD = 3;
+    protected const MAX_REPORTING_PERIOD_MONTHS = 3;
 
     /**
      * @var Item\Mapper
@@ -88,9 +88,11 @@ class Controller extends Base
             try {
                 $end = Alaress_Date_Format::newLocalShort($formEnd);
 
-                if ($start->diffInMonths($end) > self::MAX_REPORTING_PERIOD) {
+                // The MAX_REPORTING_PERIOD_MONTHS restriction is enforced at the client too.
+                // So check ResourceBooking/Report/templates/index.twig after any changes here.
+                if ($start->diffInMonths($end) > self::MAX_REPORTING_PERIOD_MONTHS) {
                     $end = clone $start;
-                    $end->addMonths(self::MAX_REPORTING_PERIOD);
+                    $end->addMonths(self::MAX_REPORTING_PERIOD_MONTHS);
                 }
             } catch (\Exception $e) {
                 // noop - use default
