@@ -13,7 +13,7 @@ const resultsStore = useResultsStore();
 <template>
     <div class="l-flex-col l-gap-m" data-test="sp-results">
         <sp-results-result
-            v-for="(result, index) in resultsStore.results"
+            v-for="(result, index) in resultsStore.results.data"
             :key="result.id"
             :result="result"
             :index="index"
