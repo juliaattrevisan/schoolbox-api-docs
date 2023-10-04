@@ -7,12 +7,6 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
-// Hack around iSAMS OIDC provider's redirect URL being hardcoded to root path
-if (($_POST['state'] ?? '') === 'oidc') {
-    require WEB_root . '/oidc.php';
-    exit;
-}
-
 try {
     $path = RequestUriParser::parseUrlPath($_SERVER);
 } catch (BadRequestException $e) {
