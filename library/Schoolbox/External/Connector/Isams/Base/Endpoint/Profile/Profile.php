@@ -327,10 +327,15 @@ class Profile implements IStrategy
                 ->setLastname($lastname);
 
             /* Then save it. We end up saving twice, because you need this base profile id
-             * to create a relationship between profiles in importParentOfStudent().
+             * to create a relationship between profiles in importParentOfStudent() in case
+             * it didn't already exist.
              */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($studentBaseProfile);
+            try {
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($studentBaseProfile);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
             }
 
             /* Fish out a staff member via their user code
@@ -462,7 +467,7 @@ class Profile implements IStrategy
                     $this->studentProfileMapper->save($studentProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError('Student', $externalId, $e->getMessage());
+                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
             }
         }
     }
@@ -982,7 +987,7 @@ class Profile implements IStrategy
                     $this->parentProfileMapper->save($parentProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError('Parent', $externalId, $e->getMessage());
+                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
             }
 
             /* Log it
@@ -1008,7 +1013,7 @@ class Profile implements IStrategy
                     $this->relationshipMapper->save($relationship);
                 }
             } catch (\Exception $e) {
-                $this->rememberError('Parent', $externalId, $e->getMessage());
+                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
             }
 
             /* Accumulate messages
@@ -1084,8 +1089,12 @@ class Profile implements IStrategy
 
             /* Then save it
              */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($staffBaseProfile);
+            try {
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($staffBaseProfile);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
             }
 
             /* Concat all the position titles, I guess
@@ -1168,7 +1177,7 @@ class Profile implements IStrategy
                     $this->staffProfileMapper->save($staffProfile);
                 }
             } catch (\Exception $e) {
-                $this->rememberError('Staff', $externalId, $e->getMessage());
+                $this->rememberError(__METHOD__, $externalId, $e->getMessage());
             }
         }
     }
@@ -1212,12 +1221,12 @@ class Profile implements IStrategy
     /**
      * Pile this error message into a stack, indexed by (strat, externalId) tuples
      *
-     * @param string $strat
+     * @param string $method
      * @param string $externalId
      * @param string $message
      * @return void
      */
-    private function rememberError(string $strat, string $externalId, string $message): void
+    private function rememberError(string $method, string $externalId, string $message): void
     {
         $this->log->warning(sprintf(
             'externalId %s encountered problems processing: %s',
@@ -1229,7 +1238,7 @@ class Profile implements IStrategy
          */
         $key = sprintf(
             '%s %s',
-            $strat,
+            explode('::', $method)[1],
             $externalId
         );
 
