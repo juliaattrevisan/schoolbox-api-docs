@@ -168,35 +168,39 @@ class Controller extends Assessment\Controller
             // if we are inside a project get the projects context
             $course = null;
             if ($assessment->getContext()->isImplementationContext()) {
-                $unit = $assessment->getContext()->getBaseContext();
+                //get all courses for the Class Page (Implementation)...
+                $folder = $assessment->getContext()->getFolder();
+                $courses = $this->courseImplementationMapper->findByFolderId($folder->getId());
 
-                if ($unit instanceof AbstractUnit) {
-                    $course = $unit->getCourse();
-                }
-                $course = $this->courseImplementationMapper->findById($course->getId());
-                $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
-                foreach ($course->getUnits() as $unitImpl) {
-                    /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitImpl */
-                    $unitImplId = $unitImpl->getId();
-                    $options = ['order' => ['sequence' => 'ASC']];
-                    $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options)
-                    // Remove Lesson plans, no linking to other lessons
-                    ->filter(function ($assessment) {
-                        /** @var IAssessable $assessment */
-                        return !($assessment instanceof Model);
-                    });
-                    $unitImpl->setAssessables($assessments);
-                    $courseAssessments['units'][] = [
-                        'id' => $unitImplId,
-                        'title' => $unitImpl->getTitle(),
-                        'closeDate' => $unitImpl->getDueDate()?->getUsingFormat(DATE_ATOM),
-                        'closeDateFormatted'  => $unitImpl->getDueDate()?->getRelativeTime(),
-                        'openDate' => $unitImpl->getOpenDate()?->getUsingFormat(DATE_ATOM),
-                        'openDateFormatted'  => $unitImpl->getOpenDate()?->getRelativeTime(),
-                        'relativeCloseDateFormatted' => $unitImpl->getRelativeDueDate()->getRelativeTime(),
-                        'relativeOpenDateFormatted' => $unitImpl->getRelativeOpenDate()->getRelativeTime(),
-                        'assessments' => $assessments->reindex()->map($unitAssessmentsTranslator)
-                    ];
+                foreach ($courses as $course) {
+                    // if the course has been deleted, ignore
+                    if ($course->isDeleted()) {
+                        continue;
+                    }
+                    $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
+                    foreach ($course->getUnits() as $unitImpl) {
+                        /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitImpl */
+                        $unitImplId  = $unitImpl->getId();
+                        $options     = ['order' => ['sequence' => 'ASC']];
+                        $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options)
+                            // Remove Lesson plans, no linking to other lessons
+                                            ->filter(function ($assessment) {
+                                /** @var IAssessable $assessment */
+                                                return !($assessment instanceof Model);
+                                            });
+                        $unitImpl->setAssessables($assessments);
+                        $courseAssessments['units'][] = [
+                            'id'                         => $unitImplId,
+                            'title'                      => $unitImpl->getTitle(),
+                            'closeDate'                  => $unitImpl->getDueDate()?->getUsingFormat(DATE_ATOM),
+                            'closeDateFormatted'         => $unitImpl->getDueDate()?->getRelativeTime(),
+                            'openDate'                   => $unitImpl->getOpenDate()?->getUsingFormat(DATE_ATOM),
+                            'openDateFormatted'          => $unitImpl->getOpenDate()?->getRelativeTime(),
+                            'relativeCloseDateFormatted' => $unitImpl->getRelativeDueDate()->getRelativeTime(),
+                            'relativeOpenDateFormatted'  => $unitImpl->getRelativeOpenDate()->getRelativeTime(),
+                            'assessments'                => $assessments->reindex()->map($unitAssessmentsTranslator)
+                        ];
+                    }
                 }
             } else {
                 $unit = $assessment->getContext()->getBaseContext();
