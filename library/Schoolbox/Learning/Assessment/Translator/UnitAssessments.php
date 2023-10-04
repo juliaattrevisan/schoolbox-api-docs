@@ -80,10 +80,10 @@ class UnitAssessments
         $base = $assessable->getBaseContext();
         if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
             // Implementation
-            return $base->getSpecification()->getCourse()->getFolder()->getTitle();
+            return $base->getSpecification()->getCourse()->getFolder()?->getTitle();
         } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
             // Specification
-            return $base->getCourse()->getFolder()->getTitle();
+            return $base->getCourse()->getFolder()?->getTitle();
         }
         //no course, return null
         return null;
