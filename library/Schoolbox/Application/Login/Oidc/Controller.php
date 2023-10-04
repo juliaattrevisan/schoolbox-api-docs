@@ -43,12 +43,13 @@ class Controller extends Base
      * @api GET /login/oidc
      * @since 23.1
      *
-     * @return void
+     * @throws GuzzleException
+     * @throws JWKToPEM\Exception\Base64DecodeException
+     * @throws JWKToPEM\Exception\JWKConverterException
+     * @throws RouteNotFound
      */
     public function getSendAuthorizationRequest(): void
     {
-        $config = $this->getConfigLoader();
-
         // Nonce: not required, but can be used and is respected by the JWT decoder
         // TODO generate and store in the session, if it turns out it is required?
         $nonce = null;
@@ -67,7 +68,7 @@ class Controller extends Base
             // Temporary, so that this can be redird back to here
             'state'         => 'oidc',
             'x-client-sku'  => Instance::APPLICATION_NAME . '-' . INSTANCE_ID,
-            'x-client-ver'  => $config->get('site_version'),
+            'x-client-ver'  => $this->getConfigLoader()->get('site_version'),
         ];
 
         // Generate a nonce
@@ -87,10 +88,14 @@ class Controller extends Base
      * Receive an OpenID Connect authorization response from this instance's
      * oAuth provider, and initialize a user session if it succeeded.
      *
-     * @api GET /login/oidc
+     * @api POST /login/oidc
      * @since 23.1
      *
      * @return void
+     * @throws GuzzleException
+     * @throws JWKToPEM\Exception\Base64DecodeException
+     * @throws JWKToPEM\Exception\JWKConverterException
+     * @throws RouteNotFound
      */
     public function postReceiveAuthorizationResponse(): void
     {
@@ -145,7 +150,9 @@ class Controller extends Base
         // https://github.com/steverhoades/oauth2-openid-connect-client/pull/37
         // implements this, but it is not yet merged.
         // For now I will fetch the contents manually.
-        $oidcDiscoveryUri  = $oauthIssuerUri->withPath($oauthIssuerUri->getPath() . '/.well-known/openid-configuration');
+        $oidcDiscoveryUri  = $oauthIssuerUri->withPath(
+            $oauthIssuerUri->getPath() . '/.well-known/openid-configuration',
+        );
         $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
         $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
         $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
