@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Application\Login\Oidc;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use CoderCat\JWKToPEM;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -108,7 +109,8 @@ class Controller extends Base
                 http_build_query([
                     'jwt'      => $accessToken->getIdToken()->toString(),
                     'redirect' => '/'
-                ]));
+                ])
+            );
         $this->response = $this->redirectTemporary($loginUri->__toString());
     }
 
@@ -122,8 +124,9 @@ class Controller extends Base
      * @return OpenIDConnectProvider
      * @throws JWKToPEM\Exception\JWKConverterException if the JWKS couldn't be parsed into public keys
      * @throws JWKToPEM\Exception\Base64DecodeException if the JWKS couldn't be base-64 decoded
-     * @throws GuzzleException if the request to either the OIDC provider's
-     *                         discovery or JWKS URIs failed
+     * @throws GuzzleException                          if the request to either the OIDC provider's discovery or JWKS
+     *                                                  URIs failed
+     * @throws RouteNotFound                            if somehow the route to the redirect URI wasn't found?
      */
     private function buildOidcProvider(): OpenIDConnectProvider
     {
