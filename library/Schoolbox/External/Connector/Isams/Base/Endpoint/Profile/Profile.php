@@ -326,7 +326,8 @@ class Profile implements IStrategy
                 ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
-            /* Then save it
+            /* Then save it. We end up saving twice, because you need this base profile id
+             * to create a relationship between profiles in importParentOfStudent().
              */
             if ($this->perform) {
                 $this->baseProfileMapper->save($studentBaseProfile);
