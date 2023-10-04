@@ -21,6 +21,7 @@ use OpenIDConnectClient\OpenIDConnectProvider;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Url\Factory;
@@ -67,7 +68,6 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
      * @throws ControllerException
-     * @throws InvalidArgumentException
      */
     public function getAuthorization(): void
     {
@@ -90,7 +90,6 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
      * @throws ControllerException
-     * @throws InvalidArgumentException
      */
     public function postAuthorization(): void
     {
@@ -105,7 +104,6 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\Base64DecodeException
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
-     * @throws InvalidArgumentException
      */
     private function sendAuthorizationRequest(): void
     {
@@ -143,7 +141,6 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
      * @throws ControllerException
-     * @throws InvalidArgumentException
      */
     private function receiveAuthorizationResponse(string $code): void
     {
@@ -188,7 +185,6 @@ class Controller extends Base
      * @throws GuzzleException                          if the request to either the OIDC provider's discovery or JWKS
      *                                                  URIs failed
      * @throws RouteNotFound                            if somehow the route to the redirect URI wasn't found?
-     * @throws InvalidArgumentException                 if somehow the cache couldn't be set or get?
      */
     private function buildOidcProvider(): OpenIDConnectProvider
     {
@@ -208,24 +204,28 @@ class Controller extends Base
         // implements this, but it is not yet merged.
         // For now I will fetch the configuration manually, caching the response
         // if possible.
-        $oidcConfig = $this->cache->get('oidcConfig');
-        if (!isset($oidcConfig)) {
-            $oidcDiscoveryUri  = $oauthIssuerUri->withPath(
-                $oauthIssuerUri->getPath() . '/.well-known/openid-configuration',
-            );
-            $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
-            $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
-            $this->cache->set('oidcConfig', $oidcConfig, self::OIDC_DISCOVERY_CACHE_TTL);
-        }
+        try {
+            $oidcConfig = $this->cache->get('oidcConfig');
+            if (!isset($oidcConfig)) {
+                $oidcDiscoveryUri  = $oauthIssuerUri->withPath(
+                    $oauthIssuerUri->getPath() . '/.well-known/openid-configuration',
+                );
+                $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
+                $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
+                $this->cache->set('oidcConfig', $oidcConfig, self::OIDC_DISCOVERY_CACHE_TTL);
+            }
 
-        // Now, download and parse the public keys
-        $publicKey = $this->cache->get('publicKey');
-        if (!isset($publicKey)) {
-            $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
-            $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
-            $jwkConverter      = new JWKToPEM\JWKConverter();
-            $publicKey         = $jwkConverter->multipleToPEM($jwks['keys']);
-            $this->cache->set('publicKey', $publicKey, self::OIDC_PUBLIC_KEY_CACHE_TTL);
+            // Now, download and parse the public keys
+            $publicKey = $this->cache->get('publicKey');
+            if (!isset($publicKey)) {
+                $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
+                $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
+                $jwkConverter      = new JWKToPEM\JWKConverter();
+                $publicKey         = $jwkConverter->multipleToPEM($jwks['keys']);
+                $this->cache->set('publicKey', $publicKey, self::OIDC_PUBLIC_KEY_CACHE_TTL);
+            }
+        } catch (InvalidArgumentException $e) {
+            throw new SchoolboxException('Could not cache OIDC configuration or public key', 0, $e, 500);
         }
 
         return new OpenIDConnectProvider(
