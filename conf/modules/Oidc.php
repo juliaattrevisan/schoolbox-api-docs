@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Application\Login\Oidc\Module;
+use Schoolbox\Application\Login\Oidc\Module;
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 
