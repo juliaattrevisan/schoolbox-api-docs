@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
+use Alaress\Html\ToText;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -104,43 +105,52 @@ class Hydrator extends BaseHydrator
             function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword) {
                 $assessment = $assessments->getBy('id', $match->id);
 
+                if (!($assessment instanceof IAssessable)) {
+                    return null;
+                }
+
+                // Because the description contains HTML, this match might have come about only because the
+                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if (!str_contains($assessment->getTitle(), $keyword)) {
+                    $assessmentDescTextOnly = (new ToText($assessment->getDescription()))->getText();
+                    if (!str_contains($assessmentDescTextOnly, $keyword)) {
+                        return null;
+                    }
+                }
+
                 // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
                 $assessmentCreator = $assessmentCreatorById[$assessment->getCreator()?->getId()] ?? null;
 
-                if ($assessment instanceof IAssessable) {
-                    // Note $match->type will be something like 'assessment.dueWork'.
-                    $matchTypeTokens = explode('.', $match->type);
-                    $assessmentType = $matchTypeTokens[1];
-                    $assessmentDesc = $assessment->getDescription();
-                    $assessmentDueAt = $assessment->getDueAt();
-                    $folder = $assessment->getBaseContext()->getFolder();
+                // Note $match->type will be something like 'assessment.dueWork'.
+                $matchTypeTokens = explode('.', $match->type);
+                $assessmentType = $matchTypeTokens[1];
+                $assessmentDueAt = $assessment->getDueAt();
+                $folder = $assessment->getBaseContext()->getFolder();
 
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $assessment->getTitle(),
-                        $this->buildBaseUrl()
-                             ->withPath("/learning/assessments/{$assessment->getId()}")
-                             ->__toString(),
-                        $match->type,
-                        $match->relevance,
-                        $assessment->getUpdatedAt(),
-                        $folder,
-                        (
-                            $assessment->isImplementation()
-                            ? 'Due ' . ($assessmentDueAt === null ? '[no date set]' : $assessmentDueAt->getLocal())
-                            : $assessment->getWorkType()?->getName()
-                        ),
-                        null,
-                        AssessmentType::getIconClassSuffixForType($assessmentType),
-                        $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
-                        $assessmentCreator,
-                        [$folder],
-                        [],
-                    );
-                }
-
-                return null;
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $assessment->getTitle(),
+                    $this->buildBaseUrl()
+                         ->withPath("/learning/assessments/{$assessment->getId()}")
+                         ->__toString(),
+                    $match->type,
+                    $match->relevance,
+                    $assessment->getUpdatedAt(),
+                    $folder,
+                    (
+                        $assessment->isImplementation()
+                        ? 'Due ' . ($assessmentDueAt === null ? '[no date set]' : $assessmentDueAt->getLocal())
+                        : $assessment->getWorkType()?->getName()
+                    ),
+                    null,
+                    AssessmentType::getIconClassSuffixForType($assessmentType),
+                    $this->truncateAroundKeyword($keyword, $assessment->getDescription()) ?? $this->truncate($assessmentDesc),
+                    $assessmentCreator,
+                    [$folder],
+                    [],
+                );
             },
             $matches
         );
