@@ -103,7 +103,7 @@ class Controller extends Base
             return;
         }
 
-        // client id / secret gets passed via Basic auth
+        // convert auth code to access token
         $accessToken = $this->buildOidcProvider()->getAccessToken(
             'authorization_code',
             ['code' => $this->requestPost->get('code')]
