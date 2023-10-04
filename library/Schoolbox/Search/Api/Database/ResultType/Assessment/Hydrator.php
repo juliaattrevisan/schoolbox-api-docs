@@ -92,7 +92,10 @@ class Hydrator extends BaseHydrator
         // Note creator is not hydrated in $assessments, so get assessment creators separately.
         $creatorIds = [];
         foreach ($assessments as $assessment) {
-            $creatorIds[] = $assessment->getCreator()->getId();
+            $creatorId = $assessment->getCreator()?->getId();
+            if ($creatorId !== null) {
+                $creatorIds[] = $creatorId;
+            }
         }
         $assessmentCreatorById = $this->userMapper->findByColumn('id', $creatorIds)->indexBy('id');
 
@@ -102,7 +105,7 @@ class Hydrator extends BaseHydrator
                 $assessment = $assessments->getBy('id', $match->id);
 
                 // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
-                $assessmentCreator = $assessmentCreatorById[$assessment->getCreator()->getId()];
+                $assessmentCreator = $assessmentCreatorById[$assessment->getCreator()?->getId()] ?? null;
 
                 if ($assessment instanceof IAssessable) {
                     // Note $match->type will be something like 'assessment.dueWork'.
