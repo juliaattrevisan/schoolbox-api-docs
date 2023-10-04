@@ -97,6 +97,9 @@ class Controller extends Base
             }
         }
 
+        // Add time component to $start and $end dates to ensure date range is inclusive at both ends.
+        $end->addHours(23)->addMinutes(59)->addSeconds(59);
+
         // Set up category list
         $categoryList = [];
         foreach ($this->getCategoryMapper()->findAll(['order' => ['name' => 'asc']]) as $category) {
