@@ -177,7 +177,7 @@ class Controller extends Base
         // Redirect URI: here, I suppose?
         $redirectUri = (new Factory($config))
             ->buildFullyQualified()
-            ->withPath($this->routeGenerator->generate('loginOidc.postReceiveAuthorizationResponse'))
+            ->withPath($this->routeGenerator->generate('loginOidc.getAuthorization'))
         ;
 
         // These should be discoverable using OIDC discovery:
