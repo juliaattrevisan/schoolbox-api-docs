@@ -11,7 +11,7 @@ export const RESULT_LIMIT = 10; // number of results returned by the api on a si
 export const SUB_RESULT_LIMIT = 10; // number of sub results returned by the api on a single call
 
 export const useResultsStore = defineStore("spResults", () => {
-    const results = window.Vue.ref<Result[]>([]); // returned search results
+    const results = window.Vue.ref<Results>({ data: [] }); // returned search results
     const moreResultsCount = window.Vue.ref(0); // number of subsequent result sets that have been loaded
     const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all results have been loaded
 
@@ -20,7 +20,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasResults = window.Vue.computed(() => {
-        return results.value.length > 0;
+        return results.value.data.length > 0;
     });
 
     /**
@@ -28,7 +28,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasNoResults = window.Vue.computed(() => {
-        return results.value.length === 0;
+        return results.value.data.length === 0;
     });
 
     /**
@@ -39,13 +39,13 @@ export const useResultsStore = defineStore("spResults", () => {
 
     /**
      * Set the first results
-     * @param {Result[]} firstResults - the results to set
+     * @param {Results} firstResults - the results to set
      */
-    function setFirstResults(firstResults: Result[]) {
+    function setFirstResults(firstResults: Results) {
         hasLoadedAllResults.value = false;
         results.value = firstResults;
         // if we have less results than the limit, we have loaded all results
-        if (results.value.length < RESULT_LIMIT) {
+        if (results.value.data.length < RESULT_LIMIT) {
             hasLoadedAllResults.value = true;
         }
     }
@@ -54,11 +54,11 @@ export const useResultsStore = defineStore("spResults", () => {
      * Set the next results
      * @param {Result[]} moreResults - the results to set
      */
-    function setMoreResults(moreResults: Result[]) {
-        results.value = [...results.value, ...moreResults];
+    function setMoreResults(moreResults: Results) {
+        results.value.data = [...results.value.data, ...moreResults.data];
         moreResultsCount.value += 1;
         // check if we have loaded all results yet
-        if (results.value.length < RESULT_LIMIT * (moreResultsCount.value + 1)) {
+        if (results.value.data.length < RESULT_LIMIT * (moreResultsCount.value + 1)) {
             hasLoadedAllResults.value = true;
         }
     }
@@ -69,7 +69,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @param {number} resultId - the parent id of the result the new sub results are from
      */
     function setMoreSubResults(moreSubResults: Result[], resultId: number) {
-        const parentResult = results.value.find((result) => result.id === resultId) as Result;
+        const parentResult = results.value.data.find((result) => result.id === resultId) as Result;
         (parentResult._subResults as Results).data = [
             ...(parentResult._subResults?.data as Result[]),
             ...moreSubResults,
@@ -80,7 +80,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * clear the current results
      */
     function clear() {
-        results.value = [];
+        results.value = { data: [] };
         moreResultsCount.value = 0;
         hasLoadedAllResults.value = false;
     }

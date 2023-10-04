@@ -30,7 +30,7 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
         if (moreResults.data.length === 0) {
             useResultsStore().hasLoadedAllResults = true;
         } else {
-            useResultsStore().setMoreResults(moreResults.data);
+            useResultsStore().setMoreResults(moreResults);
         }
     }
 
