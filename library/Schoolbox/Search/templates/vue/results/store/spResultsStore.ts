@@ -9,7 +9,7 @@ import { useHasMoreResults } from "../composable/useHasMoreResults";
 
 export const RESULT_LIMIT = 10; // number of results returned by the api on a single call
 export const SUB_RESULT_LIMIT = 10; // number of sub results returned by the api on a single call
-const EMPTY_RESULTS = { data: [], metadata: { cursor: { next: "" } } };
+const EMPTY_RESULTS = { data: [], metadata: { cursor: { next: "" } } }; // empty results to initialise the store
 
 export const useResultsStore = defineStore("spResults", () => {
     const allResults = window.Vue.ref<Result[]>([]); // all returned search results
@@ -58,8 +58,8 @@ export const useResultsStore = defineStore("spResults", () => {
      * @param {Result[]} moreResults - the results to set
      */
     function setMoreResults(moreResults: Results) {
-        latestResults.value = moreResults;
         allResults.value = [...allResults.value, ...latestResults.value.data];
+        latestResults.value = moreResults;
         moreResultsCount.value += 1;
         // check if we have loaded all results yet
         if (allResults.value.length < RESULT_LIMIT * (moreResultsCount.value + 1)) {
