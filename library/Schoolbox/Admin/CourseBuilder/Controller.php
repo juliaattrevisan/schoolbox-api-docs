@@ -130,8 +130,21 @@ class Controller extends Base
             }
             // set the new values
             $template->setName($templateGroup['name']);
-            $template->setCourseTemplate($this->homepageTemplateMapper->findById($templateGroup['courseTemplate']));
-            $template->setUnitTemplate($this->homepageTemplateMapper->findById($templateGroup['unitTemplate']));
+            /**
+             * Catch deleted and use the deleted item, this is still valid here
+             */
+            try {
+                $courseTemplate = $this->homepageTemplateMapper->findById($templateGroup['courseTemplate']['id']);
+            } catch (Exception\Deleted $e) {
+                $courseTemplate = $e->getDeletedObject();
+            }
+            try {
+                $unitTemplate = $this->homepageTemplateMapper->findById($templateGroup['unitTemplate']['id']);
+            } catch (Exception\Deleted $e) {
+                $unitTemplate = $e->getDeletedObject();
+            }
+            $template->setCourseTemplate($courseTemplate);
+            $template->setUnitTemplate($unitTemplate);
             $templates->add($template);
         }
         // save the template groups
