@@ -18,6 +18,7 @@ use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OpenIDConnectClient\OpenIDConnectProvider;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
+use Schoolbox\Url\Factory;
 use Schoolbox\Url\Uri;
 
 /**
@@ -47,11 +48,6 @@ class Controller extends Base
     {
         $config = $this->getConfigLoader();
 
-        // Which scope is used to identify a user?
-        // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
-        // Request just openid for now
-        $scopes = 'openid';
-
         // Nonce: not required, but can be used and is respected by the JWT decoder
         // TODO generate and store in the session, if it turns out it is required?
         $nonce = null;
@@ -60,7 +56,10 @@ class Controller extends Base
         // urlAuthorize option and generates and applies any necessary parameters
         // (e.g. state).
         $oauthOptions = [
-            'scope'         => $scopes,
+            // Which scope is used to identify a user?
+            // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
+            // Request just openid for now
+            'scope'         => 'openid',
             'response_type' => 'code token',
             'response_mode' => 'form_post',
             // State for identifying this as an OIDC request.
@@ -101,9 +100,15 @@ class Controller extends Base
             'authorization_code',
             ['code' => $this->requestPost->get('code')]
         );
+
+        // TODO check redirect URI set in state, and redir there?
         $loginUri = (new Uri())
-            ->withPath('/api/session')
-            ->withQuery(http_build_query(['jwt' => $accessToken->getIdToken()->toString()]));
+            ->withPath($this->routeGenerator->generate('api.initSessionFromQueryString'))
+            ->withQuery(
+                http_build_query([
+                    'jwt'      => $accessToken->getIdToken()->toString(),
+                    'redirect' => '/'
+                ]));
         $this->response = $this->redirectTemporary($loginUri->__toString());
     }
 
@@ -127,9 +132,11 @@ class Controller extends Base
         $clientId       = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         $clientSecret   = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_SECRET);
 
-        // For this place:
-        // hardcode redirect URI, as iSAMS hardcoded it and I can't change it
-        $redirectUri = new Uri('https://alpha.dev.schoolbox.cloud/');
+        // Redirect URI: here, I suppose?
+        $redirectUri = (new Factory($config))
+            ->buildFullyQualified()
+            ->withPath($this->routeGenerator->generate('loginOidc.postReceiveAuthorizationResponse'))
+        ;
 
         // These should be discoverable using OIDC discovery:
         // https://github.com/steverhoades/oauth2-openid-connect-client/pull/37
