@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Web\Controller\Base;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 
 /**
  * Module for OpenID Connect logins.
@@ -41,11 +42,13 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         $codec = new Base64();
-        $cache = new ItemPool(
-            $this->injector->get('redis.cache'),
-            $codec,
-            new KeyGenerator('oidc', INSTANCE_ID),
+        $cache = new SimpleCacheBridge(
+            new ItemPool(
+                $this->injector->get('redis.cache'),
+                $codec,
+                new KeyGenerator('oidc', INSTANCE_ID),
+            )
         );
-        return new Controller($this->injector->get('httpClient'), $codec);
+        return new Controller($this->injector->get('httpClient'), $codec, $cache);
     }
 }
