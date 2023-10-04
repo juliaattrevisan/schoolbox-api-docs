@@ -5,9 +5,8 @@ import { Result } from "./Result";
  */
 export type Results = {
     data: Result[];
-    metadata?: {
+    metadata: {
         cursor: {
-            current: string;
             next: string;
         };
     };

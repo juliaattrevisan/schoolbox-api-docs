@@ -6,7 +6,7 @@
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import SpResultsError from "./sp-results-error.vue";
 import { useResultsStore } from "./store/spResultsStore";
-import { useLoadMoreResultsStore } from "./store/spLoadMoreResults";
+import { useLoadMoreResultsStore } from "./store/spLoadMoreResultsStore";
 
 const resultsStore = useResultsStore();
 const loadMoreResultsStore = useLoadMoreResultsStore();
