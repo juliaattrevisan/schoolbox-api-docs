@@ -106,6 +106,19 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      */
     async function saveChanges() {
         try {
+            // Ensure all course template names are not empty, otherwise set .hasNameValidationError on the courseTemplate
+            let allTemplatesHaveNames = true;
+            courseTemplates.value.forEach((ct) => {
+                if (!ct.name) {
+                    ct.nameHasValidationError = true;
+                    allTemplatesHaveNames = false;
+                }
+            });
+
+            if (!allTemplatesHaveNames) {
+                return;
+            }
+
             saveIsProcessing.value = true;
             saveStatus.value = "Saving...";
 
