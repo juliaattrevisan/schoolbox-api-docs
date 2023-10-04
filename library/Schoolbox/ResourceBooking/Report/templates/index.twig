@@ -29,7 +29,9 @@
     const DATE_RANGE_PERIOD_MAX_UNIT = 'month';
 
     /**
-     * Ensure that the date range period never exceeds DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT.
+     * Ensure that:
+     *  - start date is always on or before end date AND
+     *  - the date range period never exceeds DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT.
      */
     function onChangeDate(changedDateName)
     {
@@ -41,18 +43,28 @@
         let endDateObj = window.dayjs($endDate.val(), dateFormat);
 
         switch (changedDateName) {
-            case 'start':
-                // If end date is too far ahead of start date, fix end date.
-                let startDatePlusPeriodObj = startDateObj.add(DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
-                if (endDateObj.isAfter(startDatePlusPeriodObj)) {
-                    $endDate.val(startDatePlusPeriodObj.format(dateFormat));
+          case 'start':
+                // If end date is behind start date, set end date to match start date.
+                if (endDateObj.isBefore(startDateObj)) {
+                    $endDate.val(startDateObj.format(dateFormat));
+                } else {
+                    // If end date is too far ahead of start date, set end date for maximum period.
+                    let startDatePlusPeriodObj = startDateObj.add(DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
+                    if (endDateObj.isAfter(startDatePlusPeriodObj)) {
+                        $endDate.val(startDatePlusPeriodObj.format(dateFormat));
+                    }
                 }
                 break;
             case 'end':
-                // If start date is too far behind end date, fix start date.
-                let endDateMinusPeriodObj = endDateObj.add(-DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
-                if (startDateObj.isBefore(endDateMinusPeriodObj)) {
-                    $startDate.val(endDateMinusPeriodObj.format(dateFormat));
+                // If start date is ahead of end date, set start date to match end date.
+                if (startDateObj.isAfter(endDateObj)) {
+                    $startDate.val(endDateObj.format(dateFormat));
+                } else {
+                    // If start date is too far behind end date, set start date for maximum period.
+                    let endDateMinusPeriodObj = endDateObj.add(-DATE_RANGE_PERIOD_MAX_NUMBER, DATE_RANGE_PERIOD_MAX_UNIT);
+                    if (startDateObj.isBefore(endDateMinusPeriodObj)) {
+                        $startDate.val(endDateMinusPeriodObj.format(dateFormat));
+                    }
                 }
                 break;
         }
