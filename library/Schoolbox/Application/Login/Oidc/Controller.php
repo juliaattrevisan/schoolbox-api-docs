@@ -106,7 +106,7 @@ class Controller extends Base
         $authorizationUrl = $oidcProvider->getAuthorizationUrl($oauthOptions);
 
         // Get the state generated for you and store it to the session
-        $this->session->set('oauth2state', $oidcProvider->getState());
+        $this->session->set('oidcState', $oidcProvider->getState());
 
         // Redirect the user to the authorization URL
         $this->response = $this->redirectTemporary($authorizationUrl);
@@ -128,10 +128,10 @@ class Controller extends Base
     {
         // check oauth2state
         $requestState = $this->requestQuery->get('state');
-        $sessionState = $this->session->get('oauth2state');
+        $sessionState = $this->session->get('oidcState');
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
-            $this->session->set('oauth2state', null);
-            $this->sendError('Invalid oAuth state');
+            $this->session->set('oidcState', null);
+            $this->sendError('State sent to and received from OIDC provider do not match');
             return;
         }
 
@@ -141,6 +141,7 @@ class Controller extends Base
             ['code' => $code]
         );
 
+        // Init the session from the ID token received from the OIDC provider
         $decodedState = $this->codec->decode($requestState);
         $loginUri     = (new Uri())
             ->withPath($this->routeGenerator->generate('api.initSessionFromQueryString'))
@@ -216,7 +217,6 @@ class Controller extends Base
      */
     private function buildState(): string
     {
-        // Build nonce, add redirect
         $payload = [
             'redirect' => $this->requestQuery->get('redirect') ?? '/',
             'nonce'    => Uuid::uuid4(),
