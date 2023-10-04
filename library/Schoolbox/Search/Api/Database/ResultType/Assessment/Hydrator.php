@@ -108,8 +108,9 @@ class Hydrator extends BaseHydrator
                     // Note $match->type will be something like 'assessment.dueWork'.
                     $matchTypeTokens = explode('.', $match->type);
                     $assessmentType = $matchTypeTokens[1];
-                    $folder = $assessment->getBaseContext()->getFolder();
                     $assessmentDesc = $assessment->getDescription();
+                    $assessmentDueAt = $assessment->getDueAt();
+                    $folder = $assessment->getBaseContext()->getFolder();
 
                     return new FullResult(
                         $match,
@@ -122,7 +123,11 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $assessment->getUpdatedAt(),
                         $folder,
-                        'Creator: ' . $assessmentCreator->getFullName(),
+                        (
+                            $assessment->isImplementation()
+                            ? 'Due ' . ($assessmentDueAt === null ? '[no date set]' : $assessmentDueAt->getLocal())
+                            : $assessment->getWorkType()?->getName()
+                        ),
                         null,
                         AssessmentType::getIconClassSuffixForType($assessmentType),
                         $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
