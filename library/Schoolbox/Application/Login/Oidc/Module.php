@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Application\Login\Oidc;
 
+use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 
@@ -37,6 +38,6 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->injector->get('httpClient'));
+        return new Controller($this->injector->get('httpClient'), new Base64());
     }
 }

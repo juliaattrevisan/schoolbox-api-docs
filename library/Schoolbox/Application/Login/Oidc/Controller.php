@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Application\Login\Oidc;
 
+use Alaress\Codec\ICodec;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Aura\Router\Exception\RouteNotFound;
@@ -17,6 +18,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OpenIDConnectClient\OpenIDConnectProvider;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Url\Factory;
@@ -31,8 +33,9 @@ class Controller extends Base
      * Constructor
      *
      * @param Client $httpClient Required for querying OIDC discovery URL
+     * @param ICodec $codec      Required for encoding/decoding state
      */
-    public function __construct(private Client $httpClient)
+    public function __construct(private Client $httpClient, private ICodec $codec)
     {
     }
 
@@ -86,9 +89,6 @@ class Controller extends Base
      */
     private function sendAuthorizationRequest(): void
     {
-        // Fetch the authorization URL from the provider; this returns the
-        // urlAuthorize option and generates and applies any necessary
-        // parameters (e.g. state).
         $oauthOptions = [
             // Which scope is used to identify a user?
             // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
@@ -96,9 +96,7 @@ class Controller extends Base
             'scope'         => 'openid',
             'response_type' => 'code token',
             'response_mode' => 'form_post',
-            // State for identifying this as an OIDC request.
-            // Temporary, so that this can be redird back to here
-            'state'         => 'oidc',
+            'state'         => $this->buildState(),
             'x-client-sku'  => Instance::APPLICATION_NAME . '-' . INSTANCE_ID,
             'x-client-ver'  => $this->getConfigLoader()->get('site_version'),
         ];
@@ -143,13 +141,13 @@ class Controller extends Base
             ['code' => $code]
         );
 
-        // TODO check redirect URI set in state, and redir there?
-        $loginUri = (new Uri())
+        $decodedState = $this->codec->decode($requestState);
+        $loginUri     = (new Uri())
             ->withPath($this->routeGenerator->generate('api.initSessionFromQueryString'))
             ->withQuery(
                 http_build_query([
                     'jwt'      => $accessToken->getIdToken()->toString(),
-                    'redirect' => '/'
+                    'redirect' => $decodedState['redirect'] ?? '/',
                 ])
             );
         $this->response = $this->redirectTemporary($loginUri->__toString());
@@ -209,5 +207,20 @@ class Controller extends Base
                 'signer' => new Sha256(),
             ]
         );
+    }
+
+    /**
+     * Build a state value containing a nonce and a path to redirect to.
+     *
+     * @return string
+     */
+    private function buildState(): string
+    {
+        // Build nonce, add redirect
+        $payload = [
+            'redirect' => $this->requestQuery->get('redirect') ?? '/',
+            'nonce'    => Uuid::uuid4(),
+        ];
+        return $this->codec->encode($payload);
     }
 }
