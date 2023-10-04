@@ -10,12 +10,12 @@ declare(strict_types=1);
 namespace Application\Login\Oidc;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception as ControllerException;
 use Aura\Router\Exception\RouteNotFound;
 use CoderCat\JWKToPEM;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceGenerator;
 use OpenIDConnectClient\OpenIDConnectProvider;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
@@ -50,13 +50,9 @@ class Controller extends Base
      */
     public function getSendAuthorizationRequest(): void
     {
-        // Nonce: not required, but can be used and is respected by the JWT decoder
-        // TODO generate and store in the session, if it turns out it is required?
-        $nonce = null;
-
         // Fetch the authorization URL from the provider; this returns the
-        // urlAuthorize option and generates and applies any necessary parameters
-        // (e.g. state).
+        // urlAuthorize option and generates and applies any necessary
+        // parameters (e.g. state).
         $oauthOptions = [
             // Which scope is used to identify a user?
             // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
@@ -71,16 +67,14 @@ class Controller extends Base
             'x-client-ver'  => $this->getConfigLoader()->get('site_version'),
         ];
 
-        // Generate a nonce
-        $nonceGenerator        = new NonceGenerator();
-        $oauthOptions['nonce'] = $nonceGenerator->generate()->getValue();
-        $oidcProvider          = $this->buildOidcProvider();
-        $authorizationUrl      = $oidcProvider->getAuthorizationUrl($oauthOptions);
+        // Build provider
+        $oidcProvider     = $this->buildOidcProvider();
+        $authorizationUrl = $oidcProvider->getAuthorizationUrl($oauthOptions);
 
-        // Get the state generated for you and store it to the session.
+        // Get the state generated for you and store it to the session
         $this->session->set('oauth2state', $oidcProvider->getState());
 
-        // Redirect the user to the authorization URL.
+        // Redirect the user to the authorization URL
         $this->response = $this->redirectTemporary($authorizationUrl);
     }
 
@@ -96,6 +90,7 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\Base64DecodeException
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
+     * @throws ControllerException
      */
     public function postReceiveAuthorizationResponse(): void
     {
