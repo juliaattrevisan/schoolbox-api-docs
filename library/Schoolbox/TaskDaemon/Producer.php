@@ -9,12 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\TaskDaemon;
 
+use Alaress_Date_Format;
 use Interop\Queue\Context;
 use Interop\Queue\Exception;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
+use Schoolbox\TaskDaemon\Message\HeaderAdapter;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\TaskDaemon\Request\MessageSerializer;
+use Schoolbox\TaskDaemon\Task\Status;
 
 /**
  * Wrapper around task daemon message sending.
@@ -22,39 +25,40 @@ use Schoolbox\TaskDaemon\Request\MessageSerializer;
 class Producer
 {
     /**
-     * The queue context to which messages will be sent.
-     */
-    private Context $context;
-
-    /**
-     * Serializer for converting messages to a format which the task daemon
-     * may understand.
-     */
-    private MessageSerializer $messageSerializer;
-
-    /**
-     * The name of the queue to send messages to.
-     */
-    private string $queueName;
-
-    /**
      * Constructor
      *
-     * @param Context           $context
-     * @param string            $queueName
-     * @param MessageSerializer $messageSerializer
+     * @param Context           $context           The queue context to which messages will be sent.
+     * @param string            $queueName         Serializer for converting messages to a format which the task daemon
+     *                                             may understand.
+     * @param MessageSerializer $messageSerializer The name of the queue to send messages to.
+     * @param HeaderAdapter     $headerAdapter     Adapter for setting task daemon specific headers on messages.
      */
-    public function __construct(Context $context, string $queueName, MessageSerializer $messageSerializer)
-    {
-        $this->context           = $context;
-        $this->queueName         = $queueName;
-        $this->messageSerializer = $messageSerializer;
+    public function __construct(
+        private Context $context,
+        private string $queueName,
+        private MessageSerializer $messageSerializer,
+        private HeaderAdapter $headerAdapter,
+    ) {
     }
 
     /**
      * Send the message to the task daemon.
      *
-     * @param Message $message The message to send
+     * @param Message     $message          The message to send
+     * @param float|null  $delay            If set: delay send by this many
+     *                                      seconds
+     * @param int|null    $maxRequeues      If set: override the max requeues by
+     *                                      this amount
+     * @param float|null $testErrorChance   If set: the task daemon randomly
+     *                                      raises an error instead of running
+     *                                      its task.
+     *                                      (0: no chance, 1: 100% chance)
+     * @param Status|null $testErrorStatus  If raising an error due to
+     *                                      `$testErrorChance`: have the task
+     *                                      return this status.
+     * @param array|null $testErrorPayload  If raising an error due to
+     *                                      `$testErrorChance`: have the task
+     *                                      return this payload.
      * @return void
      * @throws Exception                   if the context's provider fails to
      *                                     send the message due to some internal
@@ -63,11 +67,33 @@ class Producer
      *                                     invalid destination
      * @throws InvalidMessageException     if an invalid message is specified
      */
-    public function send(Message $message)
-    {
+    public function send(
+        Message $message,
+        ?float $delay = null,
+        ?int $maxRequeues = null,
+        ?float $testErrorChance = null,
+        ?Status $testErrorStatus = null,
+        ?array $testErrorPayload = null,
+    ): void {
+        $enqueueMessage = $this->context->createMessage($this->messageSerializer->serialize($message));
+        if (isset($delay)) {
+            $this->headerAdapter->setDelay($enqueueMessage, $delay);
+        }
+        if (isset($maxRequeues)) {
+            $this->headerAdapter->setMaxRequeues($enqueueMessage, $maxRequeues);
+        }
+        if (isset($testErrorChance)) {
+            $this->headerAdapter->setTestErrorChance($enqueueMessage, $testErrorChance);
+        }
+        if (isset($testErrorStatus)) {
+            $this->headerAdapter->setTestErrorStatus($enqueueMessage, $testErrorStatus);
+        }
+        if (isset($testErrorPayload)) {
+            $this->headerAdapter->setTestErrorPayload($enqueueMessage, $testErrorPayload);
+        }
         $this->context->createProducer()->send(
             $this->context->createQueue($this->queueName),
-            $this->context->createMessage($this->messageSerializer->serialize($message)),
+            $enqueueMessage,
         );
     }
 }
