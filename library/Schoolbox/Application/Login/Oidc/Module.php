@@ -25,13 +25,11 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // Routes:
-        // * a GET page for initialising an OIDC auth flow
-        $this->register(self::METHOD_GET, '', 'getSendAuthorizationRequest');
-
-        // * a POST page which the OIDC provider posts back to
-        $this->register(self::METHOD_POST, '', 'postReceiveAuthorizationResponse');
-
-        // These routes exist only if oAuth provider is set up
+        // a GET/POST page for handling both creating an auth request, and
+        // handling an auth response.
+        // These routes should only exist if oAuth provider is set up.
+        $this->register(self::METHOD_GET, '', 'getAuthorization');
+        $this->register(self::METHOD_POST, '', 'postAuthorization');
     }
 
     /**

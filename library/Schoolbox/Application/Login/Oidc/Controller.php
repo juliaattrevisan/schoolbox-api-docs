@@ -37,8 +37,7 @@ class Controller extends Base
     }
 
     /**
-     * Send an OpenID Connect authorization request to this instance's oAuth
-     * provider.
+     * Send OIDC auth requests and receive responses via the same endpoint.
      *
      * @api GET /login/oidc
      * @since 23.1
@@ -47,8 +46,45 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\Base64DecodeException
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
+     * @throws ControllerException
      */
-    public function getSendAuthorizationRequest(): void
+    public function getAuthorization(): void
+    {
+        $code = $this->requestPost->get('code') ?? $this->requestQuery->get('code');
+        if (isset($code)) {
+            $this->receiveAuthorizationResponse($code);
+        } else {
+            $this->sendAuthorizationRequest();
+        }
+    }
+
+    /**
+     * Send OIDC auth requests and receive responses via the same endpoint.
+     *
+     * @api POST /login/oidc
+     * @since 23.1
+     *
+     * @throws GuzzleException
+     * @throws JWKToPEM\Exception\Base64DecodeException
+     * @throws JWKToPEM\Exception\JWKConverterException
+     * @throws RouteNotFound
+     * @throws ControllerException
+     */
+    public function postAuthorization(): void
+    {
+        $this->getAuthorization();
+    }
+
+    /**
+     * Send an OpenID Connect authorization request to this instance's oAuth
+     * provider.
+     *
+     * @throws GuzzleException
+     * @throws JWKToPEM\Exception\Base64DecodeException
+     * @throws JWKToPEM\Exception\JWKConverterException
+     * @throws RouteNotFound
+     */
+    private function sendAuthorizationRequest(): void
     {
         // Fetch the authorization URL from the provider; this returns the
         // urlAuthorize option and generates and applies any necessary
@@ -82,9 +118,7 @@ class Controller extends Base
      * Receive an OpenID Connect authorization response from this instance's
      * oAuth provider, and initialize a user session if it succeeded.
      *
-     * @api POST /login/oidc
-     * @since 23.1
-     *
+     * @param string $code The code from the auth response.
      * @return void
      * @throws GuzzleException
      * @throws JWKToPEM\Exception\Base64DecodeException
@@ -92,7 +126,7 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws ControllerException
      */
-    public function postReceiveAuthorizationResponse(): void
+    private function receiveAuthorizationResponse(string $code): void
     {
         // check oauth2state
         $requestState = $this->requestQuery->get('state');
@@ -106,7 +140,7 @@ class Controller extends Base
         // convert auth code to access token
         $accessToken = $this->buildOidcProvider()->getAccessToken(
             'authorization_code',
-            ['code' => $this->requestPost->get('code')]
+            ['code' => $code]
         );
 
         // TODO check redirect URI set in state, and redir there?
