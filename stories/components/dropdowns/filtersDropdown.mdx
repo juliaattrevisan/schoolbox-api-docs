@@ -9,7 +9,7 @@ import * as FiltersDropdownStories from "./filtersDropdown.stories";
 To toggle the display of a group of filters
 
 -   It will display whatever is assigned to it via: `content-id="dropdown-1"`
--   To add text to the button, use `button-text="My Filter`
+-   To add text to the button, use `button-text="Category`
 -   It can be disabled via: `is-disabled`
 
 **Note that only the dropdown button is currently contained within the component. The dropdown content is not.**
@@ -17,16 +17,62 @@ To toggle the display of a group of filters
 **Also, the central div `#container` is currently used to determine the position of the dropdown content.**
 
 ```
-<sbx-filters-dropdown content-id="dropdown-1" button-text="Modify Participation">
-    <div slot="icon">
-        <svg />
-    </div>
-</sbx-filters-dropdown>
-<ul id="dropdown-1" class="f-dropdown" data-dropdown-content="">
-    <li class="separator">Manage</li>
-    <li><a>Course Markbook</a></li>
-    <li><a>Delete</a></li>
-</ul>
+<div id="container" class="l-flex-col l-flex--justify-space" style="height: 200px;">
+    <ul class="filter-dropdown flex-list flex-wrap">
+        <li class="checklist item filter-component">
+            <sbx-filters-dropdown content-id="dropdown-1" button-text="Category"></sbx-filters-dropdown>
+            <div id="dropdown-1" data-dropdown-content class="f-dropdown content l-pad-m">
+                <ul class="option-list">
+                    <li>
+                        <input
+                            id="filter_selection_22_1"
+                            type="checkbox"
+                            name="filter_selection[22][1]"
+                            value="1"
+                        />
+                        <label for="filter_selection_22_1" class="noselect">Learning</label>
+                    </li>
+                    <li>
+                        <input
+                            id="filter_selection_22_2"
+                            type="checkbox"
+                            name="filter_selection[22][2]"
+                            value="1"
+                        />
+                        <label for="filter_selection_22_2" class="noselect">Personal Development</label>
+                    </li>
+                    <li>
+                        <input
+                            id="filter_selection_22_3"
+                            type="checkbox"
+                            name="filter_selection[22][3]"
+                            value="1"
+                        />
+                        <label for="filter_selection_22_3" class="noselect">Community</label>
+                    </li>
+                    <li>
+                        <input
+                            id="filter_selection_22_4"
+                            type="checkbox"
+                            name="filter_selection[22][4]"
+                            value="1"
+                        />
+                        <label for="filter_selection_22_4" class="noselect">Extra-Curricular</label>
+                    </li>
+                    <li>
+                        <input
+                            id="filter_selection_22_5"
+                            type="checkbox"
+                            name="filter_selection[22][5]"
+                            value="1"
+                        />
+                        <labelsssssss for="filter_selection_22_5" class="noselect">Achievement Standards</labelsssssssss>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</div>
 ```
 
 <Stories />
