@@ -126,16 +126,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleExpression(): string
     {
-        return "
-            COALESCE(
-                IF(task.id, assessment.title, NULL),
-                IF(assess.assessment_id, assess.title, NULL),
-                IF(submission_box.id, submission_box.name, NULL),
-                IF(project.id, assessment.title, NULL),
-                IF(lesson_plan.id, assessment.title, NULL),
-                IF(lti_assessment.assessment_id, lti_assessment.lti_assessment_title, NULL)
-            )
-        ";
+        // Note on redundancy of assessment titles:
+        // assess.title, submission_box.title, and lti_assessment.lti_assessment_title should always match assessment.title for linked rows.
+        return "assessment.title";
     }
 
     /**
