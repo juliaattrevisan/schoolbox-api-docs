@@ -176,10 +176,10 @@ class Hydrator extends BaseHydrator
         // SQL match conditions copied from Assessment\QueryParamBuilder->buildBaseWhereParams()
         // -------------------------------------------------------------------------------------
         // 'assessment.title LIKE :assessmentKeywordLike',                    // Assessment->getTitle()
-        // 'assessment.description LIKE :assessmentKeywordLike',              // Description is leftover case.
+        // 'assessment.description LIKE :assessmentKeywordLike',              // Assessment->getDescription()
         // 'task.link LIKE :assessmentKeywordLike',                           // Assessment\Task\Model
         // 'assess.title LIKE :assessmentKeywordLike',                        // Overrides Assessment->getTitle()
-        // 'assess.description LIKE :assessmentKeywordLike',                  // Description is leftover case.
+        // 'assess.description LIKE :assessmentKeywordLike',                  // Overrides Assessment->getDescription()
         // 'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',   // Assessment\Lti\Model
         // 'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike', // Assessment\Lti\Model
         // 'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',  // Assessment\Lti\Model
