@@ -33,7 +33,8 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         }
 
         // has an internal block for the checkboxes
-        $page->setBlock($keyblock, 'filters', 'filters_block');
+        $page->setBlock($keyblock, 'assessmentfilter', 'assessmentfilter_block');
+        $page->setBlock('assessmentfilter', 'filters', 'filters_block');
         $page->setVar('filters_block', '');
 
         /* filter config */
@@ -45,5 +46,6 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
                           ]);
             $page->parse('filters_block', 'filters', true);
         }
+        $page->parse('assessmentfilter_block', 'assessmentfilter');
     }
 }
