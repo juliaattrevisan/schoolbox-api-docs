@@ -110,11 +110,13 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
+                $assessmentDesc = $assessment->getDescription();
+
                 // Because the description contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
                 if ($this->assessmentMatchesKeywordOnlyOnDescription($assessment, $keyword)) {
-                    $assessmentDescTextOnly = (new ToText($assessment->getDescription()))->getText();
+                    $assessmentDescTextOnly = (new ToText($assessmentDesc))->getText();
                     if (!str_contains($assessmentDescTextOnly, $keyword)) {
                         return null;
                     }
@@ -147,7 +149,7 @@ class Hydrator extends BaseHydrator
                     ),
                     null,
                     AssessmentType::getIconClassSuffixForType($assessmentType),
-                    $this->truncateAroundKeyword($keyword, $assessment->getDescription()) ?? $this->truncate($assessmentDesc),
+                    $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
                     $assessmentCreator,
                     [$folder],
                     [],
