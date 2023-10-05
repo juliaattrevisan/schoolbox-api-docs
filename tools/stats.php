@@ -117,7 +117,6 @@ $app = new class extends CliTool\App {
             'quiz_random'           => 'SELECT
                                         concat(numRandomised.num, \'/\', numSections.num) AS ratio
                                         FROM
-                                        # number of randomised sections
                                         (select distinct count(*) as num
                                         from assess
                                         inner join assess_section on assess.assess_id = assess_section.assess_id
@@ -125,7 +124,6 @@ $app = new class extends CliTool\App {
                                         and assess.deleted_at is null
                                         and assess_section.deleted_at is null) AS numRandomised
                                         INNER JOIN
-                                        # number of non-deleted sections in non-deleted quizzes
                                         (select count(*) as num
                                         from assess
                                         inner join assess_section on assess.assess_id = assess_section.assess_id
