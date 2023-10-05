@@ -158,6 +158,8 @@ export function usePopOut(
         content = document.querySelector(`#${contentId}[data-dropdown-content]`) as HTMLElement;
         if (content) {
             content.setAttribute("aria-hidden", "true");
+            // to close the content when the user clicks outside of it
+            onClickOutside(button, close, { ignore: [`#${content.id}`] });
         }
     }
 
@@ -172,8 +174,6 @@ export function usePopOut(
                 getContent();
             });
         }
-        // to close the content when the user clicks outside of it
-        onClickOutside(button, close, { ignore: [content] });
     });
 
     return { currentLabel, isOpen, onButtonSelected };
