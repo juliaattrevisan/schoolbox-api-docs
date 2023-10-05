@@ -106,7 +106,7 @@
         {% include '@learningAssessment/project/summary/description.twig' with {assessment: assessment} only %}
 
         {% if assessment.assessables|length %}
-            <h2 class="subheader">Activities</h2>
+            <h2 class="subheader">{{ locale.activity.properPlural }}</h2>
             <section>
                 <ul class="activity-list">
                     {% for assessable in assessment.assessables %}
@@ -123,7 +123,7 @@
         {% else %}
             <div class="empty-state">
                 <i class="icon-project"></i>
-                <p>There are no {{ locale.assessment.plural }} in this {{ locale.project }} at the moment.</p>
+                <p>There are no {{ locale.activity.plural }} in this {{ locale.project }} at the moment.</p>
             </div>
         {% endif %}
     </div>

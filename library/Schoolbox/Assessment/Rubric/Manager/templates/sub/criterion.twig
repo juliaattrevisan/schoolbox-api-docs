@@ -77,7 +77,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
                 <a class="icon-info"
                    data-reveal-id="criterion-{{ criterion.id }}"
                    href="#"
-                   title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                   title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
             {% else %}
                 {# show tot #}
                 {# delete button, with "are you sure" if it has been saved already #}
@@ -93,7 +93,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
             <li>
                 <a class="icon-info"
                    data-reveal-id="criterion-{{ criterion.id }}"
-                   href="#">Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}</a>
+                   href="#">Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}</a>
             </li>
         {% endif %}
         <li>
@@ -110,7 +110,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
             <article>
                 <h2>{{ criterion.name | nl2br }}</h2>
                 <p>{{ locale.rubricCriterion.proper }} is in use on {{ criterionUsageCount}}
-                    {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
+                    {{ criterionUsageCount > 1 ? locale.dueWork.plural : locale.dueWork }};
                 </p>
                 <ul>
                     {% for assessment in criterion.usage %}

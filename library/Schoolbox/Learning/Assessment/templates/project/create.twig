@@ -75,8 +75,8 @@
     </div>
     <div class="small-12 medium-6 columns">
         <label for="requireAllActivities">
-            Require All Activities
-            <span class="hint has-tip tip-top" title="If ON, the project will count unmarked activities as having a score of zero. This is useful where a participant must complete all activities within the project." data-tooltip>?</span>
+            Require All {{ locale.activity.properPlural }}
+            <span class="hint has-tip tip-top" title="If ON, the project will count unmarked {{ locale.activity.plural }} as having a score of zero. This is useful where a participant must complete all {{ locale.activity.plural }} within the project." data-tooltip>?</span>
         </label>
         <div class="switch">
             <input id="requireAllActivities"
@@ -107,28 +107,28 @@
         </dd>
         <dt>{{ allSummators.map.avg }}</dt>
         <dd>
-            All graded learning activities (weighted and unweighted) will contribute equally to the grade given for the project.
+            All graded learning {{ locale.activity.plural }} (weighted and unweighted) will contribute equally to the grade given for the project.
         </dd>
         <dt>{{ allSummators.map.max }}</dt>
         <dd>
-            The highest grade given to a learning activity will be the grade given for the project.
+            The highest grade given to a learning {{ locale.activity }} will be the grade given for the project.
         </dd>
         <dt>{{ allSummators.map.min }}</dt>
         <dd>
-            The lowest grade given to a learning activity will be the grade given for the project.
+            The lowest grade given to a learning {{ locale.activity }} will be the grade given for the project.
         </dd>
     </dl>
-    <h3>Require All Activities</h3>
+    <h3>Require All {{ locale.activity.properPlural }}</h3>
     <p>
-        This option changes how an unmarked activity for a participant contributes toward their total mark calculation:
+        This option changes how an unmarked {{ locale.activity }} for a participant contributes toward their total mark calculation:
     </p>
     <ul>
         <li>
-            <strong>ON</strong>: Learning activities (due work, quiz, tasks) that haven’t been submitted or graded will have a mark of zero.
-            This is useful where a student must finish all activities to complete the project.
+            <strong>ON</strong>: Learning {{ locale.activity.plural }} (due work, quiz, tasks) that haven’t been submitted or graded will have a mark of zero.
+            This is useful where a student must finish all {{ locale.activity.plural }} to complete the project.
             Custom participation and submission states can still be utilised to exclude students from parts of the project.
         </li>
-        <li><strong>OFF</strong>: Learning activities that haven’t been undertaken do not yet contribute to the project mark.</li>
+        <li><strong>OFF</strong>: Learning {{ locale.activity.plural }} that haven’t been undertaken do not yet contribute to the project mark.</li>
     </ul>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

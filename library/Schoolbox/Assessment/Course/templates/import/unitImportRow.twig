@@ -21,11 +21,11 @@
 <div class="row" data-unit="{{ unitSpec.id }}">
     {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
     {% if not unitAssessmentCount %}
-        {% set assessmentCountMessage  = 'No ' ~ locale.assessment.plural %}
+        {% set assessmentCountMessage  = 'No ' ~ locale.activity.plural %}
     {% elseif unitAssessmentCount == 1 %}
-        {% set assessmentCountMessage  = '1 ' ~ locale.assessment ~ ',' %}
+        {% set assessmentCountMessage  = '1 ' ~ locale.activity ~ ',' %}
     {% else %}
-        {% set assessmentCountMessage  = unitAssessmentCount ~ ' ' ~ locale.assessment.plural ~ ',' %}
+        {% set assessmentCountMessage  = unitAssessmentCount ~ ' ' ~ locale.activity.plural ~ ',' %}
     {% endif %}
     {#
      # No read perm on unit spec? don't show the full assessment count, just what was selected.
@@ -65,10 +65,10 @@
             <p class="alert-box">
                 {% if unitAssessmentCount %}
                 This {{ locale.unit }} is no longer accessible.
-                You can modify the dates of {{ locale.assessment.plural }},
-                and remove them from your class, but you can no longer import new {{ locale.assessment.plural }}.
+                You can modify the dates of {{ locale.activity.plural }},
+                and remove them from your class, but you can no longer import new {{ locale.activity.plural }}.
                 {% else %}
-                This {{ locale.unit }} is no longer accessible and had no {{ locale.assessment.plural }} to manage.
+                This {{ locale.unit }} is no longer accessible and had no {{ locale.activity.plural }} to manage.
                 {% endif %}
             </p>
     {% endif %}

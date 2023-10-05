@@ -114,7 +114,7 @@ Data:
     {% else %}
     <div class="small-12 large-6 island">
         {% endif %}
-        <h2 class="subheader">Activities</h2>
+        <h2 class="subheader">{{ locale.activity.properPlural }}</h2>
 
         {% if assessment.assessables | length %}
             <section>
@@ -194,7 +194,7 @@ Data:
 
                 <div id="assessment-actions" class="component-action">
                     <section>
-                        <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button" title="Create a new activity">Create Activity</a>
+                        <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button" title="Create a new {{ locale.activity }}">Create {{ locale.activity.proper }}</a>
                     </section>
                 </div>
             </section>
@@ -203,7 +203,7 @@ Data:
         <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
             {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) %}
             <i class="icon-project"></i>
-            <p>This {{ locale.project }} currently has no activities.<br />To start assessing students you should <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.assessment }}</a> next.</p>
+            <p>This {{ locale.project }} currently has no {{ locale.activity.plural }}.<br />To start assessing students you should <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.activity }}</a> next.</p>
         </div>
     </div>
     {% if assessment.baseContext is not unitSpecification %}
