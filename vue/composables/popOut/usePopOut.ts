@@ -87,6 +87,7 @@ export function usePopOut(
             scaleX: 0.95,
             scaleY: 0.95,
             transformOrigin: getTransformOrigin(position.placement),
+            // transformOrigin: "top middle",
             duration: reduceMotion ? 0 : 0.3,
         });
     }
@@ -129,6 +130,8 @@ export function usePopOut(
         cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition);
         const position = await getPosition();
         content.setAttribute("aria-hidden", "false");
+        // content.style.width = `${button.value.getBoundingClientRect().width}px`;
+        // content.style.maxWidth = `${button.value.getBoundingClientRect().width}px`;
         animateOpen(position);
     }
 
@@ -170,7 +173,7 @@ export function usePopOut(
             });
         }
         // to close the content when the user clicks outside of it
-        onClickOutside(button, close);
+        onClickOutside(button, close, { ignore: [content] });
     });
 
     return { currentLabel, isOpen, onButtonSelected };
