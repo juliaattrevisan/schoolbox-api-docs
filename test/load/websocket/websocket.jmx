@@ -152,11 +152,6 @@
           </JSONPathAssertion>
           <hashTree/>
         </hashTree>
-        <eu.luminis.jmeter.wssampler.CloseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.CloseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.CloseWebSocketSampler" testname="WebSocket Close" enabled="true">
-          <stringProp name="statusCode">1000</stringProp>
-          <stringProp name="readTimeout">6000</stringProp>
-        </eu.luminis.jmeter.wssampler.CloseWebSocketSampler>
-        <hashTree/>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
