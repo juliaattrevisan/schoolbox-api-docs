@@ -22,6 +22,7 @@ button.c-filters-dropdown {
 
 // when the dropdown is open, the icon should be flipped back
 button.c-filters-dropdown[aria-expanded="true"] {
+    background-color: #fafafa;
     .c-icon {
         transform: rotate(0deg);
     }
