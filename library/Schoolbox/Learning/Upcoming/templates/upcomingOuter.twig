@@ -5,7 +5,7 @@
         ...
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
-{% set reportContentId = 'report_content' %}
+{% set reportContentId = 'report_container' %}
 
 {# Header #}
 <div class="row">
@@ -65,8 +65,6 @@
     panel:     filterPanel,
     quickload: true
 } only %}
-
-{% set reportContentId = 'report_content' %}
 
 {% autoescape 'js' %}
     <script type="text/javascript">
