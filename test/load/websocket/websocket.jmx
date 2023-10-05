@@ -92,7 +92,7 @@
         </hashTree>
         <eu.luminis.jmeter.wssampler.OpenWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.OpenWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.OpenWebSocketSampler" testname="WebSocket Open Connection" enabled="true">
           <boolProp name="TLS">true</boolProp>
-          <stringProp name="server">vagrant.dev.schoolbox.cloud</stringProp>
+          <stringProp name="server">${__P(host, vagrant.dev.schoolbox.cloud)}</stringProp>
           <stringProp name="port">443</stringProp>
           <stringProp name="path">/websocket</stringProp>
           <stringProp name="connectTimeout">20000</stringProp>
