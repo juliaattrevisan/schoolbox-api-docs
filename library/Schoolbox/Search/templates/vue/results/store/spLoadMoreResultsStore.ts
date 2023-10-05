@@ -23,14 +23,15 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
      * load more results
      */
     async function loadMore() {
-        url.value = useStore().getEndpointWithParams();
+        const resultsStore = useResultsStore();
+        url.value = `${useStore().getEndpointWithParams()}&cursor=${resultsStore.latestResults.metadata.cursor.next}`;
         await execute();
         // if no results are returned, we've loaded all results already
         const moreResults = data.value as Results;
         if (moreResults.data.length === 0) {
-            useResultsStore().hasLoadedAllResults = true;
+            resultsStore.hasLoadedAllResults = true;
         } else {
-            useResultsStore().setMoreResults(moreResults.data);
+            resultsStore.setMoreResults(moreResults);
         }
     }
 

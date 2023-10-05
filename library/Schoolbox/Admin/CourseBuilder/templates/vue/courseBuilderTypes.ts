@@ -1,6 +1,7 @@
 export type PageTemplate = {
     id: number;
     name: string;
+    deleted: boolean;
 };
 
 export type CourseTemplate = {
@@ -8,6 +9,7 @@ export type CourseTemplate = {
     name: string;
     courseTemplate: PageTemplate;
     unitTemplate: PageTemplate;
+    nameHasValidationError?: true;
 };
 
 export type Role = {

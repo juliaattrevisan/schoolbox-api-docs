@@ -16,6 +16,11 @@ use Schoolbox\User;
 
 /**
  * Factory for building request messages.
+ *
+ * Most use-cases for the task daemon should extend `BaseMessageFactory`
+ * instead: that class provides convenience methods for the basic task daemon
+ * parameters, and also allows override for building parameters for each task
+ * type.
  */
 class MessageFactory
 {
@@ -52,6 +57,8 @@ class MessageFactory
      * @param array       $params
      * @param string|null $callbackUrl
      * @param array|null  $callbackParams
+     * @param string|null $failureCallbackUrl
+     * @param array|null  $failureCallbackParams
      * @param User|null   $effector
      * @return Message
      */
@@ -60,9 +67,12 @@ class MessageFactory
         array $params,
         ?string $callbackUrl,
         ?array $callbackParams,
+        ?string $failureCallbackUrl,
+        ?array $failureCallbackParams,
         ?User $effector
     ): Message {
         // Convert the instance to an intermediary format
+        $token = $effector ? $this->tokenBuilder->generate($effector) : null;
         return new Message(
             $task,
             $params,
@@ -75,7 +85,10 @@ class MessageFactory
             $this->instance->getSchoolCode(),
             $callbackUrl,
             $callbackParams,
-            $effector ? $this->tokenBuilder->generate($effector) : null,
+            $token,
+            $failureCallbackUrl,
+            $failureCallbackParams,
+            $token,
         );
     }
 }

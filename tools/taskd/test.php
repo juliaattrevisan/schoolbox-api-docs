@@ -11,15 +11,11 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
-use Schoolbox\Url\Factory;
-use Schoolbox\User\Translator\Author\ModelToArray;
-use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new CliTool\Kernel(new class extends CliTool\App
 {
-
     private const OPT_SHORT_HELP = 'h';
     private const OPT_SHORT_MSG  = 'm:';
 
@@ -60,6 +56,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             [],
             null,
             [],
+            null,
+            null,
             null,
         );
 

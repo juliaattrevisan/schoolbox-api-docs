@@ -98,6 +98,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 'from'      => call_user_func($userSerializer, $fromUser),
                 'to'        => call_user_func($userSerializer, $toUser),
             ],
+            null,
+            null,
             $adminUser,
         );
 

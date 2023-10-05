@@ -31,6 +31,7 @@ class HomepageTemplateMapper extends Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('left_column_width', self::TYPE_DECIMAL);
         $this->uses('right_column_width', self::TYPE_DECIMAL);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }

@@ -58,7 +58,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <form action="/adminv2/course-builder/save" method="post" @submit.prevent="saveChanges">
+    <form action="/adminv2/course-builder/save" method="post" novalidate @submit.prevent="saveChanges">
         <div class="small-12 island">
             <h2 class="subheader">Course Templates</h2>
             <section>

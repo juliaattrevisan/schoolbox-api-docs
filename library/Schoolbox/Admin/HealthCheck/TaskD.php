@@ -99,6 +99,8 @@ class TaskD
                 'from'    => call_user_func($userSerializer, $user),
                 'to'      => call_user_func($userSerializer, $user),
             ],
+            null,
+            null,
             $user,
         );
 

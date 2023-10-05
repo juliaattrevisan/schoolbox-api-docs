@@ -95,7 +95,7 @@ class Controller extends Base
             true
         )
         ->groupByCallback(function ($assessment) {
-            return $assessment->getContext()->getId();
+            return $assessment->getBaseContext()->getId();
         });
         $courses = $this->courseImplementationMapper->findByFolderId($folder->getId());
         $accessibleFolderIds = [];

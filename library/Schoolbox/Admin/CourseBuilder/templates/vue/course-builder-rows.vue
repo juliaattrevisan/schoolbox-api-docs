@@ -43,6 +43,14 @@ async function onDeleteClicked(courseTemplate: CourseTemplate) {
     }
 }
 
+/**
+ * Clear the validation error for a course
+ * @param {CourseTemplate} courseTemplate - the course template to clear the validation error for
+ */
+function clearNameValidationError(courseTemplate: CourseTemplate) {
+    courseTemplate.nameHasValidationError = undefined;
+}
+
 const existingCourseTemplateCount = window.Vue.computed(() => {
     return store.courseTemplates.filter((courseTemplate) => courseTemplate.id >= 0).length;
 });
@@ -59,19 +67,29 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                     </div>
                     <div class="small-12 medium-5 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
-                        <input v-model="courseTemplate.name" required />
+                        <input
+                            v-model="courseTemplate.name"
+                            maxlength="50"
+                            required
+                            @input="clearNameValidationError(courseTemplate)"
+                        />
+                        <label v-if="courseTemplate.nameHasValidationError" class="error"
+                            >This field is required.</label
+                        >
                     </div>
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Course Page Template:</strong>
                         <div class="select-wrapper">
                             <select v-model="courseTemplate.courseTemplate" required>
+                              <template v-for="availableTemplate in props.availableTemplates">
                                 <option
-                                    v-for="availableTemplate in props.availableTemplates"
+                                    v-if="!availableTemplate.deleted || courseTemplate.courseTemplate.id === availableTemplate.id"
                                     :key="availableTemplate.id"
                                     :value="availableTemplate"
                                 >
-                                    {{ availableTemplate.name }}
+                                    {{ availableTemplate.name }} <template v-if="availableTemplate.deleted">(Deleted)</template>
                                 </option>
+                              </template>
                             </select>
                         </div>
                     </div>
@@ -79,13 +97,15 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         <strong class="hide-for-medium-up">Unit Page Template:</strong>
                         <div class="select-wrapper">
                             <select v-model="courseTemplate.unitTemplate" required>
+                              <template v-for="availableTemplate in props.availableTemplates">
                                 <option
-                                    v-for="availableTemplate in props.availableTemplates"
+                                    v-if="!availableTemplate.deleted || courseTemplate.unitTemplate.id === availableTemplate.id"
                                     :key="availableTemplate.id"
                                     :value="availableTemplate"
                                 >
-                                    {{ availableTemplate.name }}
+                                    {{ availableTemplate.name }} <template v-if="availableTemplate.deleted">(Deleted)</template>
                                 </option>
+                              </template>
                             </select>
                         </div>
                     </div>
