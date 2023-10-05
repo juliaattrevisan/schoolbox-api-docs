@@ -1,6 +1,7 @@
 # Schoolbox Load Testing
 
-Schoolbox load tests currently uses Apache JMeter, with its websocket plugin.
+Schoolbox load tests currently uses [Apache JMeter](https://jmeter.apache.org/),
+with its websocket plugin.
 
 ## Getting Started
 
@@ -25,7 +26,9 @@ Under "Available Plugins": search for "websocket", then select and install
 "WebSocket Samplers by Peter Doornbosch"
 
 > Why not the other one (WebSocket Sampler by Maciej Zaleski)?
-> I just chose this one because it seems better documented?
+>
+> I tested that plugin, and I couldn't get it to pass cookies in websocket
+> requests.
 
 ## Configuring load test
 
@@ -38,7 +41,22 @@ myUsername,myPassword
 ```
 
 > This file is created so that passwords are not hardcoded within the JMeter
-> test description.
+> test itself.
+
+## Modifying load test
+
+Open the JMeter desktop application:
+```shell
+$JMETER_DIR/bin/jmeter \
+  -t $SCHOOLBOX_DIR/test/load/websocket/websocket.jmx
+```
+
+You may test the load test by running the Start action:
+![](start-test.png)
+
+After that, a log of the results will display in the Results Tree node of the
+test plan:
+![](results.png)
 
 ## Running load test
 
