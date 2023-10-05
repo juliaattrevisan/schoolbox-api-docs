@@ -79,7 +79,7 @@ class Controller extends Base
             ];
 
             if ($configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
-                $subTypes[] = ["title" => "LTI", "value" => "assessment.ltiAssessment"];
+                $subTypes[] = ["title" => "3rd Party Assessments", "value" => "assessment.ltiAssessment"];
             }
 
             // NOTE: Features to include based on NAME_LMS_ENABLED were found by inspecting code in conf/modules/Learning.php.
