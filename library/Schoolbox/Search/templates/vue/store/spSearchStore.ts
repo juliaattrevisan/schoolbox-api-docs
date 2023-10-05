@@ -57,7 +57,7 @@ export const useSearchStore = defineStore("spSearch", () => {
         url.value = useStore().getEndpointWithParams();
         await execute();
         try {
-            useResultsStore().setFirstResults((data.value as Results).data);
+            useResultsStore().setFirstResults(data.value as Results);
         } catch (e) {
             hasLoadError.value = true;
         }
