@@ -58,7 +58,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * @param {Result[]} moreResults - the results to set
      */
     function setMoreResults(moreResults: Results) {
-        allResults.value = [...allResults.value, ...latestResults.value.data];
+        allResults.value = [...allResults.value, ...moreResults.data];
         latestResults.value = moreResults;
         moreResultsCount.value += 1;
         // check if we have loaded all results yet
@@ -85,6 +85,7 @@ export const useResultsStore = defineStore("spResults", () => {
      */
     function clear() {
         allResults.value = [];
+        latestResults.value = EMPTY_RESULTS;
         moreResultsCount.value = 0;
         hasLoadedAllResults.value = false;
     }
