@@ -1,5 +1,7 @@
 /**
  *  To toggle the display of the content when the button is selected
+ *  floating-ui/dom is used to help position the content relative to the button,
+ *  trying to ensure the content is always in the viewport
  */
 
 import {
@@ -18,11 +20,11 @@ import { onClickOutside } from "@vueuse/core";
 
 /**
  * To toggle the display of the content when the button is selected
- * @param {Ref<HTMLButtonElement>} button - The dropdown button
+ * @param {Ref<HTMLButtonElement>} button - The pop out button
  * @param {string} buttonLabel - The label to display on the button
- * @param {string} contentId - The id of the dropdown content
- * @param {string} optimalPlacement - The optimal placement of the dropdown content
- * @param {boolean} isFilter - Whether the dropdown is a filter or not
+ * @param {string} contentId - The id of the pop out content
+ * @param {string} optimalPlacement - The optimal placement of the pop out content
+ * @param {boolean} isFilter - Whether the pop out is a filter or not
  * @returns {object} - The isOpen ref
  */
 export function usePopOut(
@@ -38,7 +40,7 @@ export function usePopOut(
 
     /**
      * The label to display on the button,
-     * changes depending on whether the dropdown is open or not
+     * changes depending on whether the pop out is open or not
      */
     const currentLabel = window.Vue.computed(() => {
         return isOpen.value ? `Hide ${buttonLabel}` : `Show ${buttonLabel}`;
@@ -58,7 +60,7 @@ export function usePopOut(
 
     /**
      * To get the transform origin of the content, relative to where it's positioned
-     * @param {Placement} placement - The placement of the dropdown content
+     * @param {Placement} placement - The placement of the pop out content
      * @returns {string} - The transform origin
      */
     function getTransformOrigin(placement: Placement) {
@@ -124,6 +126,7 @@ export function usePopOut(
 
     /**
      * Open the content using @floating-ui/dom to position it relative to the button
+     * https://floating-ui.com/
      */
     async function open() {
         isOpen.value = true;
