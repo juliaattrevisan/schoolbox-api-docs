@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -54,6 +55,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             '
         ];
         $keywordSearchParts = [
+            /**
+             * NOTE: Checks made in the Hydrator must match the checks made here.
+             * @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
+             */
             'assessment.title LIKE :assessmentKeywordLike',
             'assessment.description LIKE :assessmentKeywordLike',
             'task.link LIKE :assessmentKeywordLike',

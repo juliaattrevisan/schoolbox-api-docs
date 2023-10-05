@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 use Alaress\Html\ToText;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -112,7 +113,7 @@ class Hydrator extends BaseHydrator
                 // Because the description contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (!str_contains($assessment->getTitle(), $keyword)) {
+                if ($this->assessmentMatchesKeywordOnlyOnDescription($assessment, $keyword)) {
                     $assessmentDescTextOnly = (new ToText($assessment->getDescription()))->getText();
                     if (!str_contains($assessmentDescTextOnly, $keyword)) {
                         return null;
@@ -157,5 +158,53 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    /**
+     * Return true if the keyword is contained in the $assessment's description, but not in any of the other
+     * strings that could possibly cause matches.
+     *
+     * The checks used here must match those in Assessment\QueryParamBuilder->buildBaseWhereParams()
+     *
+     * @param IAssessable $assessment
+     * @param string      $matchType
+     * @param string      $keyword
+     * @return bool
+     */
+    private function assessmentMatchesKeywordOnlyOnDescription(IAssessable $assessment, string $keyword): bool
+    {
+        // SQL match conditions copied from Assessment\QueryParamBuilder->buildBaseWhereParams()
+        // -------------------------------------------------------------------------------------
+        // 'assessment.title LIKE :assessmentKeywordLike',                    // Assessment->getTitle()
+        // 'assessment.description LIKE :assessmentKeywordLike',              // Description is leftover case.
+        // 'task.link LIKE :assessmentKeywordLike',                           // Assessment\Task\Model
+        // 'assess.title LIKE :assessmentKeywordLike',                        // Overrides Assessment->getTitle()
+        // 'assess.description LIKE :assessmentKeywordLike',                  // Description is leftover case.
+        // 'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',   // Assessment\Lti\Model
+        // 'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike', // Assessment\Lti\Model
+        // 'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',  // Assessment\Lti\Model
+
+        if (str_contains($assessment->getTitle(), $keyword)) {
+            return false; // Found match on assessment.title or assess.title.
+        }
+
+        if ($assessment instanceof Assessment\Lti\Model) {
+            if (
+                str_contains($assessment->getLtiAssessmentUrl(), $keyword) ||
+                str_contains($assessment->getLtiAssessmentTitle(), $keyword) ||
+                str_contains($assessment->getLtiAssessmentText(), $keyword)
+            ) {
+                return false; // Found match on lti_assessment url, title, or text.
+            }
+        }
+
+        if ($assessment instanceof Assessment\Task\Model) {
+            if (str_contains($assessment->getUrl(), $keyword)) {
+                return false; // Found match on task.link.
+            }
+        }
+
+        // No other match found, so return true if match on description.
+        return str_contains($assessment->getDescription(), $keyword);
     }
 }
