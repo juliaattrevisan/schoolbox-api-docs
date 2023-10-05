@@ -258,6 +258,7 @@ class Scrub
                 $def->addAttribute('img', 'data-schoolboxresource-height', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-fullwidth', 'Text');
                 $def->addAttribute('img', 'usemap', 'Text');
+                $def->addAttribute('img', 'srcset', 'Text');
                 $def->addAttribute('div', 'data-oembed-url', 'Text');
                 $def->addAttribute('a', 'data-iframely-url', 'Text');
                 $def->addAttribute('a', 'data-template', 'Text');

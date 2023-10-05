@@ -32,6 +32,7 @@ export function getHTMLSupportSettings() {
             ],
             allow: [
                 // "img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float};"
+                // "img[usemap];"
                 {
                     name: "img",
                     classes: ["full-width"],
@@ -43,6 +44,8 @@ export function getHTMLSupportSettings() {
                         "data-schoolboxresource-type": true,
                         "data-schoolboxresource-thumbnail": true,
                         "data-schoolboxresource-source": true,
+                        srcset: true,
+                        usemap: true,
                     },
                     styles: {
                         width: true,
@@ -157,13 +160,6 @@ export function getHTMLSupportSettings() {
                         href: true,
                         target: true,
                         alt: true,
-                    },
-                },
-                // "img[usemap];"
-                {
-                    name: "img",
-                    attributes: {
-                        usemap: true,
                     },
                 },
                 // "<code>"
