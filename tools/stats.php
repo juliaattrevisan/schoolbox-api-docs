@@ -114,21 +114,19 @@ $app = new class extends CliTool\App {
                                             and assess_question.deleted_at is null
                                           group by assess.assess_id
                                           having numQuestions > 49) as numQuestions;',
-            'quiz_random'           => 'SELECT
-                                        concat(numRandomised.num, \'/\', numSections.num) AS ratio
-                                        FROM
-                                        (select distinct count(*) as num
+            'quiz_random_sections'      => '
+                                        select distinct count(*) as num
                                         from assess
                                         inner join assess_section on assess.assess_id = assess_section.assess_id
                                         where random != 0
                                         and assess.deleted_at is null
-                                        and assess_section.deleted_at is null) AS numRandomised
-                                        INNER JOIN
-                                        (select count(*) as num
-                                        from assess
-                                        inner join assess_section on assess.assess_id = assess_section.assess_id
-                                        and assess.deleted_at is null
-                                        and assess_section.deleted_at is null) AS numSections',
+                                        and assess_section.deleted_at is null',
+            'quiz_sections'     => '
+                                    select count(*) as num
+                                    from assess
+                                    inner join assess_section on assess.assess_id = assess_section.assess_id
+                                    and assess.deleted_at is null
+                                    and assess_section.deleted_at is null',
 
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
