@@ -207,9 +207,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             JOIN folder ON (
                 mv_assessment_relation.folder_id = folder.id
             )
-            LEFT JOIN project ON (
-                mv_assessment_relation.project_assessment_id = project.id
-            )
             LEFT JOIN course_implementation ON (
                 mv_assessment_relation.course_implementation_id = course_implementation.id
             )
@@ -221,6 +218,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             )
             LEFT JOIN course_unit_specification ON (
                 mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
+            )
+            LEFT JOIN project ON (
+                assessment.id=project.assessment_id
             )
             LEFT JOIN lti_assessment ON (
                 assessment.id = lti_assessment.assessment_id
