@@ -175,13 +175,13 @@ Data:
                                         {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                                         {% if assessable is quiz %}
                                             {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessable.id}) %}
-                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.assessment }}">Modify Quiz</a></li>
-                                            <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.assessment }} contents">Modify Contents</a></li>
+                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }}">Modify Quiz</a></li>
+                                            <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} contents">Modify Contents</a></li>
                                         {% else %}
-                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                                            <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }}">Modify</a></li>
                                         {% endif %}
 
-                                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>{% endif %}
+                                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}" title="Delete this {{ locale.activity }}">Delete</a></li>{% endif %}
                                     </ul>
                                 {% endif %}
                             </div>
@@ -247,7 +247,7 @@ Data:
             <div class="empty-state">
                 <i class="icon-group"></i>
                 <p>There are no students currently undertaking this {{ locale.project }}.</p>
-                <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.assessment.plural }}</a>, the participating students will appear here. </p>
+                <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
             </div>
         {% endif %}
     </div>
