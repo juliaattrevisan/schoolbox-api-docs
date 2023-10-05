@@ -22,13 +22,15 @@ import { onClickOutside } from "@vueuse/core";
  * @param {string} buttonLabel - The label to display on the button
  * @param {string} contentId - The id of the dropdown content
  * @param {string} optimalPlacement - The optimal placement of the dropdown content
+ * @param {boolean} isFilter - Whether the dropdown is a filter or not
  * @returns {object} - The isOpen ref
  */
 export function usePopOut(
     button: Ref<HTMLButtonElement>,
     buttonLabel: string,
     contentId: string,
-    optimalPlacement = "bottom-end"
+    optimalPlacement = "bottom-end",
+    isFilter = false
 ) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     let content: HTMLElement; // The content to display when the button is selected
@@ -86,8 +88,7 @@ export function usePopOut(
             opacity: 0,
             scaleX: 0.95,
             scaleY: 0.95,
-            transformOrigin: getTransformOrigin(position.placement),
-            // transformOrigin: "top middle",
+            transformOrigin: isFilter ? "top middle" : getTransformOrigin(position.placement),
             duration: reduceMotion ? 0 : 0.3,
         });
     }
@@ -130,8 +131,11 @@ export function usePopOut(
         cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition);
         const position = await getPosition();
         content.setAttribute("aria-hidden", "false");
-        // content.style.width = `${button.value.getBoundingClientRect().width}px`;
-        // content.style.maxWidth = `${button.value.getBoundingClientRect().width}px`;
+        // if it's a filter, set the width of the content to the width of the button
+        if (isFilter) {
+            content.style.width = `${button.value.getBoundingClientRect().width}px`;
+            content.style.maxWidth = `${button.value.getBoundingClientRect().width}px`;
+        }
         animateOpen(position);
     }
 

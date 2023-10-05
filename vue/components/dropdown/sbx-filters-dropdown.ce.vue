@@ -22,7 +22,8 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
     "Actions Dropdown",
     props.contentId,
-    "bottom-start"
+    "bottom-start",
+    true
 );
 </script>
 
