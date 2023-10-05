@@ -169,7 +169,6 @@ class Hydrator extends BaseHydrator
      * The checks used here must match those in Assessment\QueryParamBuilder->buildBaseWhereParams()
      *
      * @param IAssessable $assessment
-     * @param string      $matchType
      * @param string      $keyword
      * @return bool
      */
