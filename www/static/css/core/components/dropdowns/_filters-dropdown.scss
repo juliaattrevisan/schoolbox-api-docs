@@ -1,0 +1,31 @@
+// To match the typical background colour of the dropdown content
+// and better visually connect the button to the content
+button.c-button[aria-expanded="true"] {
+    // background-color: var(--content-ui-background);
+    opacity: 1;
+    // &:hover,
+    // &:active {
+    //     background-color: var(--content-ui-background);
+    // }
+    &:focus {
+        box-shadow: none;
+    }
+}
+
+// ^foundation-fixes^
+// As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
+button.c-filters-dropdown {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 !important;
+    &:focus {
+        box-shadow: 0 0 0 2px currentColor;
+    }
+    span {
+        padding-right: var(--spacing-s);
+    }
+    .c-icon {
+        transform: rotate(180deg);
+        transition: transform 200ms ease-out;
+    }
+}

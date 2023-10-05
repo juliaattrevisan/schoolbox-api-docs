@@ -21,9 +21,15 @@ import { onClickOutside } from "@vueuse/core";
  * @param {Ref<HTMLButtonElement>} button - The dropdown button
  * @param {string} buttonLabel - The label to display on the button
  * @param {string} contentId - The id of the dropdown content
+ * @param {string} optimalPlacement - The optimal placement of the dropdown content
  * @returns {object} - The isOpen ref
  */
-export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, contentId: string) {
+export function usePopOut(
+    button: Ref<HTMLButtonElement>,
+    buttonLabel: string,
+    contentId: string,
+    optimalPlacement = "bottom-end"
+) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     let content: HTMLElement; // The content to display when the button is selected
     let cleanup: () => void; // The cleanup function returned by @floating-ui/dom
@@ -91,7 +97,7 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
      */
     async function getPosition() {
         const position = await computePosition(button.value as ReferenceElement, content, {
-            placement: "bottom-end",
+            placement: optimalPlacement as Placement,
             middleware: [
                 flip({
                     boundary: document.querySelector("#container") as Boundary,

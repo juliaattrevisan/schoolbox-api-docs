@@ -21,7 +21,8 @@ const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button tha
 const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
     "Actions Dropdown",
-    props.contentId
+    props.contentId,
+    "bottom-start"
 );
 </script>
 
@@ -29,7 +30,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     <button
         ref="button"
         type="button"
-        :class="`c-button c-button--no-bkg ${props.buttonText ? `` : `c-button--icon-only f-match-existing-styles`}`"
+        class="c-button c-button--block c-button--no-bkg c-filters-dropdown"
         :title="currentLabel"
         :aria-label="currentLabel"
         aria-haspopup="menu"
@@ -45,16 +46,14 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
             <svg
                 version="1.2"
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
+                viewBox="0 0 32 32"
                 width="16"
                 height="16"
                 aria-hidden="true"
                 focusable="false"
                 class="c-icon"
             >
-                <path d="m6 0h4v4h-4z" />
-                <path d="m6 6h4v4h-4z" />
-                <path d="m6 12h4v4h-4z" />
+                <path d="M0 24h32l-16-16z"></path>
             </svg>
         </slot>
     </button>
@@ -65,5 +64,5 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
 // This means that we cannot use the global styles to style the component
 // It looks like the ability to opt out of the shadow DOM is hopefully coming soon however
 @import "../../../www/static/css/core/ui/button/_c-button.scss";
-@import "../../../www/static/css/core/components/dropdowns/_actions-dropdown.scss";
+@import "../../../www/static/css/core/components/dropdowns/_filters-dropdown.scss";
 </style>
