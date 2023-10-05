@@ -69,10 +69,22 @@ $JMETER_DIR/bin/jmeter -n \
 
 ### Customizing the run
 
-The test allows the following properties to be overridden on invocation:
+The test allows the following properties to be overridden on invocation, with
+the `-J${property}` command-line option:
 
 | Property | Meaning                                                                     | Default                     |
 |----------|-----------------------------------------------------------------------------|-----------------------------|
 | `users`  | The number of websocket connections to create simultaneously                | 3                           |
 | `rampUp` | The ramp-up period (how many seconds until `users` connections are created) | 3                           |
 | `host`   | The host to run the load test against                                       | vagrant.dev.schoolbox.cloud |
+
+For example, to run the test with 10000 simultaneous users, ramping up over 3
+minutes, against alpha.dev.schoolbox.cloud:
+```shell
+$JMETER_DIR/bin/jmeter -n \
+  -t $SCHOOLBOX_DIR/test/load/websocket/websocket.jmx \
+  -l log.jtl \
+  -Jusers=10000 \
+  -JrampUp=180 \
+  -Jhost=alpha.dev.schoolbox.cloud
+```
