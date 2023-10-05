@@ -166,7 +166,7 @@ export function usePopOut(
         if (content) {
             content.setAttribute("aria-hidden", "true");
             // to close the content when the user clicks outside of it
-            onClickOutside(button, close, { ignore: [`#${content.id}`] });
+            onClickOutside(button, close, { ignore: [`#${content.id}[data-dropdown-content]`] });
         }
     }
 

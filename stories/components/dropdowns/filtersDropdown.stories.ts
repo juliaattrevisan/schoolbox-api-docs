@@ -29,17 +29,70 @@ export const Default: Story = {
         components: { SbxFiltersDropdown },
         template: `
             <div id="container" class="l-flex-col l-flex--justify-space" style="height: 200px;">
-                <div class="l-flex-row l-flex--justify-space">
-                    <div content-id="dropdown-1">
-                        <sbx-filters-dropdown content-id="dropdown-1"></sbx-filters-dropdown>
+                <ul class="filter-dropdown flex-list flex-wrap">
+                <li class="checklist item filter-component">
+                    <sbx-filters-dropdown content-id="dropdown-1" button-text="Category"></sbx-filters-dropdown>
+                    <div id="dropdown-1" data-dropdown-content class="f-dropdown content">
+                        <ul class="option-list">
+                            <li>
+                                <input
+                                    id="filter_selection_22_1"
+                                    type="checkbox"
+                                    name="filter_selection[22][1]"
+                                    value="1"
+                                />
+                                <label for="filter_selection_22_1" class="noselect">Learning</label>
+                            </li>
+                            <li>
+                                <input
+                                    id="filter_selection_22_2"
+                                    type="checkbox"
+                                    name="filter_selection[22][2]"
+                                    value="1"
+                                />
+                                <label for="filter_selection_22_2" class="noselect"
+                                    >Personal Development</label
+                                >
+                            </li>
+                            <li>
+                                <input
+                                    id="filter_selection_22_3"
+                                    type="checkbox"
+                                    name="filter_selection[22][3]"
+                                    value="1"
+                                />
+                                <label for="filter_selection_22_3" class="noselect"
+                                    >Community</label
+                                >
+                            </li>
+                            <li>
+                                <input
+                                    id="filter_selection_22_4"
+                                    type="checkbox"
+                                    name="filter_selection[22][4]"
+                                    value="1"
+                                />
+                                <label for="filter_selection_22_4" class="noselect"
+                                    >Extra-Curricular</label
+                                >
+                            </li>
+
+                            <li>
+                                <input
+                                    id="filter_selection_22_5"
+                                    type="checkbox"
+                                    name="filter_selection[22][5]"
+                                    value="1"
+                                />
+                                <label for="filter_selection_22_5" class="noselect"
+                                    >Achievement Standards</label
+                                >
+                            </li>
+                        </ul>
                     </div>
-                </div>
+                    </li>
+                </ul>
             </div>
-            <ul data-dropdown-content="" class="f-dropdown" id="dropdown-1">
-                <li class="separator">Manage</li>
-                <li><a>Course Markbook</a></li>
-                <li><a>Delete</a></li>
-            </ul>
         `,
     }),
 };
