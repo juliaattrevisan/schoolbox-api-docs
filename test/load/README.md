@@ -5,11 +5,23 @@ with its websocket plugin.
 
 ## Getting Started
 
-### Installing JMeter and plugins
+### Installing JMeter
 
 Download the latest JMeter from https://jmeter.apache.org/download_jmeter.cgi,
 and extract to a folder somewhere (from now on, this folder will be referred to
 as `$JMETER_DIR`).
+
+### Installing required JMeter plugins
+
+The websocket test uses the plugin "WebSocket Samplers by Peter Doornbosch" for
+testing websocket connections.
+
+> Why not the other websocket plugin (WebSocket Sampler by Maciej Zaleski)?
+>
+> I tested that plugin, and I couldn't get it to pass cookies in websocket
+> requests.
+
+#### Installing via the plugins manager
 
 Download the JMeter Plugins Manager plugin from
 https://jmeter-plugins.org/wiki/PluginsManager/ (direct link:
@@ -25,10 +37,11 @@ manager.
 Under "Available Plugins": search for "websocket", then select and install
 "WebSocket Samplers by Peter Doornbosch"
 
-> Why not the other one (WebSocket Sampler by Maciej Zaleski)?
->
-> I tested that plugin, and I couldn't get it to pass cookies in websocket
-> requests.
+#### Manual installation
+
+The plugin can be downloaded directly from
+https://bitbucket.org/pjtr/jmeter-websocket-samplers/downloads/: simply download
+the latest version, and copy it into the `$JMETER_DIR/lib/ext` directory.
 
 ## Configuring load test
 
