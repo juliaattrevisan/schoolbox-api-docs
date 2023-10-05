@@ -16,8 +16,8 @@
           <stringProp name="LoopController.loops">1</stringProp>
           <boolProp name="LoopController.continue_forever">false</boolProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">3</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">3</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(users, 3)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(rampUp, 3)}</stringProp>
         <longProp name="ThreadGroup.start_time">1696293249000</longProp>
         <longProp name="ThreadGroup.end_time">1696293249000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -43,7 +43,7 @@
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">vagrant.dev.schoolbox.cloud</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(host, vagrant.dev.schoolbox.cloud)}</stringProp>
           <stringProp name="HTTPSampler.protocol">https</stringProp>
         </ConfigTestElement>
         <hashTree/>
