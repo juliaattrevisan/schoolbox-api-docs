@@ -80,9 +80,19 @@ class UnitAssessments
         $base = $assessable->getBaseContext();
         if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
             // Implementation
+            /**
+             * @phpstan-ignore-next-line
+             * we aren't always hydrating the course folder when the assessment is inside a project,
+             * so yes, phpstan, `getFolder()` can be null...
+             */
             return $base->getSpecification()->getCourse()->getFolder()?->getTitle();
         } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
             // Specification
+            /**
+             * @phpstan-ignore-next-line
+             * we aren't always hydrating the course folder when the assessment is inside a project,
+             * so yes, phpstan, `getFolder()` can be null...
+             */
             return $base->getCourse()->getFolder()?->getTitle();
         }
         //no course, return null
