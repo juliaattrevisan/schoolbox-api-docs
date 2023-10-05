@@ -76,16 +76,7 @@ class Hydrator extends BaseHydrator
              $threadIds[] = $post->getThread()->getId();
         }
 
-        $db = $this->threadMapper->getDatabase();
-        $nMatchingPostsByThreadId = $db->executeQuery(
-            'SELECT threadID, COUNT(*) AS `count`
-            FROM forumPost
-            WHERE threadID IN (' . implode(',', array_map('intval', $threadIds)) . ')
-            AND deleted="false"
-            AND body LIKE ?
-            GROUP BY threadID',
-            ["%{$keyword}%"]
-        )->fetchColumnArray('count', 'threadID');
+        $nMatchingPostsByThreadId = $this->getNumberOfMatchingPostsIndexedByThreadId($threadIds, $keyword);
 
         // And map to a full result.
         $fullResults = array_map(
@@ -143,5 +134,23 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    /**
+     * @param array  $threadIds
+     * @param string $keyword
+     * @return array
+     */
+    function getNumberOfMatchingPostsIndexedByThreadId(array $threadIds, string $keyword): array
+    {
+        return $this->threadMapper->getDatabase()->executeQuery(
+            'SELECT threadID, COUNT(*) AS `count`
+            FROM forumPost
+            WHERE threadID IN (' . implode(',', array_map('intval', $threadIds)) . ')
+            AND deleted="false"
+            AND body LIKE ?
+            GROUP BY threadID',
+            ["%{$keyword}%"]
+        )->fetchColumnArray('count', 'threadID');
     }
 }
