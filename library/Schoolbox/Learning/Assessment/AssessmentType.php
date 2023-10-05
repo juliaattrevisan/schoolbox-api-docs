@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
@@ -34,11 +35,11 @@ class AssessmentType implements IType
 
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
-    const TYPE_PROJECT = 'project';
-    const TYPE_DUE_WORK = 'dueWork';
-    const TYPE_TASK = 'task';
-    const TYPE_QUIZ = 'quiz';
-    const TYPE_LTI_ASSESSMENT = 'lti';
+    public const TYPE_PROJECT = 'project';
+    public const TYPE_DUE_WORK = 'dueWork';
+    public const TYPE_TASK = 'task';
+    public const TYPE_QUIZ = 'quiz';
+    public const TYPE_LTI_ASSESSMENT = 'lti';
     public const TYPE_LESSON_PLAN = 'lessonPlan';
 
     /**
@@ -140,5 +141,24 @@ class AssessmentType implements IType
         }
 
         return $list;
+    }
+
+    /**
+     * Return the part of the icon class after 'icon-'.  E.g. for 'icon-due-work', return 'due-work'.
+     *
+     * @param $type
+     * @return string
+     */
+    public static function getIconClassSuffixForType($type): string
+    {
+        return match ($type) {
+            self::TYPE_DUE_WORK => 'due-work',
+            self::TYPE_QUIZ => 'quiz',
+            self::TYPE_TASK => 'task',
+            self::TYPE_PROJECT => 'project',
+            self::TYPE_LTI_ASSESSMENT => 'lti',
+            self::TYPE_LESSON_PLAN => 'lesson-plan',
+            default => throw new InvalidArgumentException("Expected valid assessment type, received '$type'."),
+        };
     }
 }
