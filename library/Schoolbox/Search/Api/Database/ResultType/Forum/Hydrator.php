@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress\Html\ToText;
+use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Forum\Post as PostModel;
@@ -61,17 +62,34 @@ class Hydrator extends BaseHydrator
         // Find all forum posts that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
 
-        $ids = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
-        if (empty($ids)) {
+        $postIds = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
+        if (empty($postIds)) {
             return [];
         }
 
         // Find the matching forum posts.
-        $posts = $this->postMapper->findByColumn('postID', $ids);
+        $posts = $this->postMapper->findByColumn('postID', $postIds);
+
+        // Find the parent threadID of each forum post.
+        $threadIds = [];
+        foreach ($posts as $post) {
+             $threadIds[] = $post->getThread()->getId();
+        }
+
+        $db = $this->threadMapper->getDatabase();
+        $nMatchingPostsByThreadId = $db->executeQuery(
+            'SELECT threadID, COUNT(*) AS `count`
+            FROM forumPost
+            WHERE threadID IN (' . implode(',', array_map('intval', $threadIds)) . ')
+            AND deleted="false"
+            AND body LIKE ?
+            GROUP BY threadID',
+            ["%{$keyword}%"]
+        )->fetchColumnArray('count', 'threadID');
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($posts, $viewer, $keyword) {
+            function (RawResult $match) use ($posts, $viewer, $keyword, $nMatchingPostsByThreadId) {
                 $post = $posts->getBy('id', $match->id);
                 if (!($post instanceof PostModel)) {
                     return null;
@@ -94,16 +112,7 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $db = $this->threadMapper->getDatabase();
-                $nMatchingPostsInThread = $db->executeQuery(
-                    // TODO: Get where clause from Forum\QueryParamBuilder->buildBaseWhereParams() somehow.
-                    'SELECT COUNT(*)
-                    FROM forumPost
-                    WHERE threadID=?
-                    AND deleted="false"
-                    AND body LIKE ?',
-                    [$postThread->getId(), "%{$keyword}%"]
-                )->fetchColumn();
+                $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()];
 
                 $postBody = (new ToText($post->getBody()))->getText();
                 return new FullResult(
