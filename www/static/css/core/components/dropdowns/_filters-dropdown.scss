@@ -5,7 +5,9 @@ button.c-filters-dropdown {
     padding: 0 !important;
     &:hover,
     &:active {
-        background-color: var(--content-ui-background);
+        &:not([disabled]) {
+            background-color: var(--content-ui-background);
+        }
     }
     &:focus {
         box-shadow: 0 0 0 2px currentColor;

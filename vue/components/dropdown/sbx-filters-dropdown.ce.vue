@@ -14,6 +14,10 @@ interface Props {
      * The text to display on the button
      */
     buttonText?: string;
+    /**
+     * Whether the button is to be disabled
+     */
+    isDisabled?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -38,7 +42,8 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         :aria-expanded="isOpen"
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
-        :data-test="`sbx-actions-dropdown-${props.contentId}-button`"
+        :data-test="`sbx-filters-dropdown-${props.contentId}-button`"
+        :disabled="props.isDisabled"
         @click.prevent="onButtonSelected"
     >
         <!-- when an alternative icon should be used -->

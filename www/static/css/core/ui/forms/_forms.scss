@@ -1314,15 +1314,6 @@ ul.filters {
             &.open {
                 background: $ghost;
             }
-
-            &.no-option {
-                opacity: 0.5;
-
-                &:hover {
-                    cursor: not-allowed;
-                }
-            }
-
             &::after {
                 border-left: 5px solid transparent;
                 border-right: 5px solid transparent;
