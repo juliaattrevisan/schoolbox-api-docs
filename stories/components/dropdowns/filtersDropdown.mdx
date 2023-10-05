@@ -12,9 +12,11 @@ To toggle the display of a group of filters
 -   To add text to the button, use `button-text="Category`
 -   It can be disabled via: `is-disabled`
 
-**Note that only the dropdown button is currently contained within the component. The dropdown content is not.**
+**Please note:**
 
-**Also, the central div `#container` is currently used to determine the position of the dropdown content.**
+-   There are currently some style variations when comparing Storybook/Schoolbox. This is due to some complications so Storybook's Webpack is not yet set up exactly as our Schoolbox Webpack is. As such styles will vary slightly, so be sure to also review in Schoolbox.
+-   that only the dropdown button is currently contained within the component. The dropdown content is not.
+-   The central div `#container` is currently used to determine the position of the dropdown content, so the component must be contained wiithin this container
 
 ```
 <div id="container" class="l-flex-col l-flex--justify-space" style="height: 200px;">
