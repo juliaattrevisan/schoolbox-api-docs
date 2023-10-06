@@ -48,7 +48,8 @@ class Registry
             'moduleCache:' . INSTANCE_ID,
 
             // OIDC cache
-            'oidc:' . INSTANCE_ID,
+            'oidc:' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+            'oidc:' . INSTANCE_ID . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [

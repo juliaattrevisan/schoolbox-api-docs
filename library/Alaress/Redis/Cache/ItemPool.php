@@ -41,7 +41,7 @@ class ItemPool implements CacheItemPoolInterface
      * This may not be used as the cache key, as Redis can't store a value and
      * set in the one key.
      */
-    private const SET_KEY = '__set';
+    public const SET_KEY = '__set';
 
     /**
      * Redis client
