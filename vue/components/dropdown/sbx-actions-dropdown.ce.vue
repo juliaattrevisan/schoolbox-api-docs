@@ -14,6 +14,18 @@ interface Props {
      * The text to display on the button
      */
     buttonText?: string;
+    /**
+     * Whether the button is to be disabled
+     */
+    isDisabled?: boolean;
+    /**
+     * Whether the button should be full width
+     */
+    isFullWidth?: boolean;
+    /**
+     * Whether to use an arrow icon instead of the default icon
+     */
+    isArrowIcon?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -21,7 +33,9 @@ const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button tha
 const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
     "Actions Dropdown",
-    props.contentId
+    props.contentId,
+    "bottom-start",
+    props.isFullWidth
 );
 </script>
 
@@ -29,7 +43,11 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     <button
         ref="button"
         type="button"
-        :class="`c-button c-button--no-bkg ${props.buttonText ? `` : `c-button--icon-only f-match-existing-styles`}`"
+        :class="`c-button c-button--no-bkg ${
+            props.buttonText
+                ? `f-match-existing-button-styles`
+                : `c-button--icon-only f-match-existing-icon-only-styles`
+        } ${props.isFullWidth ? `c-button--block` : ``}`"
         :title="currentLabel"
         :aria-label="currentLabel"
         aria-haspopup="menu"
@@ -37,26 +55,43 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
         :data-test="`sbx-actions-dropdown-${props.contentId}-button`"
+        :disabled="props.isDisabled"
         @click.prevent="onButtonSelected"
     >
         <!-- when an alternative icon should be used -->
         <span v-if="buttonText">{{ buttonText }}</span>
-        <slot name="icon">
+        <template v-if="isArrowIcon">
             <svg
                 version="1.2"
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
+                viewBox="0 0 32 32"
                 width="16"
                 height="16"
                 aria-hidden="true"
                 focusable="false"
-                class="c-icon"
+                class="c-icon c-icon--dropdown"
             >
-                <path d="m6 0h4v4h-4z" />
-                <path d="m6 6h4v4h-4z" />
-                <path d="m6 12h4v4h-4z" />
+                <path d="M0 24h32l-16-16z"></path>
             </svg>
-        </slot>
+        </template>
+        <template v-else>
+            <slot name="icon">
+                <svg
+                    version="1.2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    focusable="false"
+                    class="c-icon"
+                >
+                    <path d="m6 0h4v4h-4z" />
+                    <path d="m6 6h4v4h-4z" />
+                    <path d="m6 12h4v4h-4z" />
+                </svg>
+            </slot>
+        </template>
     </button>
 </template>
 

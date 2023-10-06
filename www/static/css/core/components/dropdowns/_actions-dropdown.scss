@@ -10,11 +10,15 @@ button.c-button[aria-expanded="true"] {
     &:focus {
         box-shadow: none;
     }
+    // rotate when open
+    .c-icon--dropdown {
+        transform: rotate(0deg);
+    }
 }
 
 // ^foundation-fixes^
 // As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
-button.f-match-existing-styles {
+button.f-match-existing-icon-only-styles {
     height: 42px !important;
     min-height: 42px !important;
     width: 40px !important;
@@ -22,6 +26,25 @@ button.f-match-existing-styles {
     &:hover,
     &:active {
         opacity: 1;
+    }
+    &:focus {
+        box-shadow: 0 0 0 2px currentColor;
+    }
+}
+
+// ^foundation-fixes^
+// As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
+button.f-match-existing-button-styles {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0;
+    // to provide more space for the icon
+    span {
+        padding-right: var(--spacing-s);
+    }
+    // is a up arrow by default, so flip
+    .c-icon--dropdown {
+        transform: rotate(180deg);
     }
     &:focus {
         box-shadow: 0 0 0 2px currentColor;

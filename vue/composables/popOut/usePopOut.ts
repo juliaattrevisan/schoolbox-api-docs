@@ -24,7 +24,7 @@ import { onClickOutside } from "@vueuse/core";
  * @param {string} buttonLabel - The label to display on the button
  * @param {string} contentId - The id of the pop out content
  * @param {string} optimalPlacement - The optimal placement of the pop out content
- * @param {boolean} isFilter - Whether the pop out is a filter or not
+ * @param {boolean} isFullWidth - Whether the pop out is a filter or not
  * @returns {object} - The isOpen ref
  */
 export function usePopOut(
@@ -32,7 +32,7 @@ export function usePopOut(
     buttonLabel: string,
     contentId: string,
     optimalPlacement = "bottom-end",
-    isFilter = false
+    isFullWidth = false
 ) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     let content: HTMLElement; // The content to display when the button is selected
@@ -54,6 +54,8 @@ export function usePopOut(
             isOpen.value = false;
             content.style.display = "none";
             content.setAttribute("aria-hidden", "true");
+            // reset the colour of the button to default after changing on open state
+            button.value.style.backgroundColor = "";
             cleanup();
         }
     }
@@ -90,7 +92,7 @@ export function usePopOut(
             opacity: 0,
             scaleX: 0.95,
             scaleY: 0.95,
-            transformOrigin: isFilter ? "top middle" : getTransformOrigin(position.placement),
+            transformOrigin: isFullWidth ? "top middle" : getTransformOrigin(position.placement),
             duration: reduceMotion ? 0 : 0.3,
         });
     }
@@ -131,14 +133,16 @@ export function usePopOut(
     async function open() {
         isOpen.value = true;
         content.style.display = "block"; // The element must be visible to correctly compute its position
-        cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition);
-        const position = await getPosition();
-        content.setAttribute("aria-hidden", "false");
-        // if it's a filter, set the width of the content to the width of the button
-        if (isFilter) {
+        // if it's a full width, set the width of the content to the width of the button
+        if (isFullWidth) {
             content.style.width = `${button.value.getBoundingClientRect().width}px`;
             content.style.maxWidth = `${button.value.getBoundingClientRect().width}px`;
         }
+        content.setAttribute("aria-hidden", "false");
+        // the button will always match the colour of the content when open
+        button.value.style.backgroundColor = window.getComputedStyle(content).getPropertyValue("background-color");
+        cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition);
+        const position = await getPosition();
         animateOpen(position);
     }
 
