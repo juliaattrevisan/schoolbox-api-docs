@@ -21,7 +21,7 @@
 
     {% block filterComponent %}
         {% if isUserConfigurable %}
-            <sbx-actions-dropdown
+            <sbx-pop-out
                 content-id="filter-component-{{ definition.filter.id }}"
                 button-text="{%- block filterName %}{{ definition.name }}{% endblock filterName -%}"
                 data-test="sbx-filters-dropdown-{{ definition.filter.id }}"
@@ -29,7 +29,7 @@
                 is-arrow-icon
                 {% if isEmpty %}is-disabled{% endif %}
             >
-            </sbx-actions-dropdown>
+            </sbx-pop-out>
         {% endif %}
 
         {# Are any options available? #}

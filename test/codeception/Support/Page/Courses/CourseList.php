@@ -28,7 +28,7 @@ class CourseList
      */
     public function clickCourseDotMenu($courseDropdownNumber): void
     {
-        $this->tester->clickElementInWebComponent('[data-test=sbx-actions-dropdown-courseDropdown-' . $courseDropdownNumber . ']', '[data-test=sbx-actions-dropdown-courseDropdown-' . $courseDropdownNumber . '-button]');
+        $this->tester->clickElementInWebComponent('[data-test=sbx-pop-out-courseDropdown-' . $courseDropdownNumber . ']', '[data-test=sbx-pop-out-courseDropdown-' . $courseDropdownNumber . '-button]');
     }
 
 

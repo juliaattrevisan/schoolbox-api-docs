@@ -91,7 +91,7 @@
                                         </div>
                                         {% if readOnly == false and unit.isAfterDueDate == false %}
                                             <nav>
-                                                <sbx-actions-dropdown content-id="unit-options{{ unit.id }}"></sbx-actions-dropdown>
+                                                <sbx-pop-out content-id="unit-options{{ unit.id }}"></sbx-pop-out>
                                             </nav>
                                             <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
                                                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
@@ -180,7 +180,7 @@
 
                                             {% if not readOnly %}
                                                 <nav>
-                                                    <sbx-actions-dropdown content-id="options-task{{ assessment.id }}"></sbx-actions-dropdown>
+                                                    <sbx-pop-out content-id="options-task{{ assessment.id }}"></sbx-pop-out>
                                                 </nav>
                                             {% endif %}
 

@@ -35,7 +35,7 @@ Usage:
             </div>
         </div>
         <nav>
-            <sbx-actions-dropdown content-id="dropdown-{{ assessment.id }}"></sbx-actions-dropdown>
+            <sbx-pop-out content-id="dropdown-{{ assessment.id }}"></sbx-pop-out>
         </nav>
         <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
             <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>

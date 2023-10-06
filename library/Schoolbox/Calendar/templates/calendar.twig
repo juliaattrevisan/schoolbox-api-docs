@@ -69,7 +69,7 @@
     {% set assessmentCalendar = routeLookupIfAuthorized('learningAssessmentCalendar.getReport')  %}
     {% if assessmentCalendar %}
     <nav>
-        <sbx-actions-dropdown content-id="header-options"></sbx-actions-dropdown>
+        <sbx-pop-out content-id="header-options"></sbx-pop-out>
     </nav>
     <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
         <li><a class="icon-calendar" href="{{assessmentCalendar}}">Assessment Calendar</a></li>

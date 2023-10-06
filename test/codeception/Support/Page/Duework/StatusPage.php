@@ -18,8 +18,8 @@ class StatusPage
 {
     public const URL = '/learning/assessments/{assessment_id}/status';
 
-    public const LINK_JELLY_TOT = '[data-test=sbx-actions-dropdown-header-options]';
-    public const LINK_JELLY_TOT_BUTTON = '[data-test=sbx-actions-dropdown-header-options-button]';
+    public const LINK_JELLY_TOT = '[data-test=sbx-pop-out-header-options]';
+    public const LINK_JELLY_TOT_BUTTON = '[data-test=sbx-pop-out-header-options-button]';
     public const LINK_REVIEW_HORIZONTAL = '#header-options a.icon-class-list';
     public const LINK_BULK_REVIEW = '#header-options a.icon-approve';
     public const LINK_MODIFY = '#header-options a.icon-modify';

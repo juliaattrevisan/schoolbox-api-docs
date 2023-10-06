@@ -610,10 +610,10 @@ export default {
                                             </a>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
-                                            <sbx-actions-dropdown
+                                            <sbx-pop-out
                                                 :content-id="`evidence-${evidence.object.id}-dropdown`"
-                                                :data-test="`sbx-actions-dropdown-evidence-${evidence.object.id}`"
-                                            ></sbx-actions-dropdown>
+                                                :data-test="`sbx-pop-out-evidence-${evidence.object.id}`"
+                                            ></sbx-pop-out>
                                         </nav>
                                         <ul
                                             v-if="hasMenu(evidence.object)"

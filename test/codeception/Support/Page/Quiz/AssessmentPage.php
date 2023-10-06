@@ -17,8 +17,8 @@ use Tests\Support\AcceptanceTester;
 class AssessmentPage
 {
     public const URL = '/learning/assessments/{assessment_id}/{user_id}';
-    public const LINK_JELLY_TOT = '[data-test=sbx-actions-dropdown-header-options]';
-    public const LINK_JELLY_TOT_BUTTON = '[data-test=sbx-actions-dropdown-header-options-button]';
+    public const LINK_JELLY_TOT = '[data-test=sbx-pop-out-header-options]';
+    public const LINK_JELLY_TOT_BUTTON = '[data-test=sbx-pop-out-header-options-button]';
     public const LINK_MODIFY = '#header-options a.icon-modify';
 
     /**

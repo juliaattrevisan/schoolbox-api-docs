@@ -54,7 +54,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         :aria-expanded="isOpen"
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
-        :data-test="`sbx-actions-dropdown-${props.contentId}-button`"
+        :data-test="`sbx-pop-out-${props.contentId}-button`"
         :disabled="props.isDisabled"
         @click.prevent="onButtonSelected"
     >

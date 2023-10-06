@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import WcActionsDropdown from "../sbx-actions-dropdown.ce.vue";
+import WcActionsDropdown from "../sbx-pop-out.ce.vue";
 
 let wrapper; // so we don't need to pass it into every test
 
@@ -19,7 +19,7 @@ test("when clicked content is visible", async () => {
             contentId: "my-content",
         },
     });
-    wrapper.get(`[data-test="sbx-actions-dropdown-button-my-content"]`).trigger("click");
+    wrapper.get(`[data-test="sbx-pop-out-button-my-content"]`).trigger("click");
     const content = document.querySelector("#my-content");
     expect(content.style.display).toBe("block");
 });
@@ -31,8 +31,8 @@ test("when clicked again content is hidden", async () => {
             contentId: "my-content",
         },
     });
-    wrapper.get(`[data-test="sbx-actions-dropdown-button-my-content"]`).trigger("click");
-    wrapper.get(`[data-test="sbx-actions-dropdown-button-my-content"]`).trigger("click");
+    wrapper.get(`[data-test="sbx-pop-out-button-my-content"]`).trigger("click");
+    wrapper.get(`[data-test="sbx-pop-out-button-my-content"]`).trigger("click");
     const content = document.querySelector("#my-content");
     expect(content.style.display).toBe("none");
 });
@@ -45,6 +45,6 @@ test("button has text when provided", async () => {
             buttonText: "Open My Content",
         },
     });
-    const button = wrapper.get(`[data-test="sbx-actions-dropdown-button-my-content"]`);
+    const button = wrapper.get(`[data-test="sbx-pop-out-button-my-content"]`);
     expect(button.html()).toContain("Open My Content");
 });

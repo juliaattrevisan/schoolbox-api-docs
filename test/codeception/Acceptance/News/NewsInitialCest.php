@@ -58,7 +58,7 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-header-options]', '[data-test=sbx-actions-dropdown-header-options-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-pop-out-header-options]', '[data-test=sbx-pop-out-header-options-button]');
         $i->click('#unpublish-article');
         $i->waitForElementVisible(['css' => 'textarea#rejectedReason'], 5);
         $i->fillField(['css' => "textarea#rejectedReason"], "Testing unpublish");
@@ -187,8 +187,8 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
 
-        $i->waitForElementVisible('[data-test=sbx-actions-dropdown-header-options]', 5);
-        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-header-options]', '[data-test=sbx-actions-dropdown-header-options-button]');
+        $i->waitForElementVisible('[data-test=sbx-pop-out-header-options]', 5);
+        $i->clickElementInWebComponent('[data-test=sbx-pop-out-header-options]', '[data-test=sbx-pop-out-header-options-button]');
         $i->click(['css' => 'a.icon-delete']);
         $i->waitForElementVisible('#confirm-dialog-confirm-button', 8);
         $i->click('#confirm-dialog-confirm-button');

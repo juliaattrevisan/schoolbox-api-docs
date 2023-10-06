@@ -148,7 +148,7 @@ class LearningMoments
      */
     public function clickDropdownMenu(int $evidenceId): void
     {
-        $this->tester->clickElementInWebComponent('[data-test=sbx-actions-dropdown-evidence-' . $evidenceId . ']', '[data-test=sbx-actions-dropdown-evidence-' . $evidenceId . '-dropdown-button]');
+        $this->tester->clickElementInWebComponent('[data-test=sbx-pop-out-evidence-' . $evidenceId . ']', '[data-test=sbx-pop-out-evidence-' . $evidenceId . '-dropdown-button]');
     }
 
     /**

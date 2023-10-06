@@ -226,10 +226,10 @@ export default {
                                     </div>
                                     <template v-if="hasTot(award)">
                                         <nav>
-                                            <sbx-actions-dropdown
+                                            <sbx-pop-out
                                                 :content-id="generateIdentifier(award)"
-                                                :data-test="`sbx-actions-dropdown-${generateIdentifier(award)}`"
-                                            ></sbx-actions-dropdown>
+                                                :data-test="`sbx-pop-out-${generateIdentifier(award)}`"
+                                            ></sbx-pop-out>
                                         </nav>
                                         <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
                                             <!-- Only show Withdraw button if you can actually do it

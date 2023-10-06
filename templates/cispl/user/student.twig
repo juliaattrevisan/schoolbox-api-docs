@@ -29,7 +29,7 @@
                             </div>
                         </div>
                         <nav>
-                            <sbx-actions-dropdown content-id="row-options-contact-{{ loop.index }}"></sbx-actions-dropdown>
+                            <sbx-pop-out content-id="row-options-contact-{{ loop.index }}"></sbx-pop-out>
                         </nav>
                         <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
                             <li><a class="icon-modify" href="/homepage/4694">Update Contact Details</a></li>
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <sbx-actions-dropdown content-id="row-options-contact-{{ contact.StudentContactSpouseID }}"></sbx-actions-dropdown>
+                                <sbx-pop-out content-id="row-options-contact-{{ contact.StudentContactSpouseID }}"></sbx-pop-out>
                             </nav>
                             <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactSpouseID }}">
                                 {% if contact.StudentContactSpouseDefaultEmail and contact.StudentContactSpouseUseEmail != 'N'%}

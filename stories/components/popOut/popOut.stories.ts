@@ -30,8 +30,8 @@ export const Default: Story = {
         template: `
             <div id="container" class="l-flex-col l-flex--justify-space" style="height: 600px;">
                 <div class="l-flex-row l-flex--justify-space">
-                    <sbx-actions-dropdown content-id="dropdown-1"></sbx-actions-dropdown>
-                    <sbx-actions-dropdown content-id="dropdown-2">
+                    <sbx-pop-out content-id="dropdown-1"></sbx-pop-out>
+                    <sbx-pop-out content-id="dropdown-2">
                         <template #icon>
                             <svg
                                 version="1.2"
@@ -52,11 +52,11 @@ export const Default: Story = {
                                 <path d="m12 8c0 0.6-0.4 1-1 1h-6c-0.6 0-1-0.4-1-1 0-0.6 0.4-1 1-1h6c0.6 0 1 0.4 1 1z" />
                             </svg>
                         </template>
-                    </sbx-actions-dropdown>
+                    </sbx-pop-out>
                 </div>
                 <div class="l-flex-row l-flex--justify-space">
-                    <sbx-actions-dropdown content-id="dropdown-3" button-text="Modify Participation"></sbx-actions-dropdown>
-                    <sbx-actions-dropdown content-id="dropdown-4"></sbx-actions-dropdown>
+                    <sbx-pop-out content-id="dropdown-3" button-text="Modify Participation"></sbx-pop-out>
+                    <sbx-pop-out content-id="dropdown-4"></sbx-pop-out>
                 </div>
             </div>
             <ul data-dropdown-content="" class="f-dropdown" id="dropdown-1">

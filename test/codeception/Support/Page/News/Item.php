@@ -23,8 +23,8 @@ class Item
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    public const DOT_MENU   = '[data-test=sbx-actions-dropdown-header-options]';
-    public const DOT_MENU_BUTTON   = '[data-test=sbx-actions-dropdown-header-options-button]';
+    public const DOT_MENU   = '[data-test=sbx-pop-out-header-options]';
+    public const DOT_MENU_BUTTON   = '[data-test=sbx-pop-out-header-options-button]';
     public const LINK_MODIFY   = 'Modify';
     public const LINK_PREVIOUS = Common::ELEMENT_CONTENT . ' .icon-previous';
     public const LINK_NEXT     = Common::ELEMENT_CONTENT . ' .icon-next';

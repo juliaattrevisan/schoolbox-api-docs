@@ -195,7 +195,7 @@ class LessonPlanCest
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
         $i->amGoingTo('Add Jack Coles into the group via manage group page');
-        $i->clickElementInWebComponent('[data-test=sbx-actions-dropdown-tab-control]', '[data-test=sbx-actions-dropdown-tab-control-button]');
+        $i->clickElementInWebComponent('[data-test=sbx-pop-out-tab-control]', '[data-test=sbx-pop-out-tab-control-button]');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $manageGroup->search($teacher);
         $manageGroup->selectUser(22);
