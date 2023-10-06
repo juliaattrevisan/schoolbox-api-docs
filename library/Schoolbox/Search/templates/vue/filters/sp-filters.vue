@@ -89,7 +89,7 @@ function onClearAllSelected() {
                 {{ titleText }}
             </button>
             <div class="c-filters__container" :style="{ 'grid-template-rows': containerHeight }">
-                <div class="c-filters__inner-container">
+                <div class="c-filters__inner-container l-flex-col l-gap-m">
                     <sp-filter-date-range />
                     <sp-filter-creator />
                     <sp-filter-types />
