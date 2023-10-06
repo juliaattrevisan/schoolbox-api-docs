@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import SbxActionsDropdown from "@schoolboxVue/components/dropdown/sbx-actions-dropdown.ce.vue";
+import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 
 /**
  * Storybook meta data, any default properties that are passed into every story
  * https://storybook.js.org/docs/vue/writing-stories/introduction
  */
-const meta: Meta<typeof WcActionsDropdown> = {
-    component: SbxActionsDropdown,
+const meta: Meta<typeof SbxPopOut> = {
+    component: SbxPopOut,
     decorators: [
         () => ({
             template: `
@@ -19,14 +19,14 @@ const meta: Meta<typeof WcActionsDropdown> = {
     title: "Components/Dropdowns/Actions Dropdown",
 };
 export default meta;
-type Story = StoryObj<typeof SbxActionsDropdown>;
+type Story = StoryObj<typeof SbxPopOut>;
 
 /**
  * Shows the dropdown sitting in different regions of the viewport, which will determine which direction the dropdown opens.
  */
 export const Default: Story = {
     render: () => ({
-        components: { SbxActionsDropdown },
+        components: { SbxPopOut },
         template: `
             <div id="container" class="l-flex-col l-flex--justify-space" style="height: 600px;">
                 <div class="l-flex-row l-flex--justify-space">
