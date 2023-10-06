@@ -160,6 +160,7 @@ class Module extends BaseModule
                 new Database\ResultType\Forum\Hydrator(
                     $mapperFactory->get(PostMapper::class),
                     $mapperFactory->get(ThreadMapper::class),
+                    Access::getInstance(),
                 ),
                 new Database\ResultType\Assessment\Hydrator(
                     $assessmentMapperProxy,
