@@ -309,19 +309,21 @@ class ConfigMapper extends Mapper
      * If any of these settings change: rebuild the route and module tables.
      */
     public const SETTINGS_AFFECTING_MODULES    = [
-        ConfigMapper::NAME_LMS_ENABLED,
-        ConfigMapper::NAME_PASTORAL_ENABLED,
-        ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
-        ConfigMapper::NAME_BADGES_ENABLED,
-        ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED,
-        ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED,
-        ConfigMapper::NAME_FIXTURES_ENABLED,
-        ConfigMapper::NAME_TOURS_ENABLED,
-        ConfigMapper::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
-        ConfigMapper::NAME_EXTERNAL_TYPE,
-        ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
-        ConfigMapper::NAME_QR_LOGIN_ENABLED,
-        ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED,
+        self::NAME_LMS_ENABLED,
+        self::NAME_PASTORAL_ENABLED,
+        self::NAME_LEARNING_MOMENTS_ENABLED,
+        self::NAME_BADGES_ENABLED,
+        self::NAME_ASSESSMENT_CALENDAR_ENABLED,
+        self::NAME_RESOURCE_BOOKING_ENABLED,
+        self::NAME_FIXTURES_ENABLED,
+        self::NAME_TOURS_ENABLED,
+        self::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
+        self::NAME_EXTERNAL_TYPE,
+        self::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
+        self::NAME_QR_LOGIN_ENABLED,
+        self::NAME_SUMMATIVE_REPORT_ENABLED,
+        self::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER,
+        self::NAME_OAUTH_ENABLE_SSO,
     ];
 
     /**
@@ -335,6 +337,9 @@ class ConfigMapper extends Mapper
         self::_CLOUDWORK_OAUTH_CLIENT_SECRET,
         self::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS,
         self::NAME_OAUTH_ISSUER,
+        self::NAME_OAUTH_ENABLE_SSO,
+        self::NAME_OAUTH_SSO_IP_BLACKLIST,
+        self::NAME_OAUTH_SSO_IP_WHITELIST,
     ];
 
     /**
