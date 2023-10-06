@@ -157,7 +157,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * (Whilst a news article may be audienced to a folder, news articles are
      * not displayed underneath a folder.)
      *
-     * @return string | null
+     * @return string|null
      */
     public function buildFolderExpression(): ?string
     {
