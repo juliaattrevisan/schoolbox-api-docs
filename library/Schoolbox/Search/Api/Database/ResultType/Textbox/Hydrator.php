@@ -57,17 +57,27 @@ class Hydrator extends BaseHydrator
         // Find all textboxes that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
 
-        $ids = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
-        if (empty($ids)) {
+        $textboxIds = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
+        if (empty($textboxIds)) {
             return [];
         }
 
+        // Get componentConfigInstanceId indexed by textboxId.
+        $db = $this->textboxMapper->getDatabase();
+        $componentInstanceIdByTextboxId = $db->executeQuery(
+            'SELECT value AS textbox_id, component_instance_id
+            FROM component_config_instance cci
+            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            WHERE ccd.key="textbox"
+            AND value IN (' . implode(',', array_map('intval', $textboxIds)) . ')'
+        )->fetchColumnArray('component_instance_id', 'textbox_id');
+
         // Find the matching textboxes.
-        $textboxes = $this->textboxMapper->findByColumn('textBoxID', $ids);
+        $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($textboxes, $viewer, $keyword) {
+            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentInstanceIdByTextboxId) {
                 $textbox = $textboxes->getBy('id', $match->id);
 
                 if (!($textbox instanceof TextboxModel)) {
@@ -81,25 +91,20 @@ class Hydrator extends BaseHydrator
                 }
 
                 // Find component_instance_id for use in URL fragment.
-                $db = $this->textboxMapper->getDatabase();
-                $componentInstanceId = $db->executeQuery(
-                    'SELECT component_instance_id
-                    FROM component_config_instance cci
-                    JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-                    WHERE ccd.key="textbox"
-                    AND value=?',
-                    [$textbox->getId()]
-                )->fetchColumn();
+                $componentInstanceId = $componentInstanceIdByTextboxId[$textbox->getId()] ?? null;
 
                 $textboxBody = (new ToText($textbox->getBody()))->getText();
                 return new FullResult(
                     $match,
                     $match->id,
-                    $textbox->getHeading(),
-                    $this->buildBaseUrl()
-                         ->withPath('/homepage/' . $textbox->getCategory()->getId())
-                         ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
-                         ->__toString(),
+                    $textbox->getHeading() . ($componentInstanceId === null ? ' (not used in any component)' : ''),
+                    (
+                        $componentInstanceId === null ? '' :
+                        $this->buildBaseUrl()
+                        ->withPath('/homepage/' . $textbox->getCategory()->getId())
+                        ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
+                        ->__toString()
+                    ),
                     $match->type,
                     $match->relevance,
                     $textbox->getUpdatedAt(),
