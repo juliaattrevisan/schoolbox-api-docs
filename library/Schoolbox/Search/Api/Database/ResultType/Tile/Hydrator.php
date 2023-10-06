@@ -104,12 +104,17 @@ class Hydrator extends BaseHydrator
                         $tileFolder = null;
                     }
 
-                    $titleText = $tile->getTitleText();
+                    $titleText = trim($tile->getTitleText());
+
+                    if ($titleText === '') {
+                        // Tiles without a title should not appear in search results (AC for SA-8841).
+                        return null;
+                    }
 
                     return new FullResult(
                         $match,
                         $match->id,
-                        ($titleText === '') ? $tile->getLink() : $titleText,
+                        $titleText,
                         $tile->getLink(),
                         $match->type,
                         $match->relevance,
@@ -117,7 +122,7 @@ class Hydrator extends BaseHydrator
                         $tileFolder,
                         null,
                         $tile->getBackgroundImage() ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString() : null,
-                        'tile',
+                        'tiles',
                         '',
                         null,
                         ($tileFolder === null) ? [] : [$tileFolder],

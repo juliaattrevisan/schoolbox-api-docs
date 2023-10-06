@@ -19,6 +19,7 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Forum\ThreadMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -89,6 +90,10 @@ class Module extends BaseModule
         /** @var ArticleResolver $articleResolver */
         $articleResolver = $this->injector->get('commsNewsArticleResolver');
 
+        // Need an assessment mapper proxy
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->injector->get('assessmentDataSource');
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -103,6 +108,7 @@ class Module extends BaseModule
                 new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(
@@ -154,6 +160,10 @@ class Module extends BaseModule
                 new Database\ResultType\Forum\Hydrator(
                     $mapperFactory->get(PostMapper::class),
                     $mapperFactory->get(ThreadMapper::class),
+                ),
+                new Database\ResultType\Assessment\Hydrator(
+                    $assessmentMapperProxy,
+                    $mapperFactory->get(UserMapper::class),
                     Access::getInstance(),
                 ),
             ),

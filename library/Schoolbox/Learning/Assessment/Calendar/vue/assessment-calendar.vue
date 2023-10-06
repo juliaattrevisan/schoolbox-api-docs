@@ -373,7 +373,7 @@ export default {
                     eventAllow: false,
                 },
                 {
-                    title: "Assessments",
+                    title: "Activities",
                     children: this.folderResources,
                     eventAllow: false,
                 },

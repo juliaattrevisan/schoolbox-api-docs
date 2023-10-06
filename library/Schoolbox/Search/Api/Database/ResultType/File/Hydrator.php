@@ -95,8 +95,12 @@ class Hydrator extends BaseHydrator
                         $file->getModifiedAt(),
                         $file->getFolder(),
                         null,
-                        // Image? show thumbnail, otherwise show mimetype thumb
-                        $this->prefixGenerator->generate() . '/images/mime/' . $file->getMimetype()->getIconFile(),
+                        (
+                            // Image? show thumbnail, otherwise show mimetype thumb.
+                            (str_contains($file->getMimetype()->__toString(), 'image'))
+                            ? $this->buildStorageImageUrl($file)->__toString()
+                            : $this->prefixGenerator->generate() . '/images/mime/' . $file->getMimetype()->getIconFile()
+                        ),
                         'file',
                         $file->getDescription(),
                         // Should this be modified by instead?
