@@ -177,7 +177,7 @@ class Hydrator extends BaseHydrator
             'SELECT threadID, COUNT(*) AS `count`
             FROM forumPost
             WHERE threadID IN (' . implode(',', array_map('intval', $threadIds)) . ')
-            ' . ((count($whereParts) > 0) ? 'AND ' . implode(' AND ', $whereParts) : '') . '
+            AND ' . implode(' AND ', $whereParts) . '
             AND deleted="false"
             GROUP BY threadID',
             $params
