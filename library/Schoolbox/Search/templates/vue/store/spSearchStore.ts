@@ -53,6 +53,7 @@ export const useSearchStore = defineStore("spSearch", () => {
      */
     async function search() {
         setActive();
+        useResultsStore().clear();
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
         await execute();
@@ -61,15 +62,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         } catch (e) {
             hasLoadError.value = true;
         }
-    }
-
-    /**
-     * clear the current search
-     */
-    function clear() {
-        isSearching.value = false;
-        useQueryStore().clear();
-        useResultsStore().clear();
     }
 
     /**
@@ -85,7 +77,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         isSearching,
         hasLoadError,
         search,
-        clear,
         clearFiltersAndSearch,
         searchError,
     };
