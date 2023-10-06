@@ -36,6 +36,21 @@ class LessonPlanCest
 
     /**
      * @param AcceptanceTester $i
+     */
+
+    /**
+     * Soft deleting the homepage with certain name to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function beforeSuite(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Test Class Homepage Lesson Plan%"]);
+    }
+
+    /**
+     * @param AcceptanceTester $i
      * @throws Exception
      *
      * create a lesson plan template with a field visible to student and a field that is not visible to students
@@ -120,12 +135,18 @@ class LessonPlanCest
         $importCourseIntoClass->tickAssessmentCheckbox('151');
         $i->amGoingTo('click button Import, navigate to the homepage and check that Romeo and Juliet unit is presented in the page');
         $importCourseIntoClass->clickSubmit('Import');
+
+        //this if-clause is due to issue SA-16429
+        while ($i->tryToSeeElement('input[value="Working..."]')) {
+            $i->wait(5);
+        }
         $i->amGoingTo('check if the lesson plan is presented in the homepage');
         $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => $folderName, 'deleted_at' => null]);
         $i->amOnPage('/homepage/' . $folder_id);
-        $i->canSee('Romeo and Juliet');
+        while (!$i->tryToSee('Romeo and Juliet')) {
+            $i->wait(2);
+        }
         $i->canSee($lessonPlanName);
-
         $i->amGoingTo('as a student view the lesson plan');
         $i->impersonateViaModifyUserPage($student);
         $i->amOnPage('/homepage/' . $folder_id);
