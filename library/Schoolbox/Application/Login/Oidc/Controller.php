@@ -253,7 +253,7 @@ class Controller extends Base
     private function buildState(): string
     {
         $payload = [
-            'redirect' => $this->requestQuery->get('redirect') ?? '/',
+            'redirect' => $this->requestQuery->get('page') ?? '/',
             'nonce'    => Uuid::uuid4(),
         ];
         return $this->codec->encode($payload);
