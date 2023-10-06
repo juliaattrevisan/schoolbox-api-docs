@@ -55,6 +55,8 @@ class Controller extends Base
      */
     public function getLogin($error = null, $page = null): void
     {
+        $config = $this->getConfigLoader();
+
         // If you try to access the login screen but you are already logged in, just go home
         if ($this->getSession()->getAuthUser() instanceof User && $this->getSession()->getAuthUser()->getId()) {
             $this->response = $this->redirectSeeOther('/');
@@ -76,8 +78,8 @@ class Controller extends Base
         // (unless ?samlLogin=0 is set)
         // (or the users IP exists in the blacklist
         if (
-            ( $this->getConfigLoader()->get('saml_enabled') || $this->samlForce() )
-            && ($this->getConfigLoader()->get('saml_sso_url') !== '' || $this->getConfigLoader()->get('saml_idp_metadata_url') !== '')
+            ($config->get('saml_enabled') || $this->samlForce())
+            && ($config->get('saml_sso_url') !== '' || $config->get('saml_idp_metadata_url') !== '')
             && $samlAuth !== '0'
             && (!$this->samlBlacklist() || $samlAuth === '1')
         ) {
@@ -86,6 +88,21 @@ class Controller extends Base
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
             }
             $this->response = $this->redirectSeeOther($redirectUrl);
+            return;
+        }
+
+        // Is OIDC enabled and switched on by default?
+        // If so, redirect there
+        // TODO copy whitelist/blacklist from SAML
+        if (
+            $config->get(ConfigMapper::NAME_OAUTH_ENABLE_SSO)
+            && $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+        ) {
+            $redirectUrl = new Uri($this->routeGenerator->generate('loginOidc.getAuthorization'));
+            if ($pageUri && $pageUri->isAbsolutePath()) {
+                $redirectUrl = $redirectUrl->appendQueryParameters(['redirect' => $pageUri->__toString()]);
+            }
+            $this->response = $this->redirectSeeOther($redirectUrl->__toString());
             return;
         }
 
@@ -101,7 +118,7 @@ class Controller extends Base
 
         // Build a set of login backgrounds: choose a random one in Twig
         $data['login_backgrounds'] = [];
-        $backgrounds = explode(',', $this->getConfigLoader()->get('skin_login_bg'));
+        $backgrounds = explode(',', $config->get('skin_login_bg'));
         foreach ($backgrounds as $background) {
             if (!empty($background)) {
                 $data['login_backgrounds'][] = '/storage/image.php?' . http_build_query(['hash' => $background, 'size' => 'maxsize']);
