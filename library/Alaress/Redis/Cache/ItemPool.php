@@ -13,6 +13,7 @@ use Alaress\Codec\ICodec;
 use Cache\Adapter\Common\CacheItem;
 use Cache\Adapter\Common\HasExpirationTimestampInterface;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\SetKey;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -153,9 +154,14 @@ class ItemPool implements CacheItemPoolInterface
      */
     public function clear()
     {
-        // Find all keys which match the prefix.
-        // Can't quite figure this part out yet.
-        return false;
+        $keys = [];
+        foreach (new SetKey($this->redis, $this->keyGenerator->generateKey(self::SET_KEY)) as $key) {
+            $keys[] = $key;
+        }
+        if (!empty($keys)) {
+            $this->redis->del($keys);
+        }
+        return true;
     }
 
     /**
@@ -169,6 +175,7 @@ class ItemPool implements CacheItemPoolInterface
     {
         $this->assertKeyValid($key);
         if ($this->redis->del($this->keyGenerator->generateKey($key))) {
+            $this->redis->srem($this->keyGenerator->generateKey(self::SET_KEY), [$key]);
             unset($this->deferredItems[$key]);
             return true;
         }
