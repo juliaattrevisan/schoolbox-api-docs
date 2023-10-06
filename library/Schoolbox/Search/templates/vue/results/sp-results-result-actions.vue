@@ -4,18 +4,40 @@
  */
 
 import { Result } from "../../js/types/Result";
+import { ResultLink } from "../../js/types/ResultLink";
 
 interface Props {
     result: Result; // the result to display
 }
 const props = defineProps<Props>();
+
+const linksTest = window.Vue.ref<ResultLink[]>([
+    {
+        id: 0,
+        title: "Class List",
+        url: "/learning/class/80",
+        icon: "icon-class-list",
+    },
+    {
+        id: 1,
+        title: "Class Markbook",
+        url: "/learning/markbook/class/80/term/2023-1",
+        icon: "icon-curriculum",
+    },
+    {
+        id: 2,
+        title: "Badge Report",
+        url: "/learning/badge/award/list/80",
+        icon: "icon-achievement",
+    },
+]);
 </script>
 
 <template>
     <wc-actions-dropdown :content-id="`dropdown-${props.result.id}`"></wc-actions-dropdown>
     <ul :id="`dropdown-${props.result.id}`" class="f-dropdown" data-dropdown-content>
-        <li>
-            <a id="updateGroupSettings" href="#update-group-settings" class="icon-settings">Update Group Settings</a>
+        <li v-for="link in linksTest" :key="link.id">
+            <a :href="link.url" :class="link.icon">{{ link.title }}</a>
         </li>
     </ul>
 </template>

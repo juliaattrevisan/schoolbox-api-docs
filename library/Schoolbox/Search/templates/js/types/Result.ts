@@ -1,5 +1,6 @@
 import { ResultTypes } from "./ResultTypes";
 import type { ResultContext } from "./ResultContext";
+import type { ResultLink } from "./ResultLink";
 import type { Results } from "./Results";
 
 /**
@@ -27,8 +28,6 @@ export type Result = {
     };
     context: ResultContext[];
     icon?: string;
-    _links: {
-        subResults?: string; // url to load further results froms
-    };
+    _links: ResultLink[];
     _subResults?: Results; // further results within the result
 };
