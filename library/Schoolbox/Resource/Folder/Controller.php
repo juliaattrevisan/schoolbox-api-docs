@@ -408,7 +408,8 @@ class Controller extends BaseController
                 $classCodes,
                 $yearLevels,
                 (bool)($post['recursive-year-levels'] ?? false),
-                $this->getUser()
+                $this->getUser(),
+                (int)($post['order']) ?? null
             );
 
             /* If Inherit Permissions is on, don't create group
@@ -449,6 +450,7 @@ class Controller extends BaseController
      * @param array       $yearLevelIds       Comma-separated YearLevel ids
      * @param bool        $recurseYearLevels  If true
      * @param User        $user               the effecting user
+     * @param null|int    $order              the display order on the summative report
      * @return Model                          Representing the freshly saved folder
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -471,7 +473,8 @@ class Controller extends BaseController
         array $classCodes,
         array $yearLevelIds,
         bool $recurseYearLevels,
-        User $user
+        User $user,
+        null|int $order = null
     ): Model {
 
         /* Folders must have a name
@@ -544,6 +547,11 @@ class Controller extends BaseController
 
         // update role permission
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
+
+        // update folder order
+        if ($order) {
+            $folder->setOrder($order);
+        }
 
         $folder->setUpdatedBy($user->getId());
 

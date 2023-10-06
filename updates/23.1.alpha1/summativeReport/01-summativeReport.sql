@@ -8,4 +8,4 @@ WHERE _options IS NULL AND options<>'';
 UPDATE summative_report SET options='';
 
 ### add an order to the folder table for ordering folders in summatve summative_report
-ALTER TABLE folder ADD COLUMN order int(11) DEFAULT NULL;
+ALTER TABLE folder ADD COLUMN `order` int(11) DEFAULT NULL;
