@@ -28,7 +28,7 @@ class Module extends BaseModule
         // Routes:
         // a GET/POST page for handling both creating an auth request, and
         // handling an auth response.
-        // These routes should only exist if oAuth provider is set up.
+        // These routes should only exist if provider is set up and enabled.
         $this->register(self::METHOD_GET, '', 'getAuthorization');
         $this->register(self::METHOD_POST, '', 'postAuthorization');
     }
