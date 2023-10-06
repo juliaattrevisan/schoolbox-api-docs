@@ -11,10 +11,7 @@ namespace Schoolbox\Application\Login\Oidc;
 
 use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Web\Controller\Base;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 
 /**
  * Module for OpenID Connect logins.
