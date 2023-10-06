@@ -118,6 +118,7 @@ class Controller extends Base
                         );
                         [$folderResult] = $this->hydrator->hydrate(
                             $keyword,
+                            $filter,
                             [$rawFolderResult],
                             $this->getUser(),
                         );
@@ -308,7 +309,7 @@ class Controller extends Base
             // then add them to the full result set.
             $fullResults = array_merge(
                 $fullResults,
-                $this->hydrator->hydrate($keyword, $nextRawResults->getAll(), $this->user)
+                $this->hydrator->hydrate($keyword, $filter, $nextRawResults->getAll(), $this->user)
             );
 
             // Too many full results now?

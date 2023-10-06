@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress\Html\ToText;
-use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Forum\Post as PostModel;
@@ -20,6 +19,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
+use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
 
 /**
@@ -57,7 +57,7 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(string $keyword, array $matches, User $viewer): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all forum posts that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
@@ -76,7 +76,7 @@ class Hydrator extends BaseHydrator
              $threadIds[] = $post->getThread()->getId();
         }
 
-        $nMatchingPostsByThreadId = $this->getNumberOfMatchingPostsIndexedByThreadId($threadIds, $keyword);
+        $nMatchingPostsByThreadId = $this->getNumberOfMatchingPostsIndexedByThreadId($threadIds, $keyword, $filter);
 
         // And map to a full result.
         $fullResults = array_map(
@@ -139,18 +139,48 @@ class Hydrator extends BaseHydrator
     /**
      * @param array  $threadIds
      * @param string $keyword
+     * @param SearchFilter\DataObject $filter
      * @return array
      */
-    function getNumberOfMatchingPostsIndexedByThreadId(array $threadIds, string $keyword): array
+    function getNumberOfMatchingPostsIndexedByThreadId(array $threadIds, string $keyword, SearchFilter\DataObject $filter): array
     {
+        // The $whereParts added here are the same as those added in BaseQueryParamBuilder->buildMatchQueryParams().
+        $whereParts = [];
+        $params = [];
+
+        $datePart    = 'modified'; // Must match Forum/QueryParamBuilder->buildDateExpression();
+        $creatorPart = 'userID';   // Must match Forum/QueryParamBuilder->buildCreatorExpression();
+        // Note $folderPart is not set here because Forum/QueryParamBuilder->buildFolderExpression() returns blank.
+
+        if ($filter->fromDate) {
+            $whereParts[]             = "$datePart >= :filterFromDate";
+            $params['filterFromDate'] = $filter->fromDate->getDatabase();
+        }
+        if ($filter->toDate) {
+            // The `modified` field is used here because it is used in Forum/QueryParamBuilder->buildDateExpression();
+            $whereParts[]           = "$datePart <= :filterToDate";
+            $params['filterToDate'] = $filter->toDate->getDatabase();
+        }
+        if ($filter->creator) {
+            // The `userID` field is used here because it is used in Forum/QueryParamBuilder->buildCreatorExpression();
+            $whereParts[]            = "$creatorPart = :filterCreator";
+            $params['filterCreator'] = $filter->creator->getId();
+        }
+        // Note $filter->folder is not used here because Forum/QueryParamBuilder->buildFolderExpression() returns blank.
+        // Note $filter->types is not used here because that this function is being called implies the forum type has
+        // been selected, and that is all we care about.
+
+        $whereParts[] = 'body LIKE :filterKeywordLike';
+        $params[':filterKeywordLike'] = "%{$keyword}%";
+
         return $this->threadMapper->getDatabase()->executeQuery(
             'SELECT threadID, COUNT(*) AS `count`
             FROM forumPost
             WHERE threadID IN (' . implode(',', array_map('intval', $threadIds)) . ')
+            ' . ((count($whereParts) > 0) ? 'AND ' . implode(' AND ', $whereParts) : '') . '
             AND deleted="false"
-            AND body LIKE ?
             GROUP BY threadID',
-            ["%{$keyword}%"]
+            $params
         )->fetchColumnArray('count', 'threadID');
     }
 }

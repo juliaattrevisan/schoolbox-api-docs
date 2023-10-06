@@ -125,9 +125,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The post's date is its modified date.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return $this->getSubqueryForMostRelevantPostInThread('modified');
     }
@@ -135,9 +135,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The post's creator is its `userID` column.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(): string
     {
         return $this->getSubqueryForMostRelevantPostInThread('userID');
     }
@@ -149,7 +149,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(): ?string
     {
-        return '""';
+        return null;
     }
 
     /**

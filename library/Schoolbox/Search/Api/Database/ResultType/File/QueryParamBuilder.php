@@ -161,9 +161,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's date is its modified date.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'f.modified';
     }
@@ -171,9 +171,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's creator is its `owner` column.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(): string
     {
         return 'f.owner';
     }
@@ -181,9 +181,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's folder is its `category` column.
      *
-     * @return string|null
+     * @return string
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(): string
     {
         return 'f.category';
     }

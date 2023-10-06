@@ -62,6 +62,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Since `buildRelevanceExpression` returns a static value, page results are
      * not ordered by relevance.
+     * @return bool
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -70,6 +71,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The title of a page result is always just its name.
+     * @return string
      */
     protected function buildTitleExpression(): string
     {
@@ -131,15 +133,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * A page's date is its updated_at date.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'f.updated_at';
     }
 
     /**
      * Pages have no recorded creator: thus, this will be null.
+     * @return string|null
      */
     protected function buildCreatorExpression(): ?string
     {

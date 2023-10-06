@@ -121,9 +121,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The badge's date is its updated_at date.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'b.updated_at';
     }

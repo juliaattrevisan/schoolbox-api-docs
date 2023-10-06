@@ -127,6 +127,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The ID of a news result is simply the article's ID.
+     * @return string
      */
     protected function buildIdExpression(): string
     {
@@ -136,15 +137,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The date of a news result is the article's publish date.
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'n.publish_at';
     }
 
     /**
      * The creator of a news result is the article's author.
+     * @return string
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(): string
     {
         return 'n.author_id';
     }
@@ -155,7 +157,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * (Whilst a news article may be audienced to a folder, news articles are
      * not displayed underneath a folder.)
      *
-     * @return string|null
+     * @return string | null
      */
     public function buildFolderExpression(): ?string
     {
