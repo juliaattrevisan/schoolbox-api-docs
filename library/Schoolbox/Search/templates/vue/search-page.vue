@@ -4,7 +4,6 @@
  */
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import SpResultsHeader from "./results/sp-results-header.vue";
 import SpResultsPrompt from "./results/sp-results-prompt.vue";
 import SpResultsError from "./results/sp-results-error.vue";
 import SpResultsNone from "./results/sp-results-none.vue";
@@ -43,7 +42,6 @@ window.Vue.onMounted(async () => {
     <div class="c-search-page">
         <sp-filters class="c-search-page__filters" />
         <div class="c-search-page__results l-flex-col l-gap-m">
-            <sp-results-header />
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
             <loading-table v-else-if="searchStore.isSearching" />
             <sp-results-error v-else-if="searchStore.hasLoadError" />
