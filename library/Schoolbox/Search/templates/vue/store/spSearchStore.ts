@@ -64,15 +64,6 @@ export const useSearchStore = defineStore("spSearch", () => {
     }
 
     /**
-     * clear the current search
-     */
-    function clear() {
-        isSearching.value = false;
-        useQueryStore().clear();
-        useResultsStore().clear();
-    }
-
-    /**
      * clear the filters and search
      */
     async function clearFiltersAndSearch() {
@@ -85,7 +76,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         isSearching,
         hasLoadError,
         search,
-        clear,
         clearFiltersAndSearch,
         searchError,
     };
