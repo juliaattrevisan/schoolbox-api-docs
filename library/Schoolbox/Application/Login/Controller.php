@@ -12,7 +12,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception;
 use Schoolbox\Auth\Remember\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -91,22 +90,22 @@ class Controller extends Base
             return;
         }
 
-        // Is OIDC enabled and switched on by default?
-        // If so, redirect there.
-        // (Reuse the ?samlAuth query string var for now for bypass?)
-        if (
-            ($config->get(ConfigMapper::NAME_OAUTH_ENABLE_SSO) || $this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_WHITELIST))
-            && $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
-            && $samlAuth !== '0'
-            && (!$this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_BLACKLIST) || $samlAuth === '1')
-        ) {
-            $redirectUrl = new Uri($this->routeGenerator->generate('loginOidc.getAuthorization'));
-            if ($pageUri && $pageUri->isAbsolutePath()) {
-                $redirectUrl = $redirectUrl->appendQueryParameters(['redirect' => $pageUri->__toString()]);
-            }
-            $this->response = $this->redirectSeeOther($redirectUrl->__toString());
-            return;
-        }
+//        // Is OIDC enabled and switched on by default?
+//        // If so, redirect there.
+//        // (Reuse the ?samlAuth query string var for now for bypass?)
+//        if (
+//            ($config->get(ConfigMapper::NAME_OAUTH_ENABLE_SSO) || $this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_WHITELIST))
+//            && $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+//            && $samlAuth !== '0'
+//            && (!$this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_BLACKLIST) || $samlAuth === '1')
+//        ) {
+//            $redirectUrl = new Uri($this->routeGenerator->generate('loginOidc.getAuthorization'));
+//            if ($pageUri && $pageUri->isAbsolutePath()) {
+//                $redirectUrl = $redirectUrl->appendQueryParameters(['redirect' => $pageUri->__toString()]);
+//            }
+//            $this->response = $this->redirectSeeOther($redirectUrl->__toString());
+//            return;
+//        }
 
         $getParams = ['samlAuth' => $samlAuth, 'page' => $page,];
         $data['requestParams'] = http_build_query($getParams);
