@@ -97,6 +97,37 @@ $app = new class extends CliTool\App {
             'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
             'summative_report'  => 'SELECT count(*) FROM summative_report WHERE deleted_at is null',
 
+            // Quiz info
+            'quiz_with_multiple_sections'   => 'SELECT COUNT(*) from (SELECT COUNT(*) AS numSections
+                                          FROM assess
+                                                   INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                                          where assess.deleted_at is null
+                                            and assess_section.deleted_at is null
+                                          GROUP BY assess.assess_id
+                                          having numSections > 1) as moreThan1;',
+            'quiz_questions_over_50'   => 'SELECT COUNT(*) from (select distinct count(*) as numQuestions
+                                          from assess
+                                                   inner join assess_section on assess.assess_id = assess_section.assess_id
+                                                   inner join assess_question on assess_section.section_id = assess_question.section_id
+                                          where assess.deleted_at is null
+                                            and assess_section.deleted_at is null
+                                            and assess_question.deleted_at is null
+                                          group by assess.assess_id
+                                          having numQuestions > 49) as numQuestions;',
+            'quiz_random_sections'      => '
+                                        select distinct count(*) as num
+                                        from assess
+                                        inner join assess_section on assess.assess_id = assess_section.assess_id
+                                        where random != 0
+                                        and assess.deleted_at is null
+                                        and assess_section.deleted_at is null',
+            'quiz_sections'     => '
+                                    select count(*) as num
+                                    from assess
+                                    inner join assess_section on assess.assess_id = assess_section.assess_id
+                                    and assess.deleted_at is null
+                                    and assess_section.deleted_at is null',
+
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
             'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE deleted = "false"',
