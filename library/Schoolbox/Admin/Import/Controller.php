@@ -25,6 +25,7 @@ use Predis\ClientInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -73,6 +74,7 @@ class Controller extends ConfigController
      * @param ConfigMapper                       $configMapper
      * @param FieldStrategyFactory               $fieldStrategyFactory
      * @param Rebuilder                          $rebuilder
+     * @param CacheInterface                     $oidcCache
      * @param Mapper                             $importLogMapper
      * @param ClientInterface                    $redisStorage
      * @param \Schoolbox\External\Event\Mapper   $eventMapper
@@ -83,13 +85,14 @@ class Controller extends ConfigController
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
         protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
 
 

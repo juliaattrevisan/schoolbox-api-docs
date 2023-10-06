@@ -16,6 +16,7 @@ use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Application\Exception\Exception;
@@ -143,9 +144,10 @@ class Controller extends ConfigController
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
         private \Schoolbox\External\User $externalUser,
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
 
 

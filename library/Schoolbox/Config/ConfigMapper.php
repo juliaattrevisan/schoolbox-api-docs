@@ -322,6 +322,19 @@ class ConfigMapper extends Mapper
     ];
 
     /**
+     * Config settings which affect the oAuth/OIDC provider.
+     *
+     * If any of these settings change: invalidate the OIDC cache.
+     */
+    public const SETTINGS_AFFECTING_OAUTH = [
+        self::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER,
+        self::_CLOUDWORK_OAUTH_CLIENT_ID,
+        self::_CLOUDWORK_OAUTH_CLIENT_SECRET,
+        self::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS,
+        self::NAME_OAUTH_ISSUER,
+    ];
+
+    /**
      * @throws \InvalidArgumentException
      */
     protected function mapping(): void

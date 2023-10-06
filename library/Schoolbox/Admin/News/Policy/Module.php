@@ -69,6 +69,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
+            $this->injector->get('oidc.cache'),
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(Topic\Mapper::class),
         );

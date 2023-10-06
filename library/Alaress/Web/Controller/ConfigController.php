@@ -12,6 +12,7 @@ namespace Alaress\Web\Controller;
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Closure;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\Config;
@@ -41,11 +42,13 @@ abstract class ConfigController extends Base
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
      * @param Rebuilder            $rebuilder
+     * @param CacheInterface       $oidcCache            OIDC settings cache: invalidate on OIDC settings change
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
-        Rebuilder $rebuilder
+        Rebuilder $rebuilder,
+        private CacheInterface $oidcCache,
     ) {
         $this->configMapper         = $configMapper;
         $this->fieldStrategyFactory = $fieldStrategyFactory;
@@ -112,6 +115,8 @@ abstract class ConfigController extends Base
                 $rebuildModules = $rebuildModules || in_array($name, ConfigMapper::SETTINGS_AFFECTING_MODULES);
             }
         }
+
+        // TODO if this is in
 
         if ($rebuildModules) {
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
