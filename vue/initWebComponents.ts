@@ -5,7 +5,6 @@
  */
 
 import SbxActionsDropdown from "@schoolboxVue/components/dropdown/sbx-actions-dropdown.ce.vue";
-import SbxFiltersDropdown from "@schoolboxVue/components/dropdown/sbx-filters-dropdown.ce.vue";
 
 /**
  * Register all web components here
@@ -13,8 +12,6 @@ import SbxFiltersDropdown from "@schoolboxVue/components/dropdown/sbx-filters-dr
 export function register() {
     const SbxActionsDropdownCE = window.Vue.defineCustomElement(SbxActionsDropdown);
     window.customElements.define("sbx-actions-dropdown", SbxActionsDropdownCE);
-    const SbxFiltersDropdownCE = window.Vue.defineCustomElement(SbxFiltersDropdown);
-    window.customElements.define("sbx-filters-dropdown", SbxFiltersDropdownCE);
 }
 
 register();
