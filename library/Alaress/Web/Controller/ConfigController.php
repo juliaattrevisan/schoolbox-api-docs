@@ -48,7 +48,7 @@ abstract class ConfigController extends Base
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
-        private CacheInterface $oidcCache,
+        protected CacheInterface $oidcCache,
     ) {
         $this->configMapper         = $configMapper;
         $this->fieldStrategyFactory = $fieldStrategyFactory;
