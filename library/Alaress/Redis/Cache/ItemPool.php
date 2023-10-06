@@ -34,6 +34,15 @@ use Psr\Cache\CacheItemPoolInterface;
 class ItemPool implements CacheItemPoolInterface
 {
     /**
+     * The set key for this cache: keys are written to this set so that they
+     * may be cleared efficiently.
+     *
+     * This may not be used as the cache key, as Redis can't store a value and
+     * set in the one key.
+     */
+    private const SET_KEY = '__set';
+
+    /**
      * Redis client
      */
     private ClientInterface $redis;
@@ -205,6 +214,8 @@ class ItemPool implements CacheItemPoolInterface
             }
         }
 
+        // Put this in the key set, so it can be cleared later
+        $this->redis->sadd($this->keyGenerator->generateKey(self::SET_KEY), [$key]);
         if (isset($ttl)) {
             $result = $this->redis->setex($key, $ttl, $cached);
         } else {
@@ -253,6 +264,9 @@ class ItemPool implements CacheItemPoolInterface
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be a string: received %s', gettype($key)));
+        }
+        if ($key === self::SET_KEY) {
+            throw new InvalidArgumentException(sprintf('Cache key "%s" is reserved and may not be used', $key));
         }
     }
 //
