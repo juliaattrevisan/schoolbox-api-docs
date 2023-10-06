@@ -53,6 +53,7 @@ export const useSearchStore = defineStore("spSearch", () => {
      */
     async function search() {
         setActive();
+        useResultsStore().clear();
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
         await execute();
