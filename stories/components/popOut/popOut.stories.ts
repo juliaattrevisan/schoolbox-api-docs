@@ -16,7 +16,7 @@ const meta: Meta<typeof SbxPopOut> = {
             `,
         }),
     ],
-    title: "Components/Dropdowns/Actions Dropdown",
+    title: "Components/Pop Out",
 };
 export default meta;
 type Story = StoryObj<typeof SbxPopOut>;

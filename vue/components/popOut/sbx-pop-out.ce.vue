@@ -19,11 +19,13 @@ interface Props {
      */
     isDisabled?: boolean;
     /**
-     * Whether the button should be full width
+     * Whether the button should be full width, strecthing to the width of the parent container
+     * with the linked content also matching the width of the button
      */
     isFullWidth?: boolean;
     /**
-     * Whether to use an arrow icon instead of the default icon
+     * Whether to use an arrow icon instead of the default icon, which will switch the icon rotation
+     * depending on whether the button is opened or closed
      */
     isArrowIcon?: boolean;
 }
@@ -100,5 +102,5 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
 // This means that we cannot use the global styles to style the component
 // It looks like the ability to opt out of the shadow DOM is hopefully coming soon however
 @import "../../../www/static/css/core/ui/button/_c-button.scss";
-@import "../../../www/static/css/core/components/dropdowns/_actions-dropdown.scss";
+@import "../../../www/static/css/core/components/pop-out/_pop-out.scss";
 </style>
