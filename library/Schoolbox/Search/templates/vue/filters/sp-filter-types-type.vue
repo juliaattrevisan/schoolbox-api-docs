@@ -132,7 +132,6 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
 <style scoped>
 .sub-types {
     display: grid;
-    /* grid-template-rows: v-bind(subTypeHeight); */
     transition: grid-template-rows 300ms;
 }
 .sub-types ul {

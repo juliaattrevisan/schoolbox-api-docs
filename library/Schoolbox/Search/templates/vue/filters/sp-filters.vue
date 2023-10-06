@@ -14,7 +14,7 @@ import { useQueryStore } from "../store/spQueryStore";
 const filtersStore = useFiltersStore();
 const searchStore = useSearchStore();
 const queryStore = useQueryStore();
-const isOpen = window.Vue.ref(false); // whether the filters are shown
+const isOpen = window.Vue.ref(true); // whether the filters are shown
 
 /**
  * Whenever the input is updated, update the query store
@@ -23,6 +23,29 @@ const isOpen = window.Vue.ref(false); // whether the filters are shown
 function onInput(value: string) {
     queryStore.query = value;
 }
+
+/**
+ * To show/hide the filters when selected
+ */
+function onToggleSelected() {
+    isOpen.value = !isOpen.value;
+}
+
+/**
+ * To show/hide the filters container
+ * @returns {string} - the height of the sub types container
+ */
+const containerHeight = window.Vue.computed(() => {
+    return isOpen.value ? "1fr" : "0fr";
+});
+
+/**
+ * To update the title of the button
+ * @returns {string} - the title of the button
+ */
+const titleText = window.Vue.computed(() => {
+    return isOpen.value ? "Hide Filters" : "Show Filters";
+});
 
 /**
  * apply the selected filters with the current search query
@@ -49,7 +72,7 @@ function onClearAllSelected() {
         aria-label="Sitewide"
         @submit.prevent="onSearch"
     >
-        <div class="c-filters">
+        <div class="c-island l-pad-m">
             <sp-filter-search-term
                 :initial-input="queryStore.query"
                 :is-active-when-empty="true"
@@ -58,23 +81,41 @@ function onClearAllSelected() {
                 @click="onSearch"
             />
         </div>
-        <div class="c-filters l-flex-col l-gap-m">
-            <button class="c-filters__toggle-button icon-up-arrow">Hide Filters</button>
-            <sp-filter-date-range />
-            <sp-filter-creator />
-            <sp-filter-types />
-            <div class="l-flex-col l-gap-s">
-                <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
-                <button class="full-width submit" @click.prevent="onSearch">Apply filters and search</button>
+        <div class="c-island c-filters l-flex-col l-gap-m l-pad-m">
+            <button
+                :class="`c-filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                @click.prevent="onToggleSelected"
+            >
+                {{ titleText }}
+            </button>
+            <div class="c-filters__container" :style="{ 'grid-template-rows': containerHeight }">
+                <div class="c-filters__inner-container">
+                    <sp-filter-date-range />
+                    <sp-filter-creator />
+                    <sp-filter-types />
+                    <div class="l-flex-col l-gap-s">
+                        <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
+                        <button class="full-width submit" @click.prevent="onSearch">Apply filters and search</button>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
 </template>
 
 <style lang="scss" scoped>
-.c-filters {
+.c-island {
     background-color: var(--foreground-colour);
-    padding: var(--spacing-m);
+}
+.c-filters {
+    &__container {
+        display: grid;
+        transition: grid-template-rows 300ms;
+    }
+
+    &__inner-container {
+        overflow: hidden;
+    }
 
     &__toggle-button {
         background: none;
