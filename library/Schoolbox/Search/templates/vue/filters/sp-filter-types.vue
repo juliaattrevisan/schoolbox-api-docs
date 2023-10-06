@@ -34,7 +34,7 @@ const expandButtonText = window.Vue.computed(() => {
             >
                 {{ expandButtonText }}
             </button>
-            <ul class="option-list t-no-list-style l-flex-col l-gap-xs f-no-margins">
+            <ul class="option-list t-no-list-style l-flex-col f-no-margins">
                 <sp-filter-types-type
                     v-for="typeItem in filterTypesStore.allTypes"
                     :key="typeItem.value"
@@ -48,6 +48,8 @@ const expandButtonText = window.Vue.computed(() => {
 <style scoped>
 .checklist {
     border: 1px solid var(--form-border-color);
+    max-height: 300px;
+    overflow-y: scroll;
 }
 .option-list {
     padding: var(--spacing-s);
