@@ -75,7 +75,7 @@ class Controller extends Base
 
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
-        // (unless ?samlLogin=0 is set)
+        // (unless ?samlAuth=0 is set)
         // (or the users IP exists in the blacklist
         if (
             ($config->get('saml_enabled') || $this->samlForce())
@@ -92,11 +92,13 @@ class Controller extends Base
         }
 
         // Is OIDC enabled and switched on by default?
-        // If so, redirect there
-        // TODO copy whitelist/blacklist from SAML
+        // If so, redirect there.
+        // (Reuse the ?samlAuth query string var for now for bypass?)
         if (
-            $config->get(ConfigMapper::NAME_OAUTH_ENABLE_SSO)
+            ($config->get(ConfigMapper::NAME_OAUTH_ENABLE_SSO) || $this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_WHITELIST))
             && $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+            && $samlAuth !== '0'
+            && (!$this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_BLACKLIST) || $samlAuth === '1')
         ) {
             $redirectUrl = new Uri($this->routeGenerator->generate('loginOidc.getAuthorization'));
             if ($pageUri && $pageUri->isAbsolutePath()) {
@@ -247,8 +249,7 @@ class Controller extends Base
      */
     private function samlBlacklist(): bool
     {
-        $ipBlacklist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_blacklist')));
-        return IpUtils::checkIp(Session::getIP(), $ipBlacklist);
+        return $this->ipMatches('saml_ip_blacklist');
     }
 
     /**
@@ -257,7 +258,18 @@ class Controller extends Base
      */
     private function samlForce(): bool
     {
-        $ipWhitelist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_whitelist')));
-        return IpUtils::checkIp(Session::getIP(), $ipWhitelist);
+        return $this->ipMatches('saml_ip_whitelist');
+    }
+
+    /**
+     * Does this user's IP address exist in the config?
+     *
+     * @param string $config
+     * @return bool
+     */
+    private function ipMatches(string $config): bool
+    {
+        $ipList = array_map('trim', explode(',', $this->getConfigLoader()->get($config)));
+        return IpUtils::checkIp(Session::getIP(), $ipList);
     }
 }
