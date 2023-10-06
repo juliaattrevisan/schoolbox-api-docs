@@ -157,12 +157,10 @@ class Hydrator extends BaseHydrator
             $params['filterFromDate'] = $filter->fromDate->getDatabase();
         }
         if ($filter->toDate) {
-            // The `modified` field is used here because it is used in Forum/QueryParamBuilder->buildDateExpression();
             $whereParts[]           = "$datePart <= :filterToDate";
             $params['filterToDate'] = $filter->toDate->getDatabase();
         }
         if ($filter->creator) {
-            // The `userID` field is used here because it is used in Forum/QueryParamBuilder->buildCreatorExpression();
             $whereParts[]            = "$creatorPart = :filterCreator";
             $params['filterCreator'] = $filter->creator->getId();
         }
