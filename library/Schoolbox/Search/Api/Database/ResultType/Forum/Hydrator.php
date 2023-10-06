@@ -142,7 +142,7 @@ class Hydrator extends BaseHydrator
      * @param SearchFilter\DataObject $filter
      * @return array
      */
-    function getNumberOfMatchingPostsIndexedByThreadId(array $threadIds, string $keyword, SearchFilter\DataObject $filter): array
+    private function getNumberOfMatchingPostsIndexedByThreadId(array $threadIds, string $keyword, SearchFilter\DataObject $filter): array
     {
         // The $whereParts added here are the same as those added in BaseQueryParamBuilder->buildMatchQueryParams().
         $whereParts = [];
