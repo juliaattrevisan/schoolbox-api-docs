@@ -131,6 +131,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $assessables;
 
     /**
+     * used for sequencing / ordering folders on the summative report
+     */
+    private null|int $order = null;
+
+    /**
      * Does this category have a homepage?
      *
      * @return bool
@@ -726,5 +731,25 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function getLocationTitle(): string
     {
         return $this->getTitle();
+    }
+
+    /**
+     * Get the order for the summative report
+     * @returns null|int
+     */
+    public function getOrder(): null|int
+    {
+        return $this->order;
+    }
+
+    /**
+     * Sets the order for the summative report
+     * @param null|int
+     * @returns self
+     */
+    public function setOrder(null|int $order): self
+    {
+        $this->order = $order;
+        return $this;
     }
 }

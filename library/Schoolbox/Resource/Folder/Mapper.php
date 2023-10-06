@@ -116,6 +116,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $this->uses('colour', self::TYPE_COLOR);
 
+        // used for sequencing / ordering folders on the summative report
+        $this->uses('order', self::TYPE_INTEGER);
+
         // Joins:
         $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'coverImage', 'coverImage');
 
