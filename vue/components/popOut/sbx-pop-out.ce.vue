@@ -34,9 +34,9 @@ const props = defineProps<Props>();
 const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
 const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
-    "Actions Dropdown",
+    props.buttonText ? props.buttonText : "Actions",
     props.contentId,
-    "bottom-start",
+    "bottom-end",
     props.isFullWidth
 );
 </script>
@@ -62,6 +62,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     >
         <!-- when an alternative icon should be used -->
         <span v-if="buttonText">{{ buttonText }}</span>
+        <!-- To use the arrow icon -->
         <template v-if="isArrowIcon">
             <svg
                 version="1.2"
