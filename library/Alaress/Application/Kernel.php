@@ -10,6 +10,7 @@ namespace Alaress\Application;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
+use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
@@ -37,6 +38,7 @@ use Aura\Di;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouterContainer;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
@@ -1959,6 +1961,23 @@ abstract class Kernel
             })
         );
 
+        // OIDC things which aren't related to LTI
+        // This is the cache for the response from the OIDC discovery and JWKS
+        // requests.
+        $di->set(
+            'oidc.cache',
+            $di->lazy(
+                function () use ($di) {
+                    return new SimpleCacheBridge(
+                        new ItemPool(
+                            $di->get('redis.cache'),
+                            new Base64(),
+                            new KeyGenerator('oidc', INSTANCE_ID),
+                        )
+                    );
+                }
+            )
+        );
 
         // Filesystems
         $di->set(

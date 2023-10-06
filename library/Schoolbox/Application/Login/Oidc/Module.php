@@ -41,14 +41,10 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        $codec = new Base64();
-        $cache = new SimpleCacheBridge(
-            new ItemPool(
-                $this->injector->get('redis.cache'),
-                $codec,
-                new KeyGenerator('oidc', INSTANCE_ID),
-            )
+        return new Controller(
+            $this->injector->get('httpClient'),
+            new Base64(),
+            $this->injector->get('oidc.cache'),
         );
-        return new Controller($this->injector->get('httpClient'), $codec, $cache);
     }
 }
