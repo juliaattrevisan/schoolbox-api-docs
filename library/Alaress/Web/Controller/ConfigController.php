@@ -99,6 +99,7 @@ abstract class ConfigController extends Base
         /** @var GenericCollection|Config[] $existingConfigs */
         $existingConfigs = $this->configMapper->findByPredicates($pb)->indexBy(ConfigMapper::COL_NAME);
 
+        $clearOidcCache = false;
         $rebuildModules = false;
         foreach ($post as $name => $value) {
             if (!$existingConfigs->keyExists($name)) {
@@ -113,14 +114,17 @@ abstract class ConfigController extends Base
                 $existingConfig->setValue($newValue);
                 $this->configMapper->save($existingConfig);
                 $rebuildModules = $rebuildModules || in_array($name, ConfigMapper::SETTINGS_AFFECTING_MODULES);
+                $clearOidcCache = $clearOidcCache || in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH);
             }
         }
-
-        // TODO if this is in
 
         if ($rebuildModules) {
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             $this->response              = $this->responseEmpty();
+        }
+
+        if ($clearOidcCache) {
+            $this->oidcCache->clear();
         }
     }
 
