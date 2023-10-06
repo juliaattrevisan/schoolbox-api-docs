@@ -15,6 +15,30 @@ const filtersStore = useFiltersStore();
 const searchStore = useSearchStore();
 const queryStore = useQueryStore();
 const isOpen = window.Vue.ref(true); // whether the filters are shown
+const hideFilters = window.Vue.ref(false); // whether the filters are shown
+
+/**
+ *
+ */
+function checkContainerWidth() {
+    const container = document.getElementById("container") as HTMLElement;
+    hideFilters.value = container.getBoundingClientRect().width < 900;
+}
+
+/**
+ *
+ */
+function initResizeObserver() {
+    const resizeObserver = new ResizeObserver(() => checkContainerWidth());
+    resizeObserver.observe(document.getElementById("container") as HTMLElement);
+}
+
+/**
+ *
+ */
+window.Vue.onMounted(() => {
+    initResizeObserver();
+});
 
 /**
  * Whenever the input is updated, update the query store
@@ -82,12 +106,12 @@ function onClearAllSelected() {
             />
         </div>
         <div class="c-island c-filters l-flex-col l-gap-m l-pad-m">
-            <button
+            <!-- <button
                 :class="`c-filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 @click.prevent="onToggleSelected"
             >
                 {{ titleText }}
-            </button>
+            </button> -->
             <div class="c-filters__container" :style="{ 'grid-template-rows': containerHeight }">
                 <div class="c-filters__inner-container l-flex-col l-gap-m">
                     <sp-filter-date-range />
