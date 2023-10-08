@@ -117,9 +117,13 @@ function onClearAllSelected() {
                     <sp-filter-date-range />
                     <sp-filter-creator />
                     <sp-filter-types />
-                    <div class="l-flex-col l-gap-s">
-                        <button class="full-width" @click.prevent="onClearAllSelected">Clear all filters</button>
-                        <button class="full-width submit" @click.prevent="onSearch">Apply filters and search</button>
+                    <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                        <button class="button l-flex__item--1 icon-close" @click.prevent="onClearAllSelected">
+                            Clear filters
+                        </button>
+                        <button class="button submit l-flex__item--1 icon-search" @click.prevent="onSearch">
+                            Search
+                        </button>
                     </div>
                 </div>
             </div>

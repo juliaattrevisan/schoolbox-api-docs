@@ -65,14 +65,4 @@ window.Vue.onMounted(async () => {
         grid-area: results;
     }
 }
-
-@container (max-width: 700px) {
-    .c-search-page {
-        grid-template-areas:
-            "filters"
-            "results";
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr;
-    }
-}
 </style>
