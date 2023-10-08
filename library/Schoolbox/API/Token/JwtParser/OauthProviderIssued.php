@@ -12,7 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
 use Psr\SimpleCache\CacheInterface;
-use Schoolbox\Application\Login\Oidc\Cache;
+use Schoolbox\Oidc\CacheHelper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Uri;
@@ -81,7 +81,7 @@ class OauthProviderIssued extends Base
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
         $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
 
-        $cache = new Cache($this->httpClient, $this->oidcCache);
+        $cache = new CacheHelper($this->httpClient, $this->oidcCache);
         $jwks  = $cache->retrieveJsonWebKeySet(new Uri($oauthIdp));
 
         // Verify the JWT

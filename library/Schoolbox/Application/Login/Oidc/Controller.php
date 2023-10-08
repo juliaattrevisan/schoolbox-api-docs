@@ -25,6 +25,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
+use Schoolbox\Oidc\CacheHelper;
 use Schoolbox\Url\Factory;
 use Schoolbox\Url\Uri;
 
@@ -196,7 +197,7 @@ class Controller extends Base
         // implements this, but it is not yet merged.
         // For now I will fetch the configuration manually, caching the response
         // if possible.
-        $oidcCache = new Cache($this->httpClient, $this->cache);
+        $oidcCache = new CacheHelper($this->httpClient, $this->cache);
         try {
             $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIdentityProviderUri);
             $jwks       = $oidcCache->retrieveJsonWebKeySet($oauthIdentityProviderUri);

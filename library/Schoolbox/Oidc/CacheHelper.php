@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Application\Login\Oidc;
+namespace Schoolbox\Oidc;
 
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -18,7 +18,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 /**
  * Helper for caching OIDC config and JWKS.
  */
-class Cache
+class CacheHelper
 {
     /**
      * Default: cache config from OIDC discovery URI response for 24 hours.
