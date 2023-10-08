@@ -62,7 +62,7 @@ class Hydrator extends BaseHydrator
             return [];
         }
 
-        // Get componentConfigInstanceId indexed by textboxId.
+        // Get componentInstanceId indexed by textboxId.
         $db = $this->textboxMapper->getDatabase();
         $componentInstanceIdByTextboxId = $db->executeQuery(
             'SELECT value AS textbox_id, component_instance_id
