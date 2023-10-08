@@ -45,7 +45,12 @@ class LessonPlanCest
      */
     public function beforeSuite(AcceptanceTester $i): void
     {
-        $i->amGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
+        $i->amGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
+        $i->updateInDatabase('lesson_plan_template_field', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Field%"]);
+        $i->updateInDatabase('lesson_plan_template', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Template%"]);
+        $i->updateInDatabase('lesson_plan_field', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Field%"]);
+        $lessonPlanId = $i->grabFromDatabase('lesson_plan_template', 'id', ['title like' => "Automation Template to create%"]);
+        $i->updateInDatabase('lesson_plan', ['deleted_at' => "2022-01-15 11:22:34"], ['lesson_plan_template_id' => $lessonPlanId]);
         $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Test Class Homepage Lesson Plan%"]);
     }
 
@@ -86,6 +91,10 @@ class LessonPlanCest
         $common->clickSubmitButton();
         $createLessonPlan->typeTitle($lessonPlanName);
         $createLessonPlan->clickCreateButton();
+        //this if-clause is due to issue SA-16429
+        while ($i->tryToSeeElement('input[value="Working..."]')) {
+            $i->wait(3);
+        }
         $i->amGoingTo('check if the lesson plan is presented');
         $i->canSee('Modify Course');
         $i->canSee($lessonPlanName);
