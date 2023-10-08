@@ -93,6 +93,12 @@ class Hydrator extends BaseHydrator
                 // Find component_instance_id for use in URL fragment.
                 $componentInstanceId = $componentInstanceIdByTextboxId[$textbox->getId()] ?? null;
 
+                // If component_instance_id is null, that means the textbox is not currently used in any component.
+                // Only show textboxes not currently used in any component to users with write access.
+                if ($componentInstanceId === null && $textboxAccess < UserAccess::ACCESS_WRITE) {
+                    return null;
+                }
+
                 $textboxBody = (new ToText($textbox->getBody()))->getText();
                 return new FullResult(
                     $match,
