@@ -65,6 +65,7 @@ class Hydrator extends BaseHydrator
         // Get componentInstanceId indexed by textboxId.
         $db = $this->textboxMapper->getDatabase();
         $componentInstanceIdByTextboxId = $db->executeQuery(
+            # TODO: Use constant value instead of hard-coding string "textbox".
             'SELECT value AS textbox_id, component_instance_id
             FROM component_config_instance cci
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
@@ -72,12 +73,24 @@ class Hydrator extends BaseHydrator
             AND value IN (' . implode(',', array_map('intval', $textboxIds)) . ')'
         )->fetchColumnArray('component_instance_id', 'textbox_id');
 
+
+        // Get component_config_definition 'collapse' value by componentInstanceId.
+        // This will tell us for each component, whether the component is in the collapsed state.
+        $collapseValueByComponentInstanceId = $db->executeQuery(
+            # TODO: Use constant value instead of hard-coding string "collapse".
+            'SELECT component_instance_id, value AS collapse_value
+            FROM component_config_instance cci
+            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            WHERE ccd.key="collapse"
+            AND cci.component_instance_id IN (' . implode(',', array_map('intval', array_values($componentInstanceIdByTextboxId))) . ')'
+        )->fetchColumnArray('collapse_value', 'component_instance_id');
+
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentInstanceIdByTextboxId) {
+            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentInstanceIdByTextboxId, $collapseValueByComponentInstanceId) {
                 $textbox = $textboxes->getBy('id', $match->id);
 
                 if (!($textbox instanceof TextboxModel)) {
@@ -94,8 +107,14 @@ class Hydrator extends BaseHydrator
                 $componentInstanceId = $componentInstanceIdByTextboxId[$textbox->getId()] ?? null;
 
                 // If component_instance_id is null, that means the textbox is not currently used in any component.
-                // Only show textboxes not currently used in any component to users with write access.
+                // Textboxes not currently used in any component should be shown only to users with write access.
                 if ($componentInstanceId === null && $textboxAccess < UserAccess::ACCESS_WRITE) {
+                    return null;
+                }
+
+                // If collapseValue is null, that means the textbox component is collapsed.
+                // Textboxes in the collapsed state should be shown only to users with write access.
+                if (boolval($collapseValueByComponentInstanceId[$componentInstanceId]) === true && $textboxAccess < UserAccess::ACCESS_WRITE) {
                     return null;
                 }
 
