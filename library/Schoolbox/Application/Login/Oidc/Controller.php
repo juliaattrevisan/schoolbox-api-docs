@@ -18,6 +18,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use OpenIDConnectClient\OpenIDConnectProvider;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
@@ -185,13 +186,14 @@ class Controller extends Base
      * @throws GuzzleException                          if the request to either the OIDC provider's discovery or JWKS
      *                                                  URIs failed
      * @throws RouteNotFound                            if somehow the route to the redirect URI wasn't found?
+     * @throws ClientExceptionInterface                 if the OIDC config or JWKS couldn't be retrieved
      */
     private function buildOidcProvider(): OpenIDConnectProvider
     {
-        $config         = $this->getConfigLoader();
-        $oauthIssuerUri = new Uri($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER));
-        $clientId       = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
-        $clientSecret   = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_SECRET);
+        $config                   = $this->getConfigLoader();
+        $oauthIdentityProviderUri = new Uri($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER));
+        $clientId                 = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
+        $clientSecret             = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_SECRET);
 
         // Redirect URI: here, I suppose?
         $redirectUri = (new Factory($config))
@@ -204,36 +206,22 @@ class Controller extends Base
         // implements this, but it is not yet merged.
         // For now I will fetch the configuration manually, caching the response
         // if possible.
+        $oidcCache = new Cache($this->httpClient, $this->cache);
         try {
-            $oidcConfig = $this->cache->get('oidcConfig');
-            if (!isset($oidcConfig)) {
-                $oidcDiscoveryUri  = $oauthIssuerUri->withPath(
-                    $oauthIssuerUri->getPath() . '/.well-known/openid-configuration',
-                );
-                $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
-                $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
-                $this->cache->set('oidcConfig', $oidcConfig, self::OIDC_DISCOVERY_CACHE_TTL);
-            }
-
-            // Now, download and parse the public keys
-            $publicKey = $this->cache->get('publicKey');
-            if (!isset($publicKey)) {
-                $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
-                $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
-                $jwkConverter      = new JWKToPEM\JWKConverter();
-                $publicKey         = $jwkConverter->multipleToPEM($jwks['keys']);
-                $this->cache->set('publicKey', $publicKey, self::OIDC_PUBLIC_KEY_CACHE_TTL);
-            }
+            $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIdentityProviderUri);
+            $jwks       = $oidcCache->retrieveJsonWebKeySet($oauthIdentityProviderUri);
         } catch (InvalidArgumentException $e) {
             throw new SchoolboxException('Could not cache OIDC configuration or public key', 0, $e, 500);
         }
 
+        $jwkConverter = new JWKToPEM\JWKConverter();
+        $publicKey    = $jwkConverter->multipleToPEM($jwks['keys']);
         return new OpenIDConnectProvider(
             [
                 'clientId'                => $clientId,
                 'clientSecret'            => $clientSecret,
                 'redirectUri'             => $redirectUri->__toString(),
-                'idTokenIssuer'           => $oauthIssuerUri->__toString(),
+                'idTokenIssuer'           => $oauthIdentityProviderUri->__toString(),
                 'urlAuthorize'            => $oidcConfig['authorization_endpoint'],
                 'urlAccessToken'          => $oidcConfig['token_endpoint'],
                 'urlResourceOwnerDetails' => $oidcConfig['userinfo_endpoint'],
