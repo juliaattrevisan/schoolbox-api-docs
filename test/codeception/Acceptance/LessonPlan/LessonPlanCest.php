@@ -39,7 +39,7 @@ class LessonPlanCest
      */
 
     /**
-     * Soft deleting the homepage with certain name to not impact the tests
+     * Soft deleting data to not impact the tests
      *
      * @param AcceptanceTester $i
      */
@@ -49,8 +49,8 @@ class LessonPlanCest
         $i->updateInDatabase('lesson_plan_template_field', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Field%"]);
         $i->updateInDatabase('lesson_plan_template', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Template%"]);
         $i->updateInDatabase('lesson_plan_field', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Field%"]);
-        $lessonPlanId = $i->grabFromDatabase('lesson_plan_template', 'id', ['title like' => "Automation Template to create%"]);
-        $i->updateInDatabase('lesson_plan', ['deleted_at' => "2022-01-15 11:22:34"], ['lesson_plan_template_id' => $lessonPlanId]);
+        $i->updateInDatabase('lesson_plan', ['deleted_at' => "2022-01-15 11:22:34"], ['created_by' => '1']);
+        $i->updateInDatabase('assessment', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Lesson Plan Automation Test%"]);
         $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Test Class Homepage Lesson Plan%"]);
     }
 
