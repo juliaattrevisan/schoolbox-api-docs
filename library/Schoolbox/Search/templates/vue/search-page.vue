@@ -21,17 +21,30 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-// initialise the store
-useStore().init(props.endpoint, props.filterTypes);
+const store = useStore();
+store.init(props.endpoint, props.filterTypes); // initialise the store
 
 const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
+const searchPageEl = window.Vue.ref<HTMLDivElement>();
+
+/**
+ * Initialise the resize observer to check the width of the search page container
+ * This is done so the search page moves to single column at a certain breakpoint
+ */
+function initResizeObserver() {
+    const resizeObserver = new ResizeObserver(() => {
+        store.containerWidthChange((searchPageEl.value as HTMLDivElement).getBoundingClientRect().width);
+    });
+    resizeObserver.observe(searchPageEl.value as HTMLDivElement);
+}
 
 /**
  * start a search straight away if a keyword has been passed through
  */
 window.Vue.onMounted(async () => {
     const searchParams = new URLSearchParams(document.location.search);
+    initResizeObserver();
     if (searchParams.has(SEARCH_PARAM)) {
         await searchStore.search();
     }
@@ -39,7 +52,7 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div class="c-search-page">
+    <div ref="searchPageEl" :class="`c-search-page ${store.isSingleColumn ? 'c-search-page--single-column' : ''}`">
         <sp-filters class="c-search-page__filters" />
         <div class="c-search-page__results l-flex-col l-gap-m">
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
@@ -63,6 +76,12 @@ window.Vue.onMounted(async () => {
     }
     &__results {
         grid-area: results;
+    }
+    // is applied when the search page is in single column mode
+    &--single-column {
+        grid-template-areas: "filters" "results";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
     }
 }
 </style>
