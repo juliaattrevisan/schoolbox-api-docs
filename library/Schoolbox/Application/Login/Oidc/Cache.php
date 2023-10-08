@@ -21,14 +21,14 @@ use Psr\SimpleCache\InvalidArgumentException;
 class Cache
 {
     /**
-     * Cache config from OIDC discovery URI response for 24 hours.
+     * Default: cache config from OIDC discovery URI response for 24 hours.
      */
-    private const OIDC_CONFIC_CACHE_TTL = 86400;
+    private const OIDC_CONFIG_CACHE_DEFAULT_TTL = 86400;
 
     /**
-     * Cache JWKS URI response 1 hour.
+     * Default: cache JWKS URI response 1 hour.
      */
-    private const JWKS_CACHE_TTL = 3600;
+    private const JWKS_CACHE_DEFAULT_TTL = 3600;
 
     /**
      * Where to cache OIDC config?
@@ -43,11 +43,17 @@ class Cache
     /**
      * Constructor
      *
-     * @param Client         $httpClient for fetching OIDC discovery and JWKS URI responses
-     * @param CacheInterface $baseCache  for caching responses from those URIs
+     * @param Client         $httpClient         for fetching OIDC discovery and JWKS URI responses
+     * @param CacheInterface $baseCache          for caching responses from those URIs
+     * @param int            $oidcConfigCacheTtl If provided: override time OIDC config from discovery URI is cached for
+     * @param int            $jwksCacheTtl       If provided: override time JWKS is cached for
      */
-    public function __construct(private Client $httpClient, private CacheInterface $baseCache)
-    {
+    public function __construct(
+        private Client $httpClient,
+        private CacheInterface $baseCache,
+        private int $oidcConfigCacheTtl = self::OIDC_CONFIG_CACHE_DEFAULT_TTL,
+        private int $jwksCacheTtl = self::JWKS_CACHE_DEFAULT_TTL,
+    ) {
     }
 
     /**
@@ -71,7 +77,7 @@ class Cache
             );
             $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
             $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
-            $this->baseCache->set(self::OIDC_CONFIG_CACHE_KEY, $oidcConfig, self::OIDC_CONFIC_CACHE_TTL);
+            $this->baseCache->set(self::OIDC_CONFIG_CACHE_KEY, $oidcConfig, $this->oidcConfigCacheTtl);
         }
         return $oidcConfig;
     }
@@ -95,7 +101,7 @@ class Cache
         if (!isset($jwks)) {
             $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
             $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
-            $this->baseCache->set(self::JWKS_CACHE_KEY, $jwks, self::JWKS_CACHE_TTL);
+            $this->baseCache->set(self::JWKS_CACHE_KEY, $jwks, $this->jwksCacheTtl);
         }
         return $jwks;
     }
