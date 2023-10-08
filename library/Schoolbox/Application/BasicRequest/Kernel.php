@@ -14,6 +14,7 @@ use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
 use League\Flysystem\Filesystem;
 use Proxy\Server as ProxyServer;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
@@ -298,12 +299,14 @@ class Kernel extends WebKernelAbstract
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
                     $httpClient             = $di->get('httpClient');
+                    /** @var CacheInterface $oidcCache */
+                    $oidcCache              = $di->get('oidc.cache');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
                     return new JwtParser\Composite(
                         new JwtParser\OtherInstanceIssued($userMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
-                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
                         new JwtParser\InstanceRegistryIssued($userMapper, $config)
                     );
                 }

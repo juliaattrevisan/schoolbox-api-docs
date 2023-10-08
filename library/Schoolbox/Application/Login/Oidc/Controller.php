@@ -34,16 +34,6 @@ use Schoolbox\Url\Uri;
 class Controller extends Base
 {
     /**
-     * Cache OIDC discovery URL response for 24 hours.
-     */
-    private const OIDC_DISCOVERY_CACHE_TTL = 86400;
-
-    /**
-     * Cache public keys from OIDC provider for 1 hour.
-     */
-    private const OIDC_PUBLIC_KEY_CACHE_TTL = 3600;
-
-    /**
      * Constructor
      *
      * @param Client         $httpClient Required for querying discovery URL

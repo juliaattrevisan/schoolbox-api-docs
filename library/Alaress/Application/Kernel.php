@@ -58,6 +58,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis;
 use Proxy\Server as ProxyServer;
+use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
@@ -1849,12 +1850,14 @@ abstract class Kernel
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
                     $httpClient             = $di->get('httpClient');
+                    /** @var CacheInterface $oidcCache */
+                    $oidcCache              = $di->get('oidc.cache');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
                     return new JwtParser\Composite(
                         new JwtParser\OtherInstanceIssued($userMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
-                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
                         new JwtParser\InstanceRegistryIssued($userMapper, $config),
                     );
                 }

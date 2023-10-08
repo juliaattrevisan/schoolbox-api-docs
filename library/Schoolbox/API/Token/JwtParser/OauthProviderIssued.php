@@ -11,8 +11,11 @@ namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
+use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Application\Login\Oidc\Cache;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
@@ -31,14 +34,16 @@ class OauthProviderIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader $config     Standard configuration store.
-     * @param Client        $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     * @param UserMapper     $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader  $config     Standard configuration store.
+     * @param Client         $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     * @param CacheInterface $oidcCache  Required for caching discovery response and keys
      */
     public function __construct(
         private UserMapper $userMapper,
         private IConfigLoader $config,
         private Client $httpClient,
+        private CacheInterface $oidcCache,
     ) {
     }
 
@@ -76,12 +81,8 @@ class OauthProviderIssued extends Base
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
         $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
 
-        // TODO allow these to be configurable
-        $oidcConfigUri     = $oauthIdp . '/.well-known/openid-configuration';
-        $oidcConfigRequest = $this->httpClient->get($oidcConfigUri);
-        $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
-        $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
-        $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
+        $cache = new Cache($this->httpClient, $this->oidcCache);
+        $jwks  = $cache->retrieveJsonWebKeySet(new Uri($oauthIdp));
 
         // Verify the JWT
         $sessionLength = (int)$this->config->get('session_length');
