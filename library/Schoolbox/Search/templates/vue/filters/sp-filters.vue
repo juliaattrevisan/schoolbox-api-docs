@@ -7,15 +7,16 @@ import SpFilterSearchTerm from "./sp-filter-search-term.vue";
 import SpFilterDateRange from "./sp-filter-date-range.vue";
 import SpFilterCreator from "./sp-filter-creator.vue";
 import SpFilterTypes from "./sp-filter-types.vue";
+import { useStore } from "../store/searchPageStore";
 import { useFiltersStore } from "./store/spFiltersStore";
 import { useSearchStore } from "../store/spSearchStore";
 import { useQueryStore } from "../store/spQueryStore";
 
+const store = useStore();
 const filtersStore = useFiltersStore();
 const searchStore = useSearchStore();
 const queryStore = useQueryStore();
 const isOpen = window.Vue.ref(true); // whether the filters are shown
-const hideFilters = window.Vue.ref(false); // whether the filters are shown
 
 /**
  * Whenever the input is updated, update the query store
@@ -49,6 +50,13 @@ const titleText = window.Vue.computed(() => {
 });
 
 /**
+ * clear all the selected filters
+ */
+function onClearAllSelected() {
+    filtersStore.clear();
+}
+
+/**
  * apply the selected filters with the current search query
  */
 async function onSearch() {
@@ -59,11 +67,16 @@ async function onSearch() {
 }
 
 /**
- * clear all the selected filters
+ * Track the column state, to ensure the fitlers are shown when the page is resizied to above single column
  */
-function onClearAllSelected() {
-    filtersStore.clear();
-}
+window.Vue.watch(
+    () => store.isSingleColumn,
+    (newValue, oldValue) => {
+        if (newValue !== oldValue && newValue === false) {
+            isOpen.value = true;
+        }
+    }
+);
 </script>
 
 <template>
@@ -84,6 +97,7 @@ function onClearAllSelected() {
         </div>
         <div class="c-island c-filters l-flex-col l-gap-m l-pad-m">
             <button
+                v-if="store.isSingleColumn"
                 :class="`c-filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 @click.prevent="onToggleSelected"
             >

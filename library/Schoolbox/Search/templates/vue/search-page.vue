@@ -69,7 +69,7 @@ window.Vue.onMounted(async () => {
     display: grid;
     gap: var(--spacing-xl);
     grid-template-areas: "filters results";
-    grid-template-columns: 450px 1fr;
+    grid-template-columns: 400px 1fr;
     grid-template-rows: 1fr auto;
     &__filters {
         grid-area: filters;
@@ -79,6 +79,7 @@ window.Vue.onMounted(async () => {
     }
     // is applied when the search page is in single column mode
     &--single-column {
+        gap: var(--spacing-l);
         grid-template-areas: "filters" "results";
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;

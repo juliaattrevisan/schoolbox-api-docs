@@ -7,6 +7,8 @@ import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
 import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
 
+const SINGLE_COLUMN_BREAKPOINT = 800;
+
 export const useStore = defineStore("searchPage", () => {
     let endpoint = ""; // the endpoint to use for searching
 
@@ -48,8 +50,7 @@ export const useStore = defineStore("searchPage", () => {
      * @param {number} width - the width of the container
      */
     function containerWidthChange(width: number) {
-        isSingleColumn.value = width < 768;
-        console.warn(width);
+        isSingleColumn.value = width < SINGLE_COLUMN_BREAKPOINT;
     }
 
     return {
