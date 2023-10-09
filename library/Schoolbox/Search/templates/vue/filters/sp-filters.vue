@@ -74,7 +74,8 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * Track the column state, to ensure the fitlers are shown when the page is resizied to above single column
+ * Track the column state, to ensure the filters are shown when the page is resizied to above single column
+ * and hidden when resized to single column
  */
 window.Vue.watch(
     () => store.isSingleColumn,
