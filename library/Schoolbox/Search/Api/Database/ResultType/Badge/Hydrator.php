@@ -96,7 +96,32 @@ class Hydrator extends BaseHydrator
                         $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
                         $badge->getCreatedBy(),
                         [], // Context.  Empty since no linked folder.
-                        [], // Links.  None for badges.
+                        [
+                            [
+                                // TODO: Check permissions.
+                                'title' => 'Award Achievements',
+                                'icon' => 'icon-badge',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("") // TODO: Get URL.
+                                    ->__toString(),
+                            ],
+                            [
+                                // TODO: Check permissions.
+                                'title' => 'Modify Badge',
+                                'icon' => 'icon-modify',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("/learning/badge/{$badge->getId()}/update")
+                                    ->__toString(),
+                            ],
+                            [
+                                // TODO: Check permissions.
+                                'title' => 'Set Goal',
+                                'icon' => 'icon-goal',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("") // TODO: Get URL.
+                                    ->__toString(),
+                            ],
+                        ],
                     );
                 }
 
