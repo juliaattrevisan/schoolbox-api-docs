@@ -212,24 +212,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                     null,
                     [$textbox->getCategory(),], // Context: textbox's folder
-                    [
-                        [
-                            // TODO: Check permissions.
-                            'title' => 'Manage All Textboxes',
-                            'icon' => 'icon-textbox',
-                            'url' => $this->buildBaseUrl()
-                                ->withPath("/textbox/folder/{$textbox->getCategory()->getId()}")
-                                ->__toString(),
-                        ],
-                        [
-                            // TODO: Check permissions.
-                            'title' => 'Modify Textbox',
-                            'icon' => 'icon-modify',
-                            'url' => $this->buildBaseUrl()
-                                ->withPath("") // TODO: Get URL.
-                                ->__toString(),
-                        ],
-                    ],
+                    $this->getSearchResultLinksForTextboxes()
                 );
             }
         }
@@ -312,5 +295,39 @@ class Hydrator extends BaseHydrator
         }
 
         return $rowsByTextboxId;
+    }
+
+    /**
+     * @param User         $viewer
+     * @param TextboxModel $textbox
+     * @return array
+     */
+    private function getSearchResultLinksForTextboxes(User $viewer, TextboxModel $textbox): array
+    {
+        $links = [];
+
+        $textboxFolder = $textbox->getCategory();
+
+        if ($this->access->getFolderAccess($viewer, $textboxFolder->getId()) >= UserAccess::ACCESS_WRITE) {
+            $links[] = [
+                'title' => 'Manage All Textboxes',
+                'icon' => 'icon-textbox',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/textbox/folder/{$textboxFolder->getId()}")
+                    ->__toString(),
+            ];
+            $links[] = [
+                // This just links to the textbox not yet open for modification.
+                // To modify the user must click 'Modify' at the bottom of the textbox.
+                'title' => 'Modify Textbox',
+                'icon' => 'icon-modify',
+                'url' => $this->buildBaseUrl()
+                     ->withPath('/homepage/' . $textboxFolder->getId())
+                     ->withFragment('textbox' . $textbox->getId())
+                     ->__toString(),
+            ];
+        }
+
+        return $links;
     }
 }
