@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Factory
 {
-
     /**
      * The person to whom these imported events are relevant
      *
