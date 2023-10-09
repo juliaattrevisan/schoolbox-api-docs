@@ -74,56 +74,56 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($folders, $viewer, $keyword) {
                 $folder = $folders->getBy('id', $match->id);
-                if ($folder instanceof Folder\Model) {
-                    // Can the viewer even view this folder?
-                    if ($this->access->getFolderAccess($viewer, $folder->getId()) < UserAccess::ACCESS_READ) {
-                        return null;
-                    }
 
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $folder->getTitle(),
-                        '/homepage/' . $match->id,
-                        $match->type,
-                        $match->relevance,
-                        null,
-                        null,
-                        null,
-                        // Image: folder's image if there is one
-                        $folder->getCoverImage()
-                            ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
-                            : null,
-                        // Icon: dependent on folder type?
-                        match ($match->type) {
-                            self::BASE_TYPE . '.course'    => 'course',
-                            self::BASE_TYPE . '.unit'      => 'unit',
-                            self::BASE_TYPE . '.class'     => 'teacher',
-                            self::BASE_TYPE . '.homepage'  => 'home',
-                            default                        => 'folder',
-                        },
-                        null,
-                        null,
-                        $this->folderMapper->findParents($folder, null, true)->getAll(),
-                        [
-                            'subResults' => $this->buildBaseUrl()
-                                ->withPath(
-                                    $this->routeGenerator->generate(
-                                        'searchApi.getSearchWithinFolder',
-                                        [
-                                            'folder'   => $folder,
-                                            'folderId' => $folder->getId(),
-                                        ]
-                                    )
-                                )
-                                ->withQuery(http_build_query(['keyword' => $keyword]))
-                                ->__toString(),
-                        ],
-                    );
+                if (!($folder instanceof Folder\Model)) {
+                    return null;
                 }
 
-                // Nothing was here after all
-                return null;
+                // Can the viewer even view this folder?
+                if ($this->access->getFolderAccess($viewer, $folder->getId()) < UserAccess::ACCESS_READ) {
+                    return null;
+                }
+
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $folder->getTitle(),
+                    '/homepage/' . $match->id,
+                    $match->type,
+                    $match->relevance,
+                    null,
+                    null,
+                    null,
+                    // Image: folder's image if there is one
+                    $folder->getCoverImage()
+                        ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
+                        : null,
+                    // Icon: dependent on folder type?
+                    match ($match->type) {
+                        self::BASE_TYPE . '.course'    => 'course',
+                        self::BASE_TYPE . '.unit'      => 'unit',
+                        self::BASE_TYPE . '.class'     => 'teacher',
+                        self::BASE_TYPE . '.homepage'  => 'home',
+                        default                        => 'folder',
+                    },
+                    null,
+                    null,
+                    $this->folderMapper->findParents($folder, null, true)->getAll(),
+                    [
+                        'subResults' => $this->buildBaseUrl()
+                            ->withPath(
+                                $this->routeGenerator->generate(
+                                    'searchApi.getSearchWithinFolder',
+                                    [
+                                        'folder'   => $folder,
+                                        'folderId' => $folder->getId(),
+                                    ]
+                                )
+                            )
+                            ->withQuery(http_build_query(['keyword' => $keyword]))
+                            ->__toString(),
+                    ],
+                );
             },
             $acceptedMatches,
         );
