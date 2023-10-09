@@ -71,7 +71,7 @@ class Hydrator extends BaseHydrator
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             WHERE ccd.key=:componentKey
             AND value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
-            [TextboxMapper::HOMEPAGE_COMPONENT_KEY]
+            [':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY]
         )->fetchColumnArray('component_instance_id', 'textbox_id');
 
 
@@ -83,7 +83,7 @@ class Hydrator extends BaseHydrator
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             WHERE ccd.key=:collapse
             AND cci.component_instance_id IN (' . implode(',', array_map('intval', array_values($componentInstanceIdByTextboxId))) . ')',
-            ['collapse:' => Component_Config_Collapse::KEY]
+            [':collapse' => Component_Config_Collapse::KEY]
         )->fetchColumnArray('collapse_value', 'component_instance_id');
 
         // Find the matching textboxes.
