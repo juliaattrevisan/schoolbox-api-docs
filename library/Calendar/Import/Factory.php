@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Factory
 {
-
     /**
      * The person to whom these imported events are relevant
      *
@@ -98,7 +97,7 @@ class Factory
     /**
      * Spawn strategy
      *
-     * @return mixed
+     * @return Base
      */
     public function build()
     {
@@ -108,7 +107,16 @@ class Factory
             $classname = '\Calendar\Import\Vcal';
         }
 
-        return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getAccess(), $this->getFile(), $this->getSource());
+        return new $classname(
+            $this->getUser(),
+            $this->getAuthor(),
+            $this->getCategoryList(),
+            $this->getGroupList(),
+            $this->getCampusList(),
+            $this->getAccess(),
+            $this->getFile(),
+            $this->getSource(),
+        );
     }
 
     /* Getters/Setters
