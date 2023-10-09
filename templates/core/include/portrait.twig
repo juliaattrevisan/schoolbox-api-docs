@@ -72,13 +72,12 @@
     {% set userParameter = "userId=" ~ externalId %}
 {%  endif %}
 
-
 {# Set a default size parameter
  # Images using our transcode must come with a &size querystring param
  # Without it, you can't get any images. Use the usual constrain200
  # for profile pictures, for now
  #}
-{% set sizeParameter = 'constrain200' %}
+{% set sizeParameter = sizeParameter ~ 'constrain200' %}
 
 {% if render == "profile" %}
     {# handle 'profile' case separately because here we use a srcset. #}
