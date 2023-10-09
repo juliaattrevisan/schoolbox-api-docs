@@ -20,7 +20,9 @@ use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\CampusMapper;
 use Alaress_Date_Format;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Resource\Folder;
 
 class Csv extends Base
 {
@@ -35,6 +37,8 @@ class Csv extends Base
         $eventMapper = new EventMapper();
         $categoryRelationMapper = new CategoryMapper();
         $roleRelationMapper = new RoleMapper();
+        $folderMapper = Folder\Mapper::getInstance();
+        $folderCache  = [];
 
         // silence notifications
         $mockPropagator = new MockPropagator();
@@ -82,7 +86,7 @@ class Csv extends Base
                 $event_type,
                 $publish_date,
                 $attendance,
-                $categoryIds,
+                $folderIds,
             ] = $thisRow;
 
             /* Event name is mandatory
@@ -273,48 +277,62 @@ class Csv extends Base
                 $event->setPublishDateTime($publishDate);
             }
 
-            // Allow override of category relations only if no category list has
+            // Allow override of folder relations only if no folder list has
             // been set in the object
-            $categoryList = $this->categoryList;
-            if (empty($categoryList)) {
-                $categoryList = array_filter(
+            $folderList = $this->categoryList;
+            if (empty($folderList)) {
+                $folderList = array_filter(
                     array_map(
                         fn ($v) => intval(trim($v)),
-                        explode(',', $categoryIds),
+                        explode(',', $folderIds),
                     )
                 );
             }
-            if (!empty($categoryList)) {
+
+            // Check the folder ID actually exists
+            foreach ($folderList as $folderId) {
+                try {
+                    $folderCache[$folderId] ??= $folderMapper->findById($folderId);
+                } catch (MapperException) {
+                    $output[] = [
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => sprintf('Folder ID %d not found', $folderId),
+                    ];
+                    // Skip this entire CSV row
+                    continue 2;
+                }
+            }
+            if (!empty($folderList)) {
                 $event->setAccess(Event::ACCESS_GROUP);
             }
 
             /* Save it
              */
             $result = $eventMapper->save($event);
-
-            /* Assign Category relations
-             */
-            if ($event->isGroupLevel()) {
-                foreach ($categoryList as $currentCategory) {
-                    $category = new Category();
-                    $category->setEventId($event->getId());
-                    $category->setCategoryId($currentCategory);
-                    $categoryRelationMapper->save($category);
-                }
-            }
-
-            /* Assign Role relations
-             */
-            if ($event->isCampusLevel()) {
-                foreach ($this->getGroupList() as $currentRole) {
-                    $role = new Role();
-                    $role->setEventId($event->getId());
-                    $role->setRoleId($currentRole);
-                    $roleRelationMapper->save($role);
-                }
-            }
-
             if (is_array($result) && count($result)) {
+                /* Assign Category relations:
+                 * log what it was added to
+                 */
+                if ($event->isGroupLevel()) {
+                    foreach ($folderList as $folderId) {
+                        $category = new Category();
+                        $category->setEventId($event->getId());
+                        $category->setCategoryId($folderId);
+                        $categoryRelationMapper->save($category);
+                    }
+                }
+
+                /* Assign Role relations
+                 */
+                if ($event->isCampusLevel()) {
+                    foreach ($this->getGroupList() as $currentRole) {
+                        $role = new Role();
+                        $role->setEventId($event->getId());
+                        $role->setRoleId($currentRole);
+                        $roleRelationMapper->save($role);
+                    }
+                }
                 $output[] = array(
                     'name'   => $event->getTitle(),
                     'status' => 'Added',
@@ -327,7 +345,6 @@ class Csv extends Base
                     'error'  => 'Could not create event',
                 );
             }
-
 
             /* Free memory */
             unset($publish_date, $start, $finish);
