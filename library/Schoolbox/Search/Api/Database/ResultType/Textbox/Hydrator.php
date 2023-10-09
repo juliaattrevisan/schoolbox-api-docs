@@ -114,7 +114,8 @@ class Hydrator extends BaseHydrator
 
                 // If collapseValue is null, that means the textbox component is collapsed.
                 // Textboxes in the collapsed state should be shown only to users with write access.
-                if (boolval($collapseValueByComponentInstanceId[$componentInstanceId]) === true && $textboxAccess < UserAccess::ACCESS_WRITE) {
+                $componentIsCollapsed = boolval($collapseValueByComponentInstanceId[$componentInstanceId] ?? null);
+                if ($componentIsCollapsed === true && $textboxAccess < UserAccess::ACCESS_WRITE) {
                     return null;
                 }
 
