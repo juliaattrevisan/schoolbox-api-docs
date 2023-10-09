@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress\Html\ToText;
+use Component_Config_Collapse;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Textbox\Model as TextboxModel;
@@ -65,24 +66,24 @@ class Hydrator extends BaseHydrator
         // Get componentInstanceId indexed by textboxId.
         $db = $this->textboxMapper->getDatabase();
         $componentInstanceIdByTextboxId = $db->executeQuery(
-            # TODO: Use constant value instead of hard-coding string "textbox".
             'SELECT value AS textbox_id, component_instance_id
             FROM component_config_instance cci
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-            WHERE ccd.key="textbox"
-            AND value IN (' . implode(',', array_map('intval', $textboxIds)) . ')'
+            WHERE ccd.key=:componentKey
+            AND value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
+            [TextboxMapper::HOMEPAGE_COMPONENT_KEY]
         )->fetchColumnArray('component_instance_id', 'textbox_id');
 
 
         // Get component_config_definition 'collapse' value by componentInstanceId.
         // This will tell us for each component, whether the component is in the collapsed state.
         $collapseValueByComponentInstanceId = $db->executeQuery(
-            # TODO: Use constant value instead of hard-coding string "collapse".
             'SELECT component_instance_id, value AS collapse_value
             FROM component_config_instance cci
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-            WHERE ccd.key="collapse"
-            AND cci.component_instance_id IN (' . implode(',', array_map('intval', array_values($componentInstanceIdByTextboxId))) . ')'
+            WHERE ccd.key=:collapse
+            AND cci.component_instance_id IN (' . implode(',', array_map('intval', array_values($componentInstanceIdByTextboxId))) . ')',
+            ['collapse:' => Component_Config_Collapse::KEY]
         )->fetchColumnArray('collapse_value', 'component_instance_id');
 
         // Find the matching textboxes.
