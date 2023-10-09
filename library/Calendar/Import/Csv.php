@@ -87,7 +87,7 @@ class Csv extends Base
                 $publish_date,
                 $attendance,
                 $folderIds,
-            ] = $thisRow;
+            ] = array_pad($thisRow, 12, '');
 
             /* Event name is mandatory
              */
