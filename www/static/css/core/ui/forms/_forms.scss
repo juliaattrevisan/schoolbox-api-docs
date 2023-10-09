@@ -34,7 +34,6 @@ $input-border-radius: $global-radius;
 $input-disabled-bg: $vapor;
 $input-disabled-cursor: $cursor-default-value;
 $input-box-shadow: none;
-$input-include-glowing-effect: false;
 
 // We use these to style the fieldset border and spacing.
 $fieldset-border-style: solid;
@@ -46,15 +45,6 @@ $fieldset-margin: rem-calc(($base-font-size - 8, 0));
 // We use these to style the legends when you use them
 $legend-font-weight: $font-weight-bold !default;
 $legend-padding: rem-calc(0 3) !default;
-
-// We use these to style the prefix and postfix input elements
-$input-prefix-bg: scale-color($white, $lightness: -5%) !default;
-$input-prefix-border-color: scale-color($white, $lightness: -20%) !default;
-$input-prefix-border-size: 1px !default;
-$input-prefix-border-type: solid !default;
-$input-prefix-overflow: visible !default;
-$input-prefix-font-color: $oil !default;
-$input-prefix-font-color-alt: $white !default;
 
 // We use this setting to turn on/off HTML5 number spinners (the up/down arrows)
 $input-number-spinners: true !default;
@@ -70,7 +60,6 @@ $input-error-message-bg-color: $alert-color !default;
 $input-error-message-font-color-alt: $alert-color;
 
 // We use this to style the glowing effect of inputs when focused
-$glowing-effect-fade-time: 0.45s !default;
 $glowing-effect-color: $input-focus-border-color !default;
 
 // We use this to style the transition when inputs are focused and when the glowing effect is disabled.
@@ -136,9 +125,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
     padding: calc($form-spacing / 2);
     width: 100%;
     box-sizing: border-box;
-    @if $input-include-glowing-effect {
-        @include block-glowing-effect(focus, $glowing-effect-fade-time, $glowing-effect-color);
-    }
+
     // Basic focus styles
     &:focus {
         background: $input-focus-bg-color;
@@ -147,14 +134,6 @@ $select-hover-bg-color: tint($warning-color, 50%);
     }
     // Disabled Styles
     &:disabled {
-        background-color: $input-disabled-bg;
-        cursor: $input-disabled-cursor;
-    }
-
-    // Disabled background input background color
-    &[disabled],
-    &[readonly],
-    fieldset[disabled] & {
         background-color: $input-disabled-bg;
         cursor: $input-disabled-cursor;
     }
@@ -188,97 +167,6 @@ $select-hover-bg-color: tint($warning-color, 50%);
     }
 }
 
-// We use this mixin to create postfix/prefix form Labels
-@mixin prefix-postfix-base {
-    border-style: $input-prefix-border-type;
-    border-width: $input-prefix-border-size;
-    display: block;
-    font-size: $form-label-font-size;
-    height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
-    line-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
-    overflow: $input-prefix-overflow;
-    padding-bottom: 0;
-    padding-top: 0;
-    position: relative;
-    text-align: center;
-    width: 100%;
-    z-index: 2;
-}
-
-// @MIXIN
-//
-// We use this mixin to create prefix label styles
-// $bg - Default:$input-prefix-bg || scale-color($white, $lightness: -5%) !default;
-// $is-button - Toggle position settings if prefix is a button. Default:false
-//
-@mixin prefix($bg: $input-prefix-bg, $border: $input-prefix-border-color, $is-button: false) {
-    @if $bg {
-        $bg-lightness: lightness($bg);
-        background: $bg;
-        border-#{$opposite-direction}: none;
-
-        // Control the font color based on background brightness
-        @if $bg-lightness > 70% or $bg == yellow {
-            color: $input-prefix-font-color;
-        } @else {
-            color: $input-prefix-font-color-alt;
-        }
-    }
-
-    @if $border {
-        border-color: $border;
-    }
-
-    @if $is-button {
-        border: none;
-        padding-#{$default-float}: 0;
-        padding-#{$opposite-direction}: 0;
-        padding-bottom: 0;
-        padding-top: 0;
-        text-align: center;
-    }
-}
-
-// @MIXIN
-//
-// We use this mixin to create postfix label styles
-// $bg - Default:$input-prefix-bg || scale-color($white, $lightness: -5%) !default;
-// $is-button - Toggle position settings if prefix is a button. Default: false
-@mixin postfix(
-    $bg: $input-prefix-bg,
-    $border-left-hidden: true,
-    $border: $input-prefix-border-color,
-    $is-button: false
-) {
-    @if $bg {
-        $bg-lightness: lightness($bg);
-        background: $bg;
-        @if $border-left-hidden {
-            border-#{$default-float}: none;
-        }
-
-        // Control the font color based on background brightness
-        @if $bg-lightness > 70% or $bg == yellow {
-            color: $input-prefix-font-color;
-        } @else {
-            color: $input-prefix-font-color-alt;
-        }
-    }
-
-    @if $border {
-        border-color: $border;
-    }
-
-    @if $is-button {
-        border: none;
-        padding-#{$default-float}: 0;
-        padding-#{$opposite-direction}: 0;
-        padding-bottom: 0;
-        padding-top: 0;
-        text-align: center;
-    }
-}
-
 // We use this mixin to style fieldsets
 @mixin fieldset {
     border: $fieldset-border-width $fieldset-border-style $fieldset-border-color;
@@ -291,21 +179,6 @@ $select-hover-bg-color: tint($warning-color, 50%);
         margin: 0;
         margin-#{$default-float}: rem-calc(-3);
         padding: $legend-padding;
-    }
-}
-
-// @MIXIN
-//
-// We use this mixin to control border and background color of error inputs
-// $color - Default: $alert-color (found in settings file)
-@mixin form-error-color($color: $alert-color) {
-    background-color: rgba($color, 0.1);
-    border-color: $color;
-
-    // Go back to normal on focus
-    &:focus {
-        background: $input-focus-bg-color;
-        border-color: $input-focus-border-color;
     }
 }
 
@@ -343,7 +216,6 @@ $select-hover-bg-color: tint($warning-color, 50%);
 // We use this mixin to style select elements
 @mixin form-select {
     -webkit-appearance: none !important;
-    -moz-appearance: none !important;
     background-color: $select-bg-color;
     border-radius: 0;
 
@@ -442,125 +314,19 @@ $select-hover-bg-color: tint($warning-color, 50%);
             }
         }
 
-        /* Attach elements to the beginning or end of an input */
-        .prefix,
-        .postfix {
-            @include prefix-postfix-base;
-        }
-
-        /* Adjust padding, alignment and radius if pre/post element is a button */
-        .postfix.button {
-            @include button-size(false, false);
-            @include postfix(false, false, false, true);
-        }
-        .prefix.button {
-            @include button-size(false, false);
-            @include prefix(false, false, true);
-        }
-
-        .prefix.button.radius {
-            @include radius(0);
-            @include side-radius($default-float, $button-radius);
-        }
-        .postfix.button.radius {
-            @include radius(0);
-            @include side-radius($opposite-direction, $button-radius);
-        }
-        .prefix.button.round {
-            @include radius(0);
-            @include side-radius($default-float, $button-round);
-        }
-        .postfix.button.round {
-            @include radius(0);
-            @include side-radius($opposite-direction, $button-round);
-        }
-
-        /* Separate prefix and postfix styles when on span or label so buttons keep their own */
-        span.prefix,
-        label.prefix {
-            @include prefix();
-        }
-        span.postfix,
-        label.postfix {
-            @include postfix();
-        }
-
         /* We use this to get basic styling on all basic form elements */
         input:not([type]),
         #{text-inputs(all, 'input')} {
             -webkit-appearance: none;
-            -moz-appearance: none;
             border-radius: 0;
             @include form-element;
-            @if $input-include-glowing-effect == false {
-                transition: border-color $input-transition-fade-time $input-transition-fade-timing-function,
-                    background $input-transition-fade-time $input-transition-fade-timing-function;
-            }
             &.radius {
                 @include radius($input-border-radius);
             }
         }
 
-        form {
-            .row {
-                .prefix-radius.row.collapse {
-                    input,
-                    textarea,
-                    select,
-                    button {
-                        @include radius(0);
-                        @include side-radius($opposite-direction, $button-radius);
-                    }
-                    .prefix {
-                        @include radius(0);
-                        @include side-radius($default-float, $button-radius);
-                    }
-                }
-                .postfix-radius.row.collapse {
-                    input,
-                    textarea,
-                    select,
-                    button {
-                        @include radius(0);
-                        @include side-radius($default-float, $button-radius);
-                    }
-                    .postfix {
-                        @include radius(0);
-                        @include side-radius($opposite-direction, $button-radius);
-                    }
-                }
-                .prefix-round.row.collapse {
-                    input,
-                    textarea,
-                    select,
-                    button {
-                        @include radius(0);
-                        @include side-radius($opposite-direction, $button-round);
-                    }
-                    .prefix {
-                        @include radius(0);
-                        @include side-radius($default-float, $button-round);
-                    }
-                }
-                .postfix-round.row.collapse {
-                    input,
-                    textarea,
-                    select,
-                    button {
-                        @include radius(0);
-                        @include side-radius($default-float, $button-round);
-                    }
-                    .postfix {
-                        @include radius(0);
-                        @include side-radius($opposite-direction, $button-round);
-                    }
-                }
-            }
-        }
-
         input[type="submit"] {
             -webkit-appearance: none;
-            -moz-appearance: none;
             border-radius: 0;
         }
 
