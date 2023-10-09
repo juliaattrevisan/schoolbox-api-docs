@@ -273,32 +273,45 @@ class Csv extends Base
                 $event->setPublishDateTime($publishDate);
             }
 
+            // Allow override of category relations only if no category list has
+            // been set in the object
+            $categoryList = $this->categoryList;
+            if (empty($categoryList)) {
+                $categoryList = array_filter(
+                    array_map(
+                        fn ($v) => intval(trim($v)),
+                        explode(',', $categoryIds),
+                    )
+                );
+            }
+            if (!empty($categoryList)) {
+                $event->setAccess(Event::ACCESS_GROUP);
+            }
+
             /* Save it
              */
             $result = $eventMapper->save($event);
 
-            /* Assign Category relations:
-             * allow override only if no category list has been set in the
-             * object
+            /* Assign Category relations
              */
-            $categoryList = $this->categoryList;
-            if (empty($categoryList)) {
-                $categoryList = explode(',', $categoryIds);
-            }
-            foreach ($categoryList as $currentCategory) {
-                $category = new Category();
-                $category->setEventId($event->getId());
-                $category->setCategoryId($currentCategory);
-                $categoryRelationMapper->save($category);
+            if ($event->isGroupLevel()) {
+                foreach ($categoryList as $currentCategory) {
+                    $category = new Category();
+                    $category->setEventId($event->getId());
+                    $category->setCategoryId($currentCategory);
+                    $categoryRelationMapper->save($category);
+                }
             }
 
             /* Assign Role relations
              */
-            foreach ($this->getGroupList() as $currentRole) {
-                $role = new Role();
-                $role->setEventId($event->getId());
-                $role->setRoleId($currentRole);
-                $roleRelationMapper->save($role);
+            if ($event->isCampusLevel()) {
+                foreach ($this->getGroupList() as $currentRole) {
+                    $role = new Role();
+                    $role->setEventId($event->getId());
+                    $role->setRoleId($currentRole);
+                    $roleRelationMapper->save($role);
+                }
             }
 
             if (is_array($result) && count($result)) {
