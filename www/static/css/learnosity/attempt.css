@@ -1,0 +1,61 @@
+.lrn-assess .app-panel {
+    /* prevent the panel from going over the top of our existing UI elements */
+    z-index: 10;
+}
+
+/* general button, like previous question */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
+.lrn.lrn-assess .dialogs .lrn_btn {
+    background-color: var(--content-ui-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-foreground);
+}
+
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:hover:not(:disabled),
+.lrn.lrn-assess .dialogs .lrn_btn:hover:not(:disabled) {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+}
+
+/* button with icon colour */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue .btn-label {
+    color: var(--content-ui-foreground);
+}
+
+/* button with icon colour on hover */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover .btn-label {
+    color: var(--content-ui-foreground);
+}
+
+/* primary action button, like next question of confirmation  */
+.lrn .lrn_btn_blue,
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue,
+.lrn.lrn-assess .dialogs .lrn_btn_blue {
+    background-color: var(--content-ui-submit-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-submit-foreground);
+    font-weight: 600;
+}
+
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:hover:not(:disabled),
+.lrn.lrn-assess .dialogs .lrn_btn_blue:hover:not(:disabled) {
+    background-color: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
+    color: var(--content-ui-submit-foreground);
+}
