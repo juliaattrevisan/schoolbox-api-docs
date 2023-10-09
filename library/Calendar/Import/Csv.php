@@ -82,6 +82,7 @@ class Csv extends Base
                 $event_type,
                 $publish_date,
                 $attendance,
+                $categoryIds,
             ] = $thisRow;
 
             /* Event name is mandatory
@@ -276,15 +277,19 @@ class Csv extends Base
              */
             $result = $eventMapper->save($event);
 
-            /* Assign Category relations
+            /* Assign Category relations:
+             * allow override only if no category list has been set in the
+             * object
              */
-            if ($this->categoryList != null) {
-                foreach ($this->getCategoryList() as $currentCategory) {
-                    $category = new Category();
-                    $category->setEventId($event->getId());
-                    $category->setCategoryId($currentCategory);
-                    $categoryRelationMapper->save($category);
-                }
+            $categoryList = $this->categoryList;
+            if (empty($categoryList)) {
+                $categoryList = explode(',', $categoryIds);
+            }
+            foreach ($categoryList as $currentCategory) {
+                $category = new Category();
+                $category->setEventId($event->getId());
+                $category->setCategoryId($currentCategory);
+                $categoryRelationMapper->save($category);
             }
 
             /* Assign Role relations
