@@ -163,7 +163,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
                     $assessmentCreator,
                     [$folder],
-                    [],
+                    $this->getSearchResultLinksForAssessment($assessment),
                 );
             },
             $matches
@@ -218,5 +218,38 @@ class Hydrator extends BaseHydrator
 
         // No other match found, so return true if match on description.
         return str_contains($assessment->getDescription(), $keyword);
+    }
+
+    /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
+    private function getSearchResultLinksForAssessment(IAssessable $assessment): array
+    {
+        $links = [
+            [
+                // All assessment types use the same URL for their 'Modify' page.
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/learning/assessments/{$assessment->getId()}/modify")
+                    ->__toString(),
+                'title' => 'Modify',
+                'icon' => 'icon-modify',
+            ]
+        ];
+
+        if ($assessment instanceof Assessment\Quiz\Model) {
+            $links[] = [
+                // 'Review Horizontally' page.
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/learning/learnosity/{$assessment->getId()}/horizontal")
+                    ->__toString(),
+                'title' => 'Horizontal Marking',
+                'icon' => 'icon-modify',
+            ];
+        }
+
+        return $links;
     }
 }
