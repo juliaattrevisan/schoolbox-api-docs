@@ -520,10 +520,10 @@
         {% endif %}
 
         {% for folder in folders %}
+            {# only if there are filtered assessments for this folder #}
+            {% if (summaryAssessments[folder.id] ?? [])| length %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
-            {# if there are no filtered assessments for this folder, or no class mark ignore the folder #}
-            {% if ((summaryAssessments[folder.id] ?? [])| length) or (weightedMean != '') %}
 
                 <div class="folder-title">
                     <div class="left">
@@ -595,8 +595,8 @@
                             options: classOptions
                         } only %}
                 {% endfor %}
-            {% endif %}
             </div>
+            {% endif %}
         {% endfor %}
     {% endif %}
 </div>
