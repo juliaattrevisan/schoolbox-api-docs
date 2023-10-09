@@ -108,8 +108,8 @@ class Controller extends UserAccount\Controller
             $classInvolvement->setClass($classEntry);
 
             $row = [
-                $classInvolvement->getClass()->getCode(),
-                $classInvolvement->getClass()->getName(),
+                $classInvolvement->getClass()?->getCode() ?? 'unknown',
+                $classInvolvement->getClass()?->getName() ?? 'unknown',
                 $classInvolvement->getExternalId()
             ];
 
