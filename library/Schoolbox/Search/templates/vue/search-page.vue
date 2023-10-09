@@ -79,8 +79,10 @@ window.Vue.onMounted(async () => {
     }
     // is applied when the search page is in single column mode
     &--single-column {
-        gap: var(--spacing-l);
-        grid-template-areas: "filters" "results";
+        gap: var(--spacing-m);
+        grid-template-areas:
+            "filters"
+            "results";
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
     }

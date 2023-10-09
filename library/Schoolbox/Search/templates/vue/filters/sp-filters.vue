@@ -46,7 +46,7 @@ const containerHeight = window.Vue.computed(() => {
  * @returns {string} - the title of the button
  */
 const titleText = window.Vue.computed(() => {
-    return isOpen.value ? "Hide Filters" : "Show Filters";
+    return isOpen.value ? "Hide filters" : "Show filters";
 });
 
 /**
@@ -67,6 +67,13 @@ async function onSearch() {
 }
 
 /**
+ * By default hide the filters when on single column display
+ */
+window.Vue.onMounted(() => {
+    isOpen.value = !store.isSingleColumn;
+});
+
+/**
  * Track the column state, to ensure the fitlers are shown when the page is resizied to above single column
  */
 window.Vue.watch(
@@ -74,6 +81,10 @@ window.Vue.watch(
     (newValue, oldValue) => {
         if (newValue !== oldValue && newValue === false) {
             isOpen.value = true;
+            return;
+        }
+        if (newValue !== oldValue && newValue === true) {
+            isOpen.value = false;
         }
     }
 );
@@ -95,7 +106,7 @@ window.Vue.watch(
                 @click="onSearch"
             />
         </div>
-        <div class="c-island c-filters l-flex-col l-gap-m l-pad-m">
+        <div :class="`c-island c-filters l-flex-col  ${isOpen ? 'l-gap-m' : ''} l-pad-m`">
             <button
                 v-if="store.isSingleColumn"
                 :class="`c-filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"

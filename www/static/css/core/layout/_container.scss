@@ -22,6 +22,14 @@
     }
 }
 
+// used on pages that have the new spacing styles applied
+#container.c-container {
+    padding: var(--spacing-xl);
+    @media #{$small-only} {
+        padding: var(--spacing-m);
+    }
+}
+
 .admin-container {
     display: grid;
     grid-template-columns: 240px auto;

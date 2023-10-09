@@ -10,3 +10,15 @@
         gap: var(--spacing-#{$size});
     }
 }
+
+.l-gap-xl {
+    @media #{$small-only} {
+        gap: var(--spacing-l);
+    }
+}
+
+.l-gap-l {
+    @media #{$small-only} {
+        gap: var(--spacing-m);
+    }
+}

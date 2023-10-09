@@ -67,7 +67,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <div class="l-flex-row l-flex--no-wrap l-gap-m">
-        <div class="l-flex-col">
+        <div class="l-flex-col l-flex__item--1">
             <label for="sp-start-date-input">Start date</label>
             <input
                 id="sp-start-date-input"
@@ -78,7 +78,7 @@ window.Vue.onMounted(() => {
                 :data-datepicker-initial-value="filterDateRangeStore.startDate"
             />
         </div>
-        <div class="l-flex-col">
+        <div class="l-flex-col l-flex__item--1">
             <label for="sp-end-date-input">End date</label>
             <input
                 id="sp-end-date-input"
@@ -91,5 +91,3 @@ window.Vue.onMounted(() => {
         </div>
     </div>
 </template>
-
-<style scoped></style>
