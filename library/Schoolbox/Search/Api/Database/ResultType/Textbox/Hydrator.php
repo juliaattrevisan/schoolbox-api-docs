@@ -211,8 +211,25 @@ class Hydrator extends BaseHydrator
                     'textbox',
                     $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                     null,
-                    [$textboxFolder,], // Context: textbox's folder.
-                    [], // texbox: none.
+                    [$textbox->getCategory(),], // Context: textbox's folder
+                    [
+                        [
+                            // TODO: Check permissions.
+                            'title' => 'Manage All Textboxes',
+                            'icon' => 'icon-textbox',
+                            'url' => $this->buildBaseUrl()
+                                ->withPath("/textbox/folder/{$textbox->getCategory()->getId()}")
+                                ->__toString(),
+                        ],
+                        [
+                            // TODO: Check permissions.
+                            'title' => 'Modify Textbox',
+                            'icon' => 'icon-modify',
+                            'url' => $this->buildBaseUrl()
+                                ->withPath("") // TODO: Get URL.
+                                ->__toString(),
+                        ],
+                    ],
                 );
             }
         }
