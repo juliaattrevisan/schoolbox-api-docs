@@ -159,6 +159,7 @@ class Hydrator extends BaseHydrator
                                     ->__toString(),
                             ],
                             [
+                                // TODO: Probably need a permissions check here.
                                 'title' => 'Statistics',
                                 'icon' => 'icon-progress',
                                 'url' => $this->buildBaseUrl()
