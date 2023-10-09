@@ -520,7 +520,7 @@
         {% endif %}
 
         {% for folder in folders %}
-            {# if there are no filtered assessments for this folder #}
+            {# only if there are filtered assessments for this folder #}
             {% if (summaryAssessments[folder.id] ?? [])| length %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
