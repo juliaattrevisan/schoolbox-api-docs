@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
 use Aura\Router\Generator;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -109,6 +110,7 @@ class Hydrator extends BaseHydrator
                     null,
                     null,
                     $this->folderMapper->findParents($folder, null, true)->getAll(),
+                    $this->getSearchResultLinksForFolder($folder, $viewer),
                     [
                         'subResults' => $this->buildBaseUrl()
                             ->withPath(
@@ -128,5 +130,108 @@ class Hydrator extends BaseHydrator
             $acceptedMatches,
         );
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+
+    /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
+     *
+     * @param Folder\Model $folder
+     * @param User $viewer
+     * @return array
+     */
+    private function getSearchResultLinksForFolder(Folder\Model $folder, User $viewer): array
+    {
+        $links = [];
+
+        $isGroupPage  = $folder->isGroup();
+        $isClassPage  = $folder->isClass();
+        $isCoursePage = $folder->hasCourseSpecification();
+
+        $folderAccessLevel = $this->access->getFolderAccess($viewer, $folder->getId());
+
+        // Add links depending on page type and permissions, in alphabetical order of link title.
+
+        if ($isClassPage) {
+            if ($folderAccessLevel >= UserAccess::ACCESS_READ) { // TODO: Are there specific permissions for class list?
+                $links[] = [
+                    'title' => 'Class List',
+                    'icon' => 'icon-class-list',
+                    'url' => $this->buildBaseUrl()
+                        ->withPath("/learning/class/{$folder->getId()}")
+                        ->__toString(),
+                ];
+            }
+            if ($folderAccessLevel >= UserAccess::ACCESS_READ) { // TODO: Are there specific permissions for markbook?
+                $links[] = [
+                    'title' => 'Class Markbook',
+                    'icon' => 'icon-curriculum',
+                    'url' => $this->buildBaseUrl()
+                        ->withPath("/learning/markbook/class/{$folder->getId()}")
+                        ->__toString(),
+                ];
+            }
+        }
+
+        if ($folderAccessLevel >= UserAccess::ACCESS_READ) {
+            $links[] = [
+                'title' => 'Homepage',
+                'icon' => 'icon-home',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/homepage/{$folder->getId()}")
+                    ->__toString(),
+            ];
+        }
+
+        if ($isGroupPage) {
+//            $group = $folder->getGroup();
+//            $isGroupMember = $viewer->isGroupMember($group->getId()); // No $group->getId() function.
+            if (true) { // TODO: If user belongs to group...
+                $links[] = [
+                    'title' => 'Leave Group',
+                    'icon' => 'icon-group',
+                    'url' => $this->buildBaseUrl()
+                        ->withPath("/group/update/members/{$folder->getId()}") // TODO: Is this the right URL?
+                        ->__toString(),
+                ];
+            }
+        }
+
+        if ($isCoursePage) {
+            if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) { // TODO: Are there specific permissions for modifying course?
+                $links[] = [
+                    'title' => 'Modify Course',
+                    'icon' => 'icon-modify',
+                    'url' => $this->buildBaseUrl()
+                        ->withPath("/course/modify/{$folder->getCourseSpecification()->getId()}")
+                        ->__toString(),
+                ];
+            }
+        }
+
+        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
+            $links[] = [
+                'title' => 'Modify Folder',
+                'icon' => 'icon-modify',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/resource/folder/{$folder->getId()}/modify")
+                    ->__toString(),
+            ];
+        }
+
+        if ($isGroupPage) {
+            if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) { // TODO: Are there specific permissions for modifying groups?
+                $links[] = [
+                    'title' => 'Manage Group',
+                    'icon' => 'icon-group',
+                    'url' => $this->buildBaseUrl()
+                        ->withPath("/group/modify/{$folder->getId()}")
+                        ->__toString(),
+                ];
+            }
+        }
+
+        return $links;
     }
 }
