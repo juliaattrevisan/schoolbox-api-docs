@@ -101,6 +101,43 @@ class Hydrator extends BaseHydrator
                             )
                             ->__toString(),
                         'staff-students',
+                        null,
+                        null,
+                        [],
+                        [
+                            [
+                                // TODO: Check permissions.
+                                'title' => 'Calendar',
+                                'icon' => 'icon-calendar',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("calendar/{selectedDate}/{$user->getId()}") // TODO: Add today's date in required format.
+                                    ->__toString(),
+                            ],
+                            [
+                                // TODO: Check permissions.
+                                'title' => 'Due Work',
+                                'icon' => 'icon-due-work',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("") // TODO: Get URL.
+                                    ->__toString(),
+                            ],
+                            [
+                                // TODO: Check permissions.
+                                'title' => 'ePortfolio',
+                                'icon' => 'icon-eportfolio',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("") // TODO: Get URL.
+                                    ->__toString(),
+                            ],
+                            [
+                                // TODO: Check permissions.
+                                'title' => 'Modify',
+                                'icon' => 'icon-modify',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath(" /adminv2/user/{$user->getId()}/modify")
+                                    ->__toString(),
+                            ],
+                        ]
                     );
                 }
 
