@@ -150,7 +150,22 @@ class Hydrator extends BaseHydrator
                         $description,
                         $article->getAuthor(),
                         [],
-                        // Links: leave blank for now
+                        [
+                            [
+                                'title' => 'Save For Later',
+                                'icon' => 'icon-news',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("/news/saved/{$article->getId()}/add")
+                                    ->__toString(),
+                            ],
+                            [
+                                'title' => 'Statistics',
+                                'icon' => 'icon-progress',
+                                'url' => $this->buildBaseUrl()
+                                    ->withPath("/news/statistics/{$article->getId()}")
+                                    ->__toString(),
+                            ]
+                        ]
                     );
                 }
                 return null;
