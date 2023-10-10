@@ -169,14 +169,8 @@ $input-number-spinners: true !default;
 
 // We use this mixin to style select elements
 @mixin form-select {
-    -webkit-appearance: none !important;
     background-color: $input-bg-color;
     border-radius: 0;
-
-    // Hide the dropdown arrow shown in newer IE versions
-    &::-ms-expand {
-        display: none;
-    }
 
     // The custom arrow has some fake horizontal padding so we can align it
     // from the right side of the element without relying on CSS3
@@ -215,10 +209,7 @@ $input-number-spinners: true !default;
 @mixin html5number($browser, $on: true) {
     @if $on == false {
         @if $browser == webkit {
-            -webkit-appearance: none;
             margin: 0;
-        } @else if $browser == moz {
-            -moz-appearance: textfield;
         }
     }
 }
@@ -263,7 +254,6 @@ section {
 /* We use this to get basic styling on all basic form elements */
 input:not([type]),
 #{text-inputs(all, 'input')} {
-    -webkit-appearance: none;
     border-radius: 0;
     @include form-element;
     &.radius {
@@ -272,7 +262,6 @@ input:not([type]),
 }
 
 input[type="submit"] {
-    -webkit-appearance: none;
     border-radius: 0;
 }
 
