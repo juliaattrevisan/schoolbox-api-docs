@@ -103,7 +103,7 @@ class Factory
     {
         $classname = '\Calendar\Import\Csv';
 
-        if (stristr(file_get_contents($this->getFile(), null, null, 0, 20), 'BEGIN:VCALENDAR')) {
+        if (stristr(file_get_contents($this->getFile(), false, null, 0, 20), 'BEGIN:VCALENDAR')) {
             $classname = '\Calendar\Import\Vcal';
         }
 
