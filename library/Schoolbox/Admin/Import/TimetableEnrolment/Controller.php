@@ -14,7 +14,6 @@ use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Admin\Import\UserAccount;
 use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -39,12 +38,6 @@ class Controller extends UserAccount\Controller
 
 
     /**
-     * @var ClassInvolvementMapper
-     */
-    protected ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
      * @var INavigation
      */
     protected $navigation;
@@ -57,19 +50,16 @@ class Controller extends UserAccount\Controller
      * @param IConfigLoader          $configLoader
      * @param FilesystemProxy        $filesystemProxy
      * @param ClassEntryMapper       $classEntryMapper
-     * @param ClassInvolvementMapper $classInvolvementMapper
      */
     public function __construct(
         ImporterFactory $importerFactory,
         IConfigLoader $configLoader,
         FilesystemProxy $filesystemProxy,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
     ) {
         parent::__construct($importerFactory, $configLoader, $filesystemProxy);
 
         $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
 
         $this->navigation = new SchoolData();
     }
@@ -85,8 +75,8 @@ class Controller extends UserAccount\Controller
          * nonexisting classes; use a LEFT JOIN instead, to reveal those.
          */
         $query = "
-            SELECT 
-                sc.code, 
+            SELECT
+                sc.code,
                 sc.name,
                 scu.external_id
             FROM

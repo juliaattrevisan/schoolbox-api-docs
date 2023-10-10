@@ -63,7 +63,6 @@ class Module extends BaseModule
             $this->getConfig(),
             $this->injector->get('filesystem.storageProxy'),
             $this->getMapperFactory()->get(ClassEntryMapper::class),
-            $this->getMapperFactory()->get(ClassInvolvementMapper::class),
         );
     }
 
