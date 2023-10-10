@@ -112,14 +112,10 @@
     border: none;
 }
 
-/* hide the side panel button on the right */
-/*.lrn.lrn-assess .lrn-right-region .right-wrapper .menu-mask,
-.lrn.lrn-assess .lrn-right-region .right-wrapper .menu-overlay {
-    display: none;
+/* remove the margin so the right-region is inline with the left */
+.lrn.lrn-assess .lrn-bottom-right-region.lrn-align-top {
+    margin-top: 0;
 }
-.lrn.lrn-assess .lrn-vertical-toc {
-    right: 0;
-}*/
 
 /* to vertically align the timer with other items */
 .lrn.lrn-assess .counter {
