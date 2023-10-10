@@ -233,200 +233,196 @@ $input-number-spinners: true !default;
     }
 }
 
-@include exports("form") {
-    @if $include-html-form-classes {
-        /* Standard Forms */
-        form {
-            margin: 0 0 $form-spacing;
-        }
+/* Standard Forms */
+form {
+    margin: 0 0 $form-spacing;
+}
 
-        /* Using forms within rows, we need to set some defaults */
-        form .row {
-            @include form-row-base;
-        }
+/* Using forms within rows, we need to set some defaults */
+form .row {
+    @include form-row-base;
+}
 
-        /* Remove built-in form typography styles */
-        input,
-        button,
-        textarea,
-        select {
-            font: inherit;
-        }
+/* Remove built-in form typography styles */
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
 
-        /* Label Styles */
-        label {
-            @include form-label;
-            &.right {
-                @include form-label(right, false);
-            }
-            &.inline {
-                @include form-label(inline, false);
-            }
-            /* Styles for required inputs */
-            small {
-                text-transform: $form-label-small-transform;
-                color: scale-color($form-label-font-color, $lightness: 15%);
-            }
-        }
+/* Label Styles */
+label {
+    @include form-label;
+    &.right {
+        @include form-label(right, false);
+    }
+    &.inline {
+        @include form-label(inline, false);
+    }
+    /* Styles for required inputs */
+    small {
+        text-transform: $form-label-small-transform;
+        color: scale-color($form-label-font-color, $lightness: 15%);
+    }
+}
 
-        section {
-            label {
-                font-size: $paragraph-font-size;
-                &.inline-block {
-                    display: inline-block;
-                }
-            }
-        }
-
-        /* We use this to get basic styling on all basic form elements */
-        input:not([type]),
-        #{text-inputs(all, 'input')} {
-            -webkit-appearance: none;
-            border-radius: 0;
-            @include form-element;
-            &.radius {
-                @include radius($global-radius);
-            }
-        }
-
-        input[type="submit"] {
-            -webkit-appearance: none;
-            border-radius: 0;
-        }
-
-        /* Respect enforced amount of rows for textarea */
-        textarea[rows] {
-            height: auto;
-        }
-
-        /* Not allow resize out of parent */
-        textarea {
-            max-width: 100%;
-        }
-
-        // style placeholder text cross browser
-        ::placeholder {
-            color: $steel;
-        }
-
-        /* Add height value for select elements to match text input height */
-        select {
-            @include form-select;
-            height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
-            &[multiple] {
-                height: auto;
-            }
-        }
-
-        /* Adjust margin for form elements below */
-        input[type="file"],
-        input[type="checkbox"],
-        input[type="radio"],
-        select {
-            margin: 0 0 $form-spacing 0;
-        }
-
-        input[type="checkbox"] + label,
-        input[type="radio"] + label {
+section {
+    label {
+        font-size: $paragraph-font-size;
+        &.inline-block {
             display: inline-block;
-            margin-#{$default-float}: $form-spacing * 0.5;
-            margin-#{$opposite-direction}: $form-spacing;
-            margin-bottom: 0;
-            vertical-align: baseline;
-        }
-
-        /* Normalize file input width */
-        input[type="file"] {
-            width: 100%;
-        }
-
-        /* HTML5 Number spinners settings */
-        input[type="number"],
-        input[inputmode="numeric"] {
-            @include html5number(moz, $input-number-spinners);
-        }
-        input[type="text"]::-webkit-inner-spin-button,
-        input[type="text"]::-webkit-outer-spin-button,
-        input[inputmode="numeric"]::-webkit-inner-spin-button,
-        input[type="numeric"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            @include html5number(webkit, $input-number-spinners);
-        }
-
-        /* We add basic fieldset styling */
-        fieldset {
-            @include fieldset;
-        }
-
-        /* Error Handling */
-
-        #{data('abide')} {
-            .error small.error,
-            .error span.error,
-            span.error,
-            small.error {
-                @include form-error-message;
-            }
-            span.error,
-            small.error {
-                display: none;
-            }
-        }
-
-        span.error,
-        small.error {
-            @include form-error-message;
-        }
-
-        .error {
-            input,
-            textarea,
-            select {
-                margin-bottom: 0;
-            }
-
-            input[type="checkbox"],
-            input[type="radio"] {
-                margin-bottom: $form-spacing;
-            }
-
-            label,
-            label.error {
-                @include form-label-error-color;
-            }
-
-            small.error {
-                @include form-error-message;
-            }
-
-            > label {
-                > small {
-                    background: transparent;
-                    color: scale-color($form-label-font-color, $lightness: 15%);
-                    display: inline;
-                    font-size: 60%;
-                    font-style: normal;
-                    margin: 0;
-                    padding: 0;
-                    text-transform: $form-label-small-transform;
-                }
-            }
-
-            span.error-message {
-                display: block;
-            }
-        }
-
-        input.error,
-        textarea.error,
-        select.error {
-            margin-bottom: 0;
-        }
-        label.error {
-            @include form-label-error-color;
         }
     }
+}
+
+/* We use this to get basic styling on all basic form elements */
+input:not([type]),
+#{text-inputs(all, 'input')} {
+    -webkit-appearance: none;
+    border-radius: 0;
+    @include form-element;
+    &.radius {
+        @include radius($global-radius);
+    }
+}
+
+input[type="submit"] {
+    -webkit-appearance: none;
+    border-radius: 0;
+}
+
+/* Respect enforced amount of rows for textarea */
+textarea[rows] {
+    height: auto;
+}
+
+/* Not allow resize out of parent */
+textarea {
+    max-width: 100%;
+}
+
+// style placeholder text cross browser
+::placeholder {
+    color: $steel;
+}
+
+/* Add height value for select elements to match text input height */
+select {
+    @include form-select;
+    height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+    &[multiple] {
+        height: auto;
+    }
+}
+
+/* Adjust margin for form elements below */
+input[type="file"],
+input[type="checkbox"],
+input[type="radio"],
+select {
+    margin: 0 0 $form-spacing 0;
+}
+
+input[type="checkbox"] + label,
+input[type="radio"] + label {
+    display: inline-block;
+    margin-#{$default-float}: $form-spacing * 0.5;
+    margin-#{$opposite-direction}: $form-spacing;
+    margin-bottom: 0;
+    vertical-align: baseline;
+}
+
+/* Normalize file input width */
+input[type="file"] {
+    width: 100%;
+}
+
+/* HTML5 Number spinners settings */
+input[type="number"],
+input[inputmode="numeric"] {
+    @include html5number(moz, $input-number-spinners);
+}
+input[type="text"]::-webkit-inner-spin-button,
+input[type="text"]::-webkit-outer-spin-button,
+input[inputmode="numeric"]::-webkit-inner-spin-button,
+input[type="numeric"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    @include html5number(webkit, $input-number-spinners);
+}
+
+/* We add basic fieldset styling */
+fieldset {
+    @include fieldset;
+}
+
+/* Error Handling */
+
+#{data('abide')} {
+    .error small.error,
+    .error span.error,
+    span.error,
+    small.error {
+        @include form-error-message;
+    }
+    span.error,
+    small.error {
+        display: none;
+    }
+}
+
+span.error,
+small.error {
+    @include form-error-message;
+}
+
+.error {
+    input,
+    textarea,
+    select {
+        margin-bottom: 0;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        margin-bottom: $form-spacing;
+    }
+
+    label,
+    label.error {
+        @include form-label-error-color;
+    }
+
+    small.error {
+        @include form-error-message;
+    }
+
+    > label {
+        > small {
+            background: transparent;
+            color: scale-color($form-label-font-color, $lightness: 15%);
+            display: inline;
+            font-size: 60%;
+            font-style: normal;
+            margin: 0;
+            padding: 0;
+            text-transform: $form-label-small-transform;
+        }
+    }
+
+    span.error-message {
+        display: block;
+    }
+}
+
+input.error,
+textarea.error,
+select.error {
+    margin-bottom: 0;
+}
+label.error {
+    @include form-label-error-color;
 }
 
 @import "switches";
