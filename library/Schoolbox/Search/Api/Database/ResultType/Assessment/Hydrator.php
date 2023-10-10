@@ -240,7 +240,7 @@ class Hydrator extends BaseHydrator
         $links = [];
 
         $route = 'learningAssessment.getUpdateAssessmentForm';
-        $params = ['assessmentId' => $assessment->getId()];
+        $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.

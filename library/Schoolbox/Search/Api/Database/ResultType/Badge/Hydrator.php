@@ -135,7 +135,7 @@ class Hydrator extends BaseHydrator
 //        }
 
         $route = 'learningBadge.getUpdateForm';
-        $params = ['badgeId' => $badge->getId()];
+        $params = ['badgeId' => $badge->getId(), 'badge' => $badge];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Modify Badge',

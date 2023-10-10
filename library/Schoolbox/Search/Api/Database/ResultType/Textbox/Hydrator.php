@@ -320,7 +320,7 @@ class Hydrator extends BaseHydrator
         $textboxFolder = $textbox->getCategory();
 
         $route = 'textbox.getIndexForFolder';
-        $params = ['folderId' => $textboxFolder->getId()];
+        $params = ['folderId' => $textboxFolder->getId(), 'folder' => $textboxFolder];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'url' => $this->routeGenerator->generate($route, $params),

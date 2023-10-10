@@ -203,8 +203,9 @@ class Hydrator extends BaseHydrator
         //}
 
         if ($isCoursePage) {
+            $courseSpec = $folder->getCourseSpecification();
             $route = 'course.modifyCourse';
-            $params = ['courseId' => $folder->getCourseSpecification()->getId()];
+            $params = ['courseId' => $courseSpec->getId(), 'course' => $courseSpec];
             if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Modify Course',
@@ -226,7 +227,7 @@ class Hydrator extends BaseHydrator
 
         if ($isGroupPage) {
             $route = 'group.getModify';
-            $params = ['folderId' => $folder->getId()];
+            $params = ['folderId' => $folder->getId(), 'folder' => $folder];
             if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Manage Group',
