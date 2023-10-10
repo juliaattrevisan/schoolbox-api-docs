@@ -133,6 +133,12 @@
                     <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
                         {% endblock %}
                     {% endif %}
+
+                    {% if requestFromInternalIp %}
+                        {% block internalSso %}
+                            <p><a href="{{ internalSsoUrl }}" class="instance-registry-button">Login using Instance Registry</a></p>
+                        {% endblock %}
+                    {% endif %}
                 </div>
             </div>
         </form>
