@@ -80,57 +80,57 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($tiles, $viewer, $tileLayoutById) {
                 $tile = $tiles->getBy('id', $match->id);
-                if ($tile instanceof TileModel) {
-                    $tileLayout = $tileLayoutById[$tile->getTileLayout()->getId()];
-                    $folderId = $tileLayout->getFolder()->getId();
-
-                    if ($folderId === null) {
-                        // This tile is not linked to a folder, so it is of no interest.
-                        return null;
-                    }
-
-                    try {
-                        // Check if the user has access to the tile's folder.
-                        $tileAccess = $this->access->getFolderAccess($viewer, $folderId);
-                        if ($tileAccess < UserAccess::ACCESS_READ) {
-                            return null;
-                        }
-
-                        $tileFolder = $this->folderMapper->findById($folderId);
-                    } catch (MapperException $e) {
-                        // Tile folder could not be found for some reason.
-                        // This is a slightly different situation to situation where tile is not linked to folder.
-                        // In this case the result might be of interest, so return a result but with tileFolder null.
-                        $tileFolder = null;
-                    }
-
-                    $titleText = trim($tile->getTitleText());
-
-                    if ($titleText === '') {
-                        // Tiles without a title should not appear in search results (AC for SA-8841).
-                        return null;
-                    }
-
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $titleText,
-                        $tile->getLink(),
-                        $match->type,
-                        $match->relevance,
-                        $tile->getModifiedAt(),
-                        $tileFolder,
-                        null,
-                        $tile->getBackgroundImage() ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString() : null,
-                        'tiles',
-                        '',
-                        null,
-                        ($tileFolder === null) ? [] : [$tileFolder],
-                        [],
-                    );
+                if (!($tile instanceof TileModel)) {
+                    return null;
                 }
 
-                return null;
+                $tileLayout = $tileLayoutById[$tile->getTileLayout()->getId()];
+                $folderId = $tileLayout->getFolder()->getId();
+
+                if ($folderId === null) {
+                    // This tile is not linked to a folder, so it is of no interest.
+                    return null;
+                }
+
+                try {
+                    // Check if the user has access to the tile's folder.
+                    $tileAccess = $this->access->getFolderAccess($viewer, $folderId);
+                    if ($tileAccess < UserAccess::ACCESS_READ) {
+                        return null;
+                    }
+
+                    $tileFolder = $this->folderMapper->findById($folderId);
+                } catch (MapperException $e) {
+                    // Tile folder could not be found for some reason.
+                    // This is a slightly different situation to situation where tile is not linked to folder.
+                    // In this case the result might be of interest, so return a result but with tileFolder null.
+                    $tileFolder = null;
+                }
+
+                $titleText = trim($tile->getTitleText());
+
+                if ($titleText === '') {
+                    // Tiles without a title should not appear in search results (AC for SA-8841).
+                    return null;
+                }
+
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $titleText,
+                    $tile->getLink(),
+                    $match->type,
+                    $match->relevance,
+                    $tile->getModifiedAt(),
+                    $tileFolder,
+                    null,
+                    $tile->getBackgroundImage() ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString() : null,
+                    'tiles',
+                    '',
+                    null,
+                    ($tileFolder === null) ? [] : [$tileFolder],
+                    [],
+                );
             },
             $matches
         );
