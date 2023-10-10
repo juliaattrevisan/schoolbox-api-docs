@@ -68,5 +68,18 @@ class FullResult
                 $this->$key = trim($this->$key);
             }
         }
+
+        // Check keys of links.
+        foreach ($links as $link) {
+            if (
+                !is_array($link) ||
+                count($link) !== 3 ||
+                !array_key_exists('title', $link) ||
+                !array_key_exists('icon', $link) ||
+                !array_key_exists('url', $link)
+            ) {
+                throw new \InvalidArgumentException('Link format is invalid.');
+            }
+        }
     }
 }
