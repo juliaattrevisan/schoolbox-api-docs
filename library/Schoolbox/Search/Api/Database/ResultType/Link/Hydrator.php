@@ -69,35 +69,36 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($links, $viewer) {
                 $link = $links->getBy('id', $match->id);
-                if ($link instanceof LinkModel) {
-                    // Check if user has access to link's folder
-                    $linkAccess = $this->access->getFolderAccess($viewer, $link->getFolder()->getId());
-                    if ($linkAccess < UserAccess::ACCESS_READ) {
-                        return null;
-                    }
-                    if ($linkAccess < UserAccess::ACCESS_WRITE && $link->isHidden()) {
-                        return null;
-                    }
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $link->getDescription(), // The closest thing to a title for a link is link.description.
-                        $link->getUrl(),
-                        $match->type,
-                        $match->relevance,
-                        $link->getModified(),
-                        $link->getFolder(),
-                        "Posted {$link->getModified()->getRelativeTime()} by {$link->getOwner()->getFullName()}",
-                        null,
-                        'link',
-                        $link->getComment(), // The closest thing to a description for a link is link.comment.
-                        $link->getOwner(),
-                        [$link->getFolder(),], // Context: link's folder
-                        [],
-                    );
+                if (!($link instanceof LinkModel)) {
+                    return null;
                 }
 
-                return null;
+                // Check if user has access to link's folder
+                $linkAccess = $this->access->getFolderAccess($viewer, $link->getFolder()->getId());
+                if ($linkAccess < UserAccess::ACCESS_READ) {
+                    return null;
+                }
+                if ($linkAccess < UserAccess::ACCESS_WRITE && $link->isHidden()) {
+                    return null;
+                }
+
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $link->getDescription(), // The closest thing to a title for a link is link.description.
+                    $link->getUrl(),
+                    $match->type,
+                    $match->relevance,
+                    $link->getModified(),
+                    $link->getFolder(),
+                    "Posted {$link->getModified()->getRelativeTime()} by {$link->getOwner()->getFullName()}",
+                    null,
+                    'link',
+                    $link->getComment(), // The closest thing to a description for a link is link.comment.
+                    $link->getOwner(),
+                    [$link->getFolder(),], // Context: link's folder
+                    [],
+                );
             },
             $matches
         );
