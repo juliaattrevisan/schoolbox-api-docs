@@ -120,6 +120,7 @@ class Module extends BaseModule
                     $mapperFactory->get(UserMapper::class),
                     $userNameFormatter,
                     $config,
+                    $authorizer
                 ),
                 new Database\ResultType\News\Hydrator(
                     $mapperFactory->get(NewsMapper::class),

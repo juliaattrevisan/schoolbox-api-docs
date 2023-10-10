@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\User;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Image\Transformation\Storage;
+use Eportfolio_Authenticator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -44,11 +46,13 @@ class Hydrator extends BaseHydrator
      * @param User\Formatter\Formatter $userNameFormatter Used to format a user's name on output.
      * @param IConfigLoader            $config            Used for fetching configuration, which controls user search
      *                                                    result availability.
+     * @param Authorizer               $authorizer
      */
     public function __construct(
         private UserMapper $userMapper,
         private User\Formatter\Formatter $userNameFormatter,
         private IConfigLoader $config,
+        private Authorizer $authorizer
     ) {
     }
 
@@ -78,71 +82,37 @@ class Hydrator extends BaseHydrator
 
         // Map those users to full results
         $fullResults = array_map(
-            function (RawResult $match) use ($users) {
+            function (RawResult $match) use ($users, $viewer) {
                 $user = $users->getBy('id', $match->id);
-                if ($user instanceof User) {
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $this->userNameFormatter->formatObject($user),
-                        '/search/user/' . $match->id,
-                        $match->type,
-                        $match->relevance,
-                        $user->getUpdatedAt(),
-                        null,
-                        null,
-                        $this->buildBaseUrl()
-                            ->withPath('/portrait.php')
-                            ->withQuery(
-                                http_build_query([
-                                    'id'   => $user->getId(),
-                                    'size' => Storage::TRANSFORM_SQUARE64,
-                                ])
-                            )
-                            ->__toString(),
-                        'staff-students',
-                        null,
-                        null,
-                        [],
-                        [
-                            [
-                                // TODO: Check permissions.
-                                'title' => 'Calendar',
-                                'icon' => 'icon-calendar',
-                                'url' => $this->buildBaseUrl()
-                                    ->withPath("calendar/{selectedDate}/{$user->getId()}") // TODO: Add today's date in required format.
-                                    ->__toString(),
-                            ],
-                            [
-                                // TODO: Check permissions.
-                                'title' => 'Due Work',
-                                'icon' => 'icon-due-work',
-                                'url' => $this->buildBaseUrl()
-                                    ->withPath("") // TODO: Get URL.
-                                    ->__toString(),
-                            ],
-                            [
-                                // TODO: Check permissions.
-                                'title' => 'ePortfolio',
-                                'icon' => 'icon-eportfolio',
-                                'url' => $this->buildBaseUrl()
-                                    ->withPath("") // TODO: Get URL.
-                                    ->__toString(),
-                            ],
-                            [
-                                // TODO: Check permissions.
-                                'title' => 'Modify',
-                                'icon' => 'icon-modify',
-                                'url' => $this->buildBaseUrl()
-                                    ->withPath(" /adminv2/user/{$user->getId()}/modify")
-                                    ->__toString(),
-                            ],
-                        ]
-                    );
+                if (!($user instanceof User)) {
+                    return null;
                 }
 
-                // Nothing was here after all
-                return null;
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $this->userNameFormatter->formatObject($user),
+                    '/search/user/' . $match->id,
+                    $match->type,
+                    $match->relevance,
+                    $user->getUpdatedAt(),
+                    null,
+                    null,
+                    $this->buildBaseUrl()
+                        ->withPath('/portrait.php')
+                        ->withQuery(
+                            http_build_query([
+                                'id'   => $user->getId(),
+                                'size' => Storage::TRANSFORM_SQUARE64,
+                            ])
+                        )
+                        ->__toString(),
+                    'staff-students',
+                    null,
+                    null,
+                    [],
+                    $this->getSearchResultLinksForUser($user, $viewer)
+                );
             },
             $acceptedMatches,
         );
@@ -184,5 +154,58 @@ class Hydrator extends BaseHydrator
             $pb = $pb->notIn('g.group_type', $excludedRoles);
         }
         return $pb;
+    }
+
+    /**
+     * @param User $viewer
+     * @param User $searchResultUser
+     * @return array
+     */
+    private function getSearchResultLinksForUser(User $searchResultUser, User $viewer): array
+    {
+        $links = [];
+
+        if ($this->authorizer->isPathAuthorizedForUser('calendar.getCalendar', [$searchResultUser->getId()], $viewer)) {
+            $links[] = [
+                'title' => 'Calendar',
+                'icon' => 'icon-calendar',
+                'url' => $this->buildBaseUrl()
+                    ->withPath('/calendar/' . date('d-m-Y') . "/{$searchResultUser->getId()}")
+                    ->__toString(),
+            ];
+        }
+
+        if ($this->authorizer->isPathAuthorizedForUser('learningUpcoming.postUpcomingForStudent', [$searchResultUser->getId()], $viewer)) {
+            $links[] = [
+                'title' => 'Due Work',
+                'icon' => 'icon-due-work',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/learning/due/{$searchResultUser->getId()}")
+                    ->__toString(),
+            ];
+        }
+
+        $authenticator = new Eportfolio_Authenticator($viewer, $searchResultUser, null);
+        if ($authenticator->canView()) {
+            $links[] = [
+                'title' => 'ePortfolio',
+                'icon' => 'icon-eportfolio',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/eportfolio/{$searchResultUser->getId()}/profile")
+                    ->__toString(),
+            ];
+        }
+
+        if ($this->authorizer->isPathAuthorizedForUser('adminUser.getModify', [$searchResultUser->getId()], $viewer)) {
+            $links[] = [
+                'title' => 'Modify',
+                'icon' => 'icon-modify',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/adminv2/user/{$searchResultUser->getId()}/modify")
+                    ->__toString(),
+            ];
+        }
+
+        return $links;
     }
 }
