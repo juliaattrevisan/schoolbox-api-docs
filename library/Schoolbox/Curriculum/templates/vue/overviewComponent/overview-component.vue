@@ -12,7 +12,9 @@ import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 window.Vue.onMounted(() => {
-    findNodeLinks();
+    window.Vue.nextTick(() => {
+        findNodeLinks();
+    });
 });
 
 const selectedNode = window.Vue.ref(getEmptyNode());

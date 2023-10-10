@@ -83,8 +83,8 @@ class Controller extends Base
                 'Learning Outcomes' => null,
                 'Success Criteria' => null,
                 'Outcomes' => null,
-                'extras' => 0
             ];
+            $extraTextboxes = 0;
             // fetch all for the folder
             $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
                 SELECT
@@ -122,10 +122,11 @@ class Controller extends Base
                 } else {
                     // increase the extra textboxes by 1
                     // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
-                    $textboxes['extras']++;
+                    $extraTextboxes++;
                 }
             }
             $unitOut['textboxes'] = $textboxes;
+            $unitOut['extraTextboxes'] = $extraTextboxes;
 
             // activities
             $options = ['order' => ['sequence' => 'ASC']];
