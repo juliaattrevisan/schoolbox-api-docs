@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
@@ -94,6 +95,10 @@ class Module extends BaseModule
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->injector->get('assessmentDataSource');
 
+        // Need an authorizer.
+        /** @var Authorizer $authorizer */
+        $authorizer = $this->injector->get('authorizer');
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -167,6 +172,7 @@ class Module extends BaseModule
                     $assessmentMapperProxy,
                     $mapperFactory->get(UserMapper::class),
                     Access::getInstance(),
+                    $authorizer
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(

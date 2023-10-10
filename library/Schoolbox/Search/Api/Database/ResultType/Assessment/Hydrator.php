@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -41,11 +42,13 @@ class Hydrator extends BaseHydrator
      * @param AssessmentMapperProxy $assessmentMapperProxy Used to fetch assessments for hydration.
      * @param UserMapper $userMapper Used to hydrate assessment creators.
      * @param Access $access Used to determine if the current user may view this page.
+     * @param Authorizer $authorizer Used to determine if the current user may view system pages.
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private UserMapper $userMapper,
         private Access $access,
+        private Authorizer $authorizer,
     ) {
     }
 
@@ -109,7 +112,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword) {
+            function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword, $viewer) {
                 $assessment = $assessments->getBy('id', $match->id);
 
                 if (!($assessment instanceof IAssessable)) {
@@ -163,7 +166,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
                     $assessmentCreator,
                     [$folder],
-                    $this->getSearchResultLinksForAssessment($assessment),
+                    $this->getSearchResultLinksForAssessment($assessment, $viewer),
                 );
             },
             $matches
@@ -224,24 +227,29 @@ class Hydrator extends BaseHydrator
      * Return an array of sub-arrays, each sub-array containing info for one link.
      *
      * @param IAssessable $assessment
+     * @param User $viewer
      * @return array
      */
-    private function getSearchResultLinksForAssessment(IAssessable $assessment): array
+    private function getSearchResultLinksForAssessment(IAssessable $assessment, User $viewer): array
     {
-        $links = [
-            [
+        $links = [];
+
+        if ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getUpdateAssessmentForm', [$assessment->getId()], $viewer)) {
+            $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
                 'url' => $this->buildBaseUrl()
                     ->withPath("/learning/assessments/{$assessment->getId()}/modify")
                     ->__toString(),
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
-            ]
-        ];
+            ];
+        }
 
-        if ($assessment instanceof Assessment\Quiz\Model) {
+        if (
+            $assessment instanceof Assessment\Quiz\Model &&
+            $this->authorizer->isPathAuthorizedForUser('learnosity.getHorizontalMarking', [$assessment->getId()], $viewer)
+        ) {
             $links[] = [
-                // 'Review Horizontally' page.
                 'url' => $this->buildBaseUrl()
                     ->withPath("/learning/learnosity/{$assessment->getId()}/horizontal")
                     ->__toString(),
