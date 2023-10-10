@@ -72,10 +72,9 @@
     {% set userParameter = "userId=" ~ externalId %}
 {%  endif %}
 
-
 {% if render == "profile" %}
     {# handle 'profile' case separately because here we use a srcset. #}
-    <img src="/portrait.php?{{ userParameter }}{{ appendQueryParam }}"
+    <img src="/portrait.php?{{ userParameter }}&amp;size=constrain200{{ appendQueryParam }}"
         srcset="/portrait.php?{{ userParameter }}&amp;size=constrain200 200w, /portrait.php?{{ userParameter }}&amp;size=constrain500 500w"
         sizes="(max-width: 1300px) 200px, 500px"
     {% if class is not empty %}
