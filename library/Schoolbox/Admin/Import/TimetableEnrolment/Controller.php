@@ -80,8 +80,21 @@ class Controller extends UserAccount\Controller
      */
     public function getExport(): void
     {
-        $classEntries = $this->classEntryMapper->findAll()->indexBy('id');
-        $classInvolvements = $this->classInvolvementMapper->findAll();
+        /* Use a custom query to generate relationships
+         * Note that this excludes any broken involvements where it references
+         * nonexisting classes; use a LEFT JOIN instead, to reveal those.
+         */
+        $query = "
+            SELECT 
+                sc.code, 
+                sc.name,
+                scu.external_id
+            FROM
+                sis_class_user scu INNER JOIN sis_class sc ON scu.class_id = sc.id
+        ";
+
+        $statement = $this->classEntryMapper->getDatabase()->query($query);
+        $statement->execute();
 
         $fp = fopen('php://temp', 'w');
 
@@ -95,24 +108,7 @@ class Controller extends UserAccount\Controller
 
         /* Export properties into the same format as the csv
          */
-        foreach ($classInvolvements as $classInvolvement) {
-            /* Manually match the class involvements to their classes.
-             *
-             * I don't really think we need to hydrate these normally, because we've never really
-             * needed it outside of this one usage.
-             *
-             * It adds extra hydration that's never used effectively -except- in this one context.
-             * Even then we just need it to generate a csv
-             */
-            $classEntry = $classEntries[$classInvolvement->getClass()->getId()];
-            $classInvolvement->setClass($classEntry);
-
-            $row = [
-                $classInvolvement->getClass()?->getCode() ?? 'unknown',
-                $classInvolvement->getClass()?->getName() ?? 'unknown',
-                $classInvolvement->getExternalId()
-            ];
-
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             fputcsv($fp, $row);
         }
 
