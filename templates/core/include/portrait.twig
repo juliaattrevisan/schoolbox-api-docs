@@ -72,16 +72,9 @@
     {% set userParameter = "userId=" ~ externalId %}
 {%  endif %}
 
-{# Set a default size parameter
- # Images using our transcode must come with a &size querystring param
- # Without it, you can't get any images. Use the usual constrain200
- # for profile pictures, for now
- #}
-{% set sizeParameter = sizeParameter ~ 'constrain200' %}
-
 {% if render == "profile" %}
     {# handle 'profile' case separately because here we use a srcset. #}
-    <img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
+    <img src="/portrait.php?{{ userParameter }}&amp;size=constrain200{{ appendQueryParam }}"
         srcset="/portrait.php?{{ userParameter }}&amp;size=constrain200 200w, /portrait.php?{{ userParameter }}&amp;size=constrain500 500w"
         sizes="(max-width: 1300px) 200px, 500px"
     {% if class is not empty %}
