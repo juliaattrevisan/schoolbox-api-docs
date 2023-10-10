@@ -8,7 +8,9 @@ button.c-button[aria-expanded="true"] {
         background-color: var(--content-ui-background);
     }
     &:focus {
-        box-shadow: none;
+        &:not([disabled]) {
+            box-shadow: none;
+        }
     }
     // rotate when open
     .c-icon--dropdown {
@@ -28,7 +30,9 @@ button.f-match-existing-icon-only-styles {
         opacity: 1;
     }
     &:focus {
-        box-shadow: 0 0 0 2px currentColor;
+        &:not([disabled]) {
+            box-shadow: 0 0 0 2px currentColor;
+        }
     }
 }
 
@@ -47,6 +51,8 @@ button.f-match-existing-button-styles {
         transform: rotate(180deg);
     }
     &:focus {
-        box-shadow: 0 0 0 2px currentColor;
+        &:not([disabled]) {
+            box-shadow: 0 0 0 2px currentColor;
+        }
     }
 }
