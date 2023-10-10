@@ -68,7 +68,7 @@
             <section>
                 <h3 id="addTextboxModal-{{ component.instance.id }}-title">Create Text Box</h3>
                 <label class="required" for="addTextboxModal-{{ component.instance.id }}-form-heading">Title</label>
-                <input id="addTextboxModal-{{ component.instance.id }}-form-heading" type="text" name="heading" value="" required maxlength="100" />
+                <input id="addTextboxModal-{{ component.instance.id }}-form-heading" type="text" name="heading" value="{{ component.getConfig('componentname') }}" required maxlength="100" />
                 <input type="hidden" name="body" value="" />
                 <input type="submit" value="Create Text Box">
             </section>
