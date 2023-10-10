@@ -15,7 +15,9 @@ use Aura\Router\Generator;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -38,12 +40,15 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param Folder\Mapper $folderMapper   Used to fetch folders for hydration.
-     * @param Access        $access         Used to determine if the current user may view this page.
-     * @param Generator     $routeGenerator Used to build a route to the result search for pages.
+     * @param Mapper           $folderMapper     Used to fetch folders for hydration.
+     * @param UserAccessMapper $userAccessMapper
+     * @param Access           $access           Used to determine if the current user may view this page.
+     * @param Generator        $routeGenerator   Used to build a route to the result search for pages.
+     * @param Authorizer       $authorizer       Used to find page access permissions.
      */
     public function __construct(
         private Folder\Mapper $folderMapper,
+        private UserAccessMapper $userAccessMapper,
         private Access $access,
         private Generator $routeGenerator,
         private Authorizer $authorizer
@@ -190,17 +195,30 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        //if ($isGroupPage) {
-        //    if ($this->authorizer->isPathAuthorizedForUser('', [$folder->getId()], $viewer)) {
-        //        $links[] = [
-        //            'title' => 'Leave Group',
-        //            'icon' => 'icon-group',
-        //            'url' => $this->buildBaseUrl()
-        //                ->withPath('') // TODO: On group homepage, Leave Group posts directly to server.  Not sure how best to achieve that behaviour on the search page.
-        //                ->__toString(),
-        //        ];
-        //    }
-        //}
+        if ($isGroupPage) {
+            $groupUserAccessObjs = $this->userAccessMapper->findAllGroupsForUser($viewer);
+
+            $viewerIsMemberOfGroup = false;
+            foreach ($groupUserAccessObjs as $groupUserAccessObj) {
+                if (
+                    $groupUserAccessObj->getService() === UserAccess::SERVICE_HOMEPAGE &&
+                    $groupUserAccessObj->getServiceIdentifier() == $folder->getId()
+                ) {
+                    $viewerIsMemberOfGroup = true;
+                }
+            }
+
+            if ($viewerIsMemberOfGroup) {
+                $links[] = [
+                    'title' => 'Leave Group',
+                    'icon' => 'icon-logout',
+                    'url' => $this->buildBaseUrl()
+                        ->withPath('/group/joinForm.php')
+                        ->withQuery(http_build_query(['leave' => $folder->getId(), 'return' => 1]))
+                        ->__toString(),
+                ];
+            }
+        }
 
         if ($isCoursePage) {
             $courseSpec = $folder->getCourseSpecification();
