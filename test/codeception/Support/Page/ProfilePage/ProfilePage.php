@@ -36,6 +36,16 @@ class ProfilePage
     }
 
     /**
+     * click one of the buttons in the profile page
+     * options: eportfolio, due-work, tick, pastoral, calendar, timetable, document
+     */
+    public function clickButton(string $buttonName): void
+    {
+        $this->tester->click('a.icon-' . $buttonName);
+    }
+
+
+    /**
      * click one of the tabs in the profile page
      * options: activity, goals, achievements, classes, groups, contacts
      */

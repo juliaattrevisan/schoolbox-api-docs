@@ -112,6 +112,23 @@ class Common
         return $datetime->format(self::FORMAT_INPUT_DATETIME);
     }
 
+    /**
+     * confirm button on modal dialogs
+     */
+    public const CONFIRM_DIALOG_MODAL = 'a#confirm-dialog-confirm-button';
+
+    /**
+     * cancel button on modal dialogs
+     */
+    public const CANCEL_DIALOG_MODAL = 'a#confirm-dialog-cancel-button';
+
+    /**
+     * close x button on modal dialogs
+     */
+    public const CLOSE_BUTTON_MODAL = 'a.close-reveal-modal';
+
+
+
     public static function gentext(int $length)
     {
         $characters = 'abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+';
@@ -157,10 +174,34 @@ class Common
     }
 
     /**
-     * clicks the submit button by locating the last element in the apge
+     * clicks the submit button by locating the last element in the page
      */
     public function clickSubmitButton(): void
     {
         $this->tester->click(Locator::lastElement('a.button.submit'));
+    }
+
+    /**
+     * clicks the confirm button on the dialogs
+     */
+    public function clickConfirmButton(): void
+    {
+        $this->tester->click(self::CONFIRM_DIALOG_MODAL);
+    }
+
+    /**
+     * clicks the cancel button on the dialogs
+     */
+    public function clickCancelButton(): void
+    {
+        $this->tester->click(self::CANCEL_DIALOG_MODAL);
+    }
+
+    /**
+     * clicks the close x button on the dialogs
+     */
+    public function closeModal(): void
+    {
+        $this->tester->click(Locator::lastElement(self::CLOSE_BUTTON_MODAL));
     }
 }
