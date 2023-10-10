@@ -5,7 +5,7 @@
         ...
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
-{% set reportContentId = 'report_content' %}
+{% set reportContentId = 'report_container' %}
 
 {# Header #}
 <div class="row">
@@ -13,7 +13,7 @@
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 column">
-                    <h1>Upcoming Due Work for {{ student.formatName }}</h1>
+                    <h1>Upcoming Work for {{ student.formatName }}</h1>
                 </div>
             </div>
 
@@ -46,8 +46,8 @@
                     {% for child in children %}
                         <li>
                             <div class="card small-12">
-                                <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming Due Work">
-                                    {% include 'include/portrait.twig' with {user: child, description: 'View upcoming ' ~ locale.assessment.properPlural} only %}
+                                <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming {{  locale.activity }}">
+                                    {% include 'include/portrait.twig' with {user: child, description: 'View upcoming ' ~ locale.activity.properPlural} only %}
                                     <p>{{ child.formatName }}</p>
                                     <p class="meta">{{ child.role.name }}</p>
                                 </a>
@@ -65,8 +65,6 @@
     panel:     filterPanel,
     quickload: true
 } only %}
-
-{% set reportContentId = 'report_content' %}
 
 {% autoescape 'js' %}
     <script type="text/javascript">
@@ -106,7 +104,7 @@
 
 <div class="row">
     <div class="small-12 medium-6 columns island">
-        <h2 class="subheader">Upcoming Due Work</h2>
+        <h2 class="subheader">Upcoming Learning {{ locale.activity.properPlural }}</h2>
         <div id="{{ reportContentId }}"></div>
     </div>
 

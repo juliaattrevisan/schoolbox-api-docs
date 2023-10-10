@@ -195,8 +195,8 @@ $(function() {
                 {{ locale.rubricCriterion.properPlural }} are used as rows in a rubric.
                 These may be added while creating your rubric or initially setup via this screen.
                 {% if not allowModifyUsed %}
-                If you want to delete any {{ locale.rubricCriterion }} that has already been used on an {{ locale.assessment }},
-                you need to first remove it from the {{ locale.assessment }}, then you can delete it.
+                If you want to delete any {{ locale.rubricCriterion }} that has already been used on {{ locale.dueWork.indefiniteArticle }} {{ locale.dueWork }},
+                you need to first remove it from the {{ locale.dueWork }}, then you can delete it.
                 {% endif %}
                 If you remove all the {{ locale.rubricCriterion.plural}} from any {{ locale.rubricGroup }},
                 the {{ locale.rubricGroup }} will automatically be deleted.
@@ -345,7 +345,7 @@ $(function() {
                                 <nav>
                                     <a class="icon-info"
                                        href="#"
-                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                       title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
                                 </nav>
                             </li>
                             <li class="actions-small-1">
@@ -355,7 +355,7 @@ $(function() {
                                 <nav>
                                     <a class="icon-info"
                                        href="#"
-                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                       title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
                                 </nav>
                             </li>
                             <li class="actions-small-1">
@@ -365,7 +365,7 @@ $(function() {
                                 <nav>
                                     <a class="icon-info"
                                        href="#"
-                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                       title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
                                 </nav>
                             </li>
                             <li class="actions-small-1">
@@ -375,7 +375,7 @@ $(function() {
                                 <nav>
                                     <a class="icon-info"
                                        href="#"
-                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                       title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
                                 </nav>
                             </li>
                         </ul>
@@ -405,7 +405,7 @@ $(function() {
                                 <nav>
                                     <a class="icon-info"
                                        href="#"
-                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                       title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
                                 </nav>
                             </li>
                             <li class="actions-small-1">
@@ -415,7 +415,7 @@ $(function() {
                                 <nav>
                                     <a class="icon-info"
                                        href="#"
-                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                       title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
                                 </nav>
                             </li>
                             <li class="actions-small-1">
@@ -425,7 +425,7 @@ $(function() {
                                 <nav>
                                     <a class="icon-info"
                                        href="#"
-                                       title="Show {{ locale.assessment.plural }} using {{ locale.rubricCriterion }}"></a>
+                                       title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
                                 </nav>
                             </li>
                         </ul>
@@ -465,19 +465,19 @@ $(function() {
     {% if allowModifyUsed %}
         <p>
             If you remove it, it will be removed from all
-            {{ locale.assessment.plural }} in this {{ classTerm }}
+            {{ locale.dueWork.plural }} in this {{ classTerm }}
             and will be unavailable for use in future
-            {{ locale.assessment.plural }}.
+            {{ locale.dueWork.plural }}.
         </p>
         <p>
             Please note, it will not be removed from
-            {{ locale.assessment.plural }} on class pages that currently have
+            {{ locale.dueWork.plural }} on class pages that currently have
             the {{ locale.rubricCriterion }} imported and in use.
         </p>
     {% else %}
         <p>
             If you remove it, it will no longer be available to use in
-            {{ locale.assessment.plural }} on this {{ classTerm -}}.
+            {{ locale.dueWork.plural }} on this {{ classTerm -}}.
         </p>
     {% endif %}
     <p>

@@ -91,8 +91,8 @@
                         <ul data-dropdown-content class="f-dropdown" id="{{ dropdownId }}">
                             {% if hasAssessmentRoutes %}
                                 <li class="separator">{{ locale.translate('assessment', false, true) }}</li>
-                                {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
-                                {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
+                                {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.activity }}">Modify</a></li>{% endif %}
+                                {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.activity }}">Delete</a></li>{% endif %}
                             {% endif %}
                             {% if hasCourseRoutes %}
                                 <li class="separator">Course</li>

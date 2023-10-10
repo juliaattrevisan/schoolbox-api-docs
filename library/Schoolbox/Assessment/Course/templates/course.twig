@@ -133,7 +133,7 @@ Usage:
             var $button = $(this);
 
             $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this {{ locale.unit }}? This will also delete all Activities in the {{ locale.unit }}.',
+                text: 'Are you sure you wish to delete this {{ locale.unit }}? This will also delete all {{ locale.activity.plural }} in the {{ locale.unit }}.',
                 confirmEvent: function () {
                     $.post($button.attr('href'))
                         .done(function () {

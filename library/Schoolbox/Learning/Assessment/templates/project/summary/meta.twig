@@ -22,7 +22,7 @@
         <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {% if lastViews is not empty %}
                 {{ lastViews.student.status }}
-                {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
+                {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
             {% endif %}
         </li>
     {% endif %}
@@ -32,7 +32,7 @@
             {% if parent.date is not null %}
                 <li class="icon-staff" title="{{ parent.date }}">
                     <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
-                    {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
+                    {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
                 </li>
             {% endif %}
         {% endfor %}

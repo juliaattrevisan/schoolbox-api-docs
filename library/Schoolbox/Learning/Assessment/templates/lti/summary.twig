@@ -160,7 +160,7 @@
             <a class="button submit"
                {% if assessment.ltiTool.isTargetWindow %}target="_blank"{% endif %}
                href="{{ launchAssessmentUrl }}">
-                Attempt {{ locale.assessment.proper }}
+                Attempt {{ locale.activity.proper }}
                 {% if student.id != USER.id %}on behalf of {{ student.givenName }}{% endif %}
             </a>
         </div>
