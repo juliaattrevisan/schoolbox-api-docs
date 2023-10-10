@@ -33,8 +33,8 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         }
 
         // has an internal block for the checkboxes
-        $page->setBlock($keyblock, 'filters', 'filters_block');
-        $page->setVar('filters_block', '');
+        $page->setBlock($keyblock, 'assessmenttypes', 'assessmenttypes_block');
+        $page->setVar('assessmenttypes_block', '');
 
         /* filter config */
         foreach (Assessment\AssessmentType::getOptions($ltiEnabled) as $key => $filter) {
@@ -43,7 +43,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
                               'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($filter),
                               'COMPONENT_CONFIG_FILTER_SELECTED'  => $setConfig[$key] ?? 0 == 1 ? 'checked="checked"' : '',
                           ]);
-            $page->parse('filters_block', 'filters', true);
+            $page->parse('assessmenttypes_block', 'assessmenttypes', true);
         }
     }
 }
