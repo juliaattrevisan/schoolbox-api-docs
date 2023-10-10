@@ -10,27 +10,18 @@
 namespace Schoolbox\Realtime\Routing\Filter;
 
 use Schoolbox\IConfigLoader;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Realtime\MessageList;
+use Schoolbox\Realtime\MessageList\IListFactory;
 
 class FilterFactory
 {
-
-    /** @var IConfigLoader */
-    protected $conf;
     /**
-     * @var MessageList\IListFactory
+     * @param IListFactory|null  $factory
+     * @param IConfigLoader|null $conf
      */
-    private $factory;
-
-
-    /**
-     * @param MessageList\IListFactory $factory
-     * @param IConfigLoader            $conf
-     */
-    public function __construct(MessageList\IListFactory $factory = null, IConfigLoader $conf = null)
+    public function __construct(private ?MessageList\IListFactory $factory = null, protected ?IConfigLoader $conf = null)
     {
-        $this->factory = $factory;
-        $this->conf    = $conf;
     }
 
 
@@ -51,6 +42,7 @@ class FilterFactory
             new CampusMembershipFilter(),
             new RoleMembershipFilter(),
             new RoletypeFilter(),
+            new AccessFilter(Access::getInstance()),
         ]);
 
         if ($this->factory) {

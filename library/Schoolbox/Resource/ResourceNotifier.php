@@ -45,7 +45,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /** @var FolderMapper */
-    protected $folderMapper;
+    protected FolderMapper $folderMapper;
+
+    protected Access $access;
 
 
     /**
@@ -66,6 +68,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     public function loadDependencies($dependencies = null)
     {
         $this->folderMapper = FolderMapper::getInstance();
+        $this->access       = Access::getInstance();
+
         parent::loadDependencies($dependencies);
     }
 
@@ -139,10 +143,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     {
         $c = new Collection();
         $roletype = $currentUser->getRole()->getType();
-        $access      = Access::getInstance();
 
         try {
-            $currentPermission = $access->getFolderAccess($currentUser, $context);
+            $currentPermission = $this->access->getFolderAccess($currentUser, $context);
         } catch (Exception $e) {
             return $c;
         }
@@ -160,6 +163,10 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         foreach ($logs as $log) {
             $resource = $log->getObject();
+            if (!$this->canAccess($resource, $currentUser)) {
+                continue;
+            }
+
             $user     = $log->getUser();
             $time     = $log->getTimestamp()->getUnixTimeStamp();
 
@@ -235,6 +242,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->addTopic("cms.$kind.$id.$action")
             ->setMeta(['time' => \Alaress_Date_Format::now()->getUnixTimeStamp()])
             ->addFilter('roletype', [$roletype]);
+
+        // check access to the resource itself
+        if ($kind === LogMapper::KIND_FOLDER) {
+            $bob->addFilter('access', $id);
+        }
 
         $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
@@ -563,4 +575,14 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param Folder|File|Link|Textbox $resource
      */
     abstract protected function getAccessLevel($resource): int;
+
+    /**
+     * @param Link|Folder|Textbox|File|null $resource
+     * @param User                          $currentUser
+     * @return bool
+     */
+    public function canAccess(Link|Folder|Textbox|File|null $resource, User $currentUser): bool
+    {
+        return true;
+    }
 }

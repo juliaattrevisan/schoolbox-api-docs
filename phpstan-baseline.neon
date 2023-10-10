@@ -5101,11 +5101,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Routing/DispatchResponder.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Realtime/Routing/Filter/FilterFactory.php
-
-		-
 			message: "#^Return type \\(string\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\Subscription\\\\Test\\\\NestTestResolver\\:\\:getValue\\(\\) should be compatible with return type \\(bool\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\Subscription\\\\Resolver\\:\\:getValue\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Routing/Subscription/Test/NestTestResolver.php

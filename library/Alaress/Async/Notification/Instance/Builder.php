@@ -25,7 +25,6 @@ use OutOfBoundsException;
  */
 class Builder implements BuilderInterface
 {
-
     /** @var bool */
     protected $validate;
 
@@ -170,7 +169,7 @@ class Builder implements BuilderInterface
 
     /**
      * @param string $type
-     * @param array $ids
+     * @param mixed $ids
      * @return self
      */
     public function addFilter($type, $ids)
