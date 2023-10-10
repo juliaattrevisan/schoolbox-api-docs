@@ -212,7 +212,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                     null,
                     [$textbox->getCategory(),], // Context: textbox's folder
-                    $this->getSearchResultLinksForTextbox()
+                    $this->getSearchResultLinksForTextbox($textbox, $viewer)
                 );
             }
         }
