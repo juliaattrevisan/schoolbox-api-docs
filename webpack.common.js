@@ -153,6 +153,9 @@ module.exports = {
             "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js",
         linkedActivities: "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities.ts",
 
+        // Assessment
+        unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",
+
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",
 
