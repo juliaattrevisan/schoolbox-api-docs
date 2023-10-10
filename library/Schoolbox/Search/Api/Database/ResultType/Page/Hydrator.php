@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router\Generator;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -44,6 +44,7 @@ class Hydrator extends BaseHydrator
         private Folder\Mapper $folderMapper,
         private Access $access,
         private Generator $routeGenerator,
+        private Authorizer $authorizer
     ) {
     }
 
@@ -111,20 +112,21 @@ class Hydrator extends BaseHydrator
                     null,
                     $this->folderMapper->findParents($folder, null, true)->getAll(),
                     $this->getSearchResultLinksForFolder($folder, $viewer),
-                    [
-                        'subResults' => $this->buildBaseUrl()
-                            ->withPath(
-                                $this->routeGenerator->generate(
-                                    'searchApi.getSearchWithinFolder',
-                                    [
-                                        'folder'   => $folder,
-                                        'folderId' => $folder->getId(),
-                                    ]
-                                )
-                            )
-                            ->withQuery(http_build_query(['keyword' => $keyword]))
-                            ->__toString(),
-                    ],
+// TODO: Figure out what to do with this.
+//                    [
+//                        'subResults' => $this->buildBaseUrl()
+//                            ->withPath(
+//                                $this->routeGenerator->generate(
+//                                    'searchApi.getSearchWithinFolder',
+//                                    [
+//                                        'folder'   => $folder,
+//                                        'folderId' => $folder->getId(),
+//                                    ]
+//                                )
+//                            )
+//                            ->withQuery(http_build_query(['keyword' => $keyword]))
+//                            ->__toString(),
+//                    ],
                 );
             },
             $acceptedMatches,
@@ -154,7 +156,7 @@ class Hydrator extends BaseHydrator
         // Add links depending on page type and permissions, in alphabetical order of link title.
 
         if ($isClassPage) {
-            if ($folderAccessLevel >= UserAccess::ACCESS_READ) { // TODO: Are there specific permissions for class list?
+            if ($this->authorizer->isPathAuthorizedForUser('learning.getClassListPage', [$folder->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Class List',
                     'icon' => 'icon-class-list',
@@ -163,7 +165,7 @@ class Hydrator extends BaseHydrator
                         ->__toString(),
                 ];
             }
-            if ($folderAccessLevel >= UserAccess::ACCESS_READ) { // TODO: Are there specific permissions for markbook?
+            if ($this->authorizer->isPathAuthorizedForUser('learningMarkbook.getMarkbookForClass', [$folder->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Class Markbook',
                     'icon' => 'icon-curriculum',
@@ -185,21 +187,19 @@ class Hydrator extends BaseHydrator
         }
 
         if ($isGroupPage) {
-//            $group = $folder->getGroup();
-//            $isGroupMember = $viewer->isGroupMember($group->getId()); // No $group->getId() function.
-            if (true) { // TODO: If user belongs to group...
-                $links[] = [
-                    'title' => 'Leave Group',
-                    'icon' => 'icon-group',
-                    'url' => $this->buildBaseUrl()
-                        ->withPath("/group/update/members/{$folder->getId()}") // TODO: Is this the right URL?
-                        ->__toString(),
-                ];
-            }
+//            if ($this->authorizer->isPathAuthorizedForUser('', [$folder->getId()], $viewer)) {
+//                $links[] = [
+//                    'title' => 'Leave Group',
+//                    'icon' => 'icon-group',
+//                    'url' => $this->buildBaseUrl()
+//                        ->withPath('') // TODO: On group homepage, Leave Group posts directly to server.  Not sure how best to achieve that behaviour on the search page.
+//                        ->__toString(),
+//                ];
+//            }
         }
 
         if ($isCoursePage) {
-            if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) { // TODO: Are there specific permissions for modifying course?
+            if ($this->authorizer->isPathAuthorizedForUser('course.modifyCourse', [$folder->getCourseSpecification()->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Modify Course',
                     'icon' => 'icon-modify',
@@ -221,7 +221,7 @@ class Hydrator extends BaseHydrator
         }
 
         if ($isGroupPage) {
-            if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) { // TODO: Are there specific permissions for modifying groups?
+            if ($this->authorizer->isPathAuthorizedForUser('group.getModify', [$folder->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Manage Group',
                     'icon' => 'icon-group',

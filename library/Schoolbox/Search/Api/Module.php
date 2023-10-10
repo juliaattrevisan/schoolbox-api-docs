@@ -131,6 +131,7 @@ class Module extends BaseModule
                     $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
                     $routeGenerator,
+                    $authorizer
                 ),
                 new Database\ResultType\File\Hydrator(
                     $mapperFactory->get(FileMapper::class),
