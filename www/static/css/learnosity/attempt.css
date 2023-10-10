@@ -1,3 +1,15 @@
+/* use our font everywhere */
+.lrn,
+.lrn-assess {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif;
+}
+
+/* avoid the horizontal scroll on the questions container that's somehow being applied */
+.lrn_widget.lrn_mcq .lrn_mcqgroup {
+    overflow-x: visible;
+}
+
 .lrn-assess .app-panel {
     /* prevent the panel from going over the top of our existing UI elements */
     z-index: 10;
@@ -98,4 +110,23 @@
 .lrn.lrn-assess .dialogs .lrn_btn_blue:disabled {
     background-color: var(--content-ui-submit-background);
     border: none;
+}
+
+/* hide the side panel button on the right */
+/*.lrn.lrn-assess .lrn-right-region .right-wrapper .menu-mask,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .menu-overlay {
+    display: none;
+}
+.lrn.lrn-assess .lrn-vertical-toc {
+    right: 0;
+}*/
+
+/* to vertically align the timer with other items */
+.lrn.lrn-assess .counter {
+    line-height: 0.8;
+}
+
+/* the progress bar at the top, which moves across with question progress */
+.lrn-assess .items .progress span {
+    background-color: var(--content-ui-foreground);
 }
