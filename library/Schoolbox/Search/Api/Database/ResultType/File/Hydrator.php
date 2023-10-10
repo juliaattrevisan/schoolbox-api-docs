@@ -73,45 +73,46 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($files, $viewer) {
                 $file = $files->getBy('id', $match->id);
-                if ($file instanceof File\Model) {
-                    // Check if user has access to file's folder
-                    $fileAccess = $this->access->getFolderAccess($viewer, $file->getFolder()->getId());
-                    if ($fileAccess < UserAccess::ACCESS_READ) {
-                        return null;
-                    }
-                    if ($fileAccess < UserAccess::ACCESS_WRITE && $file->isHidden()) {
-                        return null;
-                    }
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $file->getTitle(),
-                        $this->buildBaseUrl()
-                             ->withPath('send.php')
-                             ->withQuery(http_build_query(['id' => $file->getId()]))
-                             ->__toString(),
-                        $match->type,
-                        $match->relevance,
-                        $file->getModifiedAt(),
-                        $file->getFolder(),
-                        "Posted {$file->getModifiedAt()->getRelativeTime()} by {$file->getOwner()->getFullName()}",
-                        (
-                            // Image? show thumbnail, otherwise show mimetype thumb.
-                            (str_contains($file->getMimetype()->__toString(), 'image'))
-                            ? $this->buildStorageImageUrl($file)->__toString()
-                            : $this->prefixGenerator->generate() . '/images/mime/' . $file->getMimetype()->getIconFile()
-                        ),
-                        'file',
-                        $file->getDescription(),
-                        // Should this be modified by instead?
-                        $file->getOwner(),
-                        // Context: file's folder
-                        [$file->getFolder(),],
-                        [],
-                    );
+                if (!($file instanceof File\Model)) {
+                    return null;
                 }
 
-                return null;
+                // Check if user has access to file's folder.
+                $fileAccess = $this->access->getFolderAccess($viewer, $file->getFolder()->getId());
+                if ($fileAccess < UserAccess::ACCESS_READ) {
+                    return null;
+                }
+                if ($fileAccess < UserAccess::ACCESS_WRITE && $file->isHidden()) {
+                    return null;
+                }
+
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $file->getTitle(),
+                    $this->buildBaseUrl()
+                         ->withPath('send.php')
+                         ->withQuery(http_build_query(['id' => $file->getId()]))
+                         ->__toString(),
+                    $match->type,
+                    $match->relevance,
+                    $file->getModifiedAt(),
+                    $file->getFolder(),
+                    "Posted {$file->getModifiedAt()->getRelativeTime()} by {$file->getOwner()->getFullName()}",
+                    (
+                        // Image? show thumbnail, otherwise show mimetype thumb.
+                        (str_contains($file->getMimetype()->__toString(), 'image'))
+                        ? $this->buildStorageImageUrl($file)->__toString()
+                        : $this->prefixGenerator->generate() . '/images/mime/' . $file->getMimetype()->getIconFile()
+                    ),
+                    'file',
+                    $file->getDescription(),
+                    // Should this be modified by instead?
+                    $file->getOwner(),
+                    // Context: file's folder
+                    [$file->getFolder(),],
+                    [],
+                );
             },
             $matches
         );
