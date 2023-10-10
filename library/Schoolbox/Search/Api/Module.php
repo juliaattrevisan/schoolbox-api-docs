@@ -125,6 +125,7 @@ class Module extends BaseModule
                     $mapperFactory->get(NewsMapper::class),
                     $routeGenerator,
                     $articleResolver,
+                    $authorizer
                 ),
                 new Database\ResultType\Page\Hydrator(
                     $mapperFactory->get(FolderMapper::class),
