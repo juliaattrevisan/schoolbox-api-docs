@@ -33,7 +33,7 @@
         {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
         {% block extraNavItems %}{% endblock %}
         {% if isActionRoutes %}
-            <wc-actions-dropdown content-id="duework-options{{ assessable.id }}" data-test="wc-actions-dropdown-duework-options{{ assessable.id }}"></wc-actions-dropdown>
+            <sbx-pop-out content-id="duework-options{{ assessable.id }}" data-test="sbx-pop-out-duework-options{{ assessable.id }}"></sbx-pop-out>
         {% endif %}
     </nav>
     {% if isActionRoutes %}

@@ -114,7 +114,7 @@
                 {% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %}
                     <nav>
                         {% if hasAssessmentRoutes or hasCourseRoutes %}
-                            <wc-actions-dropdown content-id="component{{ componentInstance.id }}-options-task{{ assessment.id }}"></wc-actions-dropdown>
+                            <sbx-pop-out content-id="component{{ componentInstance.id }}-options-task{{ assessment.id }}"></sbx-pop-out>
                         {% elseif isParticipant %}
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
                                 assessment: assessment,

@@ -374,10 +374,10 @@ export default {
                                     </h3>
                                 </div>
                                 <nav v-if="showBadgeMenus">
-                                    <wc-actions-dropdown
+                                    <sbx-pop-out
                                         :content-id="`badge-${badge.id}-dropdown`"
-                                        :data-test="`wc-actions-dropdown-badge-${badge.id}-dropdown`"
-                                    ></wc-actions-dropdown>
+                                        :data-test="`sbx-pop-out-badge-${badge.id}-dropdown`"
+                                    ></sbx-pop-out>
                                 </nav>
                                 <ul
                                     v-if="showBadgeMenus"

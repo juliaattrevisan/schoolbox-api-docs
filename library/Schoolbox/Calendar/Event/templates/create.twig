@@ -71,7 +71,7 @@
     </div>
     {% if event.id %}
         <nav>
-            <wc-actions-dropdown content-id="overflow"></wc-actions-dropdown>
+            <sbx-pop-out content-id="overflow"></sbx-pop-out>
         </nav>
         <ul class="f-dropdown" data-dropdown-content id="overflow">
             <li><a data-action="delete" href="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.id}) }}?{{ returnUrl }}" class="icon-delete">Delete Event</a></li>

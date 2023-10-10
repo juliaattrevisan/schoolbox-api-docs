@@ -278,7 +278,7 @@ module.exports = {
                 options: {
                     appendTsSuffixTo: [/\.vue$/],
                     compilerOptions: {
-                        isCustomElement: (tag) => tag.startsWith("wc-"), // allow wc- tags in vue templates, which is our custom element prefix
+                        isCustomElement: (tag) => tag.startsWith("sbx-"), // allow sbx- tags in vue templates, which is our custom element prefix
                         whitespace: "preserve",
                     },
                 },

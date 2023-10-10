@@ -1,0 +1,58 @@
+// To match the typical background colour of the dropdown content
+// and better visually connect the button to the content
+button.c-button[aria-expanded="true"] {
+    background-color: var(--content-ui-background);
+    opacity: 1;
+    &:hover,
+    &:active {
+        background-color: var(--content-ui-background);
+    }
+    &:focus {
+        &:not([disabled]) {
+            box-shadow: none;
+        }
+    }
+    // rotate when open
+    .c-icon--dropdown {
+        transform: rotate(0deg);
+    }
+}
+
+// ^foundation-fixes^
+// As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
+button.f-match-existing-icon-only-styles {
+    height: 42px !important;
+    min-height: 42px !important;
+    width: 40px !important;
+    opacity: 0.7;
+    &:hover,
+    &:active {
+        opacity: 1;
+    }
+    &:focus {
+        &:not([disabled]) {
+            box-shadow: 0 0 0 2px currentColor;
+        }
+    }
+}
+
+// ^foundation-fixes^
+// As we aren't quite ready to introduce the new button styles completely, we add these to match the existing styles as a stop gap
+button.f-match-existing-button-styles {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0;
+    // to provide more space for the icon
+    span {
+        padding-right: var(--spacing-s);
+    }
+    // is a up arrow by default, so flip
+    .c-icon--dropdown {
+        transform: rotate(180deg);
+    }
+    &:focus {
+        &:not([disabled]) {
+            box-shadow: 0 0 0 2px currentColor;
+        }
+    }
+}

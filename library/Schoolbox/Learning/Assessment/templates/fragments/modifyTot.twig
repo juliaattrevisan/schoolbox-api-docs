@@ -18,7 +18,7 @@
         {% if externalRedirectUrl is defined and externalRedirectUrl %}
             <a href="{{ externalRedirectUrl.url }}" class="icon-view alert" title="{{ externalRedirectUrl.name }}"></a>
         {% endif %}
-        <wc-actions-dropdown content-id="header-options" data-test="wc-actions-dropdown-header-options"></wc-actions-dropdown>
+        <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
     </nav>
     <ul data-dropdown-content id="header-options" class="f-dropdown">
         {% if gradeRoute %}

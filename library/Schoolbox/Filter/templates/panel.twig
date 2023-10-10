@@ -687,7 +687,7 @@ Usage:
 
                 // These will be deleted if the filter's not in use
                 componentsInUse[filterId]         = {};
-                componentsInUse[filterId]['name'] = $component.find('[data-filter-name]').html();
+                componentsInUse[filterId]['name'] = $component.find('[data-filter-name]').attr("button-text");
 
                 // Labels are keyed by value for now, because the label could
                 // be in both a selectize and a standard option.

@@ -86,7 +86,7 @@
                     {% if hasAssessmentRoutes or hasCourseRoutes %}
                         {% set dropdownId = "options-component" ~ component.instance.id ~ "-lessonplan" ~ lesson.id %}
                         <nav>
-                            <wc-actions-dropdown content-id="{{ dropdownId }}"></wc-actions-dropdown>
+                            <sbx-pop-out content-id="{{ dropdownId }}"></sbx-pop-out>
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" id="{{ dropdownId }}">
                             {% if hasAssessmentRoutes %}

@@ -21,15 +21,16 @@
 
     {% block filterComponent %}
         {% if isUserConfigurable %}
-            <span
-                    {% if isEmpty %}class="no-option" title="No options available"{% endif %}
-                    data-dropdown="filter-component-{{ definition.filter.id }}"
-                    aria-controls="{{ definition.filter.id }}"
-                    aria-expanded="false"
-                    data-filter-name>
-                {%- block filterName %}{{ definition.name }}{% endblock filterName -%}
-                
-            </span>
+            <sbx-pop-out
+                content-id="filter-component-{{ definition.filter.id }}"
+                button-text="{%- block filterName %}{{ definition.name }}{% endblock filterName -%}"
+                data-test="sbx-filters-dropdown-{{ definition.filter.id }}"
+                is-full-width
+                is-arrow-icon
+                data-filter-name
+                {% if isEmpty %}is-disabled{% endif %}
+            >
+            </sbx-pop-out>
         {% endif %}
 
         {# Are any options available? #}

@@ -610,10 +610,10 @@ export default {
                                             </a>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
-                                            <wc-actions-dropdown
+                                            <sbx-pop-out
                                                 :content-id="`evidence-${evidence.object.id}-dropdown`"
-                                                :data-test="`wc-actions-dropdown-evidence-${evidence.object.id}`"
-                                            ></wc-actions-dropdown>
+                                                :data-test="`sbx-pop-out-evidence-${evidence.object.id}`"
+                                            ></sbx-pop-out>
                                         </nav>
                                         <ul
                                             v-if="hasMenu(evidence.object)"

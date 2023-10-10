@@ -4,14 +4,14 @@
  * And using Vue with web components here: https://vuejs.org/guide/extras/web-components.html
  */
 
-import WcActionsDropdown from "@schoolboxVue/components/dropdown/wc-actions-dropdown.ce.vue";
+import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 
 /**
  * Register all web components here
  */
 export function register() {
-    const WcActionsDropdownCE = window.Vue.defineCustomElement(WcActionsDropdown);
-    window.customElements.define("wc-actions-dropdown", WcActionsDropdownCE);
+    const SbxPopOutCE = window.Vue.defineCustomElement(SbxPopOut);
+    window.customElements.define("sbx-pop-out", SbxPopOutCE);
 }
 
 register();

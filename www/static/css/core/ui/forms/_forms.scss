@@ -988,53 +988,6 @@ ul.filters {
             border-right: 0;
             flex: 0 0 100% !important;
         }
-
-        &.btn {
-            border: 0;
-            flex: 2 auto;
-            max-width: rem-calc(300);
-
-            @media #{$medium-down} {
-                flex: 0 0 100%;
-                max-width: none;
-            }
-        }
-
-        > span {
-            display: block;
-            padding: 0.6rem 2.5rem 0.6rem 1.5rem;
-            position: relative;
-            text-align: center;
-
-            &:hover {
-                cursor: pointer;
-            }
-
-            &.open {
-                background: $ghost;
-            }
-
-            &.no-option {
-                opacity: 0.5;
-
-                &:hover {
-                    cursor: not-allowed;
-                }
-            }
-
-            &::after {
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 5px solid $black;
-                content: "";
-                height: 0;
-                position: absolute;
-                right: 1rem;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 0;
-            }
-        }
     }
 
     .course-title {

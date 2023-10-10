@@ -1,5 +1,7 @@
 /**
  *  To toggle the display of the content when the button is selected
+ *  floating-ui/dom is used to help position the content relative to the button,
+ *  trying to ensure the content is always in the viewport
  */
 
 import {
@@ -18,19 +20,27 @@ import { onClickOutside } from "@vueuse/core";
 
 /**
  * To toggle the display of the content when the button is selected
- * @param {Ref<HTMLButtonElement>} button - The dropdown button
+ * @param {Ref<HTMLButtonElement>} button - The pop out button
  * @param {string} buttonLabel - The label to display on the button
- * @param {string} contentId - The id of the dropdown content
+ * @param {string} contentId - The id of the pop out content
+ * @param {string} optimalPlacement - The optimal placement of the pop out content
+ * @param {boolean} isFullWidth - Whether the pop out is a filter or not
  * @returns {object} - The isOpen ref
  */
-export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, contentId: string) {
+export function usePopOut(
+    button: Ref<HTMLButtonElement>,
+    buttonLabel: string,
+    contentId: string,
+    optimalPlacement = "bottom-end",
+    isFullWidth = false
+) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     let content: HTMLElement; // The content to display when the button is selected
     let cleanup: () => void; // The cleanup function returned by @floating-ui/dom
 
     /**
      * The label to display on the button,
-     * changes depending on whether the dropdown is open or not
+     * changes depending on whether the pop out is open or not
      */
     const currentLabel = window.Vue.computed(() => {
         return isOpen.value ? `Hide ${buttonLabel}` : `Show ${buttonLabel}`;
@@ -44,13 +54,15 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
             isOpen.value = false;
             content.style.display = "none";
             content.setAttribute("aria-hidden", "true");
+            // reset the colour of the button to default after changing on open state
+            button.value.style.backgroundColor = "";
             cleanup();
         }
     }
 
     /**
      * To get the transform origin of the content, relative to where it's positioned
-     * @param {Placement} placement - The placement of the dropdown content
+     * @param {Placement} placement - The placement of the pop out content
      * @returns {string} - The transform origin
      */
     function getTransformOrigin(placement: Placement) {
@@ -80,7 +92,7 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
             opacity: 0,
             scaleX: 0.95,
             scaleY: 0.95,
-            transformOrigin: getTransformOrigin(position.placement),
+            transformOrigin: isFullWidth ? "top middle" : getTransformOrigin(position.placement),
             duration: reduceMotion ? 0 : 0.3,
         });
     }
@@ -91,7 +103,7 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
      */
     async function getPosition() {
         const position = await computePosition(button.value as ReferenceElement, content, {
-            placement: "bottom-end",
+            placement: optimalPlacement as Placement,
             middleware: [
                 flip({
                     boundary: document.querySelector("#container") as Boundary,
@@ -116,13 +128,21 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
 
     /**
      * Open the content using @floating-ui/dom to position it relative to the button
+     * https://floating-ui.com/
      */
     async function open() {
         isOpen.value = true;
         content.style.display = "block"; // The element must be visible to correctly compute its position
+        // if it's a full width, set the width of the content to the width of the button
+        if (isFullWidth) {
+            content.style.width = `${button.value.getBoundingClientRect().width}px`;
+            content.style.maxWidth = `${button.value.getBoundingClientRect().width}px`;
+        }
+        content.setAttribute("aria-hidden", "false");
+        // the button will always match the colour of the content when open
+        button.value.style.backgroundColor = window.getComputedStyle(content).getPropertyValue("background-color");
         cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition);
         const position = await getPosition();
-        content.setAttribute("aria-hidden", "false");
         animateOpen(position);
     }
 
@@ -149,6 +169,8 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
         content = document.querySelector(`#${contentId}[data-dropdown-content]`) as HTMLElement;
         if (content) {
             content.setAttribute("aria-hidden", "true");
+            // to close the content when the user clicks outside of it
+            onClickOutside(button, close, { ignore: [`#${content.id}[data-dropdown-content]`] });
         }
     }
 
@@ -163,8 +185,6 @@ export function usePopOut(button: Ref<HTMLButtonElement>, buttonLabel: string, c
                 getContent();
             });
         }
-        // to close the content when the user clicks outside of it
-        onClickOutside(button, close);
     });
 
     return { currentLabel, isOpen, onButtonSelected };

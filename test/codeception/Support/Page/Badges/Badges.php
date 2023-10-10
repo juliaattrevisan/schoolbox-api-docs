@@ -60,7 +60,7 @@ class Badges
      */
     public function clickBadgeDropdown($badgeNumber): void
     {
-        $this->tester->clickElementInWebComponent('[data-test=wc-actions-dropdown-badge-' . $badgeNumber . '-dropdown]', '[data-test=wc-actions-dropdown-badge-' . $badgeNumber . '-dropdown-button]');
+        $this->tester->clickElementInWebComponent('[data-test=sbx-pop-out-badge-' . $badgeNumber . '-dropdown]', '[data-test=sbx-pop-out-badge-' . $badgeNumber . '-dropdown-button]');
     }
 
     /**

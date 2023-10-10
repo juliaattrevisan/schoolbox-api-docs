@@ -18,7 +18,7 @@
 {% block folderListItemActions %}
     {% if routeSubjectReport or hasTeachersWithEmail  %}
     <nav>
-        <wc-actions-dropdown content-id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}"></wc-actions-dropdown>
+        <sbx-pop-out content-id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}"></sbx-pop-out>
     </nav>
     <ul id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" class="f-dropdown" data-dropdown-content>
         {% if routeSubjectReport %}

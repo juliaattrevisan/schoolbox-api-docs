@@ -716,9 +716,7 @@ export default {
                             <td class="no-pad">
                                 <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                     <nav>
-                                        <wc-actions-dropdown
-                                            :content-id="`overflow${student.id}`"
-                                        ></wc-actions-dropdown>
+                                        <sbx-pop-out :content-id="`overflow${student.id}`"></sbx-pop-out>
                                     </nav>
                                 </div>
                             </td>
