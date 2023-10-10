@@ -30,7 +30,7 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
 <template>
     <div class="activity-list">
         <div class="information-list">
-            <li v-for="activity in displayedActivities" :key="activity.id">
+            <li v-for="activity in displayedActivities" :key="activity.id" class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12 compact wrap-down">
                         <a :href="activity._links.status">
@@ -39,6 +39,16 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
                         </a>
                     </div>
                 </div>
+                <nav>
+                    <wc-actions-dropdown
+                        :content-id="'dropdown-unitplanner-activity-' + activity.id"
+                    ></wc-actions-dropdown>
+                </nav>
+                <ul :id="'dropdown-unitplanner-activity-' + activity.id" class="f-dropdown" data-dropdown-content>
+                    <li>
+                        <a :href="activity._links.status" class="icon-progress">View Status</a>
+                    </li>
+                </ul>
             </li>
         </div>
         <div v-if="!isExpanded && props.activities.length > maxUnexpandedActivities" class="show-more-container">
