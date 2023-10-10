@@ -76,7 +76,7 @@ class Hydrator extends BaseHydrator
 
         // Map those folders to full results
         $fullResults = array_map(
-            function (RawResult $match) use ($folders, $viewer, $keyword) {
+            function (RawResult $match) use ($folders, $viewer) {
                 $folder = $folders->getBy('id', $match->id);
 
                 if (!($folder instanceof Folder\Model)) {
@@ -114,21 +114,21 @@ class Hydrator extends BaseHydrator
                     null,
                     $this->folderMapper->findParents($folder, null, true)->getAll(),
                     $this->getSearchResultLinksForFolder($folder, $viewer),
-// TODO: Figure out what to do with this.
-//                    [
-//                        'subResults' => $this->buildBaseUrl()
-//                            ->withPath(
-//                                $this->routeGenerator->generate(
-//                                    'searchApi.getSearchWithinFolder',
-//                                    [
-//                                        'folder'   => $folder,
-//                                        'folderId' => $folder->getId(),
-//                                    ]
-//                                )
-//                            )
-//                            ->withQuery(http_build_query(['keyword' => $keyword]))
-//                            ->__toString(),
-//                    ],
+                    // TODO: Figure out what to do with this.
+                    //[
+                    //    'subResults' => $this->buildBaseUrl()
+                    //        ->withPath(
+                    //            $this->routeGenerator->generate(
+                    //                'searchApi.getSearchWithinFolder',
+                    //                [
+                    //                    'folder'   => $folder,
+                    //                    'folderId' => $folder->getId(),
+                    //                ]
+                    //            )
+                    //        )
+                    //        ->withQuery(http_build_query(['keyword' => $keyword]))
+                    //        ->__toString(),
+                    //],
                 );
             },
             $acceptedMatches,
@@ -188,17 +188,17 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-//        if ($isGroupPage) {
-//            if ($this->authorizer->isPathAuthorizedForUser('', [$folder->getId()], $viewer)) {
-//                $links[] = [
-//                    'title' => 'Leave Group',
-//                    'icon' => 'icon-group',
-//                    'url' => $this->buildBaseUrl()
-//                        ->withPath('') // TODO: On group homepage, Leave Group posts directly to server.  Not sure how best to achieve that behaviour on the search page.
-//                        ->__toString(),
-//                ];
-//            }
-//        }
+        //if ($isGroupPage) {
+        //    if ($this->authorizer->isPathAuthorizedForUser('', [$folder->getId()], $viewer)) {
+        //        $links[] = [
+        //            'title' => 'Leave Group',
+        //            'icon' => 'icon-group',
+        //            'url' => $this->buildBaseUrl()
+        //                ->withPath('') // TODO: On group homepage, Leave Group posts directly to server.  Not sure how best to achieve that behaviour on the search page.
+        //                ->__toString(),
+        //        ];
+        //    }
+        //}
 
         if ($isCoursePage) {
             $route = 'course.modifyCourse';
