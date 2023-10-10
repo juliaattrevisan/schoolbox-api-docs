@@ -9,9 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
 use Component_Config_Collapse;
 use Component_Config_ShowComponentTitle;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -46,6 +49,8 @@ class Hydrator extends BaseHydrator
         private TextboxMapper $textboxMapper,
         private FolderMapper $folderMapper,
         private Access $access,
+        private Generator $routeGenerator,
+        private Authorizer $authorizer,
     ) {
     }
 
@@ -305,6 +310,7 @@ class Hydrator extends BaseHydrator
      * @param User         $viewer
      * @param TextboxModel $textbox
      * @return array
+     * @throws RouteNotFound
      * @throws Exception
      */
     private function getSearchResultLinksForTextbox(TextboxModel $textbox, User $viewer): array
@@ -313,14 +319,17 @@ class Hydrator extends BaseHydrator
 
         $textboxFolder = $textbox->getCategory();
 
-        if ($this->access->getFolderAccess($viewer, $textboxFolder->getId()) >= UserAccess::ACCESS_WRITE) {
+        $route = "/textbox/folder/{folderId}";
+        $params = ['folderId' => $textboxFolder->getId()];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
+                'url' => $this->routeGenerator->generate($route, $params),
                 'title' => 'Manage All Textboxes',
                 'icon' => 'icon-textbox',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/textbox/folder/{$textboxFolder->getId()}")
-                    ->__toString(),
             ];
+        }
+
+        if ($this->access->getFolderAccess($viewer, $textboxFolder->getId()) >= UserAccess::ACCESS_WRITE) {
             $links[] = [
                 // This just links to the textbox not yet open for modification.
                 // To modify the user must click 'Modify' at the bottom of the textbox.

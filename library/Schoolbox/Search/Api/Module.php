@@ -152,6 +152,8 @@ class Module extends BaseModule
                     $mapperFactory->get(TextboxMapper::class),
                     $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
+                    $routeGenerator,
+                    $authorizer
                 ),
                 new Database\ResultType\Blog\Hydrator(
                     $mapperFactory->get(BlogMapper::class),

@@ -175,20 +175,22 @@ class Hydrator extends BaseHydrator
         $links = [];
 
         $route = 'calendar.getCalendar';
-        if ($this->authorizer->isPathAuthorizedForUser($route, [$searchResultUser->getId()], $viewer)) {
+        $params = ['userId' => $searchResultUser->getId()];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Calendar',
                 'icon' => 'icon-calendar',
-                'url' => $this->routeGenerator->generate($route, ['userId' => $searchResultUser->getId()]),
+                'url' => $this->routeGenerator->generate($route, $params),
             ];
         }
 
         $route = 'learningUpcoming.postUpcomingForStudent';
-        if ($this->authorizer->isPathAuthorizedForUser($route, [$searchResultUser->getId()], $viewer)) {
+        // Params needed here are the same as set above.
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Due Work',
                 'icon' => 'icon-due-work',
-                'url' => $this->routeGenerator->generate($route, ['userId' => $searchResultUser->getId()]),
+                'url' => $this->routeGenerator->generate($route, $params),
             ];
         }
 
@@ -204,11 +206,12 @@ class Hydrator extends BaseHydrator
         }
 
         $route = 'adminUser.getModify';
-        if ($this->authorizer->isPathAuthorizedForUser($route, [$searchResultUser->getId()], $viewer)) {
+        // Params needed here are the same as set above.
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
-                'url' => $this->routeGenerator->generate($route, ['userId' => $searchResultUser->getId()]),
+                'url' => $this->routeGenerator->generate($route, $params),
             ];
         }
 

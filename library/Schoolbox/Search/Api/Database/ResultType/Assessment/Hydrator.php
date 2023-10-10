@@ -240,22 +240,24 @@ class Hydrator extends BaseHydrator
         $links = [];
 
         $route = 'learningAssessment.getUpdateAssessmentForm';
-        if ($this->authorizer->isPathAuthorizedForUser($route, [$assessment->getId()], $viewer)) {
+        $params = ['assessmentId' => $assessment->getId()];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
-                'url' => $this->routeGenerator->generate($route, ['assessmentId' => $assessment->getId()]),
+                'url' => $this->routeGenerator->generate($route, $params),
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
             ];
         }
 
         $route = 'learnosity.getHorizontalMarking';
+        // Params needed here are the same as set above.
         if (
             $assessment instanceof Assessment\Quiz\Model &&
-            $this->authorizer->isPathAuthorizedForUser($route, [$assessment->getId()], $viewer)
+            $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)
         ) {
             $links[] = [
-                'url' => $this->routeGenerator->generate($route, ['assessmentId' => $assessment->getId()]),
+                'url' => $this->routeGenerator->generate($route, $params),
                 'title' => 'Horizontal Marking',
                 'icon' => 'icon-modify',
             ];

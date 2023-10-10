@@ -161,19 +161,21 @@ class Hydrator extends BaseHydrator
 
         if ($isClassPage) {
             $route = 'learning.getClassListPage';
-            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getId()], $viewer)) {
+            $params = ['folderId' => $folder->getId()];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Class List',
                     'icon' => 'icon-class-list',
-                    'url' => $this->routeGenerator->generate($route, ['folderId' => $folder->getId()]),
+                    'url' => $this->routeGenerator->generate($route, $params),
                 ];
             }
             $route = 'learningMarkbook.getMarkbookForClass';
-            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getId()], $viewer)) {
+            // Params needed here are the same as set above.
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Class Markbook',
                     'icon' => 'icon-curriculum',
-                    'url' => $this->routeGenerator->generate($route, ['folderId' => $folder->getId()]),
+                    'url' => $this->routeGenerator->generate($route, $params),
                 ];
             }
         }
@@ -202,11 +204,12 @@ class Hydrator extends BaseHydrator
 
         if ($isCoursePage) {
             $route = 'course.modifyCourse';
-            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getCourseSpecification()->getId()], $viewer)) {
+            $params = ['courseId' => $folder->getCourseSpecification()->getId()];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Modify Course',
                     'icon' => 'icon-modify',
-                    'url' => $this->routeGenerator->generate($route, ['courseId' => $folder->getCourseSpecification()->getId()]),
+                    'url' => $this->routeGenerator->generate($route, $params),
                 ];
             }
         }
@@ -223,11 +226,12 @@ class Hydrator extends BaseHydrator
 
         if ($isGroupPage) {
             $route = 'group.getModify';
-            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getId()], $viewer)) {
+            $params = ['folderId' => $folder->getId()];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Manage Group',
                     'icon' => 'icon-group',
-                    'url' => $this->routeGenerator->generate($route, ['folderId' => $folder->getId()]),
+                    'url' => $this->routeGenerator->generate($route, $params),
                 ];
             }
         }
