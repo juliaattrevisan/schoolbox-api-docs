@@ -70,39 +70,36 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($keyword, $badges, $viewer) {
                 $badge = $badges->getBy('id', $match->id);
-                if ($badge instanceof BadgeModel) {
-                    // For other searched items, permission checks are done here.
-                    // But badges are not linked to folders, so no permission checks.
-
-                    // Work out image path for badge
-                    $image = null;
-                    if ($badge->getIcon()) {
-                        $image = $this->prefixGenerator->generate() . $badge->getIcon();
-                    }
-                    if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
-                        $image = $this->buildStorageImageUrl($badge->getImage())->__toString();
-                    }
-                    $badgeBody = (new ToText($badge->getBody()))->getText();
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $badge->getName(), // The closest thing to a title for a badge is badge.name.
-                        '',  // There is no 'view specific badge' page, so blank string here.
-                        $match->type,
-                        $match->relevance,
-                        $badge->getUpdatedAt(),
-                        null, // A badge is not linked to any folder.
-                        $badge->getCategory()->getName(), // Meta.  Context line for the search result.
-                        $image,
-                        'badge',
-                        $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
-                        $badge->getCreatedBy(),
-                        [], // Context.  Empty since no linked folder.
-                        $this->getSearchResultLinksForBadge($badge, $viewer)
-                    );
+                if (!($badge instanceof BadgeModel)) {
+                    return null;
                 }
 
-                return null;
+                // Work out image path for badge
+                $image = null;
+                if ($badge->getIcon()) {
+                    $image = $this->prefixGenerator->generate() . $badge->getIcon();
+                }
+                if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
+                    $image = $this->buildStorageImageUrl($badge->getImage())->__toString();
+                }
+                $badgeBody = (new ToText($badge->getBody()))->getText();
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $badge->getName(), // The closest thing to a title for a badge is badge.name.
+                    '',  // There is no 'view specific badge' page, so blank string here.
+                    $match->type,
+                    $match->relevance,
+                    $badge->getUpdatedAt(),
+                    null, // A badge is not linked to any folder.
+                    $badge->getCategory()->getName(), // Meta.  Context line for the search result.
+                    $image,
+                    'badge',
+                    $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
+                    $badge->getCreatedBy(),
+                    [], // Context.  Empty since no linked folder.
+                    $this->getSearchResultLinksForBadge($badge, $viewer)
+                );
             },
             $matches
         );
