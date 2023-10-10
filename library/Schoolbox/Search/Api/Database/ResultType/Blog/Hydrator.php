@@ -72,7 +72,7 @@ class Hydrator extends BaseHydrator
                 if (!$blog instanceof Blog) {
                     return null;
                 }
-                
+
                 $access = $this->access->getFolderAccess($viewer, $blog->getFolder()->getId());
                 if ($access < UserAccess::ACCESS_READ) {
                     return null;
