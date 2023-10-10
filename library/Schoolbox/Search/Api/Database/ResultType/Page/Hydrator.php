@@ -196,10 +196,8 @@ class Hydrator extends BaseHydrator
         }
 
         if ($isGroupPage) {
-            $groupUserAccessObjs = $this->userAccessMapper->findAllGroupsForUser($viewer);
-
             $viewerIsMemberOfGroup = false;
-            foreach ($groupUserAccessObjs as $groupUserAccessObj) {
+            foreach ($this->userAccessMapper->findAllGroupsForUser($viewer) as $groupUserAccessObj) {
                 if (
                     $groupUserAccessObj->getService() === UserAccess::SERVICE_HOMEPAGE &&
                     $groupUserAccessObj->getServiceIdentifier() == $folder->getId()
