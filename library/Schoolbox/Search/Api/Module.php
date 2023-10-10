@@ -156,6 +156,7 @@ class Module extends BaseModule
                 new Database\ResultType\Badge\Hydrator(
                     $mapperFactory->get(BadgeMapper::class),
                     new PrefixGenerator($this->getConfig()),
+                    $authorizer
                 ),
                 new Database\ResultType\Tile\Hydrator(
                     $mapperFactory->get(TileMapper::class),

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
@@ -36,7 +37,8 @@ class Hydrator extends BaseHydrator
      */
     public function __construct(
         private BadgeMapper $badgeMapper,
-        private PrefixGenerator $prefixGenerator
+        private PrefixGenerator $prefixGenerator,
+        private Authorizer $authorizer
     ) {
     }
 
@@ -66,7 +68,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($keyword, $badges) {
+            function (RawResult $match) use ($keyword, $badges, $viewer) {
                 $badge = $badges->getBy('id', $match->id);
                 if ($badge instanceof BadgeModel) {
                     // For other searched items, permission checks are done here.
@@ -96,32 +98,7 @@ class Hydrator extends BaseHydrator
                         $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
                         $badge->getCreatedBy(),
                         [], // Context.  Empty since no linked folder.
-                        [
-                            [
-                                // TODO: Check permissions.
-                                'title' => 'Award Achievements',
-                                'icon' => 'icon-badge',
-                                'url' => $this->buildBaseUrl()
-                                    ->withPath("") // TODO: Get URL.
-                                    ->__toString(),
-                            ],
-                            [
-                                // TODO: Check permissions.
-                                'title' => 'Modify Badge',
-                                'icon' => 'icon-modify',
-                                'url' => $this->buildBaseUrl()
-                                    ->withPath("/learning/badge/{$badge->getId()}/update")
-                                    ->__toString(),
-                            ],
-                            [
-                                // TODO: Check permissions.
-                                'title' => 'Set Goal',
-                                'icon' => 'icon-goal',
-                                'url' => $this->buildBaseUrl()
-                                    ->withPath("") // TODO: Get URL.
-                                    ->__toString(),
-                            ],
-                        ],
+                        $this->getSearchResultLinksForBadge($badge, $viewer)
                     );
                 }
 
@@ -132,5 +109,49 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing.
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     *
+     * @param BadgeModel $badge
+     * @param User $viewer
+     * @return array
+     */
+    private function getSearchResultLinksForBadge(BadgeModel $badge, User $viewer): array
+    {
+        $links = [];
+
+        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
+            $links[] = [
+                'title' => 'Award Achievement',
+                'icon' => 'icon-badge',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("") // TODO: On learning/badge page, Award Achievement opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
+                    ->__toString(),
+            ];
+        }
+
+        if ($this->authorizer->isPathAuthorizedForUser('learningBadge.getUpdateForm', [$badge->getId()], $viewer)) {
+            $links[] = [
+                'title' => 'Modify Badge',
+                'icon' => 'icon-modify',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/learning/badge/{$badge->getId()}/update")
+                    ->__toString(),
+            ];
+        }
+
+        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
+            $links[] = [
+                'title' => 'Set Goal',
+                'icon' => 'icon-goal',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("") // TODO: On learning/badge page, Set Goal opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
+                    ->__toString(),
+            ];
+        }
+
+        return $links;
     }
 }
