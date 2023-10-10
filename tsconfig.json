@@ -9,6 +9,7 @@
         "paths": {
             "@schoolboxCurriculum/*": ["library/Schoolbox/Curriculum/templates/*"],
             "@schoolboxBadge/*": ["library/Schoolbox/Learning/Badge/*"],
+            "@schoolboxAssessment": ["library/Schoolbox/Assessment/*"],
             "@schoolboxVue/*": ["vue/*"],
             "@js/*": ["www/static/js/*"]
         },
