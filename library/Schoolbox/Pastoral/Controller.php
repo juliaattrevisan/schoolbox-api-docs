@@ -451,6 +451,7 @@ class Controller extends Base
      */
     public function getStudentRecordInsertForm(?User $student): void
     {
+        $this->assertSyncability();
         // Throw in a blank pastoral record with the student populated
 
         $record = $this->pastoralDataSource->createModel();
@@ -477,6 +478,7 @@ class Controller extends Base
      */
     public function getStudentRecordUpdateForm(Model $record): void
     {
+        $this->assertSyncability();
         if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             $severities = [];
         } else {
@@ -648,6 +650,7 @@ class Controller extends Base
      */
     public function postCommentDelete(PastoralComment $comment): void
     {
+        $this->assertSyncability();
         // Delete from internal database
 
         $this->pastoralCommentMapper->delete($comment);
@@ -668,6 +671,7 @@ class Controller extends Base
      */
     public function postCommentInsert(Model $record): void
     {
+        $this->assertSyncability();
         $post = $this->requestPost;
         /**
          * confirm if the user can view / edit the private part of the record
@@ -757,6 +761,7 @@ class Controller extends Base
      */
     public function postRecordInsert(): void
     {
+        $this->assertSyncability();
         $post = $this->requestPost;
 
         $studentId           = (int)$post->get('student_id');
@@ -812,6 +817,7 @@ class Controller extends Base
      */
     public function postRecordUpdate(): void
     {
+        $this->assertSyncability();
         $post = $this->requestPost;
 
         // Grab the pastoral record we are updating
@@ -1147,6 +1153,7 @@ class Controller extends Base
      */
     public function postRecordDelete($record): void
     {
+        $this->assertSyncability();
         $studentId = $record->getStudent()->getId();
 
         /* Normally we would apply this logic in the mapper, but in this case we intentionally
@@ -1408,6 +1415,32 @@ class Controller extends Base
             ];
         });
         $this->response = $this->responseAsJson($data);
+    }
+
+    /**
+     * Assert with a reasonable degree of certainty that the current user won't
+     * receive an error when a record which they create is synced to whichever
+     * external system.
+     *
+     * Created as a controller method instead of as a permission, because the
+     * create/modify buttons shouldn't be hidden: this is an issue which should
+     * be raised to Schoolbox admins.
+     *
+     * @return void
+     * @throws Exception
+     */
+    private function assertSyncability(): void
+    {
+        $message = 'Your user account does not have an external ID, and thus cannot create or modify pastoral records.';
+        if (!$this->getUser()->isSuperuser()) {
+            $message .= ' Please contact your Schoolbox administrator.';
+        }
+        if (
+            ($this->getUser()->getExternalId() ?? '') === '' &&
+            $this->config->get(ConfigMapper::NAME_EXTERNAL_PASTORAL)
+        ) {
+            throw $this->errorMapper->generateException(null, null, $message);
+        }
     }
 }
 
