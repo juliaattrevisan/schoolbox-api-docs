@@ -122,15 +122,15 @@ class Hydrator extends BaseHydrator
     {
         $links = [];
 
-        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
-            $links[] = [
-                'title' => 'Award Achievement',
-                'icon' => 'icon-badge',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("") // TODO: On learning/badge page, Award Achievement opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
-                    ->__toString(),
-            ];
-        }
+//        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
+//            $links[] = [
+//                'title' => 'Award Achievement',
+//                'icon' => 'icon-badge',
+//                'url' => $this->buildBaseUrl()
+//                    ->withPath("") // TODO: On learning/badge page, Award Achievement opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
+//                    ->__toString(),
+//            ];
+//        }
 
         if ($this->authorizer->isPathAuthorizedForUser('learningBadge.getUpdateForm', [$badge->getId()], $viewer)) {
             $links[] = [
@@ -142,15 +142,15 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
-            $links[] = [
-                'title' => 'Set Goal',
-                'icon' => 'icon-goal',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("") // TODO: On learning/badge page, Set Goal opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
-                    ->__toString(),
-            ];
-        }
+//        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
+//            $links[] = [
+//                'title' => 'Set Goal',
+//                'icon' => 'icon-goal',
+//                'url' => $this->buildBaseUrl()
+//                    ->withPath("") // TODO: On learning/badge page, Set Goal opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
+//                    ->__toString(),
+//            ];
+//        }
 
         return $links;
     }
