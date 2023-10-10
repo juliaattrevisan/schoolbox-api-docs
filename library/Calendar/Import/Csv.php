@@ -281,28 +281,41 @@ class Csv extends Base
             // been set in the object
             $folderList = $this->categoryList;
             if (empty($folderList)) {
-                $folderList = array_filter(
-                    array_map(
-                        fn ($v) => intval(trim($v)),
-                        explode(',', $folderIds),
-                    )
-                );
-            }
+                $folderList = [];
+                foreach (explode(',', $folderIds) as $folderId) {
+                    // Empty folder ID: just ignore
+                    if ($folderId === '') {
+                        continue;
+                    }
 
-            // Check the folder ID actually exists
-            foreach ($folderList as $folderId) {
-                try {
-                    $folderCache[$folderId] ??= $folderMapper->findById($folderId);
-                } catch (MapperException) {
-                    $output[] = [
-                        'name'   => $name,
-                        'status' => 'Not Added',
-                        'error'  => sprintf('Folder ID %d not found', $folderId),
-                    ];
-                    // Skip this entire CSV row
-                    continue 2;
+                    // Is this really a folder ID?
+                    $folderIdNum = filter_var($folderId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+                    if (!$folderIdNum) {
+                        $output[] = [
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
+                        ];
+                        // If not skip this entire CSV row
+                        continue 2;
+                    }
+
+                    // Check the folder ID actually exists
+                    try {
+                        $folderCache[$folderIdNum] ??= $folderMapper->findById($folderIdNum);
+                    } catch (MapperException) {
+                        $output[] = [
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => sprintf('Folder ID %d not found', $folderIdNum),
+                        ];
+                        // If not skip this entire CSV row
+                        continue 2;
+                    }
+                    $folderList[] = $folderIdNum;
                 }
             }
+
             if (!empty($folderList)) {
                 $event->setAccess(Event::ACCESS_GROUP);
             }
