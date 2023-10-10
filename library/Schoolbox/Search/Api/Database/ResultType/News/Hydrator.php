@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\News;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
 use Schoolbox\Permission\Access\UserAccess;
@@ -44,8 +45,8 @@ class Hydrator extends BaseHydrator
      */
     public function __construct(
         private News\Mapper $newsMapper,
-        private Generator $routeGenerator,
         private News\Audience\ArticleResolver $articleResolver,
+        private Generator $routeGenerator,
         private Authorizer $authorizer
     ) {
     }
@@ -121,7 +122,7 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                // The article may have been found if the keyword matched a
+                // The article may have been found if the keyword matched an
                 // HTML attribute or its value in the blurb or body.
                 // Filter out matches which were found to match the keyword
                 // on the query, but were found to not match either:
@@ -212,32 +213,32 @@ class Hydrator extends BaseHydrator
 
     /**
      * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
      *
      * @param News\Model $article
-     * @param User $viewer
+     * @param User       $viewer
      * @return array
+     * @throws RouteNotFound
      */
     private function getSearchResultLinksForArticle(News\Model $article, User $viewer): array
     {
         $links = [];
 
-        if ($this->authorizer->isPathAuthorizedForUser('commsNewsSaveForLater.postAdd', [$article->getId()], $viewer)) {
+        $route = 'commsNewsSaveForLater.postAdd';
+        if ($this->authorizer->isPathAuthorizedForUser($route, [$article->getId()], $viewer)) {
             $links[] = [
                 'title' => 'Save For Later',
                 'icon' => 'icon-news',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/news/saved/{$article->getId()}/add")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['articleId' => $article->getId()]),
             ];
         }
 
-        if ($this->authorizer->isPathAuthorizedForUser('commsNewsStatistics.getOverview', [$article->getId()], $viewer)) {
+        $route = 'commsNewsStatistics.getOverview';
+        if ($this->authorizer->isPathAuthorizedForUser($route, [$article->getId()], $viewer)) {
             $links[] = [
                 'title' => 'Statistics',
                 'icon' => 'icon-progress',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/news/statistics/{$article->getId()}")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['articleId' => $article->getId()]),
             ];
         }
 

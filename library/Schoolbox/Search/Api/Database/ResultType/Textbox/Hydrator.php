@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 use Alaress\Html\ToText;
 use Component_Config_Collapse;
 use Component_Config_ShowComponentTitle;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -298,9 +299,13 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
+     *
      * @param User         $viewer
      * @param TextboxModel $textbox
      * @return array
+     * @throws Exception
      */
     private function getSearchResultLinksForTextbox(TextboxModel $textbox, User $viewer): array
     {

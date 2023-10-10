@@ -11,6 +11,8 @@ namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
@@ -38,6 +40,7 @@ class Hydrator extends BaseHydrator
     public function __construct(
         private BadgeMapper $badgeMapper,
         private PrefixGenerator $prefixGenerator,
+        private Generator $routeGenerator,
         private Authorizer $authorizer
     ) {
     }
@@ -110,10 +113,12 @@ class Hydrator extends BaseHydrator
 
     /**
      * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
      *
      * @param BadgeModel $badge
-     * @param User $viewer
+     * @param User       $viewer
      * @return array
+     * @throws RouteNotFound
      */
     private function getSearchResultLinksForBadge(BadgeModel $badge, User $viewer): array
     {
@@ -129,13 +134,12 @@ class Hydrator extends BaseHydrator
 //            ];
 //        }
 
-        if ($this->authorizer->isPathAuthorizedForUser('learningBadge.getUpdateForm', [$badge->getId()], $viewer)) {
+        $route = 'learningBadge.getUpdateForm';
+        if ($this->authorizer->isPathAuthorizedForUser($route, [$badge->getId()], $viewer)) {
             $links[] = [
                 'title' => 'Modify Badge',
                 'icon' => 'icon-modify',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/learning/badge/{$badge->getId()}/update")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['badgeId' => $badge->getId()]),
             ];
         }
 

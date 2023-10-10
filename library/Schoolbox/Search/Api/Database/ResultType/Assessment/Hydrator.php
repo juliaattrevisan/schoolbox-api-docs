@@ -12,6 +12,8 @@ namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -48,6 +50,7 @@ class Hydrator extends BaseHydrator
         private AssessmentMapperProxy $assessmentMapperProxy,
         private UserMapper $userMapper,
         private Access $access,
+        private Generator $routeGenerator,
         private Authorizer $authorizer,
     ) {
     }
@@ -225,34 +228,34 @@ class Hydrator extends BaseHydrator
 
     /**
      * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
      *
      * @param IAssessable $assessment
-     * @param User $viewer
+     * @param User        $viewer
      * @return array
+     * @throws RouteNotFound
      */
     private function getSearchResultLinksForAssessment(IAssessable $assessment, User $viewer): array
     {
         $links = [];
 
-        if ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getUpdateAssessmentForm', [$assessment->getId()], $viewer)) {
+        $route = 'learningAssessment.getUpdateAssessmentForm';
+        if ($this->authorizer->isPathAuthorizedForUser($route, [$assessment->getId()], $viewer)) {
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/learning/assessments/{$assessment->getId()}/modify")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['assessmentId' => $assessment->getId()]),
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
             ];
         }
 
+        $route = 'learnosity.getHorizontalMarking';
         if (
             $assessment instanceof Assessment\Quiz\Model &&
-            $this->authorizer->isPathAuthorizedForUser('learnosity.getHorizontalMarking', [$assessment->getId()], $viewer)
+            $this->authorizer->isPathAuthorizedForUser($route, [$assessment->getId()], $viewer)
         ) {
             $links[] = [
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/learning/learnosity/{$assessment->getId()}/horizontal")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['assessmentId' => $assessment->getId()]),
                 'title' => 'Horizontal Marking',
                 'icon' => 'icon-modify',
             ];

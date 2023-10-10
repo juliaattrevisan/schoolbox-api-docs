@@ -12,6 +12,8 @@ namespace Schoolbox\Search\Api\Database\ResultType\User;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Image\Transformation\Storage;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Eportfolio_Authenticator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Role;
@@ -20,6 +22,7 @@ use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
+use Schoolbox\User\Formatter\Formatter;
 use Schoolbox\UserMapper;
 
 /**
@@ -42,16 +45,18 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param UserMapper               $userMapper        Used to fetch users for hydration.
-     * @param User\Formatter\Formatter $userNameFormatter Used to format a user's name on output.
-     * @param IConfigLoader            $config            Used for fetching configuration, which controls user search
-     *                                                    result availability.
-     * @param Authorizer               $authorizer
+     * @param UserMapper    $userMapper        Used to fetch users for hydration.
+     * @param Formatter     $userNameFormatter Used to format a user's name on output.
+     * @param IConfigLoader $config            Used for fetching configuration, which controls user search
+     *                                         result availability.
+     * @param Generator     $routeGenerator
+     * @param Authorizer    $authorizer
      */
     public function __construct(
         private UserMapper $userMapper,
         private User\Formatter\Formatter $userNameFormatter,
         private IConfigLoader $config,
+        private Generator $routeGenerator,
         private Authorizer $authorizer
     ) {
     }
@@ -157,31 +162,33 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
+     *
      * @param User $viewer
      * @param User $searchResultUser
      * @return array
+     * @throws RouteNotFound
      */
     private function getSearchResultLinksForUser(User $searchResultUser, User $viewer): array
     {
         $links = [];
 
-        if ($this->authorizer->isPathAuthorizedForUser('calendar.getCalendar', [$searchResultUser->getId()], $viewer)) {
+        $route = 'calendar.getCalendar';
+        if ($this->authorizer->isPathAuthorizedForUser($route, [$searchResultUser->getId()], $viewer)) {
             $links[] = [
                 'title' => 'Calendar',
                 'icon' => 'icon-calendar',
-                'url' => $this->buildBaseUrl()
-                    ->withPath('/calendar/' . date('d-m-Y') . "/{$searchResultUser->getId()}")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['userId' => $searchResultUser->getId()]),
             ];
         }
 
-        if ($this->authorizer->isPathAuthorizedForUser('learningUpcoming.postUpcomingForStudent', [$searchResultUser->getId()], $viewer)) {
+        $route = 'learningUpcoming.postUpcomingForStudent';
+        if ($this->authorizer->isPathAuthorizedForUser($route, [$searchResultUser->getId()], $viewer)) {
             $links[] = [
                 'title' => 'Due Work',
                 'icon' => 'icon-due-work',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/learning/due/{$searchResultUser->getId()}")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['userId' => $searchResultUser->getId()]),
             ];
         }
 
@@ -196,13 +203,12 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        if ($this->authorizer->isPathAuthorizedForUser('adminUser.getModify', [$searchResultUser->getId()], $viewer)) {
+        $route = 'adminUser.getModify';
+        if ($this->authorizer->isPathAuthorizedForUser($route, [$searchResultUser->getId()], $viewer)) {
             $links[] = [
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/adminv2/user/{$searchResultUser->getId()}/modify")
-                    ->__toString(),
+                'url' => $this->routeGenerator->generate($route, ['userId' => $searchResultUser->getId()]),
             ];
         }
 

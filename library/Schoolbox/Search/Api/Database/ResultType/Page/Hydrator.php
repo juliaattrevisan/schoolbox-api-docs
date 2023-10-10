@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
 use Alaress\Authorizer\Authorizer;
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -140,8 +142,10 @@ class Hydrator extends BaseHydrator
      * The links will be in alphabetical order of title.
      *
      * @param Folder\Model $folder
-     * @param User $viewer
+     * @param User  $viewer
      * @return array
+     * @throws RouteNotFound
+     * @throws Exception
      */
     private function getSearchResultLinksForFolder(Folder\Model $folder, User $viewer): array
     {
@@ -156,22 +160,20 @@ class Hydrator extends BaseHydrator
         // Add links depending on page type and permissions, in alphabetical order of link title.
 
         if ($isClassPage) {
-            if ($this->authorizer->isPathAuthorizedForUser('learning.getClassListPage', [$folder->getId()], $viewer)) {
+            $route = 'learning.getClassListPage';
+            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Class List',
                     'icon' => 'icon-class-list',
-                    'url' => $this->buildBaseUrl()
-                        ->withPath("/learning/class/{$folder->getId()}")
-                        ->__toString(),
+                    'url' => $this->routeGenerator->generate($route, ['folderId' => $folder->getId()]),
                 ];
             }
-            if ($this->authorizer->isPathAuthorizedForUser('learningMarkbook.getMarkbookForClass', [$folder->getId()], $viewer)) {
+            $route = 'learningMarkbook.getMarkbookForClass';
+            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Class Markbook',
                     'icon' => 'icon-curriculum',
-                    'url' => $this->buildBaseUrl()
-                        ->withPath("/learning/markbook/class/{$folder->getId()}")
-                        ->__toString(),
+                    'url' => $this->routeGenerator->generate($route, ['folderId' => $folder->getId()]),
                 ];
             }
         }
@@ -186,7 +188,7 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        if ($isGroupPage) {
+//        if ($isGroupPage) {
 //            if ($this->authorizer->isPathAuthorizedForUser('', [$folder->getId()], $viewer)) {
 //                $links[] = [
 //                    'title' => 'Leave Group',
@@ -196,16 +198,15 @@ class Hydrator extends BaseHydrator
 //                        ->__toString(),
 //                ];
 //            }
-        }
+//        }
 
         if ($isCoursePage) {
-            if ($this->authorizer->isPathAuthorizedForUser('course.modifyCourse', [$folder->getCourseSpecification()->getId()], $viewer)) {
+            $route = 'course.modifyCourse';
+            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getCourseSpecification()->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Modify Course',
                     'icon' => 'icon-modify',
-                    'url' => $this->buildBaseUrl()
-                        ->withPath("/course/modify/{$folder->getCourseSpecification()->getId()}")
-                        ->__toString(),
+                    'url' => $this->routeGenerator->generate($route, ['courseId' => $folder->getCourseSpecification()->getId()]),
                 ];
             }
         }
@@ -221,13 +222,12 @@ class Hydrator extends BaseHydrator
         }
 
         if ($isGroupPage) {
-            if ($this->authorizer->isPathAuthorizedForUser('group.getModify', [$folder->getId()], $viewer)) {
+            $route = 'group.getModify';
+            if ($this->authorizer->isPathAuthorizedForUser($route, [$folder->getId()], $viewer)) {
                 $links[] = [
                     'title' => 'Manage Group',
                     'icon' => 'icon-group',
-                    'url' => $this->buildBaseUrl()
-                        ->withPath("/group/modify/{$folder->getId()}")
-                        ->__toString(),
+                    'url' => $this->routeGenerator->generate($route, ['folderId' => $folder->getId()]),
                 ];
             }
         }

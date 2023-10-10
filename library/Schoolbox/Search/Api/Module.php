@@ -120,12 +120,13 @@ class Module extends BaseModule
                     $mapperFactory->get(UserMapper::class),
                     $userNameFormatter,
                     $config,
+                    $routeGenerator,
                     $authorizer
                 ),
                 new Database\ResultType\News\Hydrator(
                     $mapperFactory->get(NewsMapper::class),
-                    $routeGenerator,
                     $articleResolver,
+                    $routeGenerator,
                     $authorizer
                 ),
                 new Database\ResultType\Page\Hydrator(
@@ -159,6 +160,7 @@ class Module extends BaseModule
                 new Database\ResultType\Badge\Hydrator(
                     $mapperFactory->get(BadgeMapper::class),
                     new PrefixGenerator($this->getConfig()),
+                    $routeGenerator,
                     $authorizer
                 ),
                 new Database\ResultType\Tile\Hydrator(
@@ -176,7 +178,8 @@ class Module extends BaseModule
                     $assessmentMapperProxy,
                     $mapperFactory->get(UserMapper::class),
                     Access::getInstance(),
-                    $authorizer
+                    $routeGenerator,
+                    $authorizer,
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(
