@@ -13,16 +13,10 @@ $include-html-form-classes: $include-html-classes !default;
 $form-spacing: rem-calc(($base-font-size));
 
 // We use these to style the labels in different ways
-$form-label-pointer: $cursor-default-value;
-$form-label-font-size: rem-calc(($base-font-size - 2));
-$form-label-font-weight: $font-weight-semibold;
-$form-label-line-height: 1.4rem;
 $form-label-font-color: $black;
 $form-label-small-transform: capitalize !default;
-$form-label-bottom-margin: 0;
 $input-font-family: inherit !default;
 $input-font-color: $black;
-$input-placeholder-font-color: $steel !default;
 $input-font-size: $paragraph-font-size;
 $input-bg-color: $white;
 $input-focus-bg-color: $form-bg-hover-color;
@@ -30,45 +24,15 @@ $input-border-color: $form-border-color !default;
 $input-focus-border-color: css-darken($form-border-color, 15%);
 $input-border-style: solid;
 $input-border-width: 0.0625rem;
-$input-border-radius: $global-radius;
 $input-disabled-bg: $vapor;
 $input-disabled-cursor: $cursor-default-value;
-$input-box-shadow: none;
 
 // We use these to style the fieldset border and spacing.
 $fieldset-border-style: solid;
 $fieldset-border-width: 2px;
-$fieldset-border-color: $body-bg;
-$fieldset-padding: rem-calc(($base-font-size - 8));
-$fieldset-margin: rem-calc(($base-font-size - 8, 0));
-
-// We use these to style the legends when you use them
-$legend-font-weight: $font-weight-bold !default;
-$legend-padding: rem-calc(0 3) !default;
 
 // We use this setting to turn on/off HTML5 number spinners (the up/down arrows)
 $input-number-spinners: true !default;
-
-// We use these to style the error states for inputs and labels
-$input-error-message-padding: rem-calc(($base-font-size - 8));
-$input-error-message-top: -1px;
-$input-error-message-font-size: rem-calc(($base-font-size - 4));
-$input-error-message-font-weight: $font-weight-normal;
-$input-error-message-font-style: italic !default;
-$input-error-message-font-color: $white !default;
-$input-error-message-bg-color: $alert-color !default;
-$input-error-message-font-color-alt: $alert-color;
-
-// We use this to style the glowing effect of inputs when focused
-$glowing-effect-color: $input-focus-border-color !default;
-
-// We use this to style the transition when inputs are focused and when the glowing effect is disabled.
-$input-transition-fade-time: 0.15s !default;
-$input-transition-fade-timing-function: linear !default;
-
-// Select variables
-$select-bg-color: $input-bg-color;
-$select-hover-bg-color: tint($warning-color, 50%);
 
 //
 // @MIXINS
@@ -115,7 +79,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
         width: $input-border-width;
         color: $input-border-color;
     }
-    box-shadow: $input-box-shadow;
+    box-shadow: none;
     color: $input-font-color;
     display: block;
     font-family: $input-font-family;
@@ -149,12 +113,12 @@ $select-hover-bg-color: tint($warning-color, 50%);
     // Control whether or not the base styles come through.
     @if $base-style {
         color: $form-label-font-color;
-        cursor: $form-label-pointer;
+        cursor: $cursor-default-value;
         display: block;
-        font-size: $form-label-font-size;
-        font-weight: $form-label-font-weight;
-        line-height: $form-label-line-height;
-        margin-bottom: $form-label-bottom-margin;
+        font-size: rem-calc(($base-font-size - 2));
+        font-weight: $font-weight-semibold;
+        line-height: 1.4rem;
+        margin-bottom: 0;
     }
 
     // Alignment options
@@ -169,16 +133,16 @@ $select-hover-bg-color: tint($warning-color, 50%);
 
 // We use this mixin to style fieldsets
 @mixin fieldset {
-    border: $fieldset-border-width $fieldset-border-style $fieldset-border-color;
-    margin: $fieldset-margin;
-    padding: $fieldset-padding;
+    border: $fieldset-border-width $fieldset-border-style $body-bg;
+    margin: rem-calc(($base-font-size - 8, 0));
+    padding: rem-calc(($base-font-size - 8));
 
     // and legend styles
     legend {
-        font-weight: $legend-font-weight;
+        font-weight: bold;
         margin: 0;
         margin-#{$default-float}: rem-calc(-3);
-        padding: $legend-padding;
+        padding: rem-calc(0 3);
     }
 }
 
@@ -194,29 +158,29 @@ $select-hover-bg-color: tint($warning-color, 50%);
 //
 // We use this mixin to create error message styles
 // $bg - Default: $alert-color (Found in settings file)
-@mixin form-error-message($bg: $input-error-message-bg-color) {
+@mixin form-error-message($bg: $alert-color) {
     display: block;
-    font-size: $input-error-message-font-size;
-    font-style: $input-error-message-font-style;
-    font-weight: $input-error-message-font-weight;
+    font-size: rem-calc(($base-font-size - 4));
+    font-style: italic;
+    font-weight: $font-weight-normal;
     margin-bottom: $form-spacing;
-    margin-top: $input-error-message-top;
-    padding: $input-error-message-padding;
+    margin-top: -1px;
+    padding: rem-calc(($base-font-size - 8));
 
     // We can control the text color based on the brightness of the background.
     $bg-lightness: lightness($bg);
     background: $bg;
     @if $bg-lightness < 70% or $bg == yellow {
-        color: $input-error-message-font-color;
+        color: $white;
     } @else {
-        color: $input-error-message-font-color-alt;
+        color: $alert-color;
     }
 }
 
 // We use this mixin to style select elements
 @mixin form-select {
     -webkit-appearance: none !important;
-    background-color: $select-bg-color;
+    background-color: $input-bg-color;
     border-radius: 0;
 
     // Hide the dropdown arrow shown in newer IE versions
@@ -247,7 +211,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
         @include radius($global-radius);
     }
     &:focus {
-        background-color: $select-hover-bg-color;
+        background-color: tint($warning-color, 50%);
         border-color: $input-focus-border-color;
     }
     // Disabled Styles
@@ -321,7 +285,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
             border-radius: 0;
             @include form-element;
             &.radius {
-                @include radius($input-border-radius);
+                @include radius($global-radius);
             }
         }
 
@@ -342,7 +306,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
 
         // style placeholder text cross browser
         ::placeholder {
-            color: $input-placeholder-font-color;
+            color: $steel;
         }
 
         /* Add height value for select elements to match text input height */
