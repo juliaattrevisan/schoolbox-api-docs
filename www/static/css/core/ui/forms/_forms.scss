@@ -7,7 +7,6 @@
 //
 // @variables
 //
-$include-html-form-classes: $include-html-classes !default;
 
 // We use this to set the base for lots of form spacing and positioning styles
 $form-spacing: rem-calc(($base-font-size));
@@ -119,15 +118,6 @@ $input-number-spinners: true !default;
         font-weight: $font-weight-semibold;
         line-height: 1.4rem;
         margin-bottom: 0;
-    }
-
-    // Alignment options
-    @if $alignment == right {
-        float: none !important;
-        text-align: right;
-    } @else if $alignment == inline {
-        margin: 0 0 $form-spacing 0;
-        padding: calc($form-spacing / 2) + rem-calc($input-border-width) 0;
     }
 }
 
@@ -254,12 +244,6 @@ select {
 /* Label Styles */
 label {
     @include form-label;
-    &.right {
-        @include form-label(right, false);
-    }
-    &.inline {
-        @include form-label(inline, false);
-    }
     /* Styles for required inputs */
     small {
         text-transform: $form-label-small-transform;
