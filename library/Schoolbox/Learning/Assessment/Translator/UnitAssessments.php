@@ -72,7 +72,7 @@ class UnitAssessments
             'closeAt'           => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
             'closeAtFormatted'  => $assessment->getCloseAt()?->getRelativeDay(),
             '_links'            => $links,
-            'assessments'    => $assessments?->reindex()->map(new self($this->routeGenerator, $this->student)),
+            'assessments'       => $assessments?->reindex()->map($this),
         ];
     }
 
