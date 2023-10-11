@@ -748,7 +748,16 @@ class Controller extends Assessment\Controller
                         $nextCapabilityId = $marks[$allIndicatorUsageIds[$nextIndex]]['capabilityId'];
                     }
 
-                    if (array_key_exists('published', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                    /* Maybe we set the Show Drafts option
+                     */
+                    $showDraft = (bool)$this->requestQuery->get('draft', false);
+
+                    if ($showDraft && array_key_exists('latest', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        $descriptor = $marks[$indicatorUsageId]['latest']->getDescriptor();
+                        $row[] = $descriptor ? $descriptor->getDescription() : '';
+                        $row[] = $marks[$indicatorUsageId]['latest']->getValue();
+                        $sum += $marks[$indicatorUsageId]['latest']->getValue();
+                    } elseif (array_key_exists('published', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
                         $row[] = $descriptor ? $descriptor->getDescription() : '';
                         $row[] = $marks[$indicatorUsageId]['published']->getValue();
@@ -761,7 +770,15 @@ class Controller extends Assessment\Controller
                     /* Prepare an additional column for Capability Marks
                      */
                     if ($isMarkPerCapability && $currentCapabilityId !== $nextCapabilityId) {
-                        $capabilityMark = $marks['capabilityMark'][$currentCapabilityId]['published'];
+                        /* Decide which kind to show: draft or published
+                         */
+                        if ($showDraft) {
+                            $key = 'latest';
+                        } else {
+                            $key = 'published';
+                        }
+
+                        $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][$key];
                         $row[] = $capabilityMark;
                     }
                 }
@@ -775,7 +792,7 @@ class Controller extends Assessment\Controller
                 $data[] = $row;
             }
         }
-
+new \Alaress_Probe($data);die();
         return $data;
     }
 

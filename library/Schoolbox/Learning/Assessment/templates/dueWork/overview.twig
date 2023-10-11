@@ -20,7 +20,7 @@
                         </label>
                     </div>
                     <nav class="c-nav-actions l-flex-row">
-                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV" data-download-csv></a>
+                        <a class="icon-download" title="Download CSV" data-download-csv></a>
                     </nav>
                 </div>
             </div>
@@ -148,7 +148,17 @@
              * find out whether we wanted to show drafts or not
              * and pass that as a querystring param
              */
+            $('[data-download-csv]').on('click', function(event) {
+                event.preventDefault;
 
+                let url = '{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv';
+
+                if ($('#show-drafts').is(':checked')) {
+                    url += '&draft=1';
+                }
+
+                window.location.href = url;
+            });
         });
     </script>
 {% endautoescape %}
