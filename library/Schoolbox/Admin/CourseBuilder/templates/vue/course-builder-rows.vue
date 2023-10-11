@@ -67,11 +67,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
         <li v-for="courseTemplate in store.courseTemplates" :key="courseTemplate.id" class="list-item-container">
             <div class="actions-small-1">
                 <div class="list-item">
-                    <div class="small-12 medium-1 column">
-                        <strong class="hide-for-medium-up">ID:</strong>
-                        {{ courseTemplate.id }}
-                    </div>
-                    <div class="small-12 medium-5 column">
+                    <div class="small-12 medium-6 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
                         <input
                             v-model="courseTemplate.name"
