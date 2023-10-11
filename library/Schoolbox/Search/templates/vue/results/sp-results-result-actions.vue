@@ -34,7 +34,7 @@ const linksTest = window.Vue.ref<ResultLink[]>([
 </script>
 
 <template>
-    <wc-actions-dropdown :content-id="`dropdown-${props.result.id}`"></wc-actions-dropdown>
+    <sbx-pop-out :content-id="`dropdown-${props.result.id}`"></sbx-pop-out>
     <ul :id="`dropdown-${props.result.id}`" class="f-dropdown" data-dropdown-content>
         <li v-for="link in linksTest" :key="link.id">
             <a :href="link.url" :class="link.icon">{{ link.title }}</a>
