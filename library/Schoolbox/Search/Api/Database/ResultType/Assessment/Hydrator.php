@@ -94,7 +94,12 @@ class Hydrator extends BaseHydrator
         // Note creator is not hydrated in $assessments, so get assessment creators separately.
         $creatorIds = [];
         foreach ($assessments as $assessment) {
-            $creatorId = $assessment->getCreator()?->getId();
+            $assessmentCreator = (
+            ($assessment instanceof Assessment\LessonPlan\Model)
+                ? $assessment->getCreatedBy() // TODO: LessonPlan uses a different function name.  Fix in LessonPlan\Model.
+                : $assessment->getCreator()
+            );
+            $creatorId = $assessmentCreator->getId();
             if ($creatorId !== null) {
                 $creatorIds[] = $creatorId;
             }
@@ -122,8 +127,14 @@ class Hydrator extends BaseHydrator
                     }
                 }
 
+                $assessmentCreator = (
+                    ($assessment instanceof Assessment\LessonPlan\Model)
+                    ? $assessment->getCreatedBy() // TODO: LessonPlan uses a different function name.  Fix in LessonPlan\Model.
+                    : $assessment->getCreator()
+                );
+
                 // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
-                $assessmentCreator = $assessmentCreatorById[$assessment->getCreator()->getId()] ?? null;
+                $assessmentCreator = $assessmentCreatorById[$assessmentCreator->getId()] ?? null;
 
                 // Note $match->type will be something like 'assessment.dueWork'.
                 $matchTypeTokens = explode('.', $match->type);
