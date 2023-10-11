@@ -65,33 +65,28 @@ class Hydrator extends BaseHydrator
 
         // Get componentInstanceId indexed by textboxId.
         $db = $this->textboxMapper->getDatabase();
-        $componentInstanceIdByTextboxId = $db->executeQuery(
-            'SELECT value AS textbox_id, component_instance_id
+        $componentInfoByTextboxId = $db->executeQuery(
+            // Start with a table of "textbox_id, component_instance_id", and join to a table of "component_instance_id, collapse" to get collapse_value.
+            'SELECT cci.value AS textbox_id, cci.component_instance_id, component_instance_collapse.collapse AS collapse_value
             FROM component_config_instance cci
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            LEFT JOIN (
+                SELECT cci2.component_instance_id, IFNULL(cci2.value, ccd2.default_value) AS collapse
+                FROM component_config_instance cci2
+                JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
+                WHERE ccd2.key=:collapse
+            ) AS component_instance_collapse ON (component_instance_collapse.component_instance_id=cci.component_instance_id)
             WHERE ccd.key=:componentKey
-            AND value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
-            [':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY]
-        )->fetchColumnArray('component_instance_id', 'textbox_id');
-
-
-        // Get component_config_definition 'collapse' value by componentInstanceId.
-        // This will tell us for each component, whether the component is in the collapsed state.
-        $collapseValueByComponentInstanceId = $db->executeQuery(
-            'SELECT component_instance_id, value AS collapse_value
-            FROM component_config_instance cci
-            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-            WHERE ccd.key=:collapse
-            AND cci.component_instance_id IN (' . implode(',', array_map('intval', array_values($componentInstanceIdByTextboxId))) . ')',
-            [':collapse' => Component_Config_Collapse::KEY]
-        )->fetchColumnArray('collapse_value', 'component_instance_id');
+            AND cci.value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
+            [':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY, ':collapse' => Component_Config_Collapse::KEY]
+        )->fetchRowArray('textbox_id');
 
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentInstanceIdByTextboxId, $collapseValueByComponentInstanceId) {
+            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentInfoByTextboxId) {
                 $textbox = $textboxes->getBy('id', $match->id);
 
                 if (!($textbox instanceof TextboxModel)) {
@@ -105,7 +100,8 @@ class Hydrator extends BaseHydrator
                 }
 
                 // Find component_instance_id for use in URL fragment.
-                $componentInstanceId = $componentInstanceIdByTextboxId[$textbox->getId()] ?? null;
+                $componentInfo = $componentInfoByTextboxId[$textbox->getId()] ?? null;
+                $componentInstanceId = $componentInfo === null ? null : $componentInfo['component_instance_id'];
 
                 // If component_instance_id is null, that means the textbox is not currently used in any component.
                 // Textboxes not currently used in any component should be shown only to users with write access.
@@ -115,7 +111,7 @@ class Hydrator extends BaseHydrator
 
                 // If collapseValue is null, that means the textbox component is collapsed.
                 // Textboxes in the collapsed state should be shown only to users with write access.
-                $componentIsCollapsed = boolval($collapseValueByComponentInstanceId[$componentInstanceId] ?? null);
+                $componentIsCollapsed = boolval($componentInfo['collapse_value'] ?? null);
                 if ($componentIsCollapsed === true && $textboxAccess < UserAccess::ACCESS_WRITE) {
                     return null;
                 }
