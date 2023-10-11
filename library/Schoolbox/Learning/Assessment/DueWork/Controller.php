@@ -99,6 +99,14 @@ use function count;
 class Controller extends Assessment\Controller
 {
     /**
+     * Draft and Published marks are stored in two different
+     * (but adjacent) areas of the $marks array
+     */
+    private const MARK_DRAFT_KEY = 'latest';
+    private const MARK_PUBLISHED_KEY = 'published';
+
+
+    /**
      * @param UserMapper                            $userMapper
      * @param Mapper                                $errorMapper
      * @param AssessmentDataSource                  $assessmentMapper
@@ -651,7 +659,7 @@ class Controller extends Assessment\Controller
                      */
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
                         $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()][self::MARK_PUBLISHED_KEY] = $indicatorMark;
                     }
                 }
             }
@@ -660,7 +668,7 @@ class Controller extends Assessment\Controller
                     /* Index cap marks by capability id, per person
                      */
                     $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-                    $marks[$studentId]['capabilityMark'][$capabilityId]['latest'] = $capabilityMark->getHumanReadableValue();
+                    $marks[$studentId]['capabilityMark'][$capabilityId][self::MARK_DRAFT_KEY] = $capabilityMark->getHumanReadableValue();
 
                     /* Remember the Capability to which this Indicator belongs
                      * (The Indicators in the csv output don't know their parent Capability)
@@ -668,7 +676,7 @@ class Controller extends Assessment\Controller
                      */
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
                         $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()][self::MARK_DRAFT_KEY] = $indicatorMark;
                     }
                 }
             }
@@ -764,16 +772,16 @@ class Controller extends Assessment\Controller
                      */
                     $showDraft = (bool)$this->requestQuery->get('draft', false);
 
-                    if ($showDraft && array_key_exists('latest', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        $descriptor = $marks[$indicatorUsageId]['latest']->getDescriptor();
+                    if ($showDraft && array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
                         $row[] = $descriptor ? $descriptor->getDescription() : '';
-                        $row[] = $marks[$indicatorUsageId]['latest']->getValue();
-                        $sum += $marks[$indicatorUsageId]['latest']->getValue();
-                    } elseif (array_key_exists('published', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
+                        $row[] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
+                        $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
+                    } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
                         $row[] = $descriptor ? $descriptor->getDescription() : '';
-                        $row[] = $marks[$indicatorUsageId]['published']->getValue();
-                        $sum += $marks[$indicatorUsageId]['published']->getValue();
+                        $row[] = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
+                        $sum += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
                     } else {
                         $row[] = '';
                         $row[] = '';
@@ -785,9 +793,9 @@ class Controller extends Assessment\Controller
                         /* Decide which kind to show: draft or published
                          */
                         if ($showDraft) {
-                            $key = 'latest';
+                            $key = self::MARK_DRAFT_KEY;
                         } else {
-                            $key = 'published';
+                            $key = self::MARK_PUBLISHED_KEY;
                         }
 
                         $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][$key];
