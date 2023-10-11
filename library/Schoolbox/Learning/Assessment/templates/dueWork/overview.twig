@@ -35,6 +35,10 @@
                 <tbody>
                     <tr>
                         <th rowspan="2" class="rb-group-name markdown">&nbsp;</th>
+                        {# If Capability Mark Type is something other than None,
+                         # prepare an additional column
+                         #}
+
                         {% for group, criteria in headers %}
                             <th colspan="{{ criteria | length }}" class="markdown">{{ group | markdown }}</th>
                         {% endfor %}
@@ -45,6 +49,10 @@
                                 <th class="rb-criterion-name markdown">{{ criterion | markdown }}</th>
                             {% endfor %}
                         {% endfor %}
+
+                        {# If Capability Mark Type is something other than None,
+                         # prepare an additional column
+                         #}
                     </tr>
                     {% for participant in participants %}
                     <tr>
@@ -77,6 +85,11 @@
                                         {% endif %}
                                     </td>
                                 {% endfor %}
+
+
+                                {# If Capability Mark Type is something other than None,
+                                 # prepare an additional column
+                                 #}
                             {% endfor %}
                     </tr>
                     {% endfor %}
