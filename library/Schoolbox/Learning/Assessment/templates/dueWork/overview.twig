@@ -20,7 +20,7 @@
                         </label>
                     </div>
                     <nav class="c-nav-actions l-flex-row">
-                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
+                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV" data-download-csv></a>
                     </nav>
                 </div>
             </div>
@@ -143,6 +143,12 @@
                     $("[data-actual-mark]").show();
                 }
             });
+
+            /* When the Download CSV button is clicked,
+             * find out whether we wanted to show drafts or not
+             * and pass that as a querystring param
+             */
+
         });
     </script>
 {% endautoescape %}
