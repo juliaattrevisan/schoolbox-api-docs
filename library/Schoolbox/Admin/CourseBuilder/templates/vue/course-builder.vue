@@ -33,9 +33,21 @@ function onAddNewRow() {
     store.courseTemplates.push({
         id: -newRowAmount.value, // New rows are set with an ever increasing negative increment to mark them as new for the back end
         name: "",
-        courseTemplate: props.availableTemplates[0],
-        unitTemplate: props.availableTemplates[0],
+        courseTemplate: firstTemplate(),
+        unitTemplate: firstTemplate(),
     });
+}
+
+/**
+ * Grab the first valid template
+ * they can now be deleted, so we need to ensure we only add new rows that contain non deleted entries
+ */
+function firstTemplate() {
+    for (const [key, value] of Object.entries(props.availableTemplates)) {
+        if (!value.deleted) {
+            return value;
+        }
+    }
 }
 
 /**
