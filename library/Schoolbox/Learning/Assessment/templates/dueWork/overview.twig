@@ -35,12 +35,18 @@
                 <tbody>
                     <tr>
                         <th rowspan="2" class="rb-group-name markdown">&nbsp;</th>
-                        {# If Capability Mark Type is something other than None,
-                         # prepare an additional column
-                         #}
 
                         {% for group, criteria in headers %}
-                            <th colspan="{{ criteria | length }}" class="markdown">{{ group | markdown }}</th>
+                            {% set colspan = criteria|length %}
+
+                            {# If Capability Mark Type is something other than None,
+                             # prepare an additional column
+                             #}
+                            {% if dueWork.isMarkPerCapability %}
+                                {% set colspan = colspan+1 %}
+                            {% endif %}
+
+                            <th colspan="{{ colspan }}" class="markdown">{{ group | markdown }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
@@ -48,11 +54,14 @@
                             {% for criterion in criteria %}
                                 <th class="rb-criterion-name markdown">{{ criterion | markdown }}</th>
                             {% endfor %}
-                        {% endfor %}
 
-                        {# If Capability Mark Type is something other than None,
-                         # prepare an additional column
-                         #}
+                            {# If Capability Mark Type is something other than None,
+                             # prepare an additional column
+                             #}
+                            {% if dueWork.isMarkPerCapability %}
+                                <th class="rb-criterion-name markdown">Overall</th>
+                            {% endif %}
+                        {% endfor %}
                     </tr>
                     {% for participant in participants %}
                     <tr>
@@ -72,6 +81,8 @@
                                 {% for id, criterion in criteria %}
                                     {% set markLatest = marks[participant.id][id]['latest'] ?? null %}
                                     {% set mark = marks[participant.id][id]['published'] ?? null %}
+                                    <pre>
+                                </pre>
                                     <td class="markdown">
                                         <div {% if markLatest %}data-actual-mark{%endif %}>
                                         {{ (mark.descriptor.description ?? '') | markdown }}
@@ -86,10 +97,12 @@
                                     </td>
                                 {% endfor %}
 
-
                                 {# If Capability Mark Type is something other than None,
                                  # prepare an additional column
                                  #}
+                                {% if dueWork.isMarkPerCapability %}
+                                    <td class="markdown">TODO 100%</td>
+                                {% endif %}
                             {% endfor %}
                     </tr>
                     {% endfor %}
