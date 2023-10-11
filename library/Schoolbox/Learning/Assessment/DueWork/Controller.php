@@ -107,6 +107,12 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * The querystring param for Show Drafts from the ui
+     */
+    private const SHOW_DRAFTS_KEY = 'draft';
+
+
+    /**
      * @param UserMapper                            $userMapper
      * @param Mapper                                $errorMapper
      * @param AssessmentDataSource                  $assessmentMapper
@@ -564,7 +570,7 @@ class Controller extends Assessment\Controller
 
         /* Maybe we set the Show Drafts option
          */
-        $showDraft = (bool)$this->requestQuery->get('draft', false);
+        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
 
         if ($showDraft) {
             $suffix = 'draft';
@@ -770,7 +776,7 @@ class Controller extends Assessment\Controller
 
                     /* Maybe we set the Show Drafts option
                      */
-                    $showDraft = (bool)$this->requestQuery->get('draft', false);
+                    $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
 
                     if ($showDraft && array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
