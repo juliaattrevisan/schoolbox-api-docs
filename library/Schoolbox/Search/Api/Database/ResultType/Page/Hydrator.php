@@ -166,7 +166,7 @@ class Hydrator extends BaseHydrator
 
         if ($isClassPage) {
             $route = 'learning.getClassListPage';
-            $params = ['folderId' => $folder->getId()];
+            $params = ['folderId' => $folder->getId(), 'folder' => $folder];
             if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Class List',
