@@ -761,17 +761,19 @@ class Controller extends Assessment\Controller
                 for ($i = 0; $i < $numIndicators; $i++) {
                     $indicatorUsageId = $allIndicatorUsageIds[$i];
 
-                    /* Implement lookahead to see when you're ready to output capability marks
-                     */
-                    $currentCapabilityId = $marks[$indicatorUsageId]['capabilityId'] ?? null;
+                    if ($isMarkPerCapability) {
+                        /* Implement lookahead to see when you're ready to output capability marks
+                         */
+                        $currentCapabilityId = $marks[$indicatorUsageId]['capabilityId'] ?? null;
 
-                    /* Because apparently you can't null coalesce a lookahead for some reason
-                    */
-                    $nextIndex = $i + 1;
-                    $nextCapabilityId = null;
+                        /* Because apparently you can't null coalesce a lookahead for some reason
+                        */
+                        $nextIndex = $i + 1;
+                        $nextCapabilityId = null;
 
-                    if ($nextIndex < $numIndicators) {
-                        $nextCapabilityId = $marks[$allIndicatorUsageIds[$nextIndex]]['capabilityId'];
+                        if ($nextIndex < $numIndicators) {
+                            $nextCapabilityId = $marks[$allIndicatorUsageIds[$nextIndex]]['capabilityId'];
+                        }
                     }
 
                     /* Maybe we set the Show Drafts option
