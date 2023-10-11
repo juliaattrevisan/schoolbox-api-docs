@@ -57,15 +57,17 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
 </script>
 
 <template>
-    <transition-group tag="ul" class="information-list" data-list @enter="onRowEnter" @leave="onRowLeave">
+    <transition-group
+        tag="ul"
+        class="information-list sortable ui-sortable"
+        data-list
+        @enter="onRowEnter"
+        @leave="onRowLeave"
+    >
         <li v-for="courseTemplate in store.courseTemplates" :key="courseTemplate.id" class="list-item-container">
             <div class="actions-small-1">
                 <div class="list-item">
-                    <div class="small-12 medium-1 column">
-                        <strong class="hide-for-medium-up">ID:</strong>
-                        {{ courseTemplate.id }}
-                    </div>
-                    <div class="small-12 medium-5 column">
+                    <div class="small-12 medium-6 column">
                         <strong class="hide-for-medium-up">Template Name:</strong>
                         <input
                             v-model="courseTemplate.name"
@@ -81,15 +83,19 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         <strong class="hide-for-medium-up">Course Page Template:</strong>
                         <div class="select-wrapper">
                             <select v-model="courseTemplate.courseTemplate" required>
-                              <template v-for="availableTemplate in props.availableTemplates">
-                                <option
-                                    v-if="!availableTemplate.deleted || courseTemplate.courseTemplate.id === availableTemplate.id"
-                                    :key="availableTemplate.id"
-                                    :value="availableTemplate"
-                                >
-                                    {{ availableTemplate.name }} <template v-if="availableTemplate.deleted">(Deleted)</template>
-                                </option>
-                              </template>
+                                <template v-for="availableTemplate in props.availableTemplates">
+                                    <option
+                                        v-if="
+                                            !availableTemplate.deleted ||
+                                            courseTemplate.courseTemplate.id === availableTemplate.id
+                                        "
+                                        :key="availableTemplate.id"
+                                        :value="availableTemplate"
+                                    >
+                                        {{ availableTemplate.name }}
+                                        <template v-if="availableTemplate.deleted">(Deleted)</template>
+                                    </option>
+                                </template>
                             </select>
                         </div>
                     </div>
@@ -97,15 +103,19 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         <strong class="hide-for-medium-up">Unit Page Template:</strong>
                         <div class="select-wrapper">
                             <select v-model="courseTemplate.unitTemplate" required>
-                              <template v-for="availableTemplate in props.availableTemplates">
-                                <option
-                                    v-if="!availableTemplate.deleted || courseTemplate.unitTemplate.id === availableTemplate.id"
-                                    :key="availableTemplate.id"
-                                    :value="availableTemplate"
-                                >
-                                    {{ availableTemplate.name }} <template v-if="availableTemplate.deleted">(Deleted)</template>
-                                </option>
-                              </template>
+                                <template v-for="availableTemplate in props.availableTemplates">
+                                    <option
+                                        v-if="
+                                            !availableTemplate.deleted ||
+                                            courseTemplate.unitTemplate.id === availableTemplate.id
+                                        "
+                                        :key="availableTemplate.id"
+                                        :value="availableTemplate"
+                                    >
+                                        {{ availableTemplate.name }}
+                                        <template v-if="availableTemplate.deleted">(Deleted)</template>
+                                    </option>
+                                </template>
                             </select>
                         </div>
                     </div>
@@ -131,6 +141,6 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
 .delete-row-button {
     width: 40px;
     height: 40px;
-    margin: 0px 8px 0px 0px;
+    margin: 14px 8px 0px 0px;
 }
 </style>
