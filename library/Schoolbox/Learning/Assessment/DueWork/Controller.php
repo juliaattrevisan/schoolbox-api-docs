@@ -551,6 +551,8 @@ class Controller extends Assessment\Controller
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
         $basename = (new Url($assessment->getTitle()))->getSlug();
+
+        /** @var Model $assessment */
         $content  = $this->array2csv($this->collateResultSquare($assessment->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
 
         /* Maybe we set the Show Drafts option
@@ -577,7 +579,7 @@ class Controller extends Assessment\Controller
      * Get headers for the rubric report or CSV download.
      *
      * @param Grid $grid
-     * @return string[][] Grouped by capability name, then indicator ID
+     * @return array Grouped by capability name, then indicator ID
      */
     private function getRubricHeaders(Grid $grid): array
     {
