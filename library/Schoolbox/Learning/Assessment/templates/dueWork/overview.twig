@@ -36,8 +36,8 @@
                     <tr>
                         <th rowspan="2" class="rb-group-name markdown">&nbsp;</th>
 
-                        {% for group, criteria in headers %}
-                            {% set colspan = criteria|length %}
+                        {% for capabilityId, capabilityData in headers.capabilities %}
+                            {% set colspan = capabilityData.indicators|length %}
 
                             {# If Capability Mark Type is something other than None,
                              # prepare an additional column
@@ -46,13 +46,13 @@
                                 {% set colspan = colspan+1 %}
                             {% endif %}
 
-                            <th colspan="{{ colspan }}" class="markdown">{{ group | markdown }}</th>
+                            <th colspan="{{ colspan }}" class="markdown">{{ capabilityData.name | markdown }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
-                        {% for criteria in headers %}
-                            {% for criterion in criteria %}
-                                <th class="rb-criterion-name markdown">{{ criterion | markdown }}</th>
+                        {% for capabilityId, capabilityData in headers.capabilities %}
+                            {% for indicatorId, indicator in capabilityData.indicators %}
+                                <th class="rb-criterion-name markdown">{{ indicator | markdown }}</th>
                             {% endfor %}
 
                             {# If Capability Mark Type is something other than None,
@@ -77,12 +77,10 @@
                                 </a>
                             </div>
                         </td>
-                            {% for criteria in headers %}
-                                {% for id, criterion in criteria %}
-                                    {% set markLatest = marks[participant.id][id]['latest'] ?? null %}
-                                    {% set mark = marks[participant.id][id]['published'] ?? null %}
-                                    <pre>
-                                </pre>
+                            {% for capabilityId, capabilityData in headers.capabilities %}
+                                {% for indicatorId, indicator in capabilityData.indicators %}
+                                    {% set markLatest = marks[participant.id][indicatorId]['latest'] ?? null %}
+                                    {% set mark = marks[participant.id][indicatorId]['published'] ?? null %}
                                     <td class="markdown">
                                         <div {% if markLatest %}data-actual-mark{%endif %}>
                                         {{ (mark.descriptor.description ?? '') | markdown }}
@@ -101,6 +99,8 @@
                                  # prepare an additional column
                                  #}
                                 {% if dueWork.isMarkPerCapability %}
+                                    <pre>{{ dump(headers) }}</pre>
+{#                                    {% set capabilityMark = marks[participant.id][id %}#}
                                     <td class="markdown">TODO 100%</td>
                                 {% endif %}
                             {% endfor %}

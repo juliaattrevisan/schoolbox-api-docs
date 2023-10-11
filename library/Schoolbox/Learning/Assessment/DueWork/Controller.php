@@ -571,10 +571,21 @@ class Controller extends Assessment\Controller
     {
         $headers = [];
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            $capability = $capabilityUsage->getCapability();
+
+            /* Index capability identifiers along with their indicator stuff
+             */
+            if (!isset($headers['capabilities'][$capabilityUsage->getCapability()->getId()])) {
+                $headers['capabilities'][$capability->getId()] = [
+                    'name' => $capability->getName(),
+                    'indicators' => []
+                ];
+            }
+
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                $capability                                           = $capabilityUsage->getCapability();
-                $indicator                                            = $indicatorUsage->getIndicator();
-                $headers[$capability->getName()][$indicator->getId()] = $indicator->getName();
+                $indicator = $indicatorUsage->getIndicator();
+
+                $headers['capabilities'][$capability->getId()]['indicators'][$indicator->getId()] = $indicator->getName();
             }
         }
         return $headers;
@@ -616,6 +627,11 @@ class Controller extends Assessment\Controller
             $studentId = $participant->getUser()->getId();
             if (null !== $markedGridPublished) {
                 foreach ($markedGridPublished->getCapabilityMarks() as $capabilityMark) {
+                    /* Index cap marks by capability id, per person
+                     */
+                    $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+                    $marks[$studentId]['capabilityMark'][$capabilityId]['published'] = $capabilityMark->getHumanReadableValue();
+
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
                         $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
                     }
@@ -623,12 +639,18 @@ class Controller extends Assessment\Controller
             }
             if (null !== $markedGridLatest) {
                 foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
+                    /* Index cap marks by capability id, per person
+                     */
+                    $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+                    $marks[$studentId]['capabilityMark'][$capabilityId]['latest'] = $capabilityMark->getHumanReadableValue();
+
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
                         $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
                     }
                 }
             }
         }
+
         return $marks;
     }
 
@@ -654,7 +676,10 @@ class Controller extends Assessment\Controller
         }
 
         // put header row in array
-        foreach ($this->getRubricHeaders($grid) as $grouping => $criteria) {
+        foreach ($this->getRubricHeaders($grid)['capabilities'] as $capabilityId => $capabilityData) {
+            $criteria = $capabilityData['indicators'];
+            $grouping = $capabilityData['name'];
+
             foreach ($criteria as $id => $criterion) {
                 $data[0][] = "$grouping - $criterion";
                 $data[0][] = '';
