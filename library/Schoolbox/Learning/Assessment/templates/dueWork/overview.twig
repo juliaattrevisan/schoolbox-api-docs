@@ -99,9 +99,20 @@
                                  # prepare an additional column
                                  #}
                                 {% if dueWork.isMarkPerCapability %}
-                                    <pre>{{ dump(headers) }}</pre>
-{#                                    {% set capabilityMark = marks[participant.id][id %}#}
-                                    <td class="markdown">TODO 100%</td>
+                                    {% set capabilityMarkLatest = marks[participant.id]['capabilityMark'][capabilityId]['latest'] ?? null %}
+                                    {% set capabilityMark = marks[participant.id]['capabilityMark'][capabilityId]['published'] ?? null %}
+
+                                    <td class="markdown">
+                                        {# "latest" typically means "draft marks" #}
+                                        <div {% if capabilityMarkLatest %}data-actual-mark{%endif %}>
+                                            <p>{{ capabilityMark }}</p>
+                                        </div>
+                                        {% if capabilityMarkLatest %}
+                                            <div data-draft-mark class="meta">
+                                                <p>{{ capabilityMarkLatest }}</p>
+                                            </div>
+                                        {% endif %}
+                                    </td>
                                 {% endif %}
                             {% endfor %}
                     </tr>
