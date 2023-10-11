@@ -15,8 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
-use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\Import\ImporterFactory;
 
 /**
@@ -62,7 +60,7 @@ class Module extends BaseModule
             new ImporterFactory(),
             $this->getConfig(),
             $this->injector->get('filesystem.storageProxy'),
-            $this->getMapperFactory()->get(ClassEntryMapper::class),
+            $this->injector->get('databaseInternal'),
         );
     }
 

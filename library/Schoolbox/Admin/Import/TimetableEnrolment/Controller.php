@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\TimetableEnrolment;
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Admin\Import\UserAccount;
@@ -46,20 +47,18 @@ class Controller extends UserAccount\Controller
     /**
      * Controller constructor.
      *
-     * @param ImporterFactory        $importerFactory
-     * @param IConfigLoader          $configLoader
-     * @param FilesystemProxy        $filesystemProxy
-     * @param ClassEntryMapper       $classEntryMapper
+     * @param ImporterFactory $importerFactory
+     * @param IConfigLoader $configLoader
+     * @param FilesystemProxy $filesystemProxy
+     * @param IConnector $database
      */
     public function __construct(
         ImporterFactory $importerFactory,
         IConfigLoader $configLoader,
         FilesystemProxy $filesystemProxy,
-        ClassEntryMapper $classEntryMapper,
+        private IConnector $database
     ) {
         parent::__construct($importerFactory, $configLoader, $filesystemProxy);
-
-        $this->classEntryMapper = $classEntryMapper;
 
         $this->navigation = new SchoolData();
     }
@@ -83,7 +82,7 @@ class Controller extends UserAccount\Controller
                 sis_class_user scu INNER JOIN sis_class sc ON scu.class_id = sc.id
         ";
 
-        $statement = $this->classEntryMapper->getDatabase()->query($query);
+        $statement = $this->database->query($query);
         $statement->execute();
 
         $fp = fopen('php://temp', 'w');
