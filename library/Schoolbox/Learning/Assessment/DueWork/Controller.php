@@ -744,6 +744,12 @@ class Controller extends Assessment\Controller
             }
         )->getAll();
 
+        /* Only needed with Capability Marks is set to something other than None;
+         * Used to do Indicator lookaheads in csv output
+         */
+        $currentCapabilityId = null;
+        $nextCapabilityId = null;
+
         foreach ($this->getMarks($participants) as $studentId => $marks) {
             // array of all marked indicator ids of the participant
             $markedIndicatorIds = array_keys($marks);
