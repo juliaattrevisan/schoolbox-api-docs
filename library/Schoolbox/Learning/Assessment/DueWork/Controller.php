@@ -792,7 +792,7 @@ class Controller extends Assessment\Controller
                 $data[] = $row;
             }
         }
-new \Alaress_Probe($data);die();
+
         return $data;
     }
 
