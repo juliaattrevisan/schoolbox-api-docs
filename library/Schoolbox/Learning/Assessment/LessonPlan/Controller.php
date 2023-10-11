@@ -231,6 +231,15 @@ class Controller extends Assessment\Controller
             }
         }
 
+        // Re-fetch linked assessments, as their context may not be hydrated.
+        // Lesson plan project contexts are deliberately not hydrated, because
+        // doing so may lead to infinite loops.
+        $linkedAssessmentIds = ($assessment->getLinkedAssessments()?->getPropertyValues('id')) ?? [];
+        $linkedAssessments   = null;
+        if ($linkedAssessmentIds) {
+            $linkedAssessments = $this->getAssessmentMapper()->findAllByIds($linkedAssessmentIds, ['cache' => false,]);
+        }
+
         $twigData = [
             'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
@@ -238,7 +247,9 @@ class Controller extends Assessment\Controller
             'student'      => $student,
             'returnUrl'    => $returnUrl,
             'courseAssessments' => $courseAssessments,
-            'linkedAssessments' => $assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map($unitAssessmentsTranslator) : [],
+            'linkedAssessments' => $linkedAssessments
+                ? $linkedAssessments->reindex()->map($unitAssessmentsTranslator)
+                : [],
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
