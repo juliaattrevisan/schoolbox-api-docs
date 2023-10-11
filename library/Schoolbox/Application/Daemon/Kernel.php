@@ -234,7 +234,7 @@ EOL;
 
         try {
             $this->loop->run();
-            $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
+            $this->logger()->debug($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
             $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
             exit(self::EXIT_STATUS_APP_ERROR);

@@ -533,7 +533,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $instanceId = $identifier->getInstanceId();
         $userId     = $identifier->getUserId();
 
-        $this->log->notice("Handling a worker response: $command");
+        $this->log->debug("Handling a worker response for $instanceId: $command");
 
         $release = true;
 
