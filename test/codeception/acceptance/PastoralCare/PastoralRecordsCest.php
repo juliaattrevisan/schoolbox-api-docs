@@ -95,24 +95,20 @@ class PastoralRecordsCest
      */
     public function commentPastoralRecord(AcceptanceTester $i): void
     {
-        $profilePage = new ProfilePage($i);
         $pastoralProfile = new PastoralProfile($i);
-        $createPastoralRecord = new CreatePastoralRecord($i);
         $common = new Common($i);
-        $studentId = 25;
-        $pastoralTitle = "Automation Test Pastoral Record";
         $i->amGoingTo('navigate to the student pastoral profile page');
         $i->amOnPage($pastoralProfile->generateRoute($studentId));
+        $i->waitForText('PASTORAL PROFILE', 10);
         $i->amGoingTo('click the pastoral record');
         $recordId = $i->grabFromDatabase('pastoral', 'id', ['deleted_at' => null, 'heading like' => "Automation Test Pastoral%"]);
         $pastoralProfile->clickPastoralRecord($studentId, $recordId);
         $i->waitForElementVisible('a[id="panel-general"]', 10);
         $common->clickAddComment();
-        $i->waitForElementVisible(['css' => '#comment-0 + div.ck'], 5);
+        $i->waitForElementVisible(['css' => '#comment-public + div.ck'], 5);
         $i->fillRichTextField('comment-public', 'This is an automation pastoral comment');
-        sleep(2);
         $common->clickSubmitComment();
-        //checking the comment is presented
+        $i->amGoingTo('check the comment is presented');
         $i->waitForText('Posted a few seconds ago', 2);
         $i->canSee('This is an automation pastoral comment', '//article/p');
     }

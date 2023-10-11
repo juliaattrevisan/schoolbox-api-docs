@@ -31,7 +31,7 @@ class PastoralProfile
      */
     public function generateRoute(int $id): string
     {
-        return str_replace('{id}', (string)$id, self::URL);
+        return str_replace('{studentId}', (string)$id, self::URL);
     }
 
 
@@ -62,9 +62,9 @@ class PastoralProfile
     /**
      * click a Pastoral Record
      */
-    public function clickPastoralRecord(int $studentId, int $recordId): void
+    public function clickPastoralRecord($studentId, $recordId): void
     {
-        $this->tester->click('href="/pastoral/student/' . $studentId . '/record/' . $recordId . '"');
+        $this->tester->click('a[href="/pastoral/student/' . $studentId . '/record/' . $recordId . '"]');
     }
 
 }
