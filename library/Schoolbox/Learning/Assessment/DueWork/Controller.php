@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use CFPropertyList\IOException;
 use CFPropertyList\PListException;
+use DebugBar\DebugBarException;
 use DomainException;
 use DOMException;
 use Eportfolio\ShowcaseMapper;
@@ -550,7 +551,7 @@ class Controller extends Assessment\Controller
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
         $basename = (new Url($assessment->getTitle()))->getSlug();
-        $content  = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
+        $content  = $this->array2csv($this->collateResultSquare($assessment->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
         $this->response = $this->responseFromContent($content)
                                ->withHeader('Pragma', ' ')
                                ->withHeader('Cache-Control', ' ')
@@ -632,7 +633,12 @@ class Controller extends Assessment\Controller
                     $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
                     $marks[$studentId]['capabilityMark'][$capabilityId]['published'] = $capabilityMark->getHumanReadableValue();
 
+                    /* Remember the Capability to which this Indicator belongs
+                     * (The Indicators in the csv output don't know their parent Capability)
+                     * Arguably you could remember the full capability instance itself, but meh
+                     */
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
                         $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
                     }
                 }
@@ -644,7 +650,12 @@ class Controller extends Assessment\Controller
                     $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
                     $marks[$studentId]['capabilityMark'][$capabilityId]['latest'] = $capabilityMark->getHumanReadableValue();
 
+                    /* Remember the Capability to which this Indicator belongs
+                     * (The Indicators in the csv output don't know their parent Capability)
+                     * Arguably you could remember the full capability instance itself, but meh
+                     */
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
                         $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
                     }
                 }
@@ -658,11 +669,12 @@ class Controller extends Assessment\Controller
     /**
      * Creates a CSV structure for this rubric grid and its participants.
      *
-     * @param Grid       $grid
+     * @param Grid $grid
      * @param Collection $participants
      * @return array
+     * @throws DebugBarException
      */
-    private function collateResultSquare(Grid $grid, Collection $participants): array
+    private function collateResultSquare(bool $isMarkPerCapability, Grid $grid, Collection $participants): array
     {
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
@@ -676,15 +688,23 @@ class Controller extends Assessment\Controller
         }
 
         // put header row in array
-        foreach ($this->getRubricHeaders($grid)['capabilities'] as $capabilityId => $capabilityData) {
-            $criteria = $capabilityData['indicators'];
-            $grouping = $capabilityData['name'];
+        foreach ($this->getRubricHeaders($grid)['capabilities'] as $capabilityData) {
+            $indicators = $capabilityData['indicators'];
+            $capabilityName = $capabilityData['name'];
 
-            foreach ($criteria as $id => $criterion) {
-                $data[0][] = "$grouping - $criterion";
+            foreach ($indicators as $indicatorId => $indicator) {
+                $data[0][] = "{$capabilityName} - {$indicator}";
                 $data[0][] = '';
             }
+
+            /* If Capability Mark Type is something other than None,
+             * prepare an additional column
+             */
+            if ($isMarkPerCapability) {
+                $data[0][] = 'Overall';
+            }
         }
+
         $data[0][] = 'Total';
 
         /**
@@ -697,6 +717,7 @@ class Controller extends Assessment\Controller
                 return $participant->getUser()->getId();
             }
         )->getAll();
+
         foreach ($this->getMarks($participants) as $studentId => $marks) {
             // array of all marked indicator ids of the participant
             $markedIndicatorIds = array_keys($marks);
@@ -709,15 +730,39 @@ class Controller extends Assessment\Controller
             $sum = null;
 
             if (count($marks)) {
-                foreach ($allIndicatorUsageIds as $indicatorUsageId) {
+                $numIndicators = \count($allIndicatorUsageIds);
+
+                for ($i = 0; $i < $numIndicators; $i++) {
+                    $indicatorUsageId = $allIndicatorUsageIds[$i];
+
+                    /* Implement lookahead to see when you're ready to output capability marks
+                     */
+                    $currentCapabilityId = $marks[$indicatorUsageId]['capabilityId'] ?? null;
+
+                    /* Because apparently you can't null coalesce a lookahead for some reason
+                    */
+                    $nextIndex = $i + 1;
+                    $nextCapabilityId = null;
+
+                    if ($nextIndex < $numIndicators) {
+                        $nextCapabilityId = $marks[$allIndicatorUsageIds[$nextIndex]]['capabilityId'];
+                    }
+
                     if (array_key_exists('published', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
-                        $row[]      = $descriptor ? $descriptor->getDescription() : '';
-                        $row[]      = $marks[$indicatorUsageId]['published']->getValue();
-                        $sum        += $marks[$indicatorUsageId]['published']->getValue();
+                        $row[] = $descriptor ? $descriptor->getDescription() : '';
+                        $row[] = $marks[$indicatorUsageId]['published']->getValue();
+                        $sum += $marks[$indicatorUsageId]['published']->getValue();
                     } else {
                         $row[] = '';
                         $row[] = '';
+                    }
+
+                    /* Prepare an additional column for Capability Marks
+                     */
+                    if ($isMarkPerCapability && $currentCapabilityId !== $nextCapabilityId) {
+                        $capabilityMark = $marks['capabilityMark'][$currentCapabilityId]['published'];
+                        $row[] = $capabilityMark;
                     }
                 }
             } else {
@@ -730,6 +775,7 @@ class Controller extends Assessment\Controller
                 $data[] = $row;
             }
         }
+
         return $data;
     }
 
