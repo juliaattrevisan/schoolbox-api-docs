@@ -1,11 +1,11 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Subscription;
 
@@ -19,48 +19,36 @@ use Psr\Log\LoggerInterface;
  */
 class SubscriptionManager implements ISubscriptionManager
 {
-
-    /** @var string */
-    private $instanceId;
-
-    /** @var ISubscriptionFactory */
-    private $factory;
-
-    /** @var LoggerInterface */
-    private $log;
-
     /**
-     * A cache of subscriptions, indexed by user ID
+     * A cache of subscriptions, indexed by instance ID and then by user ID
      *
-     * @var ISubscription[]
+     * @var array<string, array<int, ISubscription>>
      */
-    private $subscriptions = [];
+    private array $subscriptions = [];
 
     /**
-     * @param string               $instanceId
-     * @param ISubscriptionFactory $factory
-     * @param LoggerInterface      $log
+     * Constructor
+     *
+     * @param ISubscriptionFactory $factory Subscription factory
+     * @param LoggerInterface      $log     Logger
      */
-    public function __construct($instanceId, ISubscriptionFactory $factory, LoggerInterface $log)
+    public function __construct(private ISubscriptionFactory $factory, private LoggerInterface $log)
     {
-        $this->instanceId = $instanceId;
-        $this->factory    = $factory;
-        $this->log        = $log;
     }
 
     /**
-     * @param int $userId
-     * @return bool
+     * @inheritdoc
      */
-    public function subscribeUser($userId)
+    public function subscribeUser(string $instanceId, int $userId): bool
     {
-        if ($this->userHasSubscription($userId)) {
-            $this->log->info("User $userId is already subscribed");
+        if ($this->userHasSubscription($instanceId, $userId)) {
+            // TODO consider parameterised logging
+            $this->log->info("User $userId is already subscribed for instance $instanceId");
             return true;
         }
 
         try {
-            $this->putSubscription($userId, $this->factory->build($this->instanceId, $userId));
+            $this->putSubscription($instanceId, $userId, $this->factory->build($instanceId, $userId));
         } catch (\RuntimeException $e) {
             return false;
         }
@@ -68,55 +56,51 @@ class SubscriptionManager implements ISubscriptionManager
         return true;
     }
 
-
     /**
-     * @param int $userId
-     * @return bool
+     * @inheritdoc
      */
-    public function userHasSubscription($userId)
+    public function userHasSubscription(string $instanceId, int $userId): bool
     {
         return array_key_exists($userId, $this->subscriptions);
     }
 
-
     /**
-     * @param int $userId
-     * @return ISubscription
+     * @inheritdoc
      */
-    public function getUserSubscription($userId)
+    public function getUserSubscription(string $instanceId, int $userId): ISubscription
     {
-        if (!$this->userHasSubscription($userId)) {
+        if (!$this->userHasSubscription($instanceId, $userId)) {
             // doesn't exist: create it
-            $this->subscribeUser($userId);
+            $this->subscribeUser($instanceId, $userId);
         }
 
-        return $this->subscriptions[$userId];
+        return $this->subscriptions[$instanceId][$userId];
     }
 
-
     /**
-     * @param int $userId
-     * @return bool
+     * @inheritdoc
      */
-    public function removeSubscription($userId)
+    public function removeSubscription(string $instanceId, int $userId): bool
     {
-        if (!$this->userHasSubscription($userId)) {
+        if (!$this->userHasSubscription($instanceId, $userId)) {
             return false;
         }
         // unsetting this will call Subscription::__destruct, which will call unsubscribe()
-        unset($this->subscriptions[$userId]);
+        unset($this->subscriptions[$instanceId][$userId]);
 
         return true;
     }
 
-
     /**
+     * Cache this subscription.
+     *
+     * @param string        $instanceId
      * @param int           $userId
      * @param ISubscription $subscription
      * @return void
      */
-    private function putSubscription($userId, ISubscription $subscription)
+    private function putSubscription(string $instanceId, int $userId, ISubscription $subscription): void
     {
-        $this->subscriptions[$userId] = $subscription;
+        $this->subscriptions[$instanceId][$userId] = $subscription;
     }
 }

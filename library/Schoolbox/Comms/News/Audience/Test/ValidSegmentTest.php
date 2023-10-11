@@ -15,7 +15,7 @@ use External_Offline_Class;
 use PHPUnit;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
@@ -68,7 +68,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 Folder\Mapper::getInstance(),
                 Folder\Code\Mapper::getInstance(),
                 new External_Offline_User(),
-                new TestLoader(),
+                new ArrayLoader(),
                 new Folder\Code\ClassMatcherBase()
             ),
             new External_Offline_User(),

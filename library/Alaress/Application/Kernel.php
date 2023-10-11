@@ -259,7 +259,7 @@ abstract class Kernel
     protected function postInstallDependencies(): void
     {
         $config = new ConfigLoader();
-        session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL)));
+        session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
     }
 
     /**

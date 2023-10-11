@@ -17,7 +17,7 @@ use RecursiveIteratorIterator;
 use ReflectionClass;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
@@ -82,7 +82,7 @@ class ISoftDeletableTest extends TestCase
                 // Model is undefined, no need to check
                 continue;
             }
-            $mapper->setConfigLoader(new TestLoader());
+            $mapper->setConfigLoader(new ArrayLoader());
             $mappers[] = [$mapper, $reflection, $className];
         }
         return $mappers;

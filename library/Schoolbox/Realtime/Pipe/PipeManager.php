@@ -1,19 +1,23 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Pipe;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis\Async;
+use Alaress\WorkerCrew\Dispatcher;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\QueueingException;
+use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use ErrorException;
+use Exception;
 use InvalidArgumentException;
 use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
@@ -21,35 +25,30 @@ use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
+use Schoolbox\MultiInstance\InstanceRepository;
 use Schoolbox\Realtime\Notification\Decorator;
-use Schoolbox\Realtime\Pipe\Action\IAction;
-use Schoolbox\Realtime\Pipe\Action;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
-use Alaress\WorkerCrew\Dispatcher;
-use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Schoolbox\Realtime\Subscription\ISubscriptionManager;
 
 /**
- * This is the main "app" of our React loop.
- *
- * Class PipeManager
- *
- * @package Schoolbox\Realtime
+ * Multi-instance aware pipe manager.
  */
 class PipeManager implements MessageComponentInterface, TaskResponseHandlerInterface, Async\EventListener
 {
-    public const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:' . INSTANCE_ID . ':';
-    const PHP_SESSION_PREFIX   = 'PHPSESSID';
-    const INACTIVE_TIMEOUT     = 300; // 5 minutes
+    public const REDIS_SESSION_PREFIX_BASE = 'PHPREDIS_SESSION:';
+    public const REDIS_SESSION_PREFIX = self::REDIS_SESSION_PREFIX_BASE . INSTANCE_ID . ':';
 
-    const PIPE_METHOD_ACKNOWLEDGE = 'ack';
-    const PIPE_METHOD_ALERT       = 'alert';
-    const PIPE_METHOD_FETCH       = 'fetch';
-    const PIPE_METHOD_PUSH        = 'push';
-    const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
-    const PIPE_METHOD_WAIT        = 'wait';
+    public const PHP_SESSION_PREFIX   = 'PHPSESSID';
+
+    private const INACTIVE_TIMEOUT     = 300; // 5 minutes
+
+    public const PIPE_METHOD_ACKNOWLEDGE = 'ack';
+    public const PIPE_METHOD_ALERT       = 'alert';
+    public const PIPE_METHOD_FETCH       = 'fetch';
+    public const PIPE_METHOD_PUSH        = 'push';
+    public const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
+    public const PIPE_METHOD_WAIT        = 'wait';
 
     /**
      * On the matter of File Descriptors: one or more file descriptors are opened by this process every time...
@@ -62,86 +61,95 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * is undesirable. This limit buffer is to mitigate any possible race condition between sockets opening and
      * others closing.
      */
-    const FD_LIMIT_BUFFER = 16;
+    private const FD_LIMIT_BUFFER = 16;
 
-    /** @var string[] */
-    private static $headerMap = [
+    /**
+     * Map of response codes to headers.
+     */
+    private const HEADER_MAP = [
         400 => 'Bad Request',
         401 => 'Unauthorized',
         503 => 'Service Unavailable',
     ];
 
-    /** @var PipeCollection */
-    private $pipes;
-
-    /** @var ISubscriptionManager */
-    private $subscriptionManager;
-
-    /** @var LoopInterface */
-    private $reactLoop;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var Dispatcher */
-    private $taskDispatcher;
-
-    /** @var Transaction[][] */
-    private $pushTransactions;
-
-    /** @var TimerInterface[] */
-    private $userTimeouts = [];
-
-    /** @var int */
-    private $fdLimit;
-
+    /**
+     * Task dispatcher: used to spawn workers for handling commands.
+     */
+    private Dispatcher $taskDispatcher;
 
     /**
-     * @param LoopInterface             $reactLoop
-     * @param PipeCollection            $pipes
-     * @param ISubscriptionManager      $subscriptionManager
-     * @param LoggerInterface           $log
-     * @param DispatchStrategyInterface $strat
-     * @param int                       $fdLimit
+     * Push transactions (whatever those are), indexed by:
+     * * instance ID
+     * * user ID
+     * * pipe ID
+     *
+     * @var array<string, array<int, array<string, Transaction>>>
+     */
+    private array $pushTransactions = [];
+
+    /**
+     * User timeouts, indexed by instance ID and then by user ID
+     *
+     * @var array<string, array<int, TimerInterface>>
+     */
+    private array $userTimeouts = [];
+
+    /**
+     * File descriptor limit: if the number of descriptors this pipe manager
+     * has open is above this limit, reject incoming connections.
+     */
+    private int $fdLimit;
+
+    /**
+     * Constructor
+     *
+     * @param LoopInterface             $reactLoop           React loop: required for this object's task dispatcher to
+     *                                                       listen to job progress, and for timing out sessions.
+     * @param InstanceRepository        $instanceRepository  Repository of instances: required so that incoming
+     *                                                       connections may be associated with an instance.
+     * @param PipeCollection            $pipes               Collection of pipes this manager manages.
+     * @param ISubscriptionManager      $subscriptionManager Subscribes and unsubscribes users from sockets
+     * @param LoggerInterface           $log                 Logger
+     * @param DispatchStrategyInterface $strat               Strategy for dispatching jobs to the task dispatcher?
+     * @param int                       $fdLimit             Configurable limit of file descriptors: in practice,
+     *                                                       `self::FD_LIMIT_BUFFER` descriptors are left unused
      */
     public function __construct(
-        LoopInterface $reactLoop,
-        PipeCollection $pipes,
-        ISubscriptionManager $subscriptionManager,
-        LoggerInterface $log,
+        private LoopInterface $reactLoop,
+        private InstanceRepository $instanceRepository,
+        private PipeCollection $pipes,
+        private ISubscriptionManager $subscriptionManager,
+        private LoggerInterface $log,
         DispatchStrategyInterface $strat,
-        $fdLimit
+        int $fdLimit
     ) {
-        $this->reactLoop           = $reactLoop;
-        $this->log                 = $log;
-        $this->subscriptionManager = $subscriptionManager;
-        $this->pipes               = $pipes;
-        $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
-        $this->fdLimit             = $fdLimit - self::FD_LIMIT_BUFFER;
-
+        $this->taskDispatcher = new Dispatcher($reactLoop, $this, $log, $strat);
+        $this->fdLimit        = $fdLimit - self::FD_LIMIT_BUFFER;
         $this->log->debug('Instantiated PipeManager');
     }
 
     /**
-     * Returns an instance-specific session save path
+     * Returns an instance-specific session save path.
+     *
+     * @todo move to some other class, which manages sessions directly
      *
      * @param string $redisUrl
+     * @param string $instanceId
      * @return string
      */
-    public static function getSessionSavePath(string $redisUrl): string
+    public static function getSessionSavePath(string $redisUrl, string $instanceId): string
     {
-        return sprintf('%s?prefix=%s', $redisUrl, self::REDIS_SESSION_PREFIX);
+        return sprintf('%s?prefix=%s', $redisUrl, self::REDIS_SESSION_PREFIX_BASE . $instanceId . ':');
     }
-
 
     /**
      * When a new connection is opened it will be passed to this method
      *
      * @param  ConnectionInterface $conn The socket/connection that just connected to your application
-     * @throws \Exception
+     * @throws Exception
      * @return void
      */
-    public function onOpen(ConnectionInterface $conn)
+    public function onOpen(ConnectionInterface $conn): void
     {
         // receive new connection, register a pipe based on it
         $pipeCount = $this->pipes->count();
@@ -155,7 +163,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             return;
         }
 
-        $pipe = new Pipe($conn);
+        // Extract the instance ID, and inject into pipe
+        $instanceConfig = $this->instanceRepository->fetchConfigForHostname(
+            Pipe::extractWebSocketRequest($conn)->getUri()->getHost()
+        );
+        $pipe = new Pipe($conn, $instanceConfig->instanceId);
 
         try {
             $this->log->info(sprintf('Received socket connection from %s', $pipe->getRemoteAddress()));
@@ -178,17 +190,18 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
+     * Close a connection, with an associated error code.
+     *
      * @param ConnectionInterface $conn
      * @param int                 $code
      */
-    private function closeConnectionWithReason(ConnectionInterface $conn, $code)
+    private function closeConnectionWithReason(ConnectionInterface $conn, int $code): void
     {
         // handle the connection raw
         $conn->send(
             json_encode([
-                'error' => self::$headerMap[$code],
+                'error' => self::HEADER_MAP[$code],
                 'code'  => [$code],
                 'retry' => false,
             ])
@@ -197,26 +210,22 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $conn->close();
     }
 
-
     /**
      * This is called before or after a socket is closed (depends on how it's closed).
      * SendMessage to $conn will not result in an error if it has already been closed.
      *
      * @param  ConnectionInterface $conn The socket/connection that is closing/closed
-     * @throws \Exception
+     * @throws Exception
      * @return void
      */
-    public function onClose(ConnectionInterface $conn)
+    public function onClose(ConnectionInterface $conn): void
     {
         // all WS are RFC6455, we can safely assume there's a pipe to unregister
         $socketKeyForConnection = Pipe::getSocketKeyForConnection($conn);
         $pipe                   = $this->pipes->getPipeBySocketKey($socketKeyForConnection);
         $this->pipes->unregisterPipe($socketKeyForConnection);
-        if (null !== $pipe) {
-            $pipe->close();
-        }
+        $pipe?->close();
     }
-
 
     /**
      * If there is an error with one of the sockets, or somewhere in the application where an Exception is thrown, the
@@ -224,18 +233,14 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * method.
      *
      * @param  ConnectionInterface $conn
-     * @param  \Exception          $e
-     * @throws \Exception
+     * @param  Exception          $e
+     * @throws Exception
      * @return void
      */
-    public function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, Exception $e): void
     {
-//        if ($e instanceof ConnectionException) {
-//            $this->log->warning("Connection to client lost, terminating");
-//        }
-//        else
         if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`i', $e->getMessage(), $matches)) {
-            $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
+            $this->log->warning("IOException: $matches[3] [$matches[2]] ($matches[1] bytes dropped)");
         } else {
             $this->log->critical(
                 sprintf('%s: "%s" occurred in %s on line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()),
@@ -249,16 +254,15 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
      * Triggered when a client sends data through the socket
      *
      * @param  ConnectionInterface $from The socket/connection that sent the message to your application
      * @param  string              $msg  The message received
-     * @throws \Exception
+     * @throws Exception
      * @return void
      */
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $msg): void
     {
         $socketKey = Pipe::getSocketKeyForConnection($from);
         $pipe      = $this->pipes->getPipeBySocketKey($socketKey);
@@ -267,8 +271,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             throw new ErrorException("Unrecognised pipe: '$socketKey'");
         }
 
-        $userId    = $pipe->getUserId();
-        $sessionId = $pipe->getSession();
+        $instanceId = $pipe->getInstanceId();
+        $userId     = $pipe->getUserId();
+        $sessionId  = $pipe->getSession();
 
         $this->log->info(
             sprintf(
@@ -299,7 +304,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             if ($pipe->isLocked()) {
                 // pipe has a command active: don't permit another until this one is finished
-                $this->sendToPipe($pipe, json_encode([ $command => self::PIPE_METHOD_WAIT ]));
+                $this->sendToPipe($pipe, [ $command => self::PIPE_METHOD_WAIT ]);
                 return;
             }
 
@@ -307,7 +312,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $pipe->lock($command);
 
             // flag the user as active
-            $this->refreshUser($userId);
+            $this->refreshUser($instanceId, $userId);
 
             try {
                 // don't flatly spawn a new worker: add the request to a queue
@@ -329,14 +334,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
     }
 
-
     /**
      * This method is invoked whenever something is published in Redis on one of our subscriptions
      *
      * @param Async\Event\IEvent $event
      * @return void
      */
-    public function handle(Async\Event\IEvent $event)
+    public function handle(Async\Event\IEvent $event): void
     {
         if (!$event instanceof Async\Event\Message) {
             // we're only interested in messages, no pongs
@@ -345,15 +349,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         try {
             $action = $this->convertMessageToAction($event);
-        } catch (InvalidArgumentException $e) {
-            $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
-            return;
-        } catch (ErrorException $e) {
+        } catch (InvalidArgumentException | ErrorException $e) {
             $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
             return;
         }
 
-        if (!$this->pipes->userPipeCount($action->getUserId())) {
+        if (!$this->pipes->userPipeCount($action->getInstanceId(), $action->getUserId())) {
             // this scenario will arise if the last socket for the user disconnects but a message arrived on their
             // subscription before it could be unsubscribed - just drop the message.
             return;
@@ -362,130 +363,148 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $action->execute($this);
     }
 
-
     /**
      * Factory method for converting a published redis message into a pipe action
      *
      * @param Async\Event\Message $msg
      * @throws InvalidArgumentException
      * @throws ErrorException
-     * @return IAction
+     * @return Action\IAction
      */
-    private function convertMessageToAction(Async\Event\Message $msg)
+    private function convertMessageToAction(Async\Event\Message $msg): Action\IAction
     {
-        if (preg_match('`^msg:.*:(\d+):(.*)$`', $msg->getChannel(), $matches)) {
-            $userId = $matches[1];
+        if (preg_match('`^msg:(.+?):(\d+):(.*)$`', $msg->getChannel(), $matches)) {
+            [, $instanceId, $userId, $method] = $matches;
 
-            $this->log->debug("Received {$matches[2]} for {$userId}", [ 'char' => '>' ]);
+            $this->log->debug("Received $method for instance:user $instanceId:$userId ", [ 'char' => '>' ]);
 
             // in all cases, we expect the payload to be a standard message
-            $instance  = Instance::jsonUnserialize($msg->getPayload());
+            $instance = Instance::jsonUnserialize($msg->getPayload());
 
-            switch ($matches[2]) {
+            switch ($method) {
                 case static::PIPE_METHOD_PUSH:
-                    return new Action\Push($userId, $instance);
+                    return new Action\Push($instanceId, (int)$userId, $instance);
 
                 case static::PIPE_METHOD_ALERT:
-                    return new Action\Alert($userId, $instance);
+                    return new Action\Alert($instanceId, (int)$userId, $instance);
             }
         }
 
         throw new InvalidArgumentException("Invalid channel supplied: '{$msg->getChannel()}'");
     }
 
-
     /**
      * When the initiator is backend (ie. something published on our subscription) the pipe method is going to be
      * an alert or a push. As such, it doesn't matter *which* pipe is used, because it will only be used as a basis
      * for broadcasting to all the pipes that belong to the same user. This method just retrieves *a* pipe for the user.
      *
-     * @param int $userId
-     * @return Pipe
-     */
-    private function getFirstPipeForUser($userId)
-    {
-        return reset($this->pipes->getPipesByUserId($userId));
-    }
-
-
-    /**
-     * @param PipeInterface $pipe
-     * @param string        $command
-     * @param mixed         $payload
-     * @throws QueueingException
-     * @return void
-     */
-    private function enqueue(PipeInterface $pipe, $command, $payload)
-    {
-        $this->taskDispatcher->enqueue($pipe, $command, $payload);
-    }
-
-
-    /**
+     * @param string $instanceId
      * @param int    $userId
+     * @return Pipe|null
+     */
+    private function getFirstPipeForInstanceAndUser(string $instanceId, int $userId): ?Pipe
+    {
+        $pipes     = $this->pipes->getPipesByInstanceAndUserId($instanceId, $userId);
+        $firstPipe = reset($pipes);
+        return $firstPipe instanceof Pipe ? $firstPipe : null;
+    }
+
+    /**
+     * Enqueue a command through a pipe to the task dispatcher.
+     *
+     * The command's output will then be output to the pipe.
+     *
+     * @param Pipe   $pipe
      * @param string $command
      * @param mixed  $payload
      * @throws QueueingException
      * @return void
      */
-    public function enqueueUser($userId, $command, $payload)
+    private function enqueue(Pipe $pipe, string $command, mixed $payload): void
     {
-        $this->enqueue($this->getFirstPipeForUser($userId), $command, $payload);
+        $this->taskDispatcher->enqueue($pipe, $command, $payload);
     }
 
+    /**
+     *  Enqueue a command through the first pipe for the given user.
+     *
+     * @param string $instanceId
+     * @param int    $userId
+     * @param string $command
+     * @param mixed  $payload
+     * @return void
+     * @throws QueueingException
+     */
+    public function enqueueUser(string $instanceId, int $userId, string $command, mixed $payload): void
+    {
+        $pipe = $this->getFirstPipeForInstanceAndUser($instanceId, $userId);
+        if ($pipe) {
+            $this->enqueue($pipe, $command, $payload);
+        }
+    }
 
     /**
+     * Write a payload to the transaction of the first pipe for the given user.
+     *
+     * Used within `\Schoolbox\Realtime\Pipe\Action\Push` to write data to an
+     * already open pipe?
+     *
+     * @param string $instanceId
      * @param int    $userId
      * @param string $key
      * @param mixed  $payload
      * @return void
      */
-    public function transactUser($userId, $key, $payload)
+    public function transactUser(string $instanceId, int $userId, string $key, mixed $payload): void
     {
-        $this->getTransaction($this->getFirstPipeForUser($userId))->put($key, $payload);
+        $pipe = $this->getFirstPipeForInstanceAndUser($instanceId, $userId);
+        if ($pipe) {
+            $this->getTransaction($pipe)->put($key, $payload);
+        }
     }
 
-
     /**
-     * @param  PipeInterface $pipe
+     * Retrieve the transaction for the given pipe.
+     *
+     * @param  Pipe $pipe
      * @return Transaction
      */
-    private function getTransaction(PipeInterface $pipe)
+    private function getTransaction(Pipe $pipe): Transaction
     {
-        $userId = $pipe->getUserId();
-        $pipeId = $pipe->getSocketKey();
+        $instanceId = $pipe->getInstanceId();
+        $userId     = $pipe->getUserId();
+        $pipeId     = $pipe->getSocketKey();
 
-        if (empty($this->pushTransactions[$userId][$pipeId])) {
-            $this->pushTransactions[$userId][$pipeId] = new Transaction(
+        if (empty($this->pushTransactions[$instanceId][$userId][$pipeId])) {
+            $this->pushTransactions[$instanceId][$userId][$pipeId] = new Transaction(
                 $this->reactLoop,
-                function ($data) use ($pipe, $userId) {
+                function ($data) use ($pipe, $instanceId, $userId) {
 
                     // the timer contains the data to be processed
-                    $this->log->debug("Pushing cached messages to user $userId", [ 'char' => '<' ]);
+                    $this->log->debug("Pushing cached messages to instance:user $instanceId:$userId", [ 'char' => '<' ]);
 
                     try {
                         // enqueue to be dispatched
                         $this->enqueueInstances($pipe, $data);
-                    } catch (QueueingException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception' => $e]);
-                    } catch (InvalidArgumentException $e) {
+                    } catch (QueueingException | InvalidArgumentException $e) {
                         $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception' => $e]);
                     }
                 }
             );
         }
 
-        return $this->pushTransactions[$userId][$pipeId];
+        return $this->pushTransactions[$instanceId][$userId][$pipeId];
     }
 
-
     /**
-     * @param PipeInterface $pipe
-     * @param Instance[]    $instances
+     * Pushes a payload generated from `$instances` to the given pipe.
+     *
+     * @param Pipe       $pipe
+     * @param Instance[] $instances
      * @throws InvalidArgumentException
      * @throws QueueingException
      */
-    private function enqueueInstances(PipeInterface $pipe, array $instances)
+    private function enqueueInstances(Pipe $pipe, array $instances): void
     {
         if (empty($instances)) {
             return;
@@ -499,78 +518,72 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         );
     }
 
-
     /**
      * Handles a response from a Worker
      *
-     * @param Pipe   $pipe    - the identifier passed as the first argument to Dispatcher::enqueue()
-     * @param string $command - the command that was executed by the Worker
-     * @param array  $data    - the data with which the Worker responded
-     * @return void           - this method does not return any value
+     * @param Pipe   $identifier the identifier passed as the first argument to Dispatcher::enqueue()
+     * @param string $command    the command that was executed by the Worker
+     * @param array  $data       the data with which the Worker responded
+     * @return void
      * @throws InvalidArgumentException
      * @throws QueueingException
      */
-    public function handleResponse($pipe, $command, $data)
+    public function handleResponse($identifier, $command, $data): void
     {
-        $userId = $pipe->getUserId();
+        $instanceId = $identifier->getInstanceId();
+        $userId     = $identifier->getUserId();
 
-        $this->log->notice("Handling a worker response: $command");
+        $this->log->debug("Handling a worker response for $instanceId: $command");
 
         $release = true;
 
         switch (strtolower($command)) {
             // deal with this yourself
             case self::PIPE_METHOD_SUBSCRIBE:
-                if ($this->subscriptionManager->subscribeUser($userId)) {
-                    $this->sendToPipe($pipe, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
+                if ($this->subscriptionManager->subscribeUser($instanceId, $userId)) {
+                    $this->sendToPipe($identifier, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
 
-                    $this->enqueueInstances($pipe, $this->subscriptionManager
-                        ->getUserSubscription($userId)
+                    $this->enqueueInstances($identifier, $this->subscriptionManager
+                        ->getUserSubscription($instanceId, $userId)
                         ->getUnread());
                 } else {
                     // could not subscribe the user, rabbit-offline has already been reported, just inform the user
-                    $this->sendToPipe($pipe, [ $command => false ]);
+                    $this->sendToPipe($identifier, [ $command => false ]);
                 }
                 break;
 
             // this was dealt with by a worker, just push the result
             case self::PIPE_METHOD_FETCH:
                 $data = $data[0];
-                $this->sendToPipe($pipe, [ $command => $data ]);
+                $this->sendToPipe($identifier, [ $command => $data ]);
                 break;
 
+            // alert behaves like push + ack: either way it's sent the same way
+            case self::PIPE_METHOD_ALERT:
             case self::PIPE_METHOD_PUSH:
-                $this->sendToUser($userId, [ $command => $data ]);
+                $this->sendToUser($instanceId, $userId, [ $command => $data ]);
                 $release = false;
                 break;
 
             // deal with this yourself
             case self::PIPE_METHOD_ACKNOWLEDGE:
-                if ($subscription = $this->subscriptionManager->getUserSubscription($userId)) {
-                    $markAsRead = [];
-                    foreach ((array)$data[1] as $msgId) {
-                        if ($subscription->acknowledgeMessage($msgId)) {
-                            $markAsRead[] = $msgId;
-                        }
+                $subscription = $this->subscriptionManager->getUserSubscription($instanceId, $userId);
+                $markAsRead   = [];
+                foreach ((array)$data[1] as $msgId) {
+                    if ($subscription->acknowledgeMessage($msgId)) {
+                        $markAsRead[] = $msgId;
                     }
-
-                    $this->sendToUser($userId, [ $command => $markAsRead ]);
                 }
-                break;
 
-            // alert behaves like push + ack
-            case self::PIPE_METHOD_ALERT:
-                $this->sendToUser($userId, [ $command => $data ]);
-                $release = false;
+                $this->sendToUser($instanceId, $userId, [ $command => $markAsRead ]);
                 break;
         }
 
         // release the socket if permissible
         if ($release) {
-            $pipe->unlock();
+            $identifier->unlock();
         }
     }
-
 
     /**
      * Handles an error from a Worker
@@ -580,23 +593,24 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param array  $data       - the data with which the Worker responded
      * @return void              - this method does not return any value
      */
-    public function handleError($identifier, $command, $data)
+    public function handleError($identifier, $command, $data): void
     {
-        $this->log->notice("Received worker error for '$command': $data");
+        $this->log->notice("Received worker error for '$command': " . json_encode($data));
     }
 
-
     /**
+     * Send a raw header to a pipe.
+     *
      * @param Pipe $pipe
      * @param int  $code
      * @param bool $allowRetry
      * @return bool
      */
-    private function sendHeader($pipe, $code, $allowRetry = false)
+    private function sendHeader(Pipe $pipe, int $code, bool $allowRetry = false): bool
     {
-        if (isset(self::$headerMap[$code])) {
+        if (isset(self::HEADER_MAP[$code])) {
             $data = [
-                'error' => self::$headerMap[$code],
+                'error' => self::HEADER_MAP[$code],
                 'code'  => $code,
             ];
 
@@ -604,7 +618,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 $data['retry'] = true;
             }
 
-            $this->sendToPipe($pipe, json_encode($data));
+            $this->sendToPipe($pipe, $data);
 
             return true;
         }
@@ -612,122 +626,86 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         return false;
     }
 
-
     /**
      * Send data to a specific pipe.
      *
-     * @param Pipe         $pipe
-     * @param string|array $data
+     * @param Pipe  $pipe
+     * @param array $data
      * @return void
      */
-    private function sendToPipe($pipe, $data)
+    private function sendToPipe(Pipe $pipe, array $data): void
     {
-        $data  = is_string($data) ? $data : json_encode($data);
-        $bytes = strlen($data);
+        $encodedData = json_encode($data);
+        $bytes = strlen($encodedData);
 
         $this->log->debug("Sending $bytes bytes to {$pipe->getSocketKey()}", [ 'char' => '<' ]);
-        $pipe->send($data);
+        $pipe->send($encodedData);
     }
-
 
     /**
      * Send data to all pipes associated with a specific user.
      *
-     * @param int   $userId
-     * @param array $data
+     * @param string $instanceId
+     * @param int    $userId
+     * @param array  $data
      * @return void
      */
-    private function sendToUser($userId, $data)
+    private function sendToUser(string $instanceId, int $userId, array $data): void
     {
-        foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
+        foreach ($this->pipes->getPipesByInstanceAndUserId($instanceId, $userId) as $pipe) {
             $this->sendToPipe($pipe, $data);
         }
     }
 
-
     /**
-     * @param int $userId
+     * Refresh all timeouts associated with this user in this instance.
+     *
+     * @param string $instanceId
+     * @param int    $userId
      * @return void
      */
-    private function refreshUser($userId)
+    private function refreshUser(string $instanceId, int $userId): void
     {
-        if (isset($this->userTimeouts[$userId]) && $this->userTimeouts[$userId] instanceof TimerInterface) {
-            $this->reactLoop->cancelTimer($this->userTimeouts[$userId]);
-            unset($this->userTimeouts[$userId]);
+        if (
+            isset($this->userTimeouts[$instanceId][$userId])
+            && $this->userTimeouts[$instanceId][$userId] instanceof TimerInterface
+        ) {
+            $this->reactLoop->cancelTimer($this->userTimeouts[$instanceId][$userId]);
+            unset($this->userTimeouts[$instanceId][$userId]);
         }
 
-        $this->userTimeouts[$userId] = $this->reactLoop->addTimer(
+        $this->userTimeouts[$instanceId][$userId] = $this->reactLoop->addTimer(
             self::INACTIVE_TIMEOUT,
-            function () use ($userId) {
-                $this->onTimeout($userId);
+            function () use ($instanceId, $userId) {
+                $this->onTimeout($instanceId, $userId);
             }
         );
     }
 
-
     /**
-     * @param int $userId
+     * Timeout callback for a given user and instance: unregisters all pipes for
+     * that user/instance.
+     *
+     * @param string $instanceId
+     * @param int    $userId
      * @return void
      */
-    private function onTimeout($userId)
+    private function onTimeout(string $instanceId, int $userId): void
     {
-        $success = $this->subscriptionManager->removeSubscription($userId);
-        $this->log->info("User $userId has timed out, " . ($success ? 'unsubscribed' : 'failed to unsubscribe'));
+        $success = $this->subscriptionManager->removeSubscription($instanceId, $userId);
 
-        foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
+        // TODO consider parameterised logging
+        $this->log->info(
+            "Instance:user $instanceId:$userId has timed out, "
+            . ($success ? 'unsubscribed' : 'failed to unsubscribe')
+        );
+
+        foreach ($this->pipes->getPipesByInstanceAndUserId($instanceId, $userId) as $pipe) {
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
             $pipe->close();
         }
 
-        unset($this->userTimeouts[$userId], $this->pushTransactions[$userId]);
-    }
-
-
-    /**
-     * @unused
-     * Send data to all pipes associated with a specific session.
-     *
-     * @param string $sessionId
-     * @param string $data
-     * @return void
-     */
-    protected function sendToSession($sessionId, $data)
-    {
-        foreach ($this->pipes->getPipesBySessionId($sessionId) as $pipe) {
-            $this->sendToPipe($pipe, $data);
-        }
-    }
-
-
-    /**
-     * @unused
-     * Unregister all pipes associated with a session.
-     *
-     * @param string $sessionId
-     * @return void
-     */
-    protected function unregisterAllPipesBySessionId($sessionId)
-    {
-        foreach ($this->pipes->getPipesBySessionId($sessionId) as $pipe) {
-            $this->pipes->unregisterPipe($pipe->getSocketKey());
-            $pipe->close();
-        }
-    }
-
-
-    /**
-     * @unused
-     * Unregister all pipes associated with a user.
-     *
-     * @param int $userId
-     * @return void
-     */
-    protected function unregisterAllPipesByUserId($userId)
-    {
-        foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
-            $this->pipes->unregisterPipe($pipe->getSocketKey());
-            $pipe->close();
-        }
+        unset($this->userTimeouts[$instanceId][$userId], $this->pushTransactions[$instanceId][$userId]);
     }
 }

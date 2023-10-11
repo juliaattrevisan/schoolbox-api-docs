@@ -13,7 +13,7 @@ use Alaress_Date_Format;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use InvalidArgumentException;
@@ -25,7 +25,6 @@ use UnexpectedValueException;
  */
 class StudentAttributesTest extends TestCase
 {
-
     /**
      * Test we cannot generate a report for a soft-deleted student
      *
@@ -55,7 +54,7 @@ class StudentAttributesTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $user = (new User())->setYear(10);
-        new StudentAttributes(new TestLoader($invalidTermDates), $user);
+        new StudentAttributes(new ArrayLoader($invalidTermDates), $user);
     }
 
 
@@ -1391,6 +1390,6 @@ class StudentAttributesTest extends TestCase
             Config::_TIGS_START_TERM_4 => '14 October',
         ];
 
-        return new TestLoader($cache);
+        return new ArrayLoader($cache);
     }
 }

@@ -9,7 +9,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Redis;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
@@ -22,7 +21,7 @@ use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Schoolbox\Application\Daemon;
 use Schoolbox\Application\Daemon\Kernel;
-use Schoolbox\IConfigLoader;
+use Schoolbox\MultiInstance;
 use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
 
@@ -36,16 +35,25 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';
 
-    $redis = Redis::getStorageClientInstance();
 
-    /** @var IConfigLoader $config */
-    $config = $di->get('config');
+    // Need the multi-instance repository
+    /** @var MultiInstance\InstanceRepository $instanceRepository */
+    $instanceRepository = $di->get('multiInstance.instanceRepository');
 
-    /** @var Async\Client $asyncRedis */
-    $asyncRedis = $di->get('redis.signalQueue.sub');
+    // Config will always be per-instance
+    /** @var MultiInstance\ConfigRepository $configRepository */
+    $configRepository = $di->get('multiInstance.configRepository');
 
-    /** @var IConnector $db */
-    $db = $di->get('databaseInternal');
+    // Database will always be per-instance
+    /** @var MultiInstance\ConnectorRepository $connectorRepository */
+    $connectorRepository = $di->get('multiInstance.connectorRepository');
+
+    // Need the multi-instance Redis repositories
+    /** @var MultiInstance\RedisClientRepository $redisClientRepository */
+    $redisClientRepository = $di->get('multiInstance.redisStorageClientRepository');
+
+    /** @var MultiInstance\RedisAsyncClientRepository $redisAsyncClientRepository */
+    $redisAsyncClientRepository = $di->get('multiInstance.redisAsyncClientRepository');
 
     $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
 
@@ -57,13 +65,13 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $loop,
         new PhpHandler(),
         $log,
-        $redis,
-        $asyncRedis,
-        $config->get('session_length'),
-        $db,
-        INSTANCE_ID,
+        $instanceRepository,
+        $configRepository,
+        $connectorRepository,
+        $redisClientRepository,
+        $redisAsyncClientRepository,
         $stratBuilder->build($flags),
-        $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
+        $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
     ))->build();
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);

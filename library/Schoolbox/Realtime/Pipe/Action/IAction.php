@@ -13,6 +13,10 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 
 interface IAction
 {
+    /**
+     * @return string
+     */
+    public function getInstanceId(): string;
 
     /**
      * @return int

@@ -1,144 +1,149 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Pipe;
 
-use Alaress\Database\Connector\IConnector;
-use Alaress\Redis;
 use Predis\ClientInterface;
 use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;
+use Schoolbox\MultiInstance\ConfigRepository;
+use Schoolbox\MultiInstance\ConnectorRepository;
+use Schoolbox\MultiInstance\RedisClientRepository;
 use Schoolbox\Realtime\SessionException;
 use SensitiveParameter;
 use UnexpectedValueException;
 
+/**
+ * Session validator used by pipe manager.
+ */
 class SessionValidator
 {
-    /** @var ClientInterface */
-    protected $redis;
-
-    /** @var HandlerInterface */
-    protected $handler;
-
-    /** @var int */
-    protected $length;
-
-    /** @var IConnector */
-    protected $database;
-
     /**
-     * User IDs, indexed by username
+     * A cache of user IDs, keyed by instance and then username.
      *
-     * @var int[]
+     * @var array<string, array<string, int>>
      */
-    protected $userIdCache = [];
-
+    private array $userIdCache = [];
 
     /**
-     * @param ClientInterface  $redis
-     * @param HandlerInterface $handler
-     * @param int              $sessionLength
-     * @param IConnector       $database
+     * Constructor
+     *
+     * @param RedisClientRepository $redisClientRepository Repository for Redis clients for all instances served by this
+     *                                                     node.
+     * @param HandlerInterface      $handler               Session serialization handler: required for decoding session
+     *                                                     data without actually creating the session.
+     * @param ConnectorRepository   $connectorRepository   Repository for database connections for all instances served
+     *                                                     by this node: required for converting a username to a user ID
+     *                                                     for a given instance.
+     * @param ConfigRepository      $configRepository      Repository for configs for all instances served by this node:
+     *                                                     required in order to determine each node's session expiry
+     *                                                     time.
      */
-    public function __construct(ClientInterface $redis, HandlerInterface $handler, $sessionLength, IConnector $database)
-    {
-        $this->redis    = $redis;
-        $this->handler  = $handler;
-        $this->length   = $sessionLength;
-        $this->database = $database;
+    public function __construct(
+        private RedisClientRepository $redisClientRepository,
+        private HandlerInterface $handler,
+        private ConnectorRepository $connectorRepository,
+        private ConfigRepository $configRepository,
+    ) {
     }
 
-
     /**
-     * Extracts a user from a Redis remember-me and returns the associated username
+     * Find a user's ID in a given instance, from the value of their remember
+     * token.
      *
-     * @param string $rememberMe
+     * @param string $instanceId The instance ID to search within.
+     * @param string $rememberMe The user's remember me token.
      * @return int
-     * @throws SessionException
-     * @throws CommunicationException
+     * @throws SessionException       if the user wasn't found
+     * @throws CommunicationException if Redis could not be communicated with
      */
-    public function findUserIdByRememberMe(string $rememberMe): int
+    public function findUserIdByRememberMe(string $instanceId, string $rememberMe): int
     {
-        // redis will unfortunately respond with the username, not the id -_-
-        $username = $this->findUser($rememberMe, 'remember-me token', '');
+        $username = $this->findData($instanceId, $rememberMe, 'remember-me token', '');
 
-        if (empty($this->userIdCache[$username])) {
-            // *sigh*
-            $id = (int)$this->database
+        if (!isset($this->userIdCache[$instanceId][$username])) {
+            // Not in cache: query database
+            $id = (int)$this->connectorRepository->fetchConnectorForInstance($instanceId)
                 ->executeQuery(
                     'SELECT `id` FROM `user` WHERE `username` = :username LIMIT 0, 1',
-                    [ 'username' => $username ]
+                    ['username' => $username]
                 )
-                ->fetchColumn()
-            ;
+                ->fetchColumn();
             if ($id === 0) {
                 throw new SessionException('User not found');
             }
-            $this->userIdCache[$username] = $id;
+            $this->userIdCache[$instanceId][$username] = $id;
         }
 
-        return $this->userIdCache[$username];
+        return $this->userIdCache[$instanceId][$username];
     }
 
-
     /**
-     * Extracts a user from a Redis session and returns the associated ID
+     * Find a user's ID in a given instance, from a session ID associated with
+     * that user.
      *
-     * @param string $sessionId
-     * @throws SessionException
-     * @throws CommunicationException
+     * @param string $instanceId The instance ID to search within.
+     * @param string $sessionId  The user's session ID.
      * @return int
+     * @throws SessionException       if the session could not be found or decoded
+     * @throws CommunicationException if Redis could not be communicated with
      */
-    public function findUserIdBySessionId(string $sessionId): int
+    public function findUserIdBySessionId(string $instanceId, string $sessionId): int
     {
         try {
-            // note that objects DO NOT correctly unserialize
             $session = $this->handler->unserialize(
-                $this->findUser($sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX)
+                $this->findData($instanceId, $sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX_BASE . $instanceId . ':')
             );
         } catch (UnexpectedValueException $e) {
             throw new SessionException('Could not decode session', 0, $e);
         }
 
         // check a user ID exists
+        // (note: the user object in the session is not guaranteed to decode)
         if (empty($session['id'])) {
             throw new SessionException('No valid user found in session');
         }
 
         // check the session hasn't gone stale
-        if (empty($session['lasttime']) || time() - $session['lasttime'] > $this->length) {
+        $sessionLength = $this->configRepository->fetchConfigForInstance($instanceId)->get('session_length');
+        if (empty($session['lasttime']) || time() - $session['lasttime'] > $sessionLength) {
             throw new SessionException('Session has expired');
         }
 
         return (int)$session['id'];
     }
 
-
     /**
+     * Find data in Redis.
+     *
+     * @param string $instanceId
      * @param string $token
      * @param string $label
      * @param string $prefix
-     * @throws SessionException
-     * @throws CommunicationException
      * @return string
+     * @throws SessionException       if no token provided, or nothing found for token
+     * @throws CommunicationException if Redis could not be communicated with
+     * @noinspection PhpDocRedundantThrowsInspection
      */
-    protected function findUser(#[SensitiveParameter] $token, $label, $prefix)
-    {
+    private function findData(
+        string $instanceId,
+        #[SensitiveParameter] string $token,
+        string $label,
+        string $prefix,
+    ): string {
         if (!$token) {
             throw new SessionException("No $label provided on which to search.");
         }
 
-        // this has the potential to throw CommunicationException
-        $redisCommand  = $this->redis->createCommand('get', [ $prefix . $token ]);
-        $redisResponse = $this->redis->executeCommand($redisCommand);
-
-        if (!$redisResponse) {
+        // this has the potential to throw CommunicationException?
+        $redisResponse = $this->redisClientRepository->fetchForInstance($instanceId)->get($prefix . $token);
+        if (!isset($redisResponse)) {
             throw new SessionException("No session found for given $label.");
         }
 

@@ -11,29 +11,38 @@ namespace Schoolbox\Realtime\Subscription;
 
 use Alaress\Async\Notification\Instance\Instance;
 
+/**
+ *  Interface for subscriptions to a queue.
+ */
 interface ISubscription
 {
-
     /**
+     * Unsubscribe from a queue.
+     *
      * @return void
      */
-    public function unsubscribe();
+    public function unsubscribe(): void;
 
     /**
+     * Fetch the route key for this subscription: required in order to
+     * subscribe to and unsubscribe from a queue.
+     *
      * @return string
      */
-    public function getRouteKey();
+    public function getRouteKey(): string;
 
     /**
+     * Acknowledge a message with a given ID.
+     *
      * @param string $messageId
-     * @return bool
+     * @return bool Was the message actually acknowledged?
      */
-    public function acknowledgeMessage($messageId);
+    public function acknowledgeMessage(string $messageId): bool;
 
     /**
      * Returns the messageIds of the messages that are on this unread list
      *
-     * @return Instance[]
+     * @return array<Instance>
      */
-    public function getUnread();
+    public function getUnread(): array;
 }

@@ -1,11 +1,11 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Pipe;
 
@@ -14,58 +14,68 @@ use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\SessionException;
 
+/**
+ * Multi-instance aware collection of pipes.
+ */
 class PipeCollection implements Countable
 {
-
-    /** @var Pipe[] */
-    protected $pipesBySocketKey = [];
-
-    /** @var Pipe[][] */
-    protected $pipesBySessionId = [];
-
-    /** @var Pipe[][] */
-    protected $pipesByUserId    = [];
-
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var SessionValidator */
-    protected $validator;
+    /**
+     * Pipes grouped by socket key.
+     * (Socket keys should be unique across all instance IDs.)
+     *
+     * @var array<string, Pipe>
+     */
+    protected array $pipesBySocketKey = [];
 
     /**
-     * @param SessionValidator $validator
-     * @param LoggerInterface  $log
+     * Pipes grouped by instance ID, session ID and then socket key.
+     *
+     * @var array<string, array<string, array<string, Pipe>>>
      */
-    public function __construct($validator, $log)
+    protected array $pipesBySessionId = [];
+
+    /**
+     * Pipes grouped by instance ID, user ID and then socket key.
+     *
+     * @var array<string, array<int, array<string, Pipe>>>
+     */
+    protected array $pipesByInstanceAndUserId = [];
+
+    /**
+     * Constructor
+     *
+     * @param SessionValidator $validator Validator for session data: a pipe's session must be verified to be valid.
+     * @param LoggerInterface  $log       Logger
+     */
+    public function __construct(private SessionValidator $validator, private LoggerInterface $log)
     {
-        $this->validator = $validator;
-        $this->log       = $log;
     }
 
-
     /**
-     * Register this pipe connection
+     * Register this pipe within the collection.
      *
      * @param Pipe $pipe
-     * @throws SessionException
-     * @throws CommunicationException
+     * @throws SessionException       if the session in `$pipe` is not valid
+     * @throws CommunicationException if Redis could not be communicated with
      */
-    public function registerPipe(Pipe $pipe)
+    public function registerPipe(Pipe $pipe): void
     {
-        $socketKey = $pipe->getSocketKey();
-        $sessionId = $pipe->getSession();
-        $remember  = $pipe->getCookie('remember');
+        $socketKey  = $pipe->getSocketKey();
+        $sessionId  = $pipe->getSession();
+        $remember   = $pipe->getCookie('remember');
+        $instanceId = $pipe->getInstanceId();
 
+        // Extract user ID
         try {
             if (!($sessionId || $remember)) {
                 throw new SessionException('No session or remember-me token, no user.');
             }
 
-            //Try the users session, if that fails, fall back to remember me
+            // Try the users session, if that fails, fall back to remember me
             try {
-                $userId = $this->validator->findUserIdBySessionId($sessionId);
-            } catch (SessionException $e) {
-                $userId = $this->validator->findUserIdByRememberMe($remember);
+                $userId = $this->validator->findUserIdBySessionId($instanceId, $sessionId);
+            } catch (SessionException) {
+                $userId = $this->validator->findUserIdByRememberMe($instanceId, $remember);
             }
         } catch (SessionException $e) {
             $this->unregisterPipe($socketKey);
@@ -77,90 +87,85 @@ class PipeCollection implements Countable
         $pipe->setUserId($userId);
 
         // index pipe in triplicate
-        $this->pipesBySocketKey[$socketKey]             = $pipe;
-        $this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
-        $this->pipesByUserId[$userId][$socketKey]       = $pipe;
+        // Socket key is presumed to be unique between instances:
+        // session ID could be presumed to be unique as well.
+        // User ID is not unique between instances.
+        $this->pipesBySocketKey[$socketKey]                               = $pipe;
+        $this->pipesBySessionId[$instanceId][$sessionId][$socketKey]      = $pipe;
+        $this->pipesByInstanceAndUserId[$instanceId][$userId][$socketKey] = $pipe;
 
         $sess = $sessionId ?: 'sessionless';
 
         $pipeCount = count($this->pipesBySocketKey);
-        $this->log->debug("Registered $userId @ $socketKey ($sess) [pipes={$pipeCount}]");
+        $this->log->debug("Registered $userId @ $socketKey ($sess) [pipes=$pipeCount]");
     }
 
-
     /**
-     * @param string $socketKey
+     * Deregister a pipe within the collection.
+     *
+     * @param string $socketKey The pipe's socket key.
      * @return void
      */
-    public function unregisterPipe($socketKey)
+    public function unregisterPipe(string $socketKey): void
     {
         if ($this->containsPipe($socketKey)) {
-            $pipe = $this->pipesBySocketKey[$socketKey];
+            $pipe       = $this->pipesBySocketKey[$socketKey];
+            $instanceId = $pipe->getInstanceId();
 
             if ($userId = $pipe->getUserId()) {
-                unset($this->pipesByUserId[$userId][$socketKey]);
-                if (empty($this->pipesByUserId[$userId])) {
-                    unset($this->pipesByUserId[$userId]);
+                unset($this->pipesByInstanceAndUserId[$instanceId][$userId][$socketKey]);
+                if (empty($this->pipesByInstanceAndUserId[$instanceId][$userId])) {
+                    unset($this->pipesByInstanceAndUserId[$instanceId][$userId]);
                 }
             }
 
             if ($sessionId = $pipe->getSession()) {
-                unset($this->pipesBySessionId[$sessionId][$socketKey]);
-                if (empty($this->pipesBySessionId[$sessionId])) {
-                    unset($this->pipesBySessionId[$sessionId]);
+                unset($this->pipesBySessionId[$instanceId][$sessionId][$socketKey]);
+                if (empty($this->pipesBySessionId[$instanceId][$sessionId])) {
+                    unset($this->pipesBySessionId[$instanceId][$sessionId]);
                 }
             }
 
             unset($this->pipesBySocketKey[$socketKey]);
 
             $pipeCount = count($this->pipesBySocketKey);
-            $this->log->debug("Unregistered $socketKey [pipes={$pipeCount}]");
+            $this->log->debug("Unregistered $socketKey [pipes=$pipeCount]");
         } else {
             $pipeCount = count($this->pipesBySocketKey);
-            $this->log->debug("Ignoring closure of $socketKey [pipes={$pipeCount}]");
+            $this->log->debug("Ignoring closure of $socketKey [pipes=$pipeCount]");
         }
     }
 
-
     /**
-     * @param string $socketKey
+     * Does this collection contain a pipe with the given socket key?
+     *
+     * @param string $socketKey The pipe's socket key.
      * @return bool
      */
-    public function containsPipe($socketKey)
+    public function containsPipe(string $socketKey): bool
     {
         return array_key_exists($socketKey, $this->pipesBySocketKey);
     }
 
-
     /**
-     * @param int $userId
+     * How many pipes does this user have?
+     *
+     * @param string $instanceId
+     * @param int    $userId
      * @return int
      */
-    public function userPipeCount($userId)
+    public function userPipeCount(string $instanceId, int $userId): int
     {
-        return array_key_exists($userId, $this->pipesByUserId)
-            ? count($this->pipesByUserId[$userId])
-            : 0;
+        return count($this->getPipesByInstanceAndUserId($instanceId, $userId));
     }
 
-
     /**
-     * @param string $sessionId
-     * @return int
-     */
-    public function sessionPipeCount($sessionId)
-    {
-        return array_key_exists($sessionId, $this->pipesBySessionId)
-            ? count($this->pipesBySessionId[$sessionId])
-            : 0;
-    }
-
-
-    /**
+     * Fetch a pipe by its socket key if it exists.
+     *
      * @param string $socketKey
-     * @return Pipe
+     * @return Pipe|null
      */
-    public function getPipeBySocketKey($socketKey)
+    public function getPipeBySocketKey(string $socketKey): ?Pipe
     {
         if ($this->containsPipe($socketKey)) {
             return $this->pipesBySocketKey[$socketKey];
@@ -169,36 +174,21 @@ class PipeCollection implements Countable
         return null;
     }
 
-
     /**
-     * @param int $userId
-     * @return Pipe[]
+     * Fetch all pipes for this instance and user ID, keyed by socket key.
+     *
+     * @param string $instanceId
+     * @param int    $userId
+     * @return array<string, Pipe>
      */
-    public function getPipesByUserId($userId)
+    public function getPipesByInstanceAndUserId(string $instanceId, int $userId): array
     {
-        if ($this->userPipeCount($userId)) {
-            return $this->pipesByUserId[$userId];
-        }
-
-        return [];
+        return $this->pipesByInstanceAndUserId[$instanceId][$userId] ?? [];
     }
 
-
     /**
-     * @param string $sessionId
-     * @return Pipe[]
-     */
-    public function getPipesBySessionId($sessionId)
-    {
-        if ($this->sessionPipeCount($sessionId)) {
-            return $this->pipesBySessionId[$sessionId];
-        }
-
-        return [];
-    }
-
-
-    /**
+     * How many open sockets does this collection have, across all instances?
+     *
      * @return int
      */
     public function count(): int

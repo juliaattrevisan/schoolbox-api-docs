@@ -16,7 +16,6 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 
 class Alert extends AbstractAction
 {
-
     /**
      * @param PipeManager $manager
      * @throws QueueingException
@@ -26,6 +25,7 @@ class Alert extends AbstractAction
     public function execute(PipeManager $manager)
     {
         $manager->enqueueUser(
+            $this->getInstanceId(),
             $this->getUserId(),
             PipeManager::PIPE_METHOD_ALERT,
             (new Decorator())->appendInstance($this->getMessageInstance())->renderAsSocketArray(true)

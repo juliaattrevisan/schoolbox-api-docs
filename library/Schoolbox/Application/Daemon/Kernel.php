@@ -10,6 +10,7 @@
 namespace Schoolbox\Application\Daemon;
 
 use Alaress\Async\Stomp\Implementation\Stream as Stomp;
+use Alaress\Database\Factory as BaseDatabaseFactory;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Redis\Async\Client as AsyncRedisClient;
@@ -23,7 +24,10 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
+use Schoolbox\MultiInstance;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\MQ\ConnectorFactory;
 use Stomp\Protocol\Protocol;
@@ -230,7 +234,7 @@ EOL;
 
         try {
             $this->loop->run();
-            $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
+            $this->logger()->debug($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
             $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
             exit(self::EXIT_STATUS_APP_ERROR);
@@ -412,8 +416,58 @@ EOL;
         $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            return new AsyncRedisClient($conf->get('redis_ephemeral_url'), $this->loop);
+            return new AsyncRedisClient($conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL), $this->loop);
         }));
+
+        // Multi-instance repositories
+        $di->set(
+            'multiInstance.instanceRepository',
+            $di->lazy(fn () => new MultiInstance\InstanceRepository(
+                parse_ini_file("/etc/schoolbox/instances.ini", true)
+            ))
+        );
+        $di->set(
+            'multiInstance.connectorRepository',
+            $di->lazyNew(
+                MultiInstance\ConnectorRepository::class,
+                [
+                    'instanceRepository' => $di->lazyGet('multiInstance.instanceRepository'),
+                    'databaseFactory'    => $di->lazyNew(BaseDatabaseFactory::class),
+                ],
+            )
+        );
+        $di->set(
+            'multiInstance.configRepository',
+            $di->lazyNew(
+                MultiInstance\ConfigRepository::class,
+                [
+                    'connectorRepository' => $di->lazyGet('multiInstance.connectorRepository'),
+                    'dataSource'          => $di->lazyNew(DataSource::class),
+                ],
+            )
+        );
+        $di->set(
+            'multiInstance.redisStorageClientRepository',
+            $di->lazyNew(
+                MultiInstance\RedisClientRepository::class,
+                [
+                    'configRepository' => $di->lazyGet('multiInstance.configRepository'),
+                    'configKey'        => ConfigMapper::NAME_REDIS_URL,
+                ],
+            )
+        );
+        $di->set(
+            'multiInstance.redisAsyncClientRepository',
+            $di->lazyNew(
+                MultiInstance\RedisAsyncClientRepository::class,
+                [
+                    'configRepository' => $di->lazyGet('multiInstance.configRepository'),
+                    'configKey'        => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
+                    'loop'             => $di->lazy(fn () => $this->loop),
+                ],
+            )
+        );
+
         return $di;
     }
 }

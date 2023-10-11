@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel;
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Course\Task as TaskModel;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
@@ -597,7 +597,7 @@ class TranslatorTest extends TestCase
         $ownerOriginal = 100;
         $ownerUpdated  = 200;
         $userMapper = UserMapper::getInstance();
-        $userMapper->setConfigLoader(new TestLoader());
+        $userMapper->setConfigLoader(new ArrayLoader());
 
         // Set owner to original and test
         $projectObject = (new Project())->setCreator($userMapper->createModel($ownerOriginal))

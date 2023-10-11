@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -1401,7 +1401,7 @@ class AccessTest extends TestCase
      */
     private function getMockIConfigLoader(array $config): IConfigLoader
     {
-        return new TestLoader($config);
+        return new ArrayLoader($config);
     }
 
 

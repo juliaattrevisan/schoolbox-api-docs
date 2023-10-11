@@ -20,13 +20,24 @@ abstract class AbstractAction implements IAction
     private $messageInstance;
 
     /**
+     * Constructor
+     *
+     * @param string   $instanceId
      * @param int      $userId
      * @param Instance $messageInstance
      */
-    public function __construct($userId, Instance $messageInstance)
+    public function __construct(protected string $instanceId, int $userId, Instance $messageInstance)
     {
         $this->userId          = $userId;
         $this->messageInstance = $messageInstance;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInstanceId(): string
+    {
+        return $this->instanceId;
     }
 
     /**

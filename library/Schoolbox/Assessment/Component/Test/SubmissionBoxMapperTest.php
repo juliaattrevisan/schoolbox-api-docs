@@ -12,12 +12,11 @@ namespace Schoolbox\Assessment\Component\Test;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Config\TestLoader;
+use Schoolbox\Config\ArrayLoader;
 use Schoolbox\Test\TestCase;
 
 class SubmissionBoxMapperTest extends TestCase
 {
-
     /**
      * @var SubmissionBoxMapper
      */
@@ -27,7 +26,7 @@ class SubmissionBoxMapperTest extends TestCase
     {
         parent::setUp();
         $this->object = SubmissionBoxMapper::getInstance();
-        $this->object->setConfigLoader(new TestLoader());
+        $this->object->setConfigLoader(new ArrayLoader());
     }
 
     public function testHydrate()
