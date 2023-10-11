@@ -552,12 +552,23 @@ class Controller extends Assessment\Controller
 
         $basename = (new Url($assessment->getTitle()))->getSlug();
         $content  = $this->array2csv($this->collateResultSquare($assessment->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
+
+        /* Maybe we set the Show Drafts option
+         */
+        $showDraft = (bool)$this->requestQuery->get('draft', false);
+
+        if ($showDraft) {
+            $suffix = 'draft';
+        } else {
+            $suffix = 'published';
+        }
+
         $this->response = $this->responseFromContent($content)
                                ->withHeader('Pragma', ' ')
                                ->withHeader('Cache-Control', ' ')
                                ->withHeader('Content-Type', 'text/csv')
                                ->withHeader('Content-Length', strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"$basename-results.csv\"")
+                               ->withHeader('Content-Disposition', "attachment; filename=\"{$basename}-{$suffix}.csv\"")
         ;
     }
 
