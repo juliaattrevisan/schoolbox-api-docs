@@ -75,6 +75,16 @@ class UnitAssessments
             'assessments'    => $assessments?->reindex()->map(new self($this->routeGenerator, $this->student)),
         ];
     }
+
+    /**
+     * Fetch the name of the assessment's course; if it's in:
+     * * a unit spec, fetch its course's folder's name;
+     * * a unit implementation, fetch its specification's course's folder name;
+     * * otherwise, return null
+     *
+     * @param IAssessable $assessable
+     * @return string|null
+     */
     private function getCourseName(IAssessable $assessable): ?string
     {
         $base = $assessable->getBaseContext();
