@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception;
 use Schoolbox\Auth\Remember\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -117,8 +118,23 @@ class Controller extends Base
             if ($this->session->getSegment(self::class)->getFlash(self::LOGIN_ERROR_FLASH)) {
                 $data['error'] = 'Your session has expired. Please log in below to continue browsing the portal.';
             } else {
-                $data ['error'] = null;
+                $data['error'] = null;
             }
+        }
+
+        // Is this request from a known internal IP?
+        // If so show the internal SSO link
+        $data['requestFromInternalIp'] = false;
+        if ($this->samlBlacklist()) {
+            $data['requestFromInternalIp'] = true;
+            $internalSsoUrl                = new Uri($this->getConfigLoader()->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL));
+            $internalSsoUrlParams          = ['instance_id' => INSTANCE_ID];
+            if ($data['page']) {
+                $internalSsoUrlParams['redirect'] = $data['page'];
+            }
+            $data['internalSsoUrl'] = $internalSsoUrl
+                ->appendQueryParameters($internalSsoUrlParams)
+                ->withPath('/api/users/jwt');
         }
 
         $this->response = $this->responseFromTemplateUnthemed('@login/login.twig', $data);
