@@ -447,7 +447,7 @@ export default {
             <section>
                 <ul class="information-list unsortable expandable-card">
                     <template v-for="(usage, index) in textboxes">
-                        <li v-if="usage.deleted !== true" :key="index">
+                        <li v-if="usage.deleted !== true" :id="'textbox-' + usage.textbox.id" :key="index">
                             <div class="actions-small-1">
                                 <div
                                     :class="{ expander: true, 'icon-up-arrow': !Boolean(usage.textbox.id) }"
