@@ -179,6 +179,7 @@ class Controller extends ConfigController
         $reloadRouteDaemon    = false;
         $reloadScheduleDaemon = false;
         $rebuildModules       = false;
+        $clearOidcCache       = false;
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
             if (!$existingConfig->getEditable()) {
@@ -196,6 +197,9 @@ class Controller extends ConfigController
                 }
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_MODULES, true)) {
                     $rebuildModules = true;
+                }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH, true)) {
+                    $clearOidcCache = true;
                 }
                 $existingConfig->setValue(trim($newValue));
                 $this->getConfigMapper()->save($existingConfig);
@@ -215,6 +219,9 @@ class Controller extends ConfigController
             $this->postOutputCallbacks[] = $this->buildRebuildModuleCacheCallback();
             // After everything else: reload the route table
             $this->response = $this->responseEmpty();
+        }
+        if ($clearOidcCache) {
+            $this->oidcCache->clear();
         }
 
         $route          = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));

@@ -113,6 +113,9 @@ class ConfigMapper extends Mapper
     public const _CLOUDWORK_OAUTH_CLIENT_SECRET          = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
     public const _CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS     = self::PREFIX_CLOUDWORK_OAUTH . 'identifying_claims';
     public const NAME_OAUTH_ISSUER                       = 'oauth_issuer';
+    public const NAME_OAUTH_ENABLE_SSO                   = 'oauth_enable_sso';
+//    public const NAME_OAUTH_SSO_IP_BLACKLIST             = 'oauth_sso_ip_blacklist';
+//    public const NAME_OAUTH_SSO_IP_WHITELIST             = 'oauth_sso_ip_whitelist';
 
     public const _CANVAS_DATA_API_KEY    = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET = 'canvas_data_api_secret';
@@ -306,19 +309,37 @@ class ConfigMapper extends Mapper
      * If any of these settings change: rebuild the route and module tables.
      */
     public const SETTINGS_AFFECTING_MODULES    = [
-        ConfigMapper::NAME_LMS_ENABLED,
-        ConfigMapper::NAME_PASTORAL_ENABLED,
-        ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
-        ConfigMapper::NAME_BADGES_ENABLED,
-        ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED,
-        ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED,
-        ConfigMapper::NAME_FIXTURES_ENABLED,
-        ConfigMapper::NAME_TOURS_ENABLED,
-        ConfigMapper::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
-        ConfigMapper::NAME_EXTERNAL_TYPE,
-        ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
-        ConfigMapper::NAME_QR_LOGIN_ENABLED,
-        ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED,
+        self::NAME_LMS_ENABLED,
+        self::NAME_PASTORAL_ENABLED,
+        self::NAME_LEARNING_MOMENTS_ENABLED,
+        self::NAME_BADGES_ENABLED,
+        self::NAME_ASSESSMENT_CALENDAR_ENABLED,
+        self::NAME_RESOURCE_BOOKING_ENABLED,
+        self::NAME_FIXTURES_ENABLED,
+        self::NAME_TOURS_ENABLED,
+        self::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
+        self::NAME_EXTERNAL_TYPE,
+        self::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
+        self::NAME_QR_LOGIN_ENABLED,
+        self::NAME_SUMMATIVE_REPORT_ENABLED,
+        self::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER,
+        self::NAME_OAUTH_ENABLE_SSO,
+    ];
+
+    /**
+     * Config settings which affect the oAuth/OIDC provider.
+     *
+     * If any of these settings change: invalidate the OIDC cache.
+     */
+    public const SETTINGS_AFFECTING_OAUTH = [
+        self::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER,
+        self::_CLOUDWORK_OAUTH_CLIENT_ID,
+        self::_CLOUDWORK_OAUTH_CLIENT_SECRET,
+        self::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS,
+        self::NAME_OAUTH_ISSUER,
+        self::NAME_OAUTH_ENABLE_SSO,
+//        self::NAME_OAUTH_SSO_IP_BLACKLIST,
+//        self::NAME_OAUTH_SSO_IP_WHITELIST,
     ];
 
     /**

@@ -134,6 +134,14 @@
                         {% endblock %}
                     {% endif %}
 
+                    {# Only show OIDC login if it's enabled #}
+                    {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
+                    {% if oidcUrl %}
+                    {% block oidc %}
+                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton">Login using OpenID Connect</a></p>
+                    {% endblock %}
+                    {% endif %}
+
                     {% if requestFromInternalIp %}
                         {% block internalSso %}
                             <p><a href="{{ internalSsoUrl }}" class="instance-registry-button">Login using Instance Registry</a></p>

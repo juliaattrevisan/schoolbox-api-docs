@@ -13,6 +13,7 @@ use Alaress\Codec\ICodec;
 use Cache\Adapter\Common\CacheItem;
 use Cache\Adapter\Common\HasExpirationTimestampInterface;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\SetKey;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -33,6 +34,15 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class ItemPool implements CacheItemPoolInterface
 {
+    /**
+     * The set key for this cache: keys are written to this set so that they
+     * may be cleared efficiently.
+     *
+     * This may not be used as the cache key, as Redis can't store a value and
+     * set in the one key.
+     */
+    public const SET_KEY = '__set';
+
     /**
      * Redis client
      */
@@ -144,9 +154,14 @@ class ItemPool implements CacheItemPoolInterface
      */
     public function clear()
     {
-        // Find all keys which match the prefix.
-        // Can't quite figure this part out yet.
-        return false;
+        $keys = [];
+        foreach (new SetKey($this->redis, $this->keyGenerator->generateKey(self::SET_KEY)) as $key) {
+            $keys[] = $key;
+        }
+        if (!empty($keys)) {
+            $this->redis->del($keys);
+        }
+        return true;
     }
 
     /**
@@ -160,6 +175,7 @@ class ItemPool implements CacheItemPoolInterface
     {
         $this->assertKeyValid($key);
         if ($this->redis->del($this->keyGenerator->generateKey($key))) {
+            $this->redis->srem($this->keyGenerator->generateKey(self::SET_KEY), [$key]);
             unset($this->deferredItems[$key]);
             return true;
         }
@@ -205,6 +221,8 @@ class ItemPool implements CacheItemPoolInterface
             }
         }
 
+        // Put this in the key set, so it can be cleared later
+        $this->redis->sadd($this->keyGenerator->generateKey(self::SET_KEY), [$key]);
         if (isset($ttl)) {
             $result = $this->redis->setex($key, $ttl, $cached);
         } else {
@@ -253,6 +271,9 @@ class ItemPool implements CacheItemPoolInterface
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be a string: received %s', gettype($key)));
+        }
+        if ($key === self::SET_KEY) {
+            throw new InvalidArgumentException(sprintf('Cache key "%s" is reserved and may not be used', $key));
         }
     }
 //

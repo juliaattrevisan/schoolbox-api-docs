@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
+use Cache\Adapter\PHPArray\ArrayCachePool;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
@@ -265,6 +266,7 @@ class OauthProviderIssuedTest extends TestCase
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
             $this->createMock(Client::class),
+            new ArrayCachePool(null),
         );
     }
 

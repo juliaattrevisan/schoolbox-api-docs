@@ -12,7 +12,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception;
 use Schoolbox\Auth\Remember\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -55,6 +54,8 @@ class Controller extends Base
      */
     public function getLogin($error = null, $page = null): void
     {
+        $config = $this->getConfigLoader();
+
         // If you try to access the login screen but you are already logged in, just go home
         if ($this->getSession()->getAuthUser() instanceof User && $this->getSession()->getAuthUser()->getId()) {
             $this->response = $this->redirectSeeOther('/');
@@ -73,11 +74,11 @@ class Controller extends Base
 
         // is SAML enabled?
         // don't show the login page, redirect to the SAML login page.
-        // (unless ?samlLogin=0 is set)
+        // (unless ?samlAuth=0 is set)
         // (or the users IP exists in the blacklist
         if (
-            ( $this->getConfigLoader()->get('saml_enabled') || $this->samlForce() )
-            && ($this->getConfigLoader()->get('saml_sso_url') !== '' || $this->getConfigLoader()->get('saml_idp_metadata_url') !== '')
+            ($config->get('saml_enabled') || $this->samlForce())
+            && ($config->get('saml_sso_url') !== '' || $config->get('saml_idp_metadata_url') !== '')
             && $samlAuth !== '0'
             && (!$this->samlBlacklist() || $samlAuth === '1')
         ) {
@@ -88,6 +89,23 @@ class Controller extends Base
             $this->response = $this->redirectSeeOther($redirectUrl);
             return;
         }
+
+//        // Is OIDC enabled and switched on by default?
+//        // If so, redirect there.
+//        // (Reuse the ?samlAuth query string var for now for bypass?)
+//        if (
+//            ($config->get(ConfigMapper::NAME_OAUTH_ENABLE_SSO) || $this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_WHITELIST))
+//            && $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+//            && $samlAuth !== '0'
+//            && (!$this->ipMatches(ConfigMapper::NAME_OAUTH_SSO_IP_BLACKLIST) || $samlAuth === '1')
+//        ) {
+//            $redirectUrl = new Uri($this->routeGenerator->generate('loginOidc.getAuthorization'));
+//            if ($pageUri && $pageUri->isAbsolutePath()) {
+//                $redirectUrl = $redirectUrl->appendQueryParameters(['redirect' => $pageUri->__toString()]);
+//            }
+//            $this->response = $this->redirectSeeOther($redirectUrl->__toString());
+//            return;
+//        }
 
         $getParams = ['samlAuth' => $samlAuth, 'page' => $page,];
         $data['requestParams'] = http_build_query($getParams);
@@ -101,7 +119,7 @@ class Controller extends Base
 
         // Build a set of login backgrounds: choose a random one in Twig
         $data['login_backgrounds'] = [];
-        $backgrounds = explode(',', $this->getConfigLoader()->get('skin_login_bg'));
+        $backgrounds = explode(',', $config->get('skin_login_bg'));
         foreach ($backgrounds as $background) {
             if (!empty($background)) {
                 $data['login_backgrounds'][] = '/storage/image.php?' . http_build_query(['hash' => $background, 'size' => 'maxsize']);
@@ -230,8 +248,7 @@ class Controller extends Base
      */
     private function samlBlacklist(): bool
     {
-        $ipBlacklist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_blacklist')));
-        return IpUtils::checkIp(Session::getIP(), $ipBlacklist);
+        return $this->ipMatches('saml_ip_blacklist');
     }
 
     /**
@@ -240,7 +257,18 @@ class Controller extends Base
      */
     private function samlForce(): bool
     {
-        $ipWhitelist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_whitelist')));
-        return IpUtils::checkIp(Session::getIP(), $ipWhitelist);
+        return $this->ipMatches('saml_ip_whitelist');
+    }
+
+    /**
+     * Does this user's IP address exist in the config?
+     *
+     * @param string $config
+     * @return bool
+     */
+    private function ipMatches(string $config): bool
+    {
+        $ipList = array_map('trim', explode(',', $this->getConfigLoader()->get($config)));
+        return IpUtils::checkIp(Session::getIP(), $ipList);
     }
 }

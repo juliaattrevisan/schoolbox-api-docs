@@ -11,9 +11,11 @@ namespace Schoolbox\Admin\News\Policy;
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
+use Schoolbox\Comms\News\Topic\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
@@ -35,17 +37,19 @@ class Controller extends ConfigController
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
      * @param Rebuilder            $rebuilder
+     * @param CacheInterface       $oidcCache
      * @param UserAccessMapper     $userAccessMapper
-     * @param Topic\Mapper         $topicMapper
+     * @param Mapper               $topicMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
         UserAccessMapper $userAccessMapper,
         Topic\Mapper $topicMapper
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
 
         $this->userAccessMapper = $userAccessMapper;
         $this->topicMapper      = $topicMapper;

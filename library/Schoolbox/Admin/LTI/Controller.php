@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
@@ -36,15 +37,17 @@ class Controller extends ConfigController
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
      * @param Rebuilder            $rebuilder
+     * @param CacheInterface       $oidcCache
      * @param ProviderMapper       $providerMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
+        CacheInterface $oidcCache,
         ProviderMapper $providerMapper
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
 
         $this->providerMapper = $providerMapper;
     }

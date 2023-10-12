@@ -66,6 +66,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
+            $this->injector->get('oidc.cache'),
             $this->getMapperFactory()->get(\Schoolbox\External\Connector\Log\Mapper::class),
             $this->injector->get('redis.storage'),
             $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class),
