@@ -28,6 +28,9 @@ class Course implements ModuleConfigInterface
             $courseModule = new Assessment\Course\Module($di);
             $courseModule->registerModule('/course');
 
+            $planModule = new Assessment\Course\Plan\Module($di);
+            $planModule->registerModule('/course/plan');
+
             $importModule = new Assessment\Course\Import\Module($di);
             $importModule->registerModule('/course/import');
 
