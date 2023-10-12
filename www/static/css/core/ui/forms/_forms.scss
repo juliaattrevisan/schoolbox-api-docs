@@ -169,6 +169,7 @@ $input-number-spinners: true !default;
 
 // We use this mixin to style select elements
 @mixin form-select {
+    appearance: none !important;
     background-color: $input-bg-color;
     border-radius: 0;
 
@@ -208,6 +209,7 @@ $input-number-spinners: true !default;
 // We use this mixin to turn on/off HTML5 number spinners
 @mixin html5number($browser, $on: true) {
     @if $on == false {
+        appearance: none;
         @if $browser == webkit {
             margin: 0;
         }
@@ -254,6 +256,7 @@ section {
 /* We use this to get basic styling on all basic form elements */
 input:not([type]),
 #{text-inputs(all, 'input')} {
+    appearance: none;
     border-radius: 0;
     @include form-element;
     &.radius {
@@ -262,6 +265,7 @@ input:not([type]),
 }
 
 input[type="submit"] {
+    appearance: none;
     border-radius: 0;
 }
 
