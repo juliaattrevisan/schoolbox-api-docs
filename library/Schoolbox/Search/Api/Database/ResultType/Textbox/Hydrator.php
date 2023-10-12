@@ -81,7 +81,7 @@ class Hydrator extends BaseHydrator
                    "{",
                    GROUP_CONCAT(
                       CONCAT(
-                         ccd2.key, ": ",
+                         "\'", ccd2.key, "\': ",
                          IFNULL(cci2.value, ccd2.default_value)
                       ) SEPARATOR ", "
                    ),
