@@ -142,9 +142,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $article->getPublishAt(),
                         null,
-                        // Meta looks like: x days ago in $category
-                        // Should probably be a frontend responsibility?
-                        null,
+                        "Posted {$article->getPublishAt()->getRelativeTime()} by {$article->getAuthor()->getFullName()}",
                         $article->getFeatureImage()
                             ? $this->buildStorageImageUrl($article->getFeatureImage())->__toString()
                             : null,

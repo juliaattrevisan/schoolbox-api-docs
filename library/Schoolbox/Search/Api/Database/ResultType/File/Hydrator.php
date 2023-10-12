@@ -94,7 +94,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $file->getModifiedAt(),
                         $file->getFolder(),
-                        null,
+                        "Posted {$file->getModifiedAt()->getRelativeTime()} by {$file->getModifiedBy()->getFullName()}",
                         (
                             // Image? show thumbnail, otherwise show mimetype thumb.
                             (str_contains($file->getMimetype()->__toString(), 'image'))

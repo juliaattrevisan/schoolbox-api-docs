@@ -87,7 +87,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $link->getModified(),
                         $link->getFolder(),
-                        null,
+                        "Posted {$link->getModified()->getRelativeTime()} by {$link->getOwner()->getFullName()}",
                         null,
                         'link',
                         $link->getComment(), // The closest thing to a description for a link is link.comment.

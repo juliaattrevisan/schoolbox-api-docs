@@ -104,14 +104,13 @@ class Hydrator extends BaseHydrator
                 }
 
                 $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()];
+                $matchingPostString = $nMatchingPostsInThread > 1 ? "(+$nMatchingPostsInThread more matching posts)" : '';
 
                 $postBody = (new ToText($post->getBody()))->getText();
                 return new FullResult(
                     $match,
                     $match->id,
-                    $postThread->getTitle() . (
-                        " ($nMatchingPostsInThread matching post" . (($nMatchingPostsInThread === 1) ? "" : "s") . " in this thread)"
-                    ),
+                    $postThread->getTitle(),
                     $this->buildBaseUrl()
                          ->withPath("/forum/thread/{$postThread->getId()}")
                          ->withFragment("{$post->getId()}")
@@ -120,7 +119,7 @@ class Hydrator extends BaseHydrator
                     $match->relevance,
                     $post->getModified(),
                     $threadFolder,
-                    $post->getOwner()->getFullName(),
+                    "Posted {$post->getModified()->getRelativeTime()} by {$post->getOwner()->getFullName()} $matchingPostString",
                     null,
                     'forum',
                     $this->truncateAroundKeyword($keyword, $postBody) ?? $this->truncate($postBody),

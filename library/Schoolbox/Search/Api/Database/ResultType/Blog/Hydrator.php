@@ -87,7 +87,7 @@ class Hydrator extends BaseHydrator
                     $match->relevance,
                     $blog->getCreatedAt(),
                     $blog->getFolder(),
-                    null,
+                    "Posted {$blog->getCreatedAt()->getRelativeTime()} by {$blog->getOwner()->getFullName()}",
                     null,
                     self::BASE_TYPE,
                     $this->truncateAroundKeyword($keyword, $blogBody) ?? $this->truncate($blogBody),
