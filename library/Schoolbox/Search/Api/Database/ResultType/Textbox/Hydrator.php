@@ -75,22 +75,22 @@ class Hydrator extends BaseHydrator
             FROM component_config_instance cci
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             LEFT JOIN (
-               SELECT
-               cci2.component_instance_id,
-               CONCAT(
-                  "{",
-                  GROUP_CONCAT(
-                     CONCAT(
-                        ccd2.key, ": ",
-                        IFNULL(cci2.value, ccd2.default_value)
-                     ) SEPARATOR ", "
-                  ),
-                  "}"
-               ) AS configJson
-               FROM component_config_instance cci2
-               LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
-               WHERE ccd2.key IN (:collapse, :showComponentTitle)
-               GROUP BY cci2.component_instance_id
+                SELECT
+                cci2.component_instance_id,
+                CONCAT(
+                   "{",
+                   GROUP_CONCAT(
+                      CONCAT(
+                         ccd2.key, ": ",
+                         IFNULL(cci2.value, ccd2.default_value)
+                      ) SEPARATOR ", "
+                   ),
+                   "}"
+                ) AS configJson
+                FROM component_config_instance cci2
+                LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
+                WHERE ccd2.key IN (:collapse, :showComponentTitle)
+                GROUP BY cci2.component_instance_id
             ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
             WHERE ccd.key=:componentKey
             AND cci.value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
