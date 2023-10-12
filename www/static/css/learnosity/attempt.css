@@ -10,11 +10,6 @@
     overflow-x: visible;
 }
 
-.lrn-assess .app-panel {
-    /* prevent the panel from going over the top of our existing UI elements */
-    z-index: 10;
-}
-
 /* general button, like previous question */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
 .lrn.lrn-assess .dialogs .lrn_btn {
@@ -125,4 +120,9 @@
 /* the progress bar at the top, which moves across with question progress */
 .lrn-assess .items .progress span {
     background-color: var(--content-ui-foreground);
+}
+
+/* bring it back as we negative margin our own */
+.lrn legend {
+    margin-left: 0;
 }
