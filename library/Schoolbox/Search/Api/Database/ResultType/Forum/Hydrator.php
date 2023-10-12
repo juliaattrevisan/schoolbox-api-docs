@@ -142,6 +142,7 @@ class Hydrator extends BaseHydrator
      * the threadId passed to this function will not be present in the returned array.
      * (Adding all the missing keys to the return array before returning it would be a bad idea because there is no
      *  guarantee that the $threadIds passed to this function exist in the database.)
+     * (See search criteria defined in QueryParamBuilder.php.)
      *
      * @param array  $threadIds
      * @param string $keyword
