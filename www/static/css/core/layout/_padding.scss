@@ -41,3 +41,15 @@
         padding: 0;
     }
 }
+
+.l-pad-xl {
+    @media #{$small-only} {
+        padding: var(--spacing-l);
+    }
+}
+
+.l-pad-l {
+    @media #{$small-only} {
+        padding: var(--spacing-m);
+    }
+}

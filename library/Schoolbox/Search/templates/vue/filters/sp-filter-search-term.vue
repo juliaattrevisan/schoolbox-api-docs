@@ -110,7 +110,6 @@ function onMouseOut(event: MouseEvent) {
 
 <template>
     <div class="l-flex-col">
-        <label for="search-field">Search term</label>
         <div class="c-filter-search-term">
             <input
                 id="search-field"
@@ -120,6 +119,7 @@ function onMouseOut(event: MouseEvent) {
                 name="keyword"
                 maxlength="2048"
                 autocomplete="off"
+                placeholder="Search term"
                 :value="currentInput"
                 @input="onInput"
                 @keydown.down="onKeyDown"

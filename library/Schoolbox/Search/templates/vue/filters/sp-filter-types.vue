@@ -11,30 +11,30 @@ const filterTypesStore = useFilterTypesStore();
 /**
  * To show/hide all the sub types when the all sub types button is clicked
  */
-function onExpandAllSelected() {
-    filterTypesStore.isExpanded = !filterTypesStore.isExpanded;
-}
+// function onExpandAllSelected() {
+//     filterTypesStore.isExpanded = !filterTypesStore.isExpanded;
+// }
 
 /**
  * To show/hide the sub types container
  * @returns {string} - the height of the sub types container
  */
-const expandButtonText = window.Vue.computed(() => {
-    return filterTypesStore.isExpanded ? "Collapse all" : "Expand all";
-});
+// const expandButtonText = window.Vue.computed(() => {
+//     return filterTypesStore.isExpanded ? "Collapse all" : "Expand all";
+// });
 </script>
 
 <template>
     <div>
         <label>Types</label>
         <div class="checklist">
-            <button
+            <!-- <button
                 :class="`button full-width ${filterTypesStore.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 @click.prevent="onExpandAllSelected"
             >
                 {{ expandButtonText }}
-            </button>
-            <ul class="option-list t-no-list-style l-flex-col l-gap-xs f-no-margins">
+            </button> -->
+            <ul class="option-list t-no-list-style l-flex-col f-no-margins">
                 <sp-filter-types-type
                     v-for="typeItem in filterTypesStore.allTypes"
                     :key="typeItem.value"
@@ -48,8 +48,8 @@ const expandButtonText = window.Vue.computed(() => {
 <style scoped>
 .checklist {
     border: 1px solid var(--form-border-color);
-}
-.option-list {
+    max-height: 300px;
+    overflow-y: scroll;
     padding: var(--spacing-s);
 }
 </style>

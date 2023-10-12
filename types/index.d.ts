@@ -11,6 +11,9 @@ declare global {
         cdnPrefix: string;
         CKEDITOR: any;
         dayjs: typeof dayjs;
+        dateDisplayFormats: {
+            dayjs: string;
+        };
         sbProps: {
             lightGallery: Function;
             lightGalleryInit: Function;

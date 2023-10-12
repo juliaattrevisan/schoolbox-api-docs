@@ -3,6 +3,11 @@
  * To input the search query
  */
 
+interface Props {
+    placeholder: string; // the placeholder text
+}
+const props = defineProps<Props>();
+
 const emit = defineEmits<{
     input: [value: string];
 }>();
@@ -20,7 +25,14 @@ function onInput(event: Event) {
 </script>
 
 <template>
-    <input ref="queryInputEl" type="text" class="search-input" data-test="search-select-input" @input="onInput" />
+    <input
+        ref="queryInputEl"
+        type="text"
+        class="search-input"
+        :placeholder="props.placeholder"
+        data-test="search-select-input"
+        @input="onInput"
+    />
 </template>
 
 <style scoped></style>

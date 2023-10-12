@@ -66,28 +66,28 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="l-flex-col">
-        <label for="sp-start-date-input">Start date</label>
-        <input
-            id="sp-start-date-input"
-            type="text"
-            data-datepicker-vue
-            data-datepicker-buttontext
-            data-datesync-enddate="#sp-end-date-input"
-            :data-datepicker-initial-value="filterDateRangeStore.startDate"
-        />
-    </div>
-    <div class="l-flex-col">
-        <label for="sp-end-date-input">End date</label>
-        <input
-            id="sp-end-date-input"
-            type="text"
-            data-datepicker-vue
-            data-datepicker-buttontext
-            data-datesync-startdate="#sp-start-date-input"
-            :data-datepicker-initial-value="filterDateRangeStore.endDate"
-        />
+    <div class="l-flex-row l-flex--no-wrap l-gap-m">
+        <div class="l-flex-col l-flex__item--1">
+            <label for="sp-start-date-input">Start date</label>
+            <input
+                id="sp-start-date-input"
+                type="text"
+                data-datepicker-vue
+                data-datepicker-buttontext
+                data-datesync-enddate="#sp-end-date-input"
+                :data-datepicker-initial-value="filterDateRangeStore.startDate"
+            />
+        </div>
+        <div class="l-flex-col l-flex__item--1">
+            <label for="sp-end-date-input">End date</label>
+            <input
+                id="sp-end-date-input"
+                type="text"
+                data-datepicker-vue
+                data-datepicker-buttontext
+                data-datesync-startdate="#sp-start-date-input"
+                :data-datepicker-initial-value="filterDateRangeStore.endDate"
+            />
+        </div>
     </div>
 </template>
-
-<style scoped></style>

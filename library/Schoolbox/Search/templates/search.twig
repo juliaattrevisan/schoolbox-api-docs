@@ -11,10 +11,7 @@ Expected data items:
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
-
-<style>
-/* temporarily add extra padding to the container to allow the new styles */
-#container {
-    padding: 2rem;
-}
-</style>
+<script>
+// to use the new spacing styles
+document.getElementById("container").classList.add("c-container");
+</script>
