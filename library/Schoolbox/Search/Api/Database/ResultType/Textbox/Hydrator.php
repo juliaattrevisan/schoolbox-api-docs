@@ -122,18 +122,18 @@ class Hydrator extends BaseHydrator
                 // Find component_instance_id for use in URL fragment.
                 $componentInfo = $componentConfigJsonByTextboxId[$textbox->getId()] ?? null;
                 $componentInstanceId = $componentInfo === null ? null : $componentInfo['component_instance_id'];
-                $componentConfigJson = $componentInfo === null ? '{}' : $componentInfo['configJson'];
-
-                // After json_decode, $componentConfig will be an array with the following optional keys:
-                //  * Component_Config_Collapse::KEY,
-                //  * Component_Config_ShowComponentTitle::KEY
-                $componentConfig = json_decode($componentConfigJson, true);
 
                 // If component_instance_id is null, that means the textbox is not currently used in any component.
                 // Textboxes not currently used in any component should be shown only to users with write access.
                 if ($componentInstanceId === null && $textboxAccess < UserAccess::ACCESS_WRITE) {
                     return null;
                 }
+
+                // After json_decode, $componentConfig will be an array with the following optional keys:
+                //  * Component_Config_Collapse::KEY,
+                //  * Component_Config_ShowComponentTitle::KEY
+                $componentConfigJson = $componentInfo === null ? '{}' : $componentInfo['configJson'];
+                $componentConfig = json_decode($componentConfigJson, true);
 
                 // If collapseValue is null, that means the textbox component is collapsed.
                 // Textboxes in the collapsed state should be shown only to users with write access.
