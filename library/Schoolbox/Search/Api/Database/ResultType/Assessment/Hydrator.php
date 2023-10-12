@@ -99,7 +99,10 @@ class Hydrator extends BaseHydrator
                 ? $assessment->getCreatedBy() // TODO: LessonPlan uses a different function name.  Fix in LessonPlan\Model.
                 : $assessment->getCreator()
             );
-            $creatorId = $assessmentCreator->getId();
+            // NOTE: $assessmentCreator might still be null, because of bad data, or because a created_by field does not
+            //       yet exist on the assessment type.  E.g. as of 23.01 lti_assessment has no created_by/owner_id/user_id
+            //       or similar field.
+            $creatorId = $assessmentCreator?->getId();
             if ($creatorId !== null) {
                 $creatorIds[] = $creatorId;
             }
@@ -134,7 +137,8 @@ class Hydrator extends BaseHydrator
                 );
 
                 // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
-                $assessmentCreator = $assessmentCreatorById[$assessmentCreator->getId()] ?? null;
+                // NOTE: $assessmentCreator might be null here due to note above.
+                $assessmentCreator = $assessmentCreatorById[$assessmentCreator?->getId()] ?? null;
 
                 // Note $match->type will be something like 'assessment.dueWork'.
                 $matchTypeTokens = explode('.', $match->type);
