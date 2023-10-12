@@ -133,15 +133,10 @@ export function usePopOut(
     async function open() {
         isOpen.value = true;
         content.style.display = "block"; // The element must be visible to correctly compute its position
-        // if it's a full width, set the width of the content to the width of the button
-        if (isFullWidth) {
-            content.style.width = `${button.value.getBoundingClientRect().width}px`;
-            content.style.maxWidth = `${button.value.getBoundingClientRect().width}px`;
-        }
         content.setAttribute("aria-hidden", "false");
         // the button will always match the colour of the content when open
         button.value.style.backgroundColor = window.getComputedStyle(content).getPropertyValue("background-color");
-        cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition);
+        cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition as () => void);
         const position = await getPosition();
         animateOpen(position);
     }
