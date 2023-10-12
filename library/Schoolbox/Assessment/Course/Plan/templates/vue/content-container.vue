@@ -40,7 +40,7 @@ window.Vue.onMounted(() => {
     <div v-if="!isExpanded" class="show-more-container">
         <div class="component-action">
             <section>
-                <a href="#" class="button" @click.prevent="store.toggleExpanded(unitId)"> Show More </a>
+                <button @click.prevent="store.toggleExpanded(unitId)">Show More</button>
             </section>
         </div>
     </div>
