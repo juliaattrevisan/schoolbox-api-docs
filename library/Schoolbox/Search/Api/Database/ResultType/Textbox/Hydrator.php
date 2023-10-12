@@ -123,6 +123,10 @@ class Hydrator extends BaseHydrator
                 $componentInfo = $componentConfigJsonByTextboxId[$textbox->getId()] ?? null;
                 $componentInstanceId = $componentInfo === null ? null : $componentInfo['component_instance_id'];
                 $componentConfigJson = $componentInfo === null ? '{}' : $componentInfo['configJson'];
+
+                // After json_decode, $componentConfig will be an array with the following optional keys:
+                //  * Component_Config_Collapse::KEY,
+                //  * Component_Config_ShowComponentTitle::KEY
                 $componentConfig = json_decode($componentConfigJson, true);
 
                 // If component_instance_id is null, that means the textbox is not currently used in any component.
