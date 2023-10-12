@@ -140,6 +140,8 @@ class Hydrator extends BaseHydrator
                     throw new UnexpectedValueException('Component config JSON could not be decoded.');
                 }
 
+                // NOTE: Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
+                //       To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
                 $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
                 $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
 
