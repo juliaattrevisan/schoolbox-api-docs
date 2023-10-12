@@ -128,7 +128,7 @@
                 {% if hasAssessmentRoutes or hasCourseRoutes %}
                     <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-options-task{{ assessment.id }}">
                         {% if hasAssessmentRoutes %}
-                            <li class="separator">{{ locale.translate('assessment', false, true) }}</li>
+                            <li class="separator">{{ locale.translate('activity', false, true) }}</li>
                             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
                             {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
                             {%  if assessment is dueWork and assessment.useRubric %}
