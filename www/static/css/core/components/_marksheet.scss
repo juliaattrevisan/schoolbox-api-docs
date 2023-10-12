@@ -96,18 +96,33 @@
         // Table cells
         td {
             position: relative;
+            vertical-align: middle;
             a.meta {
                 border-bottom: 0;
             }
         }
+        th {
+            vertical-align: middle;
+        }
+
+        select {
+            max-width: 3rem;
+        }
+
         td.student-average a,
         td.student-average a.meta {
             color: $white;
         }
         td.gradient-none-bg a,
         td.gradient-off-bg a {
-            color: #0066b0;
+            color: $content-ui-foreground;
         }
+
+        th.gradient-none-bg,
+        th.gradient-off-bg {
+            background-color: white;
+        }
+
 
         // Various rows and headers
         .course-row {
