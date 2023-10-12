@@ -197,7 +197,11 @@ class Hydrator extends BaseHydrator
 
         return $db->executeQuery(
             // A complication here is that the same textbox can be present on multiple pages.
-            // Start with a table of "textboxIdFolderId, component_instance_id", and join to a table of "component_instance_id, configJson" to get configJson.
+            // The calling function will need to look up the component config for a given textbox on a given page,
+            // so the index combines textboxId and folderId.
+            //
+            // The basic idea of the query is to start with a table of "textboxIdFolderId, component_instance_id",
+            // and join to a table of "component_instance_id, configJson" to get configJson.
             //
             // Note the purpose of using GROUP_CONCAT and JSON syntax here is to get all the config items for a textbox
             // into a single row, while limiting the number of joined subqueries to one.  Having all the info for one
