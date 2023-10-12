@@ -581,10 +581,10 @@ class Controller extends Assessment\Controller
          */
         $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
 
+        $prefix = '';
+
         if ($showDraft) {
-            $prefix = 'Draft';
-        } else {
-            $prefix = 'Published';
+            $prefix = 'Draft - ';
         }
 
         $this->response = $this->responseFromContent($content)
@@ -592,7 +592,7 @@ class Controller extends Assessment\Controller
                                ->withHeader('Cache-Control', ' ')
                                ->withHeader('Content-Type', 'text/csv')
                                ->withHeader('Content-Length', strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix} - {$basename}.csv\"")
+                               ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"")
         ;
     }
 
