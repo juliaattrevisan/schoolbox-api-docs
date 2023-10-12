@@ -203,10 +203,10 @@ class Hydrator extends BaseHydrator
             // The basic idea of the query is to start with a table of "textboxIdFolderId, component_instance_id",
             // and join to a table of "component_instance_id, configJson" to get configJson.
             //
-            // Note the purpose of using GROUP_CONCAT and JSON syntax here is to get all the config items for a textbox
-            // into a single row, while limiting the number of joined subqueries to one.  Having all the info for one
-            // textbox on a single row allows indexing by textbox_id using a standard method, and the JSON encoded
-            // config allows for easy processing by the calling function with use of the json_decode() function.
+            // Note the purpose of using JSON syntax here is to get all the config items for a textbox into a single
+            // row, while limiting the number of joined subqueries to one.  Having all the info for one textbox on a
+            // single row allows indexing by textbox_id using a standard method, and the JSON encoded config allows for
+            // easy processing by the calling function with use of the json_decode() function.
             'SELECT
             CONCAT(cci.value, "-", ci.identifier) AS textboxIdFolderId,
             cci.component_instance_id,
