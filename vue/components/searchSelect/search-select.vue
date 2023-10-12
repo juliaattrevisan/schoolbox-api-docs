@@ -16,11 +16,13 @@ interface Props {
     defaultResults?: Result[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
+    placeholder?: string; // the placeholder text
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
     isSingleSelect: false,
     formValueName: "",
+    placeholder: "Search...",
 });
 
 const emit = defineEmits<{
@@ -121,7 +123,7 @@ function onRemoved(result: Result) {
             :is-single-select="props.isSingleSelect"
             @remove="onRemoved"
         />
-        <search-select-input @input="onInput" />
+        <search-select-input :placeholder="props.placeholder" @input="onInput" />
         <search-select-results
             :query="query"
             :is-searching="isFetching"

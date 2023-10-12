@@ -48,6 +48,7 @@ function onRemoved() {
             :selected="filterCreatorsStore.creator"
             :is-single-select="true"
             :default-results="[currentUser as Result]"
+            placeholder="Search for users..."
             @select="onSelected"
             @remove="onRemoved"
         />
