@@ -217,16 +217,7 @@ class Hydrator extends BaseHydrator
             LEFT JOIN (
                 SELECT
                 cci2.component_instance_id,
-                CONCAT(
-                   "{",
-                   GROUP_CONCAT(
-                      CONCAT(
-                         "\"", ccd2.key, "\": ",
-                         IFNULL(cci2.value, ccd2.default_value)
-                      ) SEPARATOR ", "
-                   ),
-                   "}"
-                ) AS configJson
+                JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS configJson
                 FROM component_config_instance cci2
                 LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
                 WHERE ccd2.key IN (:collapse, :showComponentTitle)
