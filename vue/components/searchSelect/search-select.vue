@@ -3,6 +3,7 @@
  * To search for searchResults and select them
  */
 
+import type { Ref } from "vue";
 import { useFetch, useDebounceFn } from "@vueuse/core";
 import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
@@ -61,30 +62,24 @@ const {
 } = useFetch(url, {
     immediate: false,
     onFetchError(ctx) {
-        // we catch the Search error to display the error message
-        console.warn(ctx);
-        // if ((ctx.data as SearchError).status) {
-        //     searchError.value = ctx.data as SearchError;
-        // }
         return ctx;
     },
 })
     .get()
     .json();
 
-// const search = useDebounceFn(async() => {
-//     await execute();
-// }, 300);
-
-// const search = useDebounceFn(async () => {
-//     await execute();
-// }, 300);
-
-// const debouncedRequest = useDebounceFn(() => execute, 300);
-
-// async function search() {
-//     await debouncedRequest();
-// }
+/**
+ * Debounce the search so we don't send a request on every key press
+ */
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+const search = useDebounceFn(async () => {
+    await execute();
+    try {
+        searchResults.value = (data as Ref<Result[]>).value;
+    } catch (error) {
+        hasError.value = true;
+    }
+}, 300);
 
 /**
  * start searching once the keyword length is greater than the minimum
@@ -98,13 +93,7 @@ async function onInput(value: string) {
         return;
     }
     canSearch.value = true;
-    await execute();
-    // await debouncedRequest(); // @TODO - resolve debounce issue
-    try {
-        searchResults.value = (data as Ref<Result[]>).value;
-    } catch (error) {
-        hasError.value = true;
-    }
+    await search();
 }
 
 /**
