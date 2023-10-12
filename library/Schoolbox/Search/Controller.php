@@ -85,7 +85,7 @@ class Controller extends Base
 
             // NOTE: Features to include based on NAME_LMS_ENABLED were found by inspecting code in conf/modules/Learning.php.
             $filters[] = [
-                "title" => $rosettaStone->translate("assessment", false, true),
+                "title" => "Learning " . $rosettaStone->translate("activity", false, true),
                 "value" => "assessment",
                 "subTypes" => $subTypes
             ];

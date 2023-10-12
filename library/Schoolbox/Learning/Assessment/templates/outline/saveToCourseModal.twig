@@ -4,13 +4,13 @@
      aria-hidden="true"
      role="dialog"
 >
-    <h2>Are you sure you wish to save this {{ locale.translate('assessment') }} back to its course?</h2>
+    <h2>Are you sure you wish to save this {{ locale.translate('activity') }} back to its course?</h2>
 
     {# Modal content: spec assessment exists variant #}
     <div data-display-if-spec-assessment-exists
          class="warning alert-box {% if specAssessment is null %}hide{% endif %}">
         <p>
-            The original {{ locale.translate('assessment') }}
+            The original {{ locale.translate('activity') }}
             &ldquo;<span data-spec-assessment-title>{{ specAssessment.title ?? null }}</span>&rdquo;
             in the course
 
@@ -20,13 +20,12 @@
             <span data-display-if-spec-assessment-not-deleted class="{% if (specAssessment.deleted ?? false) %}hide{% endif %}">
                 will be <strong>replaced</strong>
             </span>
-            with this {{ locale.translate('assessment') }}.
+            with this {{ locale.translate('activity') }}.
         </p>
         {% if assessment is project %}
             {% if assessment.assessables is not empty %}
                 <p>
-                    As this {{ locale.translate('activity') }} is a project, its
-                    activity set will also be <strong>replaced</strong>,
+                    As this {{ locale.translate('activity') }} is a project, the {{ locale.translate('activity') }} it contains will also be <strong>replaced</strong>,
                     possibly deleting activities:
                 </p>
                 <p><strong>Current</strong></p>
@@ -73,11 +72,11 @@
     <p data-display-if-spec-assessment-not-exists
        class="{% if specAssessment is not null %}hide{% endif %}"
     >
-        This {{ locale.translate('assessment') }}
+        This {{ locale.translate('activity') }}
         &ldquo;<span data-spec-assessment-title>{{ assessment.title ?? null }}</span>&rdquo;
         does not yet exist in the course;
         {% if assessment is project %}
-            it and its activities will be added.
+            it and the {{ locale.translate('activity', true) }} it contains will be added.
         {% else %}
             it will be added.
         {% endif %}
