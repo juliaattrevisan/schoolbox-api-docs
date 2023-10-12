@@ -137,20 +137,24 @@ class Hydrator extends BaseHydrator
                         ($textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
                         ? 'Untitled Textbox'
                         : $textbox->getHeading()
-                    ) .
-                    ($componentInstanceId === null ? ' (not used in any component)' : ''),
+                    ),
                     (
-                        $componentInstanceId === null ? '' :
-                        $this->buildBaseUrl()
-                        ->withPath('/homepage/' . $textbox->getCategory()->getId())
-                        ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
-                        ->__toString()
+                        // If not componentInstanceId, the URL should point to the Manage Textboxes page.
+                        $componentInstanceId === null
+                        ? $this->buildBaseUrl()
+                            ->withPath("/textbox/folder/{$textbox->getCategory()->getId()}")
+                            ->withFragment("textbox-" . $textbox->getId())
+                            ->__toString()
+                        : $this->buildBaseUrl()
+                            ->withPath('/homepage/' . $textbox->getCategory()->getId())
+                            ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
+                            ->__toString()
                     ),
                     $match->type,
                     $match->relevance,
                     $textbox->getUpdatedAt(),
                     $textbox->getCategory(),
-                    null,
+                    ($componentInstanceId === null ? 'Hidden from view' : null),
                     null,
                     'textbox',
                     $this->truncateAroundKeyword($keyword, $textboxBody) ?? $this->truncate($textboxBody),
