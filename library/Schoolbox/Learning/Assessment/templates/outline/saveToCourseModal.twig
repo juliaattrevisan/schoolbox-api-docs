@@ -25,7 +25,7 @@
         {% if assessment is project %}
             {% if assessment.assessables is not empty %}
                 <p>
-                    As this {{ locale.translate('assessment') }} is a project, its
+                    As this {{ locale.translate('activity') }} is a project, its
                     activity set will also be <strong>replaced</strong>,
                     possibly deleting activities:
                 </p>
@@ -53,41 +53,18 @@
             {% if (assessment.assessables | filter(a => a is lessonPlan)) is not empty %}
                 <p>
                     As this project contains lesson plans,
-                    their linked activity set will be <strong>replaced</strong>:
+                    any linked {{ locale.translate('activity', true) }} must be in the destination for the link to remain.
                 </p>
-                <ul>
-                    <li>
-                        Any linked activities in lesson plans will be
-                        <strong>added to</strong> the course project lesson
-                        plans
-                    </li>
-                    <li>
-                        Any activities unlinked from lesson plans will be
-                        <strong>removed from</strong> the course project
-                        lesson plans, unless they were not imported at all
-                    </li>
-                </ul>
             {% endif %}
         {% endif %}
         {% if assessment is lessonPlan %}
             <p>
-                As this {{ locale.translate('assessment') }} is a lesson plan,
-                its linked activity set will also be <strong>replaced</strong>:
+                As this {{ locale.translate('activity') }} is a lesson plan,
+                any linked {{ locale.translate('activity', true) }} must be in the destination for the link to remain.
             </p>
-            <ul>
-                <li>
-                    Any linked activities in this lesson plan will be
-                    <strong>added to</strong> the course&rsquo;s lesson plan
-                </li>
-                <li>
-                    Any activities unlinked from this lesson plan will be
-                    <strong>removed from</strong> the course&rsquo;s lesson
-                    plan, unless they were not imported at all
-                </li>
-            </ul>
         {% endif %}
         <p>
-            Any other imports of the original {{ locale.translate('assessment') }} will
+            Any other imports into classes of the original {{ locale.translate('activity') }} will
             <strong>not</strong> be updated.
         </p>
     </div>
