@@ -20,6 +20,7 @@ use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Hydrator for textbox results.
@@ -81,7 +82,7 @@ class Hydrator extends BaseHydrator
                    "{",
                    GROUP_CONCAT(
                       CONCAT(
-                         "\'", ccd2.key, "\': ",
+                         "\"", ccd2.key, "\": ",
                          IFNULL(cci2.value, ccd2.default_value)
                       ) SEPARATOR ", "
                    ),
@@ -135,18 +136,41 @@ class Hydrator extends BaseHydrator
                 $componentConfigJson = $componentInfo === null ? '{}' : $componentInfo['configJson'];
                 $componentConfig = json_decode($componentConfigJson, true);
 
-                // If collapseValue is null, that means the textbox component is collapsed.
+                if ($componentConfig === null) {
+                    throw new UnexpectedValueException('Component config JSON could not be decoded.');
+                }
+
+                $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
+                $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
+
                 // Textboxes in the collapsed state should be shown only to users with write access.
-                $componentIsCollapsed = boolval($componentConfig['collapse_value'] ?? null);
-                if ($componentIsCollapsed === true && $textboxAccess < UserAccess::ACCESS_WRITE) {
+                if ($componentIsCollapsed && $textboxAccess < UserAccess::ACCESS_WRITE) {
                     return null;
                 }
 
                 $textboxBody = (new ToText($textbox->getBody()))->getText();
+
+                // Matches whose component title is hidden should only count as matches if they match on something other
+                // than the title.  The only other thing textbox matches might match against is the body.
+                // (See match criteria for textboxes in QueryParamBuilder->buildBaseWhereParams()).
+                if (
+                    $textboxAccess === UserAccess::ACCESS_READ &&
+                    !$showTitleToReadOnlyUsers &&
+                    !str_contains(strtolower($textboxBody), $keyword)
+                ) {
+                    return null;
+                }
+
                 return new FullResult(
                     $match,
                     $match->id,
-                    $textbox->getHeading() . ($componentInstanceId === null ? ' (not used in any component)' : ''),
+                    (
+                        // Hide title if it should be hidden.
+                        ($textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
+                        ? 'Untitled Textbox'
+                        : $textbox->getHeading()
+                    ) .
+                    ($componentInstanceId === null ? ' (not used in any component)' : ''),
                     (
                         $componentInstanceId === null ? '' :
                         $this->buildBaseUrl()
