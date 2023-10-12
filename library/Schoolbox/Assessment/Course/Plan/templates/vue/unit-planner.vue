@@ -133,9 +133,20 @@ table th:first-child {
     width: 200px;
 }
 
+/* Fix the unit title column to the left */
+table th:first-child,
+table tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background-color: white;
+    border-right: 1px solid var(--body-background);
+}
+
 table th:not(:first-child) {
     min-width: 400px;
     width: 400px;
+    border-left: 1px solid var(--body-background);
 }
 
 table tbody td:not(:first-child) {
