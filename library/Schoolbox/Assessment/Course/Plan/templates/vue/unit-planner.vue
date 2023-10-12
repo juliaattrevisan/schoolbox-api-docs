@@ -24,19 +24,21 @@ const tabs = window.Vue.ref([
     { id: "curriculum-overview", label: "Curriculum Overview" },
 ]);
 
+// Get a list of every textbox that could be shown in a unit
+// in case a unit doesn't have a textbox for a particular key
+// Ensures that the table will always show all possible textboxes
 type TextboxKey = keyof Unit["textboxes"];
-
 const allTextboxKeys = window.Vue.computed(() => {
     const keysSet = new Set<TextboxKey>();
     props.units.forEach((unit) => {
         Object.keys(unit.textboxes).forEach((key) => {
-            if (key === "extras") return;
             keysSet.add(key);
         });
     });
     return [...keysSet];
 });
 
+// Figure out if there are any extra textboxes so we can show/hide the column
 const totalExtras = window.Vue.computed(() => {
     let total = 0;
     props.units.forEach((unit) => {
