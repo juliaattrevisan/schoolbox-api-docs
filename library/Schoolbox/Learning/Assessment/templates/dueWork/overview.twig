@@ -1,3 +1,5 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
+
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -12,7 +14,7 @@
                     <li class="{{ icon.renderClass(dueWork) }}">{{ dueWork.typeName }}</li>
                     <li class="icon-calendar">Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
                 </ul>
-                <div class="l-flex l-flex--align-center l-flex--justify-end l-gap-m l-pad-m--horiz">
+                <div class="l-flex l-flex--align-center l-flex--justify-end l-gap-m l-pad-m--horiz no-pad">
                     <div class="checklist">
                         <input type="checkbox" id="show-drafts">
                         <label for="show-drafts">
@@ -20,7 +22,7 @@
                         </label>
                     </div>
                     <nav class="c-nav-actions l-flex-row">
-                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV"></a>
+                        <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV" data-download-spreadsheet></a>
                     </nav>
                 </div>
             </div>
@@ -35,15 +37,32 @@
                 <tbody>
                     <tr>
                         <th rowspan="2" class="rb-group-name markdown">&nbsp;</th>
-                        {% for group, criteria in headers %}
-                            <th colspan="{{ criteria | length }}" class="markdown">{{ group | markdown }}</th>
+
+                        {% for capabilityId, capabilityData in headers.capabilities %}
+                            {% set colspan = capabilityData.indicators|length %}
+
+                            {# If Capability Mark Type is something other than None,
+                             # prepare an additional column
+                             #}
+                            {% if dueWork.isMarkPerCapability %}
+                                {% set colspan = colspan+1 %}
+                            {% endif %}
+
+                            <th colspan="{{ colspan }}" class="markdown">{{ capabilityData.name | markdown }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
-                        {% for criteria in headers %}
-                            {% for criterion in criteria %}
-                                <th class="rb-criterion-name markdown">{{ criterion | markdown }}</th>
+                        {% for capabilityId, capabilityData in headers.capabilities %}
+                            {% for indicatorId, indicator in capabilityData.indicators %}
+                                <th class="rb-criterion-name markdown">{{ indicator | markdown }}</th>
                             {% endfor %}
+
+                            {# If Capability Mark Type is something other than None,
+                             # prepare an additional column
+                             #}
+                            {% if dueWork.isMarkPerCapability %}
+                                <th class="rb-criterion-name markdown">Overall</th>
+                            {% endif %}
                         {% endfor %}
                     </tr>
                     {% for participant in participants %}
@@ -60,10 +79,10 @@
                                 </a>
                             </div>
                         </td>
-                            {% for criteria in headers %}
-                                {% for id, criterion in criteria %}
-                                    {% set markLatest = marks[participant.id][id]['latest'] ?? null %}
-                                    {% set mark = marks[participant.id][id]['published'] ?? null %}
+                            {% for capabilityId, capabilityData in headers.capabilities %}
+                                {% for indicatorId, indicator in capabilityData.indicators %}
+                                    {% set markLatest = marks[participant.id][indicatorId]['latest'] ?? null %}
+                                    {% set mark = marks[participant.id][indicatorId]['published'] ?? null %}
                                     <td class="markdown">
                                         <div {% if markLatest %}data-actual-mark{%endif %}>
                                         {{ (mark.descriptor.description ?? '') | markdown }}
@@ -77,6 +96,26 @@
                                         {% endif %}
                                     </td>
                                 {% endfor %}
+
+                                {# If Capability Mark Type is something other than None,
+                                 # prepare an additional column
+                                 #}
+                                {% if dueWork.isMarkPerCapability %}
+                                    {% set capabilityMarkLatest = marks[participant.id]['capabilityMark'][capabilityId]['latest'] ?? null %}
+                                    {% set capabilityMark = marks[participant.id]['capabilityMark'][capabilityId]['published'] ?? null %}
+
+                                    <td class="markdown">
+                                        {# "latest" typically means "draft marks" #}
+                                        <div {% if capabilityMarkLatest %}data-actual-mark{%endif %}>
+                                            <p>{{ capabilityMark }}</p>
+                                        </div>
+                                        {% if capabilityMarkLatest %}
+                                            <div data-draft-mark class="meta">
+                                                <p>{{ capabilityMarkLatest }}</p>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
                             {% endfor %}
                     </tr>
                     {% endfor %}
@@ -97,15 +136,7 @@
 {% autoescape 'js' %}
     <script type="text/javascript">
         $(function() {
-            $("#show-drafts").click(function () {
-                if ($(this).is(":checked")) {
-                    $("[data-draft-mark]").show();
-                    $("[data-actual-mark]").hide();
-                } else {
-                    $("[data-draft-mark]").hide();
-                    $("[data-actual-mark]").show();
-                }
-            });
+            $.marksheetToggleDrafts('#show-drafts');
         });
     </script>
 {% endautoescape %}

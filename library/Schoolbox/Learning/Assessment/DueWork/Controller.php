@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use CFPropertyList\IOException;
 use CFPropertyList\PListException;
+use DebugBar\DebugBarException;
 use DomainException;
 use DOMException;
 use Eportfolio\ShowcaseMapper;
@@ -51,7 +52,6 @@ use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
-use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -98,6 +98,29 @@ use function count;
  */
 class Controller extends Assessment\Controller
 {
+    /**
+     * Draft and Published marks are stored in two different
+     * (but adjacent) areas of the $marks array
+     */
+    private const MARK_DRAFT_KEY = 'latest';
+    private const MARK_PUBLISHED_KEY = 'published';
+
+
+    /**
+     * This is a suffix appended after every Draft mark
+     * so users know conclusively and obviously.
+     */
+    private const MARK_DRAFT_SUFFIX = ' (draft)';
+
+
+    /**
+     * The querystring param for Show Drafts from the ui
+     * Note that jquery.marksheet.js hardcodes this value
+     * and it needs to match this
+     */
+    private const SHOW_DRAFTS_KEY = 'showDrafts';
+
+
     /**
      * @param UserMapper                            $userMapper
      * @param Mapper                                $errorMapper
@@ -550,13 +573,26 @@ class Controller extends Assessment\Controller
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
         $basename = (new Url($assessment->getTitle()))->getSlug();
-        $content  = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
+
+        /** @var Model $assessment */
+        $content  = $this->array2csv($this->collateResultSquare($assessment->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
+
+        /* Maybe we set the Show Drafts option
+         */
+        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
+
+        $prefix = '';
+
+        if ($showDraft) {
+            $prefix = 'Draft - ';
+        }
+
         $this->response = $this->responseFromContent($content)
                                ->withHeader('Pragma', ' ')
                                ->withHeader('Cache-Control', ' ')
                                ->withHeader('Content-Type', 'text/csv')
                                ->withHeader('Content-Length', strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"$basename-results.csv\"")
+                               ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"")
         ;
     }
 
@@ -565,16 +601,27 @@ class Controller extends Assessment\Controller
      * Get headers for the rubric report or CSV download.
      *
      * @param Grid $grid
-     * @return string[][] Grouped by capability name, then indicator ID
+     * @return array Grouped by capability name, then indicator ID
      */
     private function getRubricHeaders(Grid $grid): array
     {
         $headers = [];
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            $capability = $capabilityUsage->getCapability();
+
+            /* Index capability identifiers along with their indicator stuff
+             */
+            if (!isset($headers['capabilities'][$capabilityUsage->getCapability()->getId()])) {
+                $headers['capabilities'][$capability->getId()] = [
+                    'name' => $capability->getName(),
+                    'indicators' => []
+                ];
+            }
+
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                $capability                                           = $capabilityUsage->getCapability();
-                $indicator                                            = $indicatorUsage->getIndicator();
-                $headers[$capability->getName()][$indicator->getId()] = $indicator->getName();
+                $indicator = $indicatorUsage->getIndicator();
+
+                $headers['capabilities'][$capability->getId()]['indicators'][$indicator->getId()] = $indicator->getName();
             }
         }
         return $headers;
@@ -585,7 +632,7 @@ class Controller extends Assessment\Controller
      * Get rubric marks given for each indicator.
      *
      * @param ICollection|Participant[] $participants
-     * @return array<int, array<int, array<string, IndicatorMark>>> grouped in sets indexed by user.id
+     * @return array capability id, published marks and indicator data grouped in sets indexed by user.id
      */
     private function getMarks(ICollection $participants): array
     {
@@ -616,19 +663,40 @@ class Controller extends Assessment\Controller
             $studentId = $participant->getUser()->getId();
             if (null !== $markedGridPublished) {
                 foreach ($markedGridPublished->getCapabilityMarks() as $capabilityMark) {
+                    /* Index cap marks by capability id, per person
+                     */
+                    $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+                    $marks[$studentId]['capabilityMark'][$capabilityId]['published'] = $capabilityMark->getHumanReadableValue();
+
+                    /* Remember the Capability to which this Indicator belongs
+                     * (The Indicators in the csv output don't know their parent Capability)
+                     * Arguably you could remember the full capability instance itself, but meh
+                     */
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['published'] = $indicatorMark;
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()][self::MARK_PUBLISHED_KEY] = $indicatorMark;
                     }
                 }
             }
             if (null !== $markedGridLatest) {
                 foreach ($markedGridLatest->getCapabilityMarks() as $capabilityMark) {
+                    /* Index cap marks by capability id, per person
+                     */
+                    $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+                    $marks[$studentId]['capabilityMark'][$capabilityId][self::MARK_DRAFT_KEY] = $capabilityMark->getHumanReadableValue();
+
+                    /* Remember the Capability to which this Indicator belongs
+                     * (The Indicators in the csv output don't know their parent Capability)
+                     * Arguably you could remember the full capability instance itself, but meh
+                     */
                     foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['latest'] = $indicatorMark;
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()]['capabilityId'] = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+                        $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()][self::MARK_DRAFT_KEY] = $indicatorMark;
                     }
                 }
             }
         }
+
         return $marks;
     }
 
@@ -636,11 +704,12 @@ class Controller extends Assessment\Controller
     /**
      * Creates a CSV structure for this rubric grid and its participants.
      *
-     * @param Grid       $grid
+     * @param Grid $grid
      * @param Collection $participants
      * @return array
+     * @throws DebugBarException
      */
-    private function collateResultSquare(Grid $grid, Collection $participants): array
+    private function collateResultSquare(bool $isMarkPerCapability, Grid $grid, Collection $participants): array
     {
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
@@ -654,12 +723,23 @@ class Controller extends Assessment\Controller
         }
 
         // put header row in array
-        foreach ($this->getRubricHeaders($grid) as $grouping => $criteria) {
-            foreach ($criteria as $id => $criterion) {
-                $data[0][] = "$grouping - $criterion";
+        foreach ($this->getRubricHeaders($grid)['capabilities'] as $capabilityData) {
+            $indicators = $capabilityData['indicators'];
+            $capabilityName = $capabilityData['name'];
+
+            foreach ($indicators as $indicatorId => $indicator) {
+                $data[0][] = "{$capabilityName} - {$indicator}";
                 $data[0][] = '';
             }
+
+            /* If Capability Mark Type is something other than None,
+             * prepare an additional column
+             */
+            if ($isMarkPerCapability) {
+                $data[0][] = 'Overall';
+            }
         }
+
         $data[0][] = 'Total';
 
         /**
@@ -672,6 +752,13 @@ class Controller extends Assessment\Controller
                 return $participant->getUser()->getId();
             }
         )->getAll();
+
+        /* Only needed with Capability Marks is set to something other than None;
+         * Used to do Indicator lookaheads in csv output
+         */
+        $currentCapabilityId = null;
+        $nextCapabilityId = null;
+
         foreach ($this->getMarks($participants) as $studentId => $marks) {
             // array of all marked indicator ids of the participant
             $markedIndicatorIds = array_keys($marks);
@@ -684,15 +771,63 @@ class Controller extends Assessment\Controller
             $sum = null;
 
             if (count($marks)) {
-                foreach ($allIndicatorUsageIds as $indicatorUsageId) {
-                    if (array_key_exists('published', $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        $descriptor = $marks[$indicatorUsageId]['published']->getDescriptor();
-                        $row[]      = $descriptor ? $descriptor->getDescription() : '';
-                        $row[]      = $marks[$indicatorUsageId]['published']->getValue();
-                        $sum        += $marks[$indicatorUsageId]['published']->getValue();
+                $numIndicators = \count($allIndicatorUsageIds);
+
+                for ($i = 0; $i < $numIndicators; $i++) {
+                    $indicatorUsageId = $allIndicatorUsageIds[$i];
+
+                    if ($isMarkPerCapability) {
+                        /* Implement lookahead to see when you're ready to output capability marks
+                         */
+                        $currentCapabilityId = $marks[$indicatorUsageId]['capabilityId'] ?? null;
+
+                        /* Because apparently you can't null coalesce a lookahead for some reason
+                        */
+                        $nextIndex = $i + 1;
+                        $nextCapabilityId = null;
+
+                        if ($nextIndex < $numIndicators) {
+                            $nextCapabilityId = $marks[$allIndicatorUsageIds[$nextIndex]]['capabilityId'];
+                        }
+                    }
+
+                    /* Maybe we set the Show Drafts option
+                     */
+                    $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
+
+                    if ($showDraft && array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
+                        $row[] = ($descriptor ? $descriptor->getDescription() : '')  . self::MARK_DRAFT_SUFFIX;
+                        $row[] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue() . self::MARK_DRAFT_SUFFIX;
+                        $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
+                    } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
+                        $row[] = $descriptor ? $descriptor->getDescription() : '';
+                        $row[] = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
+                        $sum += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
                     } else {
                         $row[] = '';
                         $row[] = '';
+                    }
+
+                    /* Prepare an additional column for Capability Marks
+                     */
+                    if ($isMarkPerCapability && $currentCapabilityId !== $nextCapabilityId) {
+                        $capabilityMark = '';
+
+                        /* Decide which kind to show: draft or published
+                         *
+                         * Note: the student might not have a draft available,
+                         * and/or the student might not have a published mark available
+                         */
+                        if ($showDraft && isset($marks['capabilityMark'][$currentCapabilityId][self::MARK_DRAFT_KEY])) {
+                            $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_DRAFT_KEY];
+                            $capabilityMark .= self::MARK_DRAFT_SUFFIX;
+                        } elseif (isset($marks['capabilityMark'][$currentCapabilityId][self::MARK_PUBLISHED_KEY])) {
+                            $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_PUBLISHED_KEY];
+                        }
+
+                        $row[] = $capabilityMark;
                     }
                 }
             } else {
@@ -705,6 +840,7 @@ class Controller extends Assessment\Controller
                 $data[] = $row;
             }
         }
+
         return $data;
     }
 
