@@ -40,9 +40,9 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
                     </div>
                 </div>
                 <nav>
-                    <wc-actions-dropdown
+                    <sbx-pop-out
                         :content-id="'dropdown-unitplanner-activity-' + activity.id"
-                    ></wc-actions-dropdown>
+                    ></sbx-pop-out>
                 </nav>
                 <ul :id="'dropdown-unitplanner-activity-' + activity.id" class="f-dropdown" data-dropdown-content>
                     <li>
