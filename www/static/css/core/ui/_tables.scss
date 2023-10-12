@@ -442,6 +442,28 @@ $rotate-span-width: 11rem;
     }
 }
 
+
+
+// Prevent long names causing first column to be excessively wide.
+table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
+    max-width: 200px;
+    overflow: hidden;
+    white-space: normal;
+}
+
+// Prevent grades from wrapping over two lines
+.marksheet .student-grade-cell {
+    white-space: nowrap;
+}
+
+.marksheet [data-pop-out-menu] {
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--content-ui-hover);
+    }
+}
+
 // dataTables
 .island {
     table.dataTable.no-footer {
