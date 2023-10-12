@@ -53,12 +53,11 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <ul class="sub-nav">
-        <li v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }">
+    <dl class="tabs">
+        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }">
             <a @click="selectedTab = tab.id">{{ tab.label }}</a>
-        </li>
-    </ul>
-
+        </dd>
+    </dl>
     <div class="scrollable">
         <table>
             <thead>

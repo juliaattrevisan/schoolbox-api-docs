@@ -50,11 +50,7 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
             </li>
         </div>
         <div v-if="!isExpanded && props.activities.length > maxUnexpandedActivities" class="show-more-container">
-            <div class="component-action">
-                <section>
-                    <a href="#" class="button" @click.prevent="store.toggleExpanded(unitId)"> Show More </a>
-                </section>
-            </div>
+            <button @click.prevent="store.toggleExpanded(unitId)">Show More</button>
         </div>
     </div>
 </template>
@@ -68,6 +64,11 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
     bottom: 0;
     position: absolute;
     width: 100%;
+    background: white;
+}
+.show-more-container button {
+    margin: 5px;
+    float: right;
 }
 
 .activity-list {

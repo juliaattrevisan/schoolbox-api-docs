@@ -38,11 +38,7 @@ window.Vue.onMounted(() => {
     </div>
 
     <div v-if="!isExpanded" class="show-more-container">
-        <div class="component-action">
-            <section>
-                <button @click.prevent="store.toggleExpanded(unitId)">Show More</button>
-            </section>
-        </div>
+        <button @click.prevent="store.toggleExpanded(unitId)">Show More</button>
     </div>
 </template>
 
@@ -51,10 +47,14 @@ window.Vue.onMounted(() => {
     max-height: v-bind(maxContentHeightStyle);
     overflow: hidden;
 }
-
 .show-more-container {
     bottom: 0;
     position: absolute;
     width: 100%;
+    background: white;
+}
+.show-more-container button {
+    margin: 5px;
+    float: right;
 }
 </style>
