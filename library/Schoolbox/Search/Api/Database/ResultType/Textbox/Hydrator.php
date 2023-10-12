@@ -66,41 +66,7 @@ class Hydrator extends BaseHydrator
         }
 
         // Get componentInstanceId indexed by textboxId.
-        $db = $this->textboxMapper->getDatabase();
-        $componentConfigJsonByTextboxId = $db->executeQuery(
-            // Start with a table of "textbox_id, component_instance_id", and join to a table of "component_instance_id, configJson".
-            'SELECT
-            cci.value AS textbox_id,
-            cci.component_instance_id,
-            IFNULL(component_configJson.configJson, "{}") AS configJson
-            FROM component_config_instance cci
-            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-            LEFT JOIN (
-                SELECT
-                cci2.component_instance_id,
-                CONCAT(
-                   "{",
-                   GROUP_CONCAT(
-                      CONCAT(
-                         "\"", ccd2.key, "\": ",
-                         IFNULL(cci2.value, ccd2.default_value)
-                      ) SEPARATOR ", "
-                   ),
-                   "}"
-                ) AS configJson
-                FROM component_config_instance cci2
-                LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
-                WHERE ccd2.key IN (:collapse, :showComponentTitle)
-                GROUP BY cci2.component_instance_id
-            ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
-            WHERE ccd.key=:componentKey
-            AND cci.value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
-            [
-                ':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
-                ':collapse' => Component_Config_Collapse::KEY,
-                'showComponentTitle' => Component_Config_ShowComponentTitle::KEY
-            ]
-        )->fetchRowArray('textbox_id');
+        $componentConfigJsonByTextboxId = $this->getComponentConfigJsonByTextboxId($textboxIds);
 
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
@@ -198,5 +164,61 @@ class Hydrator extends BaseHydrator
 
         // Filter out anything missing
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    /**
+     * Return an array of arrays containing config information for the textbox components matching $textboxIds.
+     *
+     * Example of returned array:
+     * [
+     *    116 => [
+     *        'textbox_id' => 116,
+     *        'component_instance_id' => 4409,
+     *        'configJson' => '{"collapse": 1, "showComponentTitle": 0}' // Both keys are optional.
+     *    ],
+     *    ...
+     * ]
+     *
+     * @param $textboxIds
+     * @return array
+     */
+    private function getComponentConfigJsonByTextboxId($textboxIds): array
+    {
+        $db = $this->textboxMapper->getDatabase();
+
+        return $db->executeQuery(
+            // Start with a table of "textbox_id, component_instance_id", and join to a table of "component_instance_id, configJson" to get configJson.
+            'SELECT
+            cci.value AS textbox_id,
+            cci.component_instance_id,
+            IFNULL(component_configJson.configJson, "{}") AS configJson
+            FROM component_config_instance cci
+            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            LEFT JOIN (
+                SELECT
+                cci2.component_instance_id,
+                CONCAT(
+                   "{",
+                   GROUP_CONCAT(
+                      CONCAT(
+                         "\"", ccd2.key, "\": ",
+                         IFNULL(cci2.value, ccd2.default_value)
+                      ) SEPARATOR ", "
+                   ),
+                   "}"
+                ) AS configJson
+                FROM component_config_instance cci2
+                LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
+                WHERE ccd2.key IN (:collapse, :showComponentTitle)
+                GROUP BY cci2.component_instance_id
+            ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
+            WHERE ccd.key=:componentKey
+            AND cci.value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
+            [
+                ':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                ':collapse' => Component_Config_Collapse::KEY,
+                'showComponentTitle' => Component_Config_ShowComponentTitle::KEY
+            ]
+        )->fetchRowArray('textbox_id');
     }
 }
