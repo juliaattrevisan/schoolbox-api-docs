@@ -16,6 +16,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
+use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
 
 /**
@@ -56,7 +57,7 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(string $keyword, array $matches, User $viewer): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all folders which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
@@ -98,7 +99,7 @@ class Hydrator extends BaseHydrator
                             self::BASE_TYPE . '.course'    => 'course',
                             self::BASE_TYPE . '.unit'      => 'unit',
                             self::BASE_TYPE . '.class'     => 'teacher',
-                            self::BASE_TYPE . '.homepage'  => 'homepage',
+                            self::BASE_TYPE . '.homepage'  => 'home',
                             default                        => 'folder',
                         },
                         null,

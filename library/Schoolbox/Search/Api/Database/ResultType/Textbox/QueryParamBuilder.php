@@ -102,13 +102,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A textbox's type is always 'Textbox'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string
     {
-        return "'textbox'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**
@@ -124,9 +122,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * A textbox's date is its updated_at date.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'tb.updated_at';
     }
@@ -144,9 +142,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The textbox's folder is its `categoryID` column.
      *
-     * @return string|null
+     * @return string
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(): string
     {
         return 'tb.categoryID';
     }

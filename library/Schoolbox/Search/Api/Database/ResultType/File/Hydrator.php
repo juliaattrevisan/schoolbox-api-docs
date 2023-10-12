@@ -16,6 +16,7 @@ use Schoolbox\Resource\File;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
+use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
 
 /**
@@ -52,7 +53,7 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(string $keyword, array $matches, User $viewer): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all news articles which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
@@ -93,7 +94,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $file->getModifiedAt(),
                         $file->getFolder(),
-                        null,
+                        "Posted {$file->getModifiedAt()->getRelativeTime()} by {$file->getModifiedBy()->getFullName()}",
                         (
                             // Image? show thumbnail, otherwise show mimetype thumb.
                             (str_contains($file->getMimetype()->__toString(), 'image'))

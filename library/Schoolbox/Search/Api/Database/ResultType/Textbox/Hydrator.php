@@ -17,6 +17,7 @@ use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
+use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
 
 /**
@@ -52,7 +53,7 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(string $keyword, array $matches, User $viewer): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all textboxes that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);

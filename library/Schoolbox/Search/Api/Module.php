@@ -17,6 +17,8 @@ use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
+use Schoolbox\Forum\PostMapper;
+use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Permission\Access\Access;
@@ -105,6 +107,7 @@ class Module extends BaseModule
                 new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter()),
             ),
             new Hydrator\Aggregate(
@@ -152,6 +155,11 @@ class Module extends BaseModule
                     $mapperFactory->get(TileMapper::class),
                     $mapperFactory->get(TileLayoutMapper::class),
                     $mapperFactory->get(FolderMapper::class),
+                    Access::getInstance(),
+                ),
+                new Database\ResultType\Forum\Hydrator(
+                    $mapperFactory->get(PostMapper::class),
+                    $mapperFactory->get(ThreadMapper::class),
                     Access::getInstance(),
                 ),
                 new Database\ResultType\Assessment\Hydrator(

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Hydrator;
 
 use Schoolbox\Search\Api\Cursor\RawResult;
+use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
 
 class Aggregate implements IHydrator
@@ -54,7 +55,7 @@ class Aggregate implements IHydrator
      * @param User                  $viewer
      * @return array<int, FullResult|null>
      */
-    public function hydrate(string $keyword, array $matches, User $viewer): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Group matches by the hydrator which accepts them
         $groupedRawResults = [];
@@ -74,7 +75,7 @@ class Aggregate implements IHydrator
         foreach ($this->hydrators as $hydrator) {
             $hydratorId = spl_object_id($hydrator);
             if (isset($groupedRawResults[$hydratorId])) {
-                $fullResults += $hydrator->hydrate($keyword, $groupedRawResults[$hydratorId], $viewer);
+                $fullResults += $hydrator->hydrate($keyword, $filter, $groupedRawResults[$hydratorId], $viewer);
             }
         }
 

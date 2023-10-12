@@ -16,6 +16,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
+use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
 
 /**
@@ -58,7 +59,7 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(string $keyword, array $matches, User $viewer): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all news articles which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
@@ -141,9 +142,7 @@ class Hydrator extends BaseHydrator
                         $match->relevance,
                         $article->getPublishAt(),
                         null,
-                        // Meta looks like: x days ago in $category
-                        // Should probably be a frontend responsibility?
-                        null,
+                        "Posted {$article->getPublishAt()->getRelativeTime()} by {$article->getAuthor()->getFullName()}",
                         $article->getFeatureImage()
                             ? $this->buildStorageImageUrl($article->getFeatureImage())->__toString()
                             : null,

@@ -103,13 +103,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A link's type is always 'link'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string
     {
-        return "'link'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**
@@ -125,9 +123,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The link's date is its modified date.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'l.modified';
     }
@@ -135,9 +133,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The link's creator is its `owner` column.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(): string
     {
         return 'l.owner';
     }
@@ -145,9 +143,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The link's folder is its `category` column.
      *
-     * @return string|null
+     * @return string
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(): string
     {
         return 'l.category';
     }

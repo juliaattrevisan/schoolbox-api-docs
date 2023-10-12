@@ -118,15 +118,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The type of a news result is simply "news".
+     * @return string
      */
     protected function buildTypeExpression(): string
     {
-        return "'news'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**
      * The ID of a news result is simply the article's ID.
+     * @return string
      */
     protected function buildIdExpression(): string
     {
@@ -136,15 +137,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The date of a news result is the article's publish date.
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'n.publish_at';
     }
 
     /**
      * The creator of a news result is the article's author.
+     * @return string
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(): string
     {
         return 'n.author_id';
     }

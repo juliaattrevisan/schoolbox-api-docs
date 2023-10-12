@@ -139,7 +139,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         $orderParts[] = "$titlePart ASC";
         $orderParts[] = "`type` ASC";
-        $orderParts[] = "$idPart ASC";
+        $orderParts[] = "$idPart DESC";
         $query .= ' ORDER BY ' . implode(', ', $orderParts);
         $query .= ' LIMIT :limit';
 
@@ -152,10 +152,9 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * * is between `$min` and `$max`
      * * is `$max` if `$dateExpressionA` and `$dateExpressionB` are within
      *   `$daysAtMax` of one another
-     * * is `$min` if `$dateExpressionA` and `$dateExpressionB` are more than
+     * * is 0 if `$dateExpressionA` and `$dateExpressionB` are more than
      *   `$daysAtMin` apart
-     * * otherwise, if between `$daysLeeway` and `$daysAtMin` days apart:
-     *   decays linearly from `$max` to `$min` the further apart they are
+     * * otherwise, decays linearly from `$max` to 0 the further apart they are
      *
      * Used for building relevance expressions which depend on how far in the
      * past or future a date is.
@@ -170,8 +169,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *                                for `$min` to be the returned value.
      * @param float  $max             The max value of the expression: defaults
      *                                to 1.
-     * @param float  $min             The min value of the expression: defaults
-     *                                to 0.
      * @return string
      */
     protected function buildLinearDecayExpression(
@@ -180,21 +177,49 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         int $daysAtMax,
         int $daysAtMin,
         float $max = 1,
-        float $min = 0,
     ): string {
-        $dateDiff    = "ABS(DATEDIFF($dateExpressionA, $dateExpressionB))";
-        $numerator   = "($dateDiff + $daysAtMax)";
-        $denominator = ($daysAtMax + $daysAtMin) ?: 1;
+        $absDateDiff = "ABS(DATEDIFF($dateExpressionA, $dateExpressionB))";
 
-        return "CAST(
-            LEAST(
-                $max,
-                GREATEST($max - ($numerator / $denominator), $min)
-            )
-            AS DECIMAL(2,2)
-        )";
+        // Derivation of line equation
+        // ---------------------------
+        // The y-axis in the diagram below is the $relevance, and the x-axis is the $absDateDiff.
+        // The line is denoted by the asterisks.
+        //
+        // The line equation is:
+        $relevanceUnrestrictedSql = "-($max / ($daysAtMin - $daysAtMax)) * ($absDateDiff - $daysAtMax) + $max";
+        //
+        // Compare the line equation above to the diagram below, and note:
+        //  * Gradient = (rise / run) = -($max / ($daysAtMin - $daysAtMax))
+        //  * $relevance=$max when $absDateDiff=$daysAtMax
+        //  * $relevance=0    when $absDateDiff=$daysAtMin
+        //
+        //   $relevance
+        //        ^   *
+        //        |      *
+        //        |         *
+        //        |            *
+        // $max --+ - - - - - - - *
+        //        |               |  *
+        //        |               |     *
+        //        |               |        *
+        //        |               |           *
+        //        |               |              *
+        //        |               |                 *
+        // <------+---------------+--------------------*---------------> $absDateDiff
+        //        |               |                    |  *
+        //        v               $daysAtMax           $daysAtMin
+
+        // Use LEAST() and GREATEST() to restrict the maximum value of $relevance to $max, and the minimum value to 0.
+        return "LEAST($max, GREATEST($relevanceUnrestrictedSql, 0))";
+
+        // Note regarding testing
+        // ----------------------
+        // The SQL used above can be tested by getting the generated SQL, substituting a range of values for
+        // $absDateDiff, and then copying and pasting to a MySQL command-line.  Like so:
+        // SELECT LEAST(1, GREATEST(-(1 / (56 - 7)) * (0 - 7) + 1, 0)) AS relevance;
+        // SELECT LEAST(1, GREATEST(-(1 / (56 - 7)) * (1 - 7) + 1, 0)) AS relevance;
+        // SELECT LEAST(1, GREATEST(-(1 / (56 - 7)) * (2 - 7) + 1, 0)) AS relevance;
     }
-
 
     /**
      * Build the base set of WHERE parts and their params.

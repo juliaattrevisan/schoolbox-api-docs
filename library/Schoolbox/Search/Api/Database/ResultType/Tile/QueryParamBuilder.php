@@ -103,13 +103,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * A tile's type is always 'tile'.
-     *
      * @return string
      */
     protected function buildTypeExpression(): string
     {
-        return "'tile'";
+        return '"' . Hydrator::BASE_TYPE . '"';
     }
 
     /**
@@ -125,9 +123,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's date is its modified date.
      *
-     * @return string|null
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 't.modified_at';
     }
@@ -145,9 +143,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's folder is its tile_layout_for_folder.folder_id column.
      *
-     * @return string|null
+     * @return string
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(): string
     {
         return 'tlf.folder_id';
     }

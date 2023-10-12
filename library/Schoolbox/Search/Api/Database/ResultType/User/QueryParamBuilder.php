@@ -79,6 +79,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The relevance of users is always maximum, so return a static value.
+     * @return string
      */
     protected function buildRelevanceExpression(): string
     {
@@ -88,6 +89,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Since `buildRelevanceExpression` returns a static value, user results are
      * not ordered by relevance.
+     * @return bool
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -97,6 +99,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The title of a user result is always their full name (preferred if
      * present, otherwise fall back to first name).
+     * @return string
      */
     protected function buildTitleExpression(): string
     {
@@ -113,14 +116,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The type of a user result will be "user.$roleType".
+     * @return string
      */
     protected function buildTypeExpression(): string
     {
-        return "CONCAT('user.', r.group_type)";
+        return "CONCAT('" . Hydrator::BASE_TYPE . ".', r.group_type)";
     }
 
     /**
      * The ID of a user result will simply be the user's ID.
+     * @return string
      */
     protected function buildIdExpression(): string
     {
@@ -129,14 +134,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The date of a user result will be their last updated date.
+     * @return string
      */
-    protected function buildDateExpression(): ?string
+    protected function buildDateExpression(): string
     {
         return 'u.updated_at';
     }
 
     /**
      * Users have no recorded creator: thus, this will always be null.
+     * @return string|null
      */
     protected function buildCreatorExpression(): ?string
     {
@@ -145,7 +152,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * Users do not have folders, thus this returns `null`.
-     *
      * @return string|null
      */
     public function buildFolderExpression(): ?string
@@ -156,6 +162,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * User results need to be fetched from the user and groups (a.k.a. roles)
      * tables.
+     * @return string
      */
     protected function buildFromStatement(): string
     {
