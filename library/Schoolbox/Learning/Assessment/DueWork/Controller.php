@@ -107,6 +107,13 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * This is a suffix appended after every Draft mark
+     * so users know conclusively and obviously.
+     */
+    private const MARK_DRAFT_SUFFIX = ' (draft)';
+
+
+    /**
      * The querystring param for Show Drafts from the ui
      */
     private const SHOW_DRAFTS_KEY = 'draft';
@@ -789,7 +796,7 @@ class Controller extends Assessment\Controller
                     if ($showDraft && array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
                         $row[] = $descriptor ? $descriptor->getDescription() : '';
-                        $row[] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
+                        $row[] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue() . self::MARK_DRAFT_SUFFIX;
                         $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
                     } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
@@ -807,12 +814,12 @@ class Controller extends Assessment\Controller
                         /* Decide which kind to show: draft or published
                          */
                         if ($showDraft) {
-                            $key = self::MARK_DRAFT_KEY;
+                            $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_DRAFT_KEY];
+                            $capabilityMark .= self::MARK_DRAFT_SUFFIX;
                         } else {
-                            $key = self::MARK_PUBLISHED_KEY;
+                            $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_PUBLISHED_KEY];
                         }
 
-                        $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][$key];
                         $row[] = $capabilityMark;
                     }
                 }
