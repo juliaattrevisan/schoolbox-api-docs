@@ -67,28 +67,32 @@ class Hydrator extends BaseHydrator
         }
 
         // Get componentInstanceId indexed by textboxId.
-        $componentConfigJsonByTextboxId = $this->getComponentConfigJsonByTextboxId($textboxIds);
+        $componentConfigJsonByTextboxIdFolderId = $this->getComponentConfigJsonByTextboxIdFolderId($textboxIds);
 
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentConfigJsonByTextboxId) {
+            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentConfigJsonByTextboxIdFolderId) {
                 $textbox = $textboxes->getBy('id', $match->id);
 
                 if (!($textbox instanceof TextboxModel)) {
                     return null;
                 }
 
+                $textboxFolder = $textbox->getCategory();
+
                 // Check if user has access to textbox's folder
-                $textboxAccess = $this->access->getFolderAccess($viewer, $textbox->getCategory()->getId());
+                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxFolder->getId());
                 if ($textboxAccess < UserAccess::ACCESS_READ) {
                     return null;
                 }
 
                 // Find component_instance_id for use in URL fragment.
-                $componentInfo = $componentConfigJsonByTextboxId[$textbox->getId()] ?? null;
+                $componentInfo = (
+                    $componentConfigJsonByTextboxIdFolderId[$textbox->getId() . '-' . $textboxFolder->getId()] ?? null
+                );
                 $componentInstanceId = $componentInfo === null ? null : $componentInfo['component_instance_id'];
 
                 // If component_instance_id is null, that means the textbox is not currently used in any component.
@@ -143,24 +147,24 @@ class Hydrator extends BaseHydrator
                         // If not componentInstanceId, the URL should point to the Manage Textboxes page.
                         $componentInstanceId === null
                         ? $this->buildBaseUrl()
-                            ->withPath("/textbox/folder/{$textbox->getCategory()->getId()}")
+                            ->withPath("/textbox/folder/{$textboxFolder->getId()}")
                             ->withFragment("textbox-" . $textbox->getId())
                             ->__toString()
                         : $this->buildBaseUrl()
-                            ->withPath('/homepage/' . $textbox->getCategory()->getId())
+                            ->withPath('/homepage/' . $textboxFolder->getId())
                             ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
                             ->__toString()
                     ),
                     $match->type,
                     $match->relevance,
                     $textbox->getUpdatedAt(),
-                    $textbox->getCategory(),
+                    $textboxFolder,
                     ($componentInstanceId === null ? 'Hidden from view' : null),
                     null,
                     'textbox',
                     $this->truncateAroundKeyword($keyword, $textboxBody) ?? $this->truncate($textboxBody),
                     null,
-                    [$textbox->getCategory(),], // Context: textbox's folder
+                    [$textboxFolder,], // Context: textbox's folder
                     [], // texbox: none.
                 );
             },
@@ -187,22 +191,24 @@ class Hydrator extends BaseHydrator
      * @param $textboxIds
      * @return array
      */
-    private function getComponentConfigJsonByTextboxId($textboxIds): array
+    private function getComponentConfigJsonByTextboxIdFolderId($textboxIds): array
     {
         $db = $this->textboxMapper->getDatabase();
 
         return $db->executeQuery(
-            // Start with a table of "textbox_id, component_instance_id", and join to a table of "component_instance_id, configJson" to get configJson.
+            // A complication here is that the same textbox can be present on multiple pages.
+            // Start with a table of "textboxIdFolderId, component_instance_id", and join to a table of "component_instance_id, configJson" to get configJson.
             //
             // Note the purpose of using GROUP_CONCAT and JSON syntax here is to get all the config items for a textbox
             // into a single row, while limiting the number of joined subqueries to one.  Having all the info for one
             // textbox on a single row allows indexing by textbox_id using a standard method, and the JSON encoded
             // config allows for easy processing by the calling function with use of the json_decode() function.
             'SELECT
-            cci.value AS textbox_id,
+            CONCAT(cci.value, "-", ci.identifier) AS textboxIdFolderId,
             cci.component_instance_id,
             IFNULL(component_configJson.configJson, "{}") AS configJson
             FROM component_config_instance cci
+            JOIN component_instance ci ON ci.id=cci.component_instance_id
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             LEFT JOIN (
                 SELECT
@@ -223,12 +229,13 @@ class Hydrator extends BaseHydrator
                 GROUP BY cci2.component_instance_id
             ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
             WHERE ccd.key=:componentKey
+            AND ci.module="homepage"
             AND cci.value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
             [
                 ':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
                 ':collapse' => Component_Config_Collapse::KEY,
                 ':showComponentTitle' => Component_Config_ShowComponentTitle::KEY
             ]
-        )->fetchRowArray('textbox_id');
+        )->fetchRowArray('textboxIdFolderId');
     }
 }
