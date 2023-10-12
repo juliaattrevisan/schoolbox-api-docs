@@ -53,8 +53,8 @@ window.Vue.onMounted(() => {
 }
 
 .show-more-container {
-    position: absolute;
     bottom: 0;
+    position: absolute;
     width: 100%;
 }
 </style>

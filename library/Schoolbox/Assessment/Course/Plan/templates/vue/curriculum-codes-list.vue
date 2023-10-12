@@ -26,10 +26,10 @@ const props = defineProps<Props>();
 
 <style scoped>
 .content {
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
     overflow: hidden;
     padding-top: 5px;
     padding-bottom: 5px;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
 }
 </style>
