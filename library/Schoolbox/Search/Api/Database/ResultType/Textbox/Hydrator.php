@@ -217,7 +217,7 @@ class Hydrator extends BaseHydrator
             [
                 ':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
                 ':collapse' => Component_Config_Collapse::KEY,
-                'showComponentTitle' => Component_Config_ShowComponentTitle::KEY
+                ':showComponentTitle' => Component_Config_ShowComponentTitle::KEY
             ]
         )->fetchRowArray('textbox_id');
     }
