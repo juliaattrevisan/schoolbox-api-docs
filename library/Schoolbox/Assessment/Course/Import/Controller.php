@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
@@ -79,7 +80,8 @@ class Controller extends Base\Base
         Access $access,
         ImportFactory $importFactory,
         Assessment\MapperProxy $assessmentMapperProxy,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        private LessonPlan\Activities\Replicator $lessonPlanActivitiesReplicator,
     ) {
         $this->unitSpecificationMapper         = $unitSpecificationMapper;
         $this->unitImplementationMapper        = $unitImplementationMapper;
@@ -1043,6 +1045,20 @@ class Controller extends Base\Base
                     $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId);
                 }
                 $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
+            }
+        }
+
+        // After all assessments are imported: link/unlink lesson plans.
+        // This must be done after creating all impl assessments: only then is
+        // it known which linked assessments actually exist.
+        foreach ($courseImpls as $courseImpl) {
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                foreach ($unitImpl->getAssessables() as $implAssessment) {
+                    $this->lessonPlanActivitiesReplicator->replicate(
+                        $implAssessment->getSpecificationAssessment(),
+                        $implAssessment,
+                    );
+                }
             }
         }
     }

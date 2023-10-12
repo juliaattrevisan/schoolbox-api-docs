@@ -22,33 +22,15 @@ use Schoolbox\User;
 class Replicator
 {
     /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentMapperProxy;
-
-    /**
-     * @var QuizMapper
-     */
-    private $quizMapper;
-
-    /**
-     * @var RubricDataSource
-     */
-    private $rubricMapper;
-
-    /**
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param QuizMapper            $quizMapper
      * @param RubricDataSource      $rubricMapper
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        QuizMapper $quizMapper,
-        RubricDataSource $rubricMapper
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private QuizMapper $quizMapper,
+        private RubricDataSource $rubricMapper,
     ) {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->quizMapper = $quizMapper;
-        $this->rubricMapper = $rubricMapper;
     }
 
 

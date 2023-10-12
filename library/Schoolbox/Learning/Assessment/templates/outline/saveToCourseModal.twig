@@ -25,7 +25,7 @@
         {% if assessment is project %}
             {% if assessment.assessables is not empty %}
                 <p>
-                    As this {{ locale.translate('assessment') }} is a project, its
+                    As this {{ locale.translate('activity') }} is a project, its
                     activity set will also be <strong>replaced</strong>,
                     possibly deleting activities:
                 </p>
@@ -50,9 +50,21 @@
                     {% endfor %}
                 </ul>
             {% endif %}
+            {% if (assessment.assessables | filter(a => a is lessonPlan)) is not empty %}
+                <p>
+                    As this project contains lesson plans,
+                    any linked {{ locale.translate('activity', true) }} must be in the destination for the link to remain.
+                </p>
+            {% endif %}
+        {% endif %}
+        {% if assessment is lessonPlan %}
+            <p>
+                As this {{ locale.translate('activity') }} is a lesson plan,
+                any linked {{ locale.translate('activity', true) }} must be in the destination for the link to remain.
+            </p>
         {% endif %}
         <p>
-            Any other imports of the original {{ locale.translate('assessment') }} will
+            Any other imports into classes of the original {{ locale.translate('activity') }} will
             <strong>not</strong> be updated.
         </p>
     </div>

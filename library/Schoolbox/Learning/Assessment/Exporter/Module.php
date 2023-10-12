@@ -14,8 +14,10 @@ use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LessonPlanLinkedAssessmentsMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -160,6 +162,10 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $lessonPlanActivitiesReplicator = new LessonPlanActivitiesReplicator(
+            $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
+            $this->getAssessmentMapperProxy(),
+        );
         return new Controller(
             $this->getMapperFactory()->get(Access::class),
             $this->getAssessmentMapperProxy(),
@@ -171,7 +177,8 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(RubricDataSource::class),
             ),
             $this->injector->get('filters.assessmentIdFinder'),
-            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
+            $lessonPlanActivitiesReplicator,
         );
     }
 

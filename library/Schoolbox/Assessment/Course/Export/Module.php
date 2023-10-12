@@ -15,8 +15,10 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LessonPlanLinkedAssessmentsMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
@@ -94,6 +96,10 @@ class Module extends \Alaress\Module\Module
      */
     public function buildController(): Base
     {
+        $lessonPlanActivitiesReplicator = new LessonPlanActivitiesReplicator(
+            $this->getMapperFactory()->get(LessonPlanLinkedAssessmentsMapper::class),
+            $this->getAssessmentDataSource(),
+        );
         return new Controller(
             $this->getAssessmentDataSource(),
             new Replicator(
@@ -106,6 +112,7 @@ class Module extends \Alaress\Module\Module
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(RubricDataSource::class),
             ),
+            $lessonPlanActivitiesReplicator,
         );
     }
 

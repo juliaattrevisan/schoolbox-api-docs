@@ -14,7 +14,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\User;
 
@@ -31,7 +30,7 @@ class Overwriter
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private QuizMapper $quizMapper,
-        private RubricDataSource $rubricMapper
+        private RubricDataSource $rubricMapper,
     ) {
     }
 

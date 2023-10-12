@@ -1553,6 +1553,15 @@ abstract class Kernel
                             'rubricMapper'          => $di->lazyNew(DataSource::class),
                         ]
                     ),
+                    'lessonPlanActivitiesReplicator' => $di->lazyNew(
+                        \Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator::class,
+                        [
+                            'linkedAssessmentsMapper' => $mapperFactory->getLazy(
+                                \Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class,
+                            ),
+                            'assessmentDataSource'    => $di->lazyGet('assessmentDataSource'),
+                        ]
+                    ),
                 ]
             )
         );

@@ -1324,7 +1324,7 @@ class Mapper extends BaseMapper
         /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
          */
         $fields = $lessonPlanFieldMapper->findByColumn('lesson_plan_id', $lessonPlanIds, [
-            'deleted' => true,
+//            'deleted' => true,
             'order' => [
                 'sequence' => 'asc'
             ]])->groupByCallback(

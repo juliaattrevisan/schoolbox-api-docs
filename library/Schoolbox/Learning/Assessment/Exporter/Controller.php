@@ -19,6 +19,8 @@ use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
@@ -39,13 +41,14 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Access                      $access
-     * @param AssessmentDataSource        $assessmentDataSource
-     * @param CourseImplementation\Mapper $courseImplementationMapper
-     * @param UnitImplementation\Mapper   $unitImplementationMapper
-     * @param Replicator                  $replicator
-     * @param AssessmentFilter\IdFinder   $assessmentIdFinder
-     * @param Project\ResultCache\Mapper  $projectResultCacheMapper
+     * @param Access                         $access
+     * @param AssessmentDataSource           $assessmentDataSource
+     * @param CourseImplementation\Mapper    $courseImplementationMapper
+     * @param UnitImplementation\Mapper      $unitImplementationMapper
+     * @param Replicator                     $replicator
+     * @param AssessmentFilter\IdFinder      $assessmentIdFinder
+     * @param Project\ResultCache\Mapper     $projectResultCacheMapper
+     * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator
      */
     public function __construct(
         protected Access $access,
@@ -54,7 +57,8 @@ class Controller extends BaseController
         private UnitImplementation\Mapper $unitImplementationMapper,
         private Replicator $replicator,
         private AssessmentFilter\IdFinder $assessmentIdFinder,
-        private Project\ResultCache\Mapper $projectResultCacheMapper
+        private Project\ResultCache\Mapper $projectResultCacheMapper,
+        private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
     ) {
     }
 
@@ -314,7 +318,7 @@ class Controller extends BaseController
                 $datesObjects[$dateType] = Alaress_Date_Format::newLocal($dates[$dateType]);
             }
 
-            $this->exportToNewContext(
+            $newAssessmentImpl = $this->exportToNewContext(
                 $assessment,
                 $assessmentImpl->getContext(),
                 $assessmentImpl->getId() ? $assessmentImpl->getSequence() : null,
@@ -323,6 +327,10 @@ class Controller extends BaseController
                 $datesObjects['due'],
                 $datesObjects['late'] ?? $datesObjects['due']
             );
+
+            // Replicate lesson plan linked activities only after assessment and
+            // project have been overwritten.
+            $this->lessonPlanActivitiesReplicator->replicate($assessment, $newAssessmentImpl);
         }
 
         /** @var UnitSpecification\Model $unitSpec */
@@ -420,8 +428,9 @@ class Controller extends BaseController
             $unitImplNew->setDueDate($closeDateAlaress);
             $this->unitImplementationMapper->save($unitImplNew);
 
+            $implSpecAssessmentPairs = [];
             foreach ($this->assessmentDataSource->findAllByUnitSpecificationId($unitSpec->getId()) as $unitSpecAssessment) {
-                $this->exportToNewContext(
+                $newAssessmentImpl = $this->exportToNewContext(
                     $unitSpecAssessment,
                     $unitImplNew,
                     null,
@@ -430,6 +439,14 @@ class Controller extends BaseController
                     $closeDateAlaress,
                     $closeDateAlaress
                 );
+                $implSpecAssessmentPairs[] = [$newAssessmentImpl, $unitSpecAssessment];
+            }
+
+            // Replicate lesson plan linked activities only after assessment and
+            // project have been overwritten.
+            foreach ($implSpecAssessmentPairs as $pair) {
+                [$newAssessmentImpl, $unitSpecAssessment] = $pair;
+                $this->lessonPlanActivitiesReplicator->replicate($unitSpecAssessment, $newAssessmentImpl);
             }
         }
 

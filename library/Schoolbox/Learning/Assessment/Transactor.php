@@ -19,6 +19,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -127,6 +129,7 @@ class Transactor
      * @param QuizMapper                            $quizMapper
      * @param Generator                             $routeGenerator
      * @param Replicator                            $replicator
+     * @param LessonPlanActivitiesReplicator        $lessonPlanActivitiesReplicator
      */
     public function __construct(
         FolderMapper $folderMapper,
@@ -139,7 +142,8 @@ class Transactor
         SingleFile\Mapper $submissionFileMapper,
         QuizMapper $quizMapper,
         Generator $routeGenerator,
-        Replicator $replicator
+        Replicator $replicator,
+        private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
     ) {
         $this->folderMapper = $folderMapper;
         $this->unitImplementationMapper = $unitImplementationMapper;
@@ -221,6 +225,10 @@ class Transactor
                     $this->replicator->replicateInNewContext($projectAssessment, $this->assessment, $currentUser);
                 }
             }
+
+            // Replicate lesson plan links
+            $this->lessonPlanActivitiesReplicator->replicate($originalAssessment, $this->assessment);
+
             $this->assessmentMapperProxy->delete($originalAssessment);
             $relocated = true;
         }
