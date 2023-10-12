@@ -72,7 +72,7 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
 
 .activity-list {
     height: 100%;
-    padding: 0;
+    padding: 0 0 5px 0;
 }
 
 .information-list {

@@ -140,6 +140,7 @@ table th:not(:first-child) {
 
 table tbody td:not(:first-child) {
     padding: 0px;
+    border-left: 1px solid var(--body-background);
 }
 
 table tbody tr {
