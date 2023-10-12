@@ -25,4 +25,8 @@ const props = defineProps<Props>();
     </table>
 </template>
 
-<style scoped></style>
+<style scoped>
+table {
+    margin-bottom: 5px;
+}
+</style>
