@@ -63,6 +63,9 @@ function onSelected() {
     &:hover {
         background: var(--content-ui-hover);
     }
+    &:last-of-type {
+        border-bottom: none;
+    }
 }
 
 input[type="checkbox"]:not(.plain) + label {

@@ -32,7 +32,7 @@ const searchResultsEl = window.Vue.ref<HTMLDivElement | null>(null);
 function animateHeight(targetHeight: number) {
     gsap.to(searchResultsContainerEl.value, {
         duration: 0.3,
-        height: targetHeight,
+        height: targetHeight === 1 ? 0 : targetHeight,
     });
 }
 
