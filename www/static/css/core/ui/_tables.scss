@@ -442,13 +442,7 @@ $rotate-span-width: 11rem;
     }
 }
 
-#marksheet-styles tr td {
-    vertical-align: middle;
-}
 
-#marksheet-styles select {
-    max-width: 3rem;
-}
 
 // Prevent long names causing first column to be excessively wide.
 table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
