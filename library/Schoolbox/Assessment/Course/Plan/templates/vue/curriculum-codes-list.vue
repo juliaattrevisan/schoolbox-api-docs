@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { CurriculumCode } from "./unitPlannerTypes";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 interface Props {
-    curriculumCodes: CurriculumCode[];
+    curriculumCodes: Node[];
 }
 
 const props = defineProps<Props>();
@@ -18,7 +18,10 @@ const props = defineProps<Props>();
                 </template>
                 {{ node.name }}
 
-                <curriculum-codes-list :curriculum-codes="node.children"></curriculum-codes-list>
+                <curriculum-codes-list
+                    v-if="node.children !== null"
+                    :curriculum-codes="node.children"
+                ></curriculum-codes-list>
             </div>
         </li>
     </ul>
