@@ -112,7 +112,7 @@ class Hydrator extends BaseHydrator
                 $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
 
                 // Textboxes in the collapsed state should be shown only to users with write access.
-                if ($componentIsCollapsed && $textboxAccess < UserAccess::ACCESS_WRITE) {
+                if (!$showTitleToReadOnlyUsers && $componentIsCollapsed && $textboxAccess < UserAccess::ACCESS_WRITE) {
                     return null;
                 }
 
