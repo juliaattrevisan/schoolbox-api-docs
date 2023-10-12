@@ -38,15 +38,6 @@ const allTextboxKeys = window.Vue.computed(() => {
     return [...keysSet];
 });
 
-// Figure out if there are any extra textboxes so we can show/hide the column
-const totalExtras = window.Vue.computed(() => {
-    let total = 0;
-    props.units.forEach((unit) => {
-        total += unit.extraTextboxes;
-    });
-    return total;
-});
-
 window.Vue.onMounted(() => {
     store.init(props.units);
 });
@@ -67,7 +58,6 @@ window.Vue.onMounted(() => {
                         <th v-for="textboxKey in allTextboxKeys" :key="textboxKey">
                             {{ textboxKey }}
                         </th>
-                        <th v-if="totalExtras > 0">Extra Textboxes</th>
                     </template>
                     <th v-if="selectedTab === 'all' || selectedTab === 'activities'">Activities</th>
                     <th v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">Rubric Capabilities</th>
@@ -84,23 +74,15 @@ window.Vue.onMounted(() => {
                         <a :href="unit.homepage" target="_blank">
                             <strong>{{ unit.title }}</strong>
                         </a>
+                        <p v-if="unit.extraTextboxes > 0" class="meta">
+                            {{ unit.extraTextboxes }} extra textbox{{ unit.extraTextboxes === 1 ? "" : "es" }}
+                        </p>
                     </td>
                     <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
                         <td v-for="(textbox, textboxKey) in unit.textboxes" :key="textboxKey">
                             <content-container :unit-id="unit.id">
                                 <textbox-content v-if="textbox !== null" :textbox="textbox"></textbox-content>
                             </content-container>
-                        </td>
-                        <td v-if="totalExtras > 0">
-                            <template v-if="unit.extraTextboxes > 0">
-                                <div class="extras-content">
-                                    <p>
-                                        {{ unit.extraTextboxes }} more textbox{{
-                                            unit.extraTextboxes === 1 ? "" : "es"
-                                        }}
-                                    </p>
-                                </div>
-                            </template>
                         </td>
                     </template>
                     <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
@@ -157,9 +139,6 @@ table tbody tr {
     height: 300px;
 }
 
-.extras-content {
-    padding: 5px;
-}
 .curriculum-codes-container {
     max-width: 500px;
 }
