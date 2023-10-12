@@ -180,8 +180,8 @@ class Hydrator extends BaseHydrator
      *
      * Example of returned array:
      * [
-     *    116 => [
-     *        'textbox_id' => 116,
+     *    '116-83' => [
+     *        'textboxIdFolderId' => '116-83',
      *        'component_instance_id' => 4409,
      *        'configJson' => '{"collapse": 1, "showComponentTitle": 0}' // Both keys are optional.
      *    ],
