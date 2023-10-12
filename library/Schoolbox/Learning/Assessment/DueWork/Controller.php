@@ -813,12 +813,17 @@ class Controller extends Assessment\Controller
                     /* Prepare an additional column for Capability Marks
                      */
                     if ($isMarkPerCapability && $currentCapabilityId !== $nextCapabilityId) {
+                        $capabilityMark = '';
+
                         /* Decide which kind to show: draft or published
+                         *
+                         * Note: the student might not have a draft available,
+                         * and/or the student might not have a published mark available
                          */
-                        if ($showDraft) {
+                        if ($showDraft && isset($marks['capabilityMark'][$currentCapabilityId][self::MARK_DRAFT_KEY])) {
                             $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_DRAFT_KEY];
                             $capabilityMark .= self::MARK_DRAFT_SUFFIX;
-                        } else {
+                        } elseif (isset($marks['capabilityMark'][$currentCapabilityId][self::MARK_PUBLISHED_KEY])) {
                             $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_PUBLISHED_KEY];
                         }
 
