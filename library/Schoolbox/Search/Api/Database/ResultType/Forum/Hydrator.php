@@ -103,7 +103,7 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()];
+                $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()] ?? 0;
                 $matchingPostString = $nMatchingPostsInThread > 1 ? "(+$nMatchingPostsInThread more matching posts)" : '';
 
                 $postBody = (new ToText($post->getBody()))->getText();
@@ -136,6 +136,14 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * Note that for the purposes of this function, a post matches the keyword if and only if the post body contains the keyword.
+     * I.e. this function does not consider matches on the thread title (nor should it).
+     * So it is possible that a thread whose title matches the keyword will have no matching posts, and in that case,
+     * the threadId passed to this function will not be present in the returned array.
+     * (Adding all the missing keys to the return array before returning it would be a bad idea because there is no
+     *  guarantee that the $threadIds passed to this function exist in the database.)
+     * (See search criteria defined in QueryParamBuilder.php.)
+     *
      * @param array  $threadIds
      * @param string $keyword
      * @param SearchFilter\DataObject $filter
