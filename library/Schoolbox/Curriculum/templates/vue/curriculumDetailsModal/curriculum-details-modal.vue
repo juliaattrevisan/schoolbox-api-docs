@@ -1,6 +1,6 @@
 <script setup>
-import RevealModal from "@schoolboxVue/components/reveal-modal";
-import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 const selectedNode = window.Vue.ref(getEmptyNode());

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
+import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 import linkedActivitiesItem from "./linked-activities-item.vue";
 import LinkedActivitiesUnlink from "./linked-activities-unlink.vue";
-import { Unit, CourseAssessments, Activity } from "./linkedActivitiesTypes";
+import { Unit, CourseAssessments } from "./linkedActivitiesTypes";
 import linkedActivitiesModalItem from "./linked-activities-modal-item.vue";
 
 interface Props {
