@@ -94,11 +94,8 @@ class Hydrator extends BaseHydrator
         // Note creator is not hydrated in $assessments, so get assessment creators separately.
         $creatorIds = [];
         foreach ($assessments as $assessment) {
-            $assessmentCreator = (
-            ($assessment instanceof Assessment\LessonPlan\Model)
-                ? $assessment->getCreatedBy() // TODO: LessonPlan uses a different function name.  Fix in LessonPlan\Model.
-                : $assessment->getCreator()
-            );
+            $assessmentCreator = $assessment->getCreator();
+
             // NOTE: $assessmentCreator might still be null, because of bad data, or because a created_by field does not
             //       yet exist on the assessment type.  E.g. as of 23.01 lti_assessment has no created_by/owner_id/user_id
             //       or similar field.
@@ -130,11 +127,7 @@ class Hydrator extends BaseHydrator
                     }
                 }
 
-                $assessmentCreator = (
-                    ($assessment instanceof Assessment\LessonPlan\Model)
-                    ? $assessment->getCreatedBy() // TODO: LessonPlan uses a different function name.  Fix in LessonPlan\Model.
-                    : $assessment->getCreator()
-                );
+                $assessmentCreator = $assessment->getCreator();
 
                 // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
                 // NOTE: $assessmentCreator might be null here due to note above.
