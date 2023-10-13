@@ -207,6 +207,10 @@ class Hydrator extends BaseHydrator
             // row, while limiting the number of joined subqueries to one.  Having all the info for one textbox on a
             // single row allows indexing by textbox_id using a standard method, and the JSON encoded config allows for
             // easy processing by the calling function with use of the json_decode() function.
+            //
+            // Note also that the query below limits results to textboxes in homepage modules only.
+            // Textboxes can also appear on homepage_templates for example, but these textboxes will not show up in
+            // search results at the moment because of the 'ci.module="homepage"' WHERE condition.
             'SELECT
             CONCAT(cci.value, "-", ci.identifier) AS textboxIdFolderId,
             cci.component_instance_id,
