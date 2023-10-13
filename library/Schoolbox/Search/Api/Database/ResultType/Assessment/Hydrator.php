@@ -95,7 +95,12 @@ class Hydrator extends BaseHydrator
         // Note creator is not hydrated in $assessments, so get assessment creators separately.
         $creatorIds = [];
         foreach ($assessments as $assessment) {
-            $creatorId = $assessment->getCreator()?->getId();
+            $assessmentCreator = $assessment->getCreator();
+
+            // NOTE: $assessmentCreator might still be null, because of bad data, or because a created_by field does not
+            //       yet exist on the assessment type.  E.g. as of 23.01 lti_assessment has no created_by/owner_id/user_id
+            //       or similar field.
+            $creatorId = $assessmentCreator?->getId();
             if ($creatorId !== null) {
                 $creatorIds[] = $creatorId;
             }
@@ -123,8 +128,13 @@ class Hydrator extends BaseHydrator
                     }
                 }
 
+                $assessmentCreator = $assessment->getCreator();
+
                 // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
-                $assessmentCreator = $assessmentCreatorById[$assessment->getCreator()->getId()] ?? null;
+                // NOTE: $assessmentCreator might be null here due to note above.
+                if ($assessmentCreator !== null) {
+                    $assessmentCreator = $assessmentCreatorById[$assessmentCreator->getId()] ?? null;
+                }
 
                 // Note $match->type will be something like 'assessment.dueWork'.
                 $matchTypeTokens = explode('.', $match->type);

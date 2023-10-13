@@ -271,6 +271,15 @@ class Model extends AbstractAssessment
         return $this->createdBy;
     }
 
+    /**
+     * Temporary fix for problem identified in SA-16504.
+     * IAssessable has getCreator(), and this class implements IAssessable.
+     * @return User|null
+     */
+    public function getCreator(): ?User
+    {
+        return $this->getCreatedBy();
+    }
 
     /**
      * @param User|null $createdBy
