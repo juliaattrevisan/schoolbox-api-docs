@@ -131,7 +131,9 @@ class Hydrator extends BaseHydrator
 
                 // Assessment->creator is not hydrated, so get from $assessmentCreatorById instead.
                 // NOTE: $assessmentCreator might be null here due to note above.
-                $assessmentCreator = $assessmentCreatorById[$assessmentCreator?->getId()] ?? null;
+                if ($assessmentCreator !== null) {
+                    $assessmentCreator = $assessmentCreatorById[$assessmentCreator->getId()] ?? null;
+                }
 
                 // Note $match->type will be something like 'assessment.dueWork'.
                 $matchTypeTokens = explode('.', $match->type);
