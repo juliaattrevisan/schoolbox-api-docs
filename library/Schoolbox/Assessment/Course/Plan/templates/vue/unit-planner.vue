@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import OverviewComponent from "@schoolboxCurriculum/vue/overviewComponent/overview-component.vue";
+import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { Unit } from "./unitPlannerTypes";
 import ContentContainer from "./content-container.vue";
@@ -105,7 +105,7 @@ window.Vue.onMounted(() => {
             </tbody>
         </table>
     </div>
-    <overview-component></overview-component>
+    <curriculum-details-modal />
 </template>
 
 <style scoped>
