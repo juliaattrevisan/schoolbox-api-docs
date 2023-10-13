@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception;
 use Schoolbox\Auth\Remember\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
