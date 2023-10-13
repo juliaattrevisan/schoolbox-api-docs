@@ -24,6 +24,7 @@ use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Role;
 use UnexpectedValueException;
 
 /**
@@ -89,6 +90,16 @@ class Profile implements IStrategy
      * @var bool
      */
     private bool $includePhoto;
+
+
+    /**
+     * A list of (strat, externalid) tuples that each have one or more error messages
+     * caused by some random reason such as overflows, incompatible types, etc
+     * since it captures root-level \Exception instances
+     *
+     * @var array
+     */
+    private array $errors = [];
 
 
     /**
@@ -224,6 +235,10 @@ class Profile implements IStrategy
 
             $this->importStaff();
         }
+
+        /* If any random problem was encountered, now is the time to say it
+         */
+        $this->announceErrors($this->errors);
     }
 
 
@@ -312,10 +327,16 @@ class Profile implements IStrategy
                 ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
-            /* Then save it
+            /* Then save it. We end up saving twice, because you need this base profile id
+             * to create a relationship between profiles in importParentOfStudent() in case
+             * it didn't already exist.
              */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($studentBaseProfile);
+            try {
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($studentBaseProfile);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(Role::STUDENT, $externalId, $e->getMessage());
             }
 
             /* Fish out a staff member via their user code
@@ -434,16 +455,20 @@ class Profile implements IStrategy
              */
             $this->importPortrait($studentBaseProfile, $personId);
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($studentBaseProfile);
-            }
+            try {
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($studentBaseProfile);
+                }
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->studentProfileMapper->save($studentProfile);
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->studentProfileMapper->save($studentProfile);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(Role::STUDENT, $externalId, $e->getMessage());
             }
         }
     }
@@ -879,6 +904,23 @@ class Profile implements IStrategy
              */
             $externalId = trim((string)$attributes[0]);
 
+            /* phone numbers can exceed the 45 char limit...
+             */
+            $phoneNumber = trim((string)$parent->Telephone);
+
+            if (self::PHONE_DB_LIMIT <= mb_strlen($phoneNumber)) {
+                $phoneNumber = substr($phoneNumber, 0, self::PHONE_DB_LIMIT);
+
+                /* Log it
+                 */
+                $this->log->warning(sprintf(
+                    'Parent profile for %s (%s). phone number exceeds the %s char limit; truncating',
+                    $fullname,
+                    $externalId,
+                    self::PHONE_DB_LIMIT
+                ));
+            }
+
             /* Assign parents' usernames in UPS
              */
             $username = '';
@@ -917,29 +959,9 @@ class Profile implements IStrategy
                 ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($parentBaseProfile);
-            }
-
-            /**
-             * phone numbers can exceed the 45 char limit...
-             */
-            $number = trim((string)$parent->Telephone);
-            if (self::PHONE_DB_LIMIT <= mb_strlen($number)) {
-                $number = substr($number, 0, self::PHONE_DB_LIMIT);
-                /* Log it
-                 */
-                $this->log->warning(sprintf(
-                    'Parent profile for %s. phone number exceeds the %s char limit. Truncated...',
-                    $fullname,
-                    self::PHONE_DB_LIMIT
-                ));
-            }
             $parentProfile
-                ->setPhoneHome($number)
-                ->setPhoneWork($number)
+                ->setPhoneHome($phoneNumber)
+                ->setPhoneWork($phoneNumber)
                 ->setMobile(trim((string)$parent->Mobile))
                 ->setEmail(trim((string)$parent->EmailAddress))
                 ->setUsername($username);
@@ -947,18 +969,27 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding parent profile for %s',
-                $fullname
+                'Adding parent profile for %s (preferred: %s) (%s)',
+                $fullname,
+                $parentBaseProfile->getFirstnamePreferred(),
+                $externalId
             ));
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->parentProfileMapper->save($parentProfile);
-            }
+            try {
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($parentBaseProfile);
+                }
 
-            /* Manufacture relations
-             */
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->parentProfileMapper->save($parentProfile);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(Role::PARENT, $externalId, $e->getMessage());
+            }
 
             /* Log it
              */
@@ -969,15 +1000,21 @@ class Profile implements IStrategy
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $relationship = $this->relationshipMapper->createModel()
-                    ->setUserProfile($parentBaseProfile)
-                    ->setChildProfile($studentBaseProfile)
-                    ->setType($relationship);
+            try {
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    /* Manufacture relations
+                     */
+                    $relationship = $this->relationshipMapper->createModel()
+                        ->setUserProfile($parentBaseProfile)
+                        ->setChildProfile($studentBaseProfile)
+                        ->setType($relationship);
 
-                $this->relationshipMapper->save($relationship);
+                    $this->relationshipMapper->save($relationship);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(Role::PARENT, $externalId, $e->getMessage());
             }
 
             /* Accumulate messages
@@ -1053,8 +1090,12 @@ class Profile implements IStrategy
 
             /* Then save it
              */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($staffBaseProfile);
+            try {
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($staffBaseProfile);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(Role::STAFF, $externalId, $e->getMessage());
             }
 
             /* Concat all the position titles, I guess
@@ -1124,17 +1165,90 @@ class Profile implements IStrategy
              */
             $this->importPortrait($staffBaseProfile, $personId);
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($staffBaseProfile);
-            }
+            try {
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($staffBaseProfile);
+                }
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->staffProfileMapper->save($staffProfile);
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->staffProfileMapper->save($staffProfile);
+                }
+            } catch (\Exception $e) {
+                $this->rememberError(Role::STAFF, $externalId, $e->getMessage());
             }
         }
+    }
+
+
+    /**
+     * Announce any errors we encountered per strat
+     *
+     * @param array $errors
+     * @return void
+     */
+    private function announceErrors(array $errors): void
+    {
+        if (\count($errors)) {
+            $this->log->info('');
+            $this->log->info('');
+            $this->log->info('We encountered errors during import for the following externalIds.');
+            $this->log->info('');
+
+            foreach ($errors as $externalId => $messages) {
+                $this->log->info(sprintf(
+                    '    %s:',
+                    $externalId
+                ));
+
+                foreach ($messages as $message => $val) {
+                    $this->log->info(sprintf(
+                        '        %s',
+                        $message
+                    ));
+                }
+
+                $this->log->info('');
+            }
+
+            $this->log->info('');
+        }
+    }
+
+
+    /**
+     * Pile this error message into a stack, indexed by (strat, externalId) tuples
+     *
+     * @param string $roleType
+     * @param string $externalId
+     * @param string $message
+     * @return void
+     */
+    private function rememberError(string $roleType, string $externalId, string $message): void
+    {
+        $this->log->warning(sprintf(
+            'externalId %s encountered problems processing: %s',
+            $externalId,
+            $message
+        ));
+
+        /* Remember it for announcing later
+         */
+        $key = sprintf(
+            '%s %s',
+            $roleType,
+            $externalId
+        );
+
+        /* Uniquify error messages that occur multiple times
+         *
+         * Can happen when a parent has multiple students and the parent
+         * records get updated for each student, for example, thus experiencing
+         * the same issue multiple times
+         */
+        $this->errors[$key][$message] = true;
     }
 }
