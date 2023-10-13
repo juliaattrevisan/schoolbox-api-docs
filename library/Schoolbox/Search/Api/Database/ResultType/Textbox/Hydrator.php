@@ -164,7 +164,7 @@ class Hydrator extends BaseHydrator
                     'textbox',
                     $this->truncateAroundKeyword($keyword, $textboxBody) ?? $this->truncate($textboxBody),
                     null,
-                    [$textboxFolder,], // Context: textbox's folder
+                    [$textboxFolder,], // Context: textbox's folder.
                     [], // texbox: none.
                 );
             },
