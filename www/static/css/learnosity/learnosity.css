@@ -148,3 +148,27 @@
 .lrn.lrn-assess .app-panel.review-screen .item-card.active:after {
     border-color: transparent transparent transparent var(--content-ui-foreground);
 }
+
+/* Hide the welcome/exit screen ui */
+.lrn-author-activity-intro-outro {
+    display: none !important;
+}
+
+/* Reconfigure column dimensioning lol (rude) */
+.lrn.lrn-author.lrn-sm .lrn-col-sm-9 {
+    width: 100%;
+}
+
+.lrn.lrn-author.lrn-sm .lrn-col-sm-3 {
+    display: none !important;
+}
+
+/* Hide the Tags */
+.lrn-list-view-meta {
+    display: none;
+}
+
+/* Hide the published/archived status  */
+.lrn-list-view-status {
+    display: none;
+}

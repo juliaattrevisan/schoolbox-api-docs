@@ -9,36 +9,6 @@
 <script src="https://authorapi-au.learnosity.com/?v2023.2.LTS"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
-<style>
-    /* Hide the welcome/exit screen ui
-     */
-    .lrn-author-activity-intro-outro {
-        display: none !important;
-    }
-
-    /* Hide the Tags
-     */
-    .lrn-list-view-meta {
-        display: none;
-    }
-
-    /* Hide the published/archived status
-     */
-    .lrn-list-view-status {
-        display: none;
-    }
-
-    /* Reconfigure column dimensioning lol (rude)
-     */
-    .lrn.lrn-author.lrn-sm .lrn-col-sm-9 {
-        width: 100%;
-    }
-
-    .lrn.lrn-author.lrn-sm .lrn-col-sm-3 {
-        display: none !important;
-    }
-
-</style>
 <div class="actions-small-1 row">
     <div class="small-12 columns">
         <h1>Questions in {{ assessment.title }}</h1>
