@@ -136,3 +136,9 @@
 .lrn legend {
     margin-left: 0;
 }
+
+/* remove the background from the review screen */
+.lrn.lrn-assess .app-panel.review-screen .panel-content,
+.lrn-assess .app-panel .panel-content {
+    background: none;
+}
