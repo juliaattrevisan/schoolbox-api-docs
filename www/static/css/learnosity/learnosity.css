@@ -10,7 +10,18 @@
     overflow-x: visible;
 }
 
-/* general button, like previous question */
+/* bring it back as we negative margin our own */
+.lrn legend {
+    margin-left: 0;
+}
+
+/* change the accessibility modal button colour */
+.lrn-assess .lrn-dialogs-close-btn:after,
+.lrn-assess .lrn-dialogs-close-btn:before {
+    background-color: var(--content-ui-foreground);
+}
+
+/* general button, like previous question or resume quiz */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
 .lrn.lrn-assess .dialogs .lrn_btn {
     background-color: var(--content-ui-background);
@@ -20,6 +31,7 @@
     min-height: auto;
 }
 
+/* general button on disabled */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:disabled:not(.lrn_btn_blue),
 .lrn.lrn-assess .dialogs .lrn_btn:disabled:not(.lrn_btn_blue) {
     color: var(--content-ui-foreground);
@@ -39,7 +51,7 @@
     border: none;
 }
 
-/* button with icon colour */
+/* button with icon only */
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:before,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn .btn-label,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:before,
@@ -49,7 +61,7 @@
     color: var(--content-ui-foreground);
 }
 
-/* button with icon colour on hover */
+/* button with icon only on hover */
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover:before,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover .btn-label,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover:before,
@@ -59,7 +71,7 @@
     color: var(--content-ui-foreground);
 }
 
-/* primary action button, like next question of confirmation  */
+/* primary action button, like next question or confirmation  */
 .lrn .lrn_btn_blue,
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue,
 .lrn.lrn-assess .dialogs .lrn_btn_blue {
@@ -68,11 +80,6 @@
     border-radius: 0;
     color: var(--content-ui-submit-foreground);
     font-weight: 600;
-}
-
-.lrn.lrn-assess .app-layout .lrn_btn_blue:after {
-    border: none;
-    border-radius: 0;
 }
 
 /* primary action button on hover */
@@ -122,6 +129,12 @@
     background-color: var(--content-ui-foreground);
 }
 
+/* remove the background from the review screen */
+.lrn.lrn-assess .app-panel.review-screen .panel-content,
+.lrn-assess .app-panel .panel-content {
+    background: none;
+}
+
 /* the colour used to highlight the selected item in the review screen */
 .lrn.lrn-assess .app-panel.review-screen .item-card.active:before {
     background-color: var(--content-ui-foreground);
@@ -130,15 +143,4 @@
 /* the colour used to highlight the selected item in the review screen (little triangle above) */
 .lrn.lrn-assess .app-panel.review-screen .item-card.active:after {
     border-color: transparent transparent transparent var(--content-ui-foreground);
-}
-
-/* bring it back as we negative margin our own */
-.lrn legend {
-    margin-left: 0;
-}
-
-/* remove the background from the review screen */
-.lrn.lrn-assess .app-panel.review-screen .panel-content,
-.lrn-assess .app-panel .panel-content {
-    background: none;
 }
