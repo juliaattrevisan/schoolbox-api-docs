@@ -44,7 +44,7 @@ $font-family-monospace: Consolas, "Liberation Mono", "Droid Mono", Courier, mono
 $font-family-icon: "schoolbox";
 
 // We use these to control various global styles
-$body-font-color: $oil;
+$body-font-color: #333333;
 $body-font-family: $font-family-sans-serif;
 $font-weight-light: 100;
 $font-weight-normal: 400;
@@ -71,7 +71,7 @@ $global-radius: 0.5rem;
 $global-rounded: 1000px;
 
 // Skeleton screen loaders
-$skeleton-background: $vapor;
+$skeleton-background: #f6f6f6;
 
 $column-gutter: rem-calc(32);
 
