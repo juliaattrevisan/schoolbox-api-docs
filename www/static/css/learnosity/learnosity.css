@@ -122,6 +122,16 @@
     background-color: var(--content-ui-foreground);
 }
 
+/* the colour used to highlight the selected item in the review screen */
+.lrn.lrn-assess .app-panel.review-screen .item-card.active:before {
+    background-color: var(--content-ui-foreground);
+}
+
+/* the colour used to highlight the selected item in the review screen (little triangle above) */
+.lrn.lrn-assess .app-panel.review-screen .item-card.active:after {
+    border-color: transparent transparent transparent var(--content-ui-foreground);
+}
+
 /* bring it back as we negative margin our own */
 .lrn legend {
     margin-left: 0;
