@@ -243,31 +243,6 @@ ol {
     }
 }
 
-// Lists without bullets
-.no-bullet {
-    list-style-type: none;
-    margin-#{$default-float}: 0;
-    li {
-        ul,
-        ol {
-            list-style: none;
-            margin-#{$default-float}: $list-nested-margin;
-            margin-bottom: 0;
-        }
-    }
-}
-
-//Definition Lists
-dl {
-    dt {
-        font-weight: $font-weight-bold;
-        margin-bottom: 0.3rem;
-    }
-    dd {
-        margin-bottom: rem-calc(12);
-    }
-}
-
 //Abbreviations
 abbr,
 acronym {
@@ -285,34 +260,6 @@ abbr {
 }
 
 //Microformats
-.vcard {
-    border: 1px solid $gainsboro;
-    display: inline-block;
-    margin: rem-calc(0 0 20 0);
-    padding: rem-calc(10 12);
-    li {
-        display: block;
-        margin: 0;
-    }
-    .fn {
-        font-size: rem-calc(15);
-        font-weight: $font-weight-bold;
-    }
-}
-
-.vevent {
-    .summary {
-        font-weight: $font-weight-bold;
-    }
-    abbr {
-        border: none;
-        cursor: $cursor-default-value;
-        font-weight: bold;
-        padding: rem-calc(0 1);
-        text-decoration: none;
-    }
-}
-
 .meta {
     color: $body-foreground;
     font-size: $paragraph-font-size;
@@ -421,8 +368,7 @@ abbr {
      *  - staffDepartment.html
      */
     a[href^="mailto:"]:after,
-    a[href^="tel:"]:after
-     {
+    a[href^="tel:"]:after {
         content: none !important;
     }
 
