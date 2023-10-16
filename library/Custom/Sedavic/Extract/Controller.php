@@ -194,8 +194,14 @@ class Controller extends Base
                 ]);
 
                 while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
+                    /* Course Spec Name, Unit Spec Name
+                     *
+                     * FIXME Unit Spec Name might be optional as curric codes are probably for the course only
+                     */
                     $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
 
+                    /* Feedback data
+                     */
                     try {
                         $feedback = $this->findFeedback($assessmentInfo['feedback_table'], (int)$assessmentInfo['feedback_id']);
                     } catch (\DomainException $e) {
