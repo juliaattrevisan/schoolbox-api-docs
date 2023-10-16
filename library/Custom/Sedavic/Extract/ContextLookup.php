@@ -114,7 +114,6 @@ class ContextLookup
      * @param int $assessmentId
      * @return array
      * @throws Exception
-     * @throws \PDOException
      */
     public function find(int $assessmentId): array
     {
@@ -193,7 +192,7 @@ class ContextLookup
      *
      * @param int $courseUnitSpecId
      * @return array
-     * @throws \PDOException
+     * @throws Exception
      */
     private function findCourseUnitSpec(int $courseUnitSpecId): array
     {
@@ -210,7 +209,7 @@ class ContextLookup
      *
      * @param int $courseImplId
      * @return array
-     * @throws \PDOException
+     * @throws Exception
      */
     private function findCourseSpecViaImpl(int $courseImplId): array
     {
@@ -227,7 +226,7 @@ class ContextLookup
      *
      * @param int $courseUnitImplId
      * @return array
-     * @throws \PDOException
+     * @throws Exception
      */
     private function findCourseUnitSpecViaImpl(int $courseUnitImplId): array
     {

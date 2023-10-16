@@ -117,8 +117,6 @@ class Controller extends Base
                 ]);
 
                 while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
-
-
                     $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
 
                     new \Alaress_Probe($assessmentInfo, $context);
