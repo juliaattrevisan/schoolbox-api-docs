@@ -45,41 +45,15 @@ class Controller extends Base
 
 
     /**
-     * A list of all the users we actually care about
-     * (We don't care about students without feedbacks)
-     */
-    private const QUERY_USER_LIST = "
-        SELECT DISTINCT student_id
-        FROM v_most_recent_feedback vmrf
-        INNER JOIN `user` u ON u.id = vmrf.student_id
-        ORDER BY lastname, firstname
-    ";
-
-
-    /**
-     * A repeatable query for each person
-     */
-    private const QUERY_USER_INFO = '
-        SELECT
-            vmrf.assessment_id,
-            u.firstname,
-            u.lastname,
-            u.synergy_id,
-            h.house,
-            lyl.name AS yearLevel
-        FROM v_most_recent_feedback vmrf
-        INNER JOIN `user` u ON u.id = vmrf.student_id
-        LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
-        LEFT JOIN house h on u.house = h.id
-        WHERE student_id = :userId
-    ';
-
-
-    /**
      * A repeatable query for each person's assessments
      */
     private const QUERY_ASSESSMENT_INFO = "
-       SELECT 
+       SELECT
+            u.synergy_id,
+            u.firstname,
+            u.lastname,
+            h.house,
+            lyl.name AS yearLevel,
             a.title,
             var.*,
             cn1.name AS Qualification,
@@ -91,15 +65,17 @@ class Controller extends Base
             vmrf.feedback_id,
             vmrf.feedback_table,
             vmrf.published_at
-        FROM curriculum_node_for_assessment cnof
-        INNER JOIN assessment a ON cnof.assessment_id = a.id
-        INNER JOIN mv_assessment_relation var ON var.assessment_id = a.id
-        INNER JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = a.id AND vmrf.student_id = :userId
+        FROM v_most_recent_feedback vmrf
+        INNER JOIN assessment a ON vmrf.assessment_id = a.id
+        INNER JOIN `user` u ON u.id = vmrf.student_id 
+        LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
+        LEFT JOIN house h ON u.house = h.id
+        LEFT JOIN curriculum_node_for_assessment cnof ON cnof.assessment_id = a.id
         LEFT JOIN curriculum_node cn1 ON cnof.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
         LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
-        WHERE a.id = :assessmentId
-        AND vmrf.published_at >= :from
+        LEFT JOIN v_assessment_relation var ON var.assessment_id = a.id
+        WHERE vmrf.published_at >= :from
         AND vmrf.published_at <= :to
     ";
 
@@ -191,7 +167,6 @@ class Controller extends Base
 
         /* Basic user and assessment metadata
          */
-        $this->userInfoStatement = $database->prepareQuery(self::QUERY_USER_INFO);
         $this->assessmentInfoStatement = $database->prepareQuery(self::QUERY_ASSESSMENT_INFO);
 
         /* Feedback prepared statements
@@ -240,64 +215,49 @@ class Controller extends Base
         }
 
         /* Find a list of student ids to process one at a time
+         * For every student, get all the stuff they need
+         *
+         * First obtain their basic user details: name, identifiers, house and year level
+         * names - because we're reusing this info per curriculum node and there'll be
+         * a lot of those
+         *
+         * Find all the curriculum codes associated with the assessments
+         * since you kinda need the full hierarchy of a curriculum node
+         * (Turns out we can just assume the three levels exist correctly)
          */
-        $studentManifestStatement = $this->getStudents();
+        $this->assessmentInfoStatement->execute([
+            'from' => $from->getDatabase(),
+            'to' => $to->getDatabase()
+        ]);
 
-        while ($manifestRow = $studentManifestStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $userId = $manifestRow['student_id'];
-
-            /* For every student, get all the stuff they need
-             *
-             * First obtain their basic user details: name, identifiers, house and year level
-             * names - because we're reusing this info per curriculum node and there'll be
-             * a lot of those
+        /* Find all the assessment info from the v_most_recent_feedback table
+         * This contains all the info you need to find their marks, for both
+         * the normalised- and human-readable marks
+         */
+        while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
+            /* Find all the ancestry info about the assessment: course, unit
              */
-            $this->userInfoStatement->execute([
-                'userId' => $userId
-            ]);
+            $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
 
-            while ($userInfo = $this->userInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
-                /* Find all the assessment info from the v_assessment_feedback table
-                 * This contains all the info you need to find their marks, for both
-                 * the normalised- and human-readable marks
-                 */
-                $this->assessmentInfoStatement->execute([
-                    'assessmentId' => $userInfo['assessment_id'],
-                    'userId' => $userId,
-                    'from' => $from->getDatabase(),
-                    'to' => $to->getDatabase()
-                ]);
+            /* Feedback data
+             */
+            try {
+                $feedback = $this->findFeedback($assessmentInfo['feedback_table'], (int)$assessmentInfo['feedback_id']);
+            } catch (\DomainException $e) {
+                // noop: skip data that randomly died, for now
+                continue;
+            }
 
-                /* Find all the curriculum codes associated with the assessments
-                 * since you kinda need the full hierarchy of a curriculum node
-                 * (Turns out we can just assume the three levels exist correctly)
-                 */
-                while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
-                    /* Find all the ancestry info about the assessment: course, unit
-                     */
-                    $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
+            /* Combine all that into a csv row
+             */
+            $row = $this->combine($assessmentInfo, $context, $feedback);
 
-                    /* Feedback data
-                     */
-                    try {
-                        $feedback = $this->findFeedback($assessmentInfo['feedback_table'], (int)$assessmentInfo['feedback_id']);
-                    } catch (\DomainException $e) {
-                        // noop: skip data that randomly died, for now
-                        continue;
-                    }
-
-                    /* Combine all that into a csv row
-                     */
-                    $row = $this->combine($userInfo, $assessmentInfo, $context, $feedback);
-
-                    /* Pump it to an fputcsv
-                     */
-                    if ($this->perform) {
-                        fputcsv($outstream, $row);
-                    } else {
-                        new \Alaress_Probe($row);
-                    }
-                }
+            /* Pump it to an fputcsv
+             */
+            if ($this->perform) {
+                fputcsv($outstream, $row);
+            } else {
+                new \Alaress_Probe($row);
             }
         }
 
@@ -306,21 +266,6 @@ class Controller extends Base
         }
 
         exit;
-    }
-
-
-    /**
-     * Get a bunch of students who have feedbacks
-     *
-     * @return \Alaress\Database\Statement\Query\Base
-     * @throws Exception
-     */
-    private function getStudents(): \Alaress\Database\Statement\Query\Base
-    {
-        $studentManifestStatement = $this->database->prepareQuery(self::QUERY_USER_LIST);
-        $studentManifestStatement->execute();
-
-        return $studentManifestStatement;
     }
 
 
@@ -371,21 +316,20 @@ class Controller extends Base
     /**
      * Take all the pieces we collected and voltron them into Its Final Form
      *
-     * @param array $userInfo
      * @param array $assessmentInfo
      * @param array $context
      * @param array $feedback
      * @return array
      */
-    private function combine(array $userInfo, array $assessmentInfo, array $context, array $feedback): array
+    private function combine(array $assessmentInfo, array $context, array $feedback): array
     {
         return [
-            'externalId' => $userInfo['synergy_id'],
-            'firstname' => $userInfo['firstname'],
-            'lastname' => $userInfo['lastname'],
+            'externalId' => $assessmentInfo['synergy_id'],
+            'firstname' => $assessmentInfo['firstname'],
+            'lastname' => $assessmentInfo['lastname'],
             'qualification' => $this->renderCurriculumNode((string)$assessmentInfo['Qualification'], (string)$assessmentInfo['QualificationCode']),
-            'year' => $userInfo['yearLevel'],
-            'house_sb' => $userInfo['house'],
+            'year' => $assessmentInfo['yearLevel'],
+            'house_sb' => $assessmentInfo['house'],
             'unit' => $this->renderCurriculumNode((string)$assessmentInfo['Unit'], (string)$assessmentInfo['UnitCode']),
             'course_sb' => $context['course']['name'],
             'unit_sb' => $context['unit']['name'],
