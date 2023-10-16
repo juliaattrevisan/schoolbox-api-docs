@@ -218,17 +218,13 @@ class Controller extends Base
                         continue;
                     }
 
-                    new \Alaress_Probe($userInfo, $assessmentInfo, $context, $feedback);
+                    /* Combine all that into a csv row
+                     */
+                    $row = $this->combine($userInfo, $assessmentInfo, $context, $feedback);
+
+                    new \Alaress_Probe($userInfo, $assessmentInfo, $context, $feedback, $row);
                 }
             }
-
-
-
-
-
-
-            /* Combine all that into a csv row
-             */
 
             /* Pump it to an fputcsv
              */
@@ -292,5 +288,34 @@ class Controller extends Base
                     $table
                 ));
         }
+    }
+
+
+    /**
+     * Take all the pieces we collected and voltron them into Its Final Form
+     *
+     * @param array $userInfo
+     * @param array $assessmentInfo
+     * @param array $context
+     * @param array $feedback
+     * @return array
+     */
+    private function combine(array $userInfo, array $assessmentInfo, array $context, array $feedback): array
+    {
+        return [
+            'externalId' => $userInfo['synergy_id'],
+            'firstname' => $userInfo['firstname'],
+            'lastname' => $userInfo['lastname'],
+            'qualification' => sprintf('%s [%s]', $assessmentInfo['Qualification'], $assessmentInfo['QualificationCode']),
+            'year' => $userInfo['yearLevel'],
+            'house_sb' => $userInfo['house'],
+            'unit' => sprintf('%s [%s]', $assessmentInfo['Unit'], $assessmentInfo['UnitCode']),
+            'course_sb' => $context['course']['name'],
+            'unit_sb' => $context['unit']['name'],
+            'assessment' => $assessmentInfo['title'],
+            'aos' => sprintf('%s [%s]', $assessmentInfo['AreaOfStudy'], $assessmentInfo['AreaOfStudyCode']),
+            'normalised' => $feedback['normalised'],
+            'humanReadable' => $feedback['humanReadable'],
+        ];
     }
 }
