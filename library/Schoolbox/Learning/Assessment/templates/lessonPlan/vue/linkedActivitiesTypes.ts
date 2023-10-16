@@ -1,16 +1,4 @@
-export type Activity = {
-    id: number;
-    title: string;
-    unit: string;
-    projectName: string;
-    assessmentType: string;
-    assessments: Activity[];
-    closeAt: string;
-    closeAtFormatted: string;
-    _links: {
-        status: string;
-    };
-};
+import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 
 export type Unit = {
     id: number;
