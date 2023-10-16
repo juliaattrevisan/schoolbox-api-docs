@@ -22,6 +22,12 @@
     </div>
 </div>
 
+<div id="horizontal-marking-container">
+    <horizontal-marking
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
+
 {# Render an html element into which each student's attempt will reside
  # This is needed for each Learnosity report which we initially hide in
  # a display:none container
@@ -97,10 +103,13 @@
      */
     let responseScores = JSON.parse('{{ scores|raw }}');
     let responseComments = JSON.parse(atob('{{ responseComments|raw }}'));
+    console.warn(responseScores);
+    console.warn(responseComments);
 
     /* Endpoints
      */
     let urls = JSON.parse('{{ urls|raw }}');
+    console.warn(urls);
 
     /* Remember how many reports were loaded
      *
@@ -111,6 +120,7 @@
      * via reportPayloads|length.
      */
     let reportPayloads = {{ reportPayloads|raw }};
+    console.warn(reportPayloads);
     let reportsLoaded = 0;
     let reportsExpected = reportPayloads.length;
 
@@ -126,6 +136,7 @@
     /* These are the Attempt Comment identifiers that we spawned with twig
      */
     let attemptComments = JSON.parse('{{ attemptReferences|raw }}');
+    console.warn(attemptComments);
 
     attemptComments.forEach(function(element, index) {
         ckeditorFields.push('#attempt-comment-' + element);
@@ -139,6 +150,7 @@
      * with the student's name, e.g. replace "Item 2" with "Michael White"
      */
     let users = JSON.parse('{{ usersEncoded|raw }}');
+    console.warn(users);
 
     /* Initialise a report for everyone's attempt
      * Selectively showing only one item's responses at a time

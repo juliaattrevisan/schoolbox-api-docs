@@ -155,6 +155,8 @@ module.exports = {
 
         // Assessment
         unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",
+        horizontalMarking:
+            "./library/Schoolbox/Learning/Learnosity/templates/vue/horizontalMarking/horizontalMarking.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",
