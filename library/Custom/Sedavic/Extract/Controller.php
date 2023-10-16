@@ -12,17 +12,45 @@ namespace Custom\Sedavic\Extract;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
-use Alaress\Database\Statement\Query\IQuery;
-use Alaress\Database\Wrapper\Db2\PDOStatement;
 use Alaress\Web\Controller\Base;
 
 class Controller extends Base
 {
     /**
+     * A repeatable query for each person
+     */
+    private const QUERY_USER_INFO = '
+        SELECT
+            vmrf.assessment_id,
+            u.firstname,
+            u.lastname,
+            u.synergy_id,
+            h.house,
+            lyl.name AS yearLevel
+        FROM v_most_recent_feedback vmrf
+        INNER JOIN `user` u ON u.id = vmrf.student_id
+        LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
+        LEFT JOIN house h on u.house = h.id
+        WHERE student_id = :userId
+    ';
+
+
+    /**
+     * Prepared statements. For some reason the typehints tell you
+     * it's an IQuery, but it's actually a one of these...what kind
+     * of sloanish witchery is this??
+     *
+     * @var \Alaress\Database\Statement\Query\Base
+     */
+    private \Alaress\Database\Statement\Query\Base $userInfoStatement;
+
+
+    /**
      * Controller constructor.
      */
     public function __construct(private IConnector $database)
     {
+        $this->userInfoStatement = $database->prepareQuery(self::QUERY_USER_INFO);
     }
 
 
@@ -45,13 +73,20 @@ class Controller extends Base
              * names - because we're reusing this info per curriculum node and there'll be
              * a lot of those
              */
+            $this->userInfoStatement->execute([
+                'userId' => $userId
+            ]);
 
-            new \Alaress_Probe($userId);
+            while ($assessmentRow = $this->userInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
+                /* Find all the assessment info from the v_assessment_feedback table
+                 * This contains all the info you need to find their marks, for both
+                 * the normalised- and human-readable marks
+                 */
 
-            /* Find all the assessment info from the v_assessment_feedback table
-             * This contains all the info you need to find their marks, for both
-             * the normalised- and human-readable marks
-             */
+                new \Alaress_Probe($assessmentRow);
+            }
+
+
 
             /* Find all the curriculum codes associated with the assessments separately
              * since you kinda need the full hierarchy of a curriculum node
