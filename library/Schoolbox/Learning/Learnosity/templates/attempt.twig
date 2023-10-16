@@ -20,7 +20,7 @@
 {% autoescape 'js' %}
 <script>
     /**
-     *
+     * So we can add browser state when moving between items (cards)
      */
     const itemsAppCallback = {
         readyListener: function () {
@@ -28,7 +28,7 @@
              * Push app location changes to browser history, so we can use the browser back/forward
              */
             itemsApp.on("item:changed", function (itemIndex) {
-                window.location.hash = "#" + itemIndex;
+                window.location.hash = `#${itemIndex}`;
             });
 
             /**

@@ -66,13 +66,17 @@
 
 {% autoescape 'js' %}
 <script>
-    /* Force tagging to occur immediately
-     * tags_on_create requires you to hit the save button or authorApp.saveActivity()
-     * in order to spawn tags. Using authorApp.setActivityTags() allows you have tags
-     * spawned immediately upon authorApp rendering
+    /**
+     * To add tags to the activit and and browser state
      */
     const authorAppCallback = {
         readyListener: function () {
+            /**
+             * Force tagging to occur immediately
+             * tags_on_create requires you to hit the save button or authorApp.saveActivity()
+             * in order to spawn tags. Using authorApp.setActivityTags() allows you have tags
+             * spawned immediately upon authorApp rendering
+             */
             authorApp.on('render:activity', function(event) {
                 authorApp.setActivityTags({{ tags|raw }});
             });
@@ -81,7 +85,7 @@
              * Push app location changes to browser history, so we can use the browser back/forward
              */
             authorApp.on("navigate", function (event) {
-                window.location.hash = "#" + event.data.location;
+                window.location.hash = `#${event.data.location}`;
             });
 
             /**
