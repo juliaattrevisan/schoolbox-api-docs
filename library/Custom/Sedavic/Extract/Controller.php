@@ -17,6 +17,18 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base
 {
     /**
+     * A list of all the users we actually care about
+     * (We don't care about students without feedbacks)
+     */
+    private const QUERY_USER_LIST = "
+        SELECT DISTINCT student_id
+        FROM v_assessment_feedback vaf
+        INNER JOIN `user` u ON u.id = vaf.student_id
+        ORDER BY lastname, firstname
+    ";
+
+
+    /**
      * A repeatable query for each person
      */
     private const QUERY_USER_INFO = '
@@ -150,14 +162,7 @@ class Controller extends Base
      */
     private function getStudents(): \Alaress\Database\Statement\Query\Base
     {
-        $query = "
-            SELECT DISTINCT student_id
-            FROM v_assessment_feedback vaf
-            INNER JOIN `user` u ON u.id = vaf.student_id
-            ORDER BY lastname, firstname
-        ";
-
-        $studentManifestStatement = $this->database->prepareQuery($query);
+        $studentManifestStatement = $this->database->prepareQuery(self::QUERY_USER_LIST);
         $studentManifestStatement->execute();
 
         return $studentManifestStatement;
