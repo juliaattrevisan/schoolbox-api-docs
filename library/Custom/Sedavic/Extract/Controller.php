@@ -50,8 +50,8 @@ class Controller extends Base
      */
     private const QUERY_USER_LIST = "
         SELECT DISTINCT student_id
-        FROM v_assessment_feedback vaf
-        INNER JOIN `user` u ON u.id = vaf.student_id
+        FROM v_most_recent_feedback vmrf
+        INNER JOIN `user` u ON u.id = vmrf.student_id
         ORDER BY lastname, firstname
     ";
 
