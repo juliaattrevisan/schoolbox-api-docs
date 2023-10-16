@@ -36,6 +36,26 @@ class Controller extends Base
 
 
     /**
+     * A repeatable query for each person's assessments
+     */
+    private const QUERY_ASSESSMENT_INFO = "
+       SELECT 
+            a.title,
+            var.*,
+            cn1.name AS Qualification,
+            cn2.name AS Unit,
+            cn3.name AS AreaOfStudy
+        FROM curriculum_node_for_assessment cnof
+        INNER JOIN assessment a ON cnof.assessment_id = a.id
+        INNER JOIN v_assessment_relation var ON var.assessment_id = a.id
+        LEFT JOIN curriculum_node cn1 ON cnof.curriculum_node_id = cn1.id
+        LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
+        LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
+        WHERE a.id = :assessmentId
+    ";
+
+
+    /**
      * Prepared statements. For some reason the typehints tell you
      * it's an IQuery, but it's actually a one of these...what kind
      * of sloanish witchery is this??
@@ -43,6 +63,13 @@ class Controller extends Base
      * @var \Alaress\Database\Statement\Query\Base
      */
     private \Alaress\Database\Statement\Query\Base $userInfoStatement;
+    private \Alaress\Database\Statement\Query\Base $assessmentInfoStatement;
+
+
+    /**
+     * @var ContextLookup
+     */
+    private ContextLookup $contextLookup;
 
 
     /**
@@ -50,7 +77,10 @@ class Controller extends Base
      */
     public function __construct(private IConnector $database)
     {
+        $this->contextLookup = new ContextLookup($database);
+
         $this->userInfoStatement = $database->prepareQuery(self::QUERY_USER_INFO);
+        $this->assessmentInfoStatement = $database->prepareQuery(self::QUERY_ASSESSMENT_INFO);
     }
 
 
@@ -77,13 +107,23 @@ class Controller extends Base
                 'userId' => $userId
             ]);
 
-            while ($assessmentRow = $this->userInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
+            while ($userRow = $this->userInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
                 /* Find all the assessment info from the v_assessment_feedback table
                  * This contains all the info you need to find their marks, for both
                  * the normalised- and human-readable marks
                  */
+                $this->assessmentInfoStatement->execute([
+                    'assessmentId' => $userRow['assessment_id']
+                ]);
 
-                new \Alaress_Probe($assessmentRow);
+                while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
+
+
+                    $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
+
+                    new \Alaress_Probe($assessmentInfo, $context);
+
+                }
             }
 
 
