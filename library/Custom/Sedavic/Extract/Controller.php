@@ -194,6 +194,7 @@ class Controller extends Base
     public function getExtract(\Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
         $outstream = null;
+        $numRows = 0;
         
         /* Set up file download thing
          */
@@ -234,6 +235,8 @@ class Controller extends Base
          * This contains all the info you need to find their marks, for both
          * the normalised- and human-readable marks
          */
+        $start = microtime(true);
+
         while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
             /* Find all the ancestry info about the assessment: course, unit
              */
@@ -257,12 +260,21 @@ class Controller extends Base
             if ($this->perform) {
                 fputcsv($outstream, $row);
             } else {
+                $numRows++;
                 new \Alaress_Probe($row);
             }
         }
 
+        $end = microtime(true);
+
         if ($this->perform) {
             fclose($outstream);
+        } else {
+            new \Alaress_Probe(sprintf(
+                '%s seconds for %s rows of data',
+                $end - $start,
+                $numRows
+            ));
         }
 
         exit;
