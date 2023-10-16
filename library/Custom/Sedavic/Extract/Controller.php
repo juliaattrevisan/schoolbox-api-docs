@@ -196,10 +196,16 @@ class Controller extends Base
                     'userId' => $userId
                 ]);
 
+                /* Find all the curriculum codes associated with the assessments
+                 * since you kinda need the full hierarchy of a curriculum node
+                 * (Turns out we can just assume the three levels exist correctly)
+                 */
                 while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
-                    /* Course Spec Name, Unit Spec Name
+                    /* Find all the ancestry info about the assessment: course, unit
                      *
-                     * FIXME Unit Spec Name might be optional as curric codes are probably for the course only
+                     * FIXME Unit Spec Name might be optional as curric codes are probably for
+                     *  the course only; also, do we care about the impl names, or is the spec
+                     *  names good enough?
                      */
                     $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
 
@@ -218,12 +224,8 @@ class Controller extends Base
 
 
 
-            /* Find all the curriculum codes associated with the assessments separately
-             * since you kinda need the full hierarchy of a curriculum node
-             */
 
-            /* Find all the ancestry info about the assessment: course, unit
-             */
+
 
             /* Combine all that into a csv row
              */
