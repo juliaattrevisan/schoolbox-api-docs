@@ -18,6 +18,14 @@ use DebugBar\DebugBarException;
 class Controller extends Base
 {
     /**
+     * Skip generating a file, instead printing data to browzer
+     *
+     * @var bool
+     */
+    private const PERFORM = true;
+
+
+    /**
      * Specify filename format with the two dates in it
      */
     private const FILENAME = 'extract-%s_%s.csv';
@@ -75,7 +83,8 @@ class Controller extends Base
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
         LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
         LEFT JOIN v_assessment_relation var ON var.assessment_id = a.id
-        WHERE vmrf.published_at >= :from
+        WHERE vmrf.feedback_table IN ('submission_return', 'assess_attempt')
+        AND vmrf.published_at >= :from
         AND vmrf.published_at <= :to
     ";
 
@@ -92,26 +101,27 @@ class Controller extends Base
         LIMIT 1
     ";
 
-
-    /**
-     * Find a particular feedback here
-     */
-    private const QUERY_FEEDBACK_TASK = "
-        SELECT 
-            CASE 
-                WHEN completion_status = 3 THEN 100.00,
-                WHEN completion_status = 2 THEN 50.00,
-                ELSE 0.00
-            END AS normalised,
-            CASE 
-                WHEN completion_status = 3 THEN 'Completed',
-                WHEN completion_status = 2 THEN 'Self-assessed',
-                ELSE 'Incomplete'
-            END AS humanReadable
-        FROM task_completion
-        WHERE id = :feedbackId
-        LIMIT 1
-    ";
+//   Temporarily disabled while I get requirements from Newman
+//
+//    /**
+//     * Find a particular feedback here
+//     */
+//    private const QUERY_FEEDBACK_TASK = "
+//        SELECT
+//            CASE
+//                WHEN completion_status = 3 THEN 100.00,
+//                WHEN completion_status = 2 THEN 50.00,
+//                ELSE 0.00
+//            END AS normalised,
+//            CASE
+//                WHEN completion_status = 3 THEN 'Completed',
+//                WHEN completion_status = 2 THEN 'Self-assessed',
+//                ELSE 'Incomplete'
+//            END AS humanReadable
+//        FROM task_completion
+//        WHERE id = :feedbackId
+//        LIMIT 1
+//    ";
 
 
     /**
@@ -134,10 +144,9 @@ class Controller extends Base
      *
      * @var \Alaress\Database\Statement\Query\Base
      */
-    private \Alaress\Database\Statement\Query\Base $userInfoStatement;
     private \Alaress\Database\Statement\Query\Base $assessmentInfoStatement;
     private \Alaress\Database\Statement\Query\Base $dueworkFeedbackStatement;
-    private \Alaress\Database\Statement\Query\Base $taskFeedbackStatement;
+//    private \Alaress\Database\Statement\Query\Base $taskFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base $quizFeedbackStatement;
 
 
@@ -145,14 +154,6 @@ class Controller extends Base
      * @var ContextLookup
      */
     private ContextLookup $contextLookup;
-
-
-    /**
-     * Skip generating a file, instead printing data to browzer
-     *
-     * @var bool
-     */
-    private bool $perform = true;
 
 
     /**
@@ -172,7 +173,7 @@ class Controller extends Base
         /* Feedback prepared statements
          */
         $this->dueworkFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_DUEWORK);
-        $this->taskFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_TASK);
+//        $this->taskFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_TASK);
         $this->quizFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_QUIZ);
     }
 
@@ -196,7 +197,7 @@ class Controller extends Base
 
         /* Set up file download thing
          */
-        if ($this->perform) {
+        if (self::PERFORM) {
             $filename = sprintf(
                 self::FILENAME,
                 $from->getDatabaseDate(),
@@ -259,7 +260,7 @@ class Controller extends Base
 
             /* Pump it to an fputcsv
              */
-            if ($this->perform) {
+            if (self::PERFORM) {
                 fputcsv($outstream, $row);
             } else {
                 $numRows++;
@@ -269,7 +270,7 @@ class Controller extends Base
 
         $end = microtime(true);
 
-        if ($this->perform) {
+        if (self::PERFORM) {
             fclose($outstream);
         } else {
             new \Alaress_Probe(sprintf(
@@ -304,12 +305,12 @@ class Controller extends Base
 
                 return $this->dueworkFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
 
-            case 'task_completion':
-                $this->taskFeedbackStatement->execute([
-                    'feedbackId' => $id
-                ]);
-
-                return $this->taskFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
+//            case 'task_completion':
+//                $this->taskFeedbackStatement->execute([
+//                    'feedbackId' => $id
+//                ]);
+//
+//                return $this->taskFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
 
             case 'assess_attempt':
                 $this->quizFeedbackStatement->execute([
