@@ -71,6 +71,53 @@ class Controller extends Base
 
 
     /**
+     * Find a particular feedback here
+     */
+    private const QUERY_FEEDBACK_DUEWORK = "
+        SELECT 
+            norm_mark AS normalised,
+            mark AS humanReadable
+        FROM submission_return
+        WHERE id = :feedbackId
+        LIMIT 1
+    ";
+
+
+    /**
+     * Find a particular feedback here
+     */
+    private const QUERY_FEEDBACK_TASK = "
+        SELECT 
+            CASE 
+                WHEN completion_status = 3 THEN 100.00,
+                WHEN completion_status = 2 THEN 50.00,
+                ELSE 0.00
+            END AS normalised,
+            CASE 
+                WHEN completion_status = 3 THEN 'Completed',
+                WHEN completion_status = 2 THEN 'Self-assessed',
+                ELSE 'Incomplete'
+            END AS humanReadable
+        FROM task_completion
+        WHERE id = :feedbackId
+        LIMIT 1
+    ";
+
+
+    /**
+     * Find a particular feedback here
+     */
+    private const QUERY_FEEDBACK_QUIZ = "
+        SELECT 
+            norm_mark AS normalised,
+            mark AS humanReadable
+        FROM assess_attempt
+        WHERE attempt_id = :feedbackId
+        LIMIT 1
+    ";
+
+
+    /**
      * Prepared statements. For some reason the typehints tell you
      * it's an IQuery, but it's actually a one of these...what kind
      * of sloanish witchery is this??
@@ -79,6 +126,9 @@ class Controller extends Base
      */
     private \Alaress\Database\Statement\Query\Base $userInfoStatement;
     private \Alaress\Database\Statement\Query\Base $assessmentInfoStatement;
+    private \Alaress\Database\Statement\Query\Base $dueworkFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base $taskFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base $quizFeedbackStatement;
 
 
     /**
@@ -92,10 +142,21 @@ class Controller extends Base
      */
     public function __construct(private IConnector $database)
     {
+        /* To figure out course names from their spec or impl
+         * Carefully abducted from Learnosity prototype
+         */
         $this->contextLookup = new ContextLookup($database);
 
+        /* Basic user and assessment metadata
+         */
         $this->userInfoStatement = $database->prepareQuery(self::QUERY_USER_INFO);
         $this->assessmentInfoStatement = $database->prepareQuery(self::QUERY_ASSESSMENT_INFO);
+
+        /* Feedback prepared statements
+         */
+        $this->dueworkFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_DUEWORK);
+        $this->taskFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_TASK);
+        $this->quizFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_QUIZ);
     }
 
 
@@ -135,8 +196,14 @@ class Controller extends Base
                 while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
                     $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
 
-                    new \Alaress_Probe($assessmentInfo, $context);
+                    try {
+                        $feedback = $this->findFeedback($assessmentInfo['feedback_table'], (int)$assessmentInfo['feedback_id']);
+                    } catch (\DomainException $e) {
+                        // noop: skip data that randomly died, for now
+                        continue;
+                    }
 
+                    new \Alaress_Probe($assessmentInfo, $context, $feedback);
                 }
             }
 
@@ -178,11 +245,41 @@ class Controller extends Base
      * marks together. Feedbacks live in different tables contextually and we only
      * ever need a particular feedback once.
      *
-     * @param array $assessmentInfo
+     * @param string $table
+     * @param int $id
      * @return array
+     * @throws Exception
+     * @throws \DomainException
      */
-    private function getFeedbacks(array $assessmentInfo): array
+    private function findFeedback(string $table, int $id): array
     {
+        switch ($table) {
+            case 'submission_return':
+                $this->dueworkFeedbackStatement->execute([
+                    'feedbackId' => $id
+                ]);
 
+                return $this->dueworkFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
+
+            case 'task_completion':
+                $this->taskFeedbackStatement->execute([
+                    'feedbackId' => $id
+                ]);
+
+                return $this->taskFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
+
+            case 'assess_attempt':
+                $this->quizFeedbackStatement->execute([
+                    'feedbackId' => $id
+                ]);
+
+                return $this->quizFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
+
+            default:
+                throw new \DomainException(sprintf(
+                    'Unknown feedback table %s',
+                    $table
+                ));
+        }
     }
 }
