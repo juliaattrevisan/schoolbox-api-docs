@@ -24,7 +24,10 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * For each student, get all their assessment info and feedback data
+     * and pump it into a csv.
+     *
+     * The date range provided relates to when the feedbacks were published.
      */
     public function getExtract(): void
     {
