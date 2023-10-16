@@ -69,7 +69,9 @@ class Hydrator extends BaseHydrator
             return [];
         }
 
-        // Get componentInstanceId indexed by textboxId.
+        // For all textboxIds, get information on all the places where $textboxId has been instantiated.
+        // Each textbox could be on multiple pages, or even in multiple components within the same page.
+        // This is done outside the main loop to reduce the number of SQL queries run.
         $textboxInstanceInfoByTextboxId = $this->getTextboxInstanceInfoByTextboxId($textboxIds);
 
         // Find the matching textboxes.
@@ -157,19 +159,20 @@ class Hydrator extends BaseHydrator
                 // After json_decode, $componentConfig will be an array with the following optional keys:
                 //  * Component_Config_Collapse::KEY,
                 //  * Component_Config_ShowComponentTitle::KEY
-                $componentConfigJson = $tio['configJson'];
+                $componentConfigJson = $tio['config_json'];
                 $componentConfig = json_decode($componentConfigJson, true);
 
                 if ($componentConfig === null) {
                     throw new UnexpectedValueException('Component config JSON could not be decoded.');
                 }
 
-                // NOTE: Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
-                //       To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
+                // Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
+                // To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
                 $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
                 $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
 
-                // Textboxes in the collapsed state should be shown only to users with write access.
+                // Textboxes that have been hidden to read-only users (by having title hidden and body collapsed)
+                // should appear in search results only for users with write access.
                 if (!$showTitleToReadOnlyUsers && $componentIsCollapsed && $textboxAccess < UserAccess::ACCESS_WRITE) {
                     continue;
                 }
@@ -185,6 +188,7 @@ class Hydrator extends BaseHydrator
                     continue;
                 }
 
+                // Create search result with link to the homepage on which the textbox has been used.
                 $fullResults[] = new FullResult(
                     $match,
                     $match->id,
@@ -225,7 +229,7 @@ class Hydrator extends BaseHydrator
      *         [
      *             'folder_id' => 83,
      *             'component_instance_id' => 4409,
-     *             'configJson' => '{"collapse": 1, "showComponentTitle": 0}' // Both keys are optional.
+     *             'config_json' => '{"collapse": 1, "showComponentTitle": 0}' // Both keys are optional.
      *         ],
      *         ...
      *     ]
@@ -242,7 +246,7 @@ class Hydrator extends BaseHydrator
             // (in different components).
             //
             // The basic idea of the query is to start with a table of "textboxId, folderId, component_instance_id",
-            // and join to a table of "component_instance_id, configJson" to get configJson.
+            // and join to a table of "component_instance_id, config_json" to get config_json.
             //
             // Note the purpose of using JSON syntax here is to get all the config items for a textbox into a single
             // row, while limiting the number of joined subqueries to one.
@@ -254,14 +258,14 @@ class Hydrator extends BaseHydrator
             cci.value AS textbox_id,
             ci.identifier AS folder_id,
             cci.component_instance_id,
-            IFNULL(component_configJson.configJson, "{}") AS configJson
+            IFNULL(component_configJson.config_json, "{}") AS config_json
             FROM component_config_instance cci
             JOIN component_instance ci ON ci.id=cci.component_instance_id
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             LEFT JOIN (
                 SELECT
                 cci2.component_instance_id,
-                JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS configJson
+                JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS config_json
                 FROM component_config_instance cci2
                 LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
                 WHERE ccd2.key IN (:collapse, :showComponentTitle)
