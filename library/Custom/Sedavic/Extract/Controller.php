@@ -202,14 +202,14 @@ class Controller extends Base
     {
         /* Set up file download thing
          */
-//        header('Content-type: text/csv; charset=UTF-8');
-//        header('Content-disposition: attachment; filename="extract.csv"');
+        header('Content-type: text/csv; charset=UTF-8');
+        header('Content-disposition: attachment; filename="extract.csv"');
 
-//        $outstream = fopen("php://output", 'r');
+        $outstream = fopen("php://output", 'r');
 
         /* Start with header row
          */
-//        fputcsv($outstream, self::HEADINGS);
+        fputcsv($outstream, self::HEADINGS);
 
         /* Find a list of student ids to process one at a time
          */
@@ -264,14 +264,13 @@ class Controller extends Base
 
                     /* Pump it to an fputcsv
                      */
-                    new \Alaress_Probe($row, $assessmentInfo['published_at']);
-//                    fputcsv($outstream, $row);
+                    fputcsv($outstream, $row);
                 }
             }
         }
 
-//        fclose($outstream);
-//        exit;
+        fclose($outstream);
+        exit;
     }
 
 
