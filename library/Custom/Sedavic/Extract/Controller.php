@@ -10,19 +10,15 @@ declare(strict_types=1);
 
 namespace Custom\Sedavic\Extract;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
-     *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
      */
-    public function __construct(private ErrorMapper $errorMapper, private UserMapper $userMapper)
+    public function __construct(private IConnector $database)
     {
     }
 
