@@ -93,7 +93,7 @@ class Controller extends Base
             vmrf.published_at
         FROM curriculum_node_for_assessment cnof
         INNER JOIN assessment a ON cnof.assessment_id = a.id
-        INNER JOIN v_assessment_relation var ON var.assessment_id = a.id
+        INNER JOIN mv_assessment_relation var ON var.assessment_id = a.id
         INNER JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = a.id AND vmrf.student_id = :userId
         LEFT JOIN curriculum_node cn1 ON cnof.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
