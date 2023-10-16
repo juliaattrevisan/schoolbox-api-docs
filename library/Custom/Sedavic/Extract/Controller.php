@@ -11,6 +11,9 @@ declare(strict_types=1);
 namespace Custom\Sedavic\Extract;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception;
+use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Database\Wrapper\Db2\PDOStatement;
 use Alaress\Web\Controller\Base;
 
 class Controller extends Base
@@ -33,30 +36,55 @@ class Controller extends Base
     {
         /* Find a list of student ids to process one at a time
          */
+        $studentManifestStatement = $this->getStudents();
 
-        /* For every student, get all the stuff they need
-         *
-         * First obtain their basic user details: name, identifiers, house and year level
-         * names - because we're reusing this info per curriculum node and there'll be
-         * a lot of those
-         */
+        while ($userId = $studentManifestStatement->fetch(\PDO::FETCH_ASSOC)['student_id']) {
+            /* For every student, get all the stuff they need
+             *
+             * First obtain their basic user details: name, identifiers, house and year level
+             * names - because we're reusing this info per curriculum node and there'll be
+             * a lot of those
+             */
 
-        /* Find all the assessment info from the v_assessment_feedback table
-         * This contains all the info you need to find their marks, for both
-         * the normalised- and human-readable marks
-         */
+            new \Alaress_Probe($userId);
 
-        /* Find all the curriculum codes associated with the assessments separately
-         * since you kinda need the full hierarchy of a curriculum node
-         */
+            /* Find all the assessment info from the v_assessment_feedback table
+             * This contains all the info you need to find their marks, for both
+             * the normalised- and human-readable marks
+             */
 
-        /* Find all the ancestry info about the assessment: course, unit
-         */
+            /* Find all the curriculum codes associated with the assessments separately
+             * since you kinda need the full hierarchy of a curriculum node
+             */
 
-        /* Combine all that into a csv row
-         */
+            /* Find all the ancestry info about the assessment: course, unit
+             */
 
-        /* Pump it to an fputcsv
-         */
+            /* Combine all that into a csv row
+             */
+
+            /* Pump it to an fputcsv
+             */
+        }
+    }
+
+
+    /**
+     * Get a bunch of students who have feedbacks
+     *
+     * @return \Alaress\Database\Statement\Query\Base
+     * @throws Exception
+     */
+    private function getStudents(): \Alaress\Database\Statement\Query\Base
+    {
+        $query = "
+            SELECT DISTINCT student_id
+            FROM v_assessment_feedback
+        ";
+
+        $studentManifestStatement = $this->database->prepareQuery($query);
+        $studentManifestStatement->execute();
+
+        return $studentManifestStatement;
     }
 }
