@@ -234,10 +234,6 @@ class Controller extends Base
                  */
                 while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
                     /* Find all the ancestry info about the assessment: course, unit
-                     *
-                     * FIXME Unit Spec Name might be optional as curric codes are probably for
-                     *  the course only; also, do we care about the impl names, or is the spec
-                     *  names good enough?
                      */
                     $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
 
