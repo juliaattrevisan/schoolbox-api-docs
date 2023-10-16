@@ -360,16 +360,34 @@ class Controller extends Base
             'externalId' => $userInfo['synergy_id'],
             'firstname' => $userInfo['firstname'],
             'lastname' => $userInfo['lastname'],
-            'qualification' => sprintf('%s [%s]', $assessmentInfo['Qualification'], $assessmentInfo['QualificationCode']),
+            'qualification' => $this->renderCurriculumNode((string)$assessmentInfo['Qualification'], (string)$assessmentInfo['QualificationCode']),
             'year' => $userInfo['yearLevel'],
             'house_sb' => $userInfo['house'],
-            'unit' => sprintf('%s [%s]', $assessmentInfo['Unit'], $assessmentInfo['UnitCode']),
+            'unit' => $this->renderCurriculumNode((string)$assessmentInfo['Unit'], (string)$assessmentInfo['UnitCode']),
             'course_sb' => $context['course']['name'],
             'unit_sb' => $context['unit']['name'],
             'assessment' => $assessmentInfo['title'],
-            'aos' => sprintf('%s [%s]', $assessmentInfo['AreaOfStudy'], $assessmentInfo['AreaOfStudyCode']),
+            'aos' => $this->renderCurriculumNode((string)$assessmentInfo['AreaOfStudy'], (string)$assessmentInfo['AreaOfStudyCode']),
             'normalised' => $feedback['normalised'],
             'humanReadable' => $feedback['humanReadable'],
         ];
+    }
+
+
+    /**
+     * Render curriculum nodes consistently,
+     * accounting for maybe broken data
+     *
+     * @param string $name
+     * @param string $code
+     * @return string
+     */
+    private function renderCurriculumNode(string $name, string $code): string
+    {
+        if ('' !== trim($name) && '' !== trim($code)) {
+            return sprintf('%s [%s]', $name, $code);
+        }
+
+        return '';
     }
 }
