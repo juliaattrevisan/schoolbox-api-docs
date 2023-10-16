@@ -185,29 +185,6 @@ class Hydrator extends BaseHydrator
             }
         }
 
-        if ($isGroupPage) {
-            $viewerIsMemberOfGroup = false;
-            foreach ($this->userAccessMapper->findAllGroupsForUser($viewer) as $groupUserAccessObj) {
-                if (
-                    $groupUserAccessObj->getService() === UserAccess::SERVICE_HOMEPAGE &&
-                    $groupUserAccessObj->getServiceIdentifier() == $folder->getId()
-                ) {
-                    $viewerIsMemberOfGroup = true;
-                }
-            }
-
-            if ($viewerIsMemberOfGroup) {
-                $links[] = [
-                    'title' => 'Leave Group',
-                    'icon' => 'icon-logout',
-                    'url' => $this->buildBaseUrl()
-                        ->withPath('/group/joinForm.php')
-                        ->withQuery(http_build_query(['leave' => $folder->getId(), 'return' => 1]))
-                        ->__toString(),
-                ];
-            }
-        }
-
         if ($isCoursePage) {
             $courseSpec = $folder->getCourseSpecification();
             $route = 'course.modifyCourse';
