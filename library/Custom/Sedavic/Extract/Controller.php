@@ -56,10 +56,13 @@ class Controller extends Base
             var.*,
             cn1.name AS Qualification,
             cn2.name AS Unit,
-            cn3.name AS AreaOfStudy
+            cn3.name AS AreaOfStudy,
+            vmrf.feedback_id,
+            vmrf.feedback_table
         FROM curriculum_node_for_assessment cnof
         INNER JOIN assessment a ON cnof.assessment_id = a.id
         INNER JOIN v_assessment_relation var ON var.assessment_id = a.id
+        INNER JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = a.id AND vmrf.student_id = :userId
         LEFT JOIN curriculum_node cn1 ON cnof.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
         LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
@@ -125,7 +128,8 @@ class Controller extends Base
                  * the normalised- and human-readable marks
                  */
                 $this->assessmentInfoStatement->execute([
-                    'assessmentId' => $userRow['assessment_id']
+                    'assessmentId' => $userRow['assessment_id'],
+                    'userId' => $userId
                 ]);
 
                 while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
@@ -166,5 +170,19 @@ class Controller extends Base
         $studentManifestStatement->execute();
 
         return $studentManifestStatement;
+    }
+
+
+    /**
+     * Figure out where the feedback lives, and get its normalised- and human-readable
+     * marks together. Feedbacks live in different tables contextually and we only
+     * ever need a particular feedback once.
+     *
+     * @param array $assessmentInfo
+     * @return array
+     */
+    private function getFeedbacks(array $assessmentInfo): array
+    {
+
     }
 }
