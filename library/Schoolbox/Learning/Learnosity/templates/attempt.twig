@@ -40,7 +40,7 @@
             /**
              * Listen for hash changes so we can navigate to the correct part of the app
              */
-            window.onhashchange = async function () {
+            window.onhashchange = function () {
                 // If the hash is empty, go back to the previous page, as the first hash is injected on quiz load
                 if (window.location.hash === "") {
                     history.back();
