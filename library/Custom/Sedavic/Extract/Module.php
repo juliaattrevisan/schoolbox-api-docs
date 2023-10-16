@@ -37,7 +37,41 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '', 'getExtract', $getPerms, null);
+        $preloadDates = function ($params) {
+            return $this->preloadDates($params);
+        };
+
+        $this->register('GET', '/{from}/{to}', 'getExtract', $getPerms, $preloadDates);
+    }
+
+
+    /**
+     * Assert dates are sensible, i.e. $from is less than or equal to $to
+     * with the following axioms:
+     *
+     * $from is always taken from start of day;
+     * $to is always until the end of day
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
+     */
+    private function preloadDates(array $params): array
+    {
+        /* Assert $from <= $to
+         */
+        $from = (new \Alaress_Date_Format($params['from'], \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
+        $to = (new \Alaress_Date_Format($params['to'], \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
+
+        if ($from->gt($to)) {
+            throw new \UnexpectedValueException("Custom Extract: 'from' date must be before 'to' date");
+        }
+
+        return [
+            'from' => $from,
+            'to' => $to
+        ];
     }
 
 

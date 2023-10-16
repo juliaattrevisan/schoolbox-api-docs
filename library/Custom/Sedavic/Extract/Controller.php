@@ -82,7 +82,8 @@ class Controller extends Base
             cn3.name AS AreaOfStudy,
             cn3.code AS AreaOfStudyCode,
             vmrf.feedback_id,
-            vmrf.feedback_table
+            vmrf.feedback_table,
+            vmrf.published_at
         FROM curriculum_node_for_assessment cnof
         INNER JOIN assessment a ON cnof.assessment_id = a.id
         INNER JOIN v_assessment_relation var ON var.assessment_id = a.id
@@ -91,6 +92,8 @@ class Controller extends Base
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
         LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
         WHERE a.id = :assessmentId
+        AND vmrf.published_at >= :from
+        AND vmrf.published_at <= :to
     ";
 
 
@@ -189,19 +192,24 @@ class Controller extends Base
      * and pump it into a csv.
      *
      * The date range provided relates to when the feedbacks were published.
+     *
+     * @param \Alaress_Date_Format $from
+     * @param \Alaress_Date_Format $to
+     * @return void
+     * @throws Exception
      */
-    public function getExtract(): void
+    public function getExtract(\Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
         /* Set up file download thing
          */
-        header('Content-type: text/csv; charset=UTF-8');
-        header('Content-disposition: attachment; filename="extract.csv"');
+//        header('Content-type: text/csv; charset=UTF-8');
+//        header('Content-disposition: attachment; filename="extract.csv"');
 
-        $outstream = fopen("php://output", 'r');
+//        $outstream = fopen("php://output", 'r');
 
         /* Start with header row
          */
-        fputcsv($outstream, self::HEADINGS);
+//        fputcsv($outstream, self::HEADINGS);
 
         /* Find a list of student ids to process one at a time
          */
@@ -227,7 +235,9 @@ class Controller extends Base
                  */
                 $this->assessmentInfoStatement->execute([
                     'assessmentId' => $userInfo['assessment_id'],
-                    'userId' => $userId
+                    'userId' => $userId,
+                    'from' => $from->getDatabase(),
+                    'to' => $to->getDatabase()
                 ]);
 
                 /* Find all the curriculum codes associated with the assessments
@@ -254,13 +264,14 @@ class Controller extends Base
 
                     /* Pump it to an fputcsv
                      */
-                    fputcsv($outstream, $row);
+                    new \Alaress_Probe($row, $assessmentInfo['published_at']);
+//                    fputcsv($outstream, $row);
                 }
             }
         }
 
-        fclose($outstream);
-        exit;
+//        fclose($outstream);
+//        exit;
     }
 
 
