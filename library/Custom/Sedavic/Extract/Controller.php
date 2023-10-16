@@ -55,8 +55,11 @@ class Controller extends Base
             a.title,
             var.*,
             cn1.name AS Qualification,
+            cn1.code AS QualificationCode,
             cn2.name AS Unit,
+            cn2.code AS UnitCode,
             cn3.name AS AreaOfStudy,
+            cn3.code AS AreaOfStudyCode,
             vmrf.feedback_id,
             vmrf.feedback_table
         FROM curriculum_node_for_assessment cnof
