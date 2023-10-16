@@ -141,6 +141,7 @@ class Module extends BaseModule
                 ),
                 new Database\ResultType\Textbox\Hydrator(
                     $mapperFactory->get(TextboxMapper::class),
+                    $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
                 ),
                 new Database\ResultType\Blog\Hydrator(
