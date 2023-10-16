@@ -79,21 +79,23 @@
 
             // Push app location changes to browser history.
             authorApp.on("navigate", function (event) {
-                if (event.data.location.includes("items/new") || event.data.location.includes("widgets/new")) {
-                    window.location.hash = "#" + event.data.location;
-                    console.warn("navigate", event.data.location);
-                }
+                window.location.hash = "#" + event.data.location;
             });
 
             /**
-            * Go to initial browser location. The window location hash includes
-            * the # at the start, so we strip it with some basic regex.
-            */
+             * Go to initial browser location. The window location hash includes
+             * the # at the start, so we strip it with some basic regex.
+             */
             authorApp.navigate(window.location.hash.replace(/^#/, ""));
 
             // Push changes to browser location hash to app.
             window.onhashchange = function () {
-                authorApp.navigate(window.location.hash.replace(/^#/, ""));
+                // If the hash is empty, go back to the previous page, as the first hash is injected on quiz load
+                if (window.location.hash === "") {
+                    history.back();
+                } else {
+                    authorApp.navigate(window.location.hash.replace(/^#/, ""));
+                }
                 console.warn("hashchange", window.location.hash);
             };
         }
@@ -102,5 +104,6 @@
     let authorApp = LearnosityAuthor.init(
         {{ initOptions | raw }}, authorAppCallback
     );
+
 </script>
 {% endautoescape %}
