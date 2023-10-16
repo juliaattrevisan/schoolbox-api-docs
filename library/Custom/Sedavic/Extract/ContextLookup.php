@@ -28,7 +28,7 @@ class ContextLookup
             course_unit_implementation_id,
             course_specification_id,
             course_unit_specification_id
-        FROM mv_assessment_relation
+        FROM v_assessment_relation
         WHERE assessment_id = :assessmentId
         LIMIT 1
     ';
