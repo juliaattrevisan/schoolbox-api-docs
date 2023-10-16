@@ -54,6 +54,11 @@ class Controller extends Base
 
     /**
      * A repeatable query for each person's assessments
+     *
+     * For some oddball reason I need to specify collation here, because
+     * our views + random text strings are an illegal mix somehow
+     *
+     * Error Code: 1267. Illegal mix of collations (utf8mb4_unicode_ci,COERCIBLE) and (utf8mb4_general_ci,COERCIBLE)
      */
     private const QUERY_ASSESSMENT_INFO = "
        SELECT
@@ -83,7 +88,7 @@ class Controller extends Base
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
         LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
         LEFT JOIN v_assessment_relation var ON var.assessment_id = a.id
-        WHERE vmrf.feedback_table IN ('submission_return', 'assess_attempt')
+        WHERE vmrf.feedback_table COLLATE utf8mb4_unicode_ci IN ('submission_return', 'assess_attempt')
         AND vmrf.published_at >= :from
         AND vmrf.published_at <= :to
         AND a.deleted_at IS NULL
