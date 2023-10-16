@@ -17,6 +17,27 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base
 {
     /**
+     * Header row in the csv, as per the jira
+     * It's probably not exactly what they're after...but ok
+     */
+    private const HEADINGS = [
+        'Synergetic ID',
+        'Firstname',
+        'Lastname',
+        'Qualification',
+        'Year Level',
+        'Class (House)',
+        'Unit',
+        'Course (SB)',
+        'Unit (SB)',
+        'Assessment',
+        'Area of Study/Outcome',
+        'Result (S/N)',
+        'Result (Raw)'
+    ];
+
+
+    /**
      * A list of all the users we actually care about
      * (We don't care about students without feedbacks)
      */
@@ -171,6 +192,17 @@ class Controller extends Base
      */
     public function getExtract(): void
     {
+        /* Set up file download thing
+         */
+        header('Content-type: text/csv; charset=UTF-8');
+        header('Content-disposition: attachment; filename="extract.csv"');
+
+        $outstream = fopen("php://output", 'r');
+
+        /* Start with header row
+         */
+        fputcsv($outstream, self::HEADINGS);
+
         /* Find a list of student ids to process one at a time
          */
         $studentManifestStatement = $this->getStudents();
@@ -222,13 +254,14 @@ class Controller extends Base
                      */
                     $row = $this->combine($userInfo, $assessmentInfo, $context, $feedback);
 
-                    new \Alaress_Probe($userInfo, $assessmentInfo, $context, $feedback, $row);
+                    /* Pump it to an fputcsv
+                     */
+                    fputcsv($outstream, $row);
                 }
             }
-
-            /* Pump it to an fputcsv
-             */
         }
+
+        fclose($outstream);
     }
 
 
