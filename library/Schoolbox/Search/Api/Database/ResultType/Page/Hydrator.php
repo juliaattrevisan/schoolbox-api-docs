@@ -118,7 +118,7 @@ class Hydrator extends BaseHydrator
                     null,
                     null,
                     $this->folderMapper->findParents($folder, null, true)->getAll(),
-                    $this->getSearchResultLinksForFolder($folder, $viewer),
+                    $this->getSearchResultLinks($folder, $viewer),
                     // TODO: Figure out what to do with this.
                     //[
                     //    'subResults' => $this->buildBaseUrl()
@@ -152,7 +152,7 @@ class Hydrator extends BaseHydrator
      * @throws RouteNotFound
      * @throws Exception
      */
-    private function getSearchResultLinksForFolder(Folder\Model $folder, User $viewer): array
+    private function getSearchResultLinks(Folder\Model $folder, User $viewer): array
     {
         $links = [];
 

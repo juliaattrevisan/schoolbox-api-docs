@@ -116,7 +116,7 @@ class Hydrator extends BaseHydrator
                     null,
                     null,
                     [],
-                    $this->getSearchResultLinksForUser($user, $viewer)
+                    $this->getSearchResultLinks($user, $viewer)
                 );
             },
             $acceptedMatches,
@@ -170,7 +170,7 @@ class Hydrator extends BaseHydrator
      * @return array
      * @throws RouteNotFound
      */
-    private function getSearchResultLinksForUser(User $searchResultUser, User $viewer): array
+    private function getSearchResultLinks(User $searchResultUser, User $viewer): array
     {
         $links = [];
 

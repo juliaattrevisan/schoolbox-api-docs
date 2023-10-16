@@ -158,7 +158,7 @@ class Hydrator extends BaseHydrator
                     $description,
                     $article->getAuthor(),
                     [],
-                    $this->getSearchResultLinksForArticle($article, $viewer)
+                    $this->getSearchResultLinks($article, $viewer)
                 );
             },
             $matches,
@@ -203,7 +203,7 @@ class Hydrator extends BaseHydrator
      * @return array
      * @throws RouteNotFound
      */
-    private function getSearchResultLinksForArticle(News\Model $article, User $viewer): array
+    private function getSearchResultLinks(News\Model $article, User $viewer): array
     {
         $links = [];
 

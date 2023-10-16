@@ -218,7 +218,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                     null,
                     [$textbox->getCategory(),], // Context: textbox's folder
-                    $this->getSearchResultLinksForTextbox($textbox, $viewer)
+                    $this->getSearchResultLinks($textbox, $viewer)
                 );
             }
         }
@@ -313,7 +313,7 @@ class Hydrator extends BaseHydrator
      * @throws RouteNotFound
      * @throws Exception
      */
-    private function getSearchResultLinksForTextbox(TextboxModel $textbox, User $viewer): array
+    private function getSearchResultLinks(TextboxModel $textbox, User $viewer): array
     {
         $links = [];
 

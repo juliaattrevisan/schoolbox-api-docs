@@ -169,7 +169,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
                     $assessmentCreator,
                     [$folder],
-                    $this->getSearchResultLinksForAssessment($assessment, $viewer),
+                    $this->getSearchResultLinks($assessment, $viewer),
                 );
             },
             $matches
@@ -235,7 +235,7 @@ class Hydrator extends BaseHydrator
      * @return array
      * @throws RouteNotFound
      */
-    private function getSearchResultLinksForAssessment(IAssessable $assessment, User $viewer): array
+    private function getSearchResultLinks(IAssessable $assessment, User $viewer): array
     {
         $links = [];
 

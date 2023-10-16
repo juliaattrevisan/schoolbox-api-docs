@@ -101,7 +101,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
                     $badge->getCreatedBy(),
                     [], // Context.  Empty since no linked folder.
-                    $this->getSearchResultLinksForBadge($badge, $viewer)
+                    $this->getSearchResultLinks($badge, $viewer)
                 );
             },
             $matches
@@ -120,7 +120,7 @@ class Hydrator extends BaseHydrator
      * @return array
      * @throws RouteNotFound
      */
-    private function getSearchResultLinksForBadge(BadgeModel $badge, User $viewer): array
+    private function getSearchResultLinks(BadgeModel $badge, User $viewer): array
     {
         $links = [];
 
