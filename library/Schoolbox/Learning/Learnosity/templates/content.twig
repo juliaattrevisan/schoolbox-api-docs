@@ -77,7 +77,9 @@
                 authorApp.setActivityTags({{ tags|raw }});
             });
 
-            // Push app location changes to browser history.
+            /**
+             * Push app location changes to browser history, so we can use the browser back/forward
+             */
             authorApp.on("navigate", function (event) {
                 window.location.hash = "#" + event.data.location;
             });
@@ -88,7 +90,9 @@
              */
             authorApp.navigate(window.location.hash.replace(/^#/, ""));
 
-            // Push changes to browser location hash to app.
+            /**
+             * Listen for hash changes so we can navigate to the correct part of the app
+             */
             window.onhashchange = function () {
                 // If the hash is empty, go back to the previous page, as the first hash is injected on quiz load
                 if (window.location.hash === "") {
@@ -96,7 +100,6 @@
                 } else {
                     authorApp.navigate(window.location.hash.replace(/^#/, ""));
                 }
-                console.warn("hashchange", window.location.hash);
             };
         }
     };
