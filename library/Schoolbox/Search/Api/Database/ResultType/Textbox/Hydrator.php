@@ -134,6 +134,8 @@ class Hydrator extends BaseHydrator
                 }
 
                 $textboxBodyTextOnly = (new ToText($textbox->getBody()))->getText();
+                $textboxBodyTextOnlyLowercase = strtolower($textboxBodyTextOnly);
+                $keywordLowercase = strtolower($keyword);
 
                 // Matches whose component title is hidden should only count as matches if they match on something other
                 // than the title.  The only other thing textbox matches might match against is the body.
@@ -141,7 +143,7 @@ class Hydrator extends BaseHydrator
                 if (
                     $textboxAccess === UserAccess::ACCESS_READ &&
                     !$showTitleToReadOnlyUsers &&
-                    !str_contains(strtolower($textboxBodyTextOnly), $keyword)
+                    !str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)
                 ) {
                     continue;
                 }
@@ -149,8 +151,8 @@ class Hydrator extends BaseHydrator
                 // Because the textbox body contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (!str_contains($textbox->getHeading(), $keyword)) {
-                    if (!str_contains($textboxBodyTextOnly, $keyword)) {
+                if (!str_contains(strtolower($textbox->getHeading()), $keywordLowercase)) {
+                    if (!str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)) {
                         continue;
                     }
                 }
