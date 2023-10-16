@@ -86,6 +86,7 @@ class Controller extends Base
         WHERE vmrf.feedback_table IN ('submission_return', 'assess_attempt')
         AND vmrf.published_at >= :from
         AND vmrf.published_at <= :to
+        ORDER BY lastname, firstname
     ";
 
 
