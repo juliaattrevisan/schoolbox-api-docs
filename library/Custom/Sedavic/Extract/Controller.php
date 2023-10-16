@@ -88,8 +88,7 @@ class Controller extends Base
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
         LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
         LEFT JOIN mv_assessment_relation var ON var.assessment_id = a.id
-        WHERE vmrf.feedback_table COLLATE utf8mb4_unicode_ci IN ('submission_return', 'assess_attempt')
-        AND vmrf.published_at >= :from
+        WHERE vmrf.published_at >= :from
         AND vmrf.published_at <= :to
         AND a.deleted_at IS NULL
         AND u.deleted_at IS NULL
