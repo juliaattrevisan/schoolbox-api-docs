@@ -174,8 +174,6 @@ class Controller extends Base
         $this->dueworkFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_DUEWORK);
         $this->taskFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_TASK);
         $this->quizFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_QUIZ);
-
-        $this->perform = false;
     }
 
 
@@ -195,7 +193,7 @@ class Controller extends Base
     {
         $outstream = null;
         $numRows = 0;
-        
+
         /* Set up file download thing
          */
         if ($this->perform) {
