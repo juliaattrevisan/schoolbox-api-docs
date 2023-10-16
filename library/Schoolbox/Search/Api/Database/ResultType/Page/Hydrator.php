@@ -185,16 +185,6 @@ class Hydrator extends BaseHydrator
             }
         }
 
-        if ($folderAccessLevel >= UserAccess::ACCESS_READ) {
-            $links[] = [
-                'title' => 'Homepage',
-                'icon' => 'icon-home',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/homepage/{$folder->getId()}")
-                    ->__toString(),
-            ];
-        }
-
         if ($isGroupPage) {
             $viewerIsMemberOfGroup = false;
             foreach ($this->userAccessMapper->findAllGroupsForUser($viewer) as $groupUserAccessObj) {
