@@ -84,20 +84,67 @@ class Hydrator extends BaseHydrator
                 continue;
             }
 
+            // The $textboxRootFolder is the folder on which the textbox was originally created.
+            // It is the folder on whose 'Manage Textboxes' page the textbox will appear.
+            $textboxRootFolder = $textbox->getCategory();
+
+            $textboxBodyTextOnly = (new ToText($textbox->getBody()))->getText();
+            $textboxBodyTextOnlyLowercase = strtolower($textboxBodyTextOnly);
+            $keywordLowercase = strtolower($keyword);
+
+            // Because the textbox body contains HTML, this match might have come about only because the
+            // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+            // Eliminate those kinds of matches.
+            if (!str_contains(strtolower($textbox->getHeading()), $keywordLowercase)) {
+                if (!str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)) {
+                    continue;
+                }
+            }
+
             // Find all the instances of $textbox.
-            $textboxInstanceInfo = $textboxInstanceInfoByTextboxId[$textbox->getId()] ?? null;
+            $textboxInstanceInfo = $textboxInstanceInfoByTextboxId[$textbox->getId()] ?? [];
 
             if (count($textboxInstanceInfo) === 0) {
-                // This textbox is not used in any pages.
-                // TODO: Deal with this case.
-                echo "TextboxID {$textbox->getId()} is not used on any pages!";
-                die;
+                // This textbox is not used on any page.
+
+                // Textboxes not currently used in any component should be shown
+                // only to users with write access to the textbox's main folder.
+                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxRootFolder->getId());
+                if ($textboxAccess < UserAccess::ACCESS_WRITE) {
+                    continue;
+                }
+
+                // Create search result with link to the textbox's 'Manage Textboxes' page.
+                $fullResults[] = new FullResult(
+                    $match,
+                    $match->id,
+                    // No component, so no config, so:
+                    //  * $componentIsCollapsed does not apply,
+                    //  * $showTitleToReadOnlyUsers will have default value, true.
+                    // Conclusion: No reason not to display heading.
+                    $textbox->getHeading(),
+                    $this->buildBaseUrl()
+                         ->withPath("/textbox/folder/{$textboxRootFolder->getId()}")
+                         ->withFragment("textbox-" . $textbox->getId())
+                         ->__toString(),
+                    $match->type,
+                    $match->relevance,
+                    $textbox->getUpdatedAt(),
+                    $textboxRootFolder,
+                    'Hidden from view',
+                    null,
+                    'textbox',
+                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
+                    null,
+                    [$textboxRootFolder,], // Context: textbox's folder.
+                    [], // texbox: none.
+                );
             }
 
             foreach ($textboxInstanceInfo as $tio) {
                 $folderId = $tio['folder_id'];
 
-                $textboxFolder = $this->folderMapper->findById($folderId);
+                $textboxFolder = $this->folderMapper->findById($folderId); // This is the page on which the textbox component is used.
 
                 // Check if user has access to textbox's folder
                 $textboxAccess = $this->access->getFolderAccess($viewer, $textboxFolder->getId());
@@ -106,12 +153,6 @@ class Hydrator extends BaseHydrator
                 }
 
                 $componentInstanceId = $tio['component_instance_id'];
-
-                // If component_instance_id is null, that means the textbox is not currently used in any component.
-                // Textboxes not currently used in any component should be shown only to users with write access.
-                if ($componentInstanceId === null && $textboxAccess < UserAccess::ACCESS_WRITE) {
-                    continue;
-                }
 
                 // After json_decode, $componentConfig will be an array with the following optional keys:
                 //  * Component_Config_Collapse::KEY,
@@ -133,10 +174,6 @@ class Hydrator extends BaseHydrator
                     continue;
                 }
 
-                $textboxBodyTextOnly = (new ToText($textbox->getBody()))->getText();
-                $textboxBodyTextOnlyLowercase = strtolower($textboxBodyTextOnly);
-                $keywordLowercase = strtolower($keyword);
-
                 // Matches whose component title is hidden should only count as matches if they match on something other
                 // than the title.  The only other thing textbox matches might match against is the body.
                 // (See match criteria for textboxes in QueryParamBuilder->buildBaseWhereParams()).
@@ -148,15 +185,6 @@ class Hydrator extends BaseHydrator
                     continue;
                 }
 
-                // Because the textbox body contains HTML, this match might have come about only because the
-                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if (!str_contains(strtolower($textbox->getHeading()), $keywordLowercase)) {
-                    if (!str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)) {
-                        continue;
-                    }
-                }
-
                 $fullResults[] = new FullResult(
                     $match,
                     $match->id,
@@ -166,23 +194,15 @@ class Hydrator extends BaseHydrator
                         ? 'Untitled Textbox'
                         : $textbox->getHeading()
                     ),
-                    (
-                        // If not componentInstanceId, the URL should point to the Manage Textboxes page.
-                        $componentInstanceId === null
-                        ? $this->buildBaseUrl()
-                            ->withPath("/textbox/folder/{$textboxFolder->getId()}")
-                            ->withFragment("textbox-" . $textbox->getId())
-                            ->__toString()
-                        : $this->buildBaseUrl()
-                            ->withPath('/homepage/' . $textboxFolder->getId())
-                            ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
-                            ->__toString()
-                    ),
+                    $this->buildBaseUrl()
+                        ->withPath('/homepage/' . $textboxFolder->getId())
+                        ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
+                        ->__toString(),
                     $match->type,
                     $match->relevance,
                     $textbox->getUpdatedAt(),
                     $textboxFolder,
-                    ($componentInstanceId === null ? 'Hidden from view' : null),
+                    null, // Could put the heading of $textboxRootFolder here, but probably not relevant to the user.
                     null,
                     'textbox',
                     $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
