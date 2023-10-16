@@ -213,8 +213,7 @@ class Hydrator extends BaseHydrator
             }
         }
 
-        // Filter out anything missing
-        return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+        return $fullResults;
     }
 
     /**
