@@ -71,7 +71,7 @@
      * in order to spawn tags. Using authorApp.setActivityTags() allows you have tags
      * spawned immediately upon authorApp rendering
      */
-    let authorAppCallback = {
+    const authorAppCallback = {
         readyListener: function () {
             authorApp.on('render:activity', function(event) {
                 authorApp.setActivityTags({{ tags|raw }});
@@ -104,8 +104,9 @@
         }
     };
 
-    let authorApp = LearnosityAuthor.init(
-        {{ initOptions | raw }}, authorAppCallback
+    const authorApp = LearnosityAuthor.init(
+        {{ initOptions | raw }},
+        authorAppCallback
     );
 
 </script>

@@ -19,12 +19,47 @@
 
 {% autoescape 'js' %}
 <script>
-    let itemsApp = LearnosityItems.init({{ initOptions | raw }});
+    /**
+     *
+     */
+    const itemsAppCallback = {
+        readyListener: function () {
+            /**
+             * Push app location changes to browser history, so we can use the browser back/forward
+             */
+            itemsApp.on('item:changed', function (itemIndex) {
+                window.location.hash = "#" + itemIndex;
+            });
+
+            /**
+             * Go to initial browser location. The window location hash includes
+             * the # at the start, so we strip it with some basic regex.
+             */
+            itemsApp.items().goto(parseInt(window.location.hash.replace(/^#/, "")));
+
+            /**
+             * Listen for hash changes so we can navigate to the correct part of the app
+             */
+            window.onhashchange = async function () {
+                // If the hash is empty, go back to the previous page, as the first hash is injected on quiz load
+                if (window.location.hash === "") {
+                    history.back();
+                } else {
+                    itemsApp.items().goto(parseInt(window.location.hash.replace(/^#/, "")));
+                }
+            };
+        }
+    };
+
+    const itemsApp = LearnosityItems.init(
+        {{ initOptions | raw }},
+        itemsAppCallback
+    );
 
     /* Async attempt completion
      */
     itemsApp.on('test:submit:success', function() {
-        let payload = new FormData();
+        const payload = new FormData();
         payload.append('attemptId', '{{ attemptId }}');
         payload.append('learnosityReference','{{ learnositySessionReference }}');
 
