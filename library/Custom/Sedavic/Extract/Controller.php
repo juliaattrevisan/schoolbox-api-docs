@@ -114,7 +114,9 @@ class Controller extends Base
     {
         $query = "
             SELECT DISTINCT student_id
-            FROM v_assessment_feedback
+            FROM v_assessment_feedback vaf
+            INNER JOIN `user` u ON u.id = vaf.student_id
+            ORDER BY lastname, firstname
         ";
 
         $studentManifestStatement = $this->database->prepareQuery($query);
