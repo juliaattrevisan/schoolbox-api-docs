@@ -13,6 +13,7 @@ namespace Custom\Sedavic\Extract;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
 use Alaress\Web\Controller\Base;
+use DebugBar\DebugBarException;
 
 class Controller extends Base
 {
@@ -171,6 +172,14 @@ class Controller extends Base
 
 
     /**
+     * Skip generating a file, instead printing data to browzer
+     *
+     * @var bool
+     */
+    private bool $perform = true;
+
+
+    /**
      * Controller constructor.
      */
     public function __construct(private IConnector $database)
@@ -190,6 +199,8 @@ class Controller extends Base
         $this->dueworkFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_DUEWORK);
         $this->taskFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_TASK);
         $this->quizFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_QUIZ);
+
+        $this->perform = false;
     }
 
 
@@ -203,25 +214,30 @@ class Controller extends Base
      * @param \Alaress_Date_Format $to
      * @return void
      * @throws Exception
+     * @throws DebugBarException
      */
     public function getExtract(\Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
+        $outstream = null;
+        
         /* Set up file download thing
          */
-        $filename = sprintf(
-            self::FILENAME,
-            $from->getDatabaseDate(),
-            $to->getDatabaseDate()
-        );
+        if ($this->perform) {
+            $filename = sprintf(
+                self::FILENAME,
+                $from->getDatabaseDate(),
+                $to->getDatabaseDate()
+            );
 
-        header('Content-type: text/csv; charset=UTF-8');
-        header("Content-disposition: attachment; filename=\"{$filename}\"");
+            header('Content-type: text/csv; charset=UTF-8');
+            header("Content-disposition: attachment; filename=\"{$filename}\"");
 
-        $outstream = fopen("php://output", 'r');
+            $outstream = fopen("php://output", 'r');
 
-        /* Start with header row
-         */
-        fputcsv($outstream, self::HEADINGS);
+            /* Start with header row
+             */
+            fputcsv($outstream, self::HEADINGS);
+        }
 
         /* Find a list of student ids to process one at a time
          */
@@ -276,12 +292,19 @@ class Controller extends Base
 
                     /* Pump it to an fputcsv
                      */
-                    fputcsv($outstream, $row);
+                    if ($this->perform) {
+                        fputcsv($outstream, $row);
+                    } else {
+                        new \Alaress_Probe($row);
+                    }
                 }
             }
         }
 
-        fclose($outstream);
+        if ($this->perform) {
+            fclose($outstream);
+        }
+
         exit;
     }
 
