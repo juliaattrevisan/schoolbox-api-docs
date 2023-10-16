@@ -24,8 +24,10 @@ class Controller extends Base
      * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      */
-    public function __construct(private ErrorMapper $errorMapper, private UserMapper $userMapper)
-    {
+    public function __construct(
+        private ErrorMapper $errorMapper,
+        private UserMapper $userMapper
+    ) {
     }
 
 
