@@ -238,16 +238,20 @@ class Controller extends Base
         $start = microtime(true);
 
         while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
-            /* Find all the ancestry info about the assessment: course, unit
-             */
-            $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
-
-            /* Feedback data
-             */
             try {
+                /* Find all the ancestry info about the assessment: course, unit
+                 */
+                $context = $this->contextLookup->find((int)$assessmentInfo['assessment_id']);
+
+                /* Feedback data
+                 */
                 $feedback = $this->findFeedback($assessmentInfo['feedback_table'], (int)$assessmentInfo['feedback_id']);
-            } catch (\DomainException $e) {
-                // noop: skip data that randomly died, for now
+            } catch (\DomainException | \RuntimeException $e) {
+                /* noop: skip data that randomly died, for now
+                 *
+                 *   - Assessment Feedback must be one of Due Work, Task or Quiz feedbacks;
+                 *   - Assessments must be in a course to be included in this extract;
+                 */
                 continue;
             }
 

@@ -114,6 +114,7 @@ class ContextLookup
      * @param int $assessmentId
      * @return array
      * @throws Exception
+     * @throws \RuntimeException
      */
     public function find(int $assessmentId): array
     {
@@ -141,15 +142,23 @@ class ContextLookup
         /* If course_implementation_id is set, find out its corresponding spec's name
          * If course_unit_implementation_id is set, find out its corresponding spec's name
          */
-        $courseSpec = $this->findCourseSpecViaImpl((int)$row['course_implementation_id']);
-        $courseUnitSpec = $this->findCourseUnitSpecViaImpl((int)$row['course_unit_implementation_id']);
+        if ($row['course_implementation_id'] && $row['course_unit_implementation_id']) {
+            $courseSpec = $this->findCourseSpecViaImpl((int)$row['course_implementation_id']);
+            $courseUnitSpec = $this->findCourseUnitSpecViaImpl((int)$row['course_unit_implementation_id']);
 
-        /* Figure out the course name and unit name
-         */
-        return [
-            'course' => $courseSpec,
-            'unit' => $courseUnitSpec
-        ];
+            /* Figure out the course name and unit name
+             */
+            return [
+                'course' => $courseSpec,
+                'unit' => $courseUnitSpec
+            ];
+        }
+
+        throw new \RuntimeException(sprintf(
+            'Assessment %s is not in a course',
+            $assessmentId
+
+        ));
     }
 
 
