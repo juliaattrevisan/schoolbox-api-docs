@@ -183,13 +183,13 @@ class Controller extends Base
                 'userId' => $userId
             ]);
 
-            while ($userRow = $this->userInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
+            while ($userInfo = $this->userInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
                 /* Find all the assessment info from the v_assessment_feedback table
                  * This contains all the info you need to find their marks, for both
                  * the normalised- and human-readable marks
                  */
                 $this->assessmentInfoStatement->execute([
-                    'assessmentId' => $userRow['assessment_id'],
+                    'assessmentId' => $userInfo['assessment_id'],
                     'userId' => $userId
                 ]);
 
@@ -209,7 +209,7 @@ class Controller extends Base
                         continue;
                     }
 
-                    new \Alaress_Probe($assessmentInfo, $context, $feedback);
+                    new \Alaress_Probe($userInfo, $assessmentInfo, $context, $feedback);
                 }
             }
 
