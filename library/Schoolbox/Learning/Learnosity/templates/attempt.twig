@@ -27,7 +27,7 @@
             /**
              * Push app location changes to browser history, so we can use the browser back/forward
              */
-            itemsApp.on('item:changed', function (itemIndex) {
+            itemsApp.on("item:changed", function (itemIndex) {
                 window.location.hash = "#" + itemIndex;
             });
 
