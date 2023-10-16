@@ -133,7 +133,7 @@ class Hydrator extends BaseHydrator
                     continue;
                 }
 
-                $textboxBody = (new ToText($textbox->getBody()))->getText();
+                $textboxBodyTextOnly = (new ToText($textbox->getBody()))->getText();
 
                 // Matches whose component title is hidden should only count as matches if they match on something other
                 // than the title.  The only other thing textbox matches might match against is the body.
@@ -141,9 +141,18 @@ class Hydrator extends BaseHydrator
                 if (
                     $textboxAccess === UserAccess::ACCESS_READ &&
                     !$showTitleToReadOnlyUsers &&
-                    !str_contains(strtolower($textboxBody), $keyword)
+                    !str_contains(strtolower($textboxBodyTextOnly), $keyword)
                 ) {
                     continue;
+                }
+
+                // Because the textbox body contains HTML, this match might have come about only because the
+                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if (!str_contains($textbox->getHeading(), $keyword)) {
+                    if (!str_contains($textboxBodyTextOnly, $keyword)) {
+                        continue;
+                    }
                 }
 
                 $fullResults[] = new FullResult(
@@ -174,7 +183,7 @@ class Hydrator extends BaseHydrator
                     ($componentInstanceId === null ? 'Hidden from view' : null),
                     null,
                     'textbox',
-                    $this->truncateAroundKeyword($keyword, $textboxBody) ?? $this->truncate($textboxBody),
+                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                     null,
                     [$textboxFolder,], // Context: textbox's folder.
                     [], // texbox: none.
