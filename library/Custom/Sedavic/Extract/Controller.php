@@ -207,7 +207,9 @@ class Controller extends Base
          */
         $studentManifestStatement = $this->getStudents();
 
-        while ($userId = $studentManifestStatement->fetch(\PDO::FETCH_ASSOC)['student_id']) {
+        while ($manifestRow = $studentManifestStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $userId = $manifestRow['student_id'];
+
             /* For every student, get all the stuff they need
              *
              * First obtain their basic user details: name, identifiers, house and year level
@@ -258,6 +260,7 @@ class Controller extends Base
         }
 
         fclose($outstream);
+        exit;
     }
 
 
