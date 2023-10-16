@@ -17,6 +17,12 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base
 {
     /**
+     * Specify filename format with the two dates in it
+     */
+    private const FILENAME = 'extract-%s_%s.csv';
+
+
+    /**
      * Header row in the csv, as per the jira
      * It's probably not exactly what they're after...but ok
      */
@@ -202,8 +208,14 @@ class Controller extends Base
     {
         /* Set up file download thing
          */
+        $filename = sprintf(
+            self::FILENAME,
+            $from->getDatabaseDate(),
+            $to->getDatabaseDate()
+        );
+
         header('Content-type: text/csv; charset=UTF-8');
-        header('Content-disposition: attachment; filename="extract.csv"');
+        header("Content-disposition: attachment; filename=\"{$filename}\"");
 
         $outstream = fopen("php://output", 'r');
 
