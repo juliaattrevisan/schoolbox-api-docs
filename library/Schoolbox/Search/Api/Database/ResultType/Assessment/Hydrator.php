@@ -250,19 +250,6 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        $route = 'learnosity.getHorizontalMarking';
-        // Params needed here are the same as set above.
-        if (
-            $assessment instanceof Assessment\Quiz\Model &&
-            $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)
-        ) {
-            $links[] = [
-                'url' => $this->routeGenerator->generate($route, $params),
-                'title' => 'Horizontal Marking',
-                'icon' => 'icon-modify',
-            ];
-        }
-
         return $links;
     }
 }
