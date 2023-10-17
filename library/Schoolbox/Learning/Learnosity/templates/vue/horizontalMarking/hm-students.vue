@@ -10,11 +10,13 @@ const studentsStore = useStudentsStore();
 </script>
 
 <template>
-    <hm-students-student
-        v-for="student in studentsStore.students"
-        :key="student.id"
-        :student="student"
-    ></hm-students-student>
+    <div>
+        <hm-students-student
+            v-for="student in studentsStore.students"
+            :key="student.id"
+            :student="student"
+        ></hm-students-student>
+    </div>
 </template>
 
 <style scoped></style>
