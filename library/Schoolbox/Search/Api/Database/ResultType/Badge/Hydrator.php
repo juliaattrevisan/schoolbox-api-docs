@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule;
 use Alaress\Html\ToText;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
+use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -55,6 +57,7 @@ class Hydrator extends BaseHydrator
 
     /**
      * @inheritdoc
+     * @throws RouteNotFound
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
@@ -124,15 +127,17 @@ class Hydrator extends BaseHydrator
     {
         $links = [];
 
-//        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
-//            $links[] = [
-//                'title' => 'Award Achievement',
-//                'icon' => 'icon-badge',
-//                'url' => $this->buildBaseUrl()
-//                    ->withPath("") // TODO: On learning/badge page, Award Achievement opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
-//                    ->__toString(),
-//            ];
-//        }
+        $canCreateBadgesRule = new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF);
+        $canCreateBadges = $canCreateBadgesRule->authorize([], $this->authorizer->getUser());
+
+        if ($canCreateBadges) {
+            $links[] = [
+                'title' => 'Award Achievement',
+                'icon' => 'icon-badge',
+                'url' => null,
+                'modal' => 'awardAchievement' // This asks the client to create a modal like the one used on the learning/badge page.
+            ];                                // The modal prompts the user to supply the students to whom the achievement should be awarded.
+        }
 
         $route = 'learningBadge.getUpdateForm';
         $params = ['badgeId' => $badge->getId(), 'badge' => $badge];
@@ -144,15 +149,14 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-//        if ($this->authorizer->isPathAuthorizedForUser('', [$badge->getId()], $viewer)) {
-//            $links[] = [
-//                'title' => 'Set Goal',
-//                'icon' => 'icon-goal',
-//                'url' => $this->buildBaseUrl()
-//                    ->withPath("") // TODO: On learning/badge page, Set Goal opens a modal on the same page.  Not sure how best to achieve that behaviour on the search page.
-//                    ->__toString(),
-//            ];
-//        }
+        if ($canCreateBadges) {
+            $links[] = [
+                'title' => 'Set Goal',
+                'icon' => 'icon-goal',
+                'url' => null,
+                'modal' => 'setGoal' // This asks the client to create a modal like the one used on the learning/badge page.
+            ];                       // The modal prompts the user to supply the students for whom the goal should be set.
+        }
 
         return $links;
     }
