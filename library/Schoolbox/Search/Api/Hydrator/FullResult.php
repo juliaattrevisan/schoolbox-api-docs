@@ -43,7 +43,7 @@ class FullResult
      * @param array<FolderModel>       $context     A folder structure which this result lives within:
      *                                              may be empty if there are no folders.
      *
-     * @param array{"title": string, "icon": string, "url": string, "modal"?: string} $links
+     * @param array{"title": string, "icon": string, "url": string, "action"?: string} $links
      *     A set of supplementary contextual links for this search result,
      *     for actions which the search user may perform on or for that result.
      */
@@ -73,8 +73,8 @@ class FullResult
 
         // Check keys of links.
         foreach ($links as $link) {
-            if (!array_key_exists('modal', $link)) {
-                $link['modal'] = null; // The 'modal' key is optional.
+            if (!array_key_exists('action', $link)) {
+                $link['action'] = null; // The 'action' key is optional.
             }
 
             if (
@@ -83,7 +83,7 @@ class FullResult
                 !array_key_exists('title', $link) ||
                 !array_key_exists('icon', $link) ||
                 !array_key_exists('url', $link) ||
-                !array_key_exists('modal', $link)
+                !array_key_exists('action', $link)
             ) {
                 throw new \InvalidArgumentException('Link format is invalid.');
             }

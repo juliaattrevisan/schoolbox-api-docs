@@ -135,8 +135,8 @@ class Hydrator extends BaseHydrator
                 'title' => 'Award Achievement',
                 'icon' => 'icon-badge',
                 'url' => '',
-                'modal' => 'awardAchievement' // This asks the client to create a modal like the one used on the learning/badge page.
-            ];                                // The modal prompts the user to supply the students to whom the achievement should be awarded.
+                'action' => 'awardAchievementModal' // This asks the client to create a modal like the one used on the learning/badge page.
+            ];                                      // The modal prompts the user to supply the students to whom the achievement should be awarded.
         }
 
         $route = 'learningBadge.getUpdateForm';
@@ -154,8 +154,8 @@ class Hydrator extends BaseHydrator
                 'title' => 'Set Goal',
                 'icon' => 'icon-goal',
                 'url' => '',
-                'modal' => 'setGoal' // This asks the client to create a modal like the one used on the learning/badge page.
-            ];                       // The modal prompts the user to supply the students for whom the goal should be set.
+                'action' => 'setGoalModal' // This asks the client to create a modal like the one used on the learning/badge page.
+            ];                             // The modal prompts the user to supply the students for whom the goal should be set.
         }
 
         return $links;
