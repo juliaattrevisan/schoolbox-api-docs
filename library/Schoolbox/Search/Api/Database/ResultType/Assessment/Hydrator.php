@@ -14,13 +14,13 @@ use Alaress\Html\ToText;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -248,6 +248,20 @@ class Hydrator extends BaseHydrator
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
             ];
+        }
+
+        if (!($assessment instanceof Assessment\LessonPlan\Model)) {
+            $route = 'learningAssessment.getStatus';
+            $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                $links[] = [
+                    // All assessment types use the same URL for their 'View Status' page,
+                    // except lesson plans.  Lesson plans have no 'View Status' page.
+                    'url' => $this->routeGenerator->generate($route, $params),
+                    'title' => 'View Status',
+                    'icon' => 'icon-progress',
+                ];
+            }
         }
 
         return $links;
