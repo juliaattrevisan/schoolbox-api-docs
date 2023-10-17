@@ -8,6 +8,7 @@ import { useReportsStore } from "./store/hmReportsStore";
 import HmStudents from "./hmStudents.vue";
 
 interface Props {
+    title: string; //
     responseScores: object; //
     responseComments: string; //
     urls: object; //
@@ -18,11 +19,15 @@ interface Props {
 const props = defineProps<Props>();
 
 useStudentsStore().init(props.students);
-useReportsStore().init(props.reportPayloads);
+// useReportsStore().init(props.reportPayloads);
 </script>
 
 <template>
-    <hm-students />
+    <div class="l-flex-col">
+        <!-- Title. But add the metadata etc. when you get up to that bit -->
+        <h1>Horizontal Marking for {{ props.title }}</h1>
+        <hm-students />
+    </div>
 </template>
 
 <style scoped></style>

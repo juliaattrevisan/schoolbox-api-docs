@@ -15,15 +15,9 @@
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
-{# Title. But add the metadata etc. when you get up to that bit #}
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Horizontal Marking for {{ assessment.title }}</h1>
-    </div>
-</div>
-
 <div id="horizontal-marking-container">
     <horizontal-marking
+        :title="'{{ assessment.title }}'"
         :response-scores="{{ scores }}"
         :response-comments="{{ responseComments|json_encode }}"
         :urls="{{ urls }}"
