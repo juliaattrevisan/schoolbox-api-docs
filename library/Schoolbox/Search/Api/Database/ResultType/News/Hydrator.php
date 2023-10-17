@@ -207,11 +207,11 @@ class Hydrator extends BaseHydrator
     {
         $links = [];
 
-        $route = 'commsNewsSaveForLater.postAdd';
+        $route = 'commsNews.getUpdate';
         $params = ['articleId' => $article->getId(), 'article' => $article];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
-                'title' => 'Save For Later',
+                'title' => 'Modify',
                 'icon' => 'icon-news',
                 'url' => $this->routeGenerator->generate($route, $params),
             ];
