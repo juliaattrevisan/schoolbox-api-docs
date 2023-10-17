@@ -18,8 +18,15 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-useStudentsStore().init(props.students);
-// useReportsStore().init(props.reportPayloads);
+/**
+ * Initialise the stores, adding the students first, then the reports as
+ * when the reports are loaded they look for the students in the store/DOM tree
+ */
+window.Vue.onMounted(async () => {
+    useStudentsStore().init(props.students);
+    await window.Vue.nextTick();
+    useReportsStore().init(props.reportPayloads);
+});
 </script>
 
 <template>

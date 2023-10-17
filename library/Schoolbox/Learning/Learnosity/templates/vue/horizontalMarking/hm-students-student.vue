@@ -32,9 +32,12 @@ const containerHeight = window.Vue.computed(() => {
     <div class="c-island l-flex-col l-pad-m">
         <div class="l-flex-row l-gap-m f-no-margins">
             <button
+                v-if="props.student.isReportLoaded"
                 :class="`toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                :disabled="!props.student.isReportLoaded"
                 @click.prevent="onToggleSelected"
             ></button>
+            <span v-else class="loader"></span>
             <h2>{{ props.student.name }}</h2>
         </div>
         <div class="response l-grid">
