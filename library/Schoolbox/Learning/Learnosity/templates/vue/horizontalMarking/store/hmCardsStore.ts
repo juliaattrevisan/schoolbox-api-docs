@@ -17,8 +17,16 @@ export const useCardsStore = defineStore("hmCards", () => {
      */
     function init($cards: Card[]) {
         cards.value = $cards;
-        activeCard.value = cards.value[0];
+        activeCard.value = { ...$cards[0] };
     }
 
-    return { init, cards, activeCard };
+    /**
+     * Set the active card
+     * @param {string} reference - the reference of the card to set as active
+     */
+    function setActiveCard(reference: string) {
+        activeCard.value = cards.value.find((card) => card.reference === reference) || EMPTY_CARD;
+    }
+
+    return { init, cards, activeCard, setActiveCard };
 });

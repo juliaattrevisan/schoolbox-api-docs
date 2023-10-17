@@ -13,7 +13,10 @@ const props = defineProps<Props>();
 
 const isOpen = window.Vue.ref(false); // whether the filters are shown
 const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+const containerEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const cardsStore = useCardsStore();
+let learnosityContainer: HTMLDivElement;
+let currentCardResponse: HTMLDivElement;
 
 /**
  * To show/hide the filters when selected
@@ -31,24 +34,57 @@ const containerHeight = window.Vue.computed(() => {
 });
 
 /**
+ * Initialy hide all the children within the learnosity container
+ */
+function hideAllChildren() {
+    Array.from(learnosityContainer.children).forEach((element) => {
+        (element as HTMLDivElement).style.display = "none";
+    });
+}
+
+/**
+ * To display the current card
+ */
+function displayActiveCard() {
+    currentCardResponse = learnosityContainer.querySelector(
+        `[data-reference="${cardsStore.activeCard.reference}"]`
+    ) as HTMLDivElement;
+    currentCardResponse.style.display = "block";
+}
+
+/**
+ * To change the current card
+ */
+function changeActiveCard() {
+    currentCardResponse.style.display = "none";
+    currentCardResponse = learnosityContainer.querySelector(
+        `[data-reference="${cardsStore.activeCard.reference}"]`
+    ) as HTMLDivElement;
+    currentCardResponse.style.display = "block";
+}
+
+/**
  * When its loaded hide everything by default, and then only show the current card
  */
 window.Vue.watch(
     () => props.student.isReportLoaded,
     async () => {
         if (props.student.isReportLoaded) {
-            await window.Vue.nextTick();
-            const learnosityContainer = (studentEl.value as HTMLDivElement).querySelector(
-                `#${props.student.elementId}`
-            ) as HTMLDivElement;
-            Array.from(learnosityContainer.children).forEach((element) => {
-                (element as HTMLDivElement).style.display = "none";
-            });
-            const currentCardResponse = learnosityContainer.querySelector(
-                `[data-reference="${cardsStore.activeCard.reference}"]`
-            ) as HTMLDivElement;
-            currentCardResponse.style.display = "block";
+            await window.Vue.nextTick(); // ensure the learnosity DOM is ready
+            learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
+            hideAllChildren();
+            displayActiveCard();
         }
+    }
+);
+
+/**
+ * Show the appropriate response when the card is changed
+ */
+window.Vue.watch(
+    () => cardsStore.activeCard,
+    () => {
+        changeActiveCard();
     }
 );
 </script>
@@ -66,7 +102,7 @@ window.Vue.watch(
             <h2>{{ props.student.name }}</h2>
         </div>
         <div class="response l-grid">
-            <div class="response__inner-container">
+            <div ref="containerEl" class="response__inner-container">
                 <div :id="props.student.elementId"></div>
             </div>
         </div>
