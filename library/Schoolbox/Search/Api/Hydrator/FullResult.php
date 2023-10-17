@@ -43,9 +43,13 @@ class FullResult
      * @param array<FolderModel>       $context     A folder structure which this result lives within:
      *                                              may be empty if there are no folders.
      *
-     * @param array{"title": string, "icon": string, "url": string, "action"?: string} $links
+     * @param array{array{"title": string, "icon": string, "url": string, "action"?: string}} $links
      *     A set of supplementary contextual links for this search result,
      *     for actions which the search user may perform on or for that result.
+     *     The 'action' key is for use when something other than a redirect to the URL is required.
+     *     E.g. ['action' => 'awardBadgeModal'] could be used to request the display of a particular modal.
+     *     If 'action' is used, the value must be expected by the client.
+     *
      */
     public function __construct(
         public RawResult $rawResult,

@@ -130,7 +130,7 @@ class Hydrator extends BaseHydrator
      *
      * @param Folder\Model $folder
      * @param User  $viewer
-     * @return array array{"title": string, "icon": string, "url": string, "action"?: string}
+     * @return array array{array{"title": string, "icon": string, "url": string, "action"?: string}}
      * @throws RouteNotFound
      * @throws Exception
      */
