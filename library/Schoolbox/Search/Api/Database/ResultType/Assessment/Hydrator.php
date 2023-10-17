@@ -232,7 +232,7 @@ class Hydrator extends BaseHydrator
      *
      * @param IAssessable $assessment
      * @param User        $viewer
-     * @return array array{array{"title": string, "icon": string, "url": string, "action"?: string}}
+     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
      * @throws RouteNotFound
      */
     private function getSearchResultLinks(IAssessable $assessment, User $viewer): array
