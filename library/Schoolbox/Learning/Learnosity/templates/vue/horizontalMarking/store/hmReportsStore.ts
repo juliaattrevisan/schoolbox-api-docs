@@ -32,11 +32,11 @@ export const useReportsStore = defineStore("hmReports", () => {
             reportCallbacks[i] = {
                 readyListener: function () {
                     let attemptReport = reportsApp.getReport(reportId);
-                    useStudentsStore().reportLoaded(reportId);
 
                     /* itemsApi only spawns if you used session-detail-by-item
                      */
                     attemptReport.on("ready:itemsApi", function (itemsApp) {
+                        useStudentsStore().reportLoaded(reportId);
                         // debugger;
                         // window.itemsApp = itemsApp;
 

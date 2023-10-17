@@ -27,7 +27,7 @@ const props = defineProps<Props>();
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    useCardsStore().cards = props.cards;
+    useCardsStore().init(props.cards);
     useStudentsStore().init(props.students);
     await window.Vue.nextTick();
     useReportsStore().init(props.reportPayloads);

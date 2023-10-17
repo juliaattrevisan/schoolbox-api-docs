@@ -3,6 +3,7 @@
  * Display a single student's responses
  */
 
+import { useCardsStore } from "./store/hmCardsStore";
 import type { Student } from "./types/Student";
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const isOpen = window.Vue.ref(false); // whether the filters are shown
+const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+const cardsStore = useCardsStore();
 
 /**
  * To show/hide the filters when selected
@@ -26,10 +29,32 @@ function onToggleSelected() {
 const containerHeight = window.Vue.computed(() => {
     return isOpen.value ? "1fr" : "0fr";
 });
+
+/**
+ * When its loaded hide everything by default, and then only show the current card
+ */
+window.Vue.watch(
+    () => props.student.isReportLoaded,
+    async () => {
+        if (props.student.isReportLoaded) {
+            await window.Vue.nextTick();
+            const learnosityContainer = (studentEl.value as HTMLDivElement).querySelector(
+                `#${props.student.elementId}`
+            ) as HTMLDivElement;
+            Array.from(learnosityContainer.children).forEach((element) => {
+                (element as HTMLDivElement).style.display = "none";
+            });
+            const currentCardResponse = learnosityContainer.querySelector(
+                `[data-reference="${cardsStore.activeCard.reference}"]`
+            ) as HTMLDivElement;
+            currentCardResponse.style.display = "block";
+        }
+    }
+);
 </script>
 
 <template>
-    <div class="c-island l-flex-col l-pad-m">
+    <div ref="studentEl" class="c-island l-flex-col l-pad-m">
         <div class="l-flex-row l-gap-m f-no-margins">
             <button
                 v-if="props.student.isReportLoaded"
