@@ -187,3 +187,9 @@
     position: static;
     width: auto;
 }
+
+/*the color used to highlit the selceted item  */
+.lrn_widget .lrn_valid,
+.lrn_widget .lrn_selected {
+    background-color: var(--content-ui-selected);
+}
