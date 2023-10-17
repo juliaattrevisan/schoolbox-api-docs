@@ -329,19 +329,6 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        if ($this->access->getFolderAccess($viewer, $textboxFolder->getId()) >= UserAccess::ACCESS_WRITE) {
-            $links[] = [
-                // This just links to the textbox not yet open for modification.
-                // To modify the user must click 'Modify' at the bottom of the textbox.
-                'title' => 'Modify Textbox',
-                'icon' => 'icon-modify',
-                'url' => $this->buildBaseUrl()
-                     ->withPath('/homepage/' . $textboxFolder->getId())
-                     ->withFragment('textbox' . $textbox->getId())
-                     ->__toString(),
-            ];
-        }
-
         return $links;
     }
 }
