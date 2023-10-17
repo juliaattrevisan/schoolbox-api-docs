@@ -15,7 +15,6 @@ use Aura\Router\Generator;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -41,14 +40,12 @@ class Hydrator extends BaseHydrator
      * Constructor
      *
      * @param Mapper           $folderMapper     Used to fetch folders for hydration.
-     * @param UserAccessMapper $userAccessMapper
      * @param Access           $access           Used to determine if the current user may view this page.
      * @param Generator        $routeGenerator   Used to build a route to the result search for pages.
      * @param Authorizer       $authorizer       Used to find page access permissions.
      */
     public function __construct(
         private Folder\Mapper $folderMapper,
-        private UserAccessMapper $userAccessMapper,
         private Access $access,
         private Generator $routeGenerator,
         private Authorizer $authorizer
