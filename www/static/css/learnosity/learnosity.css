@@ -298,6 +298,14 @@ input[type="checkbox"] {
 }
 .lrn_cloze .lrn_response_input .lrn_textinput input,
 .lrn_cloze .lrn_response_input .lrn_textinput textarea {
-    margin: 0px 0px 10px 0px;
     color: #000;
+}
+
+/*  update the border color for label image with drag and drop */
+.lrn_widget.lrn_imageclozeassociationV2
+    .lrn_response_input
+    .lrn_dropzones_container
+    .lrn_imagecloze_response
+    .lrn_dropzone_mask {
+    border: 2px dashed var(--content-ui-foreground);
 }
