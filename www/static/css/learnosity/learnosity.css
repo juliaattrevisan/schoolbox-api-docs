@@ -133,6 +133,11 @@
     background-color: var(--content-ui-foreground);
 }
 
+/* the vertical menu running down the right hand side */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .menu-overlay {
+    background-color: var(--content-ui-background);
+}
+
 /* remove the background from the review screen */
 .lrn.lrn-assess .app-panel.review-screen .panel-content,
 .lrn-assess .app-panel .panel-content {
