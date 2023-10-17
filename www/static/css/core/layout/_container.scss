@@ -114,3 +114,8 @@
         }
     }
 }
+
+// to identify 'islands' of content, sitting on --background-colour
+.c-island {
+    background-color: var(--foreground-colour);
+}
