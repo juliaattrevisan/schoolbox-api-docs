@@ -309,3 +309,8 @@ input[type="checkbox"] {
     .lrn_dropzone_mask {
     border: 2px dashed var(--content-ui-foreground);
 }
+
+/* update the border color for label image with text*/
+.lrn_widget .lrn_imagecloze_response .lrn_textinput.lrn_response_pointer_right:before {
+    border-left: 1.14285714em solid var(--content-ui-foreground);
+}
