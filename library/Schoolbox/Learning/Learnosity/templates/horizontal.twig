@@ -29,7 +29,7 @@
         :urls="{{ urls }}"
         :report-payloads="{{ reportPayloads }}"
         :attempt-comments="{{ attemptReferences }}"
-        :users="{{ usersEncoded }}"
+        :students="{{ usersEncoded }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
@@ -305,7 +305,7 @@
 
         /* Initialise reports for each attempt
          */
-        let reportsApp = LearnosityReports.init(initOptions, reportCallbacks[i]);
+        //let reportsApp = LearnosityReports.init(initOptions, reportCallbacks[i]);
     }
 
     /* Poll to see when reportsLoaded == reportsExpected
