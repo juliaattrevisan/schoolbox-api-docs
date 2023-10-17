@@ -193,6 +193,13 @@
 .lrn_widget .lrn_selected {
     background-color: var(--content-ui-selected);
 }
+
+/*the color used to highlight the selceted item in the mutiplechoice-block layout */
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
+    background-color: var(--content-ui-selected);
+}
+
+/*update the radio and checkbox background color to content-ui-foregroud*/
 input[type="radio"],
 input[type="checkbox"] {
     accent-color: var(--content-ui-foreground);
