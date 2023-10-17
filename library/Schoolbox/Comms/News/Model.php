@@ -1096,7 +1096,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function getAudience(): ?GenericCollection
     {
-        return $this->audience ?? new GenericCollection(Audience\Model::class);
+//        return $this->audience ?? new GenericCollection(Audience\Model::class);
+        return $this->audience;
     }
 
 
