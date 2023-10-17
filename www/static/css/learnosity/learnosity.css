@@ -383,3 +383,37 @@ input[type="checkbox"] {
 .lrn_widget.lrn_sortlist .lrn_arrow_right span {
     border-left: 1em solid var(--content-ui-foreground);
 }
+
+/* reachtext styles */
+.lrn_widget.lrn_chemistryessayV2 .lrn_response_input_wrapper,
+.lrn_widget.lrn_formulaessayV2 .lrn_response_input_wrapper,
+.lrn_widget.lrn_longtextV2 .lrn_response_input_wrapper {
+    border-color: var(--content-ui-foreground);
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn-toolbar,
+.lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
+.lrn_widget.lrn_longtextV2 .lrn-toolbar {
+    border-bottom: 1px solid var(--content-ui-foreground);
+    background: #ffff;
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
+.lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
+.lrn_widget.lrn_longtextV2 .lrn-divider:after {
+    transform: translate(0, -50%);
+    border-right: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn-toolbar-footer,
+.lrn_widget.lrn_formulaessayV2 .lrn-toolbar-footer,
+.lrn_widget.lrn_longtextV2 .lrn-toolbar-footer {
+    background: #ffff;
+    border-top: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable:focus,
+.lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable.lrn_active,
+.lrn_widget.lrn_formulaessayV2 .lrn_texteditor_editable:focus,
+.lrn_widget.lrn_formulaessayV2 .lrn_texteditor_editable.lrn_active,
+.lrn_widget.lrn_longtextV2 .lrn_texteditor_editable:focus,
+.lrn_widget.lrn_longtextV2 .lrn_texteditor_editable.lrn_active {
+    outline: none;
+    box-shadow: 2px 2px 3px #0000001a inset;
+}
