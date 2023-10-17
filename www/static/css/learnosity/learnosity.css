@@ -353,3 +353,33 @@ input[type="checkbox"] {
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_list.lrn_hover {
     box-shadow: inset 0 0 0 2px var(--content-ui-foreground);
 }
+
+/* update sortlist border, color and arrow icons styles */
+.lrn_widget.lrn_sortlist .lrn_response .lrn_cell {
+    border: 2px solid var(--content-ui-foreground);
+}
+.lrn_widget .lrn_btn_drag:focus:hover,
+.lrn_widget .lrn_btn_drag.lrn_focus.lrn_hover,
+.lrn_widget .lrn_btn_drag.lrn_focus:hover,
+.lrn_widget .lrn_btn_drag:focus.lrn_hover,
+.lrn_widget .lrn_btn_sort:focus:hover,
+.lrn_widget .lrn_btn_sort.lrn_focus.lrn_hover,
+.lrn_widget .lrn_btn_sort.lrn_focus:hover,
+.lrn_widget .lrn_btn_sort:focus.lrn_hover {
+    box-shadow: inset 0 0 0 2px var(--content-ui-foreground), inset 0 0 0 4px var(--content-ui-foreground);
+}
+.lrn .lrn_btn_sort {
+    color: #000;
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_top span {
+    border-bottom: 1em solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_down span {
+    border-top: 1em solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_left span {
+    border-right: 1em solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_right span {
+    border-left: 1em solid var(--content-ui-foreground);
+}
