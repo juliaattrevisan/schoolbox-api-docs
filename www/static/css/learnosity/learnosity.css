@@ -177,3 +177,13 @@
 .lrn-list-view-status {
     display: none;
 }
+
+/* reset the radio and checkboxes to default */
+.lrn_widget input[type="radio"],
+.lrn_widget input[type="checkbox"] {
+    height: auto;
+    opacity: 1;
+    min-height: auto;
+    position: static;
+    width: auto;
+}
