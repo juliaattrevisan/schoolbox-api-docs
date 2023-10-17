@@ -18,6 +18,7 @@
 <div id="horizontal-marking-container">
     <horizontal-marking
         :title="'{{ assessment.title }}'"
+        :cards="{{ itemReferences|json_encode }}"
         :response-scores="{{ scores }}"
         :response-comments="{{ responseComments|json_encode }}"
         :urls="{{ urls }}"

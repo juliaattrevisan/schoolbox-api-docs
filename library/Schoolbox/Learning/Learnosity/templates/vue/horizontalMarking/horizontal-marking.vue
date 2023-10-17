@@ -3,12 +3,15 @@
  * To use horizontal marking when assessing a quiz
  */
 
+import { useCardsStore } from "./store/hmCardsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { useReportsStore } from "./store/hmReportsStore";
+import type { Card } from "./types/Card";
 import HmStudents from "./hm-students.vue";
 
 interface Props {
     title: string; //
+    cards: Card[]; // the cards linked to quiz
     responseScores: object; //
     responseComments: string; //
     urls: object; //
@@ -23,6 +26,7 @@ const props = defineProps<Props>();
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
+    useCardsStore().cards = props.cards;
     useStudentsStore().init(props.students);
     await window.Vue.nextTick();
     useReportsStore().init(props.reportPayloads);

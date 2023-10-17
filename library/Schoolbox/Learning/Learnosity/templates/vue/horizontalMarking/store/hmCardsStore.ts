@@ -3,12 +3,10 @@
  */
 
 import { defineStore } from "pinia";
+import type { Card } from "../types/Card";
 
 export const useCardsStore = defineStore("hmCards", () => {
-    /**
-     * store any passed through properties
-     */
-    function init() {}
+    const cards = window.Vue.ref<Card[]>([]);
 
-    return {};
+    return { cards };
 });
