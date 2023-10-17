@@ -72,18 +72,38 @@ class UnitAssessments
             'closeAt'           => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
             'closeAtFormatted'  => $assessment->getCloseAt()?->getRelativeDay(),
             '_links'            => $links,
-            'assessments'    => $assessments?->reindex()->map(new self($this->routeGenerator, $this->student)),
+            'assessments'       => $assessments?->reindex()->map($this),
         ];
     }
+
+    /**
+     * Fetch the name of the assessment's course; if it's in:
+     * * a unit spec, fetch its course's folder's name;
+     * * a unit implementation, fetch its specification's course's folder name;
+     * * otherwise, return null
+     *
+     * @param IAssessable $assessable
+     * @return string|null
+     */
     private function getCourseName(IAssessable $assessable): ?string
     {
         $base = $assessable->getBaseContext();
         if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
             // Implementation
-            return $base->getSpecification()->getCourse()->getFolder()->getTitle();
+            /**
+             * @phpstan-ignore-next-line
+             * we aren't always hydrating the course folder when the assessment is inside a project,
+             * so yes, phpstan, `getFolder()` can be null...
+             */
+            return $base->getSpecification()->getCourse()->getFolder()?->getTitle();
         } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
             // Specification
-            return $base->getCourse()->getFolder()->getTitle();
+            /**
+             * @phpstan-ignore-next-line
+             * we aren't always hydrating the course folder when the assessment is inside a project,
+             * so yes, phpstan, `getFolder()` can be null...
+             */
+            return $base->getCourse()->getFolder()?->getTitle();
         }
         //no course, return null
         return null;
