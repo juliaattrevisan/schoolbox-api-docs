@@ -268,3 +268,24 @@ input[type="checkbox"] {
 .lrn_widget .lrn_btn_sort:focus.lrn_active {
     box-shadow: inset 0 0 0 2px var(--content-ui-selected), inset 0 0 0 3px #fff;
 }
+
+/* updated the drop down styles*/
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
+    color: var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-foreground);
+    background-color: #fff;
+    margin: 10px 0px;
+    padding: 0px 20px 0px 10px;
+}
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:hover,
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:focus {
+    color: var(--form-bg-hover-color-contrast);
+    background-color: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    outline: none;
+}
