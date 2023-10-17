@@ -193,3 +193,7 @@
 .lrn_widget .lrn_selected {
     background-color: var(--content-ui-selected);
 }
+input[type="radio"],
+input[type="checkbox"] {
+    accent-color: var(--content-ui-foreground);
+}
