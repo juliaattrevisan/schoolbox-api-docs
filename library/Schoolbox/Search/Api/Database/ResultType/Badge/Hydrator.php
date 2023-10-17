@@ -134,7 +134,7 @@ class Hydrator extends BaseHydrator
             $links[] = [
                 'title' => 'Award Achievement',
                 'icon' => 'icon-badge',
-                'url' => null,
+                'url' => '',
                 'modal' => 'awardAchievement' // This asks the client to create a modal like the one used on the learning/badge page.
             ];                                // The modal prompts the user to supply the students to whom the achievement should be awarded.
         }
@@ -153,7 +153,7 @@ class Hydrator extends BaseHydrator
             $links[] = [
                 'title' => 'Set Goal',
                 'icon' => 'icon-goal',
-                'url' => null,
+                'url' => '',
                 'modal' => 'setGoal' // This asks the client to create a modal like the one used on the learning/badge page.
             ];                       // The modal prompts the user to supply the students for whom the goal should be set.
         }

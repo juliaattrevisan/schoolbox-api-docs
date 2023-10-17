@@ -42,8 +42,10 @@ class FullResult
      * @param User|null                $creator     An optional creator of this search result.
      * @param array<FolderModel>       $context     A folder structure which this result lives within:
      *                                              may be empty if there are no folders.
-     * @param array                    $links       A set of supplementary contextual links for this search result,
-     *                                              for actions which the search user may perform on or for that result.
+     *
+     * @param array{"title": string, "icon": string, "url": string, "modal"?: string} $links
+     *     A set of supplementary contextual links for this search result,
+     *     for actions which the search user may perform on or for that result.
      */
     public function __construct(
         public RawResult $rawResult,
