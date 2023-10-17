@@ -205,12 +205,42 @@ class Hydrator extends BaseHydrator
             ];
         }
 
+        $route = 'learningGrades.getGrades';
+        // Params needed here are the same as set above.
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Grades',
+                'icon' => 'icon-approve',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
+        }
+
         $route = 'adminUser.getModify';
         // Params needed here are the same as set above.
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
+        }
+
+        $route = 'pastoral.getStudent';
+        // Params needed here are the same as set above.
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Pastoral Care',
+                'icon' => 'icon-pastoral',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
+        }
+
+        $route = 'timetable.getTimetableCalendarRedirect';
+        // Params needed here are the same as set above.
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Timetable',
+                'icon' => 'icon-timetable',
                 'url' => $this->routeGenerator->generate($route, $params),
             ];
         }
