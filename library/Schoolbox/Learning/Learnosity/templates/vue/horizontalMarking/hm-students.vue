@@ -11,6 +11,7 @@ const studentsStore = useStudentsStore();
 
 <template>
     <div>
+        <h2 class="subheader">Students</h2>
         <hm-students-student
             v-for="student in studentsStore.students"
             :key="student.id"
