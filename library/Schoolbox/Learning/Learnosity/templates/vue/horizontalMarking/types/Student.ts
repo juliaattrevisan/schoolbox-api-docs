@@ -7,4 +7,7 @@ export type Student = {
     lastname: string;
     name: string;
     elementId: string;
+    hasReport: boolean;
+    isReportLoaded: boolean;
+    isExpanded: boolean;
 };

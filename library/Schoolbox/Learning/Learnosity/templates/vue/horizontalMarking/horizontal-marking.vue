@@ -19,7 +19,7 @@ interface Props {
 const props = defineProps<Props>();
 
 useStudentsStore().init(props.students);
-useReportsStore().init(props.reportPayloads);
+// useReportsStore().init(props.reportPayloads);
 </script>
 
 <template>
