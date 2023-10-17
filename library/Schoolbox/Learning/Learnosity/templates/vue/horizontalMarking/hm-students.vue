@@ -4,7 +4,7 @@
  */
 
 import { useStudentsStore } from "./store/hmStudentsStore";
-import HmStudentsStudent from "./hmStudentsStudent.vue";
+import HmStudentsStudent from "./hm-students-student.vue";
 
 const studentsStore = useStudentsStore();
 </script>

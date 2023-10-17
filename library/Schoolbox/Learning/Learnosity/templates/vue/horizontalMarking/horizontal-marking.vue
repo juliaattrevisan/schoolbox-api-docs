@@ -5,7 +5,7 @@
 
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { useReportsStore } from "./store/hmReportsStore";
-import HmStudents from "./hmStudents.vue";
+import HmStudents from "./hm-students.vue";
 
 interface Props {
     title: string; //
