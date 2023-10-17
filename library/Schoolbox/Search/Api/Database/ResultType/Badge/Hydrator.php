@@ -120,7 +120,7 @@ class Hydrator extends BaseHydrator
      *
      * @param BadgeModel $badge
      * @param User       $viewer
-     * @return array
+     * @return array array{"title": string, "icon": string, "url": string, "action"?: string}
      * @throws RouteNotFound
      */
     private function getSearchResultLinks(BadgeModel $badge, User $viewer): array

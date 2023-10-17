@@ -167,7 +167,7 @@ class Hydrator extends BaseHydrator
      *
      * @param User $viewer
      * @param User $searchResultUser
-     * @return array
+     * @return array array{"title": string, "icon": string, "url": string, "action"?: string}
      * @throws RouteNotFound
      */
     private function getSearchResultLinks(User $searchResultUser, User $viewer): array

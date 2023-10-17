@@ -70,23 +70,5 @@ class FullResult
                 $this->$key = trim($this->$key);
             }
         }
-
-        // Check keys of links.
-        foreach ($links as $link) {
-            if (!array_key_exists('action', $link)) {
-                $link['action'] = null; // The 'action' key is optional.
-            }
-
-            if (
-                !is_array($link) ||
-                count($link) !== 4 ||
-                !array_key_exists('title', $link) ||
-                !array_key_exists('icon', $link) ||
-                !array_key_exists('url', $link) ||
-                !array_key_exists('action', $link)
-            ) {
-                throw new \InvalidArgumentException('Link format is invalid.');
-            }
-        }
     }
 }
