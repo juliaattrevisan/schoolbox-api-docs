@@ -50,7 +50,7 @@ $tooltip-max-width: 300px !default;
             }
         }
 
-        .tooltip {
+        span.tooltip {
             background: $tooltip-bg;
             color: $tooltip-font-color;
             display: none;

@@ -1,0 +1,179 @@
+/**
+ * The following styles are used to override the default Learnosity styles.
+ */
+
+/* use our font everywhere */
+.lrn,
+.lrn-assess {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif;
+}
+
+/* avoid the horizontal scroll on the questions container that's somehow being applied */
+.lrn_widget.lrn_mcq .lrn_mcqgroup {
+    overflow-x: visible;
+}
+
+/* bring it back as we negative margin our own */
+.lrn legend {
+    margin-left: 0;
+}
+
+/* change the accessibility modal button colour */
+.lrn-assess .lrn-dialogs-close-btn:after,
+.lrn-assess .lrn-dialogs-close-btn:before {
+    background-color: var(--content-ui-foreground);
+}
+
+/* general button, like previous question or resume quiz */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
+.lrn.lrn-assess .dialogs .lrn_btn {
+    background-color: var(--content-ui-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-foreground);
+    min-height: auto;
+}
+
+/* general button on disabled */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:disabled:not(.lrn_btn_blue),
+.lrn.lrn-assess .dialogs .lrn_btn:disabled:not(.lrn_btn_blue) {
+    color: var(--content-ui-foreground);
+    opacity: 0.5;
+}
+
+/* general button on hover */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:hover:not(:disabled),
+.lrn.lrn-assess .dialogs .lrn_btn:hover:not(:disabled) {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+}
+
+/* general button on focus */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:focus,
+.lrn.lrn-assess .dialogs .lrn_btn:focus {
+    border: none;
+}
+
+/* button with icon only */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue .btn-label {
+    color: var(--content-ui-foreground);
+}
+
+/* button with icon only on hover */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover .btn-label {
+    color: var(--content-ui-foreground);
+}
+
+/* primary action button, like next question or confirmation  */
+.lrn .lrn_btn_blue,
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue,
+.lrn.lrn-assess .dialogs .lrn_btn_blue {
+    background-color: var(--content-ui-submit-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-submit-foreground);
+    font-weight: 600;
+}
+
+/* primary action button on hover */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:hover:not(:disabled),
+.lrn.lrn-assess .dialogs .lrn_btn_blue:hover:not(:disabled) {
+    background-color: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
+    color: var(--content-ui-submit-foreground);
+}
+
+/* primary action button on active */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:active,
+.lrn.lrn-assess .dialogs .lrn_btn_blue:active {
+    background-color: var(--content-ui-submit-background);
+    color: var(--content-ui-submit-foreground);
+}
+
+/* primary action button on focus */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:focus,
+.lrn.lrn-assess .dialogs .lrn_btn_blue:focus {
+    background-color: var(--content-ui-submit-background);
+}
+
+/* primary action button on disabled */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:disabled,
+.lrn.lrn-assess .dialogs .lrn_btn_blue:disabled {
+    background-color: var(--content-ui-submit-background);
+    border: none;
+}
+
+/* remove the margin so the right-region is inline with the left */
+.lrn.lrn-assess .lrn-bottom-right-region.lrn-align-top {
+    margin-top: 0;
+}
+
+/* to vertically align the timer with other items */
+.lrn.lrn-assess .counter {
+    line-height: 0.8;
+}
+
+/* the progress bar at the top, which moves across with question progress */
+.lrn-assess .items .progress span {
+    background-color: var(--content-ui-foreground);
+}
+
+/* the vertical menu running down the right hand side */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .menu-overlay {
+    background-color: var(--content-ui-background);
+}
+
+/* remove the background from the review screen */
+.lrn.lrn-assess .app-panel.review-screen .panel-content,
+.lrn-assess .app-panel .panel-content {
+    background: none;
+}
+
+/* the colour used to highlight the selected item in the review screen */
+.lrn.lrn-assess .app-panel.review-screen .item-card.active:before {
+    background-color: var(--content-ui-foreground);
+}
+
+/* the colour used to highlight the selected item in the review screen (little triangle above) */
+.lrn.lrn-assess .app-panel.review-screen .item-card.active:after {
+    border-color: transparent transparent transparent var(--content-ui-foreground);
+}
+
+/* Hide the welcome/exit screen ui */
+.lrn-author-activity-intro-outro {
+    display: none !important;
+}
+
+/* Reconfigure column dimensioning lol (rude) */
+.lrn.lrn-author.lrn-sm .lrn-col-sm-9 {
+    width: 100%;
+}
+
+.lrn.lrn-author.lrn-sm .lrn-col-sm-3 {
+    display: none !important;
+}
+
+/* Hide the Tags */
+.lrn-list-view-meta {
+    display: none;
+}
+
+/* Hide the published/archived status  */
+.lrn-list-view-status {
+    display: none;
+}
