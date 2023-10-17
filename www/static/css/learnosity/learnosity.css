@@ -289,3 +289,15 @@ input[type="checkbox"] {
     );
     outline: none;
 }
+
+/* update the color , border and margin of textarea */
+.lrn_widget input:not([type="radio"]):not([type="checkbox"]),
+.lrn_widget textarea,
+.lrn_widget .lrn_texteditor_editable {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_cloze .lrn_response_input .lrn_textinput input,
+.lrn_cloze .lrn_response_input .lrn_textinput textarea {
+    margin: 0px 0px 10px 0px;
+    color: #000;
+}
