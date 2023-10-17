@@ -116,21 +116,6 @@ class Hydrator extends BaseHydrator
                     null,
                     $this->folderMapper->findParents($folder, null, true)->getAll(),
                     $this->getSearchResultLinks($folder, $viewer),
-                    // TODO: Figure out what to do with this.
-                    //[
-                    //    'subResults' => $this->buildBaseUrl()
-                    //        ->withPath(
-                    //            $this->routeGenerator->generate(
-                    //                'searchApi.getSearchWithinFolder',
-                    //                [
-                    //                    'folder'   => $folder,
-                    //                    'folderId' => $folder->getId(),
-                    //                ]
-                    //            )
-                    //        )
-                    //        ->withQuery(http_build_query(['keyword' => $keyword]))
-                    //        ->__toString(),
-                    //],
                 );
             },
             $acceptedMatches,
