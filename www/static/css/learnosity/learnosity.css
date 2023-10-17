@@ -323,3 +323,6 @@ input[type="checkbox"] {
     border-top: 2px dashed var(--content-ui-foreground);
     border-left: 2px dashed var(--content-ui-foreground);
 }
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
+    border-right: 2px dashed var(--content-ui-foreground);
+}
