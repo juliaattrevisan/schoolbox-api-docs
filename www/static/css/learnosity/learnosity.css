@@ -314,3 +314,12 @@ input[type="checkbox"] {
 .lrn_widget .lrn_imagecloze_response .lrn_textinput.lrn_response_pointer_right:before {
     border-left: 1.14285714em solid var(--content-ui-foreground);
 }
+
+/* update the border color for classification */
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
+    border-bottom: 2px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
+    border-top: 2px dashed var(--content-ui-foreground);
+    border-left: 2px dashed var(--content-ui-foreground);
+}
