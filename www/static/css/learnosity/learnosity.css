@@ -204,3 +204,8 @@ input[type="radio"],
 input[type="checkbox"] {
     accent-color: var(--content-ui-foreground);
 }
+
+/*the hover color of choice matrix-standard radio buttons set to content-ui-selected*/
+.lrn_qr.lrn_choicematrix .lrn_response_input > table td.lrn_option.lrn_enabled.lrn_selected:hover {
+    background-color: var(--content-ui-selected);
+}
