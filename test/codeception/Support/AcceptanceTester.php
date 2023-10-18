@@ -292,4 +292,28 @@ class AcceptanceTester extends Actor
     {
         $this->executeJS('document.querySelector("' . $selector . '").shadowRoot.querySelector("' . $inSelector . '").click();');
     }
+
+
+    /**
+     * Generate a data-test query selector for the given base format and optional IDs.
+     *
+     * @param string $baseFormat The base data-test value (e.g., "sp-results-result").
+     * @param bool $useStartsWith Optional whether to write a selector for elements starting with baseFormat, default false
+     * @param array $ids Optional array of identifiers (e.g., [1, 2] for suffixes of "-1" and "-2").
+     * @return string The query selector. (e.g. "[data-test="sp-results-result-1-2"]")
+     */
+    public static function getTestSelector(string $baseFormat, bool $useStartsWith = false, array $ids = []): string
+    {
+        $selector = "[data-test";
+        if ($useStartsWith) {
+            $selector .= "^";
+        }
+        $dataValue = $baseFormat;
+        foreach ($ids as $id) {
+            $dataValue .= "-$id";
+        }
+        $selector .= "=\"$dataValue\"]";
+
+        return $selector;
+    }
 }

@@ -40,7 +40,10 @@ const hasSubResults = window.Vue.computed(() => {
 
 <template>
     <div ref="resultEl" class="l-flex-col">
-        <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`" data-test-sp-results-result>
+        <div
+            :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`"
+            :data-test="`sp-results-result-${props.result.id}`"
+        >
             <div class="l-flex-col l-gap-m l-pad-m">
                 <div class="l-flex-row l-gap-m">
                     <sp-results-result-image :result="props.result" />

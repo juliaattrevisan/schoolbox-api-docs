@@ -95,6 +95,7 @@ function onSelected(result: Result) {
                 <search-select-result
                     v-for="result in props.results"
                     :key="result.id"
+                    :data-test="`search-select-result-${result.id}`"
                     :query="query"
                     :selected="selected"
                     :results="props.results"
