@@ -13,5 +13,5 @@ beforeEach(() => {
 });
 
 test("if has not searched, should display search prompt", async () => {
-    expect(wrapper.get("[data-test=sp-results-prompt]").isVisible()).toBe(true);
+    expect(wrapper.get('[data-test="sp-results-prompt"]').isVisible()).toBe(true);
 });

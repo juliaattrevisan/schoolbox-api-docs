@@ -14,13 +14,13 @@ beforeEach(() => {
 });
 
 test("if there are no search results, no results should be displayed", async () => {
-    expect(wrapper.find("[data-test=sp-results-list-result]").exists()).toBe(false);
+    expect(wrapper.find('[data-test^="sp-results-result"]').exists()).toBe(false);
 });
 
 test("if there are search results, results should be displayed", async () => {
     const resultsStore = useResultsStore();
     await resultsStore.$patch({ results: [{ id: 1, name: "test", type: "user" }] });
-    expect(wrapper.get("[data-test=sp-results-list-result]").isVisible()).toBe(true);
+    expect(wrapper.get('[data-test^="sp-results-result"]').isVisible()).toBe(true);
 });
 
 test("if there are two search results, two results should be shown", async () => {
@@ -31,5 +31,5 @@ test("if there are two search results, two results should be shown", async () =>
             { id: 2, name: "test", type: "user" },
         ],
     });
-    expect(wrapper.findAll("[data-test=sp-results-list-result]")).toHaveLength(2);
+    expect(wrapper.findAll('[data-test^="sp-results-result"]')).toHaveLength(2);
 });
