@@ -66,7 +66,6 @@ abstract class Base
 
     /**
      * Execute search
-     * Execute search count
      *
      * @param User            $user
      * @param Mapper          $mapper
