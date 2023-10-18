@@ -506,7 +506,35 @@ input[type="checkbox"] {
     border-color: var(--content-ui-foreground) transparent transparent;
 }
 
-/* Number line with plot */
+/* update number line with plot styles  */
 .lrn_widget.lrn_numberlineplot .lrn_jxg_toolbox li button.lrn_active {
     background: var(--content-ui-foreground);
+}
+
+/* update file upload styles */
+.lrn_widget.lrn_fileupload .lrn_response_input_wrapper {
+    border-color: var(--content-ui-foreground);
+}
+.lrn_wid .lrn_widget.lrn_fileupload .lrn-toolbar {
+    border-bottom: 1px solid var(--content-ui-foreground);
+    background: #fff;
+}
+.lrn_widget.lrn_fileupload .lrn-toolbar-footer {
+    background: #fff;
+    border-top: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_fileupload .lrn-toolbar {
+    border-bottom: 1px solid var(--content-ui-foreground);
+    background: #fff;
+}
+.lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
+.lrn_widget .lrn-imageupload-img-wrapper-is-empty {
+    border-right: 1px solid var(--content-ui-foreground);
+    border-bottom: 1px solid var(--content-ui-foreground);
+    border-left: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_imageupload .lrn_toolbar {
+    touch-action: none;
+    -ms-touch-action: none;
+    border: 1px solid var(--content-ui-foreground);
 }
