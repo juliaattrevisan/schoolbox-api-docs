@@ -49,7 +49,7 @@ const hasSubResults = window.Vue.computed(() => {
                         <sp-results-result-title :result="props.result" />
                         <sp-results-result-meta :result="props.result" />
                     </div>
-                    <sp-results-result-actions v-if="result._links" :result="props.result" />
+                    <sp-results-result-actions v-if="props.result._links.length > 0" :result="props.result" />
                 </div>
                 <sp-results-result-description v-if="props.result.description" :result="result" />
             </div>
