@@ -12,6 +12,7 @@ namespace Custom\Sedavic\Extract;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
+use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
 use DebugBar\DebugBarException;
 
@@ -145,10 +146,10 @@ class Controller extends Base
      *
      * @var \Alaress\Database\Statement\Query\Base
      */
-    private \Alaress\Database\Statement\Query\Base $assessmentInfoStatement;
-    private \Alaress\Database\Statement\Query\Base $nodeStatement;
-    private \Alaress\Database\Statement\Query\Base $dueworkFeedbackStatement;
-    private \Alaress\Database\Statement\Query\Base $quizFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $assessmentInfoStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $nodeStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $dueworkFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $quizFeedbackStatement;
 
 
     /**
@@ -165,7 +166,7 @@ class Controller extends Base
         /* To figure out course names from their spec or impl
          * Carefully abducted from Learnosity prototype
          */
-        $this->contextLookup = new ContextLookup($database);
+        $this->contextLookup = new ContextLookup($this->database);
 
         /* Basic user and assessment metadata
          */
@@ -198,6 +199,7 @@ class Controller extends Base
 
         /* Set up file download thing
          */
+        /* @phpstan-ignore-next-line */
         if (self::PERFORM) {
             $filename = sprintf(
                 self::FILENAME,
@@ -265,6 +267,7 @@ class Controller extends Base
 
             /* Pump it to an fputcsv
              */
+            /* @phpstan-ignore-next-line */
             if (self::PERFORM) {
                 foreach ($rows as $row) {
                     fputcsv($outstream, $row);
@@ -279,6 +282,7 @@ class Controller extends Base
 
         $end = microtime(true);
 
+        /* @phpstan-ignore-next-line */
         if (self::PERFORM) {
             fclose($outstream);
         } else {

@@ -11,7 +11,7 @@ namespace Custom\Sedavic\Extract;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
-use Alaress\Database\Statement\Query\Base;
+use Alaress\Database\Statement\Query\IQuery;
 
 /**
  * Builds some basic data about courses and units for a given assessment
@@ -84,11 +84,11 @@ class ContextLookup
 
     /* For prepared statements
      */
-    private Base $mvRelationStatement;
-    private Base $courseSpecStatement;
-    private Base $courseUnitSpecStatement;
-    private Base $courseImplStatement;
-    private Base $courseUnitImplStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $mvRelationStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $courseSpecStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $courseUnitSpecStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $courseImplStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $courseUnitImplStatement;
 
 
     /**
@@ -157,7 +157,6 @@ class ContextLookup
         throw new \RuntimeException(sprintf(
             'Assessment %s is not in a course',
             $assessmentId
-
         ));
     }
 
