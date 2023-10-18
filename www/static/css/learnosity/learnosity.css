@@ -465,3 +465,8 @@ input[type="checkbox"] {
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:focus {
     border: 2px solid var(--content-ui-foreground);
 }
+
+/* update token highlight styles */
+.lrn_widget.lrn_tokenhighlight .lrn_response .lrn_response_input_wrapper {
+    box-shadow: 0 0 0 1px var(--content-ui-foreground);
+}
