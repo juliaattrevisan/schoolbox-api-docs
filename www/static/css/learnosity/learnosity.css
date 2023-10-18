@@ -538,3 +538,30 @@ input[type="checkbox"] {
     -ms-touch-action: none;
     border: 1px solid var(--content-ui-foreground);
 }
+
+/* update rating styles */
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_ratingInfo_icon_wrap {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn .lrn_btn {
+    color: #000;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:hover {
+    box-shadow: inset 0 0 0 2px var(--content-ui-foreground);
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:focus {
+    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 2px #fff, inset 0 0 0 4px #1877b1;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
+    box-shadow: inset 0 0 0 2px var(--content-ui-foreground), inset 0 0 0 3px #fff;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
+    background-color: var(--content-ui-selected);
+    color: var(--content-ui-foreground);
+}
