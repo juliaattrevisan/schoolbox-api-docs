@@ -7,6 +7,7 @@ import type { Student } from "../types/Student";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
+    const isExpanded = window.Vue.ref<boolean>(false);
 
     /**
      * store any passed through properties
@@ -33,6 +34,16 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * To show/hide all students
+     */
+    function toggleAllStudents() {
+        isExpanded.value = !isExpanded.value;
+        students.value.forEach((student) => {
+            student.isExpanded = isExpanded.value;
+        });
+    }
+
+    /**
      * To notify that a report linked to a student has been loaded
      * @param {number} reportId - the report id
      */
@@ -46,7 +57,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     return {
         init,
         students,
+        isExpanded,
         toggleStudent,
+        toggleAllStudents,
         reportLoaded,
     };
 });

@@ -13,7 +13,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
-const containerEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 let learnosityContainer: HTMLDivElement;
@@ -103,7 +102,7 @@ window.Vue.watch(
             <h2>{{ props.student.name }}</h2>
         </div>
         <div class="response l-grid">
-            <div ref="containerEl" class="response__inner-container">
+            <div class="response__inner-container">
                 <div :id="props.student.elementId"></div>
             </div>
         </div>

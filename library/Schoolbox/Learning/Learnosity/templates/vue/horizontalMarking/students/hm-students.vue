@@ -4,14 +4,18 @@
  */
 
 import { useStudentsStore } from "../store/hmStudentsStore";
+import HmStudentsToggle from "./hm-students-toggle.vue";
 import HmStudentsStudent from "./hm-students-student.vue";
 
 const studentsStore = useStudentsStore();
 </script>
 
 <template>
-    <div>
-        <h2 class="subheader">Students</h2>
+    <div class="l-flex-col l-gap-s">
+        <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
+            <h2 class="subheader">Students</h2>
+            <hm-students-toggle />
+        </div>
         <hm-students-student
             v-for="student in studentsStore.students"
             :key="student.id"
