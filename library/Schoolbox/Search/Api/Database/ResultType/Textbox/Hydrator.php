@@ -14,6 +14,7 @@ use Component_Config_Collapse;
 use Component_Config_ShowComponentTitle;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox\Model as TextboxModel;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -37,10 +38,12 @@ class Hydrator extends BaseHydrator
      * Constructor
      *
      * @param TextboxMapper $textboxMapper Used to fetch textboxes for hydration.
+     * @param FolderMapper  $folderMapper  Used to fetch the folder to which a textbox belongs.
      * @param Access        $access        Used to determine if the current user may view this page.
      */
     public function __construct(
         private TextboxMapper $textboxMapper,
+        private FolderMapper $folderMapper,
         private Access $access,
     ) {
     }
@@ -66,58 +69,113 @@ class Hydrator extends BaseHydrator
             return [];
         }
 
-        // Get componentInstanceId indexed by textboxId.
-        $componentConfigJsonByTextboxId = $this->getComponentConfigJsonByTextboxId($textboxIds);
+        // For all textboxIds, get information on all the places where $textboxId has been instantiated.
+        // Each textbox could be on multiple pages, or even in multiple components within the same page.
+        // This is done outside the main loop to reduce the number of SQL queries run.
+        $textboxInstanceInfoByTextboxId = $this->getTextboxInstanceInfoByTextboxId($textboxIds);
 
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
 
-        // And map to a full result.
-        $fullResults = array_map(
-            function (RawResult $match) use ($textboxes, $viewer, $keyword, $componentConfigJsonByTextboxId) {
-                $textbox = $textboxes->getBy('id', $match->id);
+        $fullResults = [];
 
-                if (!($textbox instanceof TextboxModel)) {
-                    return null;
+        foreach ($matches as $match) {
+            $textbox = $textboxes->getBy('id', $match->id);
+
+            if (!($textbox instanceof TextboxModel)) {
+                continue;
+            }
+
+            // The $textboxRootFolder is the folder on which the textbox was originally created.
+            // It is the folder on whose 'Manage Textboxes' page the textbox will appear.
+            $textboxRootFolder = $textbox->getCategory();
+
+            $textboxBodyTextOnly = (new ToText($textbox->getBody()))->getText();
+            $textboxBodyTextOnlyLowercase = strtolower($textboxBodyTextOnly);
+            $keywordLowercase = strtolower($keyword);
+
+            // Because the textbox body contains HTML, this match might have come about only because the
+            // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+            // Eliminate those kinds of matches.
+            if (!str_contains(strtolower($textbox->getHeading()), $keywordLowercase)) {
+                if (!str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)) {
+                    continue;
                 }
+            }
+
+            // Find all the instances of $textbox.
+            $textboxInstanceInfo = $textboxInstanceInfoByTextboxId[$textbox->getId()] ?? [];
+
+            if (count($textboxInstanceInfo) === 0) {
+                // This textbox is not used on any page.
+
+                // Textboxes not currently used in any component should be shown
+                // only to users with write access to the textbox's main folder.
+                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxRootFolder->getId());
+                if ($textboxAccess < UserAccess::ACCESS_WRITE) {
+                    continue;
+                }
+
+                // Create search result with link to the textbox's 'Manage Textboxes' page.
+                $fullResults[] = new FullResult(
+                    $match,
+                    $match->id,
+                    // No component, so no config, so:
+                    //  * $componentIsCollapsed does not apply,
+                    //  * $showTitleToReadOnlyUsers will have default value, true.
+                    // Conclusion: No reason not to display heading.
+                    $textbox->getHeading(),
+                    $this->buildBaseUrl()
+                         ->withPath("/textbox/folder/{$textboxRootFolder->getId()}")
+                         ->withFragment("textbox-" . $textbox->getId())
+                         ->__toString(),
+                    $match->type,
+                    $match->relevance,
+                    $textbox->getUpdatedAt(),
+                    $textboxRootFolder,
+                    'Hidden from view',
+                    null,
+                    'textbox',
+                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
+                    null,
+                    [$textboxRootFolder,], // Context: textbox's folder.
+                    [], // texbox: none.
+                );
+            }
+
+            foreach ($textboxInstanceInfo as $tio) {
+                $folderId = $tio['folder_id'];
+
+                $textboxFolder = $this->folderMapper->findById($folderId); // This is the page on which the textbox component is used.
 
                 // Check if user has access to textbox's folder
-                $textboxAccess = $this->access->getFolderAccess($viewer, $textbox->getCategory()->getId());
+                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxFolder->getId());
                 if ($textboxAccess < UserAccess::ACCESS_READ) {
-                    return null;
+                    continue;
                 }
 
-                // Find component_instance_id for use in URL fragment.
-                $componentInfo = $componentConfigJsonByTextboxId[$textbox->getId()] ?? null;
-                $componentInstanceId = $componentInfo === null ? null : $componentInfo['component_instance_id'];
-
-                // If component_instance_id is null, that means the textbox is not currently used in any component.
-                // Textboxes not currently used in any component should be shown only to users with write access.
-                if ($componentInstanceId === null && $textboxAccess < UserAccess::ACCESS_WRITE) {
-                    return null;
-                }
+                $componentInstanceId = $tio['component_instance_id'];
 
                 // After json_decode, $componentConfig will be an array with the following optional keys:
                 //  * Component_Config_Collapse::KEY,
                 //  * Component_Config_ShowComponentTitle::KEY
-                $componentConfigJson = $componentInfo === null ? '{}' : $componentInfo['configJson'];
+                $componentConfigJson = $tio['config_json'];
                 $componentConfig = json_decode($componentConfigJson, true);
 
                 if ($componentConfig === null) {
                     throw new UnexpectedValueException('Component config JSON could not be decoded.');
                 }
 
-                // NOTE: Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
-                //       To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
+                // Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
+                // To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
                 $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
                 $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
 
-                // Textboxes in the collapsed state should be shown only to users with write access.
+                // Textboxes that have been hidden to read-only users (by having title hidden and body collapsed)
+                // should appear in search results only for users with write access.
                 if (!$showTitleToReadOnlyUsers && $componentIsCollapsed && $textboxAccess < UserAccess::ACCESS_WRITE) {
-                    return null;
+                    continue;
                 }
-
-                $textboxBody = (new ToText($textbox->getBody()))->getText();
 
                 // Matches whose component title is hidden should only count as matches if they match on something other
                 // than the title.  The only other thing textbox matches might match against is the body.
@@ -125,12 +183,13 @@ class Hydrator extends BaseHydrator
                 if (
                     $textboxAccess === UserAccess::ACCESS_READ &&
                     !$showTitleToReadOnlyUsers &&
-                    !str_contains(strtolower($textboxBody), $keyword)
+                    !str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)
                 ) {
-                    return null;
+                    continue;
                 }
 
-                return new FullResult(
+                // Create search result with link to the homepage on which the textbox has been used.
+                $fullResults[] = new FullResult(
                     $match,
                     $match->id,
                     (
@@ -139,36 +198,26 @@ class Hydrator extends BaseHydrator
                         ? 'Untitled Textbox'
                         : $textbox->getHeading()
                     ),
-                    (
-                        // If not componentInstanceId, the URL should point to the Manage Textboxes page.
-                        $componentInstanceId === null
-                        ? $this->buildBaseUrl()
-                            ->withPath("/textbox/folder/{$textbox->getCategory()->getId()}")
-                            ->withFragment("textbox-" . $textbox->getId())
-                            ->__toString()
-                        : $this->buildBaseUrl()
-                            ->withPath('/homepage/' . $textbox->getCategory()->getId())
-                            ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
-                            ->__toString()
-                    ),
+                    $this->buildBaseUrl()
+                        ->withPath('/homepage/' . $textboxFolder->getId())
+                        ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
+                        ->__toString(),
                     $match->type,
                     $match->relevance,
                     $textbox->getUpdatedAt(),
-                    $textbox->getCategory(),
-                    ($componentInstanceId === null ? 'Hidden from view' : null),
+                    $textboxFolder,
+                    null, // Could put the heading of $textboxRootFolder here, but probably not relevant to the user.
                     null,
                     'textbox',
-                    $this->truncateAroundKeyword($keyword, $textboxBody) ?? $this->truncate($textboxBody),
+                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                     null,
-                    [$textbox->getCategory(),], // Context: textbox's folder
+                    [$textboxFolder,], // Context: textbox's folder.
                     [], // texbox: none.
                 );
-            },
-            $matches
-        );
+            }
+        }
 
-        // Filter out anything missing
-        return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+        return $fullResults;
     }
 
     /**
@@ -176,59 +225,75 @@ class Hydrator extends BaseHydrator
      *
      * Example of returned array:
      * [
-     *    116 => [
-     *        'textbox_id' => 116,
-     *        'component_instance_id' => 4409,
-     *        'configJson' => '{"collapse": 1, "showComponentTitle": 0}' // Both keys are optional.
-     *    ],
-     *    ...
+     *     116 => [ // Key is textboxId.
+     *         [
+     *             'folder_id' => 83,
+     *             'component_instance_id' => 4409,
+     *             'config_json' => '{"collapse": 1, "showComponentTitle": 0}' // Both keys are optional.
+     *         ],
+     *         ...
+     *     ]
      * ]
      *
      * @param $textboxIds
      * @return array
      */
-    private function getComponentConfigJsonByTextboxId($textboxIds): array
+    private function getTextboxInstanceInfoByTextboxId($textboxIds): array
     {
         $db = $this->textboxMapper->getDatabase();
-
-        return $db->executeQuery(
-            // Start with a table of "textbox_id, component_instance_id", and join to a table of "component_instance_id, configJson" to get configJson.
+        $rows = $db->executeQuery(
+            // The same textbox can be instantiated on multiple pages, and even multiple times on the same page
+            // (in different components).
             //
-            // Note the purpose of using GROUP_CONCAT and JSON syntax here is to get all the config items for a textbox
-            // into a single row, while limiting the number of joined subqueries to one.  Having all the info for one
-            // textbox on a single row allows indexing by textbox_id using a standard method, and the JSON encoded
-            // config allows for easy processing by the calling function with use of the json_decode() function.
+            // The basic idea of the query is to start with a table of "textboxId, folderId, component_instance_id",
+            // and join to a table of "component_instance_id, config_json" to get config_json.
+            //
+            // Note the purpose of using JSON syntax here is to get all the config items for a textbox into a single
+            // row, while limiting the number of joined subqueries to one.
+            //
+            // Note also that the query below limits results to textboxes in homepage modules only.
+            // Textboxes can also appear on homepage_templates for example, but these textboxes will not show up in
+            // search results at the moment because of the 'ci.module="homepage"' WHERE condition.
             'SELECT
             cci.value AS textbox_id,
+            ci.identifier AS folder_id,
             cci.component_instance_id,
-            IFNULL(component_configJson.configJson, "{}") AS configJson
+            IFNULL(component_configJson.config_json, "{}") AS config_json
             FROM component_config_instance cci
+            JOIN component_instance ci ON ci.id=cci.component_instance_id
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             LEFT JOIN (
                 SELECT
                 cci2.component_instance_id,
-                CONCAT(
-                   "{",
-                   GROUP_CONCAT(
-                      CONCAT(
-                         "\"", ccd2.key, "\": ",
-                         IFNULL(cci2.value, ccd2.default_value)
-                      ) SEPARATOR ", "
-                   ),
-                   "}"
-                ) AS configJson
+                JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS config_json
                 FROM component_config_instance cci2
                 LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
                 WHERE ccd2.key IN (:collapse, :showComponentTitle)
                 GROUP BY cci2.component_instance_id
             ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
             WHERE ccd.key=:componentKey
+            AND ci.module="homepage"
             AND cci.value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
             [
                 ':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
                 ':collapse' => Component_Config_Collapse::KEY,
                 ':showComponentTitle' => Component_Config_ShowComponentTitle::KEY
             ]
-        )->fetchRowArray('textbox_id');
+        );
+
+        $rowsByTextboxId = [];
+
+        foreach ($rows as $row) {
+            $textboxId = $row['textbox_id'];
+            unset($row['textbox_id']);
+
+            if (!array_key_exists($textboxId, $rowsByTextboxId)) {
+                $rowsByTextboxId[$textboxId] = [];
+            }
+
+            $rowsByTextboxId[$textboxId][] = $row;
+        }
+
+        return $rowsByTextboxId;
     }
 }
