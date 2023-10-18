@@ -417,3 +417,16 @@ input[type="checkbox"] {
     outline: none;
     box-shadow: 2px 2px 3px #0000001a inset;
 }
+
+/* plaintext styles*/
+.lrn .lrn_btn {
+    background-color: var(--content-ui-background);
+}
+.lrn_toolbar {
+    background-color: #fff;
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget .lrn_texteditor_editable:focus {
+    border: 1px solid var(--content-ui-foreground);
+    box-shadow: 2px 2px 3px #0000001a inset;
+}
