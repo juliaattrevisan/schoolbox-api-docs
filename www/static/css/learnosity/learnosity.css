@@ -578,3 +578,13 @@ input[type="checkbox"] {
 .lrn.lrn-assess .app-panel.review-screen .item-card[data-attempt_status="fully_attempted"]:not(.active):before {
     background-color: var(--content-ui-foreground);
 }
+
+/* update the botton hover and focus styles */
+.lrn .lrn_btn:hover,
+.lrn .lrn_btn.lrn_hover,
+.lrn .lrn_btn:active,
+.lrn .lrn_btn.lrn_active,
+.lrn .lrn_btn:focus {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+}
