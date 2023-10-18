@@ -198,6 +198,13 @@
 .lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
     background-color: var(--content-ui-selected);
 }
+/* update border color in the mutiplechoice-block layout */
+.lrn_widget.lrn_mcq
+    .lrn_response
+    .lrn_mcqgroup-block
+    .lrn-mcq-option.lrn_selected:not(.lrn_valid):not(.lrn_correct):not(.lrn_incorrect) {
+    border-left-color: var(--content-ui-foreground);
+}
 
 /*update the radio and checkbox background color to content-ui-foregroud*/
 input[type="radio"],
