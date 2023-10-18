@@ -114,7 +114,10 @@ class Module extends BaseModule
                 new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
-                new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter()),
+                new Database\ResultType\Assessment\QueryParamBuilder(
+                    $database->getQuoter(),
+                    $mapperFactory->get(UserMapper::class)
+                ),
             ),
             new Hydrator\Aggregate(
                 new Database\ResultType\User\Hydrator(

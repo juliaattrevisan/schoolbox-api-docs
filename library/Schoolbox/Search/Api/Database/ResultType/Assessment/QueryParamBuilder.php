@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
+use Schoolbox\UserMapper;
 
 /**
  * Query parameter builder for link searches.
@@ -23,9 +24,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Constructor
      *
-     * @param IQuoter $quoter
+     * @param IQuoter    $quoter
+     * @param UserMapper $userMapper
      */
-    public function __construct(private IQuoter $quoter)
+    public function __construct(private IQuoter $quoter, private UserMapper $userMapper)
     {
     }
 
