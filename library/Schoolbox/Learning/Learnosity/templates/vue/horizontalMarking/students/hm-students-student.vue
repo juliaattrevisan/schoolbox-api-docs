@@ -47,7 +47,7 @@ function hideAllChildren() {
  */
 function displayActiveCard() {
     currentCardResponse = learnosityContainer.querySelector(
-        `[data-reference="${itemsStore.activeCard.reference}"]`
+        `[data-reference="${itemsStore.activeItem.reference}"]`
     ) as HTMLDivElement;
     currentCardResponse.style.display = "block";
 }
@@ -58,7 +58,7 @@ function displayActiveCard() {
 function changeActiveCard() {
     currentCardResponse.style.display = "none";
     currentCardResponse = learnosityContainer.querySelector(
-        `[data-reference="${itemsStore.activeCard.reference}"]`
+        `[data-reference="${itemsStore.activeItem.reference}"]`
     ) as HTMLDivElement;
     currentCardResponse.style.display = "block";
 }
@@ -82,7 +82,7 @@ window.Vue.watch(
  * Show the appropriate response when the card is changed
  */
 window.Vue.watch(
-    () => itemsStore.activeCard,
+    () => itemsStore.activeItem,
     () => {
         changeActiveCard();
     }

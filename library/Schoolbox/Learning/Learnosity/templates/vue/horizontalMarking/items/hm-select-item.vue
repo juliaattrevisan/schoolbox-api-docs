@@ -13,7 +13,7 @@ const itemsStore = useItemsStore();
  */
 function onChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    itemsStore.setActiveCard(target.value);
+    itemsStore.setActiveItem(target.value);
 }
 </script>
 
@@ -22,12 +22,12 @@ function onChange(event: Event) {
         <h2 class="subheader">Cards</h2>
         <select @change="onChange">
             <option
-                v-for="card in itemsStore.cards"
-                :key="card.id"
-                :value="card.reference"
-                :selected="itemsStore.activeCard.reference === card.reference"
+                v-for="item in itemsStore.items"
+                :key="item.id"
+                :value="item.reference"
+                :selected="itemsStore.activeItem.reference === item.reference"
             >
-                {{ card.title }}
+                {{ item.title }}
             </option>
         </select>
     </div>
