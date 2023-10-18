@@ -11,6 +11,7 @@ namespace Custom\Sedavic\Extract;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
+use Alaress\Database\Statement\Query\Base;
 use Alaress\Database\Statement\Query\IQuery;
 
 /**
@@ -84,11 +85,11 @@ class ContextLookup
 
     /* For prepared statements
      */
-    private IQuery $mvRelationStatement;
-    private IQuery $courseSpecStatement;
-    private IQuery $courseUnitSpecStatement;
-    private IQuery $courseImplStatement;
-    private IQuery $courseUnitImplStatement;
+    private Base|IQuery $mvRelationStatement;
+    private Base|IQuery $courseSpecStatement;
+    private Base|IQuery $courseUnitSpecStatement;
+    private Base|IQuery $courseImplStatement;
+    private Base|IQuery $courseUnitImplStatement;
 
 
     /**

@@ -23,7 +23,7 @@ class Controller extends Base
      *
      * @var bool
      */
-    private const PERFORM = true;
+    private const PERFORM = false;
 
 
     /**
@@ -144,10 +144,10 @@ class Controller extends Base
      * it's an IQuery, but it's actually a one of these...what kind
      * of sloanish witchery is this??
      */
-    private IQuery $assessmentInfoStatement;
-    private IQuery $nodeStatement;
-    private IQuery $dueworkFeedbackStatement;
-    private IQuery $quizFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $assessmentInfoStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $nodeStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $dueworkFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $quizFeedbackStatement;
 
 
     /**
@@ -310,6 +310,13 @@ class Controller extends Base
         ]);
 
         $unitRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$unitRow) {
+            return [
+                'misc' => [],
+                'outcomes' => [],
+            ];
+        }
 
         /* The first element in the stack is the Unit,
          * and the Qualification is the Unit's parent
