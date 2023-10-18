@@ -104,6 +104,10 @@ class Controller extends Base
 
         $tags = $tagFactory->produceFromAssessment($assessment);
 
+        /* The plan that we're currently on
+         */
+        $sitePlan = $this->getConfigLoader()->get('site_plan');
+
         $payload = [
             'config' => [
                 'activity_edit' => [
@@ -127,6 +131,24 @@ class Controller extends Base
                     /* Tags are only spawned upon clicking Save, not before
                      */
                     'tags_on_create' => $tags
+                ],
+                'dependencies' => [
+                    'questions_api' => [
+                        'init_options' => [
+                            'question_type_groups' => [
+                                [ "reference"  =>  "math"  ],
+                                [ "reference"  =>  "chart"  ],
+                                [ "reference"  =>  "graph"  ],
+                                [ "reference"  =>  "chemistry"  ],
+                                [ "reference"  =>  "cloze"  ],
+                                [ "reference"  =>  "match"  ],
+                                [ "reference"  =>  "mcq"  ],
+                                [ "reference"  =>  "highlight"  ],
+                                [ "reference"  =>  "writespeak"  ],
+                                [ "reference"  =>  "other"  ]
+                            ]
+                        ]
+                    ]
                 ],
                 /* Editing a particular item
                  */
@@ -158,6 +180,9 @@ class Controller extends Base
                 ]
             ],
             'mode' => 'activity_edit',
+
+
+
             /* A Learnosity uuid that we arbitrarily prescribed
              */
             'reference' => $assessment->getLearnosityReference(),
