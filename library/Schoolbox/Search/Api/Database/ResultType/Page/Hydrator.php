@@ -170,7 +170,7 @@ class Hydrator extends BaseHydrator
         if ($isCoursePage) {
             $courseSpec = $folder->getCourseSpecification();
             $route = 'course.modifyCourse';
-            $params = ['courseId' => $courseSpec->getId(), 'course' => $courseSpec];
+            $params = ['id' => $courseSpec->getId(), 'course' => $courseSpec];
             if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
                     'title' => 'Modify Course',
