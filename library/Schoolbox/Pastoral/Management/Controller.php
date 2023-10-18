@@ -99,7 +99,7 @@ class Controller extends Base
                 'roleTypes'           => null,
                 'roles'               => $roles,
                 'moderatorIds'        => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
-                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+                'minimumSearchLength' => UserMapper::MIN_CHARACTER_LIMIT,
             ],
             'Update Pastoral Group',
         );

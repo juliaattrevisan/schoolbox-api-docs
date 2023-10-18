@@ -33,7 +33,13 @@ class Controller extends Base
     /**
      * Maximum number of search results to return per call.
      */
-    private const MAX_RESULT_LIMIT = 10;
+    private const MAX_RESULT_LIMIT = 20;
+
+    /**
+     * Minimum number of characters required to complete a search
+     */
+    private const MIN_CHARACTER_LIMIT = 2;
+
 
     /**
      * Constructor
@@ -68,7 +74,7 @@ class Controller extends Base
         $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         $cursor  = null;
-        if (mb_strlen($keyword) >= 2) {
+        if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
             $translatedResults = [];

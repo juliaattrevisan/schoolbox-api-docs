@@ -62,8 +62,13 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    const ATTACHZONE_PRIVATE = 'private';
-    const ATTACHZONE_PUBLIC  = 'public';
+    const ATTACHZONE_PRIVATE  = 'private';
+    const ATTACHZONE_PUBLIC   = 'public';
+
+    /**
+     * The minimum amount of characters required when searching for a user
+     */
+    private const MIN_CHARACTER_LIMIT = 2;
 
     /**
      * Constructor
@@ -164,7 +169,7 @@ class Controller extends Base
                 'search'              => trim($get['keyword']),
                 'results'             => $this->pastoralDataSource->getSearchResults($this->getUser(), $get['keyword']),
                 'students'            => $this->userMapper->findStudents($get['keyword']),
-                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+                'minimumSearchLength' => self::MIN_CHARACTER_LIMIT,
             ],
             'Search',
         );
