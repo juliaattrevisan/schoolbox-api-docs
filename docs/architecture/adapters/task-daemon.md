@@ -36,6 +36,9 @@ $messageFactory = $di->get('taskd.messageFactory');
 // (download files or PDFs from a set of URLs, convert to a ZIP)
 /** @var \Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory $downloadPagesMessageFactory */
 $downloadPagesMessageFactory = $di->get('taskd.downloadPagesMessageFactory');
+
+/** @var \Http\Discovery\Psr17Factory $httpFactory */
+$httpFactory = $kernel->get('httpFactory');
 ```
 
 ## Usage
@@ -60,4 +63,54 @@ $message = $downloadPagesMessageFactory
     ->setOutfile('output.zip')
     ->build();
 $messageProducer->send($message);
+
+// For sending a HTTP request:
+$messageFactory = new \Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory(
+    $kernel->get('instance'),
+    $kernel->get('user.tokenBuilder'),
+);
+/** @var \Http\Discovery\Psr17Factory $httpFactory */
+$uri     = new Schoolbox\Url\Uri('https://example.com');
+$message = $httpRequestMessageFactory
+    ->setRequest($httpFactory->createRequest('GET', $uri));
+$messageProducer->send($message);
+```
+
+### Delaying message sending
+
+A message may be delayed a given number of seconds:
+
+```php
+/** @var \Schoolbox\TaskDaemon\Producer $messageProducer */
+$messageProducer->send($message, delay: 1.25);
+```
+
+### Customising maximum number of requeues
+
+A message will by default be requeued up to three times, if an unexpected error
+occurs or the job reports that it is not yet complete.
+
+If a message is requeued: it will not be retried immediately, instead it will be
+subject to exponential backoff.
+
+```php
+/** @var \Schoolbox\TaskDaemon\Producer $messageProducer */
+$messageProducer->send($message, maxRequeues: 10);
+```
+
+### Test job failure
+
+A failure of the message's job may also be simulated: useful for testing the
+resilience of the code which is sending the message.
+
+```php
+/** @var \Schoolbox\TaskDaemon\Producer $messageProducer */
+$messageProducer->send(
+    $message,
+    testErrorChance: 0.5,
+    testErrorStatus: Schoolbox\TaskDaemon\Task\Status::FAILURE,
+    // Determining a payload requires knowledge of the task being run:
+    // for error testing, you should be able to leave this blank
+    testErrorPayload: [],
+);
 ```
