@@ -42,6 +42,47 @@ class Controller extends Base
     private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT = 300;
 
 
+
+    private const LEARNOSITY_QUESTION_GROUP_PLANS = [
+        'elite' => [
+            'question_type_groups' => [
+                [ 'reference' => 'mcq' ],
+                [ 'reference' => 'cloze' ],
+                [ 'reference' => 'match' ],
+                [ 'reference' => 'writespeak' ],
+                [ 'reference' => 'highlight' ],
+                [ 'reference' => 'graph' ],
+                [ 'reference' => 'math' ],
+                [ 'reference' => 'chart' ],
+                [ 'reference' => 'chemistry' ],
+                [ 'reference' => 'other' ],
+            ]
+        ],
+        'default' => [
+            'question_type_groups' => [
+                [ 'reference' => 'mcq' ],
+                [ 'reference' => 'cloze' ],
+                [ 'reference' => 'match' ],
+                [ 'reference' => 'writespeak' ],
+                [ 'reference' => 'highlight' ],
+                [ 'reference' => 'graph' ],
+                [
+                    'reference' => 'math',
+                    'template_references' => [
+                        'ef0ab0ba-235f-459d-9380-a4a106280c9a',
+                        '57b0690f-4e99-4bbc-9c8f-aa3074baa495',
+                        '11c9093a-dfd3-4852-b1ee-d5e5c3f032df',
+                        '7b810c2c-9100-4ff1-96de-cda23bf34445',
+                    ]
+                ],
+                [ 'reference' => 'chart' ],
+                [ 'reference' => 'chemistry' ],
+                [ 'reference' => 'other' ],
+            ]
+        ]
+    ];
+
+
     /**
      * Learnosity API instance is the same for everything afaict
      *
@@ -106,7 +147,8 @@ class Controller extends Base
 
         /* The plan that we're currently on
          */
-        $sitePlan = $this->getConfigLoader()->get('site_plan');
+        $sitePlan = strtolower($this->getConfigLoader()->get('site_plan'));
+        $questionGroups = self::LEARNOSITY_QUESTION_GROUP_PLANS[$sitePlan] ?? self::LEARNOSITY_QUESTION_GROUP_PLANS['default'];
 
         $payload = [
             'config' => [
@@ -133,21 +175,8 @@ class Controller extends Base
                     'tags_on_create' => $tags
                 ],
                 'dependencies' => [
-                    'questions_api' => [
-                        'init_options' => [
-                            'question_type_groups' => [
-                                [ "reference"  =>  "math"  ],
-                                [ "reference"  =>  "chart"  ],
-                                [ "reference"  =>  "graph"  ],
-                                [ "reference"  =>  "chemistry"  ],
-                                [ "reference"  =>  "cloze"  ],
-                                [ "reference"  =>  "match"  ],
-                                [ "reference"  =>  "mcq"  ],
-                                [ "reference"  =>  "highlight"  ],
-                                [ "reference"  =>  "writespeak"  ],
-                                [ "reference"  =>  "other"  ]
-                            ]
-                        ]
+                    'question_editor_api' => [
+                        'init_options' => $questionGroups
                     ]
                 ],
                 /* Editing a particular item
@@ -180,9 +209,6 @@ class Controller extends Base
                 ]
             ],
             'mode' => 'activity_edit',
-
-
-
             /* A Learnosity uuid that we arbitrarily prescribed
              */
             'reference' => $assessment->getLearnosityReference(),
