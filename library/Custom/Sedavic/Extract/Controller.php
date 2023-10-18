@@ -143,13 +143,11 @@ class Controller extends Base
      * Prepared statements. For some reason the typehints tell you
      * it's an IQuery, but it's actually a one of these...what kind
      * of sloanish witchery is this??
-     *
-     * @var \Alaress\Database\Statement\Query\Base
      */
-    private \Alaress\Database\Statement\Query\Base|IQuery $assessmentInfoStatement;
-    private \Alaress\Database\Statement\Query\Base|IQuery $nodeStatement;
-    private \Alaress\Database\Statement\Query\Base|IQuery $dueworkFeedbackStatement;
-    private \Alaress\Database\Statement\Query\Base|IQuery $quizFeedbackStatement;
+    private IQuery $assessmentInfoStatement;
+    private IQuery $nodeStatement;
+    private IQuery $dueworkFeedbackStatement;
+    private IQuery $quizFeedbackStatement;
 
 
     /**

@@ -84,11 +84,11 @@ class ContextLookup
 
     /* For prepared statements
      */
-    private \Alaress\Database\Statement\Query\Base|IQuery $mvRelationStatement;
-    private \Alaress\Database\Statement\Query\Base|IQuery $courseSpecStatement;
-    private \Alaress\Database\Statement\Query\Base|IQuery $courseUnitSpecStatement;
-    private \Alaress\Database\Statement\Query\Base|IQuery $courseImplStatement;
-    private \Alaress\Database\Statement\Query\Base|IQuery $courseUnitImplStatement;
+    private IQuery $mvRelationStatement;
+    private IQuery $courseSpecStatement;
+    private IQuery $courseUnitSpecStatement;
+    private IQuery $courseImplStatement;
+    private IQuery $courseUnitImplStatement;
 
 
     /**
