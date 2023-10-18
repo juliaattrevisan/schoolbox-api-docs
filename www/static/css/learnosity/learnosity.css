@@ -443,3 +443,25 @@ input[type="checkbox"] {
     border: 1px solid var(--content-ui-foreground);
     border-radius: 2px;
 }
+
+/* update shading styles */
+.lrn_widget.lrn_simpleshading .lrn-shading-cell {
+    background-color: #e6f2fc;
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:hover,
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:focus {
+    background-color: var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-background);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 2px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-cell.lrn-shading-selected {
+    background-color: var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-background);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:focus {
+    border: 2px solid var(--content-ui-foreground);
+}
