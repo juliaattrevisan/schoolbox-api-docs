@@ -122,13 +122,17 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $assessmentDesc = $assessment->getDescription();
+                $assessmentDesc = (
+                    ($assessment instanceof Assessment\LessonPlan\Model)
+                    ? $this->getConcatenationOfLessonPlanFieldTitlesAndBodies($assessment)
+                    : $assessment->getDescription()
+                );
+                $assessmentDescTextOnly = (new ToText($assessmentDesc))->getText();
 
                 // Because the description contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
                 if ($this->assessmentMatchesKeywordOnlyOnDescription($assessment, $keyword)) {
-                    $assessmentDescTextOnly = (new ToText($assessmentDesc))->getText();
                     if (!str_contains($assessmentDescTextOnly, $keyword)) {
                         return null;
                     }
@@ -166,7 +170,7 @@ class Hydrator extends BaseHydrator
                     ),
                     null,
                     AssessmentType::getIconClassSuffixForType($assessmentType),
-                    $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
+                    ($this->truncateAroundKeyword($keyword, $assessmentDescTextOnly) ?? $this->truncate($assessmentDescTextOnly)),
                     $assessmentCreator,
                     [$folder],
                     $this->getSearchResultLinks($assessment, $viewer),
@@ -193,6 +197,10 @@ class Hydrator extends BaseHydrator
     {
         // SQL match conditions copied from Assessment\QueryParamBuilder->buildBaseWhereParams()
         // -------------------------------------------------------------------------------------
+        // NOTES:
+        //  * Checks made in the Hydrator must match the checks made here.
+        //  * The concatenation of all the lesson_plan_field titles and bodies will be treated as a description.
+        // -------------------------------------------------------------------------------------
         // 'assessment.title LIKE :assessmentKeywordLike',                    // Assessment->getTitle()
         // 'assessment.description LIKE :assessmentKeywordLike',              // Assessment->getDescription()
         // 'task.link LIKE :assessmentKeywordLike',                           // Assessment\Task\Model
@@ -201,6 +209,17 @@ class Hydrator extends BaseHydrator
         // 'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',   // Assessment\Lti\Model
         // 'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike', // Assessment\Lti\Model
         // 'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',  // Assessment\Lti\Model
+        // 'IF(
+        //      (
+        //          lesson_plan.visibility="student" OR
+        //          (lesson_plan.visibility="staff" AND ' . (($loggedInUserIsStaffOrSuper) ? 'TRUE' : 'FALSE') . ')
+        //      ),
+        //      (
+        //          lesson_plan_field.title LIKE :assessmentKeywordLike OR    // Assessment\LessonPlan\Model (treated as description)
+        //          lesson_plan_field.body LIKE :assessmentKeywordLike        // Assessment\LessonPlan\Model (treated as description)
+        //      ),
+        //      FALSE
+        //  )'
 
         if (str_contains($assessment->getTitle(), $keyword)) {
             return false; // Found match on assessment.title or assess.title.
@@ -215,8 +234,7 @@ class Hydrator extends BaseHydrator
                 return false; // Found match on lti_assessment url, title, or text.
             }
         }
-
-        if ($assessment instanceof Assessment\Task\Model) {
+        elseif ($assessment instanceof Assessment\Task\Model) {
             if (str_contains($assessment->getUrl(), $keyword)) {
                 return false; // Found match on task.link.
             }
@@ -265,5 +283,20 @@ class Hydrator extends BaseHydrator
         }
 
         return $links;
+    }
+
+    /**
+     * @param Assessment\LessonPlan\Model $lessonPlan
+     * @return string
+     */
+    private function getConcatenationOfLessonPlanFieldTitlesAndBodies(Assessment\LessonPlan\Model $lessonPlan): string
+    {
+        $strings = [];
+
+        foreach ($lessonPlan->getFields() as $field) {
+            $strings[] = $field->getTitle() . "\n" . $field->getBody();
+        }
+
+        return implode("\n\n", $strings);
     }
 }

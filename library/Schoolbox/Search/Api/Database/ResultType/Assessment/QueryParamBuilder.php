@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
+use Schoolbox\UserMapper;
 
 /**
  * Query parameter builder for link searches.
@@ -23,9 +24,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Constructor
      *
-     * @param IQuoter $quoter
+     * @param IQuoter    $quoter
+     * @param UserMapper $userMapper
      */
-    public function __construct(private IQuoter $quoter)
+    public function __construct(private IQuoter $quoter, private UserMapper $userMapper)
     {
     }
 
@@ -40,7 +42,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $whereParts         = [
+        $loggedInUser = $this->userMapper->getSessionUser();
+        $loggedInUserIsStaffOrSuper = (
+            $loggedInUser->getRole()->isStaff() ||
+            $loggedInUser->isSuperuser()
+        );
+
+        $whereParts = [
             // If any higher-level row the assessment is linked to is deleted, treat the assessment as deleted.
             'assessment.deleted_at IS NULL AND
              folder.deleted_at IS NULL AND
@@ -56,8 +64,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             /**
-             * NOTE: Checks made in the Hydrator must match the checks made here.
-             * @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
+             * NOTES:
+             *  * Checks made in the Hydrator must match the checks made here.
+             *    @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
+             *  * The concatenation of all the lesson_plan_field titles and bodies will be treated as a description.
              */
             'assessment.title LIKE :assessmentKeywordLike',
             'assessment.description LIKE :assessmentKeywordLike',
@@ -67,9 +77,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',
+            'IF(
+                 (
+                     lesson_plan.visibility="student" OR
+                     (lesson_plan.visibility="staff" AND ' . (($loggedInUserIsStaffOrSuper) ? 'TRUE' : 'FALSE') . ')
+                 ),
+                 (
+                     lesson_plan_field.title LIKE :assessmentKeywordLike OR
+                     lesson_plan_field.body LIKE :assessmentKeywordLike
+                 ),
+                 FALSE
+            )'
         ];
-        $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
-        $params             = [
+        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $params       = [
             'assessmentNow'         => Alaress_Date_Format::now()->getDatabase(),
             'assessmentKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
@@ -236,6 +257,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             )
             LEFT JOIN lesson_plan ON (
                 lesson_plan.assessment_id = assessment.id
+            )
+            LEFT JOIN lesson_plan_field ON (
+                lesson_plan_field.lesson_plan_id = lesson_plan.id AND
+                lesson_plan_field.deleted_at IS NULL
             )
         ';
     }
