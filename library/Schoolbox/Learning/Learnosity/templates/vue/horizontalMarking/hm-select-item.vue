@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * To move between the cards
+ * To move between the items (called cards in sbx)
  */
 
-import { useCardsStore } from "./store/hmCardsStore";
+import { useCardsStore } from "./store/hmItemsStore";
 
 const cardsStore = useCardsStore();
 

@@ -3,11 +3,11 @@
  * To use horizontal marking when assessing a quiz
  */
 
-import { useCardsStore } from "./store/hmCardsStore";
+import { useCardsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { useReportsStore } from "./store/hmReportsStore";
 import type { Card } from "./types/Card";
-import HmSelectCard from "./hm-select-card.vue";
+import HmSelectItem from "./hm-select-item.vue";
 import HmStudents from "./hm-students.vue";
 
 interface Props {
@@ -38,8 +38,9 @@ window.Vue.onMounted(async () => {
     <div class="l-flex-col">
         <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Horizontal Marking for {{ props.title }}</h1>
-        <hm-select-card />
+        <hm-select-item />
         <hm-students />
+        <div class="l-flex-row l-gap-m"></div>
     </div>
 </template>
 

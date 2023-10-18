@@ -3,7 +3,7 @@
  * Display a single student's responses
  */
 
-import { useCardsStore } from "./store/hmCardsStore";
+import { useCardsStore } from "./store/hmItemsStore";
 import type { Student } from "./types/Student";
 
 interface Props {
