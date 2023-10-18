@@ -23,7 +23,7 @@ class Controller extends Base
      *
      * @var bool
      */
-    private const PERFORM = false;
+    private const PERFORM = true;
 
 
     /**
