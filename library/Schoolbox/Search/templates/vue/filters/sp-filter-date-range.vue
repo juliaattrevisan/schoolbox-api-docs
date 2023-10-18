@@ -72,7 +72,6 @@ window.Vue.onMounted(() => {
             <input
                 id="sp-start-date-input"
                 type="text"
-                data-test="sp-filter-date-range-start"
                 data-datepicker-vue
                 data-datepicker-buttontext
                 data-datesync-enddate="#sp-end-date-input"

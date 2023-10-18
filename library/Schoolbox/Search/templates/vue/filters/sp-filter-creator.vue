@@ -44,7 +44,6 @@ function onRemoved() {
     <div class="l-flex-col">
         <label for="creator">Creator</label>
         <search-select
-            data-test="sp-filter-creator"
             endpoint="/ajax/user.php?groupID=0&query="
             :selected="filterCreatorsStore.creator"
             :is-single-select="true"
