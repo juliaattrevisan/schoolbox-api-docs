@@ -481,3 +481,10 @@ input[type="checkbox"] {
 .lrn .lrn-btn-grid-sym {
     background: var(--body-background);
 }
+.lrn_widget .lrn-formula-keyboard .lrn-formula-keyboard-close {
+    top: -0.5em;
+}
+.lrn_widget .lrn-formula-keyboard-menu-left button,
+.lrn_widget .lrn-formula-keyboard-menu-right button {
+    top: 0.5em;
+}
