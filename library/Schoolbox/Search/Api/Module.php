@@ -116,7 +116,7 @@ class Module extends BaseModule
                 new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
                 new Database\ResultType\Assessment\QueryParamBuilder(
                     $database->getQuoter(),
-                    $mapperFactory->get(UserMapper::class)
+                    $mapperFactory->get(UserAccess::class)
                 ),
             ),
             new Hydrator\Aggregate(
