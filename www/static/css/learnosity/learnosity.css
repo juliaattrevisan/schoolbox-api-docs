@@ -424,9 +424,22 @@ input[type="checkbox"] {
 }
 .lrn_toolbar {
     background-color: #fff;
-    border: 1px solid var(--content-ui-foreground);
+    border-top: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget .lrn_texteditor_editable:focus {
     border: 1px solid var(--content-ui-foreground);
     box-shadow: 2px 2px 3px #0000001a inset;
+}
+
+/* update Audio recorder styles */
+.lrn_box_skin_wrapper .lrn_widget_footer .lrn_toolbar_left .lrn_btn {
+    border-bottom: 1px solid var(--content-ui-foreground);
+    border-right: 1px solid var(--content-ui-foreground);
+}
+.lrn_box_skin_wrapper .lrn_audioblock_right {
+    border-left: 1px solid var(--content-ui-foreground);
+}
+.lrn_response_input_wrapper {
+    border: 1px solid var(--content-ui-foreground);
+    border-radius: 2px;
 }
