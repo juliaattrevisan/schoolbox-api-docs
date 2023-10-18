@@ -565,3 +565,9 @@ input[type="checkbox"] {
     background-color: var(--content-ui-selected);
     color: var(--content-ui-foreground);
 }
+
+/* update review section styles */
+.lrn.lrn-assess .app-panel.review-screen .item-card[data-attempt_status="partially_attempted"]:not(.active):before,
+.lrn.lrn-assess .app-panel.review-screen .item-card[data-attempt_status="fully_attempted"]:not(.active):before {
+    background-color: var(--content-ui-foreground);
+}
