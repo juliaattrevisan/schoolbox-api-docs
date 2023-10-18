@@ -488,3 +488,20 @@ input[type="checkbox"] {
 .lrn_widget .lrn-formula-keyboard-menu-right button {
     top: 0.5em;
 }
+
+/* update number line with drag and drop styles */
+.lrn .lrn_btn_arrow:after {
+    border-color: var(--content-ui-foreground) transparent transparent;
+}
+.lrn_widget.lrn_numberline .lrn_btn_arrow {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):hover,
+.lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):focus {
+    border-color: var(--content-ui-foreground);
+    background: var(--content-ui-selected);
+}
+.lrn .lrn_btn_arrow:active:after,
+.lrn .lrn_btn_arrow.lrn_active:after {
+    border-color: var(--content-ui-foreground) transparent transparent;
+}
