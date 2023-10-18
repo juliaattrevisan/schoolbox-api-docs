@@ -18,19 +18,16 @@ function onChange(event: Event) {
 </script>
 
 <template>
-    <div>
-        <h2 class="subheader">Cards</h2>
-        <select @change="onChange">
-            <option
-                v-for="item in itemsStore.items"
-                :key="item.id"
-                :value="item.reference"
-                :selected="itemsStore.activeItem.reference === item.reference"
-            >
-                {{ item.title }}
-            </option>
-        </select>
-    </div>
+    <select @change="onChange">
+        <option
+            v-for="item in itemsStore.items"
+            :key="item.id"
+            :value="item.reference"
+            :selected="itemsStore.activeItem.reference === item.reference"
+        >
+            {{ item.title }}
+        </option>
+    </select>
 </template>
 
 <style scoped></style>

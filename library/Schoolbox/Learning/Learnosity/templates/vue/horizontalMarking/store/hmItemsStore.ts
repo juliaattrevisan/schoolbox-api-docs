@@ -10,6 +10,9 @@ export const EMPTY_ITEM: Item = { id: "", reference: "", title: "" };
 export const useItemsStore = defineStore("hmItems", () => {
     const items = window.Vue.ref<Item[]>([]);
     const activeItem = window.Vue.ref<Item>(EMPTY_ITEM);
+    const activeItemIndex = window.Vue.ref<number>(0);
+    const hasPreviousItem = window.Vue.computed(() => activeItemIndex.value > 0);
+    const hasNextItem = window.Vue.computed(() => activeItemIndex.value < items.value.length - 1);
 
     /**
      * store any passed through properties
@@ -26,15 +29,28 @@ export const useItemsStore = defineStore("hmItems", () => {
      */
     function setActiveItem(reference: string) {
         activeItem.value = items.value.find((card) => card.reference === reference) || EMPTY_ITEM;
+        activeItemIndex.value = items.value.findIndex((card) => card.reference === reference);
     }
 
     /**
-     * Set the active card
-     * @param {string} reference - the reference of the card to set as active
+     * Set the previous card
      */
-    function toNextItem(reference: string) {
-        activeItem.value = items.value.find((card) => card.reference === reference) || EMPTY_ITEM;
+    function toPreviousItem() {
+        if (hasPreviousItem.value) {
+            activeItemIndex.value -= 1;
+            activeItem.value = items.value[activeItemIndex.value];
+        }
     }
 
-    return { init, items, activeItem, setActiveItem };
+    /**
+     * Set the next card
+     */
+    function toNextItem() {
+        if (hasNextItem.value) {
+            activeItemIndex.value += 1;
+            activeItem.value = items.value[activeItemIndex.value];
+        }
+    }
+
+    return { init, items, activeItem, setActiveItem, hasPreviousItem, hasNextItem, toPreviousItem, toNextItem };
 });

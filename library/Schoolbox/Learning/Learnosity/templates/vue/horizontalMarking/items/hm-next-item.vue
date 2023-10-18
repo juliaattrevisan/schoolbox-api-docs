@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To move between the items (called cards in sbx)
+ * To move to the next item (card) if available
  */
 
 import { useItemsStore } from "../store/hmItemsStore";
@@ -8,29 +8,15 @@ import { useItemsStore } from "../store/hmItemsStore";
 const itemsStore = useItemsStore();
 
 /**
- * To change the active card
- * @param {Event} event - the event from the select
+ * To move to next item
  */
-function onChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    itemsStore.setActiveItem(target.value);
+function onSelected() {
+    itemsStore.toNextItem();
 }
 </script>
 
 <template>
-    <div>
-        <h2 class="subheader">Cards</h2>
-        <select @change="onChange">
-            <option
-                v-for="card in itemsStore.items"
-                :key="card.id"
-                :value="card.reference"
-                :selected="itemsStore.activeItem.reference === card.reference"
-            >
-                {{ card.title }}
-            </option>
-        </select>
-    </div>
+    <button class="button full-width" :disabled="!itemsStore.hasNextItem" @click.prevent="onSelected">Next Card</button>
 </template>
 
 <style scoped></style>

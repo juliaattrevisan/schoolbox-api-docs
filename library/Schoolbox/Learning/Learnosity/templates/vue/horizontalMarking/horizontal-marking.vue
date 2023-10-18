@@ -6,13 +6,14 @@
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { useReportsStore } from "./store/hmReportsStore";
-import type { Card } from "./types/Card";
+import type { Item } from "./types/Item";
 import HmSelectItem from "./items/hm-select-item.vue";
 import HmStudents from "./students/hm-students.vue";
+import HmNextItem from "./items/hm-next-item.vue";
 
 interface Props {
     title: string; //
-    cards: Card[]; // the cards linked to quiz
+    cards: Item[]; // the cards linked to quiz
     responseScores: object; //
     responseComments: string; //
     urls: object; //
@@ -35,12 +36,17 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div class="l-flex-col">
+    <div class="l-flex-col l-gap-m f-no-margins">
         <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Horizontal Marking for {{ props.title }}</h1>
-        <hm-select-item />
+        <div>
+            <h2 class="subheader">Cards</h2>
+            <hm-select-item />
+        </div>
         <hm-students />
-        <div class="l-flex-row l-gap-m"></div>
+        <div class="l-flex-row l-gap-m">
+            <hm-next-item />
+        </div>
     </div>
 </template>
 
