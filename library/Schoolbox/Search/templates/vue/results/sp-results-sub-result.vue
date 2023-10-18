@@ -26,7 +26,7 @@ const props = defineProps<Props>();
                     <sp-results-result-title :result="props.subResult" :is-sub-result="true" />
                     <sp-results-result-meta :result="props.subResult" :is-sub-result="true" />
                 </div>
-                <sp-results-result-actions v-if="props.subResult._links" :result="props.subResult" />
+                <sp-results-result-actions v-if="props.subResult._links.length > 0" :result="props.subResult" />
             </div>
             <sp-results-result-description v-if="props.subResult.description" :result="props.subResult" />
         </div>

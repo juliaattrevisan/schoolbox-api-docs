@@ -74,5 +74,10 @@ class FullResult
                 $this->$key = trim($this->$key);
             }
         }
+
+        // Add 'id' key/value to $links.  These are expected by the client.
+        for ($i = 0; $i < count($this->links); ++$i) {
+            $this->links[$i]['id'] = $i;
+        }
     }
 }
