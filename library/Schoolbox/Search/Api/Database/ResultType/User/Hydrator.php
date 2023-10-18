@@ -234,7 +234,7 @@ class Hydrator extends BaseHydrator
         }
 
         $route = 'pastoral.getStudent';
-        // Params needed here are the same as set above.
+        $params = ['studentId' => $searchResultUser->getId(), 'student' => $searchResultUser];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Pastoral Care',
@@ -244,7 +244,7 @@ class Hydrator extends BaseHydrator
         }
 
         $route = 'timetable.getTimetableCalendarRedirect';
-        // Params needed here are the same as set above.
+        $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Timetable',
