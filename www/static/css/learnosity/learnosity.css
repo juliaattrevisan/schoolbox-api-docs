@@ -505,3 +505,8 @@ input[type="checkbox"] {
 .lrn .lrn_btn_arrow.lrn_active:after {
     border-color: var(--content-ui-foreground) transparent transparent;
 }
+
+/* Number line with plot */
+.lrn_widget.lrn_numberlineplot .lrn_jxg_toolbox li button.lrn_active {
+    background: var(--content-ui-foreground);
+}
