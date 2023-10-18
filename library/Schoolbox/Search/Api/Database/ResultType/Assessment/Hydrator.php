@@ -317,7 +317,7 @@ class Hydrator extends BaseHydrator
                 str_contains($assessment->getLtiAssessmentUrl(), $keyword) ||
                 str_contains($assessment->getLtiAssessmentTitle(), $keyword)
             ) {
-                return false; // Found match on lti_assessment url, title, or text.
+                return false; // Found match on lti_assessment.lti_assessment_url or lti_assessment.lti_assessment_title.
             }
         } elseif ($assessment instanceof Assessment\Task\Model) {
             if (str_contains($assessment->getUrl(), $keyword)) {
