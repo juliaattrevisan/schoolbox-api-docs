@@ -22,7 +22,7 @@ class Controller extends Base
      *
      * @var bool
      */
-    private const PERFORM = true;
+    private const PERFORM = false;
 
 
     /**
@@ -68,13 +68,8 @@ class Controller extends Base
             h.house,
             lyl.name AS yearLevel,
             ai.title,
+            asi.specification_assessment_id AS assessmentSpecId,
             var.*,
-            cn1.name AS Qualification,
-            cn1.code AS QualificationCode,
-            cn2.name AS Unit,
-            cn2.code AS UnitCode,
-            cn3.name AS AreaOfStudy,
-            cn3.code AS AreaOfStudyCode,
             vmrf.feedback_id,
             vmrf.feedback_table,
             vmrf.published_at
@@ -84,16 +79,9 @@ class Controller extends Base
         INNER JOIN `user` u ON u.id = vmrf.student_id 
         LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
         LEFT JOIN house h ON u.house = h.id
-        LEFT JOIN curriculum_node_for_assessment cnof ON cnof.assessment_id = asi.specification_assessment_id
-        LEFT JOIN curriculum_node cn1 ON cnof.curriculum_node_id = cn1.id
-        LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
-        LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
         LEFT JOIN mv_assessment_relation var ON var.assessment_id = ai.id
         WHERE vmrf.published_at >= :from
         AND vmrf.published_at <= :to
-        AND cn1.id IS NOT NULL
-        AND cn2.id IS NOT NULL
-        AND cn3.id IS NOT NULL
         AND ai.deleted_at IS NULL
         AND u.deleted_at IS NULL
         ORDER BY lastname, firstname
@@ -285,7 +273,7 @@ class Controller extends Base
 
                 /* Curriculum nodes
                  */
-                $curriculumNodes = $this->findCurriculumNodes($assessmentInfo['assessment_id']);
+                $curriculumNodes = $this->findCurriculumNodes((int)$assessmentInfo['assessmentSpecId']);
             } catch (\DomainException | \RuntimeException $e) {
                 /* noop: skip data that randomly died, for now
                  *
@@ -295,17 +283,21 @@ class Controller extends Base
                 continue;
             }
 
-            /* Combine all that into a csv row
+            /* Combine all that into a set of csv rows
              */
-            $row = $this->combine($assessmentInfo, $curriculumNodes, $context, $feedback);
+            $rows = $this->combine($assessmentInfo, $curriculumNodes, $context, $feedback);
 
             /* Pump it to an fputcsv
              */
             if (self::PERFORM) {
-                fputcsv($outstream, $row);
+                foreach ($rows as $row) {
+                    fputcsv($outstream, $row);
+                }
             } else {
-                $numRows++;
-                new \Alaress_Probe($row);
+                foreach ($rows as $row) {
+                    $numRows++;
+                    new \Alaress_Probe($row);
+                }
             }
         }
 
@@ -325,6 +317,14 @@ class Controller extends Base
     }
 
 
+    /**
+     * Find the assigned nodes for an assessment,
+     * plus one parent node that isn't assigned
+     *
+     * @param int $assessmentId
+     * @return array
+     * @throws Exception
+     */
     private function findCurriculumNodes(int $assessmentId): array
     {
         $this->nodeStatement->execute([
@@ -336,23 +336,27 @@ class Controller extends Base
         /* The first element in the stack is the Unit,
          * and the Qualification is the Unit's parent
          */
-        $stack = [
+        $miscStack = [
             'QualificationName' => $unitRow['parentName'],
             'QualificationCode' => $unitRow['parentCode'],
             'UnitName' => $unitRow['name'],
             'UnitCode' => $unitRow['code'],
         ];
 
-        $unitRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC);
-        $aosRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC);
+        $outcomeStack = [];
 
+        while ($outcomeRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $outcomeStack[] = [
+                'OutcomeName' => $outcomeRow['name'],
+                'OutcomeCode' => $outcomeRow['code']
+            ];
+        }
+
+        /* When an assessment has multiple outcomes, dupe the row
+         */
         return [
-            'Qualification' => $qualificationRow['name'],
-            'QualificationCode' => $qualificationRow['code'],
-            'Unit' => $unitRow['name'],
-            'UnitCode' => $unitRow['code'],
-            'AreaOfStudy' => $aosRow['name'],
-            'AreaOfStudyCode' => $aosRow['code'],
+            'misc' => $miscStack,
+            'outcomes' => $outcomeStack
         ];
     }
 
@@ -412,21 +416,29 @@ class Controller extends Base
      */
     private function combine(array $assessmentInfo, array $curriculumNodes, array $context, array $feedback): array
     {
-        return [
-            'externalId' => $assessmentInfo['synergy_id'],
-            'firstname' => $assessmentInfo['firstname'],
-            'lastname' => $assessmentInfo['lastname'],
-            'qualification' => $this->renderCurriculumNode((string)$curriculumNodes['Qualification'], (string)$curriculumNodes['QualificationCode']),
-            'year' => $assessmentInfo['yearLevel'],
-            'house_sb' => $assessmentInfo['house'],
-            'unit' => $this->renderCurriculumNode((string)$curriculumNodes['Unit'], (string)$curriculumNodes['UnitCode']),
-            'course_sb' => $context['course']['name'],
-            'unit_sb' => $context['unit']['name'],
-            'assessment' => $assessmentInfo['title'],
-            'aos' => $this->renderCurriculumNode((string)$curriculumNodes['AreaOfStudy'], (string)$curriculumNodes['AreaOfStudyCode']),
-            'normalised' => $feedback['normalised'],
-            'humanReadable' => $feedback['humanReadable'],
-        ];
+        $stack = [];
+
+        foreach ($curriculumNodes['outcomes'] as $outcomeNode) {
+            $assessmentRow =  [
+                'externalId' => $assessmentInfo['synergy_id'],
+                'firstname' => $assessmentInfo['firstname'],
+                'lastname' => $assessmentInfo['lastname'],
+                'qualification' => $this->renderCurriculumNode((string)$curriculumNodes['misc']['QualificationName'], (string)$curriculumNodes['misc']['QualificationCode']),
+                'year' => $assessmentInfo['yearLevel'],
+                'house_sb' => $assessmentInfo['house'],
+                'unit' => $this->renderCurriculumNode((string)$curriculumNodes['misc']['UnitName'], (string)$curriculumNodes['misc']['UnitCode']),
+                'course_sb' => $context['course']['name'],
+                'unit_sb' => $context['unit']['name'],
+                'assessment' => $assessmentInfo['title'],
+                'aos' => $this->renderCurriculumNode((string)$outcomeNode['OutcomeName'], (string)$outcomeNode['OutcomeCode']),
+                'normalised' => $feedback['normalised'],
+                'humanReadable' => $feedback['humanReadable'],
+            ];
+
+            $stack[] = $assessmentRow;
+        }
+
+        return $stack;
     }
 
 
@@ -440,7 +452,9 @@ class Controller extends Base
      */
     private function renderCurriculumNode(string $name, string $code): string
     {
-        if ('' !== trim($name) && '' !== trim($code)) {
+        /* Code is sometimes empty
+         */
+        if ('' !== trim($name)) {
             return sprintf('%s [%s]', $name, $code);
         }
 
