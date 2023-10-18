@@ -55,7 +55,13 @@ class Controller extends Base
                 [ 'reference' => 'math' ],
                 [ 'reference' => 'chart' ],
                 [ 'reference' => 'chemistry' ],
-                [ 'reference' => 'other' ],
+                [
+                    'reference' => 'other',
+                    'template_references' => [
+                        '8ff43fa9-804b-42e7-9b3e-3cdd7e3a882b',
+                        '8e99fa69-b829-4a7d-ae2a-eb935fe3a2c6',
+                    ]
+                ],
             ]
         ],
         'default' => [
@@ -77,7 +83,13 @@ class Controller extends Base
                 ],
                 [ 'reference' => 'chart' ],
                 [ 'reference' => 'chemistry' ],
-                [ 'reference' => 'other' ],
+                [
+                    'reference' => 'other',
+                    'template_references' => [
+                        '8ff43fa9-804b-42e7-9b3e-3cdd7e3a882b',
+                        '8e99fa69-b829-4a7d-ae2a-eb935fe3a2c6',
+                    ]
+                ],
             ]
         ]
     ];
