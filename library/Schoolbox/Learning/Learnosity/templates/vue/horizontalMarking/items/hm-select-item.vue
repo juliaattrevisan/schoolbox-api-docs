@@ -3,7 +3,7 @@
  * To move between the items (called cards in sbx)
  */
 
-import { useItemsStore } from "./store/hmItemsStore";
+import { useItemsStore } from "../store/hmItemsStore";
 
 const itemsStore = useItemsStore();
 

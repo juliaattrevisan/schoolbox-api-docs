@@ -3,8 +3,8 @@
  * Display a single student's responses
  */
 
-import { useItemsStore } from "./store/hmItemsStore";
-import type { Student } from "./types/Student";
+import { useItemsStore } from "../store/hmItemsStore";
+import type { Student } from "../types/Student";
 
 interface Props {
     student: Student; //

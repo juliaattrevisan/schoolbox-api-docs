@@ -7,8 +7,8 @@ import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { useReportsStore } from "./store/hmReportsStore";
 import type { Card } from "./types/Card";
-import HmSelectItem from "./hm-select-item.vue";
-import HmStudents from "./hm-students.vue";
+import HmSelectItem from "./items/hm-select-item.vue";
+import HmStudents from "./students/hm-students.vue";
 
 interface Props {
     title: string; //
