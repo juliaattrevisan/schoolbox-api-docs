@@ -7,7 +7,7 @@ import type { Card } from "../types/Card";
 
 export const EMPTY_CARD: Card = { id: "", reference: "", title: "" };
 
-export const useCardsStore = defineStore("hmCards", () => {
+export const useItemsStore = defineStore("hmCards", () => {
     const cards = window.Vue.ref<Card[]>([]);
     const activeCard = window.Vue.ref<Card>(EMPTY_CARD);
 

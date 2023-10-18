@@ -3,9 +3,9 @@
  * To move between the items (called cards in sbx)
  */
 
-import { useCardsStore } from "./store/hmItemsStore";
+import { useItemsStore } from "./store/hmItemsStore";
 
-const cardsStore = useCardsStore();
+const itemsStore = useItemsStore();
 
 /**
  * To change the active card
@@ -13,7 +13,7 @@ const cardsStore = useCardsStore();
  */
 function onChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    cardsStore.setActiveCard(target.value);
+    itemsStore.setActiveCard(target.value);
 }
 </script>
 
@@ -22,10 +22,10 @@ function onChange(event: Event) {
         <h2 class="subheader">Cards</h2>
         <select @change="onChange">
             <option
-                v-for="card in cardsStore.cards"
+                v-for="card in itemsStore.cards"
                 :key="card.id"
                 :value="card.reference"
-                :selected="cardsStore.activeCard.reference === card.reference"
+                :selected="itemsStore.activeCard.reference === card.reference"
             >
                 {{ card.title }}
             </option>

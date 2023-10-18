@@ -3,7 +3,7 @@
  * Display a single student's responses
  */
 
-import { useCardsStore } from "./store/hmItemsStore";
+import { useItemsStore } from "./store/hmItemsStore";
 import type { Student } from "./types/Student";
 
 interface Props {
@@ -14,7 +14,7 @@ const props = defineProps<Props>();
 const isOpen = window.Vue.ref(false); // whether the filters are shown
 const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const containerEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
-const cardsStore = useCardsStore();
+const itemsStore = useItemsStore();
 let learnosityContainer: HTMLDivElement;
 let currentCardResponse: HTMLDivElement;
 
@@ -47,7 +47,7 @@ function hideAllChildren() {
  */
 function displayActiveCard() {
     currentCardResponse = learnosityContainer.querySelector(
-        `[data-reference="${cardsStore.activeCard.reference}"]`
+        `[data-reference="${itemsStore.activeCard.reference}"]`
     ) as HTMLDivElement;
     currentCardResponse.style.display = "block";
 }
@@ -58,7 +58,7 @@ function displayActiveCard() {
 function changeActiveCard() {
     currentCardResponse.style.display = "none";
     currentCardResponse = learnosityContainer.querySelector(
-        `[data-reference="${cardsStore.activeCard.reference}"]`
+        `[data-reference="${itemsStore.activeCard.reference}"]`
     ) as HTMLDivElement;
     currentCardResponse.style.display = "block";
 }
@@ -82,7 +82,7 @@ window.Vue.watch(
  * Show the appropriate response when the card is changed
  */
 window.Vue.watch(
-    () => cardsStore.activeCard,
+    () => itemsStore.activeCard,
     () => {
         changeActiveCard();
     }
