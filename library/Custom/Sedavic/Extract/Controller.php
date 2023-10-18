@@ -67,7 +67,7 @@ class Controller extends Base
             u.lastname,
             h.house,
             lyl.name AS yearLevel,
-            a.title,
+            ai.title,
             var.*,
             cn1.name AS Qualification,
             cn1.code AS QualificationCode,
@@ -79,20 +79,48 @@ class Controller extends Base
             vmrf.feedback_table,
             vmrf.published_at
         FROM v_most_recent_feedback vmrf
-        INNER JOIN assessment a ON vmrf.assessment_id = a.id
+        INNER JOIN assessment ai ON vmrf.assessment_id = ai.id
+        INNER JOIN assessment_specification_implementation asi ON ai.id = asi.implementation_assessment_id
         INNER JOIN `user` u ON u.id = vmrf.student_id 
         LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
         LEFT JOIN house h ON u.house = h.id
-        LEFT JOIN curriculum_node_for_assessment cnof ON cnof.assessment_id = a.id
+        LEFT JOIN curriculum_node_for_assessment cnof ON cnof.assessment_id = asi.specification_assessment_id
         LEFT JOIN curriculum_node cn1 ON cnof.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn2.curriculum_node_parent_id = cn1.id
         LEFT JOIN curriculum_node cn3 ON cn3.curriculum_node_parent_id = cn2.id
-        LEFT JOIN mv_assessment_relation var ON var.assessment_id = a.id
+        LEFT JOIN mv_assessment_relation var ON var.assessment_id = ai.id
         WHERE vmrf.published_at >= :from
         AND vmrf.published_at <= :to
-        AND a.deleted_at IS NULL
+        AND cn1.id IS NOT NULL
+        AND cn2.id IS NOT NULL
+        AND cn3.id IS NOT NULL
+        AND ai.deleted_at IS NULL
         AND u.deleted_at IS NULL
         ORDER BY lastname, firstname
+    ";
+
+
+    /**
+     * These are obtained separately so you can compute the node hierarchy
+     * outside of sql, since they appear in an arbitrary order. You could
+     * assume a sequence circumstantially based on the way we import our
+     * curriculum nodes, though; ordering by id DESC. Child node ids must
+     * be larger than parent node ids and they were always created in a
+     * hierarchy, never flat.
+     */
+    private const QUERY_CURRICULUM_NODES = "
+        SELECT 
+            cn.name,
+            cn.code,
+            cnp.name AS parentName,
+            cnp.code AS parentCode
+        FROM curriculum_node_for_assessment cnof 
+        INNER JOIN curriculum_node cn ON cnof.curriculum_node_id = cn.id
+        INNER JOIN curriculum_node cnp ON cn.curriculum_node_parent_id = cnp.id
+        WHERE assessment_id = :assessmentId
+        AND cn.deleted_at IS NULL
+        AND cnp.deleted_at IS NULL
+        ORDER BY cn.curriculum_node_parent_id
     ";
 
 
@@ -152,6 +180,7 @@ class Controller extends Base
      * @var \Alaress\Database\Statement\Query\Base
      */
     private \Alaress\Database\Statement\Query\Base $assessmentInfoStatement;
+    private \Alaress\Database\Statement\Query\Base $nodeStatement;
     private \Alaress\Database\Statement\Query\Base $dueworkFeedbackStatement;
 //    private \Alaress\Database\Statement\Query\Base $taskFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base $quizFeedbackStatement;
@@ -176,6 +205,7 @@ class Controller extends Base
         /* Basic user and assessment metadata
          */
         $this->assessmentInfoStatement = $database->prepareQuery(self::QUERY_ASSESSMENT_INFO);
+        $this->nodeStatement = $database->prepareQuery(self::QUERY_CURRICULUM_NODES);
 
         /* Feedback prepared statements
          */
@@ -252,6 +282,10 @@ class Controller extends Base
                 /* Feedback data
                  */
                 $feedback = $this->findFeedback($assessmentInfo['feedback_table'], (int)$assessmentInfo['feedback_id']);
+
+                /* Curriculum nodes
+                 */
+                $curriculumNodes = $this->findCurriculumNodes($assessmentInfo['assessment_id']);
             } catch (\DomainException | \RuntimeException $e) {
                 /* noop: skip data that randomly died, for now
                  *
@@ -263,7 +297,7 @@ class Controller extends Base
 
             /* Combine all that into a csv row
              */
-            $row = $this->combine($assessmentInfo, $context, $feedback);
+            $row = $this->combine($assessmentInfo, $curriculumNodes, $context, $feedback);
 
             /* Pump it to an fputcsv
              */
@@ -288,6 +322,38 @@ class Controller extends Base
         }
 
         exit;
+    }
+
+
+    private function findCurriculumNodes(int $assessmentId): array
+    {
+        $this->nodeStatement->execute([
+            'assessmentId' => $assessmentId
+        ]);
+
+        $unitRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC);
+
+        /* The first element in the stack is the Unit,
+         * and the Qualification is the Unit's parent
+         */
+        $stack = [
+            'QualificationName' => $unitRow['parentName'],
+            'QualificationCode' => $unitRow['parentCode'],
+            'UnitName' => $unitRow['name'],
+            'UnitCode' => $unitRow['code'],
+        ];
+
+        $unitRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC);
+        $aosRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC);
+
+        return [
+            'Qualification' => $qualificationRow['name'],
+            'QualificationCode' => $qualificationRow['code'],
+            'Unit' => $unitRow['name'],
+            'UnitCode' => $unitRow['code'],
+            'AreaOfStudy' => $aosRow['name'],
+            'AreaOfStudyCode' => $aosRow['code'],
+        ];
     }
 
 
@@ -339,24 +405,25 @@ class Controller extends Base
      * Take all the pieces we collected and voltron them into Its Final Form
      *
      * @param array $assessmentInfo
+     * @param array $curriculumNodes
      * @param array $context
      * @param array $feedback
      * @return array
      */
-    private function combine(array $assessmentInfo, array $context, array $feedback): array
+    private function combine(array $assessmentInfo, array $curriculumNodes, array $context, array $feedback): array
     {
         return [
             'externalId' => $assessmentInfo['synergy_id'],
             'firstname' => $assessmentInfo['firstname'],
             'lastname' => $assessmentInfo['lastname'],
-            'qualification' => $this->renderCurriculumNode((string)$assessmentInfo['Qualification'], (string)$assessmentInfo['QualificationCode']),
+            'qualification' => $this->renderCurriculumNode((string)$curriculumNodes['Qualification'], (string)$curriculumNodes['QualificationCode']),
             'year' => $assessmentInfo['yearLevel'],
             'house_sb' => $assessmentInfo['house'],
-            'unit' => $this->renderCurriculumNode((string)$assessmentInfo['Unit'], (string)$assessmentInfo['UnitCode']),
+            'unit' => $this->renderCurriculumNode((string)$curriculumNodes['Unit'], (string)$curriculumNodes['UnitCode']),
             'course_sb' => $context['course']['name'],
             'unit_sb' => $context['unit']['name'],
             'assessment' => $assessmentInfo['title'],
-            'aos' => $this->renderCurriculumNode((string)$assessmentInfo['AreaOfStudy'], (string)$assessmentInfo['AreaOfStudyCode']),
+            'aos' => $this->renderCurriculumNode((string)$curriculumNodes['AreaOfStudy'], (string)$curriculumNodes['AreaOfStudyCode']),
             'normalised' => $feedback['normalised'],
             'humanReadable' => $feedback['humanReadable'],
         ];
