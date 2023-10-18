@@ -276,8 +276,7 @@ class Hydrator extends BaseHydrator
         IAssessable $assessment,
         string $keyword,
         string $assessmentContentHtml
-    ): bool
-    {
+    ): bool {
         // SQL match conditions copied from Assessment\QueryParamBuilder->buildBaseWhereParams()
         // -------------------------------------------------------------------------------------
         // NOTES:
