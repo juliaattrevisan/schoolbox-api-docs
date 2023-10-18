@@ -182,7 +182,7 @@ class Hydrator extends BaseHydrator
 
         if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
             $links[] = [
-                'title' => 'Modify Folder',
+                'title' => 'Modify',
                 'icon' => 'icon-modify',
                 'url' => $this->buildBaseUrl()
                     ->withPath("/resource/folder/{$folder->getId()}/modify")
