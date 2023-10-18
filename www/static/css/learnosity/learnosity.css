@@ -470,3 +470,14 @@ input[type="checkbox"] {
 .lrn_widget.lrn_tokenhighlight .lrn_response .lrn_response_input_wrapper {
     box-shadow: 0 0 0 1px var(--content-ui-foreground);
 }
+
+/* update Math and calculator styles */
+.lrn.lrn_widget .lrn_bordered_mathinput {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn .lrn-btn-grid-num {
+    background: var(--content-ui-selected);
+}
+.lrn .lrn-btn-grid-sym {
+    background: var(--body-background);
+}
