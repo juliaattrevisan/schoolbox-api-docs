@@ -9,6 +9,7 @@ import { useReportsStore } from "./store/hmReportsStore";
 import type { Item } from "./types/Item";
 import HmSelectItem from "./items/hm-select-item.vue";
 import HmStudents from "./students/hm-students.vue";
+import HmPreviousItem from "./items/hm-previous-item.vue";
 import HmNextItem from "./items/hm-next-item.vue";
 
 interface Props {
@@ -44,7 +45,8 @@ window.Vue.onMounted(async () => {
             <hm-select-item />
         </div>
         <hm-students />
-        <div class="l-flex-row l-gap-m">
+        <div class="l-flex-row l-flex--no-wrap l-gap-m">
+            <hm-previous-item />
             <hm-next-item />
         </div>
     </div>

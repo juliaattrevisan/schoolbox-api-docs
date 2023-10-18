@@ -16,7 +16,9 @@ function onSelected() {
 </script>
 
 <template>
-    <button class="button full-width" :disabled="!itemsStore.hasNextItem" @click.prevent="onSelected">Next Card</button>
+    <button class="button full-width icon-next" :disabled="!itemsStore.hasNextItem" @click.prevent="onSelected">
+        Next Card
+    </button>
 </template>
 
 <style scoped></style>
