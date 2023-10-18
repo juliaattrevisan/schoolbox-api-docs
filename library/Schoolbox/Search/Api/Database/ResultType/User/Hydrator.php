@@ -175,7 +175,11 @@ class Hydrator extends BaseHydrator
         $links = [];
 
         $route = 'calendar.getCalendar';
-        $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
+        $params = [
+            'selectedDate' => date('d-m-Y'),
+            'userId' => $searchResultUser->getId(),
+            'user' => $searchResultUser
+        ];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Calendar',
