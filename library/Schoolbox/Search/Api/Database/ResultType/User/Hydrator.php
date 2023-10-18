@@ -188,8 +188,12 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        $route = 'learningUpcoming.postUpcomingForStudent';
-        // Params needed here are the same as set above.
+        $route = 'learningUpcoming.getUpcomingForStudent';
+        $params = [
+            'date' => date('d-m-Y'),
+            'studentId' => $searchResultUser->getId(),
+            'student' => $searchResultUser
+        ];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Due Work',
@@ -210,7 +214,7 @@ class Hydrator extends BaseHydrator
         }
 
         $route = 'learningGrades.getGrades';
-        // Params needed here are the same as set above.
+        $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Grades',
