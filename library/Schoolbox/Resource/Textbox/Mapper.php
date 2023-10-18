@@ -8,8 +8,8 @@
 
 namespace Schoolbox\Resource\Textbox;
 
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Textbox\Search\Result;
 use Schoolbox\User;
 use Schoolbox\Mapper\Searchable;
@@ -277,7 +277,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $limit = self::DEFAULT_LIMIT;
         }
 
-        $searcher = new Result();
+        $searcher = new Result(Access::getInstance());
         $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;

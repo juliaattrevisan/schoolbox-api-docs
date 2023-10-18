@@ -27,7 +27,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, IHomepageCleanable
 {
-
     /**
      * @return string
      */

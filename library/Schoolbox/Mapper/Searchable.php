@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 interface Searchable
 {
-
     const DEFAULT_LIMIT = 20;
 
 

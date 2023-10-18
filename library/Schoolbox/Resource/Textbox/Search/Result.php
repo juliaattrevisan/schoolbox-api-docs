@@ -142,10 +142,10 @@ class Result extends Base
                     && ((int)$row['collapse'] === 0 || (int)$row['show_title'] === 1)
                 ) {
                     // if component exists and it's not hidden, read only user can see this
-                    return $this->getAccessor()->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_DENY;
+                    return $this->accessor->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_DENY;
                 } else {
                     // if component doesn't exist, only write+ user can see this
-                    return $this->getAccessor()->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_READ;
+                    return $this->accessor->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_READ;
                 }
             }
         );
