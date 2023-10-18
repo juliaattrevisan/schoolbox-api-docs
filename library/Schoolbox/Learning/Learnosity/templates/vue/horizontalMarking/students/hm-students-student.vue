@@ -4,6 +4,7 @@
  */
 
 import { useItemsStore } from "../store/hmItemsStore";
+import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
 
 interface Props {
@@ -11,18 +12,18 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const isOpen = window.Vue.ref(false); // whether the filters are shown
 const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const containerEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
+const studentsStore = useStudentsStore();
 let learnosityContainer: HTMLDivElement;
 let currentCardResponse: HTMLDivElement;
 
 /**
- * To show/hide the filters when selected
+ * To show/hide the student when selected
  */
 function onToggleSelected() {
-    isOpen.value = !isOpen.value;
+    studentsStore.toggleStudent(props.student);
 }
 
 /**
@@ -30,7 +31,7 @@ function onToggleSelected() {
  * @returns {string} - the height of the sub types container
  */
 const containerHeight = window.Vue.computed(() => {
-    return isOpen.value ? "1fr" : "0fr";
+    return props.student.isExpanded ? "1fr" : "0fr";
 });
 
 /**
@@ -43,9 +44,9 @@ function hideAllChildren() {
 }
 
 /**
- * To display the current card
+ * To display the current item
  */
-function displayActiveCard() {
+function displayActiveItem() {
     currentCardResponse = learnosityContainer.querySelector(
         `[data-reference="${itemsStore.activeItem.reference}"]`
     ) as HTMLDivElement;
@@ -53,9 +54,9 @@ function displayActiveCard() {
 }
 
 /**
- * To change the current card
+ * To change the current item
  */
-function changeActiveCard() {
+function changeActiveItem() {
     currentCardResponse.style.display = "none";
     currentCardResponse = learnosityContainer.querySelector(
         `[data-reference="${itemsStore.activeItem.reference}"]`
@@ -64,7 +65,7 @@ function changeActiveCard() {
 }
 
 /**
- * When its loaded hide everything by default, and then only show the current card
+ * When its loaded hide everything by default, and then only show the current item
  */
 window.Vue.watch(
     () => props.student.isReportLoaded,
@@ -73,18 +74,18 @@ window.Vue.watch(
             await window.Vue.nextTick(); // ensure the learnosity DOM is ready
             learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
             hideAllChildren();
-            displayActiveCard();
+            displayActiveItem();
         }
     }
 );
 
 /**
- * Show the appropriate response when the card is changed
+ * Show the appropriate response when the item is changed
  */
 window.Vue.watch(
     () => itemsStore.activeItem,
     () => {
-        changeActiveCard();
+        changeActiveItem();
     }
 );
 </script>
@@ -94,7 +95,7 @@ window.Vue.watch(
         <div class="l-flex-row l-gap-m f-no-margins">
             <button
                 v-if="props.student.isReportLoaded"
-                :class="`toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                :class="`toggle-button ${props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 :disabled="!props.student.isReportLoaded"
                 @click.prevent="onToggleSelected"
             ></button>

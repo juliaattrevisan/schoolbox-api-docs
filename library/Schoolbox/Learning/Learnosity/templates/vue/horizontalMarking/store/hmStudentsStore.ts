@@ -25,6 +25,14 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * To show/hide a student
+     * @param {Student} student - the student to change
+     */
+    function toggleStudent(student: Student) {
+        student.isExpanded = !student.isExpanded;
+    }
+
+    /**
      * To notify that a report linked to a student has been loaded
      * @param {number} reportId - the report id
      */
@@ -38,6 +46,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     return {
         init,
         students,
+        toggleStudent,
         reportLoaded,
     };
 });

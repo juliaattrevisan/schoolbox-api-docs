@@ -1,5 +1,5 @@
 /**
- * Holds the items (items in Learnosity) and the active card (the one being marked)
+ * Holds the items (card in sbx) and the active item (the one being marked)
  */
 
 import { defineStore } from "pinia";
