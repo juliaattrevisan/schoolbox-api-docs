@@ -295,6 +295,11 @@ class Controller extends Base
                         'assessmentId' => $assessment->getId(),
                         'studentId' => $student->getId(),
                     ]),
+                    /* Reading Time
+                     */
+                    'reading_mode' => [
+                        'reading_time' => $quiz->getReadingTimeDuration()
+                    ]
                 ],
                 "navigation" => [
                     "auto_save" => [
