@@ -141,6 +141,8 @@ class Hydrator extends BaseHydrator
                             (str_contains($field->getTitle(), $keyword) || str_contains($field->getBody(), $keyword))
                         ) {
                             break; // The keyword was found in a visible field, so the match counts.
+                            // Note that if the keyword was only found in parts of the HTML that is invisible,
+                            // that is not a problem because such matches will be eliminated in the next step.
                         }
                     }
 
@@ -320,17 +322,8 @@ class Hydrator extends BaseHydrator
         // 'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',   // Assessment\Lti\Model->getLtiAssessmentUrl()         Other
         // 'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike', // Assessment\Lti\Model->getLtiAssessmentTitle()       Other
         // 'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',  // Assessment\Lti\Model->getLtiAssessmentText()        HtmlContent
-        // 'IF(                                                                                                                      .
-        //      (                                                                                                                    .
-        //          lesson_plan.visibility="student" OR                                                                              .
-        //          (lesson_plan.visibility="staff" AND ' . (($loggedInUserIsStaffOrSuper) ? 'TRUE' : 'FALSE') . ')                  .
-        //      ),                                                                                                                   .
-        //      (                                                                                                                    .
-        //          lesson_plan_field.title LIKE :assessmentKeywordLike OR    // Assessment\LessonPlan\Model->getField()->getTitle() HtmlContent
-        //          lesson_plan_field.body LIKE :assessmentKeywordLike        // Assessment\LessonPlan\Model->getField()->getBody()  HtmlContent
-        //      ),
-        //      FALSE
-        //  )'
+        // 'lesson_plan_field.title LIKE :assessmentKeywordLike',             // Assessment\LessonPlan\Model->getField()->getTitle() HtmlContent
+        // 'lesson_plan_field.body LIKE :assessmentKeywordLike'               // Assessment\LessonPlan\Model->getField()->getBody()  HtmlContent
 
         if (str_contains($assessment->getTitle(), $keyword)) {
             return false; // Found match on assessment.title or assess.title.
