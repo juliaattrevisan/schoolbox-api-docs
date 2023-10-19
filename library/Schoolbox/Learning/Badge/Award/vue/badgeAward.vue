@@ -200,6 +200,16 @@ export default {
             const userIdList = this.selected.map((user) => user.id);
             return userIdList.join(",");
         },
+
+        /**
+         * return a list of options that are not already selected
+         * @returns {Array} - the list of options that are not already selected
+         */
+        filteredOptions() {
+            return this.options.filter((option) => {
+                return !this.selected.some((selected) => selected.id === option.id);
+            });
+        },
     },
     methods: {
         /**
@@ -314,7 +324,7 @@ export default {
 
         <v-select
             class="schoolbox-vue-selectize"
-            :options="options"
+            :options="filteredOptions"
             :clear-search-on-blur="
                 function () {
                     return true;
