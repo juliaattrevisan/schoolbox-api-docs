@@ -31,6 +31,10 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      */
     function toggleStudent(student: Student) {
         student.isExpanded = !student.isExpanded;
+        // if all students are now expanded, set the overall toggle to true
+        if (students.value.every(($student) => $student.isExpanded)) {
+            isExpanded.value = true;
+        }
     }
 
     /**

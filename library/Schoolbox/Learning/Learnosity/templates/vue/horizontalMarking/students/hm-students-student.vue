@@ -3,7 +3,6 @@
  * Display a single student's responses
  */
 
-import { removeAllFromElement, hideAllChildren } from "@js/util/domUtils";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
@@ -43,8 +42,7 @@ window.Vue.watch(
         if (props.student.isReportLoaded) {
             await window.Vue.nextTick(); // ensure the learnosity DOM is ready
             const learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
-            removeAllFromElement(learnosityContainer, ".clearfix"); // remove all the clearfix elements
-            // hideAllChildren(learnosityContainer);
+            learnosityContainer.remove(); // remove the learnosity container as it's no longer neexed after the next tick, as everything needed has been moved out of it now
         }
     }
 );

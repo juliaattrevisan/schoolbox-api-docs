@@ -12,7 +12,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
-const itemEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 
 /**
  * To display the current item
@@ -26,12 +26,16 @@ const display = window.Vue.computed(() => {
  */
 window.Vue.onMounted(() => {
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
-    itemEl.value?.appendChild(response);
+    responseEl.value?.appendChild(response);
 });
 </script>
 
 <template>
-    <div ref="itemEl" class="item"></div>
+    <div class="item l-flex-col l-gap-s l-pad-s">
+        <div ref="responseEl"></div>
+        <div></div>
+        <div></div>
+    </div>
 </template>
 
 <style scoped>
