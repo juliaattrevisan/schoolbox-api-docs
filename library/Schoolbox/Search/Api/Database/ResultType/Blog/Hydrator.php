@@ -52,7 +52,9 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
+    public function hydrate(
+        string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer, string $currentUrl
+    ): array
     {
         // Find all news articles which match $matches
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);

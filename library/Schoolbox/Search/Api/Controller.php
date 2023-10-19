@@ -69,7 +69,11 @@ class Controller extends Base
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         $cursor  = null;
         if (mb_strlen($keyword) >= 2) {
-            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
+            $currentUrl = $this->getRequest()->getUri()->__toString();
+
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
+                $keyword, $filter, $limit, $currentUrl
+            );
 
             $translatedResults = [];
             foreach ($results as $result) {
@@ -121,6 +125,7 @@ class Controller extends Base
                             $filter,
                             [$rawFolderResult],
                             $this->getUser(),
+                            $currentUrl
                         );
                         if (!$folderResult) {
                             continue;
@@ -187,7 +192,9 @@ class Controller extends Base
         $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $folder);
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         if (mb_strlen($keyword) >= 2) {
-            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
+                $keyword, $filter, $limit, $this->getRequest()->getUri()->__toString()
+            );
 
             // Finally output the response
             $this->response = $this->responseAsJson(
@@ -276,7 +283,9 @@ class Controller extends Base
      * @param int                     $limit
      * @return array{results: array<FullResult>, nextCursor: string}
      */
-    private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit): array
+    private function populateResultSet(
+        string $keyword, SearchFilter\DataObject $filter, int $limit, string $currentUrl
+    ): array
     {
         $cursor = new Cursor\Cursor(
             $this->source,
@@ -309,7 +318,9 @@ class Controller extends Base
             // then add them to the full result set.
             $fullResults = array_merge(
                 $fullResults,
-                $this->hydrator->hydrate($keyword, $filter, $nextRawResults->getAll(), $this->user)
+                $this->hydrator->hydrate(
+                    $keyword, $filter, $nextRawResults->getAll(), $this->user, $currentUrl
+                )
             );
 
             // Too many full results now?

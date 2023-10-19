@@ -55,7 +55,9 @@ class Aggregate implements IHydrator
      * @param User                  $viewer
      * @return array<int, FullResult|null>
      */
-    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
+    public function hydrate(
+        string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer, string $currentUrl
+    ): array
     {
         // Group matches by the hydrator which accepts them
         $groupedRawResults = [];
@@ -75,7 +77,9 @@ class Aggregate implements IHydrator
         foreach ($this->hydrators as $hydrator) {
             $hydratorId = spl_object_id($hydrator);
             if (isset($groupedRawResults[$hydratorId])) {
-                $fullResults += $hydrator->hydrate($keyword, $filter, $groupedRawResults[$hydratorId], $viewer);
+                $fullResults += $hydrator->hydrate(
+                    $keyword, $filter, $groupedRawResults[$hydratorId], $viewer, $currentUrl
+                );
             }
         }
 

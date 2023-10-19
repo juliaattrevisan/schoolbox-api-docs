@@ -38,17 +38,20 @@ interface IHydrator
      * should be preserved so that the raw result may be associated with a full
      * result.
      *
-     * @param string                  $keyword The original search keyword:
-     *                                         required so that descriptions may
-     *                                         be truncated to around where the
-     *                                         keyword is found.
-     * @param SearchFilter\DataObject $filter  This is supplied for use cases such as:
-     *                                          - The hydrate function for forum search results needs to get the
-     *                                            number of matching posts that occur in each matching forum thread.
-     *                                            This requires another database query, and requires the filter info.
-     * @param array<int, RawResult>   $matches A set of matches to hydrate.
-     * @param User                    $viewer  The user viewing the search result.
+     * @param string                  $keyword    The original search keyword:
+     *                                            required so that descriptions may
+     *                                            be truncated to around where the
+     *                                            keyword is found.
+     * @param SearchFilter\DataObject $filter     This is supplied for use cases such as:
+     *                                             - The hydrate function for forum search results needs to get the
+     *                                               number of matching posts that occur in each matching forum thread.
+     *                                               This requires another database query, and requires the filter info.
+     * @param array<int, RawResult>   $matches    A set of matches to hydrate.
+     * @param User                    $viewer     The user viewing the search result.
+     * @param String                  $currentUrl Useful for setting 'returnUrl' URL params on linked pages.
      * @return array<int, FullResult|null>
      */
-    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array;
+    public function hydrate(
+        string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer, string $currentUrl
+    ): array;
 }
