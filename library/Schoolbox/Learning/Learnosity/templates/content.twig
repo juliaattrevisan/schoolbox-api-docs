@@ -35,6 +35,16 @@
     </div>
 </div>
 
+{% if 'elite' != config.site_plan %}
+    <style>
+        [data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"],
+        [data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]
+        {
+            display: none;
+        }
+    </style>
+{% endif %}
+
 {% autoescape 'js' %}
 <script>
     /**
@@ -50,6 +60,14 @@
              */
             authorApp.on('render:activity', function(event) {
                 authorApp.setActivityTags({{ tags|raw }});
+            });
+
+            authorApp.on('widgetedit:editor:ready', function(event) {
+                let a = document.querySelector('[data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"]');
+
+                /* Why does this crash?
+                 * console.log(a.closest('li'));
+                 */
             });
 
             /**
