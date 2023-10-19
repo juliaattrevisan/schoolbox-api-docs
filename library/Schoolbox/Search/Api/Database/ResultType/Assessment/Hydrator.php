@@ -14,6 +14,7 @@ use Alaress\Html\ToText;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -46,6 +47,7 @@ class Hydrator extends BaseHydrator
      * @param UserMapper $userMapper Used to hydrate assessment creators.
      * @param Access $access Used to determine if the current user may view this page.
      * @param Authorizer $authorizer Used to determine if the current user may view system pages.
+     * @param ServerRequestInterface $request Used to get the request URL.
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -53,6 +55,7 @@ class Hydrator extends BaseHydrator
         private Access $access,
         private Generator $routeGenerator,
         private Authorizer $authorizer,
+        private ServerRequestInterface $request
     ) {
     }
 
@@ -243,8 +246,8 @@ class Hydrator extends BaseHydrator
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $currentUrl = $this->request->getUri()->__toString(); // This will be like '.../api/search?keyword=...'.
-            $returnUrl = str_replace('/api/', '/', $currentUrl); // Get URL like '.../search?keyword=...'.
+            $requestUrl = $this->request->getUri()->__toString(); // This will be like '.../api/search?keyword=...'.
+            $returnUrl = str_replace('/api/', '/', $requestUrl); // Get URL like '.../search?keyword=...'.
 
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
