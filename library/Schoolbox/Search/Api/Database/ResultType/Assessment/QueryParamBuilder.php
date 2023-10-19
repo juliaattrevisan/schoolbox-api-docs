@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
+use Schoolbox\UserMapper;
 
 /**
  * Query parameter builder for link searches.
@@ -26,8 +27,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @param IQuoter    $quoter
      * @param UserAccess $userAccess
+     * @param UserMapper $userMapper
      */
-    public function __construct(private IQuoter $quoter, private UserAccess $userAccess)
+    public function __construct(private IQuoter $quoter, private UserMapper $userMapper)
     {
     }
 
@@ -42,8 +44,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $loggedInUser = $this->userAccess->getUser();
+        $loggedInUser = $this->userMapper->getSessionUser();
         $loggedInUserIsStaffOrSuper = (
+            // The session will not be available when this is run as part of an API call run outside a browser.
+            // TODO: Find a way of getting the logged in user that does not depend on the session.
+            //       (the logged in user should still be available because of the user access token used with the API)
             $loggedInUser !== null && ($loggedInUser->getRole()->isStaff() || $loggedInUser->isSuperuser())
         );
 
