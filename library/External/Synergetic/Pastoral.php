@@ -280,6 +280,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $log->setStudentName(null);
         $log->setCreatorName(null);
         $log->setResult("Parent Importing " . ($importParentAccess ? 'Enabled' : 'Disabled'));
+        $log->setCreatedAt(Alaress_Date_Format::now(new \Alaress\Date\Clock()));
         $this->pastoralLogMapper->save($log);
 
         if ($importRecords) {
@@ -350,6 +351,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $logRecord->setHeading($heading);
                     $logRecord->setStudentName("{$record["StudentLastname"]}, {$record["StudentFirstname"]}");
                     $logRecord->setCreatorName("{$record["OwnerLastname"]}, {$record["OwnerFirstname"]}");
+                    $logRecord->setCreatedAt(Alaress_Date_Format::now(new \Alaress\Date\Clock()));
 
                     try {
                         $student = $this->getSchoolboxUser($record["ID"]);
@@ -475,6 +477,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $log->setStudentName($pastoralRecord->getStudent()->getFullName());
                                         $log->setHeading("Imported Attachment '{$document["filename"]}'");
                                         $log->setResult("OK");
+                                        $log->setCreatedAt(Alaress_Date_Format::now(new \Alaress\Date\Clock()));
                                         $this->pastoralLogMapper->save($log);
 
                                         // temp file will be removed by storage manager, but just in case
@@ -529,6 +532,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $logAccess->setPastoralId($pastoralRecord->getId());
                     $logAccess->setCreatorName($pastoralRecord->getOwner()->getFullName());
                     $logAccess->setStudentName($pastoralRecord->getStudent()->getFullName());
+                    $logAccess->setCreatedAt(Alaress_Date_Format::now(new \Alaress\Date\Clock()));
 
                     $audienceUser = $this->getSchoolboxUser($audience["ID"]);
 
@@ -561,6 +565,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $log->setUserId($user->getId());
         $log->setHeading("Import Completed");
         $log->setResult("Completed");
+        $log->setCreatedAt(Alaress_Date_Format::now(new \Alaress\Date\Clock()));
+
         $this->pastoralLogMapper->save($log);
     }
 
