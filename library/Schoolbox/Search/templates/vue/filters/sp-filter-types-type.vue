@@ -102,7 +102,9 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
                     :value="props.type.value"
                     :class="{ indeterminate: isSomeSubTypesSelected }"
                 />
-                <label :for="props.type.value">{{ props.type.title }}</label>
+                <label :for="props.type.value" :data-test="`sp-filter-type-label-${props.type.value}`">{{
+                    props.type.title
+                }}</label>
             </div>
             <button
                 v-if="props.type.subTypes"
