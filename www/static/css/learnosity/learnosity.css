@@ -455,6 +455,15 @@ input[type="checkbox"] {
 .lrn .lrn_btn {
     background-color: var(--content-ui-background);
 }
+button.lrn_btn.lrn_start_recording {
+    background-color: #eaeaea;
+}
+.lrn_box_skin_wrapper .lrn_widget_footer .lrn_toolbar_left .lrn_btn {
+    background: #eaeaea;
+}
+button.lrn_btn.lrn_volume-high.lrn_volume_btn {
+    background-color: #eaeaea;
+}
 .lrn_toolbar {
     background-color: #fff;
 }
