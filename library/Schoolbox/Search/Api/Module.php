@@ -99,6 +99,9 @@ class Module extends BaseModule
         /** @var Authorizer $authorizer */
         $authorizer = $this->injector->get('authorizer');
 
+        // Need an httpRequest.
+        $httpRequest = $this->injector->get('httpRequest');
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -182,6 +185,7 @@ class Module extends BaseModule
                     Access::getInstance(),
                     $routeGenerator,
                     $authorizer,
+                    $httpRequest
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(

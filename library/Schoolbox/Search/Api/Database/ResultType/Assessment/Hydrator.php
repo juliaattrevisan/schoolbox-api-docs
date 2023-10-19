@@ -243,8 +243,8 @@ class Hydrator extends BaseHydrator
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $currentUrl = $_SERVER['REQUEST_URI']; // This will be the search API URL (eg. '...schoolbox/api/search?keyword=...').
-            $returnUrl = str_replace('/api/', '/', $currentUrl); // Get a URL like '...schoolbox/search?keyword=...'.
+            $currentUrl = $this->request->getUri()->__toString(); // This will be like '.../api/search?keyword=...'.
+            $returnUrl = str_replace('/api/', '/', $currentUrl); // Get URL like '.../search?keyword=...'.
 
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
