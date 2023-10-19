@@ -753,6 +753,97 @@ class Controller extends Assessment\Controller
             }
         )->getAll();
 
+        /* For each student,
+         * try to build a csv row based on capability and indicator usage
+         */
+        foreach ($this->getMarks($participants) as $studentId => $marks) {
+            /** @var Participant $participant */
+            $participant = $participantsGrouped[$studentId]->first();
+
+            $sum = 0;
+
+            $row = [
+                'name' => $participant->getUser()->formatName('{lastname}, {firstname}'),
+                'externalId' => $participant->getUser()->getExternalId(),
+            ];
+
+            foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+                foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                    $capabilityUsageId = $capabilityUsage->getCapability()->getId();
+                    $indicatorUsageId = $indicatorUsage->getIndicator()->getId();
+
+                    $descriptorIndex = "{$capabilityUsageId}-{$indicatorUsageId}-descriptor";
+                    $valueIndex = "{$capabilityUsageId}-{$indicatorUsageId}-value";
+
+                    /* Initialise nodes even if they will contain nothing because the student
+                     * doesn't have any marks for these indicator/descriptor combinations
+                     */
+                    $row[$descriptorIndex] = '';
+                    $row[$valueIndex] = '';
+
+                    /* If the student has marks, populate with their values
+                     */
+                    if (\count($marks)) {
+                        // array of all marked indicator ids of the participant
+                        $markedIndicatorIds = array_keys($marks);
+
+                        /* Maybe we set the Show Drafts option
+                         */
+                        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
+
+                        /* If the current descriptor has a draft,
+                         * and we enabled drafts,
+                         * show its draft value and add a suffix (even if it's null/empty)
+                         */
+                        if ($showDraft) {
+                            if (array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                                $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
+                                $row[$descriptorIndex] = ($descriptor ? $descriptor->getDescription() : '') . self::MARK_DRAFT_SUFFIX;
+                                $row[$valueIndex] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue() . self::MARK_DRAFT_SUFFIX;
+                                $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
+                            } else {
+                                $row[$descriptorIndex] = self::MARK_DRAFT_SUFFIX;
+                                $row[$valueIndex] = self::MARK_DRAFT_SUFFIX;
+                            }
+                        } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                            $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
+                            $row[$descriptorIndex] = $descriptor ? $descriptor->getDescription() : '';
+                            $row[$valueIndex] = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
+                            $sum += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        new \Alaress_Probe($row);
+
+
+        die();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /* Only needed with Capability Marks is set to something other than None;
          * Used to do Indicator lookaheads in csv output
          */
@@ -760,14 +851,14 @@ class Controller extends Assessment\Controller
         $nextCapabilityId = null;
 
         foreach ($this->getMarks($participants) as $studentId => $marks) {
-            // array of all marked indicator ids of the participant
-            $markedIndicatorIds = array_keys($marks);
+//            // array of all marked indicator ids of the participant
+//            $markedIndicatorIds = array_keys($marks);
+//
+//            /** @var Participant $participant */
+//            $participant = $participantsGrouped[$studentId]->first();
+//            $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
 
-            /** @var Participant $participant */
-            $participant = $participantsGrouped[$studentId]->first();
-            $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
-
-            $row = [$studentName, $participant->getUser()->getExternalId()];
+//            $row = [$studentName, $participant->getUser()->getExternalId()];
             $sum = null;
 
             if (count($marks)) {
