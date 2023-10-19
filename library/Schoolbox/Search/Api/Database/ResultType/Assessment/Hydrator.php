@@ -67,9 +67,7 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function hydrate(
-        string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer, string $currentUrl
-    ): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all assessments that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
@@ -118,9 +116,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use (
-                $assessments, $assessmentCreatorById, $keyword, $viewer, $currentUrl
-            ) {
+            function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword, $viewer) {
                 $assessment = $assessments->getBy('id', $match->id);
 
                 if (!($assessment instanceof IAssessable)) {
@@ -174,7 +170,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
                     $assessmentCreator,
                     [$folder],
-                    $this->getSearchResultLinks($assessment, $viewer, $currentUrl),
+                    $this->getSearchResultLinks($assessment, $viewer),
                 );
             },
             $matches
@@ -240,16 +236,19 @@ class Hydrator extends BaseHydrator
      * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
      * @throws RouteNotFound
      */
-    private function getSearchResultLinks(IAssessable $assessment, User $viewer, string $currentUrl): array
+    private function getSearchResultLinks(IAssessable $assessment, User $viewer): array
     {
         $links = [];
 
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $currentUrl = $_SERVER['REQUEST_URI']; // This will be the search API URL (eg. '...schoolbox/api/search?keyword=...').
+            $returnUrl = str_replace('/api/', '/', $currentUrl); // Get a URL like '...schoolbox/search?keyword=...'.
+
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
-                'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($currentUrl),
+                'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
             ];

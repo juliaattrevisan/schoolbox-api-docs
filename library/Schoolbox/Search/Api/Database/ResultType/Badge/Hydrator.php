@@ -59,9 +59,7 @@ class Hydrator extends BaseHydrator
      * @inheritdoc
      * @throws RouteNotFound
      */
-    public function hydrate(
-        string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer, string $currentUrl
-    ): array
+    public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all badges that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
