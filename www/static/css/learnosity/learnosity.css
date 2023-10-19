@@ -238,7 +238,7 @@ input[type="checkbox"] {
 .lrn_widget .lrn_btn_sort:focus,
 .lrn_widget .lrn_btn_sort.lrn_focus {
     box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 1px #fff,
-        inset 0 0 0 4px var(--content-ui-foreground);
+        inset 0 0 0 1px var(--content-ui-foreground);
 }
 
 /* update the hover color for drag and drop */
@@ -495,12 +495,6 @@ input[type="checkbox"] {
 .lrn.lrn_widget .lrn_bordered_mathinput {
     border: 1px solid var(--content-ui-foreground);
 }
-.lrn .lrn-btn-grid-num {
-    background: var(--content-ui-selected);
-}
-.lrn .lrn-btn-grid-sym {
-    background: var(--body-background);
-}
 .lrn_widget .lrn-formula-keyboard .lrn-formula-keyboard-close {
     top: -0.5em;
 }
@@ -709,4 +703,22 @@ input[type="checkbox"] {
 .lrn_cloze .lrn_response_input .lrn_textinput input,
 .lrn_cloze .lrn_response_input .lrn_textinput textarea {
     padding-left: 0.5rem;
+}
+
+/* fixed calculator drop down */
+.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle {
+    top: 0;
+    background: transparent;
+}
+.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:focus,
+.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:hover {
+    background: transparent;
+    border-color: transparent;
+}
+.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle {
+    background: transparent;
+}
+.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:focus,
+.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:hover {
+    background: transparent;
 }
