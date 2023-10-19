@@ -653,3 +653,61 @@ input[type="checkbox"] {
 .lrn_widget.lrn_shorttext .lrn_textinput input {
     border-radius: 0px;
 }
+
+/* update the classification drop zone borders */
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
+    border-right: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
+    border-bottom: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
+    border-right: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
+    border-bottom: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
+    border-top: 1px dashed var(--content-ui-foreground);
+    border-left: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_last.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_last.lrn_over,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_over,
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr
+    .lrn_response_container.lrn_last.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr
+    .lrn_response_container.lrn_last.lrn_over,
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_over {
+    border: 1px var(--content-ui-background) solid;
+}
