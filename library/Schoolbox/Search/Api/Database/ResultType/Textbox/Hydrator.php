@@ -9,9 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
 use Component_Config_Collapse;
 use Component_Config_ShowComponentTitle;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -45,6 +49,8 @@ class Hydrator extends BaseHydrator
         private TextboxMapper $textboxMapper,
         private FolderMapper $folderMapper,
         private Access $access,
+        private Generator $routeGenerator,
+        private Authorizer $authorizer,
     ) {
     }
 
@@ -211,8 +217,8 @@ class Hydrator extends BaseHydrator
                     'textbox',
                     $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                     null,
-                    [$textboxFolder,], // Context: textbox's folder.
-                    [], // texbox: none.
+                    [$textbox->getCategory(),], // Context: textbox's folder
+                    $this->getSearchResultLinks($textbox, $viewer)
                 );
             }
         }
@@ -295,5 +301,34 @@ class Hydrator extends BaseHydrator
         }
 
         return $rowsByTextboxId;
+    }
+
+    /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
+     *
+     * @param User         $viewer
+     * @param TextboxModel $textbox
+     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
+     * @throws RouteNotFound
+     * @throws Exception
+     */
+    private function getSearchResultLinks(TextboxModel $textbox, User $viewer): array
+    {
+        $links = [];
+
+        $textboxFolder = $textbox->getCategory();
+
+        $route = 'textbox.getIndexForFolder';
+        $params = ['folderId' => $textboxFolder->getId(), 'folder' => $textboxFolder];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'url' => $this->routeGenerator->generate($route, $params),
+                'title' => 'Manage Textbox',
+                'icon' => 'icon-textbox',
+            ];
+        }
+
+        return $links;
     }
 }

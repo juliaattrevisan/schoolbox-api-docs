@@ -42,8 +42,14 @@ class FullResult
      * @param User|null                $creator     An optional creator of this search result.
      * @param array<FolderModel>       $context     A folder structure which this result lives within:
      *                                              may be empty if there are no folders.
-     * @param array                    $links       A set of supplementary contextual links for this search result,
-     *                                              for actions which the search user may perform on or for that result.
+     *
+     * @param array<array{"title": string, "icon": string, "url": string, "action"?: string}> $links
+     *     A set of supplementary contextual links for this search result,
+     *     for actions which the search user may perform on or for that result.
+     *     The 'action' key is for use when something other than a redirect to the URL is required.
+     *     E.g. ['action' => 'awardBadgeModal'] could be used to request the display of a particular modal.
+     *     If 'action' is used, the value must be expected by the client.
+     *
      */
     public function __construct(
         public RawResult $rawResult,
@@ -67,6 +73,11 @@ class FullResult
             if (in_array($key, ["title", "url", "type", "meta", "description"]) && $value !== null) {
                 $this->$key = trim($this->$key);
             }
+        }
+
+        // Add 'id' key/value to $links.  These are expected by the client.
+        for ($i = 0; $i < count($this->links); ++$i) {
+            $this->links[$i]['id'] = $i;
         }
     }
 }

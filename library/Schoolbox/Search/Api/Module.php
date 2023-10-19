@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
@@ -23,6 +24,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
@@ -94,6 +96,10 @@ class Module extends BaseModule
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->injector->get('assessmentDataSource');
 
+        // Need an authorizer.
+        /** @var Authorizer $authorizer */
+        $authorizer = $this->injector->get('authorizer');
+
         return new Controller(
             new Database\AggregateSource(
                 $database,
@@ -115,16 +121,20 @@ class Module extends BaseModule
                     $mapperFactory->get(UserMapper::class),
                     $userNameFormatter,
                     $config,
+                    $routeGenerator,
+                    $authorizer
                 ),
                 new Database\ResultType\News\Hydrator(
                     $mapperFactory->get(NewsMapper::class),
-                    $routeGenerator,
                     $articleResolver,
+                    $routeGenerator,
+                    $authorizer
                 ),
                 new Database\ResultType\Page\Hydrator(
                     $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
                     $routeGenerator,
+                    $authorizer
                 ),
                 new Database\ResultType\File\Hydrator(
                     $mapperFactory->get(FileMapper::class),
@@ -143,6 +153,8 @@ class Module extends BaseModule
                     $mapperFactory->get(TextboxMapper::class),
                     $mapperFactory->get(FolderMapper::class),
                     Access::getInstance(),
+                    $routeGenerator,
+                    $authorizer
                 ),
                 new Database\ResultType\Blog\Hydrator(
                     $mapperFactory->get(BlogMapper::class),
@@ -151,6 +163,8 @@ class Module extends BaseModule
                 new Database\ResultType\Badge\Hydrator(
                     $mapperFactory->get(BadgeMapper::class),
                     new PrefixGenerator($this->getConfig()),
+                    $routeGenerator,
+                    $authorizer
                 ),
                 new Database\ResultType\Tile\Hydrator(
                     $mapperFactory->get(TileMapper::class),
@@ -167,6 +181,8 @@ class Module extends BaseModule
                     $assessmentMapperProxy,
                     $mapperFactory->get(UserMapper::class),
                     Access::getInstance(),
+                    $routeGenerator,
+                    $authorizer,
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(

@@ -180,7 +180,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * @var GenericCollection|Audience\Model[]
      */
-    private $audience;
+    private ?GenericCollection $audience = null;
 
     /**
      * @var Metadata

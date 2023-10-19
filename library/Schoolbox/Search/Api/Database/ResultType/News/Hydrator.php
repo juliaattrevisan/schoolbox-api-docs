@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
 use Schoolbox\Permission\Access\UserAccess;
@@ -43,8 +45,9 @@ class Hydrator extends BaseHydrator
      */
     public function __construct(
         private News\Mapper $newsMapper,
-        private Generator $routeGenerator,
         private News\Audience\ArticleResolver $articleResolver,
+        private Generator $routeGenerator,
+        private Authorizer $authorizer
     ) {
     }
 
@@ -112,48 +115,51 @@ class Hydrator extends BaseHydrator
 
         // And map them to a full result
         $fullResults = array_map(
-            function (RawResult $match) use ($articles, $keyword) {
+            function (RawResult $match) use ($articles, $keyword, $viewer) {
                 $article = $articles->getBy('id', $match->id);
-                if ($article instanceof News\Model) {
-                    // The article may have been found if the keyword matched a
-                    // HTML attribute or its value in the blurb or body.
-                    // Filter out matches which were found to match the keyword
-                    // on the query, but were found to not match either:
-                    // * the title
-                    // * the generated description
-                    $description = $this->generateDescriptionForArticle($keyword, $article);
-                    if (!isset($description) && !str_contains($match->title, $keyword)) {
-                        return null;
-                    }
-                    return new FullResult(
-                        $match,
-                        $match->id,
-                        $match->title,
-                        $this->buildBaseUrl()
-                            ->withPath(
-                                $this->routeGenerator->generate(
-                                    'commsNews.getDetail',
-                                    ['articleId' => $article->getId()],
-                                )
-                            )
-                            ->withQuery(http_build_query(['ref' => 'search']))
-                            ->__toString(),
-                        $match->type,
-                        $match->relevance,
-                        $article->getPublishAt(),
-                        null,
-                        "Posted {$article->getPublishAt()->getRelativeTime()} by {$article->getAuthor()->getFullName()}",
-                        $article->getFeatureImage()
-                            ? $this->buildStorageImageUrl($article->getFeatureImage())->__toString()
-                            : null,
-                        'news',
-                        $description,
-                        $article->getAuthor(),
-                        [],
-                        // Links: leave blank for now
-                    );
+
+                if (!($article instanceof News\Model)) {
+                    return null;
                 }
-                return null;
+
+                // The article may have been found if the keyword matched an
+                // HTML attribute or its value in the blurb or body.
+                // Filter out matches which were found to match the keyword
+                // on the query, but were found to not match either:
+                // * the title
+                // * the generated description
+                $description = $this->generateDescriptionForArticle($keyword, $article);
+                if (!isset($description) && !str_contains($match->title, $keyword)) {
+                    return null;
+                }
+
+                return new FullResult(
+                    $match,
+                    $match->id,
+                    $match->title,
+                    $this->buildBaseUrl()
+                        ->withPath(
+                            $this->routeGenerator->generate(
+                                'commsNews.getDetail',
+                                ['articleId' => $article->getId()],
+                            )
+                        )
+                        ->withQuery(http_build_query(['ref' => 'search']))
+                        ->__toString(),
+                    $match->type,
+                    $match->relevance,
+                    $article->getPublishAt(),
+                    null,
+                    "Posted {$article->getPublishAt()->getRelativeTime()} by {$article->getAuthor()->getFullName()}",
+                    $article->getFeatureImage()
+                        ? $this->buildStorageImageUrl($article->getFeatureImage())->__toString()
+                        : null,
+                    'news',
+                    $description,
+                    $article->getAuthor(),
+                    [],
+                    $this->getSearchResultLinks($article, $viewer)
+                );
             },
             $matches,
         );
@@ -186,5 +192,41 @@ class Hydrator extends BaseHydrator
         }
 
         return null;
+    }
+
+    /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
+     *
+     * @param News\Model $article
+     * @param User       $viewer
+     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
+     * @throws RouteNotFound
+     */
+    private function getSearchResultLinks(News\Model $article, User $viewer): array
+    {
+        $links = [];
+
+        $route = 'commsNews.getUpdate';
+        $params = ['articleId' => $article->getId(), 'article' => $article];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Modify',
+                'icon' => 'icon-news',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
+        }
+
+        $route = 'commsNewsStatistics.getOverview';
+        // Same params as already set above.
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Statistics',
+                'icon' => 'icon-progress',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
+        }
+
+        return $links;
     }
 }

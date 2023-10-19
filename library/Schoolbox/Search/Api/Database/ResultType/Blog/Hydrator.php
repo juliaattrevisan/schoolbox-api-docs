@@ -68,13 +68,16 @@ class Hydrator extends BaseHydrator
         $fullResults = array_map(
             function (RawResult $match) use ($blogs, $keyword, $viewer) {
                 $blog = $blogs->offsetGet($match->id);
+
                 if (!$blog instanceof Blog) {
                     return null;
                 }
+
                 $access = $this->access->getFolderAccess($viewer, $blog->getFolder()->getId());
                 if ($access < UserAccess::ACCESS_READ) {
                     return null;
                 }
+
                 $blogBody = (new ToText($blog->getBody()))->getText();
                 return new FullResult(
                     $match,
@@ -98,6 +101,7 @@ class Hydrator extends BaseHydrator
             },
             $matches,
         );
+
         return array_filter($fullResults, fn(?FullResult $x) => isset($x));
     }
 }

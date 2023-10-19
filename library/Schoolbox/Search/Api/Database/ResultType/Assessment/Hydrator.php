@@ -9,15 +9,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Html\ToText;
 use Alaress_Date_Format;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
@@ -41,11 +44,14 @@ class Hydrator extends BaseHydrator
      * @param AssessmentMapperProxy $assessmentMapperProxy Used to fetch assessments for hydration.
      * @param UserMapper $userMapper Used to hydrate assessment creators.
      * @param Access $access Used to determine if the current user may view this page.
+     * @param Authorizer $authorizer Used to determine if the current user may view system pages.
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private UserMapper $userMapper,
         private Access $access,
+        private Generator $routeGenerator,
+        private Authorizer $authorizer,
     ) {
     }
 
@@ -109,7 +115,7 @@ class Hydrator extends BaseHydrator
 
         // And map to a full result.
         $fullResults = array_map(
-            function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword) {
+            function (RawResult $match) use ($assessments, $assessmentCreatorById, $keyword, $viewer) {
                 $assessment = $assessments->getBy('id', $match->id);
 
                 if (!($assessment instanceof IAssessable)) {
@@ -163,7 +169,7 @@ class Hydrator extends BaseHydrator
                     $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
                     $assessmentCreator,
                     [$folder],
-                    [],
+                    $this->getSearchResultLinks($assessment, $viewer),
                 );
             },
             $matches
@@ -218,5 +224,46 @@ class Hydrator extends BaseHydrator
 
         // No other match found, so return true if match on description.
         return str_contains($assessment->getDescription(), $keyword);
+    }
+
+    /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
+     *
+     * @param IAssessable $assessment
+     * @param User        $viewer
+     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
+     * @throws RouteNotFound
+     */
+    private function getSearchResultLinks(IAssessable $assessment, User $viewer): array
+    {
+        $links = [];
+
+        $route = 'learningAssessment.getUpdateAssessmentForm';
+        $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                // All assessment types use the same URL for their 'Modify' page.
+                'url' => $this->routeGenerator->generate($route, $params),
+                'title' => 'Modify',
+                'icon' => 'icon-modify',
+            ];
+        }
+
+        if (!($assessment instanceof Assessment\LessonPlan\Model) && $assessment->isImplementation()) {
+            $route = 'learningAssessment.getStatus';
+            $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                $links[] = [
+                    // All assessment types use the same URL for their 'View Status' page,
+                    // except lesson plans.  Lesson plans have no 'View Status' page.
+                    'url' => $this->routeGenerator->generate($route, $params),
+                    'title' => 'View Status',
+                    'icon' => 'icon-progress',
+                ];
+            }
+        }
+
+        return $links;
     }
 }
