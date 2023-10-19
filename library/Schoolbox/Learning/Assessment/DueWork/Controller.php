@@ -704,23 +704,15 @@ class Controller extends Assessment\Controller
     /**
      * Creates a CSV structure for this rubric grid and its participants.
      *
+     * @param bool $isMarkPerCapability
      * @param Grid $grid
      * @param Collection $participants
      * @return array
-     * @throws DebugBarException
      */
     private function collateResultSquare(bool $isMarkPerCapability, Grid $grid, Collection $participants): array
     {
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
-
-        // array of all used indicator ids for the assessment
-        $allIndicatorUsageIds = [];
-        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
-            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                $allIndicatorUsageIds[] = $indicatorUsage->getIndicator()->getId();
-            }
-        }
 
         // put header row in array
         foreach ($this->getRubricHeaders($grid)['capabilities'] as $capabilityData) {
@@ -858,7 +850,6 @@ class Controller extends Assessment\Controller
             $data[] = array_values(array_map('trim', $row));
         }
 
-        new \Alaress_Probe($data);die();
         return $data;
     }
 
