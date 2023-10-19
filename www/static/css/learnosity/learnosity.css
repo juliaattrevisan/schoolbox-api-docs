@@ -614,3 +614,42 @@ input[type="checkbox"] {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
 }
+
+/* update the border radius to 0px */
+.lrn .lrn_btn {
+    border-radius: 0px;
+}
+.lrn_widget .lrn_response .lrn_response_container {
+    border-radius: 0px;
+}
+.lrn .lrn_btn_drag {
+    border-radius: 0px;
+}
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
+    border-radius: 0px;
+}
+.lrn_cloze .lrn_response_input .lrn_textinput input,
+.lrn_cloze .lrn_response_input .lrn_textinput textarea {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_qr .lrn-clozeformula-input {
+    border-radius: 0px;
+}
+.lrn_response_input_wrapper {
+    border-radius: 0px;
+}
+.lrn.lrn_widget .lrn_bordered_mathinput {
+    border-radius: 0px;
+}
+.lrn .lrn_btn_arrow {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_fileupload .lrn_response_input_wrapper {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_shorttext .lrn_textinput input {
+    border-radius: 0px;
+}
