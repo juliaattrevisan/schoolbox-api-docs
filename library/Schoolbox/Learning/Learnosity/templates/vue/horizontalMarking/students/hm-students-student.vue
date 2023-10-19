@@ -3,10 +3,11 @@
  * Display a single student's responses
  */
 
-import { hideAllChildren } from "@js/util/domUtils";
+import { removeAllFromElement, hideAllChildren } from "@js/util/domUtils";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
+import HmStudentsStudentMark from "./hm-students-student-mark.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
 
 interface Props {
@@ -42,6 +43,7 @@ window.Vue.watch(
         if (props.student.isReportLoaded) {
             await window.Vue.nextTick(); // ensure the learnosity DOM is ready
             const learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
+            removeAllFromElement(learnosityContainer, ".clearfix"); // remove all the clearfix elements
             // hideAllChildren(learnosityContainer);
         }
     }
@@ -49,16 +51,31 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="studentEl" class="c-island l-flex-col l-pad-m">
-        <div class="l-flex-row l-gap-m f-no-margins">
-            <button
-                v-if="props.student.isReportLoaded"
-                :class="`toggle-button ${props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
-                :disabled="!props.student.isReportLoaded"
-                @click.prevent="onToggleSelected"
-            ></button>
-            <span v-else class="loader"></span>
-            <h2>{{ props.student.name }}</h2>
+    <div ref="studentEl" class="c-island l-flex-col l-pad-s">
+        <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
+            <div class="l-flex-row l-flex--align-center l-gap-s">
+                <button
+                    v-if="props.student.isReportLoaded"
+                    :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
+                        props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
+                    }`"
+                    :disabled="!props.student.isReportLoaded"
+                    @click.prevent="onToggleSelected"
+                ></button>
+                <span v-else class="loader"></span>
+                <h2>{{ props.student.name }}</h2>
+            </div>
+            <div>
+                <template v-if="props.student.isReportLoaded">
+                    <hm-students-student-mark
+                        v-for="(item, index) in itemsStore.items"
+                        :key="item.id"
+                        :item="item"
+                        :index="index"
+                        :container="(studentEl as HTMLDivElement)"
+                    />
+                </template>
+            </div>
         </div>
         <div class="response l-grid">
             <div class="response__inner-container">
@@ -80,6 +97,13 @@ window.Vue.watch(
 .toggle-button {
     background: none;
     color: var(--content-ui-foreground);
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
+.loader {
+    height: 2.5rem;
+    width: 2.5rem;
 }
 .response {
     background-color: var(--foreground-colour);

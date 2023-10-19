@@ -1,0 +1,46 @@
+<script setup lang="ts">
+/**
+ * Contains a students mark linked to an item, (only one item is shown at a time)
+ */
+
+import type { Item } from "../types/Item";
+import { useItemsStore } from "../store/hmItemsStore";
+
+interface Props {
+    item: Item; //
+    index: number; //
+    container: HTMLDivElement; // the parent container, to look for the relevant item
+}
+const props = defineProps<Props>();
+const itemsStore = useItemsStore();
+const markEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+
+/**
+ * To display the current item
+ */
+const display = window.Vue.computed(() => {
+    return props.item.reference === itemsStore.activeItem.reference ? "block" : "none";
+});
+
+/**
+ *
+ */
+window.Vue.onMounted(() => {
+    const marks = props.container.querySelectorAll(".lrn-report-item-title");
+    const mark = marks[props.index] as HTMLHeadingElement;
+    if (mark) {
+        (mark.firstChild as HTMLElement).nodeValue = "";
+        markEl.value?.appendChild(mark);
+    }
+});
+</script>
+
+<template>
+    <div ref="markEl" class="lrn learnosity-report session-detail-by-item mark"></div>
+</template>
+
+<style scoped>
+.mark {
+    display: v-bind(display);
+}
+</style>
