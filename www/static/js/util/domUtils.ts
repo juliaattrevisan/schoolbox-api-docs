@@ -19,6 +19,16 @@ export function getIndex(element: HTMLElement) {
 }
 
 /**
+ * display none all children
+ * @param {HTMLElement} container - the DOM element to display none all children
+ */
+export function hideAllChildren(container: HTMLElement) {
+    Array.from(container.children).forEach((element) => {
+        (element as HTMLDivElement).style.display = "none";
+    });
+}
+
+/**
  * empty the element of children
  * replacement for $(el).empty
  * @param {HTMLElement} element - the DOM element to empty

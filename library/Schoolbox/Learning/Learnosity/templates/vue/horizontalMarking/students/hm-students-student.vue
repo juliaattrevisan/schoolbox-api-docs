@@ -3,6 +3,7 @@
  * Display a single student's responses
  */
 
+import { hideAllChildren } from "@js/util/domUtils";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
@@ -19,28 +20,19 @@ let learnosityContainer: HTMLDivElement;
 let currentCardResponse: HTMLDivElement;
 
 /**
- * To show/hide the student when selected
+ * To show/hide the response when selected
  */
 function onToggleSelected() {
     studentsStore.toggleStudent(props.student);
 }
 
 /**
- * To show/hide the filters container
- * @returns {string} - the height of the sub types container
+ * To show/hide the response container
+ * @returns {string} - the height of the response container
  */
 const containerHeight = window.Vue.computed(() => {
     return props.student.isExpanded ? "1fr" : "0fr";
 });
-
-/**
- * Initialy hide all the children within the learnosity container
- */
-function hideAllChildren() {
-    Array.from(learnosityContainer.children).forEach((element) => {
-        (element as HTMLDivElement).style.display = "none";
-    });
-}
 
 /**
  * To display the current item
@@ -72,7 +64,7 @@ window.Vue.watch(
         if (props.student.isReportLoaded) {
             await window.Vue.nextTick(); // ensure the learnosity DOM is ready
             learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
-            hideAllChildren();
+            hideAllChildren(learnosityContainer);
             displayActiveItem();
         }
     }
