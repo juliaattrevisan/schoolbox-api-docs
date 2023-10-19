@@ -753,6 +753,10 @@ class Controller extends Assessment\Controller
             }
         )->getAll();
 
+        /* Maybe we set the Show Drafts option
+         */
+        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
+
         /* For each student,
          * try to build a csv row based on capability and indicator usage
          */
@@ -760,18 +764,20 @@ class Controller extends Assessment\Controller
             /** @var Participant $participant */
             $participant = $participantsGrouped[$studentId]->first();
 
-            $sum = 0;
-
             $row = [
                 'name' => $participant->getUser()->formatName('{lastname}, {firstname}'),
                 'externalId' => $participant->getUser()->getExternalId(),
             ];
 
             foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+                $capabilityUsageId = $capabilityUsage->getCapability()->getId();
+
                 foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                    $capabilityUsageId = $capabilityUsage->getCapability()->getId();
                     $indicatorUsageId = $indicatorUsage->getIndicator()->getId();
 
+                    /* Indexing to preserve structure and order for students without marks selected
+                     * via the rubric grid (ie. descriptor stayed unclicked)
+                     */
                     $descriptorIndex = "{$capabilityUsageId}-{$indicatorUsageId}-descriptor";
                     $valueIndex = "{$capabilityUsageId}-{$indicatorUsageId}-value";
 
@@ -787,20 +793,15 @@ class Controller extends Assessment\Controller
                         // array of all marked indicator ids of the participant
                         $markedIndicatorIds = array_keys($marks);
 
-                        /* Maybe we set the Show Drafts option
-                         */
-                        $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
-
                         /* If the current descriptor has a draft,
                          * and we enabled drafts,
                          * show its draft value and add a suffix (even if it's null/empty)
                          */
-                        if ($showDraft) {
-                            if (array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        if ($showDraft && array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? [])) {
+                            if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                                 $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
                                 $row[$descriptorIndex] = ($descriptor ? $descriptor->getDescription() : '') . self::MARK_DRAFT_SUFFIX;
                                 $row[$valueIndex] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue() . self::MARK_DRAFT_SUFFIX;
-                                $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
                             } else {
                                 $row[$descriptorIndex] = self::MARK_DRAFT_SUFFIX;
                                 $row[$valueIndex] = self::MARK_DRAFT_SUFFIX;
@@ -809,127 +810,36 @@ class Controller extends Assessment\Controller
                             $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
                             $row[$descriptorIndex] = $descriptor ? $descriptor->getDescription() : '';
                             $row[$valueIndex] = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
-                            $sum += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
                         }
                     }
                 }
-            }
-        }
 
+                /* Prepare an additional column for Capability Marks
+                 */
+                if ($isMarkPerCapability) {
+                    $capabilityMarkIndex = "{$capabilityUsageId}-mark";
 
-        new \Alaress_Probe($row);
-
-
-        die();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /* Only needed with Capability Marks is set to something other than None;
-         * Used to do Indicator lookaheads in csv output
-         */
-        $currentCapabilityId = null;
-        $nextCapabilityId = null;
-
-        foreach ($this->getMarks($participants) as $studentId => $marks) {
-//            // array of all marked indicator ids of the participant
-//            $markedIndicatorIds = array_keys($marks);
-//
-//            /** @var Participant $participant */
-//            $participant = $participantsGrouped[$studentId]->first();
-//            $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
-
-//            $row = [$studentName, $participant->getUser()->getExternalId()];
-            $sum = null;
-
-            if (count($marks)) {
-                $numIndicators = \count($allIndicatorUsageIds);
-
-                for ($i = 0; $i < $numIndicators; $i++) {
-                    $indicatorUsageId = $allIndicatorUsageIds[$i];
-
-                    if ($isMarkPerCapability) {
-                        /* Implement lookahead to see when you're ready to output capability marks
-                         */
-                        $currentCapabilityId = $marks[$indicatorUsageId]['capabilityId'] ?? null;
-
-                        /* Because apparently you can't null coalesce a lookahead for some reason
-                        */
-                        $nextIndex = $i + 1;
-                        $nextCapabilityId = null;
-
-                        if ($nextIndex < $numIndicators) {
-                            $nextCapabilityId = $marks[$allIndicatorUsageIds[$nextIndex]]['capabilityId'];
-                        }
-                    }
-
-                    /* Maybe we set the Show Drafts option
+                    /* Decide which kind to show: draft or published
+                     *
+                     * Note: the student might not have a draft available,
+                     * and/or the student might not have a published mark available
                      */
-                    $showDraft = (bool)$this->requestQuery->get(self::SHOW_DRAFTS_KEY, false);
+                    $capabilityMark = '';
 
-                    if ($showDraft && array_key_exists(self::MARK_DRAFT_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        $descriptor = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getDescriptor();
-                        $row[] = ($descriptor ? $descriptor->getDescription() : '')  . self::MARK_DRAFT_SUFFIX;
-                        $row[] = $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue() . self::MARK_DRAFT_SUFFIX;
-                        $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
-                    } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
-                        $row[] = $descriptor ? $descriptor->getDescription() : '';
-                        $row[] = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
-                        $sum += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
-                    } else {
-                        $row[] = '';
-                        $row[] = '';
+                    if ($showDraft && isset($marks['capabilityMark'][$capabilityUsageId][self::MARK_DRAFT_KEY])) {
+                        $capabilityMark = $marks['capabilityMark'][$capabilityUsageId][self::MARK_DRAFT_KEY];
+                        $capabilityMark .= self::MARK_DRAFT_SUFFIX;
+                    } elseif (isset($marks['capabilityMark'][$capabilityUsageId][self::MARK_PUBLISHED_KEY])) {
+                        $capabilityMark = $marks['capabilityMark'][$capabilityUsageId][self::MARK_PUBLISHED_KEY];
                     }
 
-                    /* Prepare an additional column for Capability Marks
-                     */
-                    if ($isMarkPerCapability && $currentCapabilityId !== $nextCapabilityId) {
-                        $capabilityMark = '';
-
-                        /* Decide which kind to show: draft or published
-                         *
-                         * Note: the student might not have a draft available,
-                         * and/or the student might not have a published mark available
-                         */
-                        if ($showDraft && isset($marks['capabilityMark'][$currentCapabilityId][self::MARK_DRAFT_KEY])) {
-                            $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_DRAFT_KEY];
-                            $capabilityMark .= self::MARK_DRAFT_SUFFIX;
-                        } elseif (isset($marks['capabilityMark'][$currentCapabilityId][self::MARK_PUBLISHED_KEY])) {
-                            $capabilityMark = $marks['capabilityMark'][$currentCapabilityId][self::MARK_PUBLISHED_KEY];
-                        }
-
-                        $row[] = $capabilityMark;
-                    }
+                    $row[$capabilityMarkIndex] = $capabilityMark;
                 }
-            } else {
-                $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
             }
 
-            // If the sum is still NULL, the student has no marks, and should be hidden from the csv
-            if (null !== $sum) {
-                $row[]  = $sum;
-                $data[] = $row;
-            }
+            /* Trim everything
+             */
+            $data[] = array_map('trim', $row);
         }
 
         return $data;
