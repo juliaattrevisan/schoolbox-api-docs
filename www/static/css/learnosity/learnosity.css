@@ -736,3 +736,25 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:hover {
     background: transparent;
 }
+
+/* update graphing border */
+.lrn_widget.lrn_graphplotting .lrn_response_wrapper .lrn_graph_plotter .lrn_toolbar:focus-within {
+    outline: unset;
+}
+
+/* update image upload button box-shadow */
+.lrn_widget.lrn_imageupload .lrn_toolbar .lrn_btn.lrn_active {
+    box-shadow: unset;
+}
+/* upload image button color */
+span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
+    background-color: var(--content-ui-foreground);
+}
+
+/* upload file button color */
+.lrn_widget.lrn_fileupload .lrn-fileupload-btn-upload {
+    background-color: var(--content-ui-foreground);
+}
+.lrn_widget.lrn_imageupload .lrn_toolbar .lrn_btn.lrn_active:focus {
+    box-shadow: unset;
+}
