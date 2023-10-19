@@ -265,6 +265,32 @@ input[type="checkbox"] {
     color: var(--content-ui-foreground);
 }
 
+/* update the drag and drop empty state styles  */
+.lrn_widget.lrn_clozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight.lrn_over.lrn-dragdrop-empty:not(.lrn_disabled),
+.lrn_widget.lrn_clozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty),
+.lrn_widget.lrn_imageclozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight.lrn_over.lrn-dragdrop-empty:not(.lrn_disabled),
+.lrn_widget.lrn_imageclozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty),
+.lrn_widget.lrn_imageclozeassociationV2
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight.lrn_over.lrn-dragdrop-empty:not(.lrn_disabled),
+.lrn_widget.lrn_imageclozeassociationV2
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty) {
+    background-color: var(--content-ui-background);
+}
+.lrn .lrn_possibilityList.lrn_over,
+.lrn .lrn_possibilityListContainer.lrn_over {
+    background-color: var(--content-ui-background);
+}
+
 /* update the active border color of the drag and drop to content-ui-selected*/
 .lrn_widget .lrn_btn_drag:focus:active,
 .lrn_widget .lrn_btn_drag.lrn_focus.lrn_active,
