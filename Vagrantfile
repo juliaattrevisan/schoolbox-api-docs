@@ -30,8 +30,9 @@ instance_id_env_var = default["instance_id_env_var"]
 puppet_sync_type = default["puppet_sync_type"]
 force_upgrade = default["force_upgrade"]
 extra_hostname = default["extra_hostname"]
-aws_iam_key = default["aws_iam_key"]
-aws_iam_secret = default["aws_iam_secret"]
+aws_account_id = default["aws_account_id"]
+aws_role_name = default["aws_role_name"]
+aws_start_url = default["aws_start_url"]
 primary_php_majver = default["primary_php_majver"]
 taskd_dir = default["taskd_dir"]
 taskd_sync_type = default["taskd_sync_type"]
@@ -111,11 +112,14 @@ if File.file?('vagrant.yaml')
   if !conf["extra_hostname"].nil?
     extra_hostname = conf["extra_hostname"]
   end
-  if !conf["aws_iam_key"].nil?
-    aws_iam_key = conf["aws_iam_key"]
+  if !conf["aws_account_id"].nil?
+    aws_account_id = conf["aws_account_id"]
   end
-  if !conf["aws_iam_secret"].nil?
-    aws_iam_secret = conf["aws_iam_secret"]
+  if !conf["aws_role_name"].nil?
+    aws_role_name = conf["aws_role_name"]
+  end
+  if !conf["aws_start_url"].nil?
+    aws_start_url = conf["aws_start_url"]
   end
   if !conf["primary_php_majver"].nil?
     primary_php_majver = conf["primary_php_majver"]
@@ -180,7 +184,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "tools/vagrant-provision-pre-puppet.sh"
-    s.args = "'#{instance_registry_url_override}' '#{instance_registry_api_key}' '#{data_source}' '#{extra_hostname}' '#{aws_iam_key}' '#{aws_iam_secret}'"
+    s.args = "'#{instance_registry_url_override}' '#{instance_registry_api_key}' '#{data_source}' '#{extra_hostname}' '#{aws_account_id}' '#{aws_role_name}' '#{aws_start_url}'"
   end
 
 
@@ -194,7 +198,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # This script runs inside vagrant and can access the shared mount at '/tmp/puppet'
   config.vm.synced_folder "#{puppet_dir}/keys", "/tmp/puppet/keys"
   config.vm.synced_folder "#{puppet_dir}/vagrant/hooks", "/tmp/puppet/hooks"
-  config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet --data-source '#{data_source}' --iam-access-key '#{aws_iam_key}' --iam-secret-key '#{aws_iam_secret}'"
+  config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet --data-source '#{data_source}'"
 
 
   # Sync the taskd shared folder, if taskd_build_from_local is on
@@ -233,8 +237,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       "suppress_instance_configuration" => true,
       "primary_php_majver" => primary_php_majver,
       "taskd_systemd_service_installed" => taskd_build_from_local ? "0" : "1",
-      "iam_access_key" => "#{aws_iam_key}",
-      "iam_secret_key" => "#{aws_iam_secret}",
     }
   end
 
@@ -252,9 +254,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         + "'#{instance_registry_url_override}' " \
         + "'#{extra_hostname}' " \
         + "'#{primary_php_majver}' " \
-        + "'#{taskd_build_from_local ? 1 : 0}' " \
-        + "'#{aws_iam_key}' " \
-        + "'#{aws_iam_secret}'"
+        + "'#{taskd_build_from_local ? 1 : 0}' "
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}' '#{taskd_build_from_local ? 1 : 0}'"
 end

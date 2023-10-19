@@ -70,3 +70,11 @@ network_auto_config: true
 # Enabling this will let your API cests evaluate responses against api schema yaml files
 # api_dir: "../schoolbox-api-docs"
 api_dir: null
+# The AWS account ID of the Schoolbox company AWS account for sso
+aws_account_id: '476058706527'
+
+# The AWS IAM role name to assume when using the Schoolbox company AWS account for sso
+aws_role_name: 'Vagrant'
+
+# The sso start url
+aws_start_url: 'https://d-976758be37.awsapps.com/start#/'
