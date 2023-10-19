@@ -25,6 +25,8 @@ class Decorator implements DecoratorInterface
         private string $learnosityReference,
         protected int $durationHours,
         protected int $durationMinutes,
+        protected int $readingTimeDurationHours,
+        protected int $readingTimeDurationMinutes,
         protected int $maxAttempts,
         protected string $completionMessage
     ) {
@@ -47,7 +49,20 @@ class Decorator implements DecoratorInterface
             $duration = (3600 * $durationHours) + (60 * $durationMinutes);
         }
 
+        // If hours or minutes field is empty, treat it as 0
+        $readingTimeDurationHours = empty($this->getReadingTimeDurationHours()) ? 0 : $this->getReadingTimeDurationHours();
+        $readingTimeDurationMinutes = empty($this->getReadingTimeDurationMinutes()) ? 0 : $this->getReadingTimeDurationMinutes();
+
+        /* Use unlimited duration if a specific duration isn't provided
+         */
+        if (!$readingTimeDurationHours && !$readingTimeDurationMinutes) {
+            $readingTimeDuration = Assess_Main::UNLIMITED_DURATION;
+        } else {
+            $readingTimeDuration = (3600 * $readingTimeDurationHours) + (60 * $readingTimeDurationMinutes);
+        }
+
         $assessment->setDuration($duration);
+        $assessment->setReadingTimeDuration($readingTimeDuration);
         $assessment->setMaxAttempts($this->getMaxAttempts());
         $assessment->setCompletionMessage($this->getCompletionMessage());
         $assessment->setLearnosityReference($this->getLearnosityReference());

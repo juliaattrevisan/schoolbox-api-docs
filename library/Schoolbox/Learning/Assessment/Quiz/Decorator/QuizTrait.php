@@ -25,6 +25,16 @@ trait QuizTrait
     /**
      * @var int
      */
+    protected int $readingTimeDurationHours;
+
+    /**
+     * @var int
+     */
+    protected int $readingTimeDurationMinutes;
+
+    /**
+     * @var int
+     */
     protected int $maxAttempts;
 
     /** @var string */
@@ -68,6 +78,42 @@ trait QuizTrait
     public function setDurationMinutes($durationMinutes)
     {
         $this->durationMinutes = $durationMinutes;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReadingTimeDurationHours()
+    {
+        return $this->readingTimeDurationHours;
+    }
+
+    /**
+     * @param int $readingTimeDurationHours
+     * @return $this
+     */
+    public function setReadingTimeDurationHours($readingTimeDurationHours)
+    {
+        $this->readingTimeDurationHours = $readingTimeDurationHours;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReadingTimeDurationMinutes()
+    {
+        return $this->readingTimeDurationMinutes;
+    }
+
+    /**
+     * @param int $readingTimeDurationMinutes
+     * @return $this
+     */
+    public function setReadingTimeDurationMinutes($readingTimeDurationMinutes)
+    {
+        $this->readingTimeDurationMinutes = $readingTimeDurationMinutes;
         return $this;
     }
 

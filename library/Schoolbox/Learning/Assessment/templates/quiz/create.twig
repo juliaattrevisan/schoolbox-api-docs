@@ -138,6 +138,30 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="small-5 medium-2 columns">
+            <label for="hasReadingTimeDuration" class="inline-block">Reading Time<span class="hint has-tip tip-top" data-tooltip title="The amount of time students have to examine the quiz before starting. Switch off to disable.">?</span></label>
+            <div class="switch">
+                <input name="hasReadingTimeDuration" id="hasReadingTimeDuration" type="checkbox" {% if assessment.readingTimeDuration != -1 %}checked="checked"{% endif %} />
+                <label for="hasReadingTimeDuration">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+        <div class="small-7 medium-10 columns no-pad {% if assessment.readingTimeDuration == -1 %}hide{% endif %}" id="durationPanel">
+            <div class="small-6 columns">
+                <label>Hours
+                    <input name='readingTimeDurationHours' type="text" value="{% if assessment.readingTimeDuration != -1 %}{{ assessment.readingTimeDurationComponents.hours ?? '' }}{% endif %}" />
+                </label>
+            </div>
+            <div class="small-6 columns">
+                <label>Minutes
+                    <input name='readingTimeDurationMinutes' type="text" value="{% if assessment.readingTimeDuration != -1 %}{{ assessment.readingTimeDurationComponents.minutes ?? '' }}{% endif %}" />
+                </label>
+            </div>
+        </div>
+    </div>
 
     {# Enforce Safe Exam Browser #}
     {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}

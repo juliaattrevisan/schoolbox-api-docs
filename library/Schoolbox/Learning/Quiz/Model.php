@@ -105,6 +105,13 @@ class Model implements ISoftDeletable, IAssessableDataModel
     protected $duration;
 
     /**
+     * This quiz's reading time duration
+     *
+     * @var int
+     */
+    private $readingTimeDuration;
+
+    /**
     * @var int
     */
     protected $max_attempts;
@@ -431,6 +438,24 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function getDuration()
     {
         return $this->duration;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getReadingTimeDuration(): ?int
+    {
+        return $this->readingTimeDuration;
+    }
+
+    /**
+     * @param int|null $readingTimeDuration
+     * @return static
+     */
+    public function setReadingTimeDuration(?int $readingTimeDuration): self
+    {
+        $this->readingTimeDuration = $readingTimeDuration;
+        return $this;
     }
 
     /**

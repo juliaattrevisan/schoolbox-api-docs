@@ -28,8 +28,6 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswerModel;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestionModel;
-use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
-use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\User;
@@ -74,6 +72,7 @@ class Mapper extends BaseMapper
         $this->uses('start', self::TYPE_DATETIME);
         $this->uses('finish', self::TYPE_DATETIME);
         $this->uses('duration', self::TYPE_INTEGER);
+        $this->uses('reading_time_duration', self::TYPE_INTEGER);
         $this->uses('max_attempts', self::TYPE_INTEGER);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('availability', self::TYPE_STRING);

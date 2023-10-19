@@ -33,3 +33,7 @@ ALTER TABLE `course_specification`
 ALTER TABLE `course_unit_specification`
     ADD COLUMN `uuid` VARCHAR(36) NULL AFTER `course_specification_id`,
     ADD UNIQUE INDEX `uuid_UNIQUE` (`uuid` ASC);
+
+-- Add Reading Time
+ALTER TABLE `assess`
+    ADD COLUMN `reading_time_duration` INT NULL AFTER `duration`;
