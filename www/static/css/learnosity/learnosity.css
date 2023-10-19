@@ -717,3 +717,9 @@ input[type="checkbox"] {
 .lrn_widget.lrn_sortlist .lrn_response .lrn_btn_sort.lrn_active:before {
     color: var(--content-ui-foreground);
 }
+
+/* update left padding for input */
+.lrn_cloze .lrn_response_input .lrn_textinput input,
+.lrn_cloze .lrn_response_input .lrn_textinput textarea {
+    padding-left: 0.5rem;
+}
