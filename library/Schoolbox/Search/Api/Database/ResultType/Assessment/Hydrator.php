@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -242,9 +243,12 @@ class Hydrator extends BaseHydrator
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $currentUrl = $_SERVER['REQUEST_URI']; // This will be the search API URL (eg. '...schoolbox/api/search?keyword=...').
+            $returnUrl = str_replace('/api/', '/', $currentUrl); // Get a URL like '...schoolbox/search?keyword=...'.
+
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
-                'url' => $this->routeGenerator->generate($route, $params),
+                'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
             ];
