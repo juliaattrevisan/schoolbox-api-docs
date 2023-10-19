@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
+use Schoolbox\UserMapper;
 
 /**
  * Query parameter builder for link searches.
@@ -26,8 +27,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @param IQuoter    $quoter
      * @param UserAccess $userAccess
+     * @param UserMapper $userMapper
      */
-    public function __construct(private IQuoter $quoter, private UserAccess $userAccess)
+    public function __construct(private IQuoter $quoter, private UserMapper $userMapper)
     {
     }
 
