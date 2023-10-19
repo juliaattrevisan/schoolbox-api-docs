@@ -139,16 +139,6 @@ class Hydrator extends BaseHydrator
             ];                                      // The modal prompts the user to supply the students to whom the achievement should be awarded.
         }
 
-        $route = 'learningBadge.getUpdateForm';
-        $params = ['badgeId' => $badge->getId(), 'badge' => $badge];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Modify Badge',
-                'icon' => 'icon-modify',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
-        }
-
         if ($canCreateBadges) {
             $links[] = [
                 'title' => 'Set Goal',
@@ -156,6 +146,16 @@ class Hydrator extends BaseHydrator
                 'url' => '',
                 'action' => 'setGoalModal' // This asks the client to create a modal like the one used on the learning/badge page.
             ];                             // The modal prompts the user to supply the students for whom the goal should be set.
+        }
+
+        $route = 'learningBadge.getUpdateForm';
+        $params = ['badgeId' => $badge->getId(), 'badge' => $badge];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Modify',
+                'icon' => 'icon-modify',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
         }
 
         return $links;

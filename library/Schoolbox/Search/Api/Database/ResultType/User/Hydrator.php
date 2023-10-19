@@ -174,6 +174,26 @@ class Hydrator extends BaseHydrator
     {
         $links = [];
 
+        $route = 'adminUser.getModify';
+        $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Modify',
+                'icon' => 'icon-modify',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
+        }
+
+        $route = 'user.impersonate';
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                'title' => 'Impersonate',
+                'icon' => 'icon-staff-students',
+                'url' => $this->routeGenerator->generate($route, $params),
+            ];
+        }
+
+
         $route = 'calendar.getCalendar';
         $params = [
             'selectedDate' => date('d-m-Y'),
@@ -219,16 +239,6 @@ class Hydrator extends BaseHydrator
             $links[] = [
                 'title' => 'Grades',
                 'icon' => 'icon-approve',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
-        }
-
-        $route = 'adminUser.getModify';
-        // Params needed here are the same as set above.
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Modify',
-                'icon' => 'icon-modify',
                 'url' => $this->routeGenerator->generate($route, $params),
             ];
         }

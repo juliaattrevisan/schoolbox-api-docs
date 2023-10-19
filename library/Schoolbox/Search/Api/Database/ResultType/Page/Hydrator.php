@@ -141,6 +141,7 @@ class Hydrator extends BaseHydrator
         $isGroupPage  = $folder->isGroup();
         $isClassPage  = $folder->isClass();
         $isCoursePage = $folder->hasCourseSpecification();
+        $isUnitPage = $folder->hasUnitSpecification();
 
         $folderAccessLevel = $this->access->getFolderAccess($viewer, $folder->getId());
 
@@ -167,9 +168,15 @@ class Hydrator extends BaseHydrator
             }
         }
 
-        if ($isCoursePage) {
-            $courseSpec = $folder->getCourseSpecification();
-            $route = 'course.modifyCourse';
+        if ($isCoursePage || $isUnitPage) {
+            if ($isCoursePage) {
+                $courseSpec = $folder->getCourseSpecification();
+            } elseif ($isUnitPage) {
+                $courseSpec = $folder->getUnitSpecification()->getCourse();
+            }
+
+            $route      = 'course.modifyCourse';
+
             $params = ['id' => $courseSpec->getId(), 'course' => $courseSpec];
             if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                 $links[] = [
@@ -178,16 +185,6 @@ class Hydrator extends BaseHydrator
                     'url' => $this->routeGenerator->generate($route, $params),
                 ];
             }
-        }
-
-        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
-            $links[] = [
-                'title' => 'Modify',
-                'icon' => 'icon-modify',
-                'url' => $this->buildBaseUrl()
-                    ->withPath("/resource/folder/{$folder->getId()}/modify")
-                    ->__toString(),
-            ];
         }
 
         if ($isGroupPage) {
@@ -201,6 +198,18 @@ class Hydrator extends BaseHydrator
                 ];
             }
         }
+
+        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
+            $links[] = [
+                'title' => 'Modify Folder',
+                'icon' => 'icon-modify',
+                'url' => $this->buildBaseUrl()
+                    ->withPath("/resource/folder/{$folder->getId()}/modify")
+                    ->__toString(),
+            ];
+        }
+
+
 
         return $links;
     }

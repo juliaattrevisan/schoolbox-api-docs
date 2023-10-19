@@ -250,7 +250,7 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        if (!($assessment instanceof Assessment\LessonPlan\Model)) {
+        if (!($assessment instanceof Assessment\LessonPlan\Model) && $assessment->isImplementation()) {
             $route = 'learningAssessment.getStatus';
             $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
             if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {

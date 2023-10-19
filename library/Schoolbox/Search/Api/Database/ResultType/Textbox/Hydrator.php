@@ -324,7 +324,7 @@ class Hydrator extends BaseHydrator
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'url' => $this->routeGenerator->generate($route, $params),
-                'title' => 'Manage All Textboxes',
+                'title' => 'Manage Textbox',
                 'icon' => 'icon-textbox',
             ];
         }
