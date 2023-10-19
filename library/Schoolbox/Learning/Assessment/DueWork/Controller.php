@@ -758,7 +758,8 @@ class Controller extends Assessment\Controller
 
             /* Total marks for this person
              */
-            $sum = null;
+            $sumDraft = null;
+            $sumPublished = null;
 
             $row = [
                 'name' => $participant->getUser()->formatName('{lastname}, {firstname}'),
@@ -805,7 +806,7 @@ class Controller extends Assessment\Controller
 
                             /* Accumulate total marks for this person
                              */
-                            $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
+                            $sumDraft += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
                         } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                             $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
                             $row[$descriptorIndex] = $descriptor ? $descriptor->getDescription() : '';
@@ -813,7 +814,7 @@ class Controller extends Assessment\Controller
 
                             /* Accumulate total marks for this person
                              */
-                            $sum += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
+                            $sumPublished += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
                         }
                     }
                 }
@@ -843,7 +844,13 @@ class Controller extends Assessment\Controller
 
             /* Total marks for this person
              */
-            $row['total'] = $sum;
+            if (null !== $sumDraft) {
+                $row['total'] = $sumDraft . self::MARK_DRAFT_SUFFIX;
+            } elseif (null !== $sumPublished) {
+                $row['total'] = $sumPublished;
+            } else {
+                $row['total'] = '';
+            }
 
             /* Trim everything
              */
