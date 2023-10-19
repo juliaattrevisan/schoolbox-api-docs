@@ -8,7 +8,7 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 const studentsStore = useStudentsStore();
 
 const buttonText = window.Vue.computed(() => {
-    return studentsStore.isExpanded ? "Collapse All" : "Expand All";
+    return studentsStore.isExpanded ? "Collapse all" : "Expand all";
 });
 
 /**

@@ -7,17 +7,16 @@ import { hideAllChildren } from "@js/util/domUtils";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
+import HmStudentsStudentItem from "./hm-students-student-item.vue";
 
 interface Props {
-    student: Student; //
+    student: Student; // the student to display
 }
 const props = defineProps<Props>();
 
 const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
-let learnosityContainer: HTMLDivElement;
-let currentCardResponse: HTMLDivElement;
 
 /**
  * To show/hide the response when selected
@@ -35,48 +34,16 @@ const containerHeight = window.Vue.computed(() => {
 });
 
 /**
- * To display the current item
- */
-function displayActiveItem() {
-    currentCardResponse = learnosityContainer.querySelector(
-        `[data-reference="${itemsStore.activeItem.reference}"]`
-    ) as HTMLDivElement;
-    currentCardResponse.style.display = "block";
-}
-
-/**
- * To change the current item
- */
-function changeActiveItem() {
-    currentCardResponse.style.display = "none";
-    currentCardResponse = learnosityContainer.querySelector(
-        `[data-reference="${itemsStore.activeItem.reference}"]`
-    ) as HTMLDivElement;
-    currentCardResponse.style.display = "block";
-}
-
-/**
- * When its loaded hide everything by default, and then only show the current item
+ * When its loaded hide everything by default
  */
 window.Vue.watch(
     () => props.student.isReportLoaded,
     async () => {
         if (props.student.isReportLoaded) {
             await window.Vue.nextTick(); // ensure the learnosity DOM is ready
-            learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
-            hideAllChildren(learnosityContainer);
-            displayActiveItem();
+            const learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
+            // hideAllChildren(learnosityContainer);
         }
-    }
-);
-
-/**
- * Show the appropriate response when the item is changed
- */
-window.Vue.watch(
-    () => itemsStore.activeItem,
-    () => {
-        changeActiveItem();
     }
 );
 </script>
@@ -96,6 +63,14 @@ window.Vue.watch(
         <div class="response l-grid">
             <div class="response__inner-container">
                 <div :id="props.student.elementId"></div>
+                <template v-if="props.student.isReportLoaded">
+                    <hm-students-student-item
+                        v-for="item in itemsStore.items"
+                        :key="item.id"
+                        :item="item"
+                        :container="(studentEl as HTMLDivElement)"
+                    />
+                </template>
             </div>
         </div>
     </div>
