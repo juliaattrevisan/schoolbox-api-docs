@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Assessment\Timeline\Module as TimelineModule;
 use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
 use Schoolbox\Learning\Badge\Module as BadgeModule;
+use Schoolbox\Learning\Badge\OpenBadge\Module as OpenBadgeModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Learnosity\Module as LearnosityModule;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
@@ -89,6 +90,8 @@ class Learning extends ModuleLoader
         if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
             $this->loadModule($di, BadgeModule::class, "/{$namespace}/badge");
             $this->loadModule($di, BadgeAwardModule::class, "/{$namespace}/badge/award");
+            $this->loadModule($di, OpenBadgeModule::class, "/{$namespace}/badge/api");
+
         }
 
         // Feed module: not behind a feature flag
