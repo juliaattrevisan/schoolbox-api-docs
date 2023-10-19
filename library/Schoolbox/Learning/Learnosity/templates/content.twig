@@ -42,14 +42,14 @@
  # Hide them in css, then remove the li with javascript since the li elements
  # reserve a 33% width in the learnosity ui lol and I can't css-selector those
 #}
-{% if 'elite' != config.site_plan %}
-    <style>
-        [data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"],
-        [data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]
-        {
-            display: none !important;
-        }
-    </style>
+{% if 'elite' != config.site_plan|lower %}
+<style>
+    [data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"],
+    [data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]
+    {
+        display: none !important;
+    }
+</style>
 {% endif %}
 
 {% autoescape 'js' %}
@@ -69,7 +69,7 @@
                 authorApp.setActivityTags({{ tags|raw }});
             });
 
-            {% if 'elite' != config.site_plan %}
+            {% if 'elite' != config.site_plan|lower %}
             authorApp.on('widgetedit:editor:ready', function(event) {
                 /* Artificially wait for their dom
                  */
