@@ -219,7 +219,7 @@ input[type="checkbox"] {
 
 /*update the border color of dropzone in Cloze with drag & drop*/
 .lrn_dropzone {
-    border: 2px dashed var(--content-ui-foreground);
+    border: 1px dashed var(--content-ui-foreground);
 }
 
 /* update the drag items color to content-ui-foreground in Cloze with drago & drop */
