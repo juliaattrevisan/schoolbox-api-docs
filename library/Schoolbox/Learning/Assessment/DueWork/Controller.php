@@ -764,6 +764,10 @@ class Controller extends Assessment\Controller
             /** @var Participant $participant */
             $participant = $participantsGrouped[$studentId]->first();
 
+            /* Total marks for this person
+             */
+            $sum = null;
+
             $row = [
                 'name' => $participant->getUser()->formatName('{lastname}, {firstname}'),
                 'externalId' => $participant->getUser()->getExternalId(),
@@ -806,10 +810,18 @@ class Controller extends Assessment\Controller
                                 $row[$descriptorIndex] = self::MARK_DRAFT_SUFFIX;
                                 $row[$valueIndex] = self::MARK_DRAFT_SUFFIX;
                             }
+
+                            /* Accumulate total marks for this person
+                             */
+                            $sum += $marks[$indicatorUsageId][self::MARK_DRAFT_KEY]->getValue();
                         } elseif (array_key_exists(self::MARK_PUBLISHED_KEY, $marks[$indicatorUsageId] ?? []) && in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                             $descriptor = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getDescriptor();
                             $row[$descriptorIndex] = $descriptor ? $descriptor->getDescription() : '';
                             $row[$valueIndex] = $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
+
+                            /* Accumulate total marks for this person
+                             */
+                            $sum += $marks[$indicatorUsageId][self::MARK_PUBLISHED_KEY]->getValue();
                         }
                     }
                 }
@@ -837,11 +849,16 @@ class Controller extends Assessment\Controller
                 }
             }
 
+            /* Total marks for this person
+             */
+            $row['total'] = $sum;
+
             /* Trim everything
              */
-            $data[] = array_map('trim', $row);
+            $data[] = array_values(array_map('trim', $row));
         }
 
+        new \Alaress_Probe($data);die();
         return $data;
     }
 
