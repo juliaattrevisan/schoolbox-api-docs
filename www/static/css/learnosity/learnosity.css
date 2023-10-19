@@ -237,7 +237,7 @@ input[type="checkbox"] {
 .lrn_widget .lrn_btn_drag.lrn_focus,
 .lrn_widget .lrn_btn_sort:focus,
 .lrn_widget .lrn_btn_sort.lrn_focus {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 2px #fff,
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 1px #fff,
         inset 0 0 0 4px var(--content-ui-foreground);
 }
 
@@ -246,7 +246,7 @@ input[type="checkbox"] {
 .lrn_widget .lrn_btn_drag.lrn_hover,
 .lrn_widget .lrn_btn_sort:hover,
 .lrn_widget .lrn_btn_sort.lrn_hover {
-    box-shadow: inset 0 0 0 2px;
+    box-shadow: inset 0 0 0 1px;
 }
 .lrn .lrn_btn_drag:hover,
 .lrn .lrn_btn_drag.lrn_hover,
@@ -300,7 +300,7 @@ input[type="checkbox"] {
 .lrn_widget .lrn_btn_sort.lrn_focus.lrn_active,
 .lrn_widget .lrn_btn_sort.lrn_focus:active,
 .lrn_widget .lrn_btn_sort:focus.lrn_active {
-    box-shadow: inset 0 0 0 2px var(--content-ui-selected), inset 0 0 0 3px #fff;
+    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 3px #fff;
 }
 
 /* updated the drop down styles*/
@@ -341,7 +341,7 @@ input[type="checkbox"] {
     .lrn_dropzones_container
     .lrn_imagecloze_response
     .lrn_dropzone_mask {
-    border: 2px dashed var(--content-ui-foreground);
+    border: 1px dashed var(--content-ui-foreground);
 }
 
 /* update the border color for label image with text*/
@@ -351,14 +351,14 @@ input[type="checkbox"] {
 
 /* update the border color for classification */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 2px dashed var(--content-ui-foreground);
+    border-bottom: 1px dashed var(--content-ui-foreground);
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-top: 2px dashed var(--content-ui-foreground);
-    border-left: 2px dashed var(--content-ui-foreground);
+    border-top: 1px dashed var(--content-ui-foreground);
+    border-left: 1px dashed var(--content-ui-foreground);
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
-    border-right: 2px dashed var(--content-ui-foreground);
+    border-right: 1px dashed var(--content-ui-foreground);
 }
 
 /* update border styles for match list */
@@ -384,12 +384,12 @@ input[type="checkbox"] {
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_button.lrn_hover,
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_list:hover,
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_list.lrn_hover {
-    box-shadow: inset 0 0 0 2px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
 }
 
 /* update sortlist border, color and arrow icons styles */
 .lrn_widget.lrn_sortlist .lrn_response .lrn_cell {
-    border: 2px solid var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget .lrn_btn_drag:focus:hover,
 .lrn_widget .lrn_btn_drag.lrn_focus.lrn_hover,
@@ -399,7 +399,7 @@ input[type="checkbox"] {
 .lrn_widget .lrn_btn_sort.lrn_focus.lrn_hover,
 .lrn_widget .lrn_btn_sort.lrn_focus:hover,
 .lrn_widget .lrn_btn_sort:focus.lrn_hover {
-    box-shadow: inset 0 0 0 2px var(--content-ui-foreground), inset 0 0 0 2px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 1px var(--content-ui-foreground);
 }
 .lrn .lrn_btn_sort {
     color: #000;
@@ -448,7 +448,7 @@ input[type="checkbox"] {
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable.lrn_active {
     outline: none;
-    box-shadow: 2px 2px 3px #0000001a inset;
+    box-shadow: 1px 1px 2px #0000001a inset;
 }
 
 /* plaintext styles*/
@@ -461,7 +461,7 @@ input[type="checkbox"] {
 }
 .lrn_widget .lrn_texteditor_editable:focus {
     border: 1px solid var(--content-ui-foreground);
-    box-shadow: 2px 2px 3px #0000001a inset;
+    box-shadow: 1px 1px 2px #0000001a inset;
 }
 
 /* update Audio recorder styles */
@@ -474,7 +474,6 @@ input[type="checkbox"] {
 }
 .lrn_response_input_wrapper {
     border: 1px solid var(--content-ui-foreground);
-    border-radius: 2px;
 }
 
 /* update shading styles */
@@ -489,14 +488,14 @@ input[type="checkbox"] {
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:hover {
     background-color: rgba(255, 255, 255, 0.8);
-    border: 2px solid var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-cell.lrn-shading-selected {
     background-color: var(--content-ui-foreground);
     border: 1px solid var(--content-ui-background);
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:focus {
-    border: 2px solid var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-foreground);
 }
 
 /* update token highlight styles */
@@ -583,16 +582,16 @@ input[type="checkbox"] {
     color: #000;
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:hover {
-    box-shadow: inset 0 0 0 2px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:focus {
-    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 2px #fff, inset 0 0 0 4px #1877b1;
+    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 1px #fff, inset 0 0 0 4px #1877b1;
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
     box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
-    box-shadow: inset 0 0 0 2px var(--content-ui-foreground), inset 0 0 0 3px #fff;
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 3px #fff;
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
     background-color: var(--content-ui-selected);
