@@ -171,7 +171,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         SELECT        dbo.tPastoralCare.PastoralCareSeq,
                       dbo.tPastoralCare.ID,
                       dbo.tPastoralCare.ClassCode,
-                      dbo.tPastoralCare.ItemDate,
+                      CONVERT(varchar, dbo.tPastoralCare.ItemDate, {$style}) AS ItemDate,
                       dbo.tPastoralCare.MethodCode,
                       dbo.tPastoralCare.Details,
                       dbo.tPastoralCare.PrivateDetails,
