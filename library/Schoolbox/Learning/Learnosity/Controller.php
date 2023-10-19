@@ -347,6 +347,11 @@ class Controller extends Base
                         ['type' => 'next_button'],
                     ]
                 ],
+                /* Allowed Time
+                 */
+                'time' => [
+                    'max_time' => $quiz->getDuration()
+                ],
                 /* This is our Quiz title, I guess
                  */
                 "title" => $assessment->getTitle(),
