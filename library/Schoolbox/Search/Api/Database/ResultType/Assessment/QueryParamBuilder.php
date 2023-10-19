@@ -13,9 +13,7 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
-use Schoolbox\UserMapper;
 
 /**
  * Query parameter builder for link searches.
@@ -25,11 +23,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Constructor
      *
-     * @param IQuoter    $quoter
-     * @param UserAccess $userAccess
-     * @param UserMapper $userMapper
+     * @param IQuoter $quoter
      */
-    public function __construct(private IQuoter $quoter, private UserMapper $userMapper)
+    public function __construct(private IQuoter $quoter)
     {
     }
 
@@ -44,14 +40,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $loggedInUser = $this->userMapper->getSessionUser();
-        $loggedInUserIsStaffOrSuper = (
-            // The session will not be available when this is run as part of an API call run outside a browser.
-            // TODO: Find a way of getting the logged in user that does not depend on the session.
-            //       (the logged in user should still be available because of the user access token used with the API)
-            $loggedInUser !== null && ($loggedInUser->getRole()->isStaff() || $loggedInUser->isSuperuser())
-        );
-
         $whereParts = [
             // If any higher-level row the assessment is linked to is deleted, treat the assessment as deleted.
             'assessment.deleted_at IS NULL AND
@@ -81,17 +69,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',
-            'IF(
-                 (
-                     lesson_plan.visibility="student" OR
-                     (lesson_plan.visibility="staff" AND ' . (($loggedInUserIsStaffOrSuper) ? 'TRUE' : 'FALSE') . ')
-                 ),
-                 (
-                     lesson_plan_field.title LIKE :assessmentKeywordLike OR
-                     lesson_plan_field.body LIKE :assessmentKeywordLike
-                 ),
-                 FALSE
-            )'
+            'lesson_plan_field.title LIKE :assessmentKeywordLike', // -+ NOTE: lesson_plan_field.visibility is checked in the Hydrator.
+            'lesson_plan_field.body LIKE :assessmentKeywordLike'   // /
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params       = [

@@ -122,6 +122,31 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
+                // Lesson plan fields have a visibility enum that is either 'staff' or 'student' (lesson_plan_field.visibility).
+                // For the purposes of this permission check, anyone who is not staff or superuser will be treated as a student.
+                // If the viewer is a student (not staff or superuser), and the lesson plan did not match on title,
+                // then it might have only matched on a field that should not be visible to the viewer.
+                // Eliminate those types of matches.
+                if (
+                    $assessment instanceof Assessment\LessonPlan\Model &&
+                    !($viewer->isSuperuser() || $viewer->getRole()->isStaff()) && // If viewer is student...
+                    !str_contains($assessment->getTitle(), $keyword)
+                ) {
+                    // The search must have matched on one or more of the lesson plan fields.
+                    // Keep the match only if the keyword is found in a visible field.
+                    $lessonPlan = $assessment;
+                    foreach ($lessonPlan->getFields() as $field) {
+                        if (
+                            ($field->getVisibility() === 'student') && // If field is visible to students...
+                            (str_contains($field->getTitle(), $keyword) || str_contains($field->getBody(), $keyword))
+                        ) {
+                            break; // The keyword was found in a visible field, so the match counts.
+                        }
+                    }
+
+                    return null; // The field was not found in any visible fields, so the match is eliminated.
+                }
+
                 $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
                 $assessmentContentTextOnly = (new ToText($assessmentContentHtml))->getText(); // Remove HTML tags.
 
