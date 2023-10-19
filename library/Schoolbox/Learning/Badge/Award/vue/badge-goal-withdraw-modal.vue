@@ -74,17 +74,27 @@ export default {
     },
 
     /**
+     * Computed properties.
+     * Access the results of a function as if they were a property of an object.
+     */
+    computed: {
+        /**
+         * return a list of options that are not already selected
+         * @returns {Array} - the list of options that are not already selected
+         */
+        filteredOptions() {
+            return this.options.filter((option) => {
+                return !this.selected.some((selected) => selected.id === option.id);
+            });
+        },
+    },
+
+    /**
      * Mounted.
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
     mounted: function () {},
-
-    /**
-     * Computed properties.
-     * Access the results of a function as if they were a property of an object.
-     */
-    computed: {},
 
     /**
      * Methods.
@@ -219,7 +229,7 @@ export default {
 
             <v-select
                 class="schoolbox-vue-selectize"
-                :options="options"
+                :options="filteredOptions"
                 :clear-search-on-blur="
                     function () {
                         return true;
