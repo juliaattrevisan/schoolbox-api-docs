@@ -720,8 +720,10 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 }
 
 /* fixed calculator drop down */
-.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle {
-    top: 0;
+.lrn-formula-keyboard-menu-container.lrn-formula-keyboard-menu-groups
+    > .lrn_dropdown.lrn_theme_primary
+    button.lrn_btn.lrn_dropdown_toggle {
+    top: -4px;
     background: transparent;
 }
 .lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:focus,
