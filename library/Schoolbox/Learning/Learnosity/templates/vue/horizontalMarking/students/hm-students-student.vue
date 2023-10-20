@@ -80,7 +80,7 @@ window.Vue.watch(
                 <div :id="props.student.elementId"></div>
                 <template v-if="props.student.isReportLoaded">
                     <hm-students-student-item
-                        v-for="item in itemsStore.items"
+                        v-for="item in props.student.items"
                         :key="item.id"
                         :item="item"
                         :container="(studentEl as HTMLDivElement)"

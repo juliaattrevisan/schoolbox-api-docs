@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { Student } from "../types/Student";
+import type { Item } from "../types/Item";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
@@ -21,7 +22,20 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 isReportLoaded: false,
                 isExpanded: true,
                 hasReport: false,
+                items: [],
             });
+        }
+    }
+
+    /**
+     * Add items to a student
+     * @param {string} reportId - the report id
+     * @param {Item[]} items - the items to add
+     */
+    function addItems(reportId: string, items: Item[]) {
+        const studentForItems = students.value.find((student) => student.elementId === reportId);
+        if (studentForItems) {
+            studentForItems.items = items;
         }
     }
 
@@ -60,6 +74,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     return {
         init,
+        addItems,
         students,
         isExpanded,
         toggleStudent,
