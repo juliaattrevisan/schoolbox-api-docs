@@ -780,3 +780,8 @@ span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
 }
+
+/* upadet active menu button style */
+.lrn.lrn-assess .toc .lrn-pager li.pagination-active a {
+    background: var(--content-ui-background);
+}
