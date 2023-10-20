@@ -7,7 +7,7 @@ import type { Student } from "../types/Student";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
-    const isExpanded = window.Vue.ref<boolean>(false);
+    const isExpanded = window.Vue.ref<boolean>(true);
 
     /**
      * store any passed through properties
@@ -19,7 +19,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 ...value,
                 elementId: key as string,
                 isReportLoaded: false,
-                isExpanded: false,
+                isExpanded: true,
                 hasReport: false,
             });
         }

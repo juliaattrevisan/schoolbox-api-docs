@@ -4,8 +4,9 @@
 
 import { defineStore } from "pinia";
 import type { Item } from "../types/Item";
+import type { Question } from "../types/Question";
 
-export const EMPTY_ITEM: Item = { id: "", reference: "", title: "" };
+export const EMPTY_ITEM: Item = { id: "", reference: "", title: "", questions: [] };
 
 export const useItemsStore = defineStore("hmItems", () => {
     const items = window.Vue.ref<Item[]>([]);
@@ -20,7 +21,21 @@ export const useItemsStore = defineStore("hmItems", () => {
      */
     function init($items: Item[]) {
         items.value = $items;
+        items.value.forEach((item) => {
+            item.questions = []; // add the questions array for future use
+        });
         activeItem.value = { ...$items[0] };
+    }
+
+    /**
+     * Link a question to an item
+     * @param {Question} question - the question to add to the item
+     */
+    function addQuestionToItem(question: Question) {
+        const itemToAddQuestion = items.value.find((item) => item.id === question.metadata.sheet_reference);
+        if (itemToAddQuestion) {
+            itemToAddQuestion.questions.push(question);
+        }
     }
 
     /**
@@ -52,5 +67,15 @@ export const useItemsStore = defineStore("hmItems", () => {
         }
     }
 
-    return { init, items, activeItem, setActiveItem, hasPreviousItem, hasNextItem, toPreviousItem, toNextItem };
+    return {
+        items,
+        activeItem,
+        hasPreviousItem,
+        hasNextItem,
+        init,
+        addQuestionToItem,
+        setActiveItem,
+        toPreviousItem,
+        toNextItem,
+    };
 });
