@@ -3,7 +3,6 @@
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  */
 
-import { ck } from "@fullcalendar/core/internal-common";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 import type { Ref } from "vue";
@@ -16,7 +15,7 @@ import type { Ref } from "vue";
  *  - true if the CKEditor field content storage limit was found to have been exceeded at last check
  * @returns { string } - the initial value
  */
-export function useEditor($initialValue: string, ckeditorSelector: string, isMaxCharCountExceeded: Ref<boolean>) {
+export async function useEditor($initialValue: string, ckeditorSelector: string, isMaxCharCountExceeded: Ref<boolean>) {
     const initialValue = window.Vue.ref($initialValue);
 
     /**
@@ -75,12 +74,7 @@ export function useEditor($initialValue: string, ckeditorSelector: string, isMax
         }
     }
 
-    /**
-     * to load the ckeditor when ready
-     */
-    window.Vue.onMounted(async () => {
-        await loadCKEditor();
-    });
+    await loadCKEditor();
 
     return initialValue;
 }

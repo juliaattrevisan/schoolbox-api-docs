@@ -71,10 +71,10 @@ window.Vue.watch(
             <div>
                 <template v-if="props.student.isReportLoaded">
                     <hm-students-student-mark
-                        v-for="(item, index) in itemsStore.items"
+                        v-for="(item, markIndex) in itemsStore.items"
                         :key="item.id"
                         :item="item"
-                        :index="index"
+                        :index="markIndex"
                         :container="(studentEl as HTMLDivElement)"
                     />
                 </template>
@@ -85,10 +85,11 @@ window.Vue.watch(
                 <div :id="props.student.elementId"></div>
                 <template v-if="props.student.isReportLoaded">
                     <hm-students-student-item
-                        v-for="item in props.student.items"
+                        v-for="(item, itemIndex) in props.student.items"
                         :key="item.id"
                         :student="props.student"
                         :item="item"
+                        :index="itemIndex"
                         :container="(studentEl as HTMLDivElement)"
                     />
                 </template>

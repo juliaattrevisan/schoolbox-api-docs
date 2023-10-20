@@ -13,12 +13,13 @@ interface Props {
     student: Student; // the student to display
     item: Item; //
     container: HTMLDivElement; // the parent container, to look for the relevant item
+    index: number; // the index of the student in the list
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
-const editorId = `comment-${props.item.reference}`;
+const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
 /**
