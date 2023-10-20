@@ -85,19 +85,15 @@ window.Vue.watch(
             <div class="response__inner-container">
                 <div :id="props.student.elementId"></div>
                 <template v-if="props.student.isReportLoaded">
-                    <template v-if="!itemsStore.isFinalReview">
-                        <hm-students-student-item
-                            v-for="(item, itemIndex) in props.student.items"
-                            :key="item.id"
-                            :student="props.student"
-                            :item="item"
-                            :index="itemIndex"
-                            :container="(studentEl as HTMLDivElement)"
-                        />
-                    </template>
-                    <template v-else>
-                        <hm-students-student-final-review :student="props.student" />
-                    </template>
+                    <hm-students-student-item
+                        v-for="(item, itemIndex) in props.student.items"
+                        :key="item.id"
+                        :student="props.student"
+                        :item="item"
+                        :index="itemIndex"
+                        :container="(studentEl as HTMLDivElement)"
+                    />
+                    <hm-students-student-final-review :student="props.student" />
                 </template>
             </div>
         </div>

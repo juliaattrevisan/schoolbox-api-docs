@@ -5,6 +5,7 @@
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "../types/Student";
+import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
@@ -12,8 +13,16 @@ interface Props {
 }
 const props = defineProps<Props>();
 const studentsStore = useStudentsStore();
+const itemsStore = useItemsStore();
 const editorId = `final-review-comment-${props.student.elementId}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+
+/**
+ * To display the item when it's the active item
+ */
+const display = window.Vue.computed(() => {
+    return itemsStore.isFinalReview ? "block" : "none";
+});
 
 /**
  * Add in the editor
@@ -49,4 +58,8 @@ function onSaveSelected() {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.item {
+    display: v-bind(display);
+}
+</style>

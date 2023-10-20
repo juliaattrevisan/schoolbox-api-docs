@@ -10,8 +10,8 @@ const itemsStore = useItemsStore();
 /**
  * Hide the button if there is no next item
  */
-const display = window.Vue.computed(() => {
-    return itemsStore.isFinalReview ? "none" : "block";
+const opacity = window.Vue.computed(() => {
+    return itemsStore.isFinalReview ? 0 : 1;
 });
 
 /**
@@ -37,6 +37,6 @@ function onSelected() {
 
 <style scoped>
 .button {
-    display: v-bind(display);
+    opacity: v-bind(opacity);
 }
 </style>

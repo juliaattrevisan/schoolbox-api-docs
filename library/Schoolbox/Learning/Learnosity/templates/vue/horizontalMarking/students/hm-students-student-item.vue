@@ -26,6 +26,9 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
  * To display the item when it's the active item
  */
 const display = window.Vue.computed(() => {
+    if (itemsStore.isFinalReview) {
+        return "none";
+    }
     return props.item.reference === itemsStore.activeItem?.reference ? "block" : "none";
 });
 
