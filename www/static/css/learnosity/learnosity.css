@@ -773,3 +773,8 @@ span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
 }
+.lds-btn-secondary,
+.lrn .lrn_btn:is(.lds-btn-secondary):focus {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+}
