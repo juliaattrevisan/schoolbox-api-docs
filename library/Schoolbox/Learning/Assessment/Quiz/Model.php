@@ -241,24 +241,6 @@ class Model extends AbstractAssessment
         return false;
     }
 
-    /**
-     * The number of hours and minutes that is represented by getDuration()
-     * (which is the duration represented in seconds)
-     */
-    public function getDurationComponents(): array
-    {
-        return $this->calculateDurationComponents($this->getDuration());
-    }
-
-    /**
-     * The number of hours and minutes that is represented by getDuration()
-     * (which is the duration represented in seconds)
-     */
-    public function getReadingTimeDurationComponents(): array
-    {
-        return $this->calculateDurationComponents($this->getReadingTimeDuration());
-    }
-
 
     /**
      * Takes $duration seconds and converts it to an (hours, minutes) tuple
@@ -269,7 +251,7 @@ class Model extends AbstractAssessment
      * @param int $duration
      * @return array
      */
-    private function calculateDurationComponents(int $duration): array
+    public function getDurationComponents(int $duration): array
     {
         if ($duration) {
             return [
