@@ -35,7 +35,15 @@
              * Go to initial browser location. The window location hash includes
              * the # at the start, so we strip it with some basic regex.
              */
-            itemsApp.items().goto(parseInt(window.location.hash.replace(/^#/, "")));
+            let previousLocation = parseInt(window.location.hash.replace(/^#/, ""));
+
+            {# Note that one-item quizzes won't let you navigate to anything beyond the
+             # current screen. This means the #1 anchor will never exist, causing previousLocation
+             # to be NaN (not a number). Using that in a .goto() causes the button to disable.
+             #}
+            if (!isNaN(previousLocation)) {
+                itemsApp.items().goto(previousLocation);
+            }
 
             /**
              * Listen for hash changes so we can navigate to the correct part of the app
