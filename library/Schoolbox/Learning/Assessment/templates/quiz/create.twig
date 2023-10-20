@@ -228,38 +228,32 @@
 
         $(document).foundation();
 
-        var $durationPanel = $('#durationPanel');
-        var $durationInputs = $durationPanel.find('input[type=text]');
+        setDurationPanels($('#hasDuration'), $('#durationPanel'));
+        setDurationPanels($('#hasReadingTimeDuration'), $('#readingTimeDurationPanel'));
 
-        $('#hasDuration').on('click', function() {
-            var $checkbox = $(this);
-            if ($checkbox.is(':checked')) {
-                $('#durationPanel').stop().hide().removeClass('hide').fadeIn(400);
-                $durationInputs.prop('disabled', false);
-            }
-            else {
-                /* Hide panel + disable inputs
-                 */
-                $durationPanel.stop().fadeOut(400);
-                $durationInputs.prop('disabled', true);
-            }
-        });
+        /**
+         * Toggles duration settings.
+         *
+         * @param toggle
+         * @param durationPanel
+         */
+        function setDurationPanels(toggle, durationPanel) {
+            let durationInputs = durationPanel.find('input[type=text]');
 
-        var $readingTimeDurationPanel = $('#readingTimeDurationPanel');
-        var $readingTimeDurationInputs = $readingTimeDurationPanel.find('input[type=text]');
+            toggle.on('click', function() {
+                let $checkbox = $(this);
 
-        $('#hasReadingTimeDuration').on('click', function() {
-            var $checkbox = $(this);
-            if ($checkbox.is(':checked')) {
-                $('#readingTimeDurationPanel').stop().hide().removeClass('hide').fadeIn(400);
-                $readingTimeDurationInputs.prop('disabled', false);
-            }
-            else {
-                /* Hide panel + disable inputs
-                 */
-                $readingTimeDurationPanel.stop().fadeOut(400);
-                $readingTimeDurationInputs.prop('disabled', true);
-            }
-        });
+                if ($checkbox.is(':checked')) {
+                    durationPanel.stop().hide().removeClass('hide').fadeIn(400);
+                    durationInputs.prop('disabled', false);
+                }
+                else {
+                    /* Hide panel + disable inputs
+                     */
+                    durationPanel.stop().fadeOut(400);
+                    durationInputs.prop('disabled', true);
+                }
+            });
+        }
     });
 </script>
