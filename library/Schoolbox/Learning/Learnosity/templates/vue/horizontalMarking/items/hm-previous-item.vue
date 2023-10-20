@@ -8,6 +8,13 @@ import { useItemsStore } from "../store/hmItemsStore";
 const itemsStore = useItemsStore();
 
 /**
+ * Hide the button if there is no previous item
+ */
+const opacity = window.Vue.computed(() => {
+    return itemsStore.hasPreviousItem ? 1 : 0;
+});
+
+/**
  * To move to previous item
  */
 function onSelected() {
@@ -21,4 +28,8 @@ function onSelected() {
     </button>
 </template>
 
-<style scoped></style>
+<style scoped>
+.button {
+    opacity: v-bind(opacity);
+}
+</style>

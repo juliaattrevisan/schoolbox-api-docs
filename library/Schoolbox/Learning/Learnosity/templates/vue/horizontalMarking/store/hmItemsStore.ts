@@ -71,6 +71,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         hasPreviousItem,
         hasNextItem,
         isNextFinalReview,
+        isFinalReview,
         init,
         setActiveItem,
         toPreviousItem,

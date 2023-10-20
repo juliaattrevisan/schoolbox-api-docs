@@ -102,8 +102,8 @@ function onSaveSelected() {
                     <label>Comment</label>
                     <textarea :id="editorId"></textarea>
                 </div>
-                <div class="l-flex-row l-flex--justify-end">
-                    <button @click.prevent="onSaveSelected">Save and continue</button>
+                <div>
+                    <button class="full-width" @click.prevent="onSaveSelected">Save and continue</button>
                 </div>
             </template>
         </div>

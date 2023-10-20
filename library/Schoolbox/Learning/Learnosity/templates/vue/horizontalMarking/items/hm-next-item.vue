@@ -8,6 +8,13 @@ import { useItemsStore } from "../store/hmItemsStore";
 const itemsStore = useItemsStore();
 
 /**
+ * Hide the button if there is no next item
+ */
+const display = window.Vue.computed(() => {
+    return itemsStore.isFinalReview ? "none" : "block";
+});
+
+/**
  * The title of the button, will change when next is attempt comments
  */
 const buttonTitle = window.Vue.computed(() => {
@@ -28,4 +35,8 @@ function onSelected() {
     </button>
 </template>
 
-<style scoped></style>
+<style scoped>
+.button {
+    display: v-bind(display);
+}
+</style>
