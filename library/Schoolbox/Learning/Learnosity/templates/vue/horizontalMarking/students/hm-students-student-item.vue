@@ -3,7 +3,6 @@
  * Contains a students response to an item, (only one item is shown at a time)
  */
 
-import { insertElementAfter } from "@js/util/domUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Item } from "../types/Item";
 import { useItemsStore } from "../store/hmItemsStore";
@@ -31,10 +30,21 @@ const display = window.Vue.computed(() => {
 useEditor("", editorId, isMaxCharCountExceeded);
 
 /**
+ * Update the styles of the response element to match the rest of the page
+ * @param {HTMLDivElement} response - the response element to update the styles of
+ */
+function updateResponseStyles(response: HTMLDivElement) {
+    const rowEl = response.querySelector(".row") as HTMLDivElement;
+    rowEl.className = "";
+    const colEl = response.querySelector(".col-xs-12") as HTMLDivElement;
+    colEl.className = "l-flex-col l-gap-m";
+}
+
+/**
  * Add any sample answers to the questions in the items
  * @param {HTMLDivElement} response - the response element to add the sample answers to
  */
-function addSampleAnwers(response: HTMLDivElement) {
+function addSampleAnswers(response: HTMLDivElement) {
     props.item.questions.forEach((question) => {
         if (question.metadata.sample_answer) {
             const addHtml = `
@@ -45,7 +55,7 @@ function addSampleAnwers(response: HTMLDivElement) {
             const questionEl = response.querySelector(
                 `[data-lrn-widget-container="${question.response_id}"]`
             ) as HTMLDivElement;
-            insertElementAfter(questionEl, sampleAnswerEl);
+            questionEl.appendChild(sampleAnswerEl);
         }
     });
 }
@@ -56,13 +66,19 @@ function addSampleAnwers(response: HTMLDivElement) {
 window.Vue.onMounted(() => {
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
     responseEl.value?.appendChild(response);
-    addSampleAnwers(response);
+    updateResponseStyles(response);
+    addSampleAnswers(response);
 });
+
+/**
+ * Update the response of the item
+ */
+function onSaveSelected() {}
 </script>
 
 <template>
     <div class="item">
-        <div class="l-flex-col l-gap-s l-pad-s">
+        <div class="l-flex-col l-gap-m">
             <div ref="responseEl"></div>
             <div>
                 <label>Customise Score</label>
@@ -71,6 +87,9 @@ window.Vue.onMounted(() => {
             <div>
                 <label>Comment</label>
                 <textarea :id="editorId"></textarea>
+            </div>
+            <div>
+                <button @click.prevent="onSaveSelected">Save and continue</button>
             </div>
         </div>
     </div>

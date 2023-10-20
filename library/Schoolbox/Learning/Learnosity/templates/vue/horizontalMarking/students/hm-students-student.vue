@@ -49,9 +49,9 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="studentEl" class="c-island l-flex-col l-pad-s">
-        <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
-            <div class="l-flex-row l-flex--align-center l-gap-s">
+    <div ref="studentEl" class="c-island l-flex-col l-pad-m">
+        <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
+            <div class="l-flex-row l-flex--align-center l-gap-m">
                 <button
                     v-if="props.student.isReportLoaded"
                     :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
