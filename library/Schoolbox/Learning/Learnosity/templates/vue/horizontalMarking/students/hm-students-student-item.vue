@@ -25,11 +25,6 @@ const display = window.Vue.computed(() => {
 });
 
 /**
- * Use a ckeditor for the comments field
- */
-useEditor("", editorId, isMaxCharCountExceeded);
-
-/**
  * Update the styles of the response element to match the rest of the page
  * @param {HTMLDivElement} response - the response element to update the styles of
  */
@@ -67,7 +62,10 @@ window.Vue.onMounted(() => {
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
     responseEl.value?.appendChild(response);
     updateResponseStyles(response);
-    addSampleAnswers(response);
+    if (props.item.questions.length > 0) {
+        useEditor("", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+        addSampleAnswers(response);
+    }
 });
 
 /**
@@ -80,17 +78,19 @@ function onSaveSelected() {}
     <div class="item">
         <div class="l-flex-col l-gap-m">
             <div ref="responseEl"></div>
-            <div>
-                <label>Customise Score</label>
-                <input :id="`customise-score-${$props.item.reference}`" type="text" />
-            </div>
-            <div>
-                <label>Comment</label>
-                <textarea :id="editorId"></textarea>
-            </div>
-            <div>
-                <button @click.prevent="onSaveSelected">Save and continue</button>
-            </div>
+            <template v-if="props.item.questions.length > 0">
+                <div>
+                    <label>Customise Score</label>
+                    <input :id="`customise-score-${$props.item.reference}`" type="text" />
+                </div>
+                <div>
+                    <label>Comment</label>
+                    <textarea :id="editorId"></textarea>
+                </div>
+                <div>
+                    <button @click.prevent="onSaveSelected">Save and continue</button>
+                </div>
+            </template>
         </div>
     </div>
 </template>
