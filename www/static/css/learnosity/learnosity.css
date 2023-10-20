@@ -758,3 +758,18 @@ span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
 .lrn_widget.lrn_imageupload .lrn_toolbar .lrn_btn.lrn_active:focus {
     box-shadow: unset;
 }
+
+/* Check answer button */
+.lds-btn-secondary,
+.lrn .lrn_btn:is(.lds-btn-secondary) {
+    background-color: var(--content-ui-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-foreground);
+    min-height: auto;
+}
+.lds-btn-secondary,
+.lrn .lrn_btn:is(.lds-btn-secondary):hover {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+}
