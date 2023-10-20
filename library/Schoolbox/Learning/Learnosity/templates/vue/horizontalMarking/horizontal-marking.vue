@@ -5,7 +5,7 @@
 
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
-import { useReportsStore } from "./store/hmReportsStore";
+import { loadReports } from "./util/loadReports";
 import type { Item } from "./types/Item";
 import HmSelectItem from "./items/hm-select-item.vue";
 import HmStudents from "./students/hm-students.vue";
@@ -14,7 +14,7 @@ import HmNextItem from "./items/hm-next-item.vue";
 
 interface Props {
     title: string; //
-    items: Item[]; // the cards linked to quiz
+    items: Item[]; // the items linked to quiz
     responseScores: object; //
     responseComments: string; //
     urls: object; //
@@ -36,7 +36,7 @@ window.Vue.onMounted(async () => {
     useItemsStore().init(props.items);
     useStudentsStore().init(props.students);
     await window.Vue.nextTick();
-    useReportsStore().init(props.reportPayloads);
+    loadReports(props.reportPayloads);
 });
 </script>
 
