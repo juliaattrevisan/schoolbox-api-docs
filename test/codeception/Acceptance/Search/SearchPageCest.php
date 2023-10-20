@@ -8,7 +8,7 @@ use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Search\SearchPage;
 use Exception;
 
-class SearchCest
+class SearchPageCest
 {
     /**
      * Preparations
