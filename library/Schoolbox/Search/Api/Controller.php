@@ -64,17 +64,11 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        try {
-            $keyword = (string)($this->requestQuery['keyword'] ?? '');
-            $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
-            $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
-            $cursor  = null;
-
-            if (mb_strlen($keyword) < 2) {
-                $this->sendJsonError('Search keyword must be at least 2 characters', 400);
-                return;
-            }
-
+        $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
+        $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
+        $cursor  = null;
+        if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
             $translatedResults = [];
@@ -174,10 +168,8 @@ class Controller extends Base
                     ],
                 ]
             );
-        } catch (Exception $e) {
-            // Catch all exceptions here, because all should be returned as JSON.
-            // If any are allowed to propagate up to the WebRequest\Kernel, they may end up as HTML.
-            $this->sendJsonError('Unexpected response from server', 400);
+        } else {
+            $this->sendJsonError('Search keyword must be at least 2 characters', 400);
         }
     }
 
@@ -191,18 +183,13 @@ class Controller extends Base
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
-        try {
-            $keyword = (string)($this->requestQuery['keyword'] ?? '');
-            $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $folder);
-            $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
-
-            if (mb_strlen($keyword) < 2) {
-                $this->sendJsonError('Search keyword must be at least 2 characters', 400);
-            }
-
+        $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $folder);
+        $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
+        if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
-            // Finally output the response.
+            // Finally output the response
             $this->response = $this->responseAsJson(
                 [
                     'data'     => array_map($this->fullResultTranslator, $results),
@@ -215,10 +202,8 @@ class Controller extends Base
                     ],
                 ]
             );
-        } catch (Exception $e) {
-            // Catch all exceptions here, because all should be returned as JSON.
-            // If any are allowed to propagate up to the WebRequest\Kernel, they may end up as HTML.
-            $this->sendJsonError('Unexpected response from server', 400);
+        } else {
+            $this->sendJsonError('Search keyword must be at least 2 characters', 400);
         }
     }
 
