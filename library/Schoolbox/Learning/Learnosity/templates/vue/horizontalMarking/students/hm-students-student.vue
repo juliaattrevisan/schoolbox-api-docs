@@ -55,7 +55,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="studentEl" class="c-island l-flex-col l-gap-m l-pad-m">
+    <div ref="studentEl" :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`">
         <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
             <div class="l-flex-row l-flex--align-center l-gap-m">
                 <button
