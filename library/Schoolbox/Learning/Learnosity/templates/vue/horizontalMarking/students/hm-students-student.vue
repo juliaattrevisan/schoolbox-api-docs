@@ -8,6 +8,7 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
 import HmStudentsStudentMark from "./hm-students-student-mark.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
+import HmStudentsStudentFinalReview from "./hm-students-student-final-review.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -54,7 +55,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="studentEl" class="c-island l-flex-col l-pad-m">
+    <div ref="studentEl" class="c-island l-flex-col l-gap-m l-pad-m">
         <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
             <div class="l-flex-row l-flex--align-center l-gap-m">
                 <button
@@ -84,14 +85,19 @@ window.Vue.watch(
             <div class="response__inner-container">
                 <div :id="props.student.elementId"></div>
                 <template v-if="props.student.isReportLoaded">
-                    <hm-students-student-item
-                        v-for="(item, itemIndex) in props.student.items"
-                        :key="item.id"
-                        :student="props.student"
-                        :item="item"
-                        :index="itemIndex"
-                        :container="(studentEl as HTMLDivElement)"
-                    />
+                    <template v-if="!itemsStore.isFinalReview">
+                        <hm-students-student-item
+                            v-for="(item, itemIndex) in props.student.items"
+                            :key="item.id"
+                            :student="props.student"
+                            :item="item"
+                            :index="itemIndex"
+                            :container="(studentEl as HTMLDivElement)"
+                        />
+                    </template>
+                    <template v-else>
+                        <hm-students-student-final-review :student="props.student" />
+                    </template>
                 </template>
             </div>
         </div>

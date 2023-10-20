@@ -26,7 +26,7 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
  * To display the item when it's the active item
  */
 const display = window.Vue.computed(() => {
-    return props.item.reference === itemsStore.activeItem.reference ? "block" : "none";
+    return props.item.reference === itemsStore.activeItem?.reference ? "block" : "none";
 });
 
 /**
@@ -64,9 +64,6 @@ function addSampleAnswers(response: HTMLDivElement) {
  * Add the response to the item to our element
  */
 window.Vue.onMounted(async () => {
-    if (props.item.isFinalReview) {
-        return;
-    }
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
     responseEl.value?.appendChild(response);
     updateResponseStyles(response);
