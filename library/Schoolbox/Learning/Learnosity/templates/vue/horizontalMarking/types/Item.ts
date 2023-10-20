@@ -9,4 +9,5 @@ export type Item = {
     reference: string;
     title: string;
     questions: Question[];
+    isFinalReview: boolean;
 };

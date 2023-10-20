@@ -63,12 +63,15 @@ function addSampleAnswers(response: HTMLDivElement) {
 /**
  * Add the response to the item to our element
  */
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
+    if (props.item.isFinalReview) {
+        return;
+    }
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
     responseEl.value?.appendChild(response);
     updateResponseStyles(response);
     if (props.item.questions.length > 0) {
-        useEditor("", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+        await useEditor("", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
         addSampleAnswers(response);
     }
 });
