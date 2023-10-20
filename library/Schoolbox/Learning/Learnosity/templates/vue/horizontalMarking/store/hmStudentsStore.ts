@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
 import type { Item } from "../types/Item";
 
@@ -75,16 +76,23 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * To move to the next student
+     * To move to the next student report, if that's the last student, move to the next item
      * @param {Student} student - the student to move from
      */
-    function toNextStudent(student: Student) {
+    function progressReport(student: Student) {
         const studentIndex = students.value.findIndex(($student) => $student.elementId === student.elementId);
         if (studentIndex < students.value.length - 1) {
             student.isExpanded = false;
             const nextStudent = students.value[studentIndex + 1];
             nextStudent.isExpanded = true;
+            return;
             // shift focus them somehow?
+        }
+        if (studentIndex === students.value.length - 1 && useItemsStore().hasNextItem) {
+            student.isExpanded = false;
+            useItemsStore().toNextItem();
+            const nextStudent = students.value[0];
+            nextStudent.isExpanded = true;
         }
     }
 
@@ -92,10 +100,10 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * To update a student
      * @param {Student} student - the student to update
      */
-    function updateStudent(student: Student) {
+    function updateStudentReport(student: Student) {
         // send the student payload
         // once done move to the next student
-        toNextStudent(student);
+        progressReport(student);
     }
 
     return {
@@ -106,6 +114,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         toggleStudent,
         toggleAllStudents,
         reportLoaded,
-        updateStudent,
+        updateStudentReport,
     };
 });

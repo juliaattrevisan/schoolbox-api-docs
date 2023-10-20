@@ -76,7 +76,7 @@ window.Vue.onMounted(() => {
  * Update the response of the item
  */
 function onSaveSelected() {
-    studentsStore.updateStudent(props.student);
+    studentsStore.updateStudentReport(props.student);
     // pass through the customised score and comment
     // can the -mark be updated? I assume so
     // once that's been submitted, move to the next student
