@@ -1,5 +1,5 @@
 /**
- *
+ * Store the students, and link them to their reports and items
  */
 
 import { defineStore } from "pinia";
@@ -8,7 +8,7 @@ import type { Item } from "../types/Item";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
-    const isExpanded = window.Vue.ref<boolean>(true);
+    const isExpanded = window.Vue.ref<boolean>(false);
 
     /**
      * store any passed through properties
@@ -20,7 +20,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 ...value,
                 elementId: key as string,
                 isReportLoaded: false,
-                isExpanded: true,
+                isExpanded: false,
                 hasReport: false,
                 items: [],
             });
@@ -29,6 +29,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * Add items to a student
+     * Note that the items are stored per student to link them to their report
+     * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
      * @param {string} reportId - the report id
      * @param {Item[]} items - the items to add
      */
@@ -72,6 +74,30 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         }
     }
 
+    /**
+     * To move to the next student
+     * @param {Student} student - the student to move from
+     */
+    function toNextStudent(student: Student) {
+        const studentIndex = students.value.findIndex(($student) => $student.elementId === student.elementId);
+        if (studentIndex < students.value.length - 1) {
+            student.isExpanded = false;
+            const nextStudent = students.value[studentIndex + 1];
+            nextStudent.isExpanded = true;
+            // shift focus them somehow?
+        }
+    }
+
+    /**
+     * To update a student
+     * @param {Student} student - the student to update
+     */
+    function updateStudent(student: Student) {
+        // send the student payload
+        // once done move to the next student
+        toNextStudent(student);
+    }
+
     return {
         init,
         addItems,
@@ -80,5 +106,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         toggleStudent,
         toggleAllStudents,
         reportLoaded,
+        updateStudent,
     };
 });

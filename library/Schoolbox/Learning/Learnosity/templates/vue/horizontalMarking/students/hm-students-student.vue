@@ -11,6 +11,7 @@ import HmStudentsStudentItem from "./hm-students-student-item.vue";
 
 interface Props {
     student: Student; // the student to display
+    index: number; // the index of the student in the list
 }
 const props = defineProps<Props>();
 
@@ -43,6 +44,10 @@ window.Vue.watch(
             await window.Vue.nextTick(); // ensure the learnosity DOM is ready
             const learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
             learnosityContainer.remove(); // remove the learnosity container as it's no longer neexed after the next tick, as everything needed has been moved out of it now
+        }
+        if (props.index === 0) {
+            // if this is the first student, then select them
+            studentsStore.toggleStudent(props.student);
         }
     }
 );
@@ -82,6 +87,7 @@ window.Vue.watch(
                     <hm-students-student-item
                         v-for="item in props.student.items"
                         :key="item.id"
+                        :student="props.student"
                         :item="item"
                         :container="(studentEl as HTMLDivElement)"
                     />

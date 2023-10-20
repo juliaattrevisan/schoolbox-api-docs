@@ -28,17 +28,6 @@ export const useItemsStore = defineStore("hmItems", () => {
     }
 
     /**
-     * Link a question to an item
-     * @param {Question} question - the question to add to the item
-     */
-    function addQuestionToItem(question: Question) {
-        const itemToAddQuestion = items.value.find((item) => item.id === question.metadata.sheet_reference);
-        if (itemToAddQuestion) {
-            itemToAddQuestion.questions.push(question);
-        }
-    }
-
-    /**
      * Set the active card
      * @param {string} reference - the reference of the card to set as active
      */
@@ -73,7 +62,6 @@ export const useItemsStore = defineStore("hmItems", () => {
         hasPreviousItem,
         hasNextItem,
         init,
-        addQuestionToItem,
         setActiveItem,
         toPreviousItem,
         toNextItem,

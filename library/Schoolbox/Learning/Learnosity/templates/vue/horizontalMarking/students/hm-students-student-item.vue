@@ -4,15 +4,19 @@
  */
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
+import type { Student } from "../types/Student";
 import type { Item } from "../types/Item";
 import { useItemsStore } from "../store/hmItemsStore";
+import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
+    student: Student; // the student to display
     item: Item; //
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
+const studentsStore = useStudentsStore();
 const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const editorId = `comment-${props.item.reference}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
@@ -71,7 +75,14 @@ window.Vue.onMounted(() => {
 /**
  * Update the response of the item
  */
-function onSaveSelected() {}
+function onSaveSelected() {
+    studentsStore.updateStudent(props.student);
+    // pass through the customised score and comment
+    // can the -mark be updated? I assume so
+    // once that's been submitted, move to the next student
+    // if thats the last student, move to the next item
+    // if thats the last student on the last item, move to finalise review
+}
 </script>
 
 <template>
@@ -87,7 +98,7 @@ function onSaveSelected() {}
                     <label>Comment</label>
                     <textarea :id="editorId"></textarea>
                 </div>
-                <div>
+                <div class="l-flex-row l-flex--justify-end">
                     <button @click.prevent="onSaveSelected">Save and continue</button>
                 </div>
             </template>

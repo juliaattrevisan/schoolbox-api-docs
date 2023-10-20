@@ -31,9 +31,10 @@ export const useReportsStore = defineStore("hmReports", () => {
 
                     // itemsApi only spawns if you used session-detail-by-item
                     attemptReport.on("ready:itemsApi", (itemsApp) => {
-                        // Load the questions into the items store
+                        // Load the items for the student
                         itemsApp.getItems(($items: object) => {
                             const items: Item[] = [];
+                            // grab each item object and push it into the items array
                             Object.values($items).forEach((item: Item) => {
                                 items.push(item);
                             });
