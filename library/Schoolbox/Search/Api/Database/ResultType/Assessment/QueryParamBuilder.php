@@ -57,9 +57,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         $keywordSearchParts = [
             /**
              * NOTES:
-             *  * Checks made in the Hydrator must match the checks made here.
+             *  - Checks made in the Hydrator must match the checks made here.
              *    @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
-             *  * The concatenation of all the lesson_plan_field titles and bodies will be treated as a description.
+             *  - The concatenation of all the lesson_plan_field titles and bodies will be treated as a description.
+             *  - lesson_plan_field.visibility is checked in the Hydrator.
              */
             'assessment.title LIKE :assessmentKeywordLike',
             'assessment.description LIKE :assessmentKeywordLike',
@@ -69,8 +70,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',
-            'lesson_plan_field.title LIKE :assessmentKeywordLike', // -+ NOTE: lesson_plan_field.visibility is checked in the Hydrator.
-            'lesson_plan_field.body LIKE :assessmentKeywordLike'   // /
+            'EXISTS(
+                 SELECT *
+                 FROM lesson_plan_field
+                 WHERE lesson_plan_field.lesson_plan_id = lesson_plan.id
+                 AND lesson_plan_field.deleted_at IS NULL
+                 AND (title LIKE :assessmentKeywordLike OR body LIKE :assessmentKeywordLike)
+             )'
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params       = [
@@ -240,10 +246,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             )
             LEFT JOIN lesson_plan ON (
                 lesson_plan.assessment_id = assessment.id
-            )
-            LEFT JOIN lesson_plan_field ON (
-                lesson_plan_field.lesson_plan_id = lesson_plan.id AND
-                lesson_plan_field.deleted_at IS NULL
             )
         ';
     }
