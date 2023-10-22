@@ -10,4 +10,5 @@ export type Item = {
     title: string;
     questions: Question[];
     isFinalReview: boolean;
+    response?: string; // feedback for the student
 };
