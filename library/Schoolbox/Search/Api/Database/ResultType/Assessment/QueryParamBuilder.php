@@ -59,7 +59,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
              * NOTES:
              *  - Checks made in the Hydrator must match the checks made here.
              *    @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
-             *  - The concatenation of all the lesson_plan_field titles and bodies will be treated as a description.
              *  - lesson_plan_field.visibility is checked in the Hydrator.
              */
             'assessment.title LIKE :assessmentKeywordLike',
