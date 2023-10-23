@@ -184,15 +184,33 @@ class Controller extends Base
     }
 
     /**
-     * @return object - Array of filter names indexed by group name.
+     * To set the default date range filter
+     * @return object - { startDate: string, endDate: string }
      */
     private function getDateRangeFilter(): array
     {
+        switch ($this->getConfigLoader()->get('date_range_search_filter')) {
+            case 0:
+                $startDate = "start date 0";
+                $endDate = "end date 0";
+                break;
+            case 1:
+                $startDate = "start date 1";
+                $endDate = "end date 1";
+                break;
+            case 2:
+                $startDate = "start date 2";
+                $endDate = "end date 2";
+                break;
+            case 3:
+                $startDate = "start date 3";
+                $endDate = "end date 3";
+                break;
+        }
         $filters = [
-            "startDate" => "2022-10-23T11:33:05+11:00",
-            "endDate" => "2023-10-23T11:33:05+11:00",
+            "startDate" => $startDate,
+            "endDate" => $endDate,
         ];
         return $filters;
-        //return $this->getConfigLoader()->get('date_range_search_filter');
     }
 }
