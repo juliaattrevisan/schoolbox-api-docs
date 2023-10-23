@@ -43,7 +43,8 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             "@search/search.twig",
             [
-                'filters' => $this->getFiltersRawArray()
+                'filterTypes' => $this->getFiltersRawArray(),
+                'filterDateRange' => $this->getDateRangeFilter(),
             ]
         );
     }
@@ -75,8 +76,8 @@ class Controller extends Base
                 ["title" => $rosettaStone->translate("dueWork", false, true), "value" => "assessment.dueWork"],
                 ["title" => $rosettaStone->translate("project", false, true), "value" => "assessment.project"],
                 ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"],
-                ["title" => "Quiz"       , "value" => "assessment.quiz"      ],
-                ["title" => "Task"       , "value" => "assessment.task"      ],
+                ["title" => "Quiz", "value" => "assessment.quiz"],
+                ["title" => "Task", "value" => "assessment.task"],
             ];
 
             if ($configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
@@ -99,18 +100,18 @@ class Controller extends Base
             "title" => "Files",
             "value" => "file",
             "subTypes" => [
-                ["title" => "Audio"   , "value" => "file.audio"   ],
+                ["title" => "Audio", "value" => "file.audio"],
                 ["title" => "Document", "value" => "file.document"],
-                ["title" => "Image"   , "value" => "file.image"   ],
-                ["title" => "Other"   , "value" => "file.other"   ],
-                ["title" => "Video"   , "value" => "file.video"   ],
+                ["title" => "Image", "value" => "file.image"],
+                ["title" => "Other", "value" => "file.other"],
+                ["title" => "Video", "value" => "file.video"],
             ]
         ];
 
         $pagesFoldersSubTypes = [
             ["title" => "Current " . $rosettaStone->translate("class", true, true), "value" => "page.class"],
-            ["title" => "Folders"  , "value" => "page.folder"  ],
-            ["title" => "Groups"   , "value" => "page.group"   ],
+            ["title" => "Folders", "value" => "page.folder"],
+            ["title" => "Groups", "value" => "page.group"],
             ["title" => "Homepages", "value" => "page.homepage"],
         ];
 
@@ -147,7 +148,7 @@ class Controller extends Base
                 $configLoader->get('parent_search_enable')
             )
         ) {
-            $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
+            $userSubTypes[] = ["title" => "Parent", "value" => "user.parent"];
         }
 
         $filters[] = [
@@ -180,5 +181,49 @@ class Controller extends Base
     public static function compareFilterArraysForSortingPurposes($filterA, $filterB): int
     {
         return strnatcmp($filterA["title"], $filterB["title"]);
+    }
+
+    /**
+     * To set the default date range filter
+     * @return array - { startDate: string, endDate: string }
+     */
+    private function getDateRangeFilter(): array
+    {
+        switch ($this->getConfigLoader()->get('date_range_search_filter')) {
+            case 0: // School year
+                $startDate =
+                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->getJson();
+                break;
+            case 1: // 1 year (6 months in the past, 6 months in the future)
+                $startDate =
+                    \Alaress_Date_Format::now()->addMonths(-6)->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->addMonths(6)->endOfDay()->getJson();
+                break;
+            case 2: // 2 years (1 year in the past, 1 year in the future)
+                $startDate =
+                    \Alaress_Date_Format::now()->addYears(-1)->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->addYears(1)->endOfDay()->getJson();
+                break;
+            case 3: // 5 years (2.5 years in the past, 2.5 years in the future)
+                $startDate =
+                    \Alaress_Date_Format::now()->addYears(-2)->addMonths(-6)->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->addYears(2)->addMonths(6)->endOfDay()->getJson();
+                break;
+            default: // default to School year
+                $startDate =
+                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->getJson();
+                break;
+        }
+        return [
+            "startDate" => $startDate,
+            "endDate" => $endDate,
+        ];
     }
 }

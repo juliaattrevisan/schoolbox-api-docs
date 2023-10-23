@@ -11,6 +11,7 @@ import SpResults from "./results/sp-results.vue";
 import SpFilters from "./filters/sp-filters.vue";
 import { useStore } from "./store/searchPageStore";
 import type { FilterType } from "./filters/store/spFilterTypesStore";
+import type { FilterDateRange } from "./filters/store/spFilterDateRangeStore";
 import { useSearchStore } from "./store/spSearchStore";
 import { useResultsStore } from "./results/store/spResultsStore";
 import { SEARCH_PARAM } from "./store/spQueryStore";
@@ -18,11 +19,12 @@ import { SEARCH_PARAM } from "./store/spQueryStore";
 interface Props {
     endpoint: string; // the search api endpoint
     filterTypes: FilterType[]; // the filter types available, will vary depending on SB plan
+    filterDateRange: FilterDateRange; // the default date range for the date filter
 }
 const props = defineProps<Props>();
 
 const store = useStore();
-store.init(props.endpoint, props.filterTypes); // initialise the store
+store.init(props.endpoint, props.filterTypes, props.filterDateRange); // initialise the store
 
 const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
