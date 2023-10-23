@@ -243,6 +243,21 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * @param Assessment\LessonPlan\Model $lessonPlan
+     * @return string
+     */
+    private function getConcatenationOfLessonPlanFieldTitlesAndBodies(Assessment\LessonPlan\Model $lessonPlan): string
+    {
+        $strings = [];
+
+        foreach ($lessonPlan->getFields() as $field) {
+            $strings[] = $field->getTitle() . "\n" . $field->getBody();
+        }
+
+        return implode("\n\n", $strings);
+    }
+
+    /**
      * Return an array of sub-arrays, each sub-array containing info for one link.
      * The links will be in alphabetical order of title.
      *
@@ -281,21 +296,6 @@ class Hydrator extends BaseHydrator
         }
 
         return $links;
-    }
-
-    /**
-     * @param Assessment\LessonPlan\Model $lessonPlan
-     * @return string
-     */
-    private function getConcatenationOfLessonPlanFieldTitlesAndBodies(Assessment\LessonPlan\Model $lessonPlan): string
-    {
-        $strings = [];
-
-        foreach ($lessonPlan->getFields() as $field) {
-            $strings[] = $field->getTitle() . "\n" . $field->getBody();
-        }
-
-        return implode("\n\n", $strings);
     }
 
     /**
