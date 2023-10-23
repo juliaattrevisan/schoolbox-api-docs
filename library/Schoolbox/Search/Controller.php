@@ -43,7 +43,8 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             "@search/search.twig",
             [
-                'filterTypes' => $this->getFiltersRawArray()
+                'filterTypes' => $this->getFiltersRawArray(),
+                'filterDateRange' => $this->getConfigLoader()->get('date_range_search_filter'),
             ]
         );
     }

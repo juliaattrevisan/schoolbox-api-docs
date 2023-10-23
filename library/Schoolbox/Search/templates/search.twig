@@ -1,13 +1,14 @@
 {#
 Expected data items:
- - filterTypes
+ - filterTypes: An array of filter types, including sub types if available
+ - filterDateRange: An object containing the Start and End dates
  #}
 
 <div id="search-page-container">
     <search-page
         endpoint="/api/search"
         :filter-types="{{ filterTypes|json_encode }}"
-        :filter-date-range="{{ config.date_range_search_filter }}"
+        :filter-date-range="{{ filterDateRange }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
