@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-namespace PastoralCare;
+namespace Tests\Acceptance\PastoralCare;
 
-use AcceptanceTester;
+use Tests\Support\AcceptanceTester;
 use Exception;
-use Page\Common;
-use Tests\Page\PastoralCare\CreatePastoralRecord;
-use Tests\Page\PastoralCare\PastoralProfile;
-use Page\ProfilePage\ProfilePage;
+use Tests\Support\Page\Common;
+use Tests\Support\Page\ProfilePage\ProfilePage;
+use Tests\Support\Page\PastoralCare\CreatePastoralRecord;
+use Tests\Support\Page\PastoralCare\PastoralProfile;
 
 class PastoralRecordsCest
 {
@@ -186,7 +186,6 @@ class PastoralRecordsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     * @beforeSuite
      *
      * navigate to the student pastoral care page
      * create a pastoral record for the student
@@ -222,7 +221,7 @@ class PastoralRecordsCest
         $i->waitForText('PASTORAL PROFILE', 10);
         $i->canSee($pastoralTitle, '//div/a/h3');
         $i->amGoingTo('as a parent check the pastoral care records details');
-        $i->impersonateViaModifyUserPage('Jenni Reed');
+        $i->impersonateViaModifyUserPage('Ms Jenni Reed');
         $i->amOnPage($pastoralProfile->generateRoute($studentId));
         $recordId = $i->grabFromDatabase('pastoral', 'id', ['deleted_at' => null, 'heading like' => "Automation Test View Pastoral%"]);
         $pastoralProfile->clickPastoralRecord($studentId, $recordId);
@@ -231,7 +230,7 @@ class PastoralRecordsCest
         $i->canSee('Academic', '//div/dl/dd');
         $i->canSee('Award/Achievement', '//div/dl/dd');
         $i->amGoingTo('as a student check the pastoral care records details');
-        $i->impersonateViaModifyUserPage('Jana Reed');
+        $i->impersonateViaModifyUserPage('Ms Jana Reed');
         $i->amOnPage($pastoralProfile->generateRoute($studentId));
         $pastoralProfile->clickPastoralRecord($studentId, $recordId);
         $i->waitForElementVisible('a[id="panel-general"]', 10);

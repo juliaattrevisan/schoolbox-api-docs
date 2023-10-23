@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Page\PastoralCare;
+namespace Tests\Support\Page\PastoralCare;
 
 use Tests\Support\AcceptanceTester;
 

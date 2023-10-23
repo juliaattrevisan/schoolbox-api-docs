@@ -1,8 +1,8 @@
 <?php
 
-namespace Page\PastoralCare;
+namespace Tests\Support\Page\PastoralCare;
 
-use AcceptanceTester;
+use Tests\Support\AcceptanceTester;
 
 class CreatePastoralRecord
 {
