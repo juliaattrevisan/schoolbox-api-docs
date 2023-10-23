@@ -452,7 +452,11 @@ AND u.synergy_id = 156764
         /* Code is sometimes empty
          */
         if ('' !== trim($name)) {
-            return sprintf('%s [%s]', $name, $code);
+            if ('' !== trim($code)) {
+                return sprintf('%s [%s]', $name, $code);
+            }
+
+            return $name;
         }
 
         return '';
