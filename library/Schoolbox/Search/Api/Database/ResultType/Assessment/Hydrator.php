@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
@@ -135,42 +136,38 @@ class Hydrator extends BaseHydrator
                     }
                 }
 
-                $matchingAssessmentContentTextOnly = null;
+                if (!($assessment instanceof Assessment\LessonPlan\Model)) {
+                    // The content text with HTML tags removed is safe to use as the search result context.
+                    $searchResultContext = $assessmentContentTextOnly;
+                } else {
+                    // For lesson plans only, we use a different method to get the search result context text.  This is
+                    // necessary because lesson plan content is split into separate fields, and some fields are not
+                    // visible to student users.
+                    $fieldContentHtmlMatchingKeyword = (
+                        $this->getLessonPlanFieldContentHtmlMatchingKeyword($assessment, $keyword, $viewer)
+                    );
 
-                // Lesson plan fields have a visibility enum that is either 'staff' or 'student' (lesson_plan_field.visibility).
-                // For the purposes of this permission check, anyone who is not staff or superuser will be treated as a student.
-                // If the viewer is a student (not staff or superuser), and the lesson plan did not match on title,
-                // then it might have only matched on a field that should not be visible to the viewer.
-                // Eliminate those types of matches.
-                if (
-                    $assessment instanceof Assessment\LessonPlan\Model &&
-                    !($viewer->isSuperuser() || $viewer->getRole()->isStaff()) && // If viewer is student...
-                    !str_contains(strtolower($assessment->getTitle()), $keywordLower)
-                ) {
-                    // The search must have matched on one or more of the lesson plan fields.
-                    // Keep the match only if the keyword is found in a visible field.
-                    $lessonPlan = $assessment;
-                    foreach ($lessonPlan->getFields() as $field) {
-                        $fieldTitleLower = strtolower($field->getTitle());
-                        $fieldBodyLower = strtolower($field->getBody());
+                    if ($fieldContentHtmlMatchingKeyword !== null) {
+                        // The keyword was found in field content visible to the user.
+                        // Set the search result context to the content of the field that contained the keyword.
+                        $searchResultContextHtml = $fieldContentHtmlMatchingKeyword;
+                    } else {
+                        // The keyword was not found in any field content visible to the user.
 
-                        if (
-                            ($field->getVisibility() === 'student') && // If field is visible to students...
-                            (str_contains($fieldTitleLower, $keywordLower) || str_contains($fieldBodyLower, $keywordLower))
-                            // Use str_contains on lowercase strings to simulate case-insensitive match used by SQL LIKE condition.
-                        ) {
-                            // Found the keyword in text that is visible to the user, so the match counts.
-                            // This field's text is safe to use as the search result context text.
-                            $matchingAssessmentContentTextOnly = $field->getTitle() . "\n\n" . $field->getBody();
-                            break;
+                        // If the keyword is found in the lesson plan title, then the match is still good.
+                        if (str_contains(strtolower($assessment->getTitle()), $keywordLower)) {
+                            // Set the search result context to the content of the first field.
+                            $searchResultContextHtml = (
+                                $this->consistentlyFormatLessonPlanFieldContent($assessment->getFields()->first())
+                            );
+                        } else {
+                            // This lesson plan is only here because it matched on content text that is invisible to the
+                            // user.  Therefore, this match should be eliminated.
+                            return null;
                         }
                     }
 
-                    if ($matchingAssessmentContentTextOnly === null) {
-                        return null; // The field was not found in any visible fields, so the match is eliminated.
-                    }
-                } else {
-                    $matchingAssessmentContentTextOnly = $assessmentContentTextOnly;
+                    $searchResultContext = (new ToText($searchResultContextHtml))->getText(); // Remove HTML tags.
                 }
 
                 $assessmentCreator = $assessment->getCreator();
@@ -205,8 +202,7 @@ class Hydrator extends BaseHydrator
                     ),
                     null,
                     AssessmentType::getIconClassSuffixForType($assessmentType),
-                    // NOTE: Must return non-HTML text here, because truncating HTML around a keyword cannot be done without messing up styles.
-                    ($this->truncateAroundKeyword($keyword, $matchingAssessmentContentTextOnly) ?? $this->truncate($matchingAssessmentContentTextOnly)),
+                    ($this->truncateAroundKeyword($keyword, $searchResultContext) ?? $this->truncate($searchResultContext)),
                     $assessmentCreator,
                     [$folder],
                     $this->getSearchResultLinks($assessment, $viewer),
@@ -253,7 +249,7 @@ class Hydrator extends BaseHydrator
         $strings = [];
 
         foreach ($lessonPlan->getFields() as $field) {
-            $strings[] = $field->getTitle() . "\n" . $field->getBody();
+            $strings[] = $this->consistentlyFormatLessonPlanFieldContent($field);
         }
 
         return implode("\n\n", $strings);
@@ -319,6 +315,57 @@ class Hydrator extends BaseHydrator
 
         // No other match found, so return true if the keyword matches on the HTML content.
         return str_contains(strtolower($assessmentContentHtml), $keywordLower);
+    }
+
+    /**
+     * @param Model  $lessonPlan
+     * @param string $keyword
+     * @param User   $viewer
+     * @return string | null
+     */
+    private function getLessonPlanFieldContentHtmlMatchingKeyword(
+        Assessment\LessonPlan\Model $lessonPlan,
+        string $keyword,
+        User $viewer
+    ): ?string
+    {
+        // Lesson plan fields have a visibility enum that is either 'staff' or 'student' (lesson_plan_field.visibility).
+        // For the purposes of this permission check, superusers are treated as staff, and anyone who is not
+        // staff or superuser is treated as a student.
+        $treatViewerAsStudent = !($viewer->isSuperuser() || $viewer->getRole()->isStaff());
+
+        $fieldContentHtmlToReturn = null;
+        $keywordLower = strtolower($keyword);
+
+        // Find visible content that contains the search keyword.
+        foreach ($lessonPlan->getFields() as $field) {
+            if ($treatViewerAsStudent && $field->getVisibility() !== 'student') {
+                // No visible content here.
+                continue;
+            }
+
+            if (
+                // Use str_contains on lowercase strings to simulate case-insensitive match used by SQL LIKE condition.{
+                str_contains(strtolower($field->getTitle()), $keywordLower) ||
+                str_contains(strtolower($field->getBody()), $keywordLower)
+            ) {
+                // Found the keyword in text that is visible to the user, so this field's text is safe to
+                // use as the search result context text.
+                $fieldContentHtmlToReturn = $this->consistentlyFormatLessonPlanFieldContent($field);
+                break;
+            }
+        }
+
+        return $fieldContentHtmlToReturn;
+    }
+
+    /**
+     * @param Assessment\DataModel\LessonPlan\Field\Model $field
+     * @return string
+     */
+    private function consistentlyFormatLessonPlanFieldContent(Assessment\DataModel\LessonPlan\Field\Model $field): string
+    {
+        return $field->getTitle() . " -\n\n" . $field->getBody();
     }
 
     /**
