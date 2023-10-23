@@ -162,7 +162,7 @@ class LearningMomentPhotoCest
         $common->clickAddComment();
         $learningMoments->typeComment();
         sleep(2);
-        $learningMoments->clickSubmitComment();
+        $common->clickSubmitComment();
         $i->amGoingTo('checking the comment is presented');
         $i->waitForText('Well done. This is my first comment in this learning moment!', 2);
         $i->amGoingTo('delete the learning moments comment');
