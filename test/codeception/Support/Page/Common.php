@@ -127,6 +127,15 @@ class Common
      */
     public const CLOSE_BUTTON_MODAL = 'a.close-reveal-modal';
 
+    /**
+     * add a comment element for learning moments, news, pastoral records
+     */
+    public const ADD_COMMENT_BUTTON = 'button.show-ckeditor-button';
+
+    /**
+     * submit buttons for comment fields for learning moments, news, pastoral records
+     */
+    public const COMMENT_SUBMIT_BUTTON = 'button[class=button\ submit]';
 
 
     public static function gentext(int $length)
@@ -203,5 +212,23 @@ class Common
     public function closeModal(): void
     {
         $this->tester->click(Locator::lastElement(self::CLOSE_BUTTON_MODAL));
+    }
+
+
+    /**
+     * click add a comment for learning moments, news, pastoral records etc
+     */
+    public function clickAddComment(): void
+    {
+        $this->tester->click(self::ADD_COMMENT_BUTTON);
+    }
+
+
+    /**
+     * click post comment for learning moments, news, pastoral care records
+     */
+    public function clickSubmitComment(): void
+    {
+        $this->tester->click(self::COMMENT_SUBMIT_BUTTON);
     }
 }

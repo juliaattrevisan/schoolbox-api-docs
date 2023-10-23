@@ -12,8 +12,8 @@ namespace PastoralCare;
 use AcceptanceTester;
 use Exception;
 use Page\Common;
-use Page\PastoralCare\CreatePastoralRecord;
-use Page\PastoralCare\PastoralProfile;
+use Tests\Page\PastoralCare\CreatePastoralRecord;
+use Tests\Page\PastoralCare\PastoralProfile;
 use Page\ProfilePage\ProfilePage;
 
 class PastoralRecordsCest
@@ -82,6 +82,40 @@ class PastoralRecordsCest
         $i->canSee($pastoralTitle, '//div/a/h3');
     }
 
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * navigate to the student pastoral care page
+     * comment a pastoral record for the student
+     * ensure the comment is created with the proper details
+     * delete the comment
+     * ensure the comment is deleted
+     */
+    public function commentPastoralRecord(AcceptanceTester $i): void
+    {
+        $profilePage = new ProfilePage($i);
+        $pastoralProfile = new PastoralProfile($i);
+        $createPastoralRecord = new CreatePastoralRecord($i);
+        $common = new Common($i);
+        $studentId = 25;
+        $pastoralTitle = "Automation Test Pastoral Record";
+        $i->amGoingTo('navigate to the student pastoral profile page');
+        $i->amOnPage($pastoralProfile->generateRoute($studentId));
+        $i->amGoingTo('click the pastoral record');
+        $recordId = $i->grabFromDatabase('pastoral', 'id', ['deleted_at' => null, 'heading like' => "Automation Test Pastoral%"]);
+        $pastoralProfile->clickPastoralRecord($studentId, $recordId);
+        $i->waitForElementVisible('a[id="panel-general"]', 10);
+        $common->clickAddComment();
+        $i->waitForElementVisible(['css' => '#comment-0 + div.ck'], 5);
+        $i->fillRichTextField('comment-public', 'This is an automation pastoral comment');
+        sleep(2);
+        $common->clickSubmitComment();
+        //checking the comment is presented
+        $i->waitForText('Posted a few seconds ago', 2);
+        $i->canSee('This is an automation pastoral comment', '//article/p');
+    }
     /**
      * @param AcceptanceTester $i
      * @throws Exception

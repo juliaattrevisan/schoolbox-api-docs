@@ -1,8 +1,8 @@
 <?php
 
-namespace Page\PastoralCare;
+namespace Tests\Page\PastoralCare;
 
-use AcceptanceTester;
+use Tests\Support\AcceptanceTester;
 
 class PastoralProfile
 {
@@ -21,6 +21,17 @@ class PastoralProfile
     public function __construct(AcceptanceTester $i)
     {
         $this->tester = $i;
+    }
+
+    /**
+     * Generates route for this page.
+     *
+     * @param int $id
+     * @return string
+     */
+    public function generateRoute(int $id): string
+    {
+        return str_replace('{id}', (string)$id, self::URL);
     }
 
 
@@ -48,5 +59,12 @@ class PastoralProfile
         $this->tester->click('a[id="' . $recordId . '"');
     }
 
+    /**
+     * click a Pastoral Record
+     */
+    public function clickPastoralRecord(int $studentId, int $recordId): void
+    {
+        $this->tester->click('href="/pastoral/student/' . $studentId . '/record/' . $recordId . '"');
+    }
 
 }
