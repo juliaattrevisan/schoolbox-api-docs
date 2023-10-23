@@ -116,12 +116,19 @@ class Controller extends Base
                             $folderResultType,
                             $result->relevance,
                         );
-                        [$folderResult] = $this->hydrator->hydrate(
+                        $hydratedResults = $this->hydrator->hydrate(
                             $keyword,
                             $filter,
                             [$rawFolderResult],
                             $this->getUser(),
                         );
+
+                        if (count($hydratedResults) === 0) {
+                            // Could not hydrate this $rawFolderResult, likely because the user does not have access to the folder.
+                            continue;
+                        }
+
+                        $folderResult = $hydratedResults[0];
                         if (!$folderResult) {
                             continue;
                         }
