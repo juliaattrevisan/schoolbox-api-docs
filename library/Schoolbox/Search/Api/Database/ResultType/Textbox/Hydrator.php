@@ -152,7 +152,15 @@ class Hydrator extends BaseHydrator
             foreach ($textboxInstanceInfo as $tio) {
                 $folderId = $tio['folder_id'];
 
-                $textboxFolder = $this->folderMapper->findById($folderId); // This is the page on which the textbox component is used.
+                try {
+                    $textboxFolder = $this->folderMapper->findById($folderId); // This is the page on which the textbox component is used.
+                } catch (Exception\Deleted $e) {
+                    // We have found a soft-deleted folder.  Skip this textbox instance.
+                    // Note that it is difficult to JOIN the `folder` table to the SQL query used in this->getTextboxInstanceInfoByTextboxId(),
+                    // because of the way components are defined (and enum field determines the table to join for different modules).
+                    // Easier to just skip deleted folders here.
+                    continue;
+                }
 
                 // Check if user has access to textbox's folder
                 $textboxAccess = $this->access->getFolderAccess($viewer, $textboxFolder->getId());
