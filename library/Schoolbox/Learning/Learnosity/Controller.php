@@ -68,7 +68,14 @@ class Controller extends Base
                 [ 'reference' => 'mcq' ],
                 [ 'reference' => 'cloze' ],
                 [ 'reference' => 'match' ],
-                [ 'reference' => 'writespeak' ],
+                [
+                    'reference' => 'writespeak',
+                    'template_references' => [
+                        '1e6039f8-0676-495d-aca9-108710a51ce5',
+                        '0f559437-5072-475e-830d-1fa9d2f6bb0d',
+                        '4fe6c726-419c-4aff-b189-4a9756a0ffda',
+                    ]
+                ],
                 [ 'reference' => 'highlight' ],
                 [ 'reference' => 'graph' ],
                 [
