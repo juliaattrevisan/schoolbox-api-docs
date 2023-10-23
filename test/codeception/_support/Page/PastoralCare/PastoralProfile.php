@@ -13,6 +13,9 @@ class PastoralProfile
      */
     private $tester;
 
+    public const DELETE_COMMENT_ICON = 'a[href="#delete-comment"]';
+
+
     /**
      * Constructor
      *
@@ -54,9 +57,9 @@ class PastoralProfile
     /**
      * click Delete Pastoral Record icon
      */
-    public function clickDeleteIcon(int $recordId): void
+    public function clickDeleteIcon($recordId): void
     {
-        $this->tester->click('a[id="' . $recordId . '"');
+        $this->tester->click('a[id="' . $recordId . '"]');
     }
 
     /**
@@ -65,6 +68,14 @@ class PastoralProfile
     public function clickPastoralRecord($studentId, $recordId): void
     {
         $this->tester->click('a[href="/pastoral/student/' . $studentId . '/record/' . $recordId . '"]');
+    }
+
+    /**
+     * click delete comment icon for learning moments, news, pastoral care records
+     */
+    public function clickDeleteCommentIcon(): void
+    {
+        $this->tester->click(self::DELETE_COMMENT_ICON);
     }
 
 }

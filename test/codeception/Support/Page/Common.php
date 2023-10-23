@@ -106,6 +106,10 @@ class Common
      */
     public const FORMAT_INPUT_DATETIME = self::FORMAT_INPUT_DATE . ' ' . self::FORMAT_INPUT_TIME;
 
+    /**
+     * modify button on pages like news feed, pastoral record
+     */
+    public const ICON_MODIFY_PAGES = 'a.icon-modify.no-text';
 
     public static function toDatepickerFormat(\Datetime $datetime)
     {
@@ -136,6 +140,11 @@ class Common
      * submit buttons for comment fields for learning moments, news, pastoral records
      */
     public const COMMENT_SUBMIT_BUTTON = 'button[class=button\ submit]';
+
+    /**
+     * delete button on modal dialogs
+     */
+    public const MODAL_DELETE_BUTTON = 'button.button.submit';
 
 
     public static function gentext(int $length)
@@ -230,5 +239,18 @@ class Common
     public function clickSubmitComment(): void
     {
         $this->tester->click(self::COMMENT_SUBMIT_BUTTON);
+    }
+
+    /**
+     * click the last element to confirm deletion in a modal dialog
+     */
+    public function clickModalDeleteButton(): void
+    {
+        $this->tester->click(Locator::lastElement(self::MODAL_DELETE_BUTTON));
+    }
+
+    public function clickIconModifyPage(): void
+    {
+        $this->tester->click(self::ICON_MODIFY_PAGES);
     }
 }
