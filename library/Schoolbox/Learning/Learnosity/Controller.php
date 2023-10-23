@@ -968,7 +968,8 @@ class Controller extends Base
                 /* Find all the comments for this attempt (need it later)
                  */
                 $attemptComments[$attempt->getUser()->getId()] = [
-                    'reference' => $attempt->getLearnosityReference(),
+                    'id' => $attempt->getLearnosityReference(),
+                    'studentId' => $attempt->getUser()->getId(),
                     'comment' => $attempt->getComment()
                 ];
 
@@ -978,7 +979,8 @@ class Controller extends Base
                     'id' => (string)$attempt->getUser()->getId(),
                     'name' => $attempt->getUser()->getFullName(),
                     'firstname' => $attempt->getUser()->getFirstname(),
-                    'lastname' => $attempt->getUser()->getLastname()
+                    'lastname' => $attempt->getUser()->getLastname(),
+                    'elementId' => $key
                 ];
 
                 /* Collate a report payload for this attempt
@@ -1015,9 +1017,10 @@ class Controller extends Base
                 ];
 
                 $urls[$attempt->getUser()->getId()] = [
-                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
-                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'studentId' => $attempt->getUser()->getId(),
                     'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
                 ];
             }
         }
@@ -1100,8 +1103,9 @@ class Controller extends Base
                 $learnosityReference = $response['response_id'];
 
                 $scores[$learnosityReference] = [
+                    'id' => $learnosityReference,
                     'score' => $response['score'],
-                    'max' => $response['max_score']
+                    'maxScore' => $response['max_score']
                 ];
             }
         }
@@ -1110,21 +1114,39 @@ class Controller extends Base
          */
         $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
 
+        /* New donny thing - combine, restructure and rename vars
+         */
+        $students = array_values($users);
+        $itemResponses = $this->encodeJs(array_merge_recursive($scores, $responseComments));
+        $attemptResponses = $this->encodeJs($attemptComments);
+        $urls = array_values($urls);
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
-            'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
-            'users' => $users,
-            'usersEncoded' => json_encode($users, JSON_THROW_ON_ERROR),
             'assessment' => $assessment,
+            'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
             'itemReferences' => $itemReferences,
-            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'responseComments' => base64_encode(json_encode($responseComments, JSON_THROW_ON_ERROR)),
-            'attemptComments' => $attemptComments,
-            'attemptReferences' => json_encode(array_values($sessions), JSON_THROW_ON_ERROR),
-            'urls' => json_encode($urls, JSON_THROW_ON_ERROR)
+            'students' => $students,
+            'itemResponses' => $itemResponses,
+            'attemptResponses' => $attemptResponses,
+            'urls' => $urls
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
+    }
+
+
+    /**
+     * Takes an array of data, removes associations, json_encodes then
+     * bse64_encodes for html safety prior to giving to twig
+     *
+     * @param array $data
+     * @return string
+     * @throws \JsonException
+     */
+    private function encodeJs(array $data): string
+    {
+        return base64_encode(json_encode(array_values($data), JSON_THROW_ON_ERROR));
     }
 
 

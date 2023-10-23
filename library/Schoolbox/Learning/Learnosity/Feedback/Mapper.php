@@ -81,7 +81,7 @@ class Mapper extends \Schoolbox\Mapper
              */
             $feedback->setComment(\Scrub::html($feedback->getComment()));
 
-            $comments[$feedback->getLearnosityReference()] = $feedback->getComment();
+            $comments[$feedback->getLearnosityReference()]['comment'] = $feedback->getComment();
         }
 
         return $comments;

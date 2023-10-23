@@ -2,15 +2,12 @@
  # Give feedback for each attempt, one question at a time
  #
  # @param string $reportPayloads    Learnosity API initialisation objects (one for each person's attempt, json encoded)
- # @param array $users              A set of (report id, user data) tuples used to render Learnosity app anchor divs
- # @param string $usersEncoded      Same as above, but json encoded for use in js
- # @param IAssessable $assessment   Our schoolbgox quiz instance
  # @param array $itemReferences     A set of (item reference, item title) tuples for rendering the table of contents
- # @param array $scores             A list of score tuples obtained per question in this attempt
- # @param array $responseComments   A list of comment tuples that contain per-question comments
- # @param array $attemptComments    A list of comment tuples that contain per-attempt comments
- # @param array $attemptReferences  A list of attempt Learnosity references used in Attempt Comment textarea ids
- # @param array $urls               A list of (score, comment, attempt comment) endpoint tuples which tell us each user's persistence urls, indexed by user id
+ # @param array $students           A set of (user data, dom element id) tuples used to render Learnosity app anchor divs
+ # @param string $itemResponses     A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
+ # @param string $attemptResponses  A base64_encoded set of (student id, item reference, attempt comment) tuples that contain overall comments for a person's attempt
+ # @param array $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
+ # @param IAssessable $assessment   Our schoolbgox quiz instance
  #}
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
