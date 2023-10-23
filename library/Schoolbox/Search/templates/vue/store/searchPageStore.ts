@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
 import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
+import { useFilterDateRangeStore, FilterDateRange } from "../filters/store/spFilterDateRangeStore";
 
 const SINGLE_COLUMN_BREAKPOINT = 800;
 
@@ -18,10 +19,13 @@ export const useStore = defineStore("searchPage", () => {
      * store any passed through properties
      * @param {string} $endpoint - the search api url
      * @param {FilterType[]} $filterTypes - the filter types
+     * @param {FilterDateRange} $filterDateRange - the date range filter
      */
-    function init($endpoint: string, $filterTypes: FilterType[]) {
+    function init($endpoint: string, $filterTypes: FilterType[], $filterDateRange: FilterDateRange) {
         endpoint = $endpoint;
         useFilterTypesStore().allTypes = $filterTypes;
+        useFilterDateRangeStore().startDate = $filterDateRange.startDate;
+        useFilterDateRangeStore().endDate = $filterDateRange.endDate;
     }
 
     /**

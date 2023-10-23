@@ -191,20 +191,20 @@ class Controller extends Base
     {
         switch ($this->getConfigLoader()->get('date_range_search_filter')) {
             case 0:
-                $startDate = "start date 0";
-                $endDate = "end date 0";
+                $startDate = "2022-10-23T11:52:22+11:00";
+                $endDate = "2023-10-23T11:52:22+11:00";
                 break;
             case 1:
-                $startDate = "start date 1";
-                $endDate = "end date 1";
+                $startDate = "2022-10-23T11:52:22+11:00";
+                $endDate = "2023-10-23T11:52:22+11:00";
                 break;
             case 2:
-                $startDate = "start date 2";
-                $endDate = "end date 2";
+                $startDate = "2021-10-23T11:52:22+11:00";
+                $endDate = "2023-10-23T11:52:22+11:00";
                 break;
             case 3:
-                $startDate = "start date 3";
-                $endDate = "end date 3";
+                $startDate = "2022-10-23T11:52:22+11:00";
+                $endDate = "2023-10-23T11:52:22+11:00";
                 break;
         }
         $filters = [

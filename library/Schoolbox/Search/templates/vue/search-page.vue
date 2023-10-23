@@ -24,7 +24,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore();
-store.init(props.endpoint, props.filterTypes); // initialise the store
+store.init(props.endpoint, props.filterTypes, props.filterDateRange); // initialise the store
 
 const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
