@@ -295,6 +295,11 @@ class Controller extends Base
                         'assessmentId' => $assessment->getId(),
                         'studentId' => $student->getId(),
                     ]),
+                    /* Reading Time
+                     */
+                    'reading_mode' => [
+                        'reading_time' => $quiz->getReadingTimeDuration()
+                    ]
                 ],
                 "navigation" => [
                     "auto_save" => [
@@ -341,6 +346,11 @@ class Controller extends Base
                     'bottom-right' => [
                         ['type' => 'next_button'],
                     ]
+                ],
+                /* Allowed Time
+                 */
+                'time' => [
+                    'max_time' => $quiz->getDuration()
                 ],
                 /* This is our Quiz title, I guess
                  */

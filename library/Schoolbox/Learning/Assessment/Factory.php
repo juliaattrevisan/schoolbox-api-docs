@@ -245,10 +245,12 @@ class Factory
         /* Quiz needs this to instantiate correctly
          */
         $this->setLearnosityReference((string)($post['learnosityReference'] ?? ''));
-        $this->setDurationHours(intval($post['durationHours'] ?? 0));
-        $this->setDurationMinutes(intval($post['durationMinutes'] ?? 0));
-        $this->setMaxAttempts(intval($post['maxAttempts'] ?? 0));
-        $this->setMarkVisibility(intval($post['visibility'] ?? 0));
+        $this->setDurationHours((int)($post['durationHours'] ?? 0));
+        $this->setDurationMinutes((int)($post['durationMinutes'] ?? 0));
+        $this->setReadingTimeDurationHours((int)($post['readingTimeDurationHours'] ?? 0));
+        $this->setReadingTimeDurationMinutes((int)($post['readingTimeDurationMinutes'] ?? 0));
+        $this->setMaxAttempts((int)($post['maxAttempts'] ?? 0));
+        $this->setMarkVisibility((int)($post['visibility'] ?? 0));
         $this->setCompletionMessage($post['completion_message'] ?? '');
 
         // LTI needs this to instantiate correctly
@@ -405,6 +407,8 @@ class Factory
                 $this->getLearnosityReference(),
                 $this->getDurationHours(),
                 $this->getDurationMinutes(),
+                $this->getReadingTimeDurationHours(),
+                $this->getReadingTimeDurationMinutes(),
                 $this->getMaxAttempts(),
                 $this->getCompletionMessage()
             );

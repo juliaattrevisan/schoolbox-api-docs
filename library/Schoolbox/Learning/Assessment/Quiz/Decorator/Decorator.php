@@ -25,6 +25,8 @@ class Decorator implements DecoratorInterface
         private string $learnosityReference,
         protected int $durationHours,
         protected int $durationMinutes,
+        protected int $readingTimeDurationHours,
+        protected int $readingTimeDurationMinutes,
         protected int $maxAttempts,
         protected string $completionMessage
     ) {
@@ -39,17 +41,37 @@ class Decorator implements DecoratorInterface
         $durationHours = empty($this->getDurationHours()) ? 0 : $this->getDurationHours();
         $durationMinutes = empty($this->getDurationMinutes()) ? 0 : $this->getDurationMinutes();
 
-        /* Use unlimited duration if a specific duration isn't provided
-         */
-        if (!$durationHours && !$durationMinutes) {
-            $duration = Assess_Main::UNLIMITED_DURATION;
-        } else {
-            $duration = (3600 * $durationHours) + (60 * $durationMinutes);
-        }
+        $duration = $this->convertToSeconds($durationHours, $durationMinutes);
+
+        // If hours or minutes field is empty, treat it as 0
+        $readingTimeDurationHours = empty($this->getReadingTimeDurationHours()) ? 0 : $this->getReadingTimeDurationHours();
+        $readingTimeDurationMinutes = empty($this->getReadingTimeDurationMinutes()) ? 0 : $this->getReadingTimeDurationMinutes();
+
+        $readingTimeDuration = $this->convertToSeconds($readingTimeDurationHours, $readingTimeDurationMinutes);
 
         $assessment->setDuration($duration);
+        $assessment->setReadingTimeDuration($readingTimeDuration);
         $assessment->setMaxAttempts($this->getMaxAttempts());
         $assessment->setCompletionMessage($this->getCompletionMessage());
         $assessment->setLearnosityReference($this->getLearnosityReference());
+    }
+
+
+    /**
+     * Calculates $hours + $minutes into seconds
+     *
+     * @param int $hours
+     * @param int $minutes
+     * @return int
+     */
+    private function convertToSeconds(int $hours, int $minutes): int
+    {
+        /* Use unlimited duration if a specific duration isn't provided
+         */
+        if (!$hours && !$minutes) {
+            return Assess_Main::UNLIMITED_DURATION;
+        }
+
+        return (3600 * $hours) + (60 * $minutes);
     }
 }

@@ -70,6 +70,15 @@ class Model extends AbstractAssessment
      */
     private $duration = 0;
 
+
+    /**
+     * This quiz's reading time duration
+     *
+     * @var int
+     */
+    private $readingTimeDuration = 0;
+
+
     /**
      * A (HTML) message that is displayed to a participant once they have completed the quiz.
      *
@@ -232,21 +241,28 @@ class Model extends AbstractAssessment
         return false;
     }
 
+
     /**
+     * Takes $duration seconds and converts it to an (hours, minutes) tuple
+     *
      * The number of hours and minutes that is represented by getDuration()
      * (which is the duration represented in seconds)
+     *
+     * @param int $duration
+     * @return array
      */
-    public function getDurationComponents()
+    public function getDurationComponents(int $duration): array
     {
-        if ($this->getDuration()) {
+        if ($duration) {
             return [
-                'hours'   => floor($this->getDuration() / 3600),
-                'minutes' => ($this->getDuration() % 3600) / 60
+                'hours'   => floor($duration / 3600),
+                'minutes' => ($duration % 3600) / 60
             ];
         }
 
         return [];
     }
+
 
     /**
      * Check the dates set on this model are valid
@@ -357,6 +373,26 @@ class Model extends AbstractAssessment
         $this->duration = $duration;
         return $this;
     }
+
+
+    /**
+     * @return int|null
+     */
+    public function getReadingTimeDuration(): ?int
+    {
+        return $this->readingTimeDuration;
+    }
+
+    /**
+     * @param int|null $readingTimeDuration
+     * @return static
+     */
+    public function setReadingTimeDuration(?int $readingTimeDuration): self
+    {
+        $this->readingTimeDuration = $readingTimeDuration;
+        return $this;
+    }
+
 
     /**
      * Is this quiz unlimited duration?
