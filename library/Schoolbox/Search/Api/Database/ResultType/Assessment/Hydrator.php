@@ -327,8 +327,7 @@ class Hydrator extends BaseHydrator
         Assessment\LessonPlan\Model $lessonPlan,
         string $keyword,
         User $viewer
-    ): ?string
-    {
+    ): ?string {
         // Lesson plan fields have a visibility enum that is either 'staff' or 'student' (lesson_plan_field.visibility).
         // For the purposes of this permission check, superusers are treated as staff, and anyone who is not
         // staff or superuser is treated as a student.
