@@ -15,11 +15,13 @@
     <horizontal-marking
         :title="'{{ assessment.title }}'"
         :items="{{ itemReferences|json_encode }}"
-        :item-responses="{{ itemResponses }}"
-        :attempt-responses="{{ attemptResponses }}"
-        :urls="{{ urls }}"
-        :report-payloads="{{ reportPayloads }}"
-        :students="{{ students }}"
+        {# :item-responses="{{ itemResponses }}" #}
+        {# :attempt-responses="{{ attemptResponses }}" #}
+        {# :urls="{{ urls }}" #}
+        {# :report-payloads="{{ reportPayloads }}" #}
+        {# :students="{{ students }}" #}
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
+
+<p>{{ itemReferences }}</p>

@@ -15,11 +15,11 @@ import type { Item } from "./types/Item";
 interface Props {
     title: string; //
     items: Item[]; // the items linked to quiz
-    itemResponses: object; //
-    attemptResponses: object; //
+    // itemResponses: object; //
+    // attemptResponses: object; //
     urls: object; //
     reportPayloads: string[]; //
-    students: object; //
+    // students: object; //
 }
 const props = defineProps<Props>();
 
