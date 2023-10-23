@@ -23,7 +23,7 @@ class Controller extends Base
      *
      * @var bool
      */
-    private const PERFORM = false;
+    private const PERFORM = true;
 
 
     /**
@@ -85,7 +85,6 @@ class Controller extends Base
         AND vmrf.published_at <= :to
         AND ai.deleted_at IS NULL
         AND u.deleted_at IS NULL
-AND u.synergy_id = 156764        
         ORDER BY lastname, firstname
     ";
 
