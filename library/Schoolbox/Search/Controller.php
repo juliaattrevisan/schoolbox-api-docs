@@ -44,7 +44,7 @@ class Controller extends Base
             "@search/search.twig",
             [
                 'filterTypes' => $this->getFiltersRawArray(),
-                'filterDateRange' => $this->getConfigLoader()->get('date_range_search_filter'),
+                'filterDateRange' => $this->getDateRangeFilter(),
             ]
         );
     }
@@ -181,5 +181,18 @@ class Controller extends Base
     public static function compareFilterArraysForSortingPurposes($filterA, $filterB): int
     {
         return strnatcmp($filterA["title"], $filterB["title"]);
+    }
+
+    /**
+     * @return object - Array of filter names indexed by group name.
+     */
+    private function getDateRangeFilter(): array
+    {
+        $filters = [
+            "startDate" => "2022-10-23T11:33:05+11:00",
+            "endDate" => "2023-10-23T11:33:05+11:00",
+        ];
+        return $filters;
+        //return $this->getConfigLoader()->get('date_range_search_filter');
     }
 }

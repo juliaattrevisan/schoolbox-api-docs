@@ -8,7 +8,7 @@ Expected data items:
     <search-page
         endpoint="/api/search"
         :filter-types="{{ filterTypes|json_encode }}"
-        :filter-date-range="{{ filterDateRange }}"
+        :filter-date-range="{{ filterDateRange|json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
