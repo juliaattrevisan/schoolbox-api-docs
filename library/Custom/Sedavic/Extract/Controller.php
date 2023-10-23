@@ -23,7 +23,7 @@ class Controller extends Base
      *
      * @var bool
      */
-    private const PERFORM = true;
+    private const PERFORM = false;
 
 
     /**
@@ -85,6 +85,7 @@ class Controller extends Base
         AND vmrf.published_at <= :to
         AND ai.deleted_at IS NULL
         AND u.deleted_at IS NULL
+AND u.synergy_id = 156764        
         ORDER BY lastname, firstname
     ";
 
@@ -99,8 +100,10 @@ class Controller extends Base
      */
     private const QUERY_CURRICULUM_NODES = "
         SELECT 
+            cn.id,
             cn.name,
             cn.code,
+            cnp.id AS parentId,
             cnp.name AS parentName,
             cnp.code AS parentCode
         FROM curriculum_node_for_assessment cnof 
@@ -250,7 +253,7 @@ class Controller extends Base
                 /* Curriculum nodes
                  */
                 $curriculumNodes = $this->findCurriculumNodes((int)$assessmentInfo['assessmentSpecId']);
-            } catch (\DomainException | \RuntimeException $e) {
+            } catch (\DomainException|\RuntimeException $e) {
                 /* noop: skip data that randomly died, for now
                  *
                  *   - Assessment Feedback must be one of Due Work, Task or Quiz feedbacks;
@@ -309,40 +312,52 @@ class Controller extends Base
             'assessmentId' => $assessmentId
         ]);
 
-        $unitRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC);
+        $stack = [];
 
-        if (!$unitRow) {
-            return [
-                'misc' => [],
-                'outcomes' => [],
-            ];
+        while ($unitRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC)) {
+            /* Uppermost node (inferred)
+             */
+            if ('' === $unitRow['parentCode']) {
+                $stack[] = [
+                    'id' => $unitRow['parentId'],
+                    'name' => $unitRow['parentName'],
+                    'code' => $unitRow['parentCode'],
+                    'parentId' => ''
+                ];
+            }
+
+            $stack[] = $unitRow;
         }
 
-        /* The first element in the stack is the Unit,
-         * and the Qualification is the Unit's parent
-         */
-        $miscStack = [
-            'QualificationName' => $unitRow['parentName'],
-            'QualificationCode' => $unitRow['parentCode'],
-            'UnitName' => $unitRow['name'],
-            'UnitCode' => $unitRow['code'],
-        ];
+        return $this->buildTree($stack);
+    }
 
-        $outcomeStack = [];
 
-        while ($outcomeRow = $this->nodeStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $outcomeStack[] = [
-                'OutcomeName' => $outcomeRow['name'],
-                'OutcomeCode' => $outcomeRow['code']
-            ];
+    /**
+     * Recursively build the tree of curriculum nodes
+     *
+     * @param array $leaves
+     * @param string $parentId
+     * @return array
+     */
+    private function buildTree(array $leaves, string $parentId = ''): array
+    {
+        $tree = [];
+
+        foreach ($leaves as &$leaf) {
+            if ($leaf['parentId'] === $parentId) {
+                $children = $this->buildTree($leaves, $leaf['id']);
+
+                if ($children) {
+                    $leaf['children'] = $children;
+                }
+
+                $tree[(int)$leaf['id']] = $leaf;
+                unset($leaf);
+            }
         }
 
-        /* When an assessment has multiple outcomes, dupe the row
-         */
-        return [
-            'misc' => $miscStack,
-            'outcomes' => $outcomeStack
-        ];
+        return $tree;
     }
 
 
@@ -396,24 +411,28 @@ class Controller extends Base
     {
         $stack = [];
 
-        foreach ($curriculumNodes['outcomes'] as $outcomeNode) {
-            $assessmentRow =  [
-                'externalId' => $assessmentInfo['synergy_id'],
-                'firstname' => $assessmentInfo['firstname'],
-                'lastname' => $assessmentInfo['lastname'],
-                'qualification' => $this->renderCurriculumNode((string)$curriculumNodes['misc']['QualificationName'], (string)$curriculumNodes['misc']['QualificationCode']),
-                'year' => $assessmentInfo['yearLevel'],
-                'house_sb' => $assessmentInfo['house'],
-                'unit' => $this->renderCurriculumNode((string)$curriculumNodes['misc']['UnitName'], (string)$curriculumNodes['misc']['UnitCode']),
-                'course_sb' => $context['course']['name'],
-                'unit_sb' => $context['unit']['name'],
-                'assessment' => $assessmentInfo['title'],
-                'aos' => $this->renderCurriculumNode((string)$outcomeNode['OutcomeName'], (string)$outcomeNode['OutcomeCode']),
-                'normalised' => $feedback['normalised'],
-                'humanReadable' => $feedback['humanReadable'],
-            ];
+        foreach ($curriculumNodes as $qualificationId => $qualificationData) {
+            foreach ($qualificationData['children'] as $unitId => $unitData) {
+                foreach ($unitData['children'] as $outcomeId => $outcomeData) {
+                    $assessmentRow =  [
+                        'externalId' => $assessmentInfo['synergy_id'],
+                        'firstname' => $assessmentInfo['firstname'],
+                        'lastname' => $assessmentInfo['lastname'],
+                        'qualification' => $this->renderCurriculumNode((string)$qualificationData['name'], (string)$qualificationData['code']),
+                        'year' => $assessmentInfo['yearLevel'],
+                        'house_sb' => $assessmentInfo['house'],
+                        'unit' => $this->renderCurriculumNode((string)$unitData['name'], (string)$unitData['code']),
+                        'course_sb' => $context['course']['name'],
+                        'unit_sb' => $context['unit']['name'],
+                        'assessment' => $assessmentInfo['title'],
+                        'aos' => $this->renderCurriculumNode((string)$outcomeData['name'], (string)$outcomeData['code']),
+                        'normalised' => $feedback['normalised'],
+                        'humanReadable' => $feedback['humanReadable'],
+                    ];
 
-            $stack[] = $assessmentRow;
+                    $stack[] = $assessmentRow;
+                }
+            }
         }
 
         return $stack;
