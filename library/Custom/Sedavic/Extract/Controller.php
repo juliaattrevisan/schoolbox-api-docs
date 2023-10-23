@@ -208,7 +208,6 @@ class Controller extends Base
 
         /* Set up file download thing
          */
-        /* @phpstan-ignore-next-line */
         if ($this->perform) {
             $filename = sprintf(
                 self::FILENAME,
@@ -343,7 +342,6 @@ class Controller extends Base
 
         /* Warning when something is amiss
          */
-        /* @phpstan-ignore-next-line */
         if (!$this->perform && !\count($stack)) {
             $message = sprintf(
                 'Assessment <a href="/learning/assessments/%s/modify">%s</a> is probably missing curriculum nodes',
