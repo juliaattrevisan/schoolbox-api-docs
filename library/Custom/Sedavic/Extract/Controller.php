@@ -23,7 +23,7 @@ class Controller extends Base
      *
      * @var bool
      */
-    private const PERFORM = true;
+    private bool $perform;
 
 
     /**
@@ -159,6 +159,14 @@ class Controller extends Base
 
 
     /**
+     * A list of random problems with their data
+     *
+     * @var array
+     */
+    private array $problems = [];
+
+
+    /**
      * Controller constructor.
      */
     public function __construct(private IConnector $database)
@@ -194,13 +202,14 @@ class Controller extends Base
      */
     public function getExtract(\Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
+        $this->perform = !$this->request->query['exploreData'];
         $outstream = null;
         $numRows = 0;
 
         /* Set up file download thing
          */
         /* @phpstan-ignore-next-line */
-        if (self::PERFORM) {
+        if ($this->perform) {
             $filename = sprintf(
                 self::FILENAME,
                 $from->getDatabaseDate(),
@@ -267,8 +276,7 @@ class Controller extends Base
 
             /* Pump it to an fputcsv
              */
-            /* @phpstan-ignore-next-line */
-            if (self::PERFORM) {
+            if ($this->perform) {
                 foreach ($rows as $row) {
                     fputcsv($outstream, $row);
                 }
@@ -282,10 +290,15 @@ class Controller extends Base
 
         $end = microtime(true);
 
-        /* @phpstan-ignore-next-line */
-        if (self::PERFORM) {
+        if ($this->perform) {
             fclose($outstream);
         } else {
+            $problems = array_keys($this->problems);
+
+            foreach ($problems as $problem) {
+                new \Alaress_Probe($problem);
+            }
+
             new \Alaress_Probe(sprintf(
                 '%s seconds for %s rows of data',
                 $end - $start,
@@ -326,6 +339,19 @@ class Controller extends Base
             }
 
             $stack[] = $unitRow;
+        }
+
+        /* Warning when something is amiss
+         */
+        /* @phpstan-ignore-next-line */
+        if (!$this->perform && !\count($stack)) {
+            $message = sprintf(
+                'Assessment <a href="/learning/assessments/%s/modify">%s</a> is probably missing curriculum nodes',
+                $assessmentId,
+                $assessmentId
+            );
+
+            $this->problems[$message] = true;
         }
 
         return $this->buildTree($stack);
