@@ -35,6 +35,23 @@
     </div>
 </div>
 
+{# Only Elite plan has access to Audio and Video player
+ # Audio: 734ea0be-309b-4ff8-b004-3abd70094efd
+ # Video: 25368800-1ebe-4f2c-b220-6fe90a44883b
+ #
+ # Hide them in css, then remove the li with javascript since the li elements
+ # reserve a 33% width in the learnosity ui lol and I can't css-selector those
+#}
+{% if 'elite' != config.site_plan|lower %}
+<style>
+    [data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"],
+    [data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]
+    {
+        display: none !important;
+    }
+</style>
+{% endif %}
+
 {% autoescape 'js' %}
 <script>
     /**
@@ -51,6 +68,17 @@
             authorApp.on('render:activity', function(event) {
                 authorApp.setActivityTags({{ tags|raw }});
             });
+
+            {% if 'elite' != config.site_plan|lower %}
+            authorApp.on('widgetedit:editor:ready', function(event) {
+                /* Artificially wait for their dom
+                 */
+                setTimeout(function () {
+                    document.querySelector('[data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"]')?.closest('li').remove();
+                    document.querySelector('[data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]')?.closest('li').remove();
+                }, 100);
+            });
+            {% endif %}
 
             /**
              * Push app location changes to browser history, so we can use the browser back/forward

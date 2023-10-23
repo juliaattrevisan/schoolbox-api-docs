@@ -42,6 +42,64 @@ class Controller extends Base
     private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT = 300;
 
 
+
+    private const LEARNOSITY_QUESTION_GROUP_PLANS = [
+        'elite' => [
+            'question_type_groups' => [
+                [ 'reference' => 'mcq' ],
+                [ 'reference' => 'cloze' ],
+                [ 'reference' => 'match' ],
+                [ 'reference' => 'writespeak' ],
+                [ 'reference' => 'highlight' ],
+                [ 'reference' => 'graph' ],
+                [ 'reference' => 'math' ],
+                [ 'reference' => 'chart' ],
+                [ 'reference' => 'chemistry' ],
+                [
+                    'reference' => 'other',
+                    'template_references' => [
+                        '8ff43fa9-804b-42e7-9b3e-3cdd7e3a882b',
+                    ]
+                ],
+            ]
+        ],
+        'default' => [
+            'question_type_groups' => [
+                [ 'reference' => 'mcq' ],
+                [ 'reference' => 'cloze' ],
+                [ 'reference' => 'match' ],
+                [
+                    'reference' => 'writespeak',
+                    'template_references' => [
+                        '1e6039f8-0676-495d-aca9-108710a51ce5',
+                        '0f559437-5072-475e-830d-1fa9d2f6bb0d',
+                        '4fe6c726-419c-4aff-b189-4a9756a0ffda',
+                    ]
+                ],
+                [ 'reference' => 'highlight' ],
+                [ 'reference' => 'graph' ],
+                [
+                    'reference' => 'math',
+                    'template_references' => [
+                        'ef0ab0ba-235f-459d-9380-a4a106280c9a',
+                        '57b0690f-4e99-4bbc-9c8f-aa3074baa495',
+                        '11c9093a-dfd3-4852-b1ee-d5e5c3f032df',
+                        '7b810c2c-9100-4ff1-96de-cda23bf34445',
+                    ]
+                ],
+                [ 'reference' => 'chart' ],
+                [ 'reference' => 'chemistry' ],
+                [
+                    'reference' => 'other',
+                    'template_references' => [
+                        '8ff43fa9-804b-42e7-9b3e-3cdd7e3a882b',
+                    ]
+                ],
+            ]
+        ]
+    ];
+
+
     /**
      * Learnosity API instance is the same for everything afaict
      *
@@ -104,6 +162,11 @@ class Controller extends Base
 
         $tags = $tagFactory->produceFromAssessment($assessment);
 
+        /* The plan that we're currently on
+         */
+        $sitePlan = strtolower($this->getConfigLoader()->get('site_plan'));
+        $questionGroups = self::LEARNOSITY_QUESTION_GROUP_PLANS[$sitePlan] ?? self::LEARNOSITY_QUESTION_GROUP_PLANS['default'];
+
         $payload = [
             'config' => [
                 'activity_edit' => [
@@ -127,6 +190,11 @@ class Controller extends Base
                     /* Tags are only spawned upon clicking Save, not before
                      */
                     'tags_on_create' => $tags
+                ],
+                'dependencies' => [
+                    'question_editor_api' => [
+                        'init_options' => $questionGroups
+                    ]
                 ],
                 /* Editing a particular item
                  */
