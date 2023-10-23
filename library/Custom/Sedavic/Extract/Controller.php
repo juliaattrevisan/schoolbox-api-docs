@@ -261,7 +261,7 @@ class Controller extends Base
                 /* Curriculum nodes
                  */
                 $curriculumNodes = $this->findCurriculumNodes((int)$assessmentInfo['assessmentSpecId']);
-            } catch (\DomainException|\RuntimeException $e) {
+            } catch (\DomainException | \RuntimeException $e) {
                 /* noop: skip data that randomly died, for now
                  *
                  *   - Assessment Feedback must be one of Due Work, Task or Quiz feedbacks;
