@@ -190,21 +190,29 @@ class Controller extends Base
     private function getDateRangeFilter(): array
     {
         switch ($this->getConfigLoader()->get('date_range_search_filter')) {
-            case 0:
-                $startDate = "2022-10-23T11:52:22+11:00";
-                $endDate = "2023-10-23T11:52:22+11:00";
+            case 0: // School year
+                $startDate =
+                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->getJson();
                 break;
-            case 1:
-                $startDate = "2022-10-23T11:52:22+11:00";
-                $endDate = "2023-10-23T11:52:22+11:00";
+            case 1: // 1 year (6 months in the past, 6 months in the future)
+                $startDate =
+                    \Alaress_Date_Format::now()->addMonths(-6)->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->addMonths(6)->endOfDay()->getJson();
                 break;
-            case 2:
-                $startDate = "2021-10-23T11:52:22+11:00";
-                $endDate = "2023-10-23T11:52:22+11:00";
+            case 2: // 2 years (1 year in the past, 1 year in the future)
+                $startDate =
+                    \Alaress_Date_Format::now()->addYears(-1)->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->addYears(1)->endOfDay()->getJson();
                 break;
-            case 3:
-                $startDate = "2022-10-23T11:52:22+11:00";
-                $endDate = "2023-10-23T11:52:22+11:00";
+            case 3: // 5 years (2.5 years in the past, 2.5 years in the future)
+                $startDate =
+                    \Alaress_Date_Format::now()->addYears(-2)->addMonths(-6)->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->addYears(2)->addMonths(6)->endOfDay()->getJson();
                 break;
         }
         $filters = [
