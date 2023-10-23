@@ -18,6 +18,7 @@ import { SEARCH_PARAM } from "./store/spQueryStore";
 interface Props {
     endpoint: string; // the search api endpoint
     filterTypes: FilterType[]; // the filter types available, will vary depending on SB plan
+    filterDateRange: number; // the default date range for the date filter
 }
 const props = defineProps<Props>();
 
