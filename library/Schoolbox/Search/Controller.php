@@ -185,7 +185,7 @@ class Controller extends Base
 
     /**
      * To set the default date range filter
-     * @return object - { startDate: string, endDate: string }
+     * @return array - { startDate: string, endDate: string }
      */
     private function getDateRangeFilter(): array
     {
@@ -213,6 +213,12 @@ class Controller extends Base
                     \Alaress_Date_Format::now()->addYears(-2)->addMonths(-6)->startOfDay()->getJson();
                 $endDate =
                     \Alaress_Date_Format::now()->addYears(2)->addMonths(6)->endOfDay()->getJson();
+                break;
+            default: // default to School year
+                $startDate =
+                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->getJson();
+                $endDate =
+                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->getJson();
                 break;
         }
         return [
