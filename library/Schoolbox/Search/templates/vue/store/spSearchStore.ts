@@ -28,16 +28,20 @@ export const useSearchStore = defineStore("spSearch", () => {
         data,
         isFetching: isSearching, // to notify of searching
         error: hasLoadError, // to notify of a search error
-    } = useFetch(url, {
-        immediate: false,
-        onFetchError(ctx) {
-            // we catch the Search error to display the error message
-            if ((ctx.data as SearchError).status) {
-                searchError.value = ctx.data as SearchError;
-            }
-            return ctx;
-        },
-    })
+    } = useFetch(
+        url,
+        { headers: { Accept: "application/json" } },
+        {
+            immediate: false,
+            onFetchError(ctx) {
+                // we catch the Search error to display the error message
+                if ((ctx.data as SearchError).status) {
+                    searchError.value = ctx.data as SearchError;
+                }
+                return ctx;
+            },
+        }
+    )
         .get()
         .json();
 
