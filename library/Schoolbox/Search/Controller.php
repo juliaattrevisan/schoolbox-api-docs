@@ -43,7 +43,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             "@search/search.twig",
             [
-                'filters' => $this->getFiltersRawArray()
+                'filterTypes' => $this->getFiltersRawArray()
             ]
         );
     }
@@ -75,8 +75,8 @@ class Controller extends Base
                 ["title" => $rosettaStone->translate("dueWork", false, true), "value" => "assessment.dueWork"],
                 ["title" => $rosettaStone->translate("project", false, true), "value" => "assessment.project"],
                 ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"],
-                ["title" => "Quiz"       , "value" => "assessment.quiz"      ],
-                ["title" => "Task"       , "value" => "assessment.task"      ],
+                ["title" => "Quiz", "value" => "assessment.quiz"],
+                ["title" => "Task", "value" => "assessment.task"],
             ];
 
             if ($configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
@@ -99,18 +99,18 @@ class Controller extends Base
             "title" => "Files",
             "value" => "file",
             "subTypes" => [
-                ["title" => "Audio"   , "value" => "file.audio"   ],
+                ["title" => "Audio", "value" => "file.audio"],
                 ["title" => "Document", "value" => "file.document"],
-                ["title" => "Image"   , "value" => "file.image"   ],
-                ["title" => "Other"   , "value" => "file.other"   ],
-                ["title" => "Video"   , "value" => "file.video"   ],
+                ["title" => "Image", "value" => "file.image"],
+                ["title" => "Other", "value" => "file.other"],
+                ["title" => "Video", "value" => "file.video"],
             ]
         ];
 
         $pagesFoldersSubTypes = [
             ["title" => "Current " . $rosettaStone->translate("class", true, true), "value" => "page.class"],
-            ["title" => "Folders"  , "value" => "page.folder"  ],
-            ["title" => "Groups"   , "value" => "page.group"   ],
+            ["title" => "Folders", "value" => "page.folder"],
+            ["title" => "Groups", "value" => "page.group"],
             ["title" => "Homepages", "value" => "page.homepage"],
         ];
 
@@ -147,7 +147,7 @@ class Controller extends Base
                 $configLoader->get('parent_search_enable')
             )
         ) {
-            $userSubTypes[] = ["title" => "Parent" , "value" => "user.parent"];
+            $userSubTypes[] = ["title" => "Parent", "value" => "user.parent"];
         }
 
         $filters[] = [

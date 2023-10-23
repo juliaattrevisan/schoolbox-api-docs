@@ -1,12 +1,12 @@
 {#
 Expected data items:
- - filters
+ - filterTypes
  #}
 
 <div id="search-page-container">
     <search-page
         endpoint="/api/search"
-        :filter-types="{{ filters|json_encode }}"
+        :filter-types="{{ filterTypes|json_encode }}"
         :filter-date-range="{{ config.date_range_search_filter }}"
     />
 </div>
