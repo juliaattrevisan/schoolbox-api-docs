@@ -258,47 +258,6 @@ class Hydrator extends BaseHydrator
     }
 
     /**
-     * Return an array of sub-arrays, each sub-array containing info for one link.
-     * The links will be in alphabetical order of title.
-     *
-     * @param IAssessable $assessment
-     * @param User        $viewer
-     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
-     * @throws RouteNotFound
-     */
-    private function getSearchResultLinks(IAssessable $assessment, User $viewer): array
-    {
-        $links = [];
-
-        $route = 'learningAssessment.getUpdateAssessmentForm';
-        $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                // All assessment types use the same URL for their 'Modify' page.
-                'url' => $this->routeGenerator->generate($route, $params),
-                'title' => 'Modify',
-                'icon' => 'icon-modify',
-            ];
-        }
-
-        if (!($assessment instanceof Assessment\LessonPlan\Model) && $assessment->isImplementation()) {
-            $route = 'learningAssessment.getStatus';
-            $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-                $links[] = [
-                    // All assessment types use the same URL for their 'View Status' page,
-                    // except lesson plans.  Lesson plans have no 'View Status' page.
-                    'url' => $this->routeGenerator->generate($route, $params),
-                    'title' => 'View Status',
-                    'icon' => 'icon-progress',
-                ];
-            }
-        }
-
-        return $links;
-    }
-
-    /**
      * Return true if the keyword is contained in the $assessment's content (which might contain HTML), but not in any
      * of the non-HTML strings that could possibly cause matches.
      *
@@ -358,5 +317,46 @@ class Hydrator extends BaseHydrator
 
         // No other match found, so return true if the keyword matches on the HTML content.
         return str_contains(strtolower($assessmentContentHtml), $keywordLower);
+    }
+
+    /**
+     * Return an array of sub-arrays, each sub-array containing info for one link.
+     * The links will be in alphabetical order of title.
+     *
+     * @param IAssessable $assessment
+     * @param User        $viewer
+     * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
+     * @throws RouteNotFound
+     */
+    private function getSearchResultLinks(IAssessable $assessment, User $viewer): array
+    {
+        $links = [];
+
+        $route = 'learningAssessment.getUpdateAssessmentForm';
+        $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $links[] = [
+                // All assessment types use the same URL for their 'Modify' page.
+                'url' => $this->routeGenerator->generate($route, $params),
+                'title' => 'Modify',
+                'icon' => 'icon-modify',
+            ];
+        }
+
+        if (!($assessment instanceof Assessment\LessonPlan\Model) && $assessment->isImplementation()) {
+            $route = 'learningAssessment.getStatus';
+            $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                $links[] = [
+                    // All assessment types use the same URL for their 'View Status' page,
+                    // except lesson plans.  Lesson plans have no 'View Status' page.
+                    'url' => $this->routeGenerator->generate($route, $params),
+                    'title' => 'View Status',
+                    'icon' => 'icon-progress',
+                ];
+            }
+        }
+
+        return $links;
     }
 }
