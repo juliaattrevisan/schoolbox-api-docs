@@ -5,13 +5,13 @@
 
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
-// import { loadReports } from "./util/loadReports";
+import { loadReports } from "./util/loadReports";
 import type { Item } from "./types/Item";
 import type { Student } from "./types/Student";
-// import HmSelectItem from "./items/hm-select-item.vue";
-// import HmStudents from "./students/hm-students.vue";
-// import HmPreviousItem from "./items/hm-previous-item.vue";
-// import HmNextItem from "./items/hm-next-item.vue";
+import HmSelectItem from "./items/hm-select-item.vue";
+import HmStudents from "./students/hm-students.vue";
+import HmPreviousItem from "./items/hm-previous-item.vue";
+import HmNextItem from "./items/hm-next-item.vue";
 
 interface Props {
     title: string; //
@@ -19,14 +19,14 @@ interface Props {
     // itemResponses: object; //
     // attemptResponses: object; //
     // urls: object; //
-    // reportPayloads: string[]; //
+    reportPayloads: string[]; //
     students: Student[]; //
 }
 const props = defineProps<Props>();
 
-// const hasStudents = window.Vue.computed(() => {
-//     return props.students && Object.keys(props.students).length > 0;
-// });
+const hasStudents = window.Vue.computed(() => {
+    return props.students && Object.keys(props.students).length > 0;
+});
 
 /**
  * Initialise the stores, adding the students first, then the reports as
@@ -36,15 +36,15 @@ window.Vue.onMounted(async () => {
     useItemsStore().init(props.items);
     useStudentsStore().init(props.students);
     await window.Vue.nextTick();
-    // loadReports(props.reportPayloads);
+    loadReports(props.reportPayloads);
 });
 </script>
 
 <template>
     <div></div>
-    <!-- <div class="l-flex-col l-gap-m f-no-margins"> -->
-    <!-- Title. But add the metadata etc. when you get up to that bit -->
-    <!-- <h1>Horizontal Marking for {{ props.title }}</h1>
+    <div class="l-flex-col l-gap-m f-no-margins">
+        <!-- Title. But add the metadata etc. when you get up to that bit -->
+        <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
             <div>
                 <h2 class="subheader">Cards</h2>
@@ -62,7 +62,7 @@ window.Vue.onMounted(async () => {
                 <p>No attempts have been submitted yet.</p>
             </div>
         </template>
-    </div> -->
+    </div>
 </template>
 
 <style scoped></style>
