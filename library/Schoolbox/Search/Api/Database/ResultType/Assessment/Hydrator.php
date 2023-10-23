@@ -122,6 +122,8 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
+                $keywordLower = strtolower($keyword); // Convert to lowercase for case-insensitive str_contains() searches below.
+
                 // Lesson plan fields have a visibility enum that is either 'staff' or 'student' (lesson_plan_field.visibility).
                 // For the purposes of this permission check, anyone who is not staff or superuser will be treated as a student.
                 // If the viewer is a student (not staff or superuser), and the lesson plan did not match on title,
@@ -130,23 +132,31 @@ class Hydrator extends BaseHydrator
                 if (
                     $assessment instanceof Assessment\LessonPlan\Model &&
                     !($viewer->isSuperuser() || $viewer->getRole()->isStaff()) && // If viewer is student...
-                    !str_contains($assessment->getTitle(), $keyword)
+                    !str_contains(strtolower($assessment->getTitle()), $keywordLower)
                 ) {
                     // The search must have matched on one or more of the lesson plan fields.
                     // Keep the match only if the keyword is found in a visible field.
                     $lessonPlan = $assessment;
+                    $keywordFoundInVisibleText = false;
                     foreach ($lessonPlan->getFields() as $field) {
+                        $fieldTitleLower = strtolower($field->getTitle());
+                        $fieldBodyLower = strtolower($field->getBody());
+
                         if (
                             ($field->getVisibility() === 'student') && // If field is visible to students...
-                            (str_contains($field->getTitle(), $keyword) || str_contains($field->getBody(), $keyword))
+                            (str_contains($fieldTitleLower, $keywordLower) || str_contains($fieldBodyLower, $keywordLower))
+                            // Use str_contains on lowercase strings to simulate case-insensitive match used by SQL LIKE condition.
                         ) {
+                            $keywordFoundInVisibleText = true;
                             break; // The keyword was found in a visible field, so the match counts.
                             // Note that if the keyword was only found in parts of the HTML that is invisible,
                             // that is not a problem because such matches will be eliminated in the next step.
                         }
                     }
 
-                    return null; // The field was not found in any visible fields, so the match is eliminated.
+                    if (!$keywordFoundInVisibleText) {
+                        return null; // The field was not found in any visible fields, so the match is eliminated.
+                    }
                 }
 
                 $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
@@ -156,7 +166,7 @@ class Hydrator extends BaseHydrator
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
                 if ($this->assessmentMatchesKeywordOnlyOnHtmlContent($assessment, $keyword, $assessmentContentHtml)) {
-                    if (!str_contains($assessmentContentTextOnly, $keyword)) {
+                    if (!str_contains(strtolower($assessmentContentTextOnly), $keywordLower)) {
                         return null;
                     }
                 }
@@ -292,6 +302,8 @@ class Hydrator extends BaseHydrator
      * Return true if the keyword is contained in the $assessment's content (which might contain HTML), but not in any
      * of the non-HTML strings that could possibly cause matches.
      *
+     * IMPORTANT: This function checks for case-insensitive matches.  This is to match the behaviour of an SQL 'LIKE' condition.
+     *
      * The checks used here must match those in Assessment\QueryParamBuilder->buildBaseWhereParams()
      *
      * @param IAssessable $assessment
@@ -325,24 +337,26 @@ class Hydrator extends BaseHydrator
         // 'lesson_plan_field.title LIKE :assessmentKeywordLike',             // Assessment\LessonPlan\Model->getField()->getTitle() HtmlContent
         // 'lesson_plan_field.body LIKE :assessmentKeywordLike'               // Assessment\LessonPlan\Model->getField()->getBody()  HtmlContent
 
-        if (str_contains($assessment->getTitle(), $keyword)) {
+        $keywordLower = strtolower($keyword);
+
+        if (str_contains(strtolower($assessment->getTitle()), $keywordLower)) {
             return false; // Found match on assessment.title or assess.title.
         }
 
         if ($assessment instanceof Assessment\Lti\Model) {
             if (
-                str_contains($assessment->getLtiAssessmentUrl(), $keyword) ||
-                str_contains($assessment->getLtiAssessmentTitle(), $keyword)
+                str_contains(strtolower($assessment->getLtiAssessmentUrl()), $keywordLower) ||
+                str_contains(strtolower($assessment->getLtiAssessmentTitle()), $keywordLower)
             ) {
                 return false; // Found match on lti_assessment.lti_assessment_url or lti_assessment.lti_assessment_title.
             }
         } elseif ($assessment instanceof Assessment\Task\Model) {
-            if (str_contains($assessment->getUrl(), $keyword)) {
+            if (str_contains(strtolower($assessment->getUrl()), $keywordLower)) {
                 return false; // Found match on task.link.
             }
         }
 
         // No other match found, so return true if the keyword matches on the HTML content.
-        return str_contains($assessmentContentHtml, $keyword);
+        return str_contains(strtolower($assessmentContentHtml), $keywordLower);
     }
 }

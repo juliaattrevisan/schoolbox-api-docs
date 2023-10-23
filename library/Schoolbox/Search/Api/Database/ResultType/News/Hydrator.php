@@ -129,7 +129,8 @@ class Hydrator extends BaseHydrator
                 // * the title
                 // * the generated description
                 $description = $this->generateDescriptionForArticle($keyword, $article);
-                if (!isset($description) && !str_contains($match->title, $keyword)) {
+                // Check for case-insensitive matches to match the behaviour of an SQL 'LIKE' condition.
+                if (!isset($description) && !str_contains(strtolower($match->title), strtolower($keyword))) {
                     return null;
                 }
 
