@@ -215,10 +215,9 @@ class Controller extends Base
                     \Alaress_Date_Format::now()->addYears(2)->addMonths(6)->endOfDay()->getJson();
                 break;
         }
-        $filters = [
+        return [
             "startDate" => $startDate,
             "endDate" => $endDate,
         ];
-        return $filters;
     }
 }
