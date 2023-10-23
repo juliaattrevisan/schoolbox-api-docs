@@ -77,6 +77,10 @@
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
     $(function() {
+
+        const $submitButton = $('[data-bookitemform]').find('input[type=submit]');
+        $submitButton.attr("disabled", "disabled");
+
         $('[data-resourcebookingsuggest]').selectizeSelector({
             ajax: {
                 url: '/resource-booking/item/search',
@@ -86,7 +90,19 @@
             multiple: false
         });
 
-        $('[data-bookitemform]').find('input[type=submit]').click(function(event) {
+        /**
+         * Disable the submit button if no resource is selected
+         */
+        $('[data-resourcebookingsuggest]').on("change", (event) => {
+            const items = event.target.selectize.items;
+            if (items.length > 0) {
+                $submitButton.removeAttr("disabled");
+            } else {
+                $submitButton.attr("disabled", "disabled");
+            }
+        });
+
+        $submitButton.click(function(event) {
             event.preventDefault();
 
             var id = $('[data-resourcebookingsuggest]').val().pop();
