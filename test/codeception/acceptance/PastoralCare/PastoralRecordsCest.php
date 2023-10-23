@@ -38,12 +38,14 @@ class PastoralRecordsCest
      *
      * @param AcceptanceTester $i
      */
-//    public function beforeSuite(AcceptanceTester $i): void
-//    {
-//        $i->amGoingTo("update delete_at for the pastoral records so it does not impact the tests");
-//        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Test Pastoral Record%"]);
-//        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "This is an automation pastoral record updated%"]);
-//    }
+    public function beforeSuite(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the pastoral records so it does not impact the tests");
+        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Test Pastoral Record%"]);
+        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Test View Pastoral Record%"]);
+        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "This is an automation pastoral record updated%"]);
+        $i->updateInDatabase('config', ['value' => 1], ['name' => 'pastoral_student_access']);
+    }
 
 
     /**
@@ -79,7 +81,7 @@ class PastoralRecordsCest
         $common->closeModal();
         $createPastoralRecord->clickSave();
         $i->amGoingTo('ensure the record is presented under pastoral records');
-        $i->amOnPage('/pastoral/student/25');
+        $i->amOnPage($pastoralProfile->generateRoute($studentId));
         $i->waitForText('PASTORAL PROFILE', 10);
         $i->canSee($pastoralTitle, '//div/a/h3');
     }
@@ -148,7 +150,7 @@ class PastoralRecordsCest
         $createPastoralRecord->selectTypeSubType(2);
         $createPastoralRecord->clickSave();
         $i->amGoingTo('ensure the record are properly updated');
-        $i->amOnPage('/pastoral/student/25');
+        $i->amOnPage($pastoralProfile->generateRoute($studentId));
         $i->waitForText('PASTORAL PROFILE', 10);
         $i->canSee($pastoralTitle, '//div/a/h3');
         $i->amGoingTo('click the pastoral record');
@@ -181,27 +183,60 @@ class PastoralRecordsCest
         $i->cantSee($pastoralTitle);
     }
 
-//    /**
-//     * @param AcceptanceTester $i
-//     * @throws Exception
-//     * @beforeSuite
-//     *
-//     * navigate to the student pastoral care page
-//     * create a pastoral record for the student
-//     * ensure the record details is roperly presented in the pastoral record page
-//     */
-//    public function viewPastoralRecord(AcceptanceTester $i): void
-//    {
-//        $profilePage = new ProfilePage($i);
-//        $studentId = 25;
-//        $i->amOnPage($profilePage->generateRoute($studentId));
-//        //click the pastoral care button
-//        //click create pastoral record visible to parents and students
-//        //enter the details
-//        //save it
-//        //navigate to the pastoral care record page
-//        //ensure te details is properly presented
-//        //as a parent check the pastoral care records details
-//        //as a student check the pastoral care records details
-//    }
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     * @beforeSuite
+     *
+     * navigate to the student pastoral care page
+     * create a pastoral record for the student
+     * ensure the record details is properly presented in the pastoral record page
+     */
+    public function viewPastoralRecord(AcceptanceTester $i): void
+    {
+        $profilePage = new ProfilePage($i);
+        $pastoralProfile = new PastoralProfile($i);
+        $createPastoralRecord = new CreatePastoralRecord($i);
+        $common = new Common($i);
+        $studentId = 25;
+        $pastoralTitle = "Automation Test View Pastoral Record";
+        $pastoralDescription = 'This is an automation pastoral record';
+        $i->amGoingTo('navigate to the student profile page');
+        $i->amOnPage($profilePage->generateRoute($studentId));
+        $i->amGoingTo('click the pastoral care button');
+        $profilePage->clickButton('pastoral');
+        $i->waitForText('PASTORAL PROFILE', 10);
+        $i->amGoingTo('click create pastoral record and create a pastoral record  visible to parents and students');
+        $pastoralProfile->clickCreatePastoralRecord();
+        $createPastoralRecord->typeTitle($pastoralTitle);
+        $createPastoralRecord->clickTypeDropdown();
+        $createPastoralRecord->selectTypeSubType(1);
+        $i->fillRichTextField('body_public', $pastoralDescription);
+        $createPastoralRecord->clickVisibilityLink('Role');
+        $createPastoralRecord->clickPastoralRole('Student');
+        $createPastoralRecord->clickPastoralRole('Parent');
+        $common->closeModal();
+        $createPastoralRecord->clickSave();
+        $i->amGoingTo('ensure the record is presented under pastoral records');
+        $i->amOnPage($pastoralProfile->generateRoute($studentId));
+        $i->waitForText('PASTORAL PROFILE', 10);
+        $i->canSee($pastoralTitle, '//div/a/h3');
+        $i->amGoingTo('as a parent check the pastoral care records details');
+        $i->impersonateViaModifyUserPage('Jenni Reed');
+        $i->amOnPage($pastoralProfile->generateRoute($studentId));
+        $recordId = $i->grabFromDatabase('pastoral', 'id', ['deleted_at' => null, 'heading like' => "Automation Test View Pastoral%"]);
+        $pastoralProfile->clickPastoralRecord($studentId, $recordId);
+        $i->waitForElementVisible('a[id="panel-general"]', 10);
+        $i->canSee('Automation Test View Pastoral Record');
+        $i->canSee('Academic', '//div/dl/dd');
+        $i->canSee('Award/Achievement', '//div/dl/dd');
+        $i->amGoingTo('as a student check the pastoral care records details');
+        $i->impersonateViaModifyUserPage('Jana Reed');
+        $i->amOnPage($pastoralProfile->generateRoute($studentId));
+        $pastoralProfile->clickPastoralRecord($studentId, $recordId);
+        $i->waitForElementVisible('a[id="panel-general"]', 10);
+        $i->canSee('Automation Test View Pastoral Record');
+        $i->canSee('Academic', '//div/dl/dd');
+        $i->canSee('Award/Achievement', '//div/dl/dd');
+    }
 }

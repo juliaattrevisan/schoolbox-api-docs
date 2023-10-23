@@ -77,5 +77,4 @@ class PastoralProfile
     {
         $this->tester->click(self::DELETE_COMMENT_ICON);
     }
-
 }
