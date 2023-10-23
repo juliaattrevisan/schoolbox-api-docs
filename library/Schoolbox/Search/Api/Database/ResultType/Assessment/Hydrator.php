@@ -123,6 +123,19 @@ class Hydrator extends BaseHydrator
                 }
 
                 $keywordLower = strtolower($keyword); // Convert to lowercase for case-insensitive str_contains() searches below.
+                $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
+                $assessmentContentTextOnly = (new ToText($assessmentContentHtml))->getText(); // Remove HTML tags.
+
+                // Because the assessment content might contain HTML, this match might have come about only because the
+                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if ($this->assessmentMatchesKeywordOnlyOnHtmlContent($assessment, $keyword, $assessmentContentHtml)) {
+                    if (!str_contains(strtolower($assessmentContentTextOnly), $keywordLower)) {
+                        return null;
+                    }
+                }
+
+                $matchingAssessmentContentTextOnly = null;
 
                 // Lesson plan fields have a visibility enum that is either 'staff' or 'student' (lesson_plan_field.visibility).
                 // For the purposes of this permission check, anyone who is not staff or superuser will be treated as a student.
@@ -137,7 +150,6 @@ class Hydrator extends BaseHydrator
                     // The search must have matched on one or more of the lesson plan fields.
                     // Keep the match only if the keyword is found in a visible field.
                     $lessonPlan = $assessment;
-                    $keywordFoundInVisibleText = false;
                     foreach ($lessonPlan->getFields() as $field) {
                         $fieldTitleLower = strtolower($field->getTitle());
                         $fieldBodyLower = strtolower($field->getBody());
@@ -147,28 +159,18 @@ class Hydrator extends BaseHydrator
                             (str_contains($fieldTitleLower, $keywordLower) || str_contains($fieldBodyLower, $keywordLower))
                             // Use str_contains on lowercase strings to simulate case-insensitive match used by SQL LIKE condition.
                         ) {
-                            $keywordFoundInVisibleText = true;
-                            break; // The keyword was found in a visible field, so the match counts.
-                            // Note that if the keyword was only found in parts of the HTML that is invisible,
-                            // that is not a problem because such matches will be eliminated in the next step.
+                            // Found the keyword in text that is visible to the user, so the match counts.
+                            // This field's text is safe to use as the search result context text.
+                            $matchingAssessmentContentTextOnly = $field->getTitle() . "\n\n" . $field->getBody();
+                            break;
                         }
                     }
 
-                    if (!$keywordFoundInVisibleText) {
+                    if ($matchingAssessmentContentTextOnly === null) {
                         return null; // The field was not found in any visible fields, so the match is eliminated.
                     }
-                }
-
-                $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
-                $assessmentContentTextOnly = (new ToText($assessmentContentHtml))->getText(); // Remove HTML tags.
-
-                // Because the assessment content might contain HTML, this match might have come about only because the
-                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if ($this->assessmentMatchesKeywordOnlyOnHtmlContent($assessment, $keyword, $assessmentContentHtml)) {
-                    if (!str_contains(strtolower($assessmentContentTextOnly), $keywordLower)) {
-                        return null;
-                    }
+                } else {
+                    $matchingAssessmentContentTextOnly = $assessmentContentTextOnly;
                 }
 
                 $assessmentCreator = $assessment->getCreator();
@@ -204,7 +206,7 @@ class Hydrator extends BaseHydrator
                     null,
                     AssessmentType::getIconClassSuffixForType($assessmentType),
                     // NOTE: Must return non-HTML text here, because truncating HTML around a keyword cannot be done without messing up styles.
-                    ($this->truncateAroundKeyword($keyword, $assessmentContentTextOnly) ?? $this->truncate($assessmentContentTextOnly)),
+                    ($this->truncateAroundKeyword($keyword, $matchingAssessmentContentTextOnly) ?? $this->truncate($matchingAssessmentContentTextOnly)),
                     $assessmentCreator,
                     [$folder],
                     $this->getSearchResultLinks($assessment, $viewer),
