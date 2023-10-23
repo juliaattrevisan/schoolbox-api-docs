@@ -15,17 +15,16 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * store any passed through properties
      * @param {object} $students - the students
      */
-    function init($students: object) {
-        for (const [key, value] of Object.entries($students)) {
+    function init($students: Student[]) {
+        $students.forEach((student) => {
             students.value.push({
-                ...value,
-                elementId: key as string,
+                ...student,
                 isReportLoaded: false,
                 isExpanded: false,
                 hasReport: false,
                 items: [],
             });
-        }
+        });
     }
 
     /**

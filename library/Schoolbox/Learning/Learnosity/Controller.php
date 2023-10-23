@@ -59,15 +59,15 @@ class Controller extends Base
     private const LEARNOSITY_QUESTION_GROUP_PLANS = [
         'elite' => [
             'question_type_groups' => [
-                [ 'reference' => 'mcq' ],
-                [ 'reference' => 'cloze' ],
-                [ 'reference' => 'match' ],
-                [ 'reference' => 'writespeak' ],
-                [ 'reference' => 'highlight' ],
-                [ 'reference' => 'graph' ],
-                [ 'reference' => 'math' ],
-                [ 'reference' => 'chart' ],
-                [ 'reference' => 'chemistry' ],
+                ['reference' => 'mcq'],
+                ['reference' => 'cloze'],
+                ['reference' => 'match'],
+                ['reference' => 'writespeak'],
+                ['reference' => 'highlight'],
+                ['reference' => 'graph'],
+                ['reference' => 'math'],
+                ['reference' => 'chart'],
+                ['reference' => 'chemistry'],
                 [
                     'reference' => 'other',
                     'template_references' => [
@@ -78,9 +78,9 @@ class Controller extends Base
         ],
         'default' => [
             'question_type_groups' => [
-                [ 'reference' => 'mcq' ],
-                [ 'reference' => 'cloze' ],
-                [ 'reference' => 'match' ],
+                ['reference' => 'mcq'],
+                ['reference' => 'cloze'],
+                ['reference' => 'match'],
                 [
                     'reference' => 'writespeak',
                     'template_references' => [
@@ -89,8 +89,8 @@ class Controller extends Base
                         '4fe6c726-419c-4aff-b189-4a9756a0ffda',
                     ]
                 ],
-                [ 'reference' => 'highlight' ],
-                [ 'reference' => 'graph' ],
+                ['reference' => 'highlight'],
+                ['reference' => 'graph'],
                 [
                     'reference' => 'math',
                     'template_references' => [
@@ -100,8 +100,8 @@ class Controller extends Base
                         '7b810c2c-9100-4ff1-96de-cda23bf34445',
                     ]
                 ],
-                [ 'reference' => 'chart' ],
-                [ 'reference' => 'chemistry' ],
+                ['reference' => 'chart'],
+                ['reference' => 'chemistry'],
                 [
                     'reference' => 'other',
                     'template_references' => [
@@ -1117,8 +1117,8 @@ class Controller extends Base
         /* New donny thing - combine, restructure and rename vars
          */
         $students = array_values($users);
-        $itemResponses = $this->encodeJs(array_merge_recursive($scores, $responseComments));
-        $attemptResponses = $this->encodeJs($attemptComments);
+        $itemResponses = array_merge_recursive($scores, $responseComments);
+        $attemptResponses = $attemptComments;
         $urls = array_values($urls);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [

@@ -3,10 +3,11 @@
  * To use horizontal marking when assessing a quiz
  */
 
-// import { useItemsStore } from "./store/hmItemsStore";
-// import { useStudentsStore } from "./store/hmStudentsStore";
+import { useItemsStore } from "./store/hmItemsStore";
+import { useStudentsStore } from "./store/hmStudentsStore";
 // import { loadReports } from "./util/loadReports";
 import type { Item } from "./types/Item";
+import type { Student } from "./types/Student";
 // import HmSelectItem from "./items/hm-select-item.vue";
 // import HmStudents from "./students/hm-students.vue";
 // import HmPreviousItem from "./items/hm-previous-item.vue";
@@ -17,9 +18,9 @@ interface Props {
     items: Item[]; // the items linked to quiz
     // itemResponses: object; //
     // attemptResponses: object; //
-    urls: object; //
-    reportPayloads: string[]; //
-    // students: object; //
+    // urls: object; //
+    // reportPayloads: string[]; //
+    students: Student[]; //
 }
 const props = defineProps<Props>();
 
@@ -31,12 +32,12 @@ const props = defineProps<Props>();
  * Initialise the stores, adding the students first, then the reports as
  * when the reports are loaded they look for the students in the store/DOM tree
  */
-// window.Vue.onMounted(async () => {
-//     useItemsStore().init(props.items);
-//     useStudentsStore().init(props.students);
-//     await window.Vue.nextTick();
-//     loadReports(props.reportPayloads);
-// });
+window.Vue.onMounted(async () => {
+    useItemsStore().init(props.items);
+    useStudentsStore().init(props.students);
+    await window.Vue.nextTick();
+    // loadReports(props.reportPayloads);
+});
 </script>
 
 <template>
