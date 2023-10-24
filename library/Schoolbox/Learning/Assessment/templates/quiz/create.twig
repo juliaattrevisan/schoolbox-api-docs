@@ -163,6 +163,20 @@
         </div>
     </div>
 
+    {# Shuffle Items #}
+    <div class="row">
+        <div class="small-5 medium-2 columns">
+            <label for="shuffleItems" class="inline-block">Shuffle Cards<span class="hint has-tip tip-top" data-tooltip title="You can shuffle the order of quiz cards displayed.">?</span></label>
+            <div class="switch">
+                <input name="shuffleItems" id="shuffleItems" type="checkbox" {% if assessment.shuffleItems %}checked="checked"{% endif %} value="1" />
+                <label for="shuffleItems">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
     {# Enforce Safe Exam Browser #}
     {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
 </fieldset>

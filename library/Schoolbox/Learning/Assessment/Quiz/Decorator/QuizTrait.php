@@ -35,6 +35,11 @@ trait QuizTrait
     /**
      * @var int
      */
+    protected int $shuffleItems;
+
+    /**
+     * @var int
+     */
     protected int $maxAttempts;
 
     /** @var string */
@@ -114,6 +119,24 @@ trait QuizTrait
     public function setReadingTimeDurationMinutes($readingTimeDurationMinutes)
     {
         $this->readingTimeDurationMinutes = $readingTimeDurationMinutes;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getShuffleItems()
+    {
+        return $this->shuffleItems;
+    }
+
+    /**
+     * @param int $shuffleItems
+     * @return $this
+     */
+    public function setShuffleItems($shuffleItems)
+    {
+        $this->shuffleItems = $shuffleItems;
         return $this;
     }
 
