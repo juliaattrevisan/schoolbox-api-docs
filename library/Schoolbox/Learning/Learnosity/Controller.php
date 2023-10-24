@@ -372,7 +372,11 @@ class Controller extends Base
                      * Use the current microtime() as a seed so everyone gets a random ordering
                      * https://reference.learnosity.com/items-api/initialization/config.configuration.shuffle_items
                      */
-                    'shuffle_items' => (string)microtime(true)
+                    'shuffle_items' => sprintf(
+                        '%s-%s',
+                            microtime(true),
+                            random_int(0, 1000000)
+                    )
                 ],
                 "navigation" => [
                     "auto_save" => [
