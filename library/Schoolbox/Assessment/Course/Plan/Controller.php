@@ -154,6 +154,8 @@ class Controller extends Base
 
             foreach ($rubrics as $rubric) {
                 $this->extractCurricNodes($curriculumNodes, $rubric);
+                // extract for the parent rubricCapabilities also.
+                $this->extractCurricNodes($curriculumNodes, $rubric->getCapability());
             }
 
             foreach ($assessments as $assessment) {
