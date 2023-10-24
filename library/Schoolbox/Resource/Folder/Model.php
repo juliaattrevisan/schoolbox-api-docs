@@ -744,7 +744,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
     /**
      * Sets the order for the summative report
-     * @param null|int
+     * @param null|int $order
      * @return self
      */
     public function setOrder(null|int $order): self

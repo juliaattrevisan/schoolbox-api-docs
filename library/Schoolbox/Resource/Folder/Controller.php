@@ -409,7 +409,7 @@ class Controller extends BaseController
                 $yearLevels,
                 (bool)($post['recursive-year-levels'] ?? false),
                 $this->getUser(),
-                (int)($post['order']) ?? null
+                ((int)$post['order']) ?? null
             );
 
             /* If Inherit Permissions is on, don't create group
