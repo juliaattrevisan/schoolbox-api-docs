@@ -9,22 +9,6 @@ import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorsStore } from "./spFilterCreatorsStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
 
-/**
- * The filter data currently sent through
- */
-type FilterData = {
-    filter: {
-        date: {
-            from: string;
-            to: string;
-        };
-        creator: {
-            id: number;
-        };
-        types: string[];
-    };
-};
-
 export const useFiltersStore = defineStore("spFilters", () => {
     /**
      * Are there any filters active
