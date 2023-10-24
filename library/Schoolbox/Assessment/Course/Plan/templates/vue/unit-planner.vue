@@ -99,13 +99,13 @@ window.Vue.onMounted(() => {
                     >
                         <content-container :unit-id="unit.id">
                             <curriculum-codes-list :curriculum-codes="unit.curriculumCodes"></curriculum-codes-list>
+                            <curriculum-details-modal />
                         </content-container>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <curriculum-details-modal />
 </template>
 
 <style scoped>
