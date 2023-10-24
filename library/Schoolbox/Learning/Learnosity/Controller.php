@@ -367,7 +367,12 @@ class Controller extends Base
                      */
                     'reading_mode' => [
                         'reading_time' => $quiz->getReadingTimeDuration()
-                    ]
+                    ],
+                    /* Shuffle Items
+                     * Use the current microtime() as a seed so everyone gets a random ordering
+                     * https://reference.learnosity.com/items-api/initialization/config.configuration.shuffle_items
+                     */
+                    'shuffle_items' => (string)microtime(true)
                 ],
                 "navigation" => [
                     "auto_save" => [
