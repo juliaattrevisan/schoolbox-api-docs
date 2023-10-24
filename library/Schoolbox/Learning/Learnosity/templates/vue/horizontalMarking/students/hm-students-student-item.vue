@@ -5,13 +5,13 @@
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "../types/Student";
-import type { Item } from "../types/Item";
+import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
     student: Student; // the student to display
-    item: Item; //
+    item: StudentItem; //
     container: HTMLDivElement; // the parent container, to look for the relevant item
     index: number; // the index of the student in the list
 }

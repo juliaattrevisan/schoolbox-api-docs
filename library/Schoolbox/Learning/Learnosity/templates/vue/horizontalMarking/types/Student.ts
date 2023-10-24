@@ -2,7 +2,7 @@
  * Student type
  */
 
-import type { Item } from "./Item";
+import type { StudentItem } from "./StudentItem";
 
 export type Student = {
     id: string;
@@ -13,5 +13,5 @@ export type Student = {
     hasReport: boolean;
     isReportLoaded: boolean;
     isExpanded: boolean;
-    items: Item[];
+    items: StudentItem[];
 };

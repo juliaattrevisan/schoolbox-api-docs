@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
-import type { Item } from "../types/Item";
+import type { StudentItem } from "../types/StudentItem";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
@@ -32,9 +32,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
      * @param {string} reportId - the report id
-     * @param {Item[]} items - the items to add
+     * @param {StudentItem[]} items - the items to add
      */
-    function addItems(reportId: string, items: Item[]) {
+    function addItems(reportId: string, items: StudentItem[]) {
         const studentForItems = students.value.find((student) => student.elementId === reportId);
         if (studentForItems) {
             studentForItems.items = items;
