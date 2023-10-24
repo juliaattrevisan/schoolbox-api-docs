@@ -1117,8 +1117,8 @@ class Controller extends Base
         /* New donny thing - combine, restructure and rename vars
          */
         $students = array_values($users);
-        $itemResponses = array_merge_recursive($scores, $responseComments);
-        $attemptResponses = $attemptComments;
+        $itemResponses = array_values(array_merge_recursive($scores, $responseComments));
+        $attemptResponses = array_values($attemptComments);
         $urls = array_values($urls);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [

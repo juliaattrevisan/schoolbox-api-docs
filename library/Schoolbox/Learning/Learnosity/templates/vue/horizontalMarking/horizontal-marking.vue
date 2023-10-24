@@ -8,6 +8,9 @@ import { useStudentsStore } from "./store/hmStudentsStore";
 import { loadReports } from "./util/loadReports";
 import type { Item } from "./types/Item";
 import type { Student } from "./types/Student";
+import type { StudentItemResponse } from "./types/StudentItemResponse";
+import type { StudentAttemptResponse } from "./types/StudentAttemptResponse";
+import type { Url } from "./types/Url";
 import HmSelectItem from "./items/hm-select-item.vue";
 import HmStudents from "./students/hm-students.vue";
 import HmPreviousItem from "./items/hm-previous-item.vue";
@@ -16,11 +19,11 @@ import HmNextItem from "./items/hm-next-item.vue";
 interface Props {
     title: string; //
     items: Item[]; // the items linked to quiz
-    // itemResponses: object; //
-    // attemptResponses: object; //
-    // urls: object; //
-    reportPayloads: string[]; //
     students: Student[]; //
+    itemResponses: StudentItemResponse[]; //
+    attemptResponses: StudentAttemptResponse[]; //
+    urls: Url[]; //
+    reportPayloads: string[]; //
 }
 const props = defineProps<Props>();
 

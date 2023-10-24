@@ -3,6 +3,7 @@
  */
 
 import type { StudentItem } from "./StudentItem";
+import type { StudentAttemptResponse } from "./StudentAttemptResponse";
 
 export type Student = {
     id: string;
@@ -14,4 +15,5 @@ export type Student = {
     isReportLoaded: boolean;
     isExpanded: boolean;
     items: StudentItem[];
+    attemptResponse: StudentAttemptResponse;
 };
