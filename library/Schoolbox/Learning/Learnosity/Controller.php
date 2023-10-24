@@ -968,7 +968,7 @@ class Controller extends Base
                 /* Find all the comments for this attempt (need it later)
                  */
                 $attemptComments[$attempt->getUser()->getId()] = [
-                    'id' => $attempt->getLearnosityReference(),
+                    'learnosityReference' => $attempt->getLearnosityReference(),
                     'studentId' => $attempt->getUser()->getId(),
                     'comment' => $attempt->getComment()
                 ];
@@ -1103,7 +1103,7 @@ class Controller extends Base
                 $learnosityReference = $response['response_id'];
 
                 $scores[$learnosityReference] = [
-                    'id' => $learnosityReference,
+                    'learnosityReference' => $learnosityReference,
                     'score' => $response['score'],
                     'maxScore' => $response['max_score']
                 ];
