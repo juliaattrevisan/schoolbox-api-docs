@@ -7,5 +7,6 @@ import type { StudentItemResponse } from "./StudentItemResponse";
 export type StudentItem = {
     reference: string;
     questions: Question[];
-    response?: StudentItemResponse;
+    response_ids: string[];
+    response: StudentItemResponse;
 };

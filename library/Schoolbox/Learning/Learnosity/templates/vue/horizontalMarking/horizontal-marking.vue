@@ -3,6 +3,7 @@
  * To use horizontal marking when assessing a quiz
  */
 
+import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { loadReports } from "./util/loadReports";
@@ -36,6 +37,7 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
+    useStore().init(props.itemResponses, props.attemptResponses, props.urls);
     useItemsStore().init(props.items);
     useStudentsStore().init(props.students);
     await window.Vue.nextTick();

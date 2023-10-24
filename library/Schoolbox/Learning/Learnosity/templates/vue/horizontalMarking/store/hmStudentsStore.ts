@@ -7,6 +7,7 @@ import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
+import type { StudentItemResponse } from "../types/StudentItemResponse";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
@@ -29,6 +30,18 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * Get the response for a student item
+     * @param {string} learnosityReference - the learnosity reference
+     * @returns {StudentItemResponse} - the response
+     */
+    function getResponse(learnosityReference: string) {
+        const response = useStore().itemResponses.find(
+            (itemResponse) => itemResponse.learnosityReference === learnosityReference
+        ) as StudentItemResponse;
+        return response;
+    }
+
+    /**
      * Add items to a student
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
@@ -36,9 +49,20 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {StudentItem[]} items - the items to add
      */
     function addItems(reportId: string, items: StudentItem[]) {
+        const itemsWithQuestionsOnly = items.filter((item) => item.questions.length > 0);
         const studentForItems = students.value.find((student) => student.elementId === reportId);
         if (studentForItems) {
-            studentForItems.items = items;
+            const studentItems: StudentItem[] = [];
+            itemsWithQuestionsOnly.forEach((item) => {
+                // we only want to store the reference, questions and response_ids
+                studentItems.push({
+                    reference: item.reference,
+                    questions: item.questions,
+                    response_ids: item.response_ids,
+                    response: getResponse(item.response_ids[0]),
+                });
+            });
+            studentForItems.items = studentItems;
         }
     }
 
