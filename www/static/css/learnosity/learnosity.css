@@ -835,12 +835,19 @@ td.lrn-report-area {
     color: var(--content-ui-foreground);
 }
 
-/* author primary and secondary and disabled button style */
+/* author primary and secondary and disabled button styles */
 .lrn .lrn-author-ui .lrn-btn-primary,
 .lrn .lrn-author-ui .lrn-btn-sec {
     color: var(--content-ui-foreground);
     border: none;
     background: var(--content-ui-background);
+}
+.lrn .lrn-author-ui .lrn-btn-primary:hover,
+.lrn .lrn-author-ui .lrn-btn-sec:hover,
+.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec):hover {
+    color: var(--content-ui-foreground);
+    background-color: var(--content-ui-hover);
+    text-decoration: none !important;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.lrn-author-disabled {
     background-color: var(--content-ui-background);
@@ -854,4 +861,20 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
     color: var(--content-ui-foreground);
     border: none;
     background: var(--content-ui-background);
+}
+
+/* Save button styles */
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
+    color: var(--content-ui-submit-foreground);
+    background-color: var(--content-ui-submit-background);
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save:hover {
+    border: none;
+    color: var(--content-ui-submit-foreground);
+    background-color: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
 }
