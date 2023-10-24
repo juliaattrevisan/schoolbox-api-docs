@@ -16,7 +16,7 @@ INSERT INTO
 VALUES (
         'date_range_search_filter',
         '0',
-        'Date range for search filter',
+        'Date Range for Search Filter',
         'The default date range that should be applied on the search page', (
             SELECT `id`
             FROM
