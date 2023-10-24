@@ -8,6 +8,7 @@ import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import type { StudentItemResponse } from "../types/StudentItemResponse";
+import type { StudentAttemptResponse } from "../types/StudentAttemptResponse";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
@@ -31,14 +32,24 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * Get the response for a student item
-     * @param {string} learnosityReference - the learnosity reference
+     * @param {string} learnosityReference - the learnosity reference to link the item response to
      * @returns {StudentItemResponse} - the response
      */
-    function getResponse(learnosityReference: string) {
-        const response = useStore().itemResponses.find(
+    function getItemResponse(learnosityReference: string) {
+        return useStore().itemResponses.find(
             (itemResponse) => itemResponse.learnosityReference === learnosityReference
         ) as StudentItemResponse;
-        return response;
+    }
+
+    /**
+     * Get the response for a student attempt
+     * @param {number} studentId - the student id to get the response for
+     * @returns {StudentItemResponse} - the response attempt
+     */
+    function getAttemptResponse(studentId: number) {
+        return useStore().attemptResponses.find(
+            (attemptResponse) => attemptResponse.studentId === studentId
+        ) as StudentAttemptResponse;
     }
 
     /**
@@ -50,19 +61,20 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      */
     function addItems(reportId: string, items: StudentItem[]) {
         const itemsWithQuestionsOnly = items.filter((item) => item.questions.length > 0);
-        const studentForItems = students.value.find((student) => student.elementId === reportId);
-        if (studentForItems) {
+        const selectedStudent = students.value.find((student) => student.elementId === reportId);
+        if (selectedStudent) {
             const studentItems: StudentItem[] = [];
             itemsWithQuestionsOnly.forEach((item) => {
-                // we only want to store the reference, questions and response_ids
+                // for each item, we only want to store the below properties, removing any others Learnosity may have provided
                 studentItems.push({
                     reference: item.reference,
                     questions: item.questions,
                     response_ids: item.response_ids,
-                    response: getResponse(item.response_ids[0]),
+                    response: getItemResponse(item.response_ids[0]),
                 });
             });
-            studentForItems.items = studentItems;
+            selectedStudent.items = studentItems;
+            selectedStudent.attemptResponse = getAttemptResponse(selectedStudent.id);
         }
     }
 

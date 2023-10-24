@@ -24,7 +24,6 @@ export const useStore = defineStore("horizontalMarking", () => {
         itemResponses.value = $itemResponses;
         attemptResponses.value = $attemptResponses;
         urls.value = $urls;
-        console.warn(itemResponses);
     }
 
     return {
