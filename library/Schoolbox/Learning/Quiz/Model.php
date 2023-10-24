@@ -495,10 +495,10 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param int $examMode
+     * @param int|null $examMode
      * @return $this
      */
-    public function setExamMode(int $examMode)
+    public function setExamMode(?int $examMode)
     {
         $this->examMode = $examMode;
         return $this;
