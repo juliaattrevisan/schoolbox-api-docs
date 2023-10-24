@@ -28,6 +28,7 @@ class Decorator implements DecoratorInterface
         protected int $readingTimeDurationHours,
         protected int $readingTimeDurationMinutes,
         protected int $shuffleItems,
+        protected int $examMode,
         protected int $maxAttempts,
         protected string $completionMessage
     ) {
@@ -53,6 +54,7 @@ class Decorator implements DecoratorInterface
         $assessment->setDuration($duration);
         $assessment->setReadingTimeDuration($readingTimeDuration);
         $assessment->setShuffleItems($this->getShuffleItems());
+        $assessment->setExamMode($this->getExamMode());
         $assessment->setMaxAttempts($this->getMaxAttempts());
         $assessment->setCompletionMessage($this->getCompletionMessage());
         $assessment->setLearnosityReference($this->getLearnosityReference());

@@ -177,6 +177,20 @@
         </div>
     </div>
 
+    {# Exam Mode #}
+    <div class="row">
+        <div class="small-5 medium-2 columns">
+            <label for="examMode" class="inline-block">Exam Mode<span class="hint has-tip tip-top" data-tooltip title="You can ensure more browser security during strict exams as this mode supports secure browser usage.">?</span></label>
+            <div class="switch">
+                <input name="examMode" id="examMode" type="checkbox" {% if assessment.examMode %}checked="checked"{% endif %} value="1" />
+                <label for="examMode">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
     {# Enforce Safe Exam Browser #}
     {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
 </fieldset>

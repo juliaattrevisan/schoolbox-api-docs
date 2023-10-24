@@ -65,6 +65,14 @@ class Model extends AbstractAssessment
 
 
     /**
+     * More security-conscious implementation of a learnosity quiz
+     *
+     * @var int
+     */
+    protected $examMode;
+
+
+    /**
      * What's the maximum number of attempts a participant may make on this quiz?
      *
      * @var int
@@ -445,6 +453,24 @@ class Model extends AbstractAssessment
     public function setShuffleItems($shuffleItems)
     {
         $this->shuffleItems = $shuffleItems;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExamMode()
+    {
+        return $this->examMode;
+    }
+
+    /**
+     * @param $examMode
+     * @return $this
+     */
+    public function setExamMode($examMode)
+    {
+        $this->examMode = $examMode;
         return $this;
     }
 

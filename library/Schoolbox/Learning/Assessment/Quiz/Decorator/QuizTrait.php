@@ -40,6 +40,11 @@ trait QuizTrait
     /**
      * @var int
      */
+    protected int $examMode;
+
+    /**
+     * @var int
+     */
     protected int $maxAttempts;
 
     /** @var string */
@@ -137,6 +142,24 @@ trait QuizTrait
     public function setShuffleItems($shuffleItems)
     {
         $this->shuffleItems = $shuffleItems;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExamMode()
+    {
+        return $this->examMode;
+    }
+
+    /**
+     * @param int $examMode
+     * @return $this
+     */
+    public function setExamMode($examMode)
+    {
+        $this->examMode = $examMode;
         return $this;
     }
 
