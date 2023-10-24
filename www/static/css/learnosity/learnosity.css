@@ -834,3 +834,24 @@ td.lrn-report-area {
     background-color: var(--content-ui-selected);
     color: var(--content-ui-foreground);
 }
+
+/* author primary and secondary and disabled button style */
+.lrn .lrn-author-ui .lrn-btn-primary,
+.lrn .lrn-author-ui .lrn-btn-sec {
+    color: var(--content-ui-foreground);
+    border: none;
+    background: var(--content-ui-background);
+}
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.lrn-author-disabled {
+    background-color: var(--content-ui-background);
+    border-color: transparent;
+    color: var(--content-ui-foreground);
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.5;
+}
+.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
+    color: var(--content-ui-foreground);
+    border: none;
+    background: var(--content-ui-background);
+}
