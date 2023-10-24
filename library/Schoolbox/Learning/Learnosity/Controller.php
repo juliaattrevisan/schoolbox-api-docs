@@ -454,6 +454,26 @@ class Controller extends Base
             'user_id' => (string)$this->getUser()->getId(),
         ];
 
+        /* Exam mode settings
+         */
+        if ($quiz->getExamMode()) {
+            /* Hide stuff that might normally appear client-side
+             */
+            $payload['config']['ignore_question_attributes'] = [
+                'instant_feedback',
+                'metadata.sample_answer',
+                'validation'
+            ];
+
+            /* Force hard time limits, kicking you out at the expiry
+             */
+            $payload['config']['time'] = [
+                'max_time' => $quiz->getDuration(),
+                'limit_type' => 'hard',
+                'warning_time' => 60
+            ];
+        }
+
         $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
             'initOptions' => $this->api->initOptions('items', $payload),
             'assessment' => $assessment,
