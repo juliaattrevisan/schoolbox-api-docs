@@ -40,6 +40,17 @@ export const useStore = defineStore("searchPage", () => {
     }
 
     /**
+     * Update the url params with the current query and filters
+     */
+    window.Vue.watch(
+        () => useQueryStore().activeQuery,
+        () => {
+            const newQueryParams = getQueryParams();
+            window.history.replaceState({}, "", `${window.location.pathname}?${newQueryParams.toString()}`);
+        }
+    );
+
+    /**
      * To collect all the params to send to the search api
      * @returns {string} - the query params
      */
