@@ -540,8 +540,16 @@ class Controller extends Base
 
         $existingAttempt->setMark($mark)
             ->setMaxMark($maxMark)
-            ->refreshNormalisedMark()
-            ->setFinish(\Alaress_Date_Format::now());
+            ->refreshNormalisedMark();
+
+        /* The finish time might already have been set if their timer elapsed;
+         * If it did, just use that datetime. Otherwise, you'll be recording
+         * the datetime of when the user clicked past the modal at the end of
+         * every attempt, which can record a later datetime than intended.
+         */
+        if (!$existingAttempt->getFinish()) {
+            $existingAttempt->setFinish(\Alaress_Date_Format::now());
+        }
 
         $this->attemptMapper->save($existingAttempt);
     }
