@@ -41,3 +41,7 @@ ALTER TABLE `assess`
 -- Add Shuffle Items
 ALTER TABLE `assess`
     ADD COLUMN `shuffle_items` TINYINT(1) NOT NULL DEFAULT 0 AFTER `reading_time_duration`;
+
+-- Add Exam Mode
+ALTER TABLE `assess`
+    ADD COLUMN `exam_mode` TINYINT(1) NOT NULL DEFAULT 0 AFTER `shuffle_items`;
