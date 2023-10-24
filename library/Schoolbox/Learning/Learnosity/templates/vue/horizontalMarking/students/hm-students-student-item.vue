@@ -94,8 +94,12 @@ function onSaveSelected() {
             <div ref="responseEl"></div>
             <template v-if="props.item.questions.length > 0">
                 <div>
-                    <label>Customise Score</label>
-                    <input :id="`customise-score-${$props.item.reference}`" type="text" />
+                    <label>Update Score (max score: {{ props.item.response.maxScore }})</label>
+                    <input
+                        :id="`customise-score-${$props.item.reference}`"
+                        type="text"
+                        :value="props.item.response.score"
+                    />
                 </div>
                 <div>
                     <label>Comment</label>
