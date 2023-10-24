@@ -20,7 +20,7 @@ function onChange(event: Event) {
 <template>
     <select @change="onChange">
         <option
-            v-for="item in itemsStore.items"
+            v-for="item in itemsStore.itemsWithQuestions"
             :key="item.id"
             :value="item.reference"
             :selected="itemsStore.activeItem.reference === item.reference"

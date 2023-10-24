@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
@@ -71,6 +72,10 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         const studentLoaded = students.value.find((student) => student.elementId === reportId);
         if (studentLoaded) {
             studentLoaded.isReportLoaded = true;
+        }
+        // check if all student reports are loaded and if so, set the central store to loaded
+        if (students.value.every((student) => student.isReportLoaded)) {
+            useStore().isLoaded = true;
         }
     }
 

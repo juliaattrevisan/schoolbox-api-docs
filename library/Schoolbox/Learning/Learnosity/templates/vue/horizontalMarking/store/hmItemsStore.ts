@@ -7,12 +7,17 @@ import type { Item } from "../types/Item";
 
 export const useItemsStore = defineStore("hmItems", () => {
     const items = window.Vue.ref<Item[]>([]);
-    const activeItem = window.Vue.ref<Item | null>(null);
+    const itemsWithQuestions = window.Vue.computed(() =>
+        items.value.filter((item) => item.questions.length > 0 || item.isFinalReview)
+    ); // only show those items with questions
+    const activeItem = window.Vue.ref<Item>({ id: "", reference: "", title: "", questions: [], isFinalReview: false });
     const activeItemIndex = window.Vue.ref<number>(0);
     const hasPreviousItem = window.Vue.computed(() => activeItemIndex.value > 0);
-    const hasNextItem = window.Vue.computed(() => activeItemIndex.value < items.value.length - 1);
-    const isNextFinalReview = window.Vue.computed(() => items.value[activeItemIndex.value + 1]?.isFinalReview);
-    const isFinalReview = window.Vue.computed(() => activeItem.value?.isFinalReview);
+    const hasNextItem = window.Vue.computed(() => activeItemIndex.value < itemsWithQuestions.value.length - 1);
+    const isNextFinalReview = window.Vue.computed(
+        () => itemsWithQuestions.value[activeItemIndex.value + 1]?.isFinalReview
+    );
+    const isFinalReview = window.Vue.computed(() => activeItem.value.isFinalReview);
 
     /**
      * store any passed through properties
@@ -35,7 +40,6 @@ export const useItemsStore = defineStore("hmItems", () => {
             isFinalReview: true,
         };
         items.value.push(lastItemForReview);
-        activeItem.value = { ...$items[0] };
     }
 
     /**
@@ -47,9 +51,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         $items.forEach((item, index) => {
             items.value[index].questions = item.questions;
         });
-        // filter out any items that don't have questions
-        items.value = items.value.filter((item) => item.questions.length > 0);
-        activeItem.value = { ...$items[0] };
+        activeItem.value = { ...itemsWithQuestions.value[0] };
     }
 
     /**
@@ -57,8 +59,8 @@ export const useItemsStore = defineStore("hmItems", () => {
      * @param {string} reference - the reference of the card to set as active
      */
     function setActiveItem(reference: string) {
-        activeItem.value = items.value.find((card) => card.reference === reference) as Item;
-        activeItemIndex.value = items.value.findIndex((card) => card.reference === reference);
+        activeItem.value = itemsWithQuestions.value.find((card) => card.reference === reference) as Item;
+        activeItemIndex.value = itemsWithQuestions.value.findIndex((card) => card.reference === reference);
     }
 
     /**
@@ -67,7 +69,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     function toPreviousItem() {
         if (hasPreviousItem.value) {
             activeItemIndex.value -= 1;
-            activeItem.value = items.value[activeItemIndex.value];
+            activeItem.value = itemsWithQuestions.value[activeItemIndex.value];
         }
     }
 
@@ -77,12 +79,13 @@ export const useItemsStore = defineStore("hmItems", () => {
     function toNextItem() {
         if (hasNextItem.value) {
             activeItemIndex.value += 1;
-            activeItem.value = items.value[activeItemIndex.value];
+            activeItem.value = itemsWithQuestions.value[activeItemIndex.value];
         }
     }
 
     return {
         items,
+        itemsWithQuestions,
         activeItem,
         hasPreviousItem,
         hasNextItem,
