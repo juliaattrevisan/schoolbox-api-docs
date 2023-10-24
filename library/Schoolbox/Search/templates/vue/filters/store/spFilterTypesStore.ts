@@ -18,9 +18,17 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function getInitialTypes() {
         const searchParams = new URLSearchParams(document.location.search);
-        const filters = searchParams.get("filter") as string;
-        const filtersJson = JSON.parse(filters) as FilterData;
-        return filtersJson.types ?? [];
+        const filtersJson = searchParams.get("filter") as string;
+
+        let filters;
+
+        try {
+            filters = JSON.parse(filtersJson) as FilterData;
+        } catch (e) {
+            return [];
+        }
+
+        return filters.types ?? [];
     }
 
     const allTypes = window.Vue.ref<FilterType[]>([]); // all filter types available
