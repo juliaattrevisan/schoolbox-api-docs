@@ -40,15 +40,12 @@ export const useStore = defineStore("searchPage", () => {
     }
 
     /**
-     * Update the url params with the current query and filters
+     * To update the url with the current query params
      */
-    window.Vue.watch(
-        () => useQueryStore().activeQuery,
-        () => {
-            const newQueryParams = getQueryParams();
-            window.history.replaceState({}, "", `${window.location.pathname}?${newQueryParams.toString()}`);
-        }
-    );
+    function setQueryParams() {
+        const newQueryParams = getQueryParams();
+        window.history.replaceState({}, "", `${window.location.pathname}?${newQueryParams.toString()}`);
+    }
 
     /**
      * To collect all the params to send to the search api
@@ -71,6 +68,7 @@ export const useStore = defineStore("searchPage", () => {
     return {
         init,
         getQueryParams,
+        setQueryParams,
         getEndpointWithParams,
         containerWidthChange,
         isSingleColumn,
