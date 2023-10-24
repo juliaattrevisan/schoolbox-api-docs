@@ -180,7 +180,8 @@ class Controller extends Base
 
             Node\Mapper::sortNodes($curriculumNodes, 0);
 
-            $unitOut['curriculumCodes'] = $curriculumNodes;
+            // display only unique items
+            $unitOut['curriculumCodes'] = $curriculumNodes->getUnique('id');
 
             // add this units data to the whole course units collection.
             $units[] = $unitOut;
