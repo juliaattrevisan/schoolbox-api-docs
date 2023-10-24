@@ -97,7 +97,7 @@ class Hydrator extends BaseHydrator
                     $match,
                     $match->id,
                     $this->userNameFormatter->formatObject($user),
-                    '/search/user/' . $match->id,
+                    $user->getRole()->getType() === Role::GUEST ? '' : '/search/user/' . $match->id, // Guest users do not have a profile URL
                     $match->type,
                     $match->relevance,
                     $user->getUpdatedAt(),
