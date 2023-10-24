@@ -374,8 +374,8 @@ class Controller extends Base
                      */
                     'shuffle_items' => sprintf(
                         '%s-%s',
-                            microtime(true),
-                            random_int(0, 1000000)
+                        microtime(true),
+                        random_int(0, 1000000)
                     )
                 ],
                 "navigation" => [
