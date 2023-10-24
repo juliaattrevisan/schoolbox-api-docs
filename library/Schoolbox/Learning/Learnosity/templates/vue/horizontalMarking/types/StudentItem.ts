@@ -5,10 +5,7 @@ import type { Question } from "./Question";
 import type { StudentItemResponse } from "./StudentItemResponse";
 
 export type StudentItem = {
-    id: string;
     reference: string;
-    title: string;
     questions: Question[];
-    isFinalReview: boolean;
     response?: StudentItemResponse;
 };

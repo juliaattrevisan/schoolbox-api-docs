@@ -3,6 +3,7 @@
  * load the reports data and pass it to the other stores
  */
 
+import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Item } from "../types/Item";
 
@@ -37,6 +38,11 @@ export function loadReports(reportPayloads: string[]) {
                             items.push(item);
                         });
                         useStudentsStore().addItems(reportId, items);
+
+                        // add the questions to the items, as they aren't included in the initial payload
+                        if (i === 0) {
+                            useItemsStore().addQuestions(items);
+                        }
                     });
 
                     // to notify the report has loaded

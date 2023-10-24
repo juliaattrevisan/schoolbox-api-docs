@@ -19,10 +19,12 @@ export const useItemsStore = defineStore("hmItems", () => {
      * @param {Item[]} $items - the items to store
      */
     function init($items: Item[]) {
-        items.value = $items;
-        items.value.forEach((item) => {
-            item.questions = []; // add the questions array for future use
-            item.isFinalReview = false;
+        $items.forEach((item) => {
+            items.value.push({
+                ...item,
+                questions: [],
+                isFinalReview: false,
+            });
         });
         // we add in an 'dummy' item for the final 'item' which allows the opportunity to provide final feedback for each student
         const lastItemForReview = {
@@ -33,6 +35,20 @@ export const useItemsStore = defineStore("hmItems", () => {
             isFinalReview: true,
         };
         items.value.push(lastItemForReview);
+        activeItem.value = { ...$items[0] };
+    }
+
+    /**
+     * Add questions to the items, unlike the items initialy loaded, the items linked to students loaded
+     * via the reports api contain the questions, so we add them here
+     * @param {Item[]} $items - the items to reference
+     */
+    function addQuestions($items: Item[]) {
+        $items.forEach((item, index) => {
+            items.value[index].questions = item.questions;
+        });
+        // filter out any items that don't have questions
+        items.value = items.value.filter((item) => item.questions.length > 0);
         activeItem.value = { ...$items[0] };
     }
 
@@ -73,6 +89,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         isNextFinalReview,
         isFinalReview,
         init,
+        addQuestions,
         setActiveItem,
         toPreviousItem,
         toNextItem,
