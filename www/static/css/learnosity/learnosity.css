@@ -816,6 +816,21 @@ td.lrn-report-area {
 }
 
 /* Styles of Authoring */
+
+/* hide the resources section */
 .lrn-author-activity-resource-item.lrn-col-xs-12.lrn-col-sm-12.lrn-col-md-4 {
     display: none;
+}
+
+/* edit/preview tabs styles */
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
+    background-color: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-active,
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:not(:checked) ~ .lrn-author-toggle-right,
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:checked ~ .lrn-author-toggle-left {
+    background-color: var(--content-ui-selected);
+    color: var(--content-ui-foreground);
 }
