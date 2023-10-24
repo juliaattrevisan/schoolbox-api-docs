@@ -4,7 +4,7 @@
  */
 
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import { isScriptAdded, injectScript } from "@js/util/domUtils";
+import { isScriptAdded, injectScript, isScriptLoaded } from "@js/util/domUtils";
 import type { Ref } from "vue";
 
 /**
@@ -48,6 +48,7 @@ export async function useEditor($initialValue: string, ckeditorSelector: string,
 
     /**
      * load the ckeditor into the browser
+     * Note that this doesn't currently handle the instantiation of multiple editors simultaneously unless the ckeditor script is already loaded
      */
     async function loadCKEditor() {
         try {
@@ -55,7 +56,6 @@ export async function useEditor($initialValue: string, ckeditorSelector: string,
             if (!isScriptAdded(ckeditorScript)) {
                 await injectScript(ckeditorScript);
             }
-
             const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
 
             ckeditorElem.addEventListener(EditorEvent.EDITOR__CREATED, onEditorCreated);

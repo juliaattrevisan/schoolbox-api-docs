@@ -13,7 +13,6 @@ interface Props {
     student: Student; // the student to display
     item: StudentItem; //
     container: HTMLDivElement; // the parent container, to look for the relevant item
-    index: number; // the index of the student in the list
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
@@ -71,7 +70,7 @@ window.Vue.onMounted(async () => {
     responseEl.value?.appendChild(response);
     updateResponseStyles(response);
     if (props.item.questions.length > 0) {
-        await useEditor("", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+        await useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
         addSampleAnswers(response);
     }
 });

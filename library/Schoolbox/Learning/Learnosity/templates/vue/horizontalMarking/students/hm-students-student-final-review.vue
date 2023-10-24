@@ -28,7 +28,7 @@ const display = window.Vue.computed(() => {
  * Add in the editor
  */
 window.Vue.onMounted(async () => {
-    await useEditor("", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+    await useEditor(props.student.attemptResponse.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 });
 
 /**
