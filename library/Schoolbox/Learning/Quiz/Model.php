@@ -472,10 +472,10 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param int $shuffleItems
+     * @param int|null $shuffleItems
      * @return $this
      */
-    public function setShuffleItems(int $shuffleItems)
+    public function setShuffleItems(?int $shuffleItems): self
     {
         $this->shuffleItems = $shuffleItems;
         return $this;
