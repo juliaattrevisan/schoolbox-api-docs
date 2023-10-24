@@ -21,6 +21,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMap
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as RubricIndicatorModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Scrub;
 use Twig\Error\Error;
 
@@ -33,7 +34,7 @@ class Controller extends Base
      * @param RubricIndicatorMapper $rubricIndicatorMapper
      * @param Node\Mapper           $nodeMapper
      */
-    public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper, private Node\Mapper $nodeMapper)
+    public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper, private Node\Mapper $nodeMapper, private \Component_InstanceMapper $componentInstanceMapper)
     {
     }
 
@@ -77,13 +78,26 @@ class Controller extends Base
             }
 
             /**
-             * 'Standard' Unit textbox collection, with an `extra` to keep track of the count of additional textboxes that don't match the other titles
+             * Grab the list of textboxes from the Unit Template
              */
-            $textboxes = [
-                'Learning Outcomes' => null,
-                'Success Criteria' => null,
-                'Outcomes' => null,
-            ];
+            $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+            $class = TextboxComponentController::class;
+            $textboxes = [];
+            $unitTextboxes = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
+            foreach ($unitTextboxes as $textboxComponent) {
+                if ('' !== $textboxComponent->getConfigByKey('componentname')->getValue()) {
+                    // if there is a value set for the component use that
+                    $heading = $textboxComponent->getConfigByKey('componentname')->getValue();
+                } elseif ('' !== $textboxComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                    // is there a system default value for the component
+                    $heading = $textboxComponent->getConfigByKey('componentname')->getDefaultValue();
+                } else {
+                    // Fallback of the php default title for textbox components
+                    $heading = TextboxComponentController::DEFAULT_COMPONENT_HEADING;
+                }
+                $textboxes[$heading] = $heading;
+            }
+
             $extraTextboxes = 0;
             // fetch all for the folder
             $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
