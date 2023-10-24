@@ -97,7 +97,9 @@ function onSaveSelected() {
                     <label>Update Score (max score: {{ props.item.response.maxScore }})</label>
                     <input
                         :id="`customise-score-${$props.item.reference}`"
-                        type="text"
+                        type="number"
+                        min="0"
+                        :max="props.item.response.maxScore"
                         :value="props.item.response.score"
                     />
                 </div>
