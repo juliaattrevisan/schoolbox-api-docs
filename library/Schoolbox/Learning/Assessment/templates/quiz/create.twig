@@ -163,9 +163,10 @@
         </div>
     </div>
 
-    {# Shuffle Items #}
+
     <div class="row">
-        <div class="small-5 medium-2 columns">
+        {# Shuffle Items #}
+        <div class="small-12 medium-6 columns">
             <label for="shuffleItems" class="inline-block">Shuffle Cards<span class="hint has-tip tip-top" data-tooltip title="You can shuffle the order of quiz cards displayed.">?</span></label>
             <div class="switch">
                 <input name="shuffleItems" id="shuffleItems" type="checkbox" {% if assessment.shuffleItems %}checked="checked"{% endif %} value="1" />
@@ -175,11 +176,8 @@
                 </label>
             </div>
         </div>
-    </div>
-
-    {# Exam Mode #}
-    <div class="row">
-        <div class="small-5 medium-2 columns">
+        {# Exam Mode #}
+        <div class="small-12 medium-6 columns">
             <label for="examMode" class="inline-block">Exam Mode<span class="hint has-tip tip-top" data-tooltip title="You can ensure more browser security during strict exams as this mode supports secure browser usage.">?</span></label>
             <div class="switch">
                 <input name="examMode" id="examMode" type="checkbox" {% if assessment.examMode %}checked="checked"{% endif %} value="1" />
