@@ -66,7 +66,8 @@ class Module extends BaseModule
         return new Controller(
             $this->getAssessmentMapperProxy(),
             $this->getRubricIndicatorMapper(),
-            $this->getNodeMapper()
+            $this->getNodeMapper(),
+            $this->getComponentInstanceMapper()
         );
     }
 
@@ -130,5 +131,13 @@ class Module extends BaseModule
     private function getNodeMapper(): NodeMapper
     {
         return $this->getMapperFactory()->get(NodeMapper::class);
+    }
+
+    /**
+     * @return \Component_InstanceMapper
+     */
+    private function getComponentInstanceMapper(): \Component_InstanceMapper
+    {
+        return $this->getMapperFactory()->get(\Component_InstanceMapper::class);
     }
 }

@@ -23,7 +23,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     /**
      * Default heading for this component.
      */
-    private const DEFAULT_COMPONENT_HEADING = 'Text Box';
+    public const DEFAULT_COMPONENT_HEADING = 'Text Box';
 
 
     /**

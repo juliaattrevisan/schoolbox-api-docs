@@ -16,6 +16,8 @@ class Component_Definition
     public const MODULE_HOMEPAGE   = 'homepage';
     public const MODULE_EPORTFOLIO = 'eportfolio';
 
+    public const MODULE_HOMEPAGE_TEMPLATE = 'homepage_template';
+
     /** @var int $id */
     protected $id;
 
