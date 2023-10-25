@@ -35,7 +35,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
 
         // Note the filters JSON data structure only supports one creator currently.
         // The client is partially prepared to accommodate multiple creators.
-        return filters.creator.id ? [{ id: filters.creator.id, name: "TODO: Get Username here somehow" }] : [];
+        return filters.creator.id ? [{ id: filters.creator.id, name: filters.creator.name }] : [];
     }
 
     const creator = window.Vue.ref<Creator[]>(getInitialCreators());
@@ -54,7 +54,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
         // only add creator filter if it is set
         return {
             creator: {
-                ...(isActive.value && { id: creator.value[0].id }),
+                ...(isActive.value && { id: creator.value[0].id, name: creator.value[0].name }),
             },
         };
     }
