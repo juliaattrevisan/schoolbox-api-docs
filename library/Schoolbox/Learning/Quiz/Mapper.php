@@ -73,6 +73,8 @@ class Mapper extends BaseMapper
         $this->uses('finish', self::TYPE_DATETIME);
         $this->uses('duration', self::TYPE_INTEGER);
         $this->uses('reading_time_duration', self::TYPE_INTEGER);
+        $this->uses('shuffle_items', self::TYPE_INTEGER);
+        $this->uses('exam_mode', self::TYPE_INTEGER);
         $this->uses('max_attempts', self::TYPE_INTEGER);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('availability', self::TYPE_STRING);

@@ -367,7 +367,16 @@ class Controller extends Base
                      */
                     'reading_mode' => [
                         'reading_time' => $quiz->getReadingTimeDuration()
-                    ]
+                    ],
+                    /* Shuffle Items
+                     * Use the current microtime() as a seed so everyone gets a random ordering
+                     * https://reference.learnosity.com/items-api/initialization/config.configuration.shuffle_items
+                     */
+                    'shuffle_items' => sprintf(
+                        '%s-%s',
+                        microtime(true),
+                        random_int(0, 1000000)
+                    )
                 ],
                 "navigation" => [
                     "auto_save" => [
@@ -445,6 +454,26 @@ class Controller extends Base
             'user_id' => (string)$this->getUser()->getId(),
         ];
 
+        /* Exam mode settings
+         */
+        if ($quiz->getExamMode()) {
+            /* Hide stuff that might normally appear client-side
+             */
+            $payload['config']['ignore_question_attributes'] = [
+                'instant_feedback',
+                'metadata.sample_answer',
+                'validation'
+            ];
+
+            /* Force hard time limits, kicking you out at the expiry
+             */
+            $payload['config']['time'] = [
+                'max_time' => $quiz->getDuration(),
+                'limit_type' => 'hard',
+                'warning_time' => 60
+            ];
+        }
+
         $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
             'initOptions' => $this->api->initOptions('items', $payload),
             'assessment' => $assessment,
@@ -511,8 +540,16 @@ class Controller extends Base
 
         $existingAttempt->setMark($mark)
             ->setMaxMark($maxMark)
-            ->refreshNormalisedMark()
-            ->setFinish(\Alaress_Date_Format::now());
+            ->refreshNormalisedMark();
+
+        /* The finish time might already have been set if their timer elapsed;
+         * If it did, just use that datetime. Otherwise, you'll be recording
+         * the datetime of when the user clicked past the modal at the end of
+         * every attempt, which can record a later datetime than intended.
+         */
+        if (!$existingAttempt->getFinish()) {
+            $existingAttempt->setFinish(\Alaress_Date_Format::now());
+        }
 
         $this->attemptMapper->save($existingAttempt);
     }

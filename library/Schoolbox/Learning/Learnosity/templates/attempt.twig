@@ -64,9 +64,11 @@
         itemsAppCallback
     );
 
-    /* Async attempt completion
+    /**
+     * Async attempt completion: either by choice, or automatically
+     * by the timer running out
      */
-    itemsApp.on('test:submit:success', function() {
+    function completeAttempt() {
         const payload = new FormData();
         payload.append('attemptId', '{{ attemptId }}');
         payload.append('learnosityReference','{{ learnositySessionReference }}');
@@ -77,6 +79,18 @@
         }).then(response => {
             window.location.href = '{{ outroUrl }}';
         });
+    }
+
+    /* User consciously finished
+     */
+    itemsApp.on('test:submit:success', function() {
+        completeAttempt();
+    });
+
+    /* Allowed Time elapsed
+     */
+    itemsApp.on('time:end', function() {
+        completeAttempt();
     });
 </script>
 {% endautoescape %}

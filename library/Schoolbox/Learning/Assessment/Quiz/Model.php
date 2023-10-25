@@ -57,6 +57,22 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Decide whether to randomise all the items in a learnosity quiz
+     *
+     * @var int
+     */
+    protected $shuffleItems;
+
+
+    /**
+     * More security-conscious implementation of a learnosity quiz
+     *
+     * @var int
+     */
+    protected $examMode;
+
+
+    /**
      * What's the maximum number of attempts a participant may make on this quiz?
      *
      * @var int
@@ -419,6 +435,42 @@ class Model extends AbstractAssessment
     public function setMaxAttempts($maxAttempts)
     {
         $this->maxAttempts = $maxAttempts;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getShuffleItems()
+    {
+        return $this->shuffleItems;
+    }
+
+    /**
+     * @param int $shuffleItems
+     * @return $this
+     */
+    public function setShuffleItems($shuffleItems)
+    {
+        $this->shuffleItems = $shuffleItems;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExamMode()
+    {
+        return $this->examMode;
+    }
+
+    /**
+     * @param $examMode
+     * @return $this
+     */
+    public function setExamMode($examMode)
+    {
+        $this->examMode = $examMode;
         return $this;
     }
 

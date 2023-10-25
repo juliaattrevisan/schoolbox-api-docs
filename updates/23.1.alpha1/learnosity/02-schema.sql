@@ -37,3 +37,11 @@ ALTER TABLE `course_unit_specification`
 -- Add Reading Time
 ALTER TABLE `assess`
     ADD COLUMN `reading_time_duration` INT NULL AFTER `duration`;
+
+-- Add Shuffle Items
+ALTER TABLE `assess`
+    ADD COLUMN `shuffle_items` TINYINT(1) NOT NULL DEFAULT 0 AFTER `reading_time_duration`;
+
+-- Add Exam Mode
+ALTER TABLE `assess`
+    ADD COLUMN `exam_mode` TINYINT(1) NOT NULL DEFAULT 0 AFTER `shuffle_items`;

@@ -112,6 +112,16 @@ class Model implements ISoftDeletable, IAssessableDataModel
     private $readingTimeDuration;
 
     /**
+     * @var int
+     */
+    private $shuffleItems;
+
+    /**
+     * @var int
+     */
+    private $examMode;
+
+    /**
     * @var int
     */
     protected $max_attempts;
@@ -457,6 +467,43 @@ class Model implements ISoftDeletable, IAssessableDataModel
         $this->readingTimeDuration = $readingTimeDuration;
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function getShuffleItems()
+    {
+        return $this->shuffleItems;
+    }
+
+    /**
+     * @param int|null $shuffleItems
+     * @return $this
+     */
+    public function setShuffleItems(?int $shuffleItems): self
+    {
+        $this->shuffleItems = $shuffleItems;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExamMode()
+    {
+        return $this->examMode;
+    }
+
+    /**
+     * @param int|null $examMode
+     * @return $this
+     */
+    public function setExamMode(?int $examMode)
+    {
+        $this->examMode = $examMode;
+        return $this;
+    }
+
 
     /**
      * @param Alaress_Date_Format|null $finish

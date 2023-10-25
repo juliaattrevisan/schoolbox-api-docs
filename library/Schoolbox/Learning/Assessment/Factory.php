@@ -249,6 +249,8 @@ class Factory
         $this->setDurationMinutes((int)($post['durationMinutes'] ?? 0));
         $this->setReadingTimeDurationHours((int)($post['readingTimeDurationHours'] ?? 0));
         $this->setReadingTimeDurationMinutes((int)($post['readingTimeDurationMinutes'] ?? 0));
+        $this->setShuffleItems((int)($post['shuffleItems'] ?? 0));
+        $this->setExamMode((int)($post['examMode'] ?? 0));
         $this->setMaxAttempts((int)($post['maxAttempts'] ?? 0));
         $this->setMarkVisibility((int)($post['visibility'] ?? 0));
         $this->setCompletionMessage($post['completion_message'] ?? '');
@@ -409,6 +411,8 @@ class Factory
                 $this->getDurationMinutes(),
                 $this->getReadingTimeDurationHours(),
                 $this->getReadingTimeDurationMinutes(),
+                $this->getShuffleItems(),
+                $this->getExamMode(),
                 $this->getMaxAttempts(),
                 $this->getCompletionMessage()
             );
