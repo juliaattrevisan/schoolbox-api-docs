@@ -16,7 +16,6 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
