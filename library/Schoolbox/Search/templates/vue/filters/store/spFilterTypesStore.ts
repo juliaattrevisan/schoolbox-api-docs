@@ -25,7 +25,11 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
         try {
             filters = JSON.parse(filtersJson) as FilterData;
         } catch (e) {
-            return [];
+            filters = null;
+        }
+
+        if (filters === null) {
+            filters = {};
         }
 
         return filters.types ?? [];

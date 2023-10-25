@@ -25,8 +25,12 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         let filters;
 
         try {
-            filters = JSON.parse(filtersJson) as FilterData;
+            filters = JSON.parse(filtersJson) as FilterData; // This can return null on a successful parse.
         } catch (e) {
+            filters = null;
+        }
+
+        if (filters === null) {
             return { from: EMPTY_DATE, to: EMPTY_DATE };
         }
 

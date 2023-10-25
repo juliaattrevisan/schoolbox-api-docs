@@ -24,8 +24,12 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
         let filters;
 
         try {
-            filters = JSON.parse(filtersJson) as FilterData;
+            filters = JSON.parse(filtersJson) as FilterData; // This can return null on a successful parse.
         } catch (e) {
+            filters = null;
+        }
+
+        if (filters === null) {
             return null;
         }
 
