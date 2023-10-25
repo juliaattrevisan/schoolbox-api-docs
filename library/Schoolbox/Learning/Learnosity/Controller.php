@@ -425,9 +425,12 @@ class Controller extends Base
                     ]
                 ],
                 /* Allowed Time
+                 * Force hard time limits, kicking you out at the expiry
                  */
                 'time' => [
-                    'max_time' => $quiz->getDuration()
+                    'max_time' => $quiz->getDuration(),
+                    'limit_type' => 'hard',
+                    'warning_time' => 60
                 ],
                 /* This is our Quiz title, I guess
                  */
@@ -463,14 +466,6 @@ class Controller extends Base
                 'instant_feedback',
                 'metadata.sample_answer',
                 'validation'
-            ];
-
-            /* Force hard time limits, kicking you out at the expiry
-             */
-            $payload['config']['time'] = [
-                'max_time' => $quiz->getDuration(),
-                'limit_type' => 'hard',
-                'warning_time' => 60
             ];
         }
 
