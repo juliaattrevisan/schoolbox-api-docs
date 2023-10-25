@@ -17,10 +17,9 @@ const studentsStore = useStudentsStore();
             <hm-students-toggle />
         </div>
         <hm-students-student
-            v-for="(student, index) in studentsStore.students"
+            v-for="student in studentsStore.students"
             :key="student.id"
             :student="student"
-            :index="index"
         ></hm-students-student>
     </div>
 </template>

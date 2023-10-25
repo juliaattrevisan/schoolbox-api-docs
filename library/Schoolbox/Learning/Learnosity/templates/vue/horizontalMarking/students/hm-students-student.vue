@@ -12,11 +12,10 @@ import HmStudentsStudentFinalReview from "./hm-students-student-final-review.vue
 
 interface Props {
     student: Student; // the student to display
-    index: number; // the index of the student in the list
 }
 const props = defineProps<Props>();
 
-const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
@@ -36,26 +35,18 @@ const containerHeight = window.Vue.computed(() => {
 });
 
 /**
- * When its loaded hide everything by default
+ * Display the student item was the report has been loaded
  */
 window.Vue.watch(
     () => props.student.isReportLoaded,
-    async () => {
-        if (props.student.isReportLoaded) {
-            await window.Vue.nextTick(); // ensure the learnosity DOM is ready
-            const learnosityContainer = studentEl.value?.querySelector(`#${props.student.elementId}`) as HTMLDivElement;
-            learnosityContainer.remove(); // remove the learnosity container as it's no longer neexed after the next tick, as everything needed has been moved out of it now
-        }
-        if (props.index === 0) {
-            // if this is the first student, then select them
-            studentsStore.toggleStudent(props.student);
-        }
+    () => {
+        onToggleSelected();
     }
 );
 </script>
 
 <template>
-    <div ref="studentEl" :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`">
+    <div :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`">
         <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
             <div class="l-flex-row l-flex--align-center l-gap-m">
                 <button
@@ -76,21 +67,23 @@ window.Vue.watch(
                         :key="item.id"
                         :item="item"
                         :index="markIndex"
-                        :container="(studentEl as HTMLDivElement)"
+                        :container="(responseContentEl as HTMLDivElement)"
                     />
                 </template>
             </div>
         </div>
         <div class="response l-grid">
             <div class="response__inner-container">
-                <div :id="props.student.elementId"></div>
+                <div ref="responseContentEl" class="response__content">
+                    <div :id="props.student.elementId"></div>
+                </div>
                 <template v-if="props.student.isReportLoaded">
                     <hm-students-student-item
                         v-for="item in props.student.items"
                         :key="item.reference"
                         :student="props.student"
                         :item="item"
-                        :container="(studentEl as HTMLDivElement)"
+                        :container="(responseContentEl as HTMLDivElement)"
                     />
                     <hm-students-student-final-review :student="props.student" />
                 </template>
@@ -117,6 +110,10 @@ window.Vue.watch(
     transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;
+    }
+    &__content {
+        // this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items
+        display: none;
     }
 }
 </style>

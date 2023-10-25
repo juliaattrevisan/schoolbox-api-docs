@@ -3,7 +3,6 @@
  * Contains a students response to an item, (only one item is shown at a time)
  */
 
-import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
@@ -21,16 +20,16 @@ const itemsStore = useItemsStore();
 /**
  * To display the item when it's the active item
  */
-const display = window.Vue.computed(() => {
+const isActive = window.Vue.computed(() => {
     if (itemsStore.isFinalReview) {
-        return "none";
+        return false;
     }
-    return props.item.reference === itemsStore.activeItem?.reference ? "block" : "none";
+    return props.item.reference === itemsStore.activeItem?.reference;
 });
 </script>
 
 <template>
-    <div class="item">
+    <div v-if="isActive">
         <div class="l-flex-col l-gap-m">
             <hm-students-student-item-response
                 :student="props.student"
@@ -41,9 +40,3 @@ const display = window.Vue.computed(() => {
         </div>
     </div>
 </template>
-
-<style scoped>
-.item {
-    display: v-bind(display);
-}
-</style>

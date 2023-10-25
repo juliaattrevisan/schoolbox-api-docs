@@ -46,13 +46,25 @@ function addSampleAnswers(response: HTMLDivElement) {
 }
 
 /**
- * Add the response to the item to our element
+ * Mve the item response element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
     responseEl.value?.appendChild(response);
-    updateResponseStyles(response);
-    addSampleAnswers(response);
+    if (response.dataset.hasMounted === undefined) {
+        // we only need to run these methods once, otherwise we'll get duplicate sample answers etc
+        updateResponseStyles(response);
+        addSampleAnswers(response);
+    }
+    response.dataset.hasMounted = "true";
+});
+
+/**
+ * Move the item response element back into the entire quiz response, so we keep it around for possible later use
+ */
+window.Vue.onBeforeUnmount(() => {
+    const response = responseEl.value?.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
+    props.container.appendChild(response);
 });
 </script>
 

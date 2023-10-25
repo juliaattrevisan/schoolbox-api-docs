@@ -46,7 +46,7 @@ async function saveScore() {
 async function saveComment() {
     const formData = new FormData();
     formData.append("learnosityReference", props.item.response.learnosityReference);
-    formData.append("score", comment.value);
+    formData.append("comment", comment.value);
     await fetch(props.student.urls.comment, {
         method: "POST",
         body: formData,
