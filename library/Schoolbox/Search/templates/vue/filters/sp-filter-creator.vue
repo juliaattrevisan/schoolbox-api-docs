@@ -8,6 +8,7 @@ import type { Result } from "@schoolboxVue/components/searchSelect/types/Result"
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { Creator, useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
 
+// Initial value of filterCreatorsStore.creator is set from the URL when this function runs.
 const filterCreatorsStore = useFilterCreatorsStore();
 
 const currentUser: Creator = {
