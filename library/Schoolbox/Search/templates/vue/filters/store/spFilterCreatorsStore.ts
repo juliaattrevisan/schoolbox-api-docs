@@ -36,7 +36,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
         return filters.creator.id ?? null;
     }
 
-    const creator = window.Vue.ref<Creator[]>([{ id: getInitialCreatorId(), name: "" }]);
+    const creator = window.Vue.ref<Creator[]>([{ id: getInitialCreatorId(), name: "TODO: Get Username here somehow" }]);
 
     /**
      * Is the creator filter set
