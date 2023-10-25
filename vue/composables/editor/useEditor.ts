@@ -4,7 +4,7 @@
  */
 
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import { isScriptAdded, injectScript, isScriptLoaded } from "@js/util/domUtils";
+import { isScriptAdded, injectScript } from "@js/util/domUtils";
 import type { Ref } from "vue";
 
 /**
@@ -33,15 +33,15 @@ export async function useEditor($initialValue: string, ckeditorSelector: string,
             initialValue.value = editor.getData() as string;
         });
 
-        const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
+        const ckeditorElement = document.getElementById(ckeditorSelector) as HTMLElement;
 
         // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
-        ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
+        ckeditorElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
             isMaxCharCountExceeded.value = true;
         });
 
         // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
-        ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
+        ckeditorElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
             isMaxCharCountExceeded.value = false;
         });
     }
@@ -56,9 +56,9 @@ export async function useEditor($initialValue: string, ckeditorSelector: string,
             if (!isScriptAdded(ckeditorScript)) {
                 await injectScript(ckeditorScript);
             }
-            const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
+            const ckeditorElement = document.getElementById(ckeditorSelector) as HTMLElement;
 
-            ckeditorElem.addEventListener(EditorEvent.EDITOR__CREATED, onEditorCreated);
+            ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, onEditorCreated);
 
             document.dispatchEvent(
                 new CustomEvent(EditorEvent.EDITOR__CREATE, {

@@ -11,7 +11,7 @@ import type { Item } from "./types/Item";
 import type { Student } from "./types/Student";
 import type { StudentItemResponse } from "./types/StudentItemResponse";
 import type { StudentAttemptResponse } from "./types/StudentAttemptResponse";
-import type { Url } from "./types/Url";
+import type { StudentUrls } from "./types/StudentUrls";
 import HmSelectItem from "./items/hm-select-item.vue";
 import HmStudents from "./students/hm-students.vue";
 import HmPreviousItem from "./items/hm-previous-item.vue";
@@ -23,7 +23,7 @@ interface Props {
     students: Student[]; //
     itemResponses: StudentItemResponse[]; //
     attemptResponses: StudentAttemptResponse[]; //
-    urls: Url[]; //
+    urls: StudentUrls[]; //
     reportPayloads: string[]; //
 }
 const props = defineProps<Props>();
