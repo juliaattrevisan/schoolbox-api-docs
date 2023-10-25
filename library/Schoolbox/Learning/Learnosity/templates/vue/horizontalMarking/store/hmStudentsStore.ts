@@ -154,23 +154,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {number} score - the score to update
      * @param {string} comment - the comment to update
      */
-    async function updateStudentReport(student: Student, item: StudentItem, score: number, comment: string) {
-        const formData = new FormData();
-        formData.append("learnosityReference", item.response.learnosityReference);
-        formData.append("score", score.toString());
-
-        await fetch(student.urls.score, {
-            method: "POST",
-            body: formData,
-        });
-
-        formData.delete("score");
-        formData.append("comment", comment);
-
-        await fetch(student.urls.comment, {
-            method: "POST",
-            body: formData,
-        });
+    function updateStudentReport(student: Student, item: StudentItem, score: number, comment: string) {
+        item.response.score = score;
+        item.response.comment = comment;
 
         // url.value = student.urls.comment;
         // await updateComment();

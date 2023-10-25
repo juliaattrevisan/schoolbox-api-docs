@@ -7,7 +7,8 @@ import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
-import { useStudentsStore } from "../store/hmStudentsStore";
+import hmStudentsStudentItemResponse from "./hm-students-student-item-response.vue";
+import hmStudentsStudentItemReview from "./hm-students-student-item-review.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -16,13 +17,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
-const studentsStore = useStudentsStore();
-const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
-const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
-const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
-const score = window.Vue.ref<number>(props.item.response.score ?? 0);
-// let comment = window.Vue.ref<string>("");
-const comment = useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 
 /**
  * To display the item when it's the active item
@@ -33,85 +27,17 @@ const display = window.Vue.computed(() => {
     }
     return props.item.reference === itemsStore.activeItem?.reference ? "block" : "none";
 });
-
-/**
- * Update the styles of the response element to match the rest of the page
- * @param {HTMLDivElement} response - the response element to update the styles of
- */
-function updateResponseStyles(response: HTMLDivElement) {
-    const rowEl = response.querySelector(".row") as HTMLDivElement;
-    rowEl.className = "";
-    const colEl = response.querySelector(".col-xs-12") as HTMLDivElement;
-    colEl.className = "l-flex-col l-gap-m";
-}
-
-/**
- * Add any sample answers to the questions in the items
- * @param {HTMLDivElement} response - the response element to add the sample answers to
- */
-function addSampleAnswers(response: HTMLDivElement) {
-    props.item.questions.forEach((question) => {
-        if (question.metadata.sample_answer) {
-            const addHtml = `
-                <label>Sample Answer:</label> <em>${question.metadata.sample_answer}</em>
-            `;
-            const sampleAnswerEl = document.createElement("div");
-            sampleAnswerEl.innerHTML = addHtml;
-            const questionEl = response.querySelector(
-                `[data-lrn-widget-container="${question.response_id}"]`
-            ) as HTMLDivElement;
-            questionEl.appendChild(sampleAnswerEl);
-        }
-    });
-}
-
-/**
- * Add the response to the item to our element
- */
-window.Vue.onMounted(() => {
-    const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
-    responseEl.value?.appendChild(response);
-    updateResponseStyles(response);
-    // comment = await useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
-    addSampleAnswers(response);
-});
-
-/**
- * Update the response of the item
- */
-async function onSaveSelected() {
-    await studentsStore.updateStudentReport(props.student, props.item, score.value, comment.value);
-    // pass through the customised score and comment
-    // can the -mark be updated? I assume so
-    // once that's been submitted, move to the next student
-    // if thats the last student, move to the next item
-    // if thats the last student on the last item, move to finalise review
-}
 </script>
 
 <template>
     <div class="item">
         <div class="l-flex-col l-gap-m">
-            <div ref="responseEl"></div>
-            <template v-if="props.item.questions.length > 0">
-                <div>
-                    <label>Update Score (max score: {{ props.item.response.maxScore }})</label>
-                    <input
-                        :id="`customise-score-${$props.item.reference}`"
-                        v-model="score"
-                        type="number"
-                        min="0"
-                        :max="props.item.response.maxScore"
-                    />
-                </div>
-                <div>
-                    <label>Comment</label>
-                    <textarea :id="editorId"></textarea>
-                </div>
-                <div>
-                    <button class="full-width" @click.prevent="onSaveSelected">Save and continue</button>
-                </div>
-            </template>
+            <hm-students-student-item-response
+                :student="props.student"
+                :item="props.item"
+                :container="props.container"
+            />
+            <hm-students-student-item-review :student="props.student" :item="props.item" />
         </div>
     </div>
 </template>
