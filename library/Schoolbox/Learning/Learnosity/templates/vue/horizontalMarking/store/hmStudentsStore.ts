@@ -9,6 +9,7 @@ import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import type { StudentItemResponse } from "../types/StudentItemResponse";
 import type { StudentAttemptResponse } from "../types/StudentAttemptResponse";
+import type { StudentUrls } from "../types/StudentUrls";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
@@ -53,6 +54,15 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * Get the urls for the student
+     * @param {number} studentId - the student id to get the response for
+     * @returns {StudentUrls} - the urls
+     */
+    function getUrls(studentId: number) {
+        return useStore().urls.find((urlsItem) => urlsItem.studentId === studentId) as StudentUrls;
+    }
+
+    /**
      * Add items to a student
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
@@ -75,6 +85,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             });
             selectedStudent.items = studentItems;
             selectedStudent.attemptResponse = getAttemptResponse(selectedStudent.id);
+            selectedStudent.urls = getUrls(selectedStudent.id);
         }
     }
 

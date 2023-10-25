@@ -4,6 +4,7 @@
 
 import type { StudentItem } from "./StudentItem";
 import type { StudentAttemptResponse } from "./StudentAttemptResponse";
+import type { StudentUrls } from "./StudentUrls";
 
 export type Student = {
     id: number;
@@ -16,4 +17,5 @@ export type Student = {
     isExpanded: boolean;
     items: StudentItem[];
     attemptResponse: StudentAttemptResponse;
+    urls: StudentUrls;
 };
