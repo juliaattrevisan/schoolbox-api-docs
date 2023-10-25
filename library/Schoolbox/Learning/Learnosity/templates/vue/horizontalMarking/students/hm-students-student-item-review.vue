@@ -19,13 +19,7 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 const score = window.Vue.ref<number>(props.item.response.score ?? 0);
 const comment = useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref<boolean>(false);
-
-const buttonTitle = window.Vue.computed(() => {
-    if (isSaving.value) {
-        return "Saving...";
-    }
-    return "Save and continue";
-});
+const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "Save and continue"));
 
 /**
  * Save the score

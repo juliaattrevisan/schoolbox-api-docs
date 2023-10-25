@@ -5,5 +5,5 @@ export type StudentUrls = {
     studentId: number;
     score: string;
     comment: string;
-    attemptComment: boolean;
+    attemptComment: string;
 };

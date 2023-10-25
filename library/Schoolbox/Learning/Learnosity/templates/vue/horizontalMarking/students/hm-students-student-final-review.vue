@@ -16,26 +16,31 @@ const studentsStore = useStudentsStore();
 const itemsStore = useItemsStore();
 const editorId = `final-review-comment-${props.student.elementId}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+const comment = useEditor(props.student.attemptResponse.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+const isSaving = window.Vue.ref<boolean>(false);
+const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "Save and continue"));
 
 /**
- * To display the item when it's the active item
+ * Save the comment
  */
-const display = window.Vue.computed(() => {
-    return itemsStore.isFinalReview ? "block" : "none";
-});
-
-/**
- * Add in the editor
- */
-window.Vue.onMounted(async () => {
-    await useEditor(props.student.attemptResponse.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
-});
+async function saveComment() {
+    const formData = new FormData();
+    // formData.append("learnosityReference", props.item.response.learnosityReference);
+    formData.append("comment", comment.value);
+    await fetch(props.student.urls.attemptComment, {
+        method: "POST",
+        body: formData,
+    });
+}
 
 /**
  * Update the response of the item
  */
-function onSaveSelected() {
-    studentsStore.updateStudentReport(props.student);
+async function onSaveSelected() {
+    isSaving.value = true;
+    await saveComment();
+    isSaving.value = false;
+    // studentsStore.updateStudentReport(props.student, props.item, score.value, comment.value);
     // pass through the customised score and comment
     // can the -mark be updated? I assume so
     // once that's been submitted, move to the next student
@@ -45,14 +50,14 @@ function onSaveSelected() {
 </script>
 
 <template>
-    <div class="item">
+    <div v-if="itemsStore.isFinalReview">
         <div class="l-flex-col l-gap-m">
             <div>
                 <label>Final comment</label>
                 <textarea :id="editorId"></textarea>
             </div>
             <div>
-                <button class="full-width" @click.prevent="onSaveSelected">Save and continue</button>
+                <button class="full-width" @click.prevent="onSaveSelected">{{ buttonTitle }}</button>
             </div>
         </div>
     </div>
