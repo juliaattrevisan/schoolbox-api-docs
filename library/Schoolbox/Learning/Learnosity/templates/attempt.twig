@@ -93,8 +93,7 @@
         })
         .then(response => response.text())
         .then(body => {
-            console.log(body);
-            {#window.location.href = '{{ outroUrl }}';#}
+            window.location.href = '{{ outroUrl }}';
         });
 
     }
