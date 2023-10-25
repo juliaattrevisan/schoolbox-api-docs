@@ -15,7 +15,7 @@ import type { Ref } from "vue";
  *  - true if the CKEditor field content storage limit was found to have been exceeded at last check
  * @returns { string } - the initial value
  */
-export async function useEditor($initialValue: string, ckeditorSelector: string, isMaxCharCountExceeded: Ref<boolean>) {
+export function useEditor($initialValue: string, ckeditorSelector: string, isMaxCharCountExceeded: Ref<boolean>) {
     const initialValue = window.Vue.ref($initialValue);
 
     /**
@@ -74,7 +74,9 @@ export async function useEditor($initialValue: string, ckeditorSelector: string,
         }
     }
 
-    await loadCKEditor();
+    window.Vue.onMounted(async () => {
+        await loadCKEditor();
+    });
 
     return initialValue;
 }

@@ -63,7 +63,6 @@ function create(sourceElement: HTMLElement, config: EditorConfig) {
  * @param { CustomEvent } event - the custom event
  */
 function onCreate(event: CustomEvent) {
-    console.warn("CKEditor: onCreate event fired.");
     const config = event.detail as EditorConfig;
     const { targetElements } = config;
     targetElements.forEach((targetElement) => {

@@ -150,11 +150,15 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     /**
      * To update a student
      * @param {Student} student - the student to update
+     * @param {number} score - the score to update
+     * @param {string} comment - the comment to update
      */
-    function updateStudentReport(student: Student) {
+    function updateStudentReport(student: Student, score: number, comment: string) {
+        console.warn(score);
+        console.warn(comment);
         // send the student payload
         // once done move to the next student
-        progressReport(student);
+        // progressReport(student);
     }
 
     return {

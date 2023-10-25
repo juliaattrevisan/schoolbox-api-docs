@@ -20,6 +20,9 @@ const studentsStore = useStudentsStore();
 const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+const score = window.Vue.ref<number>(props.item.response.score ?? 0);
+// let comment = window.Vue.ref<string>("");
+const comment = useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 
 /**
  * To display the item when it's the active item
@@ -65,21 +68,19 @@ function addSampleAnswers(response: HTMLDivElement) {
 /**
  * Add the response to the item to our element
  */
-window.Vue.onMounted(async () => {
+window.Vue.onMounted(() => {
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
     responseEl.value?.appendChild(response);
     updateResponseStyles(response);
-    if (props.item.questions.length > 0) {
-        await useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
-        addSampleAnswers(response);
-    }
+    // comment = await useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+    addSampleAnswers(response);
 });
 
 /**
  * Update the response of the item
  */
 function onSaveSelected() {
-    studentsStore.updateStudentReport(props.student);
+    studentsStore.updateStudentReport(props.student, score.value, comment.value);
     // pass through the customised score and comment
     // can the -mark be updated? I assume so
     // once that's been submitted, move to the next student
@@ -97,10 +98,10 @@ function onSaveSelected() {
                     <label>Update Score (max score: {{ props.item.response.maxScore }})</label>
                     <input
                         :id="`customise-score-${$props.item.reference}`"
+                        v-model="score"
                         type="number"
                         min="0"
                         :max="props.item.response.maxScore"
-                        :value="props.item.response.score"
                     />
                 </div>
                 <div>
