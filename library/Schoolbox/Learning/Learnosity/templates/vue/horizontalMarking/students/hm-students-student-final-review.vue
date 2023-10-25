@@ -44,27 +44,23 @@ async function onSaveSelected() {
     // pass through the customised score and comment
     // can the -mark be updated? I assume so
     // once that's been submitted, move to the next student
-    // if thats the last student, move to the next item
-    // if thats the last student on the last item, move to finalise review
+    // if that's the last student, move to the next item
+    // if that's the last student on the last item, move to finalise review
 }
 </script>
 
 <template>
-    <div v-if="itemsStore.isFinalReview">
+    <div>
         <div class="l-flex-col l-gap-m">
             <div>
-                <label>Final comment</label>
+                <label>Comment</label>
                 <textarea :id="editorId"></textarea>
             </div>
             <div>
-                <button class="full-width" @click.prevent="onSaveSelected">{{ buttonTitle }}</button>
+                <button class="full-width" :disabled="isSaving" @click.prevent="onSaveSelected">
+                    {{ buttonTitle }}
+                </button>
             </div>
         </div>
     </div>
 </template>
-
-<style scoped>
-.item {
-    display: v-bind(display);
-}
-</style>

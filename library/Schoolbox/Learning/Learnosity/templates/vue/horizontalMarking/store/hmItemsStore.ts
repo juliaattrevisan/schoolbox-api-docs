@@ -9,7 +9,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     const items = window.Vue.ref<Item[]>([]);
     const itemsWithQuestions = window.Vue.computed(() =>
         items.value.filter((item) => item.questions.length > 0 || item.isFinalReview)
-    ); // only show those items with questions
+    ); // only show those items with questions and the final review
     const activeItem = window.Vue.ref<Item>({ id: "", reference: "", title: "", questions: [], isFinalReview: false });
     const activeItemIndex = window.Vue.ref<number>(0);
     const hasPreviousItem = window.Vue.computed(() => activeItemIndex.value > 0);
@@ -17,7 +17,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     const isNextFinalReview = window.Vue.computed(
         () => itemsWithQuestions.value[activeItemIndex.value + 1]?.isFinalReview
     );
-    const isFinalReview = window.Vue.computed(() => activeItem.value.isFinalReview);
+    const isFinalReview = window.Vue.computed(() => activeItem.value.isFinalReview === true);
 
     /**
      * store any passed through properties
@@ -43,7 +43,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     }
 
     /**
-     * Add questions to the items, unlike the items initialy loaded, the items linked to students loaded
+     * Add questions to the items, unlike the items initially loaded, the items linked to students loaded
      * via the reports api contain the questions, so we add them here
      * @param {Item[]} $items - the items to reference
      */

@@ -85,7 +85,7 @@ window.Vue.watch(
                         :item="item"
                         :container="(responseContentEl as HTMLDivElement)"
                     />
-                    <hm-students-student-final-review :student="props.student" />
+                    <hm-students-student-final-review v-if="itemsStore.isFinalReview" :student="props.student" />
                 </template>
             </div>
         </div>

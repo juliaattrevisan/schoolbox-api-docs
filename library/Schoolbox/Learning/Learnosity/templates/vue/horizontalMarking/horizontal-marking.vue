@@ -51,7 +51,7 @@ window.Vue.onMounted(async () => {
         <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
-            <div>
+            <div v-if="useStore().isLoaded">
                 <h2 class="subheader">Cards</h2>
                 <hm-select-item />
             </div>
