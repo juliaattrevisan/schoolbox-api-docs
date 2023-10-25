@@ -2,6 +2,6 @@
  * A search result
  */
 export type Result = {
-    id: number;
+    id: number | null;
     name: string;
 };
