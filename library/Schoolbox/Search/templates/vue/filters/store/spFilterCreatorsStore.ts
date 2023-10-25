@@ -14,7 +14,7 @@ export type Creator = {
 
 export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     /**
-     * get the initial creator from the url if it exists
+     * get the initial creators from the url if they exist
      * @returns {{id: number|null, name: string}[]} - the initial creator ID or null
      */
     function getInitialCreators(): { id: number | null; name: string }[] {
@@ -33,6 +33,8 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
             return [];
         }
 
+        // Note the filters JSON data structure only supports one creator currently.
+        // The client is partially prepared to accommodate multiple creators.
         return filters.creator.id ? [{ id: filters.creator.id, name: "TODO: Get Username here somehow" }] : [];
     }
 
