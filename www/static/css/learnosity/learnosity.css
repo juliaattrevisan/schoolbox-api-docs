@@ -19,6 +19,15 @@
     margin-left: 0;
 }
 
+/* remove the opacity on disabled student response elements within horizontal marking */
+.lrn_response_wrapper :disabled,
+.lrn_response_wrapper input[type="checkbox"]:not(.plain):disabled + label,
+.lrn_response_wrapper input[type="radio"]:not(.plain):disabled + label,
+.lrn_response_wrapper input[type="checkbox"][readonly]:not(.plain) + label,
+.lrn_response_wrapper input[type="radio"][readonly]:not(.plain) + label {
+    opacity: 1;
+}
+
 /* change the accessibility modal button colour */
 .lrn-assess .lrn-dialogs-close-btn:after,
 .lrn-assess .lrn-dialogs-close-btn:before {
