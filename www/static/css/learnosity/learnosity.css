@@ -953,7 +953,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 /* question edit view styles */
 .lrn.lrn-author .lrn-author-region-sidebar,
 .lrn.lrn-author .lrn-author-widget-sidebar {
-    background: transparent;
+    background: var(--accent-background);
     border-left: none;
 }
 .lrn.lrn-author .lrn-author-region-sidebar-open .lrn-author-region-sidebar {
