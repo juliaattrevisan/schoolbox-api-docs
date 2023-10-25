@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import { useFetch } from "@vueuse/core";
 import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
@@ -15,15 +14,6 @@ import type { StudentUrls } from "../types/StudentUrls";
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
     const isExpanded = window.Vue.ref<boolean>(false);
-
-    const url = window.Vue.ref("");
-    const { execute: updateComment } = useFetch(
-        url,
-        { headers: { Accept: "application/json" } },
-        {
-            immediate: false,
-        }
-    );
 
     /**
      * store any passed through properties
@@ -165,11 +155,25 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {string} comment - the comment to update
      */
     async function updateStudentReport(student: Student, item: StudentItem, score: number, comment: string) {
-        const newQueryParams = new URLSearchParams();
-        newQueryParams.append("learnosityReference", item.response.learnosityReference);
-        newQueryParams.append("comment", comment);
-        url.value = `/${student.urls.comment}?${newQueryParams.toString()}`;
-        await updateComment();
+        const formData = new FormData();
+        formData.append("learnosityReference", item.response.learnosityReference);
+        formData.append("score", score.toString());
+
+        await fetch(student.urls.score, {
+            method: "POST",
+            body: formData,
+        });
+
+        formData.delete("score");
+        formData.append("comment", comment);
+
+        await fetch(student.urls.comment, {
+            method: "POST",
+            body: formData,
+        });
+
+        // url.value = student.urls.comment;
+        // await updateComment();
 
         // newQueryParams.append("comment", comment);
         // url.value = `/${student.urls.comment}?${newQueryParams.toString()}`;
