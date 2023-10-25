@@ -974,3 +974,11 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     color: var(--content-ui-foreground);
     background: var(--content-ui-background);
 }
+
+/* hide source and help button from edit question */
+[aria-label="View widget source"] {
+    display: none;
+}
+[aria-label="View widget help"] {
+    display: none;
+}
