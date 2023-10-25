@@ -90,9 +90,13 @@
         fetch('{{ completionUrl }}', {
             method: 'POST',
             body: payload
-        }).then(response => {
-            window.location.href = '{{ outroUrl }}';
+        })
+        .then(response => response.text())
+        .then(body => {
+            console.log(body);
+            {#window.location.href = '{{ outroUrl }}';#}
         });
+
     }
 
     /* User consciously finished

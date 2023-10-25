@@ -1288,7 +1288,7 @@ class Mapper extends BaseMapper
         $gradeGroupMapper = $this->getJoinMapper('duework.grade_group');
         foreach ($modelList as $model) {
             $submodel = $model->getSubObject();
-            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model) {
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model || $submodel instanceof Quiz\Model) {
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())

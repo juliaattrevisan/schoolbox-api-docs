@@ -540,9 +540,15 @@ class Controller extends Base
             'user_id'              => $student->getId()
         ]);
 
-        $existingAttempt->setMark($mark)
-            ->setMaxMark($maxMark)
-            ->refreshNormalisedMark();
+        /* Update normalised and humanreadable marks
+         */
+        $normalisedMark = $existingAttempt->calculateNormalisedMark($mark, $maxMark);
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+
+        $existingAttempt
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
+            ->setMaxMark($maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording
