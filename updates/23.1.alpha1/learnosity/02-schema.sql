@@ -47,8 +47,9 @@ ALTER TABLE `assess`
     ADD COLUMN `prompts_mode` TINYINT(1) NOT NULL DEFAULT 0 AFTER `shuffle_items`;
 
 -- Add Mark Type and Grade Group
+-- Defaults to Total Mark Fractional
 ALTER TABLE `assess`
-    ADD COLUMN `mark_type_id` INT(11) NOT NULL AFTER `weight`,
+    ADD COLUMN `mark_type_id` INT(11) NOT NULL DEFAULT 3 AFTER `weight`,
     ADD COLUMN `grade_group_id` INT(11) NULL AFTER `mark_type_id`;
 
 -- Reset duration to 0 for Unlimited, rather than -1
