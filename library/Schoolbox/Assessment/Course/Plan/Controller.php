@@ -105,7 +105,8 @@ class Controller extends Base
                     `ccih`.value as `componentHeading`,
                     `textBox`.`textboxID` as `textboxID`,
                     `textBox`.`heading` as `textboxHeading`,
-                    `textBox`.`body` as `textboxBody`
+                    `textBox`.`body` as `textboxBody`,
+                    `textBox`.`updated_at` as `updated_at`
                 FROM component_definition cd
                          INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
                          INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
@@ -120,8 +121,7 @@ class Controller extends Base
                   AND textBox.deleted_at IS NULL
                   AND f.deleted_at IS NULL
                   AND textBox.categoryID = :folderId
-                GROUP BY textBox.textBoxID, f.id
-                ORDER BY textBox.textBoxID
+                ORDER BY textBox.updated_at
             ");
             $statement->execute(['folderId' => $unit->getFolder()->getId()]);
             while ($row = $statement->fetch()) {
