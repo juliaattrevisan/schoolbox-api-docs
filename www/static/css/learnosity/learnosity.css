@@ -961,11 +961,6 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 .lrn .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-i-"] {
     border-top-color: transparent;
-}
-.lrn .lrn-author-ui-no-preview,
-.lrn .lrn-author-ui-no-preview input,
-.lrn .lrn-author-ui-no-preview button {
-    font-family: "Helvetica Neue", Helvetica, Arial, "sans-serif";
     color: var(--content-ui-foreground);
 }
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:hover,
@@ -981,4 +976,68 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 [aria-label="View widget help"] {
     display: none;
+}
+
+/* form styles */
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control:hover {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
+    border: 1px solid var(--form-border-color);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
+    color: var(--content-ui-foreground);
+    background: var(--content-ui-background);
+    border: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
+    color: var(--content-ui-foreground);
+    background: var(--content-ui-background);
+    border: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-switch-trigger {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_textarea_inline:focus {
+    background: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    outline: none;
+}
+/* more options styles */
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options {
+    background: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:hover,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:focus {
+    border-color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:hover,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:focus,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options.lrn-active:hover,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options.lrn-active:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:active:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:active:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:focus {
+    border-color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-default {
+    background: var(--content-ui-background);
+}
+span.lrn-qe-i-trash {
+    color: var(--content-ui-foreground);
 }
