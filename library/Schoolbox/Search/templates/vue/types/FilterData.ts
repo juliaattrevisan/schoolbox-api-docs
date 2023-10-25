@@ -7,7 +7,7 @@ export type FilterData = {
         to: string;
     };
     creator: {
-        id: number;
+        id: number | null;
     };
     types: string[];
 };

@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { FilterData } from "../../types/FilterData";
 
 export type FilterDateRange = {
     startDate: string;
@@ -13,8 +14,42 @@ export const EMPTY_DATE = ""; // the value to use when the date is not set
 export const INVALID_DATE = "Invalid Date"; // the string dayjs returns when a date is not valid
 
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
-    const startDate = window.Vue.ref("");
-    const endDate = window.Vue.ref("");
+    /**
+     * get the initial date range from the url if it exists
+     * @returns {{from: string, to: string}} - the initial date range
+     */
+    function getInitialDateRange(): { from: string; to: string } {
+        const searchParams = new URLSearchParams(document.location.search);
+        const filtersJson = searchParams.get("filter") as string;
+
+        let filters;
+
+        try {
+            filters = JSON.parse(filtersJson) as FilterData;
+        } catch (e) {
+            return { from: EMPTY_DATE, to: EMPTY_DATE };
+        }
+
+        // If either date not valid, replace with blank
+        let fromDate = filters.date.from;
+        let toDate = filters.date.to;
+
+        // Note this only checks if date can be parsed by dayjs.
+        if (!window.dayjs(fromDate).isValid()) {
+            fromDate = EMPTY_DATE;
+        }
+
+        // Note this only checks if date can be parsed by dayjs.
+        if (!window.dayjs(toDate).isValid()) {
+            toDate = EMPTY_DATE;
+        }
+
+        return { from: fromDate, to: toDate };
+    }
+
+    const initialDateRange = getInitialDateRange();
+    const startDate = window.Vue.ref(initialDateRange.from);
+    const endDate = window.Vue.ref(initialDateRange.to);
 
     /**
      * Is the start date filter set

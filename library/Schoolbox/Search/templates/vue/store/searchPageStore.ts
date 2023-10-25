@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
 import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
-import { useFilterDateRangeStore, FilterDateRange } from "../filters/store/spFilterDateRangeStore";
+import { useFilterDateRangeStore, FilterDateRange, EMPTY_DATE } from "../filters/store/spFilterDateRangeStore";
 
 const SINGLE_COLUMN_BREAKPOINT = 800;
 
@@ -14,18 +14,23 @@ export const useStore = defineStore("searchPage", () => {
     let endpoint = ""; // the endpoint to use for searching
 
     const isSingleColumn = window.Vue.ref(true); // whether to use a single column layout
+    const filterDateRangeStore = useFilterDateRangeStore();
 
     /**
      * store any passed through properties
      * @param {string} $endpoint - the search api url
      * @param {FilterType[]} $filterTypes - the filter types
-     * @param {FilterDateRange} $filterDateRange - the date range filter
+     * @param {FilterDateRange} $defaultFilterDateRange - the default date range filter
      */
-    function init($endpoint: string, $filterTypes: FilterType[], $filterDateRange: FilterDateRange) {
+    function init($endpoint: string, $filterTypes: FilterType[], $defaultFilterDateRange: FilterDateRange) {
         endpoint = $endpoint;
         useFilterTypesStore().allTypes = $filterTypes;
-        useFilterDateRangeStore().startDate = $filterDateRange.startDate;
-        useFilterDateRangeStore().endDate = $filterDateRange.endDate;
+
+        // Only set dates to default if neither date was specified in the URL.
+        if (filterDateRangeStore.startDate === EMPTY_DATE && filterDateRangeStore.endDate === EMPTY_DATE) {
+            filterDateRangeStore.startDate = $defaultFilterDateRange.startDate;
+            filterDateRangeStore.endDate = $defaultFilterDateRange.endDate;
+        }
     }
 
     /**

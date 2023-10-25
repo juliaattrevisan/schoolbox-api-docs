@@ -5,14 +5,34 @@
  */
 
 import { defineStore } from "pinia";
+import { FilterData } from "../../types/FilterData";
 
 export type Creator = {
-    id: number;
+    id: number | null;
     name: string;
 };
 
 export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
-    const creator = window.Vue.ref<Creator[]>([]);
+    /**
+     * get the initial creator from the url if it exists
+     * @returns {number|null} - the initial creator ID or null
+     */
+    function getInitialCreatorId() {
+        const searchParams = new URLSearchParams(document.location.search);
+        const filtersJson = searchParams.get("filter") as string;
+
+        let filters;
+
+        try {
+            filters = JSON.parse(filtersJson) as FilterData;
+        } catch (e) {
+            return null;
+        }
+
+        return filters.creator.id ?? null;
+    }
+
+    const creator = window.Vue.ref<Creator[]>([{ id: getInitialCreatorId(), name: "" }]);
 
     /**
      * Is the creator filter set
