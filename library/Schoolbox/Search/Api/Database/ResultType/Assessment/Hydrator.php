@@ -246,8 +246,11 @@ class Hydrator extends BaseHydrator
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $requestUrl = $this->request->getUri()->__toString(); // This will be like '.../api/search?keyword=...'.
-            $returnUrl = str_replace('/api/', '/', $requestUrl); // Get URL like '.../search?keyword=...'.
+            $returnUrl = (
+                // Note $this->request is the request to the search API, not the search page.
+                // The return URL must point to the search page, with the same query string as was used in the search API request.
+                $this->routeGenerator->generate('search.search') . '?' . $this->request->getUri()->getQuery()
+            );
 
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
