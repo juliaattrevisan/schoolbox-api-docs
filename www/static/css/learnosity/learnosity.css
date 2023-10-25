@@ -884,3 +884,45 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
 ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
     display: none;
 }
+
+/* hide setting button in questions */
+button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-outline.lrn-btn-icon-left.lrn-btn-responsive.lrn-btn-i-xs.lrn-btn {
+    display: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
+    color: var(--content-ui-foreground);
+    border: none;
+    background: var(--content-ui-background);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-btn.lrn-qe-checkbox-btn,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button {
+    font-size: 12px;
+    background-color: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
+    background-color: var(--content-ui-selected);
+    color: var(--content-ui-foreground);
+    border: 0px;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-dropdown .lrn-qe-custom-dropdown-toggle:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn span:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-btn.lrn-qe-checkbox-btn span:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate span:focus::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate span:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right:focus::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left:focus::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right:focus::after {
+    border: none;
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part::after {
+    border: none;
+}
