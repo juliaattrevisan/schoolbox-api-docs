@@ -926,3 +926,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part::after {
     border: none;
 }
+
+/* hide warning message */
+.lrn-author-message.lrn-author-message-warning.lrn-author-dependent-count-warning-wrapper {
+    display: none;
+}
