@@ -74,7 +74,6 @@ class Decorator implements DecoratorInterface
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
         $assessment->setMarkScheme($markScheme);
-
     }
 
 
