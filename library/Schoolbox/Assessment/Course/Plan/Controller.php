@@ -83,19 +83,21 @@ class Controller extends Base
             $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
             $class = TextboxComponentController::class;
             $textboxes = [];
+            $textboxesKeys = [];
             $unitTextboxes = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
             foreach ($unitTextboxes as $textboxComponent) {
                 if ('' !== $textboxComponent->getConfigByKey('componentname')->getValue()) {
                     // if there is a value set for the component use that
-                    $heading = $textboxComponent->getConfigByKey('componentname')->getValue();
+                    $heading = trim($textboxComponent->getConfigByKey('componentname')->getValue());
                 } elseif ('' !== $textboxComponent->getConfigByKey('componentname')->getDefaultValue()) {
                     // is there a system default value for the component
-                    $heading = $textboxComponent->getConfigByKey('componentname')->getDefaultValue();
+                    $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
                 } else {
                     // Fallback of the php default title for textbox components
-                    $heading = TextboxComponentController::DEFAULT_COMPONENT_HEADING;
+                    $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
                 }
-                $textboxes[$heading] = $heading;
+                $textboxes[strtolower($heading)] = strtolower($heading);
+                $textboxesKeys[strtolower($heading)] = $heading;
             }
 
             $extraTextboxes = 0;
@@ -125,11 +127,12 @@ class Controller extends Base
             ");
             $statement->execute(['folderId' => $unit->getFolder()->getId()]);
             while ($row = $statement->fetch()) {
+                $normalisedTitle = strtolower(trim($row['textboxHeading']));
                 // Check if the textbox should exist in the plan?
-                if (array_key_exists($row['textboxHeading'], $textboxes)) {
+                if (array_key_exists($normalisedTitle, $textboxes)) {
                     // NOTE: This is all based on component titles (which don't need to be unique),
                     // so you could have 2 components on a page that share the same title, and this will just display the last entry.
-                    $textboxes[$row['textboxHeading']] = [
+                    $textboxes[$normalisedTitle] = [
                         'id' => $row['textboxID'],
                         'body' => Scrub::html($row['textboxBody'])
                     ];
@@ -139,7 +142,7 @@ class Controller extends Base
                     $extraTextboxes++;
                 }
             }
-            $unitOut['textboxes'] = $textboxes;
+            $unitOut['textboxes'] = array_combine($textboxesKeys, $textboxes);
             $unitOut['extraTextboxes'] = $extraTextboxes;
 
             // activities
