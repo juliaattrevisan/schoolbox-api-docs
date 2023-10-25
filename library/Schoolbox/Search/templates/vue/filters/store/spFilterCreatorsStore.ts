@@ -15,9 +15,9 @@ export type Creator = {
 export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     /**
      * get the initial creator from the url if it exists
-     * @returns {number|null} - the initial creator ID or null
+     * @returns {{id: number|null, name: string}[]} - the initial creator ID or null
      */
-    function getInitialCreatorId(): number | null {
+    function getInitialCreators(): { id: number | null; name: string }[] {
         const searchParams = new URLSearchParams(document.location.search);
         const filtersJson = searchParams.get("filter") as string;
 
@@ -30,13 +30,13 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
         }
 
         if (filters === null) {
-            return null;
+            return [];
         }
 
-        return filters.creator.id ?? null;
+        return filters.creator.id ? [{ id: filters.creator.id, name: "TODO: Get Username here somehow" }] : [];
     }
 
-    const creator = window.Vue.ref<Creator[]>([{ id: getInitialCreatorId(), name: "TODO: Get Username here somehow" }]);
+    const creator = window.Vue.ref<Creator[]>(getInitialCreators());
 
     /**
      * Is the creator filter set
