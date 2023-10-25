@@ -540,7 +540,7 @@ class Controller extends Base
             'user_id'              => $student->getId()
         ]);
 
-        /* Update normalised and humanreadable marks
+        /* Update normalised and human-readable marks
          */
         $normalisedMark = $existingAttempt->calculateNormalisedMark($mark, $maxMark);
         $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
@@ -815,14 +815,19 @@ class Controller extends Base
         $mark = $sanitisedScore['score'];
         $maxMark = $sanitisedScore['max_score'];
 
+        /* Update normalised and human-readable marks
+         */
+        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+
         /* Save the comment and new normalised mark
          */
         $attempt->setComment(trim($postData['attempt-comment']))
-            ->setMark($mark)
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
             ->setMaxMark($maxMark)
             ->setReviewer($this->getUser())
-            ->setReviewed(\Alaress_Date_Format::now())
-            ->refreshNormalisedMark();
+            ->setReviewed(\Alaress_Date_Format::now());
 
         $this->attemptMapper->save($attempt);
 
