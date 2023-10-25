@@ -17,7 +17,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
      * get the initial creator from the url if it exists
      * @returns {number|null} - the initial creator ID or null
      */
-    function getInitialCreatorId() {
+    function getInitialCreatorId(): number | null {
         const searchParams = new URLSearchParams(document.location.search);
         const filtersJson = searchParams.get("filter") as string;
 
@@ -42,7 +42,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
 
     /**
      * Get the creator filter data
-     * @returns {string} - the creator filter data
+     * @returns {object} - the creator filter data
      */
     function getFormData() {
         // only add creator filter if it is set
