@@ -13,7 +13,7 @@ import type { StudentUrls } from "../types/StudentUrls";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
-    const isExpanded = window.Vue.ref<boolean>(false);
+    const isExpanded = window.Vue.ref<boolean>(true);
 
     /**
      * store any passed through properties
@@ -98,6 +98,10 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         // if all students are now expanded, set the overall toggle to true
         if (students.value.every(($student) => $student.isExpanded)) {
             isExpanded.value = true;
+        }
+        // if all students are now collapsed, set the overall toggle to false
+        else if (students.value.every(($student) => !$student.isExpanded)) {
+            isExpanded.value = false;
         }
     }
 
