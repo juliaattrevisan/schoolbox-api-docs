@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { useFetch } from "@vueuse/core";
 import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
@@ -14,6 +15,15 @@ import type { StudentUrls } from "../types/StudentUrls";
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
     const isExpanded = window.Vue.ref<boolean>(false);
+
+    const url = window.Vue.ref("");
+    const { execute: updateComment } = useFetch(
+        url,
+        { headers: { Accept: "application/json" } },
+        {
+            immediate: false,
+        }
+    );
 
     /**
      * store any passed through properties
@@ -150,12 +160,21 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     /**
      * To update a student
      * @param {Student} student - the student to update
+     * @param {StudentItem} item - the item to update
      * @param {number} score - the score to update
      * @param {string} comment - the comment to update
      */
-    function updateStudentReport(student: Student, score: number, comment: string) {
-        console.warn(score);
-        console.warn(comment);
+    async function updateStudentReport(student: Student, item: StudentItem, score: number, comment: string) {
+        const newQueryParams = new URLSearchParams();
+        newQueryParams.append("learnosityReference", item.response.learnosityReference);
+        newQueryParams.append("comment", comment);
+        url.value = `/${student.urls.comment}?${newQueryParams.toString()}`;
+        await updateComment();
+
+        // newQueryParams.append("comment", comment);
+        // url.value = `/${student.urls.comment}?${newQueryParams.toString()}`;
+        // await updateComment();
+
         // send the student payload
         // once done move to the next student
         // progressReport(student);
