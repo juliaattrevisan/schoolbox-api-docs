@@ -35,7 +35,13 @@ export const useSearchStore = defineStore("spSearch", () => {
             immediate: false,
             onFetchError(ctx) {
                 // we catch the Search error to display the error message
-                if ((ctx.data as SearchError).status) {
+                if (ctx.data === null) {
+                    searchError.value = {
+                        title: "Unexpected response from server",
+                        type: "Unexpected response from server",
+                        status: 500,
+                    } as SearchError;
+                } else if ((ctx.data as SearchError).status) {
                     searchError.value = ctx.data as SearchError;
                 }
                 return ctx;
