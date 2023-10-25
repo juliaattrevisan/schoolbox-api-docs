@@ -878,3 +878,9 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
         var(--content-ui-submit-background-a)
     );
 }
+
+/* hide player, detauls,tags tabs */
+
+ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
+    display: none;
+}
