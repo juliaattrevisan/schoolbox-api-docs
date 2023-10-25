@@ -926,8 +926,51 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part::after {
     border: none;
 }
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part:hover {
+    background-color: var(--content-ui-hover);
+}
 
 /* hide warning message */
 .lrn-author-message.lrn-author-message-warning.lrn-author-dependent-count-warning-wrapper {
     display: none;
+}
+
+/* show answers button */
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle {
+    background-color: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+    border: 0px;
+}
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked {
+    background-color: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+    border: 0px;
+}
+.lrn .lrn-author-ui-no-preview button:focus {
+    outline: none;
+}
+
+/* question edit view styles */
+.lrn.lrn-author .lrn-author-region-sidebar,
+.lrn.lrn-author .lrn-author-widget-sidebar {
+    background: transparent;
+    border-left: none;
+}
+.lrn.lrn-author .lrn-author-region-sidebar-open .lrn-author-region-sidebar {
+    box-shadow: none;
+}
+.lrn .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-i-"] {
+    border-top-color: transparent;
+}
+.lrn .lrn-author-ui-no-preview,
+.lrn .lrn-author-ui-no-preview input,
+.lrn .lrn-author-ui-no-preview button {
+    font-family: "Helvetica Neue", Helvetica, Arial, "sans-serif";
+    color: var(--content-ui-foreground);
+}
+.lrn .lrn-author-ui .lrn-author-widget-sidebar button:hover,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar button:focus,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar button:active {
+    color: var(--content-ui-foreground);
+    background: var(--content-ui-background);
 }
