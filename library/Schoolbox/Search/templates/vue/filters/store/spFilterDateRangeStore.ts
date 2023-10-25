@@ -30,21 +30,20 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
             filters = null;
         }
 
-        if (filters === null) {
+        if (filters === null || filters.date === undefined) {
             return { from: EMPTY_DATE, to: EMPTY_DATE };
         }
 
-        // If either date not valid, replace with blank
-        let fromDate = filters.date.from;
-        let toDate = filters.date.to;
+        let fromDate = filters.date.from ?? EMPTY_DATE;
+        let toDate = filters.date.to ?? EMPTY_DATE;
 
-        // Note this only checks if date can be parsed by dayjs.
-        if (!window.dayjs(fromDate).isValid()) {
+        // Note dayjs.isValid() only checks if the date can be parsed by dayjs.
+        if (fromDate !== EMPTY_DATE && !window.dayjs(fromDate).isValid()) {
             fromDate = EMPTY_DATE;
         }
 
-        // Note this only checks if date can be parsed by dayjs.
-        if (!window.dayjs(toDate).isValid()) {
+        // Note dayjs.isValid() only checks if the date can be parsed by dayjs.
+        if (toDate !== EMPTY_DATE && !window.dayjs(toDate).isValid()) {
             toDate = EMPTY_DATE;
         }
 
