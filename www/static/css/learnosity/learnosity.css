@@ -1292,3 +1292,15 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     .lrn-list-details {
     background-color: var(--content-ui-background);
 }
+
+/* change create and find card positions */
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
+    position: absolute;
+    right: 145px;
+    top: 45px;
+}
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
+    position: absolute;
+    right: 20px;
+    top: 45px;
+}
