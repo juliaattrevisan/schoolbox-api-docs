@@ -36,7 +36,12 @@ class Controller extends Base
     }
 
     /**
+     * Entry point for the main search page.
+     *
+     * @api GET /search
+     * @since 23.1
      * @throws Error
+     * @return void
      */
     public function search(): void
     {
