@@ -63,6 +63,10 @@ ALTER TABLE `assess_attempt`
 UPDATE assess_attempt
     SET _mark = mark;
 
+-- represent norm_mark for old attempts
+UPDATE assess_attempt
+SET norm_mark = FORMAT(100 * mark / max_mark, 11);
+
 -- change data type
 ALTER TABLE `assess_attempt`
     CHANGE COLUMN `mark` `mark` VARCHAR(255) NULL DEFAULT NULL ;
