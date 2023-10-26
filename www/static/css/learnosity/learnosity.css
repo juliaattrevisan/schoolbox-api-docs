@@ -131,6 +131,7 @@
 /* the progress bar at the top, which moves across with question progress */
 .lrn-assess .items .progress span {
     background-color: var(--content-ui-foreground);
+    color: var(--content-ui-foreground);
 }
 
 /* the vertical menu running down the right hand side */
@@ -1183,7 +1184,7 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
 ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     max-width: none;
     width: auto;
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--body-background) !important;
     position: relative;
     overflow: visible;
     list-style: none;
@@ -1236,15 +1237,16 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn-i-preview::before {
     content: "\e901";
     font-family: "schoolbox";
+    color: var(--content-ui-foreground);
 }
 .lrn .lrn-author-ui .lrn-list-view-item .lrn-btn-default {
     background: transparent;
     border: none;
 }
 .lrn-i-drag::before {
-    content: "";
     content: "\e62f";
     font-family: "schoolbox";
+    color: var(--content-ui-foreground);
 }
 .lrn .lrn-author-ui .lrn-btn:focus,
 .lrn .lrn-author-ui a.lrn-btn:focus {
@@ -1390,4 +1392,82 @@ a.button {
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
     border-radius: 0px;
+}
+
+/* aligned left buttons */
+.lrn .lrn-author-ui .lrn-author-activity-toolbar {
+    padding: 0px 20px 0px 0px;
+}
+
+/* search pages styles */
+li.lrn-list-view-item.lrn-flyout-wrapper {
+    max-width: none;
+    width: auto;
+    border-bottom: 1px solid var(--body-background) !important;
+    position: relative;
+    overflow: visible;
+    list-style: none;
+    transition: background-color 0.3s ease-in;
+    background: #fff;
+}
+[data-authorapi-view="tags-all"] {
+    display: none !important;
+}
+.lrn.lrn-author .lrn-tool-panel {
+    background: transparent;
+}
+.lrn.lrn-author .lrn-tool-panel-search {
+    padding: 0px;
+}
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-item-for-activity-pagination-top .lrn-pagination ul {
+    background: var(--body-background);
+}
+.lrn.lrn-author
+    .lrn-item-for-activity-list
+    .lrn-item-for-activity-pagination-top
+    .lrn-pagination
+    ul
+    > li
+    > button.lrn-btn.lrn-pagination-btn {
+    display: none;
+}
+.lrn-pagination-sort-wrapper {
+    margin-bottom: 10px;
+}
+.lrn .lrn-author-ui .lrn-form-control-padded,
+.lrn .lrn-author-ui .lrn-form-control {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-input-group-btn {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-input-group .lrn-form-control {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-btn-save.lrn-btn-saving {
+    color: var(--content-ui-foreground);
+}
+.lrn-i-cross::before {
+    color: var(--content-ui-foreground);
+}
+/* removed min-height for add question section */
+.lrn.lrn-author {
+    min-height: unset;
+}
+.lrn.lrn-author .lrn-author-item-edit {
+    min-height: unset;
+}
+.island .content,
+.island .calendar-list li.row,
+.calendar-list .island li.row,
+.island .calendar-list label,
+.calendar-list .island label,
+.island .matching-pairs p,
+.matching-pairs .island p,
+.island .resource-browser .meta-panel,
+.resource-browser .island .meta-panel {
+    padding: 0px;
 }
