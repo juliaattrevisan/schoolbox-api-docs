@@ -934,6 +934,9 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-author-message.lrn-author-message-warning.lrn-author-dependent-count-warning-wrapper {
     display: none;
 }
+.lrn-author-message.lrn-author-message-warning {
+    display: none;
+}
 
 /* show answers button */
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle {
