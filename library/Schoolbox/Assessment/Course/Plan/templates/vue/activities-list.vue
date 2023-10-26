@@ -33,7 +33,7 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
             <li v-for="activity in displayedActivities" :key="activity.id" class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12 compact wrap-down">
-                        <a :href="activity._links.status">
+                        <a target="_blank" :href="activity._links.status">
                             <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
                             <p>{{ activity.title }}</p>
                         </a>
@@ -44,7 +44,7 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
                 </nav>
                 <ul :id="'dropdown-unitplanner-activity-' + activity.id" class="f-dropdown" data-dropdown-content>
                     <li>
-                        <a :href="activity._links.status" class="icon-progress">View Status</a>
+                        <a target="_blank" :href="activity._links.status" class="icon-progress">View Status</a>
                     </li>
                 </ul>
             </li>
