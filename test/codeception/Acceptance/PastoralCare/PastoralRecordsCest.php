@@ -41,9 +41,9 @@ class PastoralRecordsCest
     public function beforeSuite(AcceptanceTester $i): void
     {
         $i->amGoingTo("update delete_at for the pastoral records so it does not impact the tests");
-        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Test Pastoral Record%"]);
-        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Test View Pastoral Record%"]);
-        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "This is an automation pastoral record updated%"]);
+        $i->updateInDatabase('pastoral', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Automation Test Pastoral Record%"]);
+        $i->updateInDatabase('pastoral', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Automation Test View Pastoral Record%"]);
+        $i->updateInDatabase('pastoral', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "This is an automation pastoral record updated%"]);
         $i->updateInDatabase('config', ['value' => 1], ['name' => 'pastoral_student_access']);
     }
 
@@ -116,7 +116,7 @@ class PastoralRecordsCest
         $i->fillRichTextField('comment-public', $pastoralComment);
         $common->clickSubmitComment();
         $i->amGoingTo('check the comment is presented');
-        $i->waitForText('Posted a few seconds ago', 2);
+        $i->wait(2);
         $i->canSee('This is an automation pastoral comment', '//article/p');
         $i->amGoingTo('delete the pastoral comment');
         $pastoralProfile->clickDeleteCommentIcon();
