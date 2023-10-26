@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Event;
 
+use Alaress\Html\ToText;
 use Calendar;
 use Calendar\Event\Type\Day\Event as DayEvent;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -78,11 +79,28 @@ class Hydrator extends BaseHydrator
 
         // And map them to a full result
         $fullResults = array_map(
-            function (RawResult $match) use ($events, $folders, $authors) {
+            function (RawResult $match) use ($events, $folders, $authors, $keyword) {
                 $event = $events->offsetGet($match->id);
                 if (!$event instanceof DayEvent) {
                     return null;
                 }
+
+                $eventDetailTextOnly = (new ToText($event->getDetail()))->getText();
+                $eventDetailTextOnlyLowercase = strtolower($eventDetailTextOnly);
+                $keywordLowercase = strtolower($keyword);
+
+                // Because the badge event detail HTML, this match might have come about only because the
+                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if (
+                    !str_contains(strtolower($event->getTitle()), $keywordLowercase) &&
+                    !str_contains(strtolower($event->getLocation()), $keywordLowercase)
+                ) {
+                    if (!str_contains($eventDetailTextOnlyLowercase, $keywordLowercase)) {
+                        return null;
+                    }
+                }
+
                 return new FullResult(
                     $match,
                     $match->id,
@@ -98,7 +116,7 @@ class Hydrator extends BaseHydrator
                     null,
                     null,
                     'calendar',
-                    $event->getDetail(),
+                    $this->truncateAroundKeyword($keyword, $eventDetailTextOnly) ?? $this->truncate($eventDetailTextOnly),
                     $authors->offsetGet($event->getAuthorId()),
                     [],
                     []
