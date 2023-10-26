@@ -1089,17 +1089,3 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
         var(--content-ui-submit-background-a)
     );
 }
-
-/* set correct answer styles */
-.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger.lrn-active,
-.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger.lrn-active:hover {
-    background: var(--content-ui-background);
-    border: 1px solid var(--content-ui-background);
-    background-color: var(--content-ui-hover);
-    text-decoration: none !important;
-}
-.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-sub-content {
-    background: var(--content-ui-background);
-    border: 1px solid var(--content-ui-background);
-    border-bottom: 1px solid var(--content-ui-background);
-}
