@@ -949,7 +949,33 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn .lrn-author-ui-no-preview button:focus {
     outline: none;
 }
-
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span {
+    background-color: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:hover:enabled {
+    background-color: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover {
+    background: var(--content-ui-background);
+}
+.lrn-qe .lrn-qe-modal-footer .lrn-qe-btn.lrn-qe-btn-default:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-remove.lrn-qe-btn-default:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-default:focus,
+.cke_dialog_container_qe .cke_dialog_ui_button_cancel:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus {
+    outline: none;
+    outline-offset: 0;
+    border-radius: 0;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after {
+    border: none;
+}
 /* question edit view styles */
 .lrn.lrn-author .lrn-author-region-sidebar,
 .lrn.lrn-author .lrn-author-widget-sidebar {
