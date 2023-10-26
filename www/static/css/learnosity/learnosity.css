@@ -1041,3 +1041,29 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 span.lrn-qe-i-trash {
     color: var(--content-ui-foreground);
 }
+
+/* top bar background color */
+.lrn.lrn-author .lrn-author-item-nav {
+    background-color: #fff;
+}
+
+/* save button background color */
+.lrn .lrn-author-ui .lrn-author-save-button-group {
+    background: transparent;
+}
+button.lrn-btn-save-dropdown {
+    display: none;
+}
+.lrn-author-item-nav-left {
+    position: relative;
+    overflow: hidden;
+    vertical-align: middle;
+    background-color: var(--content-ui-background);
+}
+button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
+    color: var(--content-ui-foreground);
+}
+.lrn .lrn-author-ui .lrn-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
+    padding-left: 30px;
+    color: var(--content-ui-foreground);
+}
