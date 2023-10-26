@@ -106,11 +106,46 @@ class Common
      */
     public const FORMAT_INPUT_DATETIME = self::FORMAT_INPUT_DATE . ' ' . self::FORMAT_INPUT_TIME;
 
+    /**
+     * modify button on pages like news feed, pastoral record
+     */
+    public const ICON_MODIFY_PAGES = 'a.icon-modify.no-text';
 
     public static function toDatepickerFormat(\Datetime $datetime)
     {
         return $datetime->format(self::FORMAT_INPUT_DATETIME);
     }
+
+    /**
+     * confirm button on modal dialogs
+     */
+    public const CONFIRM_DIALOG_MODAL = 'a#confirm-dialog-confirm-button';
+
+    /**
+     * cancel button on modal dialogs
+     */
+    public const CANCEL_DIALOG_MODAL = 'a#confirm-dialog-cancel-button';
+
+    /**
+     * close x button on modal dialogs
+     */
+    public const CLOSE_BUTTON_MODAL = 'a.close-reveal-modal';
+
+    /**
+     * add a comment element for learning moments, news, pastoral records
+     */
+    public const ADD_COMMENT_BUTTON = 'button.show-ckeditor-button';
+
+    /**
+     * submit buttons for comment fields for learning moments, news, pastoral records
+     */
+    public const COMMENT_SUBMIT_BUTTON = 'button[class=button\ submit]';
+
+    /**
+     * delete button on modal dialogs
+     */
+    public const MODAL_DELETE_BUTTON = 'button.button.submit';
+
 
     public static function gentext(int $length)
     {
@@ -157,10 +192,65 @@ class Common
     }
 
     /**
-     * clicks the submit button by locating the last element in the apge
+     * clicks the submit button by locating the last element in the page
      */
     public function clickSubmitButton(): void
     {
         $this->tester->click(Locator::lastElement('a.button.submit'));
+    }
+
+    /**
+     * clicks the confirm button on the dialogs
+     */
+    public function clickConfirmButton(): void
+    {
+        $this->tester->click(self::CONFIRM_DIALOG_MODAL);
+    }
+
+    /**
+     * clicks the cancel button on the dialogs
+     */
+    public function clickCancelButton(): void
+    {
+        $this->tester->click(self::CANCEL_DIALOG_MODAL);
+    }
+
+    /**
+     * clicks the close x button on the dialogs
+     */
+    public function closeModal(): void
+    {
+        $this->tester->click(Locator::lastElement(self::CLOSE_BUTTON_MODAL));
+    }
+
+
+    /**
+     * click add a comment for learning moments, news, pastoral records etc
+     */
+    public function clickAddComment(): void
+    {
+        $this->tester->click(self::ADD_COMMENT_BUTTON);
+    }
+
+
+    /**
+     * click post comment for learning moments, news, pastoral care records
+     */
+    public function clickSubmitComment(): void
+    {
+        $this->tester->click(self::COMMENT_SUBMIT_BUTTON);
+    }
+
+    /**
+     * click the last element to confirm deletion in a modal dialog
+     */
+    public function clickModalDeleteButton(): void
+    {
+        $this->tester->click(Locator::lastElement(self::MODAL_DELETE_BUTTON));
+    }
+
+    public function clickIconModifyPage(): void
+    {
+        $this->tester->click(self::ICON_MODIFY_PAGES);
     }
 }

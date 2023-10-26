@@ -21,8 +21,6 @@ class LearningMoments
     public const DELETE_A_PHOTO = 'a.button.icon-delete.delete-button';
     public const CONFIRM_BUTTON = 'Confirm';
     public const SUBMIT_BUTTON = '#evidence-submit';
-    public const ADD_COMMENT_BUTTON = 'button.show-ckeditor-button';
-    public const COMMENT_SUBMIT_BUTTON = 'button[class=button\ submit]';
     public const COMMENT_DELETE_BUTTON = 'a[title="Delete comment"]';
     public const COMMENT_CONFIRM_DELETE_BUTTON = 'ID to be added and replaced here';
     public const LEARNING_MOMENT_DELETE_BUTTON = 'a[title="Delete"]';
@@ -118,13 +116,7 @@ class LearningMoments
     {
         $this->tester->click(self::SUBMIT_BUTTON);
     }
-    /**
-     * click add a comment
-     */
-    public function clickAddComment(): void
-    {
-        $this->tester->click(self::ADD_COMMENT_BUTTON);
-    }
+
 
     /**
      * typing a comment
@@ -135,13 +127,6 @@ class LearningMoments
         $this->tester->fillCkEditorById('comment-0', 'Well done. This is my first comment in this learning moment!');
     }
 
-    /**
-     * click add a comment
-     */
-    public function clickSubmitComment(): void
-    {
-        $this->tester->click(self::COMMENT_SUBMIT_BUTTON);
-    }
     /**
      * click the 3-dot dropdown menu by passing its evidence
      * @param int $evidenceId

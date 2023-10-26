@@ -5,6 +5,7 @@ namespace Tests\Acceptance\LearningMoments;
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
 use Exception;
+use Tests\Support\Page\Common;
 use Tests\Support\Page\LearningMoments\LearningMoments;
 
 class LearningMomentPhotoCest
@@ -75,6 +76,7 @@ class LearningMomentPhotoCest
     public function testLearningMomentComments(AcceptanceTester $i): void
     {
         $learningMoments = new LearningMoments($i);
+        $common = new Common($i);
         $i->amOnPage($learningMoments->getStudentProfilePage(6));
         $i->amGoingTo('share a learning moment');
         $learningMoments->clickShareLearningMomentLink();
@@ -88,11 +90,11 @@ class LearningMomentPhotoCest
         $learningMoments->clickSubmit();
         $i->amGoingTo('check the learning moment is presented in the student activity feed and comment it');
         $i->waitForText('This is a learning moments test to be commented');
-        $learningMoments->clickAddComment();
+        $common->clickAddComment();
         $i->waitForElementVisible(['css' => '#comment-0 + div.ck'], 5);
         $learningMoments->typeComment();
         sleep(2);
-        $learningMoments->clickSubmitComment();
+        $common->clickSubmitComment();
         $i->amGoingTo('checking the comment is presented');
         $i->waitForText('Well done. This is my first comment in this learning moment!', 2);
     }
@@ -144,6 +146,7 @@ class LearningMomentPhotoCest
     public function testLearningMomentDeleteComment(AcceptanceTester $i): void
     {
         $learningMoments = new LearningMoments($i);
+        $common = new Common($i);
         $i->amOnPage($learningMoments->getStudentProfilePage(60));
         $learningMoments->clickShareLearningMomentLink();
         $learningMoments->clickTakeAPhoto();
@@ -156,10 +159,10 @@ class LearningMomentPhotoCest
         $learningMoments->clickSubmit();
         $i->amGoingTo('checking the learning moment is presented in the student activity feed and adding a comment');
         $i->waitForText('This is a learning moments test to get comments deleted');
-        $learningMoments->clickAddComment();
+        $common->clickAddComment();
         $learningMoments->typeComment();
         sleep(2);
-        $learningMoments->clickSubmitComment();
+        $common->clickSubmitComment();
         $i->amGoingTo('checking the comment is presented');
         $i->waitForText('Well done. This is my first comment in this learning moment!', 2);
         $i->amGoingTo('delete the learning moments comment');
