@@ -380,6 +380,9 @@ class QuizTest extends TestCase
             $marksAvailable += $response['available'];
         }
 
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
         $attempt = (new QuizAttempt())
             ->setId(8655)
             ->setAssessable($quiz)
@@ -388,7 +391,8 @@ class QuizTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today)
             ->setMarksAvailable($marksAvailable)
-            ->setMarksGiven($marksGiven);
+            ->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
 
         $feedback = (new QuizReview())
             ->setId(99759)
@@ -502,7 +506,13 @@ class QuizTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
+
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -542,7 +552,13 @@ class QuizTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
+
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -581,7 +597,13 @@ class QuizTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
+
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -622,7 +644,13 @@ class QuizTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
+
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
