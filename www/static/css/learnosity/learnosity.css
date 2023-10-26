@@ -1366,3 +1366,28 @@ span.lrn-author-name-wrapper {
 a.button {
     display: none;
 }
+
+/* questions and features button styles */
+.lrn .lrn-author-ui .lrn-author-btn-outline {
+    border: none;
+    min-height: 2.5rem;
+    padding: 0.5rem;
+    line-height: inherit;
+    position: relative;
+    overflow: hidden;
+    vertical-align: middle;
+    color: var(--content-ui-foreground);
+    background-color: var(--content-ui-background);
+}
+.lrn .lrn-author-ui .lrn-author-btn-outline:hover {
+    color: var(--content-ui-foreground);
+    background-color: var(--content-ui-hover);
+    text-decoration: none !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link.lrn-active {
+    border-left-color: var(--content-ui-foreground);
+    background: var(--content-ui-selected);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
+    border-radius: 0px;
+}
