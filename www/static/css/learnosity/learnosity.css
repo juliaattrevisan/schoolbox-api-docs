@@ -1090,7 +1090,6 @@ button.lrn-btn-save-dropdown {
     position: relative;
     overflow: hidden;
     vertical-align: middle;
-    background-color: var(--content-ui-background);
 }
 button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
     color: var(--content-ui-foreground);
@@ -1110,6 +1109,7 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
 .lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary {
     color: var(--content-ui-submit-foreground);
     background-color: var(--content-ui-submit-background);
+    width: 100%;
 }
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
@@ -1194,8 +1194,38 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 }
 .lrn.lrn-author .lrn-author-item-nav {
     background: var(--body-background);
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    width: 100%;
 }
 
 .lrn-qe .lrn-qe-ui .lrn-qe-tile-header {
     background: var(--content-ui-foreground);
+}
+/* removed gap from hearder */
+.lrn .lrn-author-ui .lrn-author-item-toolbar-controls,
+.lrn .lrn-author-ui .lrn-author-activity-toolbar-controls {
+    min-height: 0px;
+}
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-list-divider > li,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-divider > li,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-list-divider > li,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-divider > li {
+    margin-bottom: 1px;
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
+    width: 100%;
+}
+.lrn.lrn-author .lrn-author-item-nav-left,
+.lrn.lrn-author .lrn-author-item-nav-right {
+    display: flex;
+    width: 100%;
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
+    width: 100%;
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group {
+    width: 100%;
 }
