@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource\Textbox;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\IHomepageCleanable;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Textbox\Search\Result;
 use Schoolbox\User;
@@ -23,7 +24,7 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
  * @method Model createModel($idValue = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  */
-class Mapper extends \Schoolbox\Mapper implements Searchable
+class Mapper extends \Schoolbox\Mapper implements Searchable, IHomepageCleanable
 {
     /**
      * Textbox Homepage Controller classname
@@ -281,5 +282,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
+    }
+
+    /**
+     * Soft-deletes blog for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid): void
+    {
+        $this->deleteByColumn('folder_id', $cid);
     }
 }

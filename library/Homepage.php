@@ -125,7 +125,6 @@ class Homepage
             new Chat(),
             new Poll(),
             new Survey_Main(),
-            new TextBox(),
             new Wiki(),
 
             Schoolbox\Calendar\EventMapper::getInstance(),
@@ -135,7 +134,8 @@ class Homepage
             Schoolbox\Comms\News\Audience\Simple\Mapper::getInstance(),
             Schoolbox\Comms\News\Audience\Complex\Mapper::getInstance(),
             Schoolbox\Blog\Homepage\Post\Mapper::getInstance(),
-            \Schoolbox\Forum\ThreadMapper::getInstance(),
+            Schoolbox\Forum\ThreadMapper::getInstance(),
+            Schoolbox\Resource\Textbox\Mapper::getInstance(),
         ];
 
         foreach ($homepageCleanables as $homepageCleanable) {
