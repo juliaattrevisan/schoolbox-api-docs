@@ -979,7 +979,6 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 /* question edit view styles */
 .lrn.lrn-author .lrn-author-region-sidebar,
 .lrn.lrn-author .lrn-author-widget-sidebar {
-    background: var(--accent-background);
     border-left: none;
 }
 .lrn.lrn-author .lrn-author-region-sidebar-open .lrn-author-region-sidebar {
@@ -1162,4 +1161,41 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
 }
 [data-lrn-qe-layout-wrapper="is_math"] {
     display: none;
+}
+
+/* hide tags from questions list */
+
+.lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
+    display: none;
+}
+.lrn-list-view-alternative-reference.lrn-ellipses {
+    display: none;
+}
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-details {
+    border: none;
+}
+ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
+    margin: 0 -1rem;
+    max-width: none;
+    width: auto;
+    border-bottom: 1px solid var(--body-background);
+    position: relative;
+    overflow: visible;
+    list-style: none;
+    transition: background-color 0.3s ease-in;
+    background: #fff;
+}
+
+.island section {
+    background: var(--body-background);
+}
+.lrn.lrn-author .lrn-author-item-nav {
+    background: var(--body-background);
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-tile-header {
+    background: var(--content-ui-foreground);
 }
