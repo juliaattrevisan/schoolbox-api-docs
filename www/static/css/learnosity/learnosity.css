@@ -1307,3 +1307,52 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.l
     right: 20px;
     top: 45px;
 }
+span.lrn-author-name-wrapper {
+    border: 1px solid var(--form-border-color);
+}
+
+/* add new question button styles */
+.lrn .lrn-author-ui .lrn-author-widget-button-more .lrn-author-widget-icon:before {
+    font-size: initial;
+    color: var(--content-ui-foreground);
+}
+.lrn .lrn-author-ui .lrn-author-widget-icon:before {
+    font-size: initial;
+    color: var(--content-ui-foreground);
+}
+[data-authorapi-selector="add-button"] {
+    width: 100% !important;
+    border: 0 !important;
+    min-height: 2.5rem !important;
+    padding: 0.5rem !important;
+    line-height: inherit !important;
+    position: relative !important;
+    overflow: hidden !important;
+    vertical-align: middle !important;
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-background) !important;
+}
+.lrn .lrn-author-ui .lrn-author-widget-text {
+    bottom: 0px;
+    font-size: initial;
+    top: 0px;
+    color: var(--content-ui-foreground);
+}
+[data-authorapi-selector="show-shared-passages-button"] {
+    display: none !important;
+}
+.lrn.lrn-author .lrn-author-item-content {
+    min-height: auto;
+}
+.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
+    text-align: center !important;
+    min-height: 2.5rem !important;
+    padding: 0.5rem !important;
+    line-height: inherit !important;
+    position: relative !important;
+    overflow: hidden !important;
+    vertical-align: middle !important;
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-background) !important;
+    width: 98% !important;
+}
