@@ -599,9 +599,13 @@ class Api extends \Codeception\Module
             $feedback->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
         }
         if ($feedback instanceof \Schoolbox\Learning\Assessment\Quiz\Feedback\Model) {
+            /* Presume Total Mark Fractional mark scheme for historical data,
+             * causing human readable mark to be cached in the format "$numerator / $denominator"
+             */
             $attempt = (new \Schoolbox\Learning\Assessment\Quiz\Attempt\Model())->setAssessable($assessment)
                                                                                 ->setMarksAvailable(100)
-                                                                                ->setMarksGiven(100)
+                                                                                ->setHumanReadableMark("100 / 100")
+                                                                                ->setNormalisedMark(100 * 100 / 100)
                                                                                 ->setSubmittedOnBehalfOf($student)
                                                                                 ->setSubmittedAt($now)
                                                                                 ->setCreatedAt($now);
