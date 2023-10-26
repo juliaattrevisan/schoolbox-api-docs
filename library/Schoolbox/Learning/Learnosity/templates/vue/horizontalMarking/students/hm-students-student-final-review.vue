@@ -4,6 +4,7 @@
  */
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { Student } from "../types/Student";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
@@ -12,11 +13,25 @@ interface Props {
 }
 const props = defineProps<Props>();
 const studentsStore = useStudentsStore();
+const editorEl = window.Vue.ref<HTMLTextAreaElement | null>(null);
 const editorId = `final-review-comment-${props.student.elementId}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 const comment = useEditor(props.student.attemptResponse.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref<boolean>(false);
 const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "Save and continue"));
+
+/**
+ * Highlight that focus has shifted to this student after a previous item has been marked
+ */
+window.Vue.watch(
+    () => props.student.hasFocus,
+    () => {
+        if (props.student.hasFocus) {
+            const editor = window.sbProps.editors[editorId];
+            editor.editing.view.focus();
+        }
+    }
+);
 
 /**
  * Save the comment
@@ -35,10 +50,23 @@ async function saveComment() {
  */
 async function onSaveSelected() {
     studentsStore.updateStudentFinalReview(props.student, comment.value);
+    studentsStore.progressReport(props.student);
     isSaving.value = true;
     await saveComment();
     isSaving.value = false;
 }
+
+/**
+ * If it's been assigned focus as this student is the first to mark in the new item group
+ */
+window.Vue.onMounted(() => {
+    if (props.student.hasFocus) {
+        // listen for the editor to be created then assign focus
+        editorEl.value?.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
+            event.detail.editor.editing.view.focus();
+        });
+    }
+});
 
 /**
  * Save any unsaved changes in the front end only
@@ -54,7 +82,7 @@ window.Vue.onUnmounted(() => {
         <div class="l-flex-col l-gap-m">
             <div>
                 <label>Comment</label>
-                <textarea :id="editorId"></textarea>
+                <textarea :id="editorId" ref="editorEl"></textarea>
             </div>
             <div>
                 <button class="full-width" :disabled="isSaving" @click.prevent="onSaveSelected">

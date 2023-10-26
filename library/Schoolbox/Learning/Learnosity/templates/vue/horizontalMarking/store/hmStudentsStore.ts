@@ -138,6 +138,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         student.hasFocus = false;
         const studentIndex = students.value.findIndex(($student) => $student.elementId === student.elementId);
         if (studentIndex < students.value.length - 1) {
+            console.warn("next student");
             const nextStudent = students.value[studentIndex + 1];
             nextStudent.isExpanded = true;
             nextStudent.hasFocus = true;
