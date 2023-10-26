@@ -24,7 +24,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
@@ -99,6 +98,9 @@ class Module extends BaseModule
         // Need an authorizer.
         /** @var Authorizer $authorizer */
         $authorizer = $this->injector->get('authorizer');
+
+        // Need an httpRequest.
+        $httpRequest = $this->injector->get('httpRequest');
 
         return new Controller(
             new Database\AggregateSource(
@@ -183,6 +185,7 @@ class Module extends BaseModule
                     Access::getInstance(),
                     $routeGenerator,
                     $authorizer,
+                    $httpRequest
                 ),
             ),
             new Hydrator\Translator\FullResultToArray(

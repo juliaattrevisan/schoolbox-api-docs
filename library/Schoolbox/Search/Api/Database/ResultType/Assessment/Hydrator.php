@@ -14,11 +14,13 @@ use Alaress\Html\ToText;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -45,6 +47,7 @@ class Hydrator extends BaseHydrator
      * @param UserMapper $userMapper Used to hydrate assessment creators.
      * @param Access $access Used to determine if the current user may view this page.
      * @param Authorizer $authorizer Used to determine if the current user may view system pages.
+     * @param ServerRequestInterface $request Used to get the request URL.
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -52,6 +55,7 @@ class Hydrator extends BaseHydrator
         private Access $access,
         private Generator $routeGenerator,
         private Authorizer $authorizer,
+        private ServerRequestInterface $request
     ) {
     }
 
@@ -242,9 +246,15 @@ class Hydrator extends BaseHydrator
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $returnUrl = (
+                // Note $this->request is the request to the search API, not the search page.
+                // The return URL must point to the search page, with the same query string as was used in the search API request.
+                $this->routeGenerator->generate('search.search') . '?' . $this->request->getUri()->getQuery()
+            );
+
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
-                'url' => $this->routeGenerator->generate($route, $params),
+                'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
                 'title' => 'Modify',
                 'icon' => 'icon-modify',
             ];
