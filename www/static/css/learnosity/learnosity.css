@@ -1114,3 +1114,26 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
     );
     outline: none;
 }
+
+/*hide layout and selection, extra and more options, sections */
+[data-lrn-qe-section="layout.heading"] {
+    display: none;
+}
+[data-lrn-qe-section="layout.content"] {
+    display: none !important;
+}
+[data-lrn-qe-section="details.heading"] {
+    display: none;
+}
+[data-lrn-qe-section="details.content"] {
+    display: none !important;
+}
+[data-lrn-qe-label-path="metadata.distractor_rationale_response_level"] {
+    display: none;
+}
+[data-lrn-qe-action-add-path="metadata.distractor_rationale_response_level"] {
+    display: none;
+}
+[data-lrn-qe-layout-wrapper="is_math"] {
+    display: none;
+}
