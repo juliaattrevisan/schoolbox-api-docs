@@ -3188,6 +3188,9 @@ class SummatorTest extends TestCase
         $this->getLinker()->createAndLinkParticipant($this->sberryhill, $plan);
         $this->getLinker()->createAndLinkParticipant($this->asaxon, $plan);
 
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
         $attempt = new QuizAttempt();
         $attempt
             ->setId(8655)
@@ -3198,7 +3201,8 @@ class SummatorTest extends TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today)
             ->setMarksAvailable($marksAvailable)
-            ->setMarksGiven($marksGiven);
+            ->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
         $quiz->getParticipant($this->hodes)->getAllResponses()->add($attempt);
 
         $feedback = new QuizReview();
