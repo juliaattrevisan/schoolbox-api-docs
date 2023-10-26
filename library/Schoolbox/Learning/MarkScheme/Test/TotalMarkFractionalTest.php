@@ -19,7 +19,6 @@ use Schoolbox\User;
 
 class TotalMarkFractionalTest extends TestCase
 {
-
     /**
      * An attempt is now required when retrieving a human-readable mark.
      *
