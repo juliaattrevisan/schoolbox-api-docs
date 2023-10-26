@@ -662,7 +662,13 @@ class ProjectTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
+
         $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -703,7 +709,13 @@ class ProjectTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
+
         $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -744,7 +756,12 @@ class ProjectTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
 
         $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
@@ -786,7 +803,13 @@ class ProjectTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
+
         $quiz->getParticipant($student)->getAllFeedbacks()->add($feedback);
 
         $quiz->getParticipant($student)->getAllResponses()->add($attempt);
