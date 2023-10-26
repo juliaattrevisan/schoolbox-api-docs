@@ -146,9 +146,9 @@ class Hydrator extends BaseHydrator
                 // on the query, but were found to not match either:
                 // * the title
                 // * the generated description
-                $description = $this->generateDescriptionForArticle($keyword, $blurbTextOnly, $bodyTextOnly);
+                $descriptionTextOnly = $this->generateDescriptionForArticle($keyword, $blurbTextOnly, $bodyTextOnly);
                 // Check for case-insensitive matches to match the behaviour of an SQL 'LIKE' condition.
-                if (!isset($description) && !str_contains(strtolower($match->title), strtolower($keyword))) {
+                if (!isset($descriptionTextOnly) && !str_contains(strtolower($article->getTitle()), $keywordLowercase)) {
                     return null;
                 }
 
@@ -174,7 +174,7 @@ class Hydrator extends BaseHydrator
                         ? $this->buildStorageImageUrl($article->getFeatureImage())->__toString()
                         : null,
                     'news',
-                    $description,
+                    $descriptionTextOnly,
                     $article->getAuthor(),
                     [],
                     $this->getSearchResultLinks($article, $viewer)
