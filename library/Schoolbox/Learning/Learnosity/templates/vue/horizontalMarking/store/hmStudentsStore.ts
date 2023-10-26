@@ -180,6 +180,16 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         });
     }
 
+    /**
+     * Clear focus every time a change is made, progressReport will set the focus to the next student
+     */
+    window.Vue.watch(
+        () => useItemsStore().activeItem,
+        () => {
+            clearHasFocus();
+        }
+    );
+
     return {
         init,
         addItems,
