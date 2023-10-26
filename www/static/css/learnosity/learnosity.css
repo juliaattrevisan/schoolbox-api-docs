@@ -1356,3 +1356,13 @@ span.lrn-author-name-wrapper {
     background-color: var(--content-ui-background) !important;
     width: 98% !important;
 }
+/* replaced trash icon */
+.lrn-qe .lrn-qe-ui .lrn-qe-i-trash:before {
+    content: "\e61b";
+    font-family: "schoolbox";
+}
+
+/* hide back to home button */
+a.button {
+    display: none;
+}
