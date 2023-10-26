@@ -171,6 +171,15 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         student.attemptResponse.comment = comment;
     }
 
+    /**
+     * To clear the focus from all students
+     */
+    function clearHasFocus() {
+        students.value.forEach((student) => {
+            student.hasFocus = false;
+        });
+    }
+
     return {
         init,
         addItems,
@@ -182,5 +191,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         progressReport,
         updateStudentItemReview,
         updateStudentFinalReview,
+        clearHasFocus,
     };
 });
