@@ -131,23 +131,23 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * To move to the next student report, if that's the last student, move to the next item
+     * To move to the next student response, if that's the last student, move to the next item
      * @param {Student} student - the student to move from
      */
     function progressReport(student: Student) {
+        student.hasFocus = false;
         const studentIndex = students.value.findIndex(($student) => $student.elementId === student.elementId);
         if (studentIndex < students.value.length - 1) {
-            student.isExpanded = false;
             const nextStudent = students.value[studentIndex + 1];
             nextStudent.isExpanded = true;
+            nextStudent.hasFocus = true;
             return;
-            // shift focus them somehow?
         }
         if (studentIndex === students.value.length - 1 && useItemsStore().hasNextItem) {
-            student.isExpanded = false;
             useItemsStore().toNextItem();
             const nextStudent = students.value[0];
             nextStudent.isExpanded = true;
+            nextStudent.hasFocus = true;
         }
     }
 
@@ -160,17 +160,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     function updateStudentItemReview(item: StudentItem, score: number, comment: string) {
         item.response.score = score;
         item.response.comment = comment;
-
-        // url.value = student.urls.comment;
-        // await updateComment();
-
-        // newQueryParams.append("comment", comment);
-        // url.value = `/${student.urls.comment}?${newQueryParams.toString()}`;
-        // await updateComment();
-
-        // send the student payload
-        // once done move to the next student
-        // progressReport(student);
     }
 
     /**
@@ -180,17 +169,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      */
     function updateStudentFinalReview(student: Student, comment: string) {
         student.attemptResponse.comment = comment;
-
-        // url.value = student.urls.comment;
-        // await updateComment();
-
-        // newQueryParams.append("comment", comment);
-        // url.value = `/${student.urls.comment}?${newQueryParams.toString()}`;
-        // await updateComment();
-
-        // send the student payload
-        // once done move to the next student
-        // progressReport(student);
     }
 
     return {

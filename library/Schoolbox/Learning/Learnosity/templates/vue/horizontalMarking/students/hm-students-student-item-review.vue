@@ -16,10 +16,23 @@ const props = defineProps<Props>();
 const studentsStore = useStudentsStore();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
+const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
 const score = window.Vue.ref<number>(props.item.response.score ?? 0);
 const comment = useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref<boolean>(false);
 const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "Save and continue"));
+
+/**
+ * Highlight that focus has shifted to this student after a previous item has been marked
+ */
+window.Vue.watch(
+    () => props.student.hasFocus,
+    () => {
+        if (props.student.hasFocus) {
+            scoreEl.value?.focus();
+        }
+    }
+);
 
 /**
  * Save the score
@@ -60,6 +73,15 @@ async function onSaveSelected() {
 }
 
 /**
+ * If it's been assigned focus as this student is the first to mark in the new item group
+ */
+window.Vue.onMounted(() => {
+    if (props.student.hasFocus) {
+        scoreEl.value?.focus();
+    }
+});
+
+/**
  * Save any unsaved changes in the front end only
  * Back end changes are saved via the fetch requests above
  */
@@ -73,6 +95,7 @@ window.Vue.onUnmounted(() => {
         <label>Update Score (max score: {{ props.item.response.maxScore }})</label>
         <input
             :id="`customise-score-${$props.item.reference}`"
+            ref="scoreEl"
             v-model="score"
             type="number"
             min="0"

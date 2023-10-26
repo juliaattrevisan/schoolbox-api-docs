@@ -15,6 +15,7 @@ export type Student = {
     hasReport: boolean;
     isReportLoaded: boolean;
     isExpanded: boolean;
+    hasFocus: boolean; // to indicate if the student has focus
     items: StudentItem[];
     attemptResponse: StudentAttemptResponse;
     urls: StudentUrls;

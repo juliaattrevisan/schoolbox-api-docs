@@ -15,6 +15,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const studentEl = window.Vue.ref<HTMLDivElement | null>(null); //
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
@@ -43,10 +44,26 @@ window.Vue.watch(
         onToggleSelected();
     }
 );
+
+/**
+ * Highlight that focus has shifted to this student after a previous item has been marked
+ */
+window.Vue.watch(
+    () => props.student.hasFocus,
+    () => {
+        if (props.student.hasFocus) {
+            studentEl.value?.scrollIntoView({ behavior: "smooth" });
+        }
+    }
+);
 </script>
 
 <template>
-    <div :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`">
+    <div
+        ref="studentEl"
+        :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`"
+        :data-has-focus="props.student.hasFocus"
+    >
         <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
             <div class="l-flex-row l-flex--align-center l-gap-m">
                 <button
@@ -105,7 +122,6 @@ window.Vue.watch(
     width: 2.5rem;
 }
 .response {
-    background-color: var(--foreground-colour);
     grid-template-rows: v-bind(containerHeight);
     transition: grid-template-rows 300ms;
     &__inner-container {
@@ -114,6 +130,25 @@ window.Vue.watch(
     &__content {
         // this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items
         display: none;
+    }
+}
+
+[data-has-focus="true"] {
+    @extend .change-animation;
+    animation-name: hasFocusAnimation;
+}
+
+.change-animation {
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+}
+
+@keyframes hasFocusAnimation {
+    0% {
+        background-color: var(--content-ui-selected);
+    }
+    100% {
+        background-color: var(--foreground-colour);
     }
 }
 </style>
