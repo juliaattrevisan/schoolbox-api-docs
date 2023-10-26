@@ -292,6 +292,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable, IHomepageCleanable
      */
     public function homepageClean($cid): void
     {
-        $this->deleteByColumn('folder_id', $cid);
+        $this->deleteByColumn('categoryID', $cid);
     }
 }
