@@ -984,8 +984,15 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border-color: var(--form-border-color);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control:hover {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    color: var(--form-bg-hover-color-contrast);
+    background-color: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    outline: none;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
     border: 1px solid var(--form-border-color);
@@ -1088,4 +1095,22 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
         calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
         var(--content-ui-submit-background-a)
     );
+}
+
+/* select drop down styles */
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus {
+    color: var(--form-bg-hover-color-contrast);
+    background-color: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    outline: none;
 }
