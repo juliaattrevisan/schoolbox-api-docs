@@ -40,7 +40,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $whereParts         = [
+        $whereParts = [
             // If any higher-level row the assessment is linked to is deleted, treat the assessment as deleted.
             'assessment.deleted_at IS NULL AND
              folder.deleted_at IS NULL AND
@@ -56,8 +56,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             /**
-             * NOTE: Checks made in the Hydrator must match the checks made here.
-             * @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
+             * NOTES:
+             *  - Checks made in the Hydrator must match the checks made here.
+             *    @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
+             *  - lesson_plan_field.visibility is checked in the Hydrator.
              */
             'assessment.title LIKE :assessmentKeywordLike',
             'assessment.description LIKE :assessmentKeywordLike',
@@ -67,9 +69,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike',
             'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',
+            'EXISTS(
+                 SELECT *
+                 FROM lesson_plan_field
+                 WHERE lesson_plan_field.lesson_plan_id = lesson_plan.id
+                 AND lesson_plan_field.deleted_at IS NULL
+                 AND (title LIKE :assessmentKeywordLike OR body LIKE :assessmentKeywordLike)
+             )'
         ];
-        $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
-        $params             = [
+        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $params       = [
             'assessmentNow'         => Alaress_Date_Format::now()->getDatabase(),
             'assessmentKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];

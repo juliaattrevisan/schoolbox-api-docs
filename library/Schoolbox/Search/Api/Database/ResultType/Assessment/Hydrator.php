@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -126,16 +127,51 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $assessmentDesc = $assessment->getDescription();
+                $keywordLower = strtolower($keyword); // Convert to lowercase for case-insensitive str_contains() searches below.
+                $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
+                $assessmentContentTextOnly = (new ToText($assessmentContentHtml))->getText(); // Remove HTML tags.
 
-                // Because the description contains HTML, this match might have come about only because the
+                // Because the assessment content might contain HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if ($this->assessmentMatchesKeywordOnlyOnDescription($assessment, $keyword)) {
-                    $assessmentDescTextOnly = (new ToText($assessmentDesc))->getText();
-                    if (!str_contains($assessmentDescTextOnly, $keyword)) {
+                if ($this->assessmentMatchesKeywordOnlyOnHtmlContent($assessment, $keyword, $assessmentContentHtml)) {
+                    if (!str_contains(strtolower($assessmentContentTextOnly), $keywordLower)) {
                         return null;
                     }
+                }
+
+                if (!($assessment instanceof Assessment\LessonPlan\Model)) {
+                    // The content text with HTML tags removed is safe to use as the search result context.
+                    $searchResultContext = $assessmentContentTextOnly;
+                } else {
+                    // For lesson plans only, we use a different method to get the search result context text.  This is
+                    // necessary because lesson plan content is split into separate fields, and some fields are not
+                    // visible to student users.
+                    $fieldContentHtmlMatchingKeyword = (
+                        $this->getLessonPlanFieldContentHtmlMatchingKeyword($assessment, $keyword, $viewer)
+                    );
+
+                    if ($fieldContentHtmlMatchingKeyword !== null) {
+                        // The keyword was found in field content visible to the user.
+                        // Set the search result context to the content of the field that contained the keyword.
+                        $searchResultContextHtml = $fieldContentHtmlMatchingKeyword;
+                    } else {
+                        // The keyword was not found in any field content visible to the user.
+
+                        // If the keyword is found in the lesson plan title, then the match is still good.
+                        if (str_contains(strtolower($assessment->getTitle()), $keywordLower)) {
+                            // Set the search result context to the content of the first field.
+                            $searchResultContextHtml = (
+                                $this->consistentlyFormatLessonPlanFieldContent($assessment->getFields()->first())
+                            );
+                        } else {
+                            // This lesson plan is only here because it matched on content text that is invisible to the
+                            // user.  Therefore, this match should be eliminated.
+                            return null;
+                        }
+                    }
+
+                    $searchResultContext = (new ToText($searchResultContextHtml))->getText(); // Remove HTML tags.
                 }
 
                 $assessmentCreator = $assessment->getCreator();
@@ -170,7 +206,7 @@ class Hydrator extends BaseHydrator
                     ),
                     null,
                     AssessmentType::getIconClassSuffixForType($assessmentType),
-                    $this->truncateAroundKeyword($keyword, $assessmentDesc) ?? $this->truncate($assessmentDesc),
+                    ($this->truncateAroundKeyword($keyword, $searchResultContext) ?? $this->truncate($searchResultContext)),
                     $assessmentCreator,
                     [$folder],
                     $this->getSearchResultLinks($assessment, $viewer),
@@ -184,50 +220,155 @@ class Hydrator extends BaseHydrator
     }
 
     /**
-     * Return true if the keyword is contained in the $assessment's description, but not in any of the other
-     * strings that could possibly cause matches.
+     * Return the $assessment's content as a string possibly containing HTML.
+     *
+     * An assessment's content is:
+     *  * For LTI assessments:
+     *    the LTI assessment text.
+     *  * For lesson plans:
+     *    the concatenation of the content of all of its fields (including the field titles).
+     *  * For all other assessment types:
+     *    $assessment->getDescription()
+     *
+     * @param IAssessable $assessment
+     * @return string
+     */
+    private function getAssessmentHtmlContent(IAssessable $assessment): string
+    {
+        if ($assessment instanceof Assessment\Lti\Model) {
+            return $assessment->getLtiAssessmentText();
+        } elseif ($assessment instanceof Assessment\LessonPlan\Model) {
+            return $this->getConcatenationOfLessonPlanFieldTitlesAndBodies($assessment);
+        } else {
+            return $assessment->getDescription();
+        }
+    }
+
+    /**
+     * @param Assessment\LessonPlan\Model $lessonPlan
+     * @return string
+     */
+    private function getConcatenationOfLessonPlanFieldTitlesAndBodies(Assessment\LessonPlan\Model $lessonPlan): string
+    {
+        $strings = [];
+
+        foreach ($lessonPlan->getFields() as $field) {
+            $strings[] = $this->consistentlyFormatLessonPlanFieldContent($field);
+        }
+
+        return implode("\n\n", $strings);
+    }
+
+    /**
+     * Return true if the keyword is contained in the $assessment's content (which might contain HTML), but not in any
+     * of the non-HTML strings that could possibly cause matches.
+     *
+     * IMPORTANT: This function checks for case-insensitive matches.  This is to match the behaviour of an SQL 'LIKE' condition.
      *
      * The checks used here must match those in Assessment\QueryParamBuilder->buildBaseWhereParams()
      *
      * @param IAssessable $assessment
      * @param string      $keyword
+     * @param string      $assessmentContentHtml
      * @return bool
      */
-    private function assessmentMatchesKeywordOnlyOnDescription(IAssessable $assessment, string $keyword): bool
-    {
+    private function assessmentMatchesKeywordOnlyOnHtmlContent(
+        IAssessable $assessment,
+        string $keyword,
+        string $assessmentContentHtml
+    ): bool {
         // SQL match conditions copied from Assessment\QueryParamBuilder->buildBaseWhereParams()
         // -------------------------------------------------------------------------------------
-        // 'assessment.title LIKE :assessmentKeywordLike',                    // Assessment->getTitle()
-        // 'assessment.description LIKE :assessmentKeywordLike',              // Assessment->getDescription()
-        // 'task.link LIKE :assessmentKeywordLike',                           // Assessment\Task\Model
-        // 'assess.title LIKE :assessmentKeywordLike',                        // Overrides Assessment->getTitle()
-        // 'assess.description LIKE :assessmentKeywordLike',                  // Overrides Assessment->getDescription()
-        // 'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',   // Assessment\Lti\Model
-        // 'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike', // Assessment\Lti\Model
-        // 'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',  // Assessment\Lti\Model
+        // NOTES:
+        //  * The Search Keyword Match Conditions below must match those used in QueryParamBuilder->buildBaseWhereParams().
+        //  * The concatenation of all the lesson_plan_field titles and bodies is treated as HTML content.
+        //    Also LTI assessment text is treated as HTML content.
+        //    (see $this->getAssessmentHtmlContent())
+        //
+        // Search keyword match condition                                     Relevant field from model                        HtmlContent or Other?
+        // -----------------------------------------------------------------------------------------------------------------------------------------
+        // 'assessment.title LIKE :assessmentKeywordLike',                    // Assessment->getTitle()                              Other
+        // 'assessment.description LIKE :assessmentKeywordLike',              // Assessment->getDescription()                        HtmlContent
+        // 'task.link LIKE :assessmentKeywordLike',                           // Assessment\Task\Model->getUrl()                     Other
+        // 'assess.title LIKE :assessmentKeywordLike',                        // Overrides Assessment->getTitle()                    Other
+        // 'assess.description LIKE :assessmentKeywordLike',                  // Overrides Assessment->getDescription()              HtmlContent
+        // 'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',   // Assessment\Lti\Model->getLtiAssessmentUrl()         Other
+        // 'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike', // Assessment\Lti\Model->getLtiAssessmentTitle()       Other
+        // 'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',  // Assessment\Lti\Model->getLtiAssessmentText()        HtmlContent
+        // 'lesson_plan_field.title LIKE :assessmentKeywordLike',             // Assessment\LessonPlan\Model->getField()->getTitle() HtmlContent
+        // 'lesson_plan_field.body LIKE :assessmentKeywordLike'               // Assessment\LessonPlan\Model->getField()->getBody()  HtmlContent
 
-        if (str_contains($assessment->getTitle(), $keyword)) {
+        $keywordLower = strtolower($keyword);
+
+        if (str_contains(strtolower($assessment->getTitle()), $keywordLower)) {
             return false; // Found match on assessment.title or assess.title.
         }
 
         if ($assessment instanceof Assessment\Lti\Model) {
             if (
-                str_contains($assessment->getLtiAssessmentUrl(), $keyword) ||
-                str_contains($assessment->getLtiAssessmentTitle(), $keyword) ||
-                str_contains($assessment->getLtiAssessmentText(), $keyword)
+                str_contains(strtolower($assessment->getLtiAssessmentUrl()), $keywordLower) ||
+                str_contains(strtolower($assessment->getLtiAssessmentTitle()), $keywordLower)
             ) {
-                return false; // Found match on lti_assessment url, title, or text.
+                return false; // Found match on lti_assessment.lti_assessment_url or lti_assessment.lti_assessment_title.
             }
-        }
-
-        if ($assessment instanceof Assessment\Task\Model) {
-            if (str_contains($assessment->getUrl(), $keyword)) {
+        } elseif ($assessment instanceof Assessment\Task\Model) {
+            if (str_contains(strtolower($assessment->getUrl()), $keywordLower)) {
                 return false; // Found match on task.link.
             }
         }
 
-        // No other match found, so return true if match on description.
-        return str_contains($assessment->getDescription(), $keyword);
+        // No other match found, so return true if the keyword matches on the HTML content.
+        return str_contains(strtolower($assessmentContentHtml), $keywordLower);
+    }
+
+    /**
+     * @param Model  $lessonPlan
+     * @param string $keyword
+     * @param User   $viewer
+     * @return string | null
+     */
+    private function getLessonPlanFieldContentHtmlMatchingKeyword(
+        Assessment\LessonPlan\Model $lessonPlan,
+        string $keyword,
+        User $viewer
+    ): ?string {
+        // Lesson plan fields have a visibility enum that is either 'staff' or 'student' (lesson_plan_field.visibility).
+        // For the purposes of this permission check, superusers are treated as staff, and anyone who is not
+        // staff or superuser is treated as a student.
+        $treatViewerAsStudent = !($viewer->isSuperuser() || $viewer->getRole()->isStaff());
+
+        $fieldContentHtmlToReturn = null;
+        $keywordLower = strtolower($keyword);
+
+        // Find visible content that contains the search keyword.
+        foreach ($lessonPlan->getFields() as $field) {
+            if ($treatViewerAsStudent && $field->getVisibility() !== 'student') {
+                // No visible content here.
+                continue;
+            }
+
+            if (
+                // Use str_contains on lowercase strings to simulate case-insensitive match used by SQL LIKE condition.{
+                str_contains(strtolower($field->getTitle()), $keywordLower) ||
+                str_contains(strtolower($field->getBody()), $keywordLower)
+            ) {
+                // Found the keyword in text that is visible to the user, so this field's text is safe to
+                // use as the search result context text.
+                $fieldContentHtmlToReturn = $this->consistentlyFormatLessonPlanFieldContent($field);
+                break;
+            }
+        }
+
+        return $fieldContentHtmlToReturn;
+    }
+
+    /**
+     * @param Assessment\DataModel\LessonPlan\Field\Model $field
+     * @return string
+     */
+    private function consistentlyFormatLessonPlanFieldContent(Assessment\DataModel\LessonPlan\Field\Model $field): string
+    {
+        return $field->getTitle() . " -\n\n" . $field->getBody();
     }
 
     /**

@@ -75,54 +75,51 @@ class Hydrator extends BaseHydrator
         }
 
         $folders = $this->folderMapper->findByColumn('id', $folderIds);
+        $fullResults = [];
 
-        // Map those folders to full results
-        $fullResults = array_map(
-            function (RawResult $match) use ($folders, $viewer) {
-                $folder = $folders->getBy('id', $match->id);
+        foreach ($acceptedMatches as $match) {
+            $folder = $folders->getBy('id', $match->id);
 
-                if (!($folder instanceof Folder\Model)) {
-                    return null;
-                }
+            if (!($folder instanceof Folder\Model)) {
+                continue;
+            }
 
-                // Can the viewer even view this folder?
-                if ($this->access->getFolderAccess($viewer, $folder->getId()) < UserAccess::ACCESS_READ) {
-                    return null;
-                }
+            // Can the viewer even view this folder?
+            if ($this->access->getFolderAccess($viewer, $folder->getId()) < UserAccess::ACCESS_READ) {
+                continue;
+            }
 
-                return new FullResult(
-                    $match,
-                    $match->id,
-                    $folder->getTitle(),
-                    '/homepage/' . $match->id,
-                    $match->type,
-                    $match->relevance,
-                    null,
-                    null,
-                    null,
-                    // Image: folder's image if there is one
-                    $folder->getCoverImage()
-                        ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
-                        : null,
-                    // Icon: dependent on folder type?
-                    match ($match->type) {
-                        self::BASE_TYPE . '.course'    => 'course',
-                        self::BASE_TYPE . '.unit'      => 'unit',
-                        self::BASE_TYPE . '.class'     => 'teacher',
-                        self::BASE_TYPE . '.homepage'  => 'home',
-                        default                        => 'folder',
-                    },
-                    null,
-                    null,
-                    $this->folderMapper->findParents($folder, null, true)->getAll(),
-                    $this->getSearchResultLinks($folder, $viewer),
-                );
-            },
-            $acceptedMatches,
-        );
-        return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+            $fullResults[] = new FullResult(
+                $match,
+                $match->id,
+                $folder->getTitle(),
+                '/homepage/' . $match->id,
+                $match->type,
+                $match->relevance,
+                null,
+                null,
+                null,
+                // Image: folder's image if there is one
+                $folder->getCoverImage()
+                    ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
+                    : null,
+                // Icon: dependent on folder type?
+                match ($match->type) {
+                    self::BASE_TYPE . '.course'    => 'course',
+                    self::BASE_TYPE . '.unit'      => 'unit',
+                    self::BASE_TYPE . '.class'     => 'teacher',
+                    self::BASE_TYPE . '.homepage'  => 'home',
+                    default                        => 'folder',
+                },
+                null,
+                null,
+                $this->folderMapper->findParents($folder, null, true)->getAll(),
+                $this->getSearchResultLinks($folder, $viewer),
+            );
+        }
+
+        return $fullResults;
     }
-
 
     /**
      * Return an array of sub-arrays, each sub-array containing info for one link.
