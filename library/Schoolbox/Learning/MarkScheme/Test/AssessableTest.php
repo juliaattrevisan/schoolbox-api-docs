@@ -2458,10 +2458,14 @@ class AssessableTest extends TestCase
         // student 1: no attempts
 
         // student 2: 1 attempt + 1 published feedback (1/2)
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
         $attempt2 = (new QuizAttempt())
             ->setId(2)
             ->setSubmittedOnBehalfOf($student2)
-            ->setMarksGiven(1.0)
+            ->setHumanReadableMark("1.0 / 2.0")
+            ->setNormalisedMark(100 * 1.0 / 2.0)
             ->setMarksAvailable(2.0)
             ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
@@ -2475,7 +2479,8 @@ class AssessableTest extends TestCase
         $attempt3 = (new QuizAttempt())
             ->setId(3)
             ->setSubmittedOnBehalfOf($student3)
-            ->setMarksGiven(1.0)
+            ->setHumanReadableMark("1.0 / 2.0")
+            ->setNormalisedMark(100 * 1.0 / 2.0)
             ->setMarksAvailable(2.0)
             ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
@@ -2489,7 +2494,8 @@ class AssessableTest extends TestCase
         $attempt4a = (new QuizAttempt())
             ->setId(4)
             ->setSubmittedOnBehalfOf($student4)
-            ->setMarksGiven(1.0)
+            ->setHumanReadableMark("1.0 / 2.0")
+            ->setNormalisedMark(100 * 1.0 / 2.0)
             ->setMarksAvailable(2.0)
             ->setSubmittedAt($this->getDummyDate('2016-08-08 00:00:00'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 00:00:00'));
@@ -2502,7 +2508,8 @@ class AssessableTest extends TestCase
         $attempt4b = (new QuizAttempt())
             ->setId(5)
             ->setSubmittedOnBehalfOf($student4)
-            ->setMarksGiven(2.0)
+            ->setHumanReadableMark("2.0 / 2.0")
+            ->setNormalisedMark(100 * 2.0 / 2.0)
             ->setMarksAvailable(2.0)
             ->setSubmittedAt($this->getDummyDate('2016-08-09 00:00:00'))
             ->setUpdatedAt($this->getDummyDate('2016-08-09 00:00:00'));
@@ -2516,7 +2523,8 @@ class AssessableTest extends TestCase
         $attempt5a = (new QuizAttempt())
             ->setId(6)
             ->setSubmittedOnBehalfOf($student5)
-            ->setMarksGiven(1.0)
+            ->setHumanReadableMark("1.0 / 3.0")
+            ->setNormalisedMark(100 * 1.0 / 3.0)
             ->setMarksAvailable(3.0)
             ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
@@ -2529,7 +2537,8 @@ class AssessableTest extends TestCase
         $attempt5b = (new QuizAttempt())
             ->setId(7)
             ->setSubmittedOnBehalfOf($student5)
-            ->setMarksGiven(2.0)
+            ->setHumanReadableMark("2.0 / 2.0")
+            ->setNormalisedMark(100 * 2.0 / 2.0)
             ->setMarksAvailable(2.0)
             ->setSubmittedAt($this->getDummyDate('2016-08-09 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-09 21:03:19'));
