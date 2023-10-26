@@ -959,11 +959,9 @@ class Controller extends ConfigController
                 return strnatcasecmp($a->getTitle(), $b->getTitle());
             }
             // spaceship doesn't like null and 0 comparisons so order specifically on those ...
-            if (null === $a->getOrder())
-            {
+            if (null === $a->getOrder()) {
                 return 1;
-            } elseif(null === $b->getOrder())
-            {
+            } elseif (null === $b->getOrder()) {
                 return -1;
             }
             // no nulls, it is now safe to use normal spaceship check
