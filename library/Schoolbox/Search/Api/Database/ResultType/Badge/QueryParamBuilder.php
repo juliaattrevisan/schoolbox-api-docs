@@ -38,15 +38,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $whereParts         = [
+        $whereParts = [
             'b.deleted_at IS NULL'
         ];
         $keywordSearchParts = [
             'b.name LIKE :badgeKeywordLike',
             'b.body LIKE :badgeKeywordLike',
         ];
-        $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
-        $params             = [
+        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $params = [
             'badgeNow'         => Alaress_Date_Format::now()->getDatabase(),
             'badgeKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];

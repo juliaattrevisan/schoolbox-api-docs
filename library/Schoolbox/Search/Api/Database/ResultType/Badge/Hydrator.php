@@ -80,6 +80,19 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
+                $badgeBodyTextOnly = (new ToText($badge->getBody()))->getText();
+                $badgeBodyTextOnlyLowercase = strtolower($badgeBodyTextOnly);
+                $keywordLowercase = strtolower($keyword);
+
+                // Because the badge body contains HTML, this match might have come about only because the
+                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if (!str_contains(strtolower($badge->getName()), $keywordLowercase)) {
+                    if (!str_contains($badgeBodyTextOnlyLowercase, $keywordLowercase)) {
+                        return null;
+                    }
+                }
+
                 // Work out image path for badge
                 $image = null;
                 if ($badge->getIcon()) {
@@ -88,7 +101,7 @@ class Hydrator extends BaseHydrator
                 if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
                     $image = $this->buildStorageImageUrl($badge->getImage())->__toString();
                 }
-                $badgeBody = (new ToText($badge->getBody()))->getText();
+
                 return new FullResult(
                     $match,
                     $match->id,
@@ -101,7 +114,7 @@ class Hydrator extends BaseHydrator
                     $badge->getCategory()->getName(), // Meta.  Context line for the search result.
                     $image,
                     'badge',
-                    $this->truncateAroundKeyword($keyword, $badgeBody) ?? $this->truncate($badgeBody),
+                    $this->truncateAroundKeyword($keyword, $badgeBodyTextOnly) ?? $this->truncate($badgeBodyTextOnly),
                     $badge->getCreatedBy(),
                     [], // Context.  Empty since no linked folder.
                     $this->getSearchResultLinks($badge, $viewer)
