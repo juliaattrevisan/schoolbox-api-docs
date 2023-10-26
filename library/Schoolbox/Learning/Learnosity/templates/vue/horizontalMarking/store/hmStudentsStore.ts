@@ -153,14 +153,33 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * To update a student
-     * @param {Student} student - the student to update
      * @param {StudentItem} item - the item to update
      * @param {number} score - the score to update
      * @param {string} comment - the comment to update
      */
-    function updateStudentReport(student: Student, item: StudentItem, score: number, comment: string) {
+    function updateStudentItemReview(item: StudentItem, score: number, comment: string) {
         item.response.score = score;
         item.response.comment = comment;
+
+        // url.value = student.urls.comment;
+        // await updateComment();
+
+        // newQueryParams.append("comment", comment);
+        // url.value = `/${student.urls.comment}?${newQueryParams.toString()}`;
+        // await updateComment();
+
+        // send the student payload
+        // once done move to the next student
+        // progressReport(student);
+    }
+
+    /**
+     * To update a student
+     * @param {Student} student - the student to update
+     * @param {string} comment - the comment to update
+     */
+    function updateStudentFinalReview(student: Student, comment: string) {
+        student.attemptResponse.comment = comment;
 
         // url.value = student.urls.comment;
         // await updateComment();
@@ -182,6 +201,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         toggleStudent,
         toggleAllStudents,
         reportLoaded,
-        updateStudentReport,
+        progressReport,
+        updateStudentItemReview,
+        updateStudentFinalReview,
     };
 });

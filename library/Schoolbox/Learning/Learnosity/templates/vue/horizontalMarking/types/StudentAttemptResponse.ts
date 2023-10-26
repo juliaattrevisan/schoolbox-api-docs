@@ -3,6 +3,6 @@
  */
 export type StudentAttemptResponse = {
     learnosityReference: string;
-    studentId: number;
+    studentId: number; // used to link to the student as loaded from the server
     comment?: string;
 };

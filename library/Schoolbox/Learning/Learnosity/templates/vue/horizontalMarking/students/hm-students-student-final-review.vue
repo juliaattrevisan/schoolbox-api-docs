@@ -25,7 +25,6 @@ const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "S
  */
 async function saveComment() {
     const formData = new FormData();
-    // formData.append("learnosityReference", props.item.response.learnosityReference);
     formData.append("comment", comment.value);
     await fetch(props.student.urls.attemptComment, {
         method: "POST",
@@ -37,16 +36,19 @@ async function saveComment() {
  * Update the response of the item
  */
 async function onSaveSelected() {
+    studentsStore.updateStudentFinalReview(props.student, comment.value);
     isSaving.value = true;
     await saveComment();
     isSaving.value = false;
-    // studentsStore.updateStudentReport(props.student, props.item, score.value, comment.value);
-    // pass through the customised score and comment
-    // can the -mark be updated? I assume so
-    // once that's been submitted, move to the next student
-    // if that's the last student, move to the next item
-    // if that's the last student on the last item, move to finalise review
 }
+
+/**
+ * Save any unsaved changes in the front end only
+ * Back end changes are saved via the fetch requests above
+ */
+window.Vue.onUnmounted(() => {
+    studentsStore.updateStudentFinalReview(props.student, comment.value);
+});
 </script>
 
 <template>

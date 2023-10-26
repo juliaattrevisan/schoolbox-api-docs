@@ -51,17 +51,21 @@ async function saveComment() {
  * Save the score and comment, and then move to the next student
  */
 async function onSaveSelected() {
+    studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
+    studentsStore.progressReport(props.student);
     isSaving.value = true;
     await saveScore();
     await saveComment();
     isSaving.value = false;
-    studentsStore.updateStudentReport(props.student, props.item, score.value, comment.value);
-    // pass through the customised score and comment
-    // can the -mark be updated? I assume so
-    // once that's been submitted, move to the next student
-    // if thats the last student, move to the next item
-    // if thats the last student on the last item, move to finalise review
 }
+
+/**
+ * Save any unsaved changes in the front end only
+ * Back end changes are saved via the fetch requests above
+ */
+window.Vue.onUnmounted(() => {
+    studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
+});
 </script>
 
 <template>
