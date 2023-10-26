@@ -295,10 +295,22 @@ class Participant
      */
     public function findMostRecentInstructorGivenFeedback(): ?IFeedback
     {
-        return $this->allFeedbacks
+        $stuff = $this->allFeedbacks
             ->filter(new InstructorGivenFilter())
-            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
-            ->first();
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc']);
+
+        new \Alaress_Probe('findMostRecentInstructorGivenFeedback');
+        foreach ($stuff as $thing) {
+            new \Alaress_Probe(
+                $thing->getId(),
+                'updated: ' . $thing->getUpdatedAt()->getDatabase(),
+                'published: ' . $thing->getPublishedAt()?->getDatabase(),
+                $thing->getNormalisedMark(),
+                $thing->getHumanReadableMark()
+            );
+        }
+
+        return $stuff->first();
     }
 
 
@@ -311,11 +323,23 @@ class Participant
      */
     public function findMostRecentInstructorGivenPublishedFeedback(): ?IFeedback
     {
-        return $this->allFeedbacks
+        $stuff = $this->allFeedbacks
             ->filter(new PublishedFilter())
             ->filter(new InstructorGivenFilter())
-            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc'])
-            ->first();
+            ->sortByMultiFields(['updatedAt' => 'desc', 'id' => 'desc']);
+
+        new \Alaress_Probe('findMostRecentInstructorGivenPublishedFeedback');
+        foreach ($stuff as $thing) {
+            new \Alaress_Probe(
+                $thing->getId(),
+                'updated: ' . $thing->getUpdatedAt()->getDatabase(),
+                'published: ' . $thing->getPublishedAt()?->getDatabase() ?? null,
+                $thing->getNormalisedMark(),
+                $thing->getHumanReadableMark()
+            );
+        }
+
+        return $stuff->first();
     }
 
 
