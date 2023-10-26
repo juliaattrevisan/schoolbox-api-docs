@@ -952,10 +952,23 @@ class Controller extends ConfigController
         }
 
         // sequence folders based on folder order (if it is set, else use title natural sort)
-        $folders = $folders->sortByMultiFields([
-            'order' => 'asc',
-            'title' => 'asc',
-        ]);
+        $folders
+        ->sortByCallback(function (Folder\Model $a, Folder\Model $b) {
+            // if the order is exact (either both null, or however it goes), sort on title using a natual sort
+            if ($a->getOrder() === $b->getOrder()) {
+                return strnatcasecmp($a->getTitle(), $b->getTitle());
+            }
+            // spaceship doesn't like null and 0 comparisons so order specifically on those ...
+            if (null === $a->getOrder())
+            {
+                return 1;
+            } elseif(null === $b->getOrder())
+            {
+                return -1;
+            }
+            // no nulls, it is now safe to use normal spaceship check
+            return $a->getOrder() <=> $b->getOrder();
+        });
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['workType']);
 
