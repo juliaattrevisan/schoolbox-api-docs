@@ -1,11 +1,28 @@
 /**
- * To load the reports, currently we dont store anything here, its more to
- * load the reports data and pass it to the other stores
+ * To load the reports data and pass it to the other stores
  */
 
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Item } from "../types/Item";
+
+/**
+ * To move the marks (which are in the title div) out of the response container into <hm-students-student-mark>
+ * we need to add an attribute to the title div so it can be properly targeted, as they all just have the same class name
+ * @param {string} reportId - the report id
+ */
+function addTargetsToMarks(reportId: string) {
+    const report = document.getElementById(reportId);
+    const reportItemResponseIds: string[] = [];
+    const reportItemResponses = report?.querySelectorAll("[data-reference]");
+    reportItemResponses?.forEach((response) => {
+        reportItemResponseIds.push((response as HTMLDivElement).dataset.reference as string);
+    });
+    const reportItemTitles = report?.querySelectorAll(".lrn-report-item-title");
+    reportItemTitles?.forEach((title, index) => {
+        (title as HTMLDivElement).dataset.referenceTitle = reportItemResponseIds[index];
+    });
+}
 
 /**
  * store any passed through properties
@@ -38,6 +55,8 @@ export function loadReports(reportPayloads: string[]) {
                             items.push(item);
                         });
                         useStudentsStore().addItems(reportId, items);
+
+                        addTargetsToMarks(reportId);
 
                         // add the questions to the items, as they aren't included in the initial payload
                         if (i === 0) {

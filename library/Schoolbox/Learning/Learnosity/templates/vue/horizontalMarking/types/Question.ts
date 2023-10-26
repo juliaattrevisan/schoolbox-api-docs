@@ -7,4 +7,7 @@ export type Question = {
         sheet_reference: string;
     };
     response_id: string;
+    validation: {
+        automarkable: boolean;
+    };
 };

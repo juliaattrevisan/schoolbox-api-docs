@@ -23,11 +23,10 @@ const display = window.Vue.computed(() => {
 });
 
 /**
- *
+ * Move the item mark element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
-    const marks = props.container.querySelectorAll(".lrn-report-item-title");
-    const mark = marks[props.index] as HTMLHeadingElement;
+    const mark = props.container.querySelector(".lrn-report-item-title") as HTMLDivElement;
     if (mark) {
         (mark.firstChild as HTMLElement).nodeValue = "";
         markEl.value?.appendChild(mark);
