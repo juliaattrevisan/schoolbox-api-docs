@@ -10,7 +10,8 @@ const props = defineProps<Props>();
 
 <template>
     <ul v-if="props.curriculumCodes.length > 0" class="information-list">
-        <li v-for="node in props.curriculumCodes" :key="node.id">
+        <template v-for="node in props.curriculumCodes" :key="node.id">
+          <li v-if="node.enabled">
             <div class="content">
                 <template v-if="node.code">
                     [<a :href="'#' + node.id" title="View curriculum node details" data-display-node>{{ node.code }}</a
@@ -23,7 +24,8 @@ const props = defineProps<Props>();
                     :curriculum-codes="node.children"
                 ></curriculum-codes-list>
             </div>
-        </li>
+          </li>
+        </template>
     </ul>
 </template>
 

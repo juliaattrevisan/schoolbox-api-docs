@@ -296,6 +296,7 @@ class Model implements ISoftDeletable, JsonSerializable
             'children'    => $this->getChildren(),
             'breadcrumb'  => $this->buildBreadcrumb(' > '),
             'uuid'        => $this->getUuid(),
+            'enabled'     => $this->getEnabled(),
         ];
     }
 }
