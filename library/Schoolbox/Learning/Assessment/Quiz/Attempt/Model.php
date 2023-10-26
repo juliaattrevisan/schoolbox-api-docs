@@ -17,10 +17,20 @@ use Schoolbox\Learning\Assessment\AbstractResponse;
 class Model extends AbstractResponse
 {
     /**
-     * Total marks awarded in this attempt
-     * @var float
+     * The human readable mark for this attempt
+     *
+     * @var string|null
      */
-    private $marksGiven;
+    private $humanReadableMark;
+
+
+    /**
+     * The normalised mark for this attempt
+     *
+     * @var float|null
+     */
+    private $normalisedMark;
+
 
     /**
      * Total marks available in this attempt
@@ -87,23 +97,45 @@ class Model extends AbstractResponse
         );
     }
 
+
     /**
-     * @return float
+     * @return string|null
      */
-    public function getMarksGiven()
+    public function getHumanReadableMark(): ?string
     {
-        return $this->marksGiven;
+        return $this->humanReadableMark;
+    }
+
+
+    /**
+     * @param string|null $humanReadableMark
+     * @return $this
+     */
+    public function setHumanReadableMark(?string $humanReadableMark): self
+    {
+        $this->humanReadableMark = $humanReadableMark;
+        return $this;
     }
 
     /**
-     * @param float $marksGiven
-     * @return static
+     * @return float|null
      */
-    public function setMarksGiven($marksGiven)
+    public function getNormalisedMark(): ?float
     {
-        $this->marksGiven = $marksGiven;
+        return $this->normalisedMark;
+    }
+
+
+    /**
+     * @param float|null $normalisedMark
+     * @return $this
+     */
+    public function setNormalisedMark(?float $normalisedMark): self
+    {
+        $this->normalisedMark = $normalisedMark;
         return $this;
     }
+
 
     /**
      * @return float

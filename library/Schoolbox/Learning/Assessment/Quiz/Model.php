@@ -172,11 +172,19 @@ class Model extends AbstractAssessment
         if (null === $authoritativeAttempt) {
             return null;
         }
-        $marksAvailable = $authoritativeAttempt->getMarksAvailable();
-        if (0.0 === (float)$marksAvailable) {
-            return null;
-        }
-        return IMarkScheme::NORMALISED_MARK_MAX * $authoritativeAttempt->getMarksGiven() / $marksAvailable;
+
+        return $authoritativeAttempt->getNormalisedMark();
+    }
+
+    /**
+     * Quiz does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @inheritdoc
+     */
+    public function getHumanReadableMark(Participant $participant, $publishedOnly)
+    {
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getHumanReadableMark() : null;
     }
 
 

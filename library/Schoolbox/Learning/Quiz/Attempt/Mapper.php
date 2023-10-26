@@ -318,7 +318,8 @@ class Mapper extends BaseMapper
         $query = "
             SELECT
                 aa.attempt_id,
-                aa.mark  AS mark,
+                aa.mark AS mark,
+                aa.norm_mark AS norm_mark,
                 aa.max_mark AS max_mark,
                 (
                     SELECT `as`.section_id
