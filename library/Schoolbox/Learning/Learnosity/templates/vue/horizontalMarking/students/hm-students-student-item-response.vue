@@ -69,5 +69,17 @@ window.Vue.onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div ref="responseEl"></div>
+    <div ref="responseEl" class="item-response"></div>
 </template>
+
+<style lang="scss">
+.item-response {
+    border-top: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--body-background);
+    padding: var(--spacing-m) 0;
+    .lrn_widget {
+        margin: 0;
+        padding: 0;
+    }
+}
+</style>

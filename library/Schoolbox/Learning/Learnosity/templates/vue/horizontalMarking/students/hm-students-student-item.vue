@@ -29,14 +29,25 @@ const isActive = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="isActive">
-        <div class="l-flex-col l-gap-m">
-            <hm-students-student-item-response
-                :student="props.student"
-                :item="props.item"
-                :container="props.container"
-            />
-            <hm-students-student-item-review :student="props.student" :item="props.item" />
+    <transition>
+        <div v-if="isActive">
+            <div class="l-flex-col l-gap-m">
+                <hm-students-student-item-response
+                    :student="props.student"
+                    :item="props.item"
+                    :container="props.container"
+                />
+                <hm-students-student-item-review :student="props.student" :item="props.item" />
+            </div>
         </div>
-    </div>
+    </transition>
 </template>
+
+<style>
+.v-enter-active {
+    transition: opacity 0.3s ease;
+}
+.v-enter-from {
+    opacity: 0;
+}
+</style>
