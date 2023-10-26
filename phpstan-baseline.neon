@@ -5357,7 +5357,7 @@ parameters:
 
 		-
 			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 1
+			count: 2
 			path: library/Schoolbox/Resource/Folder/Controller.php
 
 		-

@@ -409,7 +409,7 @@ class Controller extends BaseController
                 $yearLevels,
                 (bool)($post['recursive-year-levels'] ?? false),
                 $this->getUser(),
-                $post['order'] ? (int)$post['order'] : null
+                ('' !== $post['order'] ?? '') ? (int)$post['order'] : null
             );
 
             /* If Inherit Permissions is on, don't create group
@@ -549,9 +549,7 @@ class Controller extends BaseController
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
 
         // update folder order
-        if ($order) {
-            $folder->setOrder($order);
-        }
+        $folder->setOrder($order);
 
         $folder->setUpdatedBy($user->getId());
 
