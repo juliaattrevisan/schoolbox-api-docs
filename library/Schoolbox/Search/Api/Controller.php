@@ -248,6 +248,10 @@ class Controller extends Base
 
         $fromDate = null;
         if (isset($decodedFilter['date']['from'])) {
+            if (strlen($decodedFilter['date']['from']) === 10) {
+                // Assume date has been supplied in 'Y-m-d' format, so add default time (start of day) in expected format.
+                $decodedFilter['date']['from'] .= 'T00:00:00' . date('P');
+            }
             try {
                 $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], DateTimeInterface::RFC3339);
             } catch (InvalidArgumentException $e) {
@@ -257,6 +261,10 @@ class Controller extends Base
 
         $toDate = null;
         if (isset($decodedFilter['date']['to'])) {
+            if (strlen($decodedFilter['date']['to']) === 10) {
+                // Assume date has been supplied in 'Y-m-d' format, so add default time (end of day) in expected format.
+                $decodedFilter['date']['to'] .= 'T23:59:59' . date('P');
+            }
             try {
                 $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], DateTimeInterface::RFC3339);
             } catch (InvalidArgumentException $e) {
