@@ -1178,7 +1178,6 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
     border: none;
 }
 ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
-    margin: 0 -1rem;
     max-width: none;
     width: auto;
     border-bottom: 1px solid var(--body-background);
@@ -1228,4 +1227,68 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 }
 .lrn .lrn-author-ui .lrn-author-save-button-group {
     width: 100%;
+}
+
+/* replace icons with sb icons */
+.lrn-i-preview::before {
+    content: "\e901";
+    font-family: "schoolbox";
+}
+.lrn .lrn-author-ui .lrn-list-view-item .lrn-btn-default {
+    background: transparent;
+    border: none;
+}
+.lrn-i-drag::before {
+    content: "";
+    content: "\e62f";
+    font-family: "schoolbox";
+}
+.lrn .lrn-author-ui .lrn-btn:focus,
+.lrn .lrn-author-ui a.lrn-btn:focus {
+    outline: none;
+}
+/* added right border to the cards row */
+.lrn.lrn-author
+    .lrn-item-for-activity-list.lrn-item-for-activity-list-edit
+    .lrn-list-view-item
+    .lrn-list-view-col-first {
+    border-right: 1px solid var(--body-background);
+}
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span {
+    border-radius: 0px;
+    border: 1px solid var(--form-border-color);
+    color: transparent;
+}
+/* change checkbox and rows selection background color */
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-input:checked + .lrn-check-box-span {
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-background);
+}
+.lrn.lrn-author
+    .lrn-item-for-activity-list
+    .lrn-check-box-wrapper
+    .lrn-check-box-input:checked
+    + .lrn-check-box-span:hover {
+    background-color: var(--form-border-color);
+}
+.lrn
+    .lrn-author-ui
+    .lrn-author-activity-edit
+    [data-tab-content="adaptive"]
+    .lrn-list-selected-activity
+    .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-selected-activity .lrn-list-details,
+.lrn
+    .lrn-author-ui
+    .lrn-author-activity-edit
+    [data-tab-content="templateDragAndDrop"]
+    .lrn-list-selected-activity
+    .lrn-list-details,
+.lrn
+    .lrn-author-ui
+    .lrn-author-activity-edit
+    [data-tab-content="details"]
+    .lrn-list-selected-activity
+    .lrn-list-details {
+    background-color: var(--content-ui-background);
 }
