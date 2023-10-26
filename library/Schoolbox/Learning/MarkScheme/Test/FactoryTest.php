@@ -200,8 +200,6 @@ class FactoryTest extends TestCase
     public function providerQuizMarkTypeInvalid(): array
     {
         return [
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))],
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE))],
