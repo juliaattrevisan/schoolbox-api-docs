@@ -1066,4 +1066,40 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
 .lrn .lrn-author-ui .lrn-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
     padding-left: 30px;
     color: var(--content-ui-foreground);
+    background-color: var(--content-ui-hover);
+    text-decoration: none !important;
+}
+.lrn.lrn-author .lrn-author-item-nav .lrn-btn {
+    text-transform: none;
+}
+.lrn .lrn-author-ui .lrn-btn-save:hover:enabled .lrn-i-save:before {
+    transform: none;
+}
+.lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary {
+    color: var(--content-ui-submit-foreground);
+    background-color: var(--content-ui-submit-background);
+}
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
+    color: var(--content-ui-submit-foreground);
+    background-color: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
+}
+
+/* set correct answer styles */
+.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger.lrn-active,
+.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger.lrn-active:hover {
+    background: var(--content-ui-background);
+    border: 1px solid var(--content-ui-background);
+    background-color: var(--content-ui-hover);
+    text-decoration: none !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-sub-content {
+    background: var(--content-ui-background);
+    border: 1px solid var(--content-ui-background);
+    border-bottom: 1px solid var(--content-ui-background);
 }
