@@ -47,19 +47,8 @@ export const useStore = defineStore("searchPage", () => {
     /**
      * To update the url with the current query params
      */
-    function setQueryParams(simulateRedirect: boolean) {
-        console.info("searchPageStore.ts setQueryParams() simulateRedirect: ", simulateRedirect);
-        if (simulateRedirect) {
-            console.info("searchPageStore.ts setQueryParams() simulating redirect");
-            console.info("searchPageStore.ts setQueryParams() pushing state ", window.location.href);
-            window.history.pushState({}, "", window.location.href);
-        }
-
+    function setQueryParams() {
         const newQueryParams = getQueryParams();
-        console.info(
-            "searchPageStore.ts setQueryParams() replacing state with ",
-            `${window.location.pathname}?${newQueryParams.toString()}`
-        );
         window.history.replaceState({}, "", `${window.location.pathname}?${newQueryParams.toString()}`);
     }
 

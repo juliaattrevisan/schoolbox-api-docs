@@ -63,7 +63,7 @@ async function onSearch() {
     if (searchStore.isSearching) {
         return;
     }
-    await searchStore.search(true);
+    await searchStore.search();
 }
 
 /**
