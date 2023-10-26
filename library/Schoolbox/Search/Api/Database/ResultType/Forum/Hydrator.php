@@ -106,7 +106,19 @@ class Hydrator extends BaseHydrator
                 $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()] ?? 0;
                 $matchingPostString = $nMatchingPostsInThread > 1 ? "(+$nMatchingPostsInThread more matching posts)" : '';
 
-                $postBody = (new ToText($post->getBody()))->getText();
+                $postBodyTextOnly = (new ToText($post->getBody()))->getText();
+                $postBodyTextOnlyLowercase = strtolower($postBodyTextOnly);
+                $keywordLowercase = strtolower($keyword);
+
+                // Because the blog body contains HTML, this match might have come about only because the
+                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if (!str_contains(strtolower($postThread->getTitle()), $keywordLowercase)) {
+                    if (!str_contains($postBodyTextOnlyLowercase, $keywordLowercase)) {
+                        return null;
+                    }
+                }
+
                 return new FullResult(
                     $match,
                     $match->id,
@@ -122,7 +134,7 @@ class Hydrator extends BaseHydrator
                     "Posted {$post->getModified()->getRelativeTime()} by {$post->getOwner()->getFullName()} $matchingPostString",
                     null,
                     'forum',
-                    $this->truncateAroundKeyword($keyword, $postBody) ?? $this->truncate($postBody),
+                    $this->truncateAroundKeyword($keyword, $postBodyTextOnly) ?? $this->truncate($postBodyTextOnly),
                     $post->getOwner(),
                     [$threadFolder], // Context: post's folder
                     [],

@@ -38,7 +38,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $whereParts         = [
+        $whereParts = [
             'fp.deleted="false"', // The type of forumPost.deleted is enum('true', 'false').
             'ft.deleted="false"', // The type of forumThread.deleted is enum('true', 'false').
         ];
@@ -46,8 +46,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'ft.title LIKE :postKeywordLike',
             'fp.body LIKE :postKeywordLike',
         ];
-        $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
-        $params             = [
+        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $params = [
             'postNow'         => Alaress_Date_Format::now()->getDatabase(),
             'postKeyword'     => $this->quoter->escapeForLike($keyword),
             'postKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
