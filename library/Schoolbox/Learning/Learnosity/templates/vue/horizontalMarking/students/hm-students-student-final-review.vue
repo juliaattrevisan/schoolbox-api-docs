@@ -21,19 +21,6 @@ const isSaving = window.Vue.ref<boolean>(false);
 const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "Save and continue"));
 
 /**
- * Highlight that focus has shifted to this student after a previous item has been marked
- */
-window.Vue.watch(
-    () => props.student.hasFocus,
-    () => {
-        if (props.student.hasFocus) {
-            const editor = window.sbProps.editors[editorId];
-            editor.editing.view.focus();
-        }
-    }
-);
-
-/**
  * Save the comment
  */
 async function saveComment() {

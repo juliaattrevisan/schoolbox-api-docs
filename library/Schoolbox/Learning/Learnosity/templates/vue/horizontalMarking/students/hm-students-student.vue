@@ -21,6 +21,18 @@ const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
 /**
+ * Hide the student if hideMarkedAttempts is true and the current item
+ * linked to the student has been marked
+ * @returns {string} - the height of the student container
+ */
+const containerHeight = window.Vue.computed(() => {
+    if (itemsStore.hideMarkedAttempts) {
+        return "0fr";
+    }
+    return "1fr";
+});
+
+/**
  * To show/hide the response when selected
  */
 function onToggleSelected() {
@@ -31,7 +43,7 @@ function onToggleSelected() {
  * To show/hide the response container
  * @returns {string} - the height of the response container
  */
-const containerHeight = window.Vue.computed(() => {
+const responseHeight = window.Vue.computed(() => {
     return props.student.isExpanded ? "1fr" : "0fr";
 });
 
@@ -42,7 +54,6 @@ window.Vue.watch(
     () => props.student.isReportLoaded,
     async () => {
         onToggleSelected();
-        // debugger;
         await window.Vue.nextTick();
     }
 );
@@ -61,58 +72,71 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div
-        ref="studentEl"
-        :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`"
-        :data-has-focus="props.student.hasFocus"
-    >
-        <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
-            <div class="l-flex-row l-flex--align-center l-gap-m">
-                <button
-                    v-if="props.student.isReportLoaded"
-                    :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
-                        props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
-                    }`"
-                    :disabled="!props.student.isReportLoaded"
-                    @click.prevent="onToggleSelected"
-                ></button>
-                <span v-else class="loader"></span>
-                <h2>{{ props.student.name }}</h2>
-            </div>
-            <div>
-                <template v-if="props.student.isReportLoaded">
-                    <hm-students-student-mark
-                        v-for="(item, markIndex) in itemsStore.items"
-                        :key="item.id"
-                        :item="item"
-                        :index="markIndex"
-                        :container="(responseContentEl as HTMLDivElement)"
-                    />
-                </template>
-            </div>
-        </div>
-        <div class="response l-grid">
-            <div class="response__inner-container">
-                <div ref="responseContentEl" class="response__content">
-                    <!-- this is the div Learnosity look for to insert the response content into, it will be completely replaced -->
-                    <div :id="props.student.elementId"></div>
+    <div class="student l-grid">
+        <div class="student__inner-container">
+            <div
+                ref="studentEl"
+                :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`"
+                :data-has-focus="props.student.hasFocus"
+            >
+                <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
+                    <div class="l-flex-row l-flex--align-center l-gap-m">
+                        <button
+                            v-if="props.student.isReportLoaded"
+                            :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
+                                props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
+                            }`"
+                            :disabled="!props.student.isReportLoaded"
+                            @click.prevent="onToggleSelected"
+                        ></button>
+                        <span v-else class="loader"></span>
+                        <h2>{{ props.student.name }}</h2>
+                    </div>
+                    <div>
+                        <template v-if="props.student.isReportLoaded">
+                            <hm-students-student-mark
+                                v-for="item in itemsStore.items"
+                                :key="item.id"
+                                :item="item"
+                                :container="(responseContentEl as HTMLDivElement)"
+                            />
+                        </template>
+                    </div>
                 </div>
-                <template v-if="props.student.isReportLoaded">
-                    <hm-students-student-item
-                        v-for="item in props.student.items"
-                        :key="item.reference"
-                        :student="props.student"
-                        :item="item"
-                        :container="(responseContentEl as HTMLDivElement)"
-                    />
-                    <hm-students-student-final-review v-if="itemsStore.isFinalReview" :student="props.student" />
-                </template>
+                <div class="response l-grid">
+                    <div class="response__inner-container">
+                        <div ref="responseContentEl" class="response__content">
+                            <!-- this is the div Learnosity look for to insert the response content into, it will be completely replaced -->
+                            <div :id="props.student.elementId"></div>
+                        </div>
+                        <template v-if="props.student.isReportLoaded">
+                            <hm-students-student-item
+                                v-for="item in props.student.items"
+                                :key="item.reference"
+                                :student="props.student"
+                                :item="item"
+                                :container="(responseContentEl as HTMLDivElement)"
+                            />
+                            <hm-students-student-final-review
+                                v-if="itemsStore.isFinalReview"
+                                :student="props.student"
+                            />
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
+.student {
+    grid-template-rows: v-bind(containerHeight);
+    transition: grid-template-rows 300ms;
+    &__inner-container {
+        overflow: hidden;
+    }
+}
 .toggle-button {
     background: none;
     color: var(--content-ui-foreground);
@@ -125,7 +149,7 @@ window.Vue.watch(
     width: 2.5rem;
 }
 .response {
-    grid-template-rows: v-bind(containerHeight);
+    grid-template-rows: v-bind(responseHeight);
     transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;

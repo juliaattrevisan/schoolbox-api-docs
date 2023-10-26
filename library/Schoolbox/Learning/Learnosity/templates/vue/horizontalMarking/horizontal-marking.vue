@@ -49,7 +49,24 @@ window.Vue.onMounted(async () => {
     <div></div>
     <div class="l-flex-col l-gap-m f-no-margins">
         <!-- Title. But add the metadata etc. when you get up to that bit -->
-        <h1>Horizontal Marking for {{ props.title }}</h1>
+        <div class="l-flex-row l-flex--justify-space">
+            <h1>Horizontal Marking for {{ props.title }}</h1>
+            <div class="text-right">
+                <label class="inline-block">Hide marked attempts</label>
+                <div class="long switch f-no-margins">
+                    <input
+                        id="show-only-enabled"
+                        v-model="useItemsStore().hideMarkedAttempts"
+                        type="checkbox"
+                        data-test-show-only-enabled
+                    />
+                    <label for="show-only-enabled">
+                        <span>Hidden</span>
+                        <span>Shown</span>
+                    </label>
+                </div>
+            </div>
+        </div>
         <template v-if="hasStudents">
             <div v-if="useStore().isLoaded">
                 <h2 class="subheader">Cards</h2>
@@ -62,7 +79,7 @@ window.Vue.onMounted(async () => {
             </div>
         </template>
         <template v-else>
-            <div class="empty-state-flex-centered" data-test="sp-results-prompt">
+            <div class="empty-state-flex-centered">
                 <i class="icon-submissions"></i>
                 <p>No attempts have been submitted yet.</p>
             </div>

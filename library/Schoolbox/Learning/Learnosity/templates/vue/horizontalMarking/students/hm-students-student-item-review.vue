@@ -23,18 +23,6 @@ const isSaving = window.Vue.ref<boolean>(false);
 const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "Save and continue"));
 
 /**
- * Highlight that focus has shifted to this student after a previous item has been marked
- */
-window.Vue.watch(
-    () => props.student.hasFocus,
-    () => {
-        if (props.student.hasFocus) {
-            scoreEl.value?.focus();
-        }
-    }
-);
-
-/**
  * Save the score
  */
 async function saveScore() {
@@ -94,7 +82,7 @@ window.Vue.onUnmounted(() => {
     <div>
         <label>Update Score (max score: {{ props.item.response.maxScore }})</label>
         <input
-            :id="`customise-score-${$props.item.reference}`"
+            :id="`customise-score-${props.item.reference}`"
             ref="scoreEl"
             v-model="score"
             type="number"

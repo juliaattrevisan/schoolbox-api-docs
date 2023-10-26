@@ -13,6 +13,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     const hasNextItem = window.Vue.computed(() => activeItemIndex.value < items.value.length - 1);
     const isNextFinalReview = window.Vue.computed(() => items.value[activeItemIndex.value + 1]?.isFinalReview);
     const isFinalReview = window.Vue.computed(() => activeItem.value.isFinalReview === true);
+    const hideMarkedAttempts = window.Vue.ref<boolean>(false);
 
     /**
      * store any passed through properties
@@ -82,12 +83,12 @@ export const useItemsStore = defineStore("hmItems", () => {
 
     return {
         items,
-        items,
         activeItem,
         hasPreviousItem,
         hasNextItem,
         isNextFinalReview,
         isFinalReview,
+        hideMarkedAttempts,
         init,
         addQuestions,
         setActiveItem,

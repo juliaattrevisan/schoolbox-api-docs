@@ -7,8 +7,7 @@ import type { Item } from "../types/Item";
 import { useItemsStore } from "../store/hmItemsStore";
 
 interface Props {
-    item: Item; //
-    index: number; //
+    item: Item; // the item to display
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
@@ -26,9 +25,9 @@ const display = window.Vue.computed(() => {
  * Move the item mark element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
-    const mark = props.container.querySelector(".lrn-report-item-title") as HTMLDivElement;
+    const mark = props.container.querySelector(`[data-reference-title="${props.item.reference}"]`) as HTMLDivElement;
     if (mark) {
-        (mark.firstChild as HTMLElement).nodeValue = "";
+        (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
         markEl.value?.appendChild(mark);
     }
 });
