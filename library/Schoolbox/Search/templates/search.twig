@@ -1,14 +1,17 @@
 {#
 Expected data items:
- - filterTypes: An array of filter types, including sub types if available
- - filterDateRange: An object containing the Start and End filter dates
+ - filterTypes: List of filter types (used for building the empty form).
+ - keywordValue: For populating the form.
+ - filterDateRangeValues: An object containing 'startDate' and 'endDate' for populating the form.
+ - filterCreator: An object containing 'id' and 'name' for populating the form.
+ - filterTypesValues: An array of filter type strings for populating the form.
  #}
 
 <div id="search-page-container">
     <search-page
         endpoint="/api/search"
         :filter-types="{{ filterTypes|json_encode }}"
-        :filter-date-range="{{ filterDateRange|json_encode }}"
+        :filter-date-range="{{ filterDateRangeValues|json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>

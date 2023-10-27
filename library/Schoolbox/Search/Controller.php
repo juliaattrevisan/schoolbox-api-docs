@@ -8,6 +8,7 @@
 namespace Schoolbox\Search;
 
 use Alaress\Web\Controller\Base;
+use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -45,11 +46,45 @@ class Controller extends Base
      */
     public function search(): void
     {
+        $keywordFromUrl = $this->requestQuery->get('keyword');
+        $filterFromUrlJson = $this->requestQuery->get('filter');
+
+        try {
+            $filterFromUrl = json_decode($filterFromUrlJson, true);
+        } catch (Exception $e) {
+            // Could not decode JSON from URL, so ignore.
+            $filterFromUrl = null;
+        }
+
+        $filterFromUrl = null; // TODO: Get rid of this.
+
+        // TODO: Validate $filterFromUrl?
+
         $this->response = $this->responseFromTemplate(
             "@search/search.twig",
             [
+                // List of filter types (used for building the empty form).
                 'filterTypes' => $this->getFiltersRawArray(),
-                'filterDateRange' => $this->getDateRangeFilter(),
+
+                'keywordValue' => $keywordFromUrl,
+                'filterDateRangeValues' => (
+                    ($filterFromUrl !== null)
+                    ? [
+                        'startDate' => $filterFromUrl['date']['from'],
+                        'endDate' => $filterFromUrl['date']['to']
+                    ]
+                    : $this->getDefaultDateRangeFilterValues()
+                ),
+                'filterCreator' => (
+                    ($filterFromUrl !== null)
+                    ? $filterFromUrl['creator']
+                    : null
+                ),
+                'filterTypesValues' => (
+                    ($filterFromUrl !== null)
+                    ? $filterFromUrl['types']
+                    : []
+                )
             ]
         );
     }
@@ -192,7 +227,7 @@ class Controller extends Base
      * To set the default date range filter
      * @return array - { startDate: string, endDate: string }
      */
-    private function getDateRangeFilter(): array
+    private function getDefaultDateRangeFilterValues(): array
     {
         switch ($this->getConfigLoader()->get('date_range_search_filter')) {
             case 0: // School year
