@@ -5,10 +5,9 @@
  */
 
 import { defineStore } from "pinia";
-import { FilterData } from "../../types/FilterData";
 
 export type Creator = {
-    id: number | null;
+    id: number;
     name: string;
 };
 
@@ -29,7 +28,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
         // only add creator filter if it is set
         return {
             creator: {
-                ...(isActive.value && { id: creator.value[0].id, name: creator.value[0].name }),
+                ...(isActive.value && { id: creator.value[0].id }),
             },
         };
     }

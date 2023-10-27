@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import { FilterData } from "../../types/FilterData";
 
 export type FilterDateRange = {
     startDate: string;
