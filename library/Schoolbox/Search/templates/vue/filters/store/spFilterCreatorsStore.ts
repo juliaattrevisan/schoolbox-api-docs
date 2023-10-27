@@ -13,32 +13,7 @@ export type Creator = {
 };
 
 export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
-    /**
-     * get the initial creators from the url if they exist
-     * @returns {{id: number|null, name: string}[]} - the initial creator ID or null
-     */
-    function getInitialCreators(): { id: number | null; name: string }[] {
-        const searchParams = new URLSearchParams(document.location.search);
-        const filtersJson = searchParams.get("filter") as string;
-
-        let filters;
-
-        try {
-            filters = JSON.parse(filtersJson) as FilterData; // This can return null on a successful parse.
-        } catch (e) {
-            filters = null;
-        }
-
-        if (filters === null || filters.creator === undefined) {
-            return [];
-        }
-
-        // Note the filters JSON data structure only supports one creator currently.
-        // The client is partially prepared to accommodate multiple creators.
-        return filters.creator.id ? [{ id: filters.creator.id, name: filters.creator.name }] : [];
-    }
-
-    const creator = window.Vue.ref<Creator[]>(getInitialCreators());
+    const creator = window.Vue.ref<Creator[]>([]);
 
     /**
      * Is the creator filter set

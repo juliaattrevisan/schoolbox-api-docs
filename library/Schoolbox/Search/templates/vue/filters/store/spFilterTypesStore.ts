@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import type { FilterData } from "../../types/FilterData";
 
 export type FilterType = {
     title: string;
@@ -12,31 +11,8 @@ export type FilterType = {
 };
 
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
-    /**
-     * get the initial types from the url if they exist
-     * @returns {string[]} - the initial types or empty array
-     */
-    function getInitialTypes() {
-        const searchParams = new URLSearchParams(document.location.search);
-        const filtersJson = searchParams.get("filter") as string;
-
-        let filters;
-
-        try {
-            filters = JSON.parse(filtersJson) as FilterData; // This can return null on a successful parse.
-        } catch (e) {
-            filters = null;
-        }
-
-        if (filters === null) {
-            filters = {};
-        }
-
-        return filters.types ?? [];
-    }
-
     const allTypes = window.Vue.ref<FilterType[]>([]); // all filter types available
-    const activeTypes = window.Vue.ref<string[]>(getInitialTypes()); // the currently selected filters, just the value list
+    const activeTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
     const isExpanded = window.Vue.ref<boolean>(false); // to show/hide all the sub types
 
     /**

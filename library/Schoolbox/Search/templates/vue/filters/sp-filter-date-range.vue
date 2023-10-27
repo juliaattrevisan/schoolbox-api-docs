@@ -5,7 +5,6 @@
 
 import { useFilterDateRangeStore, EMPTY_DATE } from "./store/spFilterDateRangeStore";
 
-// Initial values of startDate and endDate are set from the URL when this function runs.
 const filterDateRangeStore = useFilterDateRangeStore();
 
 /**

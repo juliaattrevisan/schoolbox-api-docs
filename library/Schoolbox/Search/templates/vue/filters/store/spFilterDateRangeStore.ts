@@ -14,45 +14,8 @@ export const EMPTY_DATE = ""; // the value to use when the date is not set
 export const INVALID_DATE = "Invalid Date"; // the string dayjs returns when a date is not valid
 
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
-    /**
-     * get the initial date range from the url if it exists
-     * @returns {{from: string, to: string}} - the initial date range
-     */
-    function getInitialDateRange(): { from: string; to: string } {
-        const searchParams = new URLSearchParams(document.location.search);
-        const filtersJson = searchParams.get("filter") as string;
-
-        let filters;
-
-        try {
-            filters = JSON.parse(filtersJson) as FilterData; // This can return null on a successful parse.
-        } catch (e) {
-            filters = null;
-        }
-
-        if (filters === null || filters.date === undefined) {
-            return { from: EMPTY_DATE, to: EMPTY_DATE };
-        }
-
-        let fromDate = filters.date.from ?? EMPTY_DATE;
-        let toDate = filters.date.to ?? EMPTY_DATE;
-
-        // Note dayjs.isValid() only checks if the date can be parsed by dayjs.
-        if (fromDate !== EMPTY_DATE && !window.dayjs(fromDate).isValid()) {
-            fromDate = EMPTY_DATE;
-        }
-
-        // Note dayjs.isValid() only checks if the date can be parsed by dayjs.
-        if (toDate !== EMPTY_DATE && !window.dayjs(toDate).isValid()) {
-            toDate = EMPTY_DATE;
-        }
-
-        return { from: fromDate, to: toDate };
-    }
-
-    const initialDateRange = getInitialDateRange();
-    const startDate = window.Vue.ref(initialDateRange.from);
-    const endDate = window.Vue.ref(initialDateRange.to);
+    const startDate = window.Vue.ref(EMPTY_DATE);
+    const endDate = window.Vue.ref(EMPTY_DATE);
 
     /**
      * Is the start date filter set
