@@ -1483,3 +1483,18 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     color: var(--content-ui-foreground);
     font-size: 16px;
 }
+
+/* update search form dropdown styles */
+.lrn .lrn-author-ui .lrn-custom-select select {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-custom-select select:hover {
+    background-color: var(--form-bg-hover-color);
+    color: #000000;
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-sort-button {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
