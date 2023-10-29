@@ -1027,14 +1027,23 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border: 1px solid var(--form-border-color);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
-    color: var(--content-ui-foreground);
     background: var(--content-ui-background);
     border: none;
+    text-align: center !important;
+    min-height: 2.5rem !important;
+    padding: 0.5rem !important;
+    line-height: inherit !important;
+    position: relative !important;
+    overflow: hidden !important;
+    vertical-align: middle !important;
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-background) !important;
+    width: 98% !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
-    color: var(--content-ui-foreground);
-    background: var(--content-ui-background);
-    border: none;
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-hover) !important;
+    text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-switch-trigger {
     border: 1px solid var(--content-ui-foreground);
@@ -1100,8 +1109,8 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
 }
 .lrn .lrn-author-ui .lrn-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
     padding-left: 30px;
-    color: var(--content-ui-foreground);
-    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-hover) !important;
     text-decoration: none !important;
 }
 .lrn.lrn-author .lrn-author-item-nav .lrn-btn {
