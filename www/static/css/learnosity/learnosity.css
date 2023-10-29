@@ -1460,14 +1460,6 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 .lrn.lrn-author .lrn-author-item-edit {
     min-height: unset;
 }
-.island .content,
-.island .calendar-list li.row,
-.calendar-list .island li.row,
-.island .calendar-list label,
-.calendar-list .island label,
-.island .matching-pairs p,
-.matching-pairs .island p,
-.island .resource-browser .meta-panel,
-.resource-browser .island .meta-panel {
-    padding: 0px;
+.lrn .lrn-qe-form-group-wrapper.question .lrn-qe-question-container {
+    overflow-x: visible;
 }
