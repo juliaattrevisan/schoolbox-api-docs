@@ -1498,3 +1498,8 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
 }
+
+/* update search button text transformation from uppercase to unset  */
+.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-lg {
+    text-transform: unset;
+}
