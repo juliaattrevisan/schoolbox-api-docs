@@ -247,41 +247,56 @@ class Mapper extends BaseMapper
          */
         $oldLearnosityReference = $source->getLearnosityReference();
 
-        /* Get the new learnosity reference and return that
-         *
-         * TODO We could either Poll Learnosity to find out when it's cloned,
-         *  or assign a random uuidv4() arbitrarily, and use that instead...
-         *  ...and hope that Learnosity is okay with it
+        /* See if there are any items in it;
+         * Learnosity crashes when you try to clone an itemless quiz
          */
-        $newLearnosityReference = (string)Uuid::uuid4();
-
-        /* Make a massive assumption that this _just worked_
-         * You could lean on the polling system to find out when this cloning has finished,
-         * or just blindly assume the uuidv4() was unique
-         *
-         * TODO make this safer
-         */
-        $response = $api->dataSetRequest('/itembank/activities/duplicate', [
-            'activities' => [
-                [
-                    'reference' => $oldLearnosityReference,
-                    'new_reference' => $newLearnosityReference
-                ]
+        $activity = $api->dataGetRequest('/itembank/activities', [
+            'references' => [
+                $oldLearnosityReference
             ]
         ]);
 
-        /* FIXME projects need some special treatment of some kind,
-         *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
-         *  which won't have a Learnosity Reference field...weird behaviours
-         *  But Why?
+        /* Only try to clone activities with items;
+         * skip duplicating activities without items for now
+         * (You can still add items after this though)
          */
-        $destination->setLearnosityReference($newLearnosityReference);
+        if (\count($activity['data'])) {
+            /* Get the new learnosity reference and return that
+             *
+             * TODO We could either Poll Learnosity to find out when it's cloned,
+             *  or assign a random uuidv4() arbitrarily, and use that instead...
+             *  ...and hope that Learnosity is okay with it
+             */
+            $newLearnosityReference = (string)Uuid::uuid4();
 
-        /* TODO Also redefine the tags in the cloned thing...but how?
-         *  You don't know when it finishes the cloning.
-         *
-         * FIXME Add Polling Mechanism
-         */
+            /* Make a massive assumption that this _just worked_
+             * You could lean on the polling system to find out when this cloning has finished,
+             * or just blindly assume the uuidv4() was unique
+             *
+             * TODO make this safer
+             */
+            $response = $api->dataSetRequest('/itembank/activities/duplicate', [
+                'activities' => [
+                    [
+                        'reference' => $oldLearnosityReference,
+                        'new_reference' => $newLearnosityReference
+                    ]
+                ]
+            ]);
+
+            /* FIXME projects need some special treatment of some kind,
+             *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
+             *  which won't have a Learnosity Reference field...weird behaviours
+             *  But Why?
+             */
+            $destination->setLearnosityReference($newLearnosityReference);
+
+            /* TODO Also redefine the tags in the cloned thing...but how?
+             *  You don't know when it finishes the cloning.
+             *
+             * FIXME Add Polling Mechanism
+             */
+        }
 
 
 //        $sectionMapper = $this->getJoinMapper('sections');
