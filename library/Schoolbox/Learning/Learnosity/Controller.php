@@ -1105,7 +1105,8 @@ class Controller extends Base
                 $scores[$learnosityReference] = [
                     'learnosityReference' => $learnosityReference,
                     'score' => $response['score'],
-                    'maxScore' => $response['max_score']
+                    'maxScore' => $response['max_score'],
+                    'itemReference' => $response['item_reference']
                 ];
             }
         }

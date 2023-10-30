@@ -21,18 +21,6 @@ const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
 /**
- * Hide the student if hideMarkedAttempts is true and the current item
- * linked to the student has been marked
- * @returns {string} - the height of the student container
- */
-const containerHeight = window.Vue.computed(() => {
-    if (itemsStore.hideMarkedAttempts) {
-        return "0fr";
-    }
-    return "1fr";
-});
-
-/**
  * To show/hide the response when selected
  */
 function onToggleSelected() {
@@ -44,6 +32,9 @@ function onToggleSelected() {
  * @returns {string} - the height of the response container
  */
 const responseHeight = window.Vue.computed(() => {
+    if (itemsStore.hideMarkedAttempts) {
+        return "0fr";
+    }
     return props.student.isExpanded ? "1fr" : "0fr";
 });
 

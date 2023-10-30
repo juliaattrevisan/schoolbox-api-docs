@@ -53,7 +53,7 @@ async function saveComment() {
  */
 async function onSaveSelected() {
     studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
-    studentsStore.progressReport(props.student);
+    // studentsStore.progressReport(props.student);
     isSaving.value = true;
     await saveScore();
     await saveComment();

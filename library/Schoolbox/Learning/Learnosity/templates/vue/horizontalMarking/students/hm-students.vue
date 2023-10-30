@@ -8,9 +8,9 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsToggle from "./hm-students-toggle.vue";
 import HmStudentsStudent from "./hm-students-student.vue";
 
-const allStudentsAttempted = window.Vue.computed(() => {
-    return useItemsStore().hideMarkedAttempts;
-});
+// const allStudentsAttempted = window.Vue.computed(() => {
+//     return useItemsStore().hideMarkedAttempts;
+// });
 
 const studentsStore = useStudentsStore();
 </script>
