@@ -130,6 +130,7 @@ class Controller extends Base
     public function deleteTextbox(Model $textbox): void
     {
         $textbox->setDeletedBy($this->getUser()->getId());
+        $this->mapper->save($textbox);
         $this->mapper->delete($textbox);
 
         // Empty response
