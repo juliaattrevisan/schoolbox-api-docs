@@ -161,12 +161,12 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * To update a student
-     * @param {Student} student - the student to update
+     * To update the comment of a response
+     * @param {StudentItemResponse} response - the response to update
      * @param {string} comment - the comment to update
      */
-    function updateStudentFinalReview(student: Student, comment: string) {
-        student.attemptResponse.comment = comment;
+    function updateItemComment(response: StudentItemResponse, comment: string) {
+        response.comment = comment;
     }
 
     /**
@@ -198,7 +198,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         reportLoaded,
         progressReport,
         updateResponseScore,
-        updateStudentFinalReview,
+        updateItemComment,
         clearHasFocus,
     };
 });

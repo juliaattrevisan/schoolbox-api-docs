@@ -6,13 +6,11 @@
 import { useFocus } from "@vueuse/core";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
-import type { StudentItem } from "../types/StudentItem";
 import type { Question } from "../types/Question";
 import type { StudentItemResponse } from "../types/StudentItemResponse";
 
 interface Props {
     student: Student; // the student to display
-    item: StudentItem; // the item to display
     question: Question; // the question that's displayed
     response: StudentItemResponse; // the response to display
     container: HTMLDivElement; // the parent container, to look for the relevant item
@@ -28,6 +26,7 @@ const score = window.Vue.ref<number>(props.response.score ?? 0);
  * Save the score
  */
 async function saveScore() {
+    studentsStore.updateResponseScore(props.response, score.value);
     const formData = new FormData();
     formData.append("learnosityReference", props.response.learnosityReference);
     formData.append("score", score.value.toString());
@@ -42,7 +41,6 @@ async function saveScore() {
  */
 window.Vue.watch(focused, async ($focused) => {
     if (!$focused) {
-        studentsStore.updateResponseScore(props.response, score.value);
         await saveScore();
     }
 });
@@ -59,12 +57,14 @@ window.Vue.onMounted(() => {
 
 /**
  * Move the item response element back into the entire quiz response, so we can add it back in if mounted again
+ * and also update the score in case the user has changed it
  */
-window.Vue.onBeforeUnmount(() => {
+window.Vue.onBeforeUnmount(async () => {
     const response = responsesEl.value?.querySelector(
         `[data-lrn-widget-container="${props.response.learnosityReference}"]`
     ) as HTMLDivElement;
     props.container.appendChild(response);
+    await saveScore();
 });
 </script>
 

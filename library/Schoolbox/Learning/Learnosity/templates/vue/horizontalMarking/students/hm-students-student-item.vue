@@ -37,7 +37,6 @@ const isActive = window.Vue.computed(() => {
                         v-for="(response, index) in props.item.responses"
                         :key="response.learnosityReference"
                         :student="props.student"
-                        :item="props.item"
                         :question="props.item.questions[index]"
                         :response="response"
                         :container="props.container"
