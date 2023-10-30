@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan as LessonPlanData;
 use Schoolbox\Learning\Assessment\DataModel\Model as DataModelModel;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -30,6 +31,21 @@ use Schoolbox\Mapper\Exception\NotFound;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+    /**
+     * Upon attempting to link a project to a lesson plan: an exception with
+     * this message will be raised.
+     *
+     * This prohibition is in place due to the possibility of creating a cyclic
+     * reference. Otherwise:
+     * * projects could contain assessments, including lesson plans
+     * * lesson plans have linked assessments, which could be the project above
+     *
+     * Attempting to load this reference currently leads to an infinite loop:
+     * this might be fixable, but for now it's easier to simply prohibit the
+     * behavior which causes the loop.
+     */
+    private const EXCEPTION_MESSAGE_ON_LINKING_PROJECT = 'Projects may not be linked to lesson plans';
+
     /**
      * @inheritDoc
      */
@@ -55,6 +71,7 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
             'assessmentModel',
         );
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertAssessmentNotProject']);
     }
 
     protected function getSelectString()
@@ -69,6 +86,21 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
             INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
         ";
+    }
+
+    /**
+     * Assert that the linked assessment is not a project.
+     *
+     * @param Model $model
+     * @return bool
+     * @throws Exception
+     */
+    protected function assertAssessmentNotProject(Model $model): bool
+    {
+        if ($model->getAssessmentModel()->getProject()) {
+            throw new Exception(self::EXCEPTION_MESSAGE_ON_LINKING_PROJECT);
+        }
+        return true;
     }
 
     /**
@@ -102,7 +134,7 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * Creates a new link between a lesson plan and an assessment
+     * Creates a new link between a lesson plan and an assessment.
      *
      * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
      * @param IAssessable $assessment
@@ -112,6 +144,11 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveLink(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan, IAssessable $assessment)
     {
+        // Assert that the linked assessment is not a project
+        if ($assessment instanceof Project) {
+            throw new Exception(self::EXCEPTION_MESSAGE_ON_LINKING_PROJECT);
+        }
+
         /**
          * Ensure we are creating a link between assessments within the same course
          */

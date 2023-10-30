@@ -73,7 +73,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
             const deleteRequests = removedActivities.map((removedActivity) =>
                 fetch(`/learning/assessments/${sourceId.value}/activities/${removedActivity.id}`, {
                     method: "DELETE",
-                })
+                }).then(throwErrorOnInvalidResponse)
             );
 
             await Promise.all(deleteRequests);
@@ -82,23 +82,38 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
             const postRequests = addedActivities.map((addedActivity) =>
                 fetch(`/learning/assessments/${sourceId.value}/activities/${addedActivity.id}`, {
                     method: "POST",
-                })
+                }).then(throwErrorOnInvalidResponse)
             );
 
             await Promise.all(postRequests);
 
             toastEl.value.timeout("Saved", true, 2000);
+
+            // Only update linked if all activities are updated successfully.
+            // This means that if one fails but others succeed, then the
+            // activity list is out of sync with the backend.
+            linkedActivities.value = [...selectedActivities.value];
         } catch (error) {
             toastEl.value.timeout("Save failed", false, 5000);
         } finally {
             saveInProgress.value = false;
         }
 
-        linkedActivities.value = [...selectedActivities.value];
-
         // Close any open modals
         isOpen.value = false;
         isSingleUnlinkOpen.value = false;
+    }
+
+    /**
+     * Raise some sort of error if a request from `fetch` does not return a
+     * success response.
+     *
+     * @param {Response} response
+     */
+    function throwErrorOnInvalidResponse(response: Response) {
+        if (!response.ok) {
+            throw new Error('Something went wrong (response code: ' + String(response.status) + ')');
+        }
     }
 
     /**

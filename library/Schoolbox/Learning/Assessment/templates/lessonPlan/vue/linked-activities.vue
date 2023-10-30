@@ -192,13 +192,16 @@ window.Vue.onMounted(() => {
                         >
                             <ul class="information-list card-selectable threaded" data-task-list>
                                 <template v-for="activity in unit.assessments" :key="activity.id">
-                                    <li class="interact child" :data-unit-assessment="activity.id">
+                                    <li v-if="activity.assessmentType !== 'project'"
+                                        :data-unit-assessment="activity.id"
+                                        class="interact child"
+                                    >
                                         <linked-activities-modal-item
                                             :activity="activity"
                                             :source-id="props.sourceId"
                                         ></linked-activities-modal-item>
                                     </li>
-                                    <li
+                                    <li v-else
                                         v-for="subActivity in activity.assessments"
                                         :key="subActivity.id"
                                         :data-unit-assessment="subActivity.id"
@@ -207,6 +210,7 @@ window.Vue.onMounted(() => {
                                         <linked-activities-modal-item
                                             :activity="subActivity"
                                             :source-id="props.sourceId"
+                                            :project-activity="activity"
                                         ></linked-activities-modal-item>
                                     </li>
                                 </template>
