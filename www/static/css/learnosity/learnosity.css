@@ -831,6 +831,7 @@ td.lrn-report-area {
     background-color: var(--content-ui-background);
     border: none;
     color: var(--content-ui-foreground);
+    border-radius: 0px;
 }
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-active,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:not(:checked) ~ .lrn-author-toggle-right,
@@ -954,6 +955,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
         Arial, sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
+    border-radius: 0px;
 }
 .lrn .lrn-author-ui-no-preview button:focus {
     outline: none;
@@ -1045,6 +1047,11 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-background) !important;
     width: 98% !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
+    font-weight: 400;
+    text-transform: unset;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
     color: var(--content-ui-foreground) !important;
@@ -1528,4 +1535,29 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
         Arial, sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
+}
+
+/* add "Add" before icon for adding question to a card */
+button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-widget-icon.lrn-i-plus:after {
+    content: " Add";
+}
+.lrn .lrn-author-ui .lrn-author-widget-button:hover .lrn-author-widget-icon:before {
+    text-shadow: none;
+    color: var(--content-ui-foreground);
+}
+button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-hover) !important;
+    text-decoration: none !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
+.lrn-qe .lrn-qe-ui a.lrn-qe-btn:focus {
+    outline: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-tile-preview {
+    border-radius: 0px;
+}
+.lrn .lrn-author-ui .lrn-btn,
+.lrn .lrn-author-ui a.lrn-btn {
+    border-radius: 0px;
 }
