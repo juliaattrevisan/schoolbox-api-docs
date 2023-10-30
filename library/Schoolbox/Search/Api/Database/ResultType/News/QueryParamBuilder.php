@@ -53,7 +53,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'n.publish_at < :newsNow',
             'n.rejected_at IS NULL',
         ];
-        $params     = [
+        $params = [
             'newsNow' => Alaress_Date_Format::now()->getDatabase(),
         ];
 
@@ -62,13 +62,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // (see https://mariadb.com/kb/en/full-text-index-overview/)
         // This match returns any results within strings, whether or not they
         // actually match a whole word.
-        $keywordSearchParts        = [
+        $keywordSearchParts = [
             'n.title LIKE :newsKeywordLike',
             'n.body LIKE :newsKeywordLike',
             'n.blurb LIKE :newsKeywordLike',
         ];
         $params['newsKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
-        $whereParts[]              = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
             'where'  => $whereParts,
             'params' => $params,

@@ -122,15 +122,33 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
+                $bodyTextOnly = (new ToText($article->getBody()))->getText();
+                $blurbTextOnly = (new ToText($article->getBlurb()))->getText();
+                $bodyTextOnlyLowercase = strtolower($bodyTextOnly);
+                $blurbTextOnlyLowercase = strtolower($blurbTextOnly);
+                $keywordLowercase = strtolower($keyword);
+
+                // Because the article body and blurb can contain HTML, this match might have come about only because
+                // the keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if (!str_contains(strtolower($article->getTitle()), $keywordLowercase)) {
+                    if (
+                        !str_contains($bodyTextOnlyLowercase, $keywordLowercase) &&
+                        !str_contains($blurbTextOnlyLowercase, $keywordLowercase)
+                    ) {
+                        return null;
+                    }
+                }
+
                 // The article may have been found if the keyword matched an
                 // HTML attribute or its value in the blurb or body.
                 // Filter out matches which were found to match the keyword
                 // on the query, but were found to not match either:
                 // * the title
                 // * the generated description
-                $description = $this->generateDescriptionForArticle($keyword, $article);
+                $descriptionTextOnly = $this->generateDescriptionForArticle($keyword, $blurbTextOnly, $bodyTextOnly);
                 // Check for case-insensitive matches to match the behaviour of an SQL 'LIKE' condition.
-                if (!isset($description) && !str_contains(strtolower($match->title), strtolower($keyword))) {
+                if (!isset($descriptionTextOnly) && !str_contains(strtolower($article->getTitle()), $keywordLowercase)) {
                     return null;
                 }
 
@@ -156,7 +174,7 @@ class Hydrator extends BaseHydrator
                         ? $this->buildStorageImageUrl($article->getFeatureImage())->__toString()
                         : null,
                     'news',
-                    $description,
+                    $descriptionTextOnly,
                     $article->getAuthor(),
                     [],
                     $this->getSearchResultLinks($article, $viewer)
@@ -168,28 +186,26 @@ class Hydrator extends BaseHydrator
     }
 
     /**
-     * Generate a description for the given article, by finding the text near
-     * the keyword in:
+     * Generate a description for the given article, by finding the text near the keyword in:
      * * the blurb first, if there is one
      * * the body otherwise
      *
-     * @param string     $keyword The search keyword.
-     * @param News\Model $article The article to generate a description for.
+     * @param string $keyword The search keyword.
+     * @param string $blurbTextOnly The blurb text with HTML tags removed.
+     * @param string $bodyTextOnly The body text with HTML tags removed.
      * @return string|null
      */
-    private function generateDescriptionForArticle(string $keyword, News\Model $article): ?string
+    private function generateDescriptionForArticle(string $keyword, string $blurbTextOnly, string $bodyTextOnly): ?string
     {
-        // Find keyword in blurb, then body
-        if ($article->getBlurb()) {
-            $blurbText = (new ToText($article->getBlurb()))->getText();
-            $truncatedBlurb = $this->truncateAroundKeyword($keyword, $blurbText) ?? $this->truncate($blurbText);
+        // Find keyword in blurb, then body.
+        if ($blurbTextOnly !== '') {
+            $truncatedBlurb = $this->truncateAroundKeyword($keyword, $blurbTextOnly) ?? $this->truncate($blurbTextOnly);
             if ($truncatedBlurb) {
                 return $truncatedBlurb;
             }
         }
-        if ($article->getBody()) {
-            $bodyText = (new ToText($article->getBody()))->getText();
-            return $this->truncateAroundKeyword($keyword, $bodyText) ?? $this->truncate($bodyText);
+        if ($bodyTextOnly !== '') {
+            return $this->truncateAroundKeyword($keyword, $bodyTextOnly) ?? $this->truncate($bodyTextOnly);
         }
 
         return null;

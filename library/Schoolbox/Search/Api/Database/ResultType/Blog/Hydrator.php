@@ -78,7 +78,19 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $blogBody = (new ToText($blog->getBody()))->getText();
+                $blogBodyTextOnly = (new ToText($blog->getBody()))->getText();
+                $blogBodyTextOnlyLowercase = strtolower($blogBodyTextOnly);
+                $keywordLowercase = strtolower($keyword);
+
+                // Because the blog body contains HTML, this match might have come about only because the
+                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
+                // Eliminate those kinds of matches.
+                if (!str_contains(strtolower($blog->getHeading()), $keywordLowercase)) {
+                    if (!str_contains($blogBodyTextOnlyLowercase, $keywordLowercase)) {
+                        return null;
+                    }
+                }
+
                 return new FullResult(
                     $match,
                     $match->id,
@@ -93,7 +105,7 @@ class Hydrator extends BaseHydrator
                     "Posted {$blog->getCreatedAt()->getRelativeTime()} by {$blog->getOwner()->getFullName()}",
                     null,
                     self::BASE_TYPE,
-                    $this->truncateAroundKeyword($keyword, $blogBody) ?? $this->truncate($blogBody),
+                    $this->truncateAroundKeyword($keyword, $blogBodyTextOnly) ?? $this->truncate($blogBodyTextOnly),
                     $blog->getOwner(),
                     [],
                     []
