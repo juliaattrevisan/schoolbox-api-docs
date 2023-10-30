@@ -102,7 +102,7 @@ class Hydrator extends BaseHydrator
                     $match->relevance,
                     $user->getUpdatedAt(),
                     null,
-                    null,
+                    $user->getPreferredTitle(),
                     $this->buildBaseUrl()
                         ->withPath('/portrait.php')
                         ->withQuery(
@@ -214,7 +214,7 @@ class Hydrator extends BaseHydrator
             'studentId' => $searchResultUser->getId(),
             'student' => $searchResultUser
         ];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+        if ($searchResultUser->getRole()->isStudent() && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Due Work',
                 'icon' => 'icon-due-work',
@@ -235,7 +235,7 @@ class Hydrator extends BaseHydrator
 
         $route = 'learningGrades.getGrades';
         $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+        if ($searchResultUser->getRole()->isStudent() && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Grades',
                 'icon' => 'icon-approve',
@@ -245,7 +245,7 @@ class Hydrator extends BaseHydrator
 
         $route = 'pastoral.getStudent';
         $params = ['studentId' => $searchResultUser->getId(), 'student' => $searchResultUser];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+        if ($searchResultUser->getRole()->isStudent() && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Pastoral Care',
                 'icon' => 'icon-pastoral',
@@ -255,7 +255,11 @@ class Hydrator extends BaseHydrator
 
         $route = 'timetable.getTimetableCalendarRedirect';
         $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+        if (
+            ($searchResultUser->getRole()->isStudent() || $searchResultUser->getRole()->isStaff())
+            && !$searchResultUser->getHideTimetable()
+            && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)
+        ) {
             $links[] = [
                 'title' => 'Timetable',
                 'icon' => 'icon-timetable',
