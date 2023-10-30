@@ -1,20 +1,16 @@
 <?php
 
 /**
- * FileType
+ * Helper class to determine if a file is audio or
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class FileType extends DeprecatedModel
+class FileType
 {
-    public $_table = 'allowedFileTypes';
-    public $_index = 'fileTypeId';
-
-
     /**
-     * Filename
+     * The full file path
      * @var string
      */
     private $path;
@@ -39,8 +35,6 @@ class FileType extends DeprecatedModel
     {
         $this->path = $path;
         $this->mime = $mime;
-
-        parent::__construct();
     }
 
 
@@ -86,26 +80,5 @@ class FileType extends DeprecatedModel
     public function isImage()
     {
         return strpos($this->mime, 'image') !== false;
-    }
-
-
-    /**
-     * Find out what the iconFile for a particular mime type is
-     *
-     * @param string $mimeType
-     * @return mixed
-     */
-    public function getIconFile($mimeType)
-    {
-        $query = "
-            SELECT iconFile
-            FROM {$this->_table}
-            WHERE mime = '{$mimeType}'
-            LIMIT 1
-        ";
-
-        $mimeType = $this->db->query($query)->fetch();
-
-        return $mimeType['iconFile'];
     }
 }
