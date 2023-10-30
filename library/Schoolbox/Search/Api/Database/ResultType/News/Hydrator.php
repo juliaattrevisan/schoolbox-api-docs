@@ -213,7 +213,7 @@ class Hydrator extends BaseHydrator
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Modify',
-                'icon' => 'icon-news',
+                'icon' => 'icon-modify',
                 'url' => $this->routeGenerator->generate($route, $params),
             ];
         }
