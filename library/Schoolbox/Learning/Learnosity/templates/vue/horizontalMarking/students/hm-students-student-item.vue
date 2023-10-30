@@ -6,7 +6,7 @@
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
-import hmStudentsStudentItemResponses from "./hm-students-student-item-responses.vue";
+import hmStudentsStudentItemResponse from "./hm-students-student-item-response.vue";
 import hmStudentsStudentItemReview from "./hm-students-student-item-review.vue";
 
 interface Props {
@@ -32,18 +32,33 @@ const isActive = window.Vue.computed(() => {
     <transition>
         <div v-if="isActive">
             <div class="l-flex-col l-gap-m">
-                <hm-students-student-item-responses
-                    :student="props.student"
-                    :item="props.item"
-                    :container="props.container"
-                />
+                <div class="item-responses l-flex-col l-gap-m">
+                    <hm-students-student-item-response
+                        v-for="response in props.item.responses"
+                        :key="response.learnosityReference"
+                        :student="props.student"
+                        :item="props.item"
+                        :response="response"
+                        :container="props.container"
+                    />
+                </div>
                 <hm-students-student-item-review :student="props.student" :item="props.item" />
             </div>
         </div>
     </transition>
 </template>
 
-<style>
+<style lang="scss">
+.item-responses {
+    border-top: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--body-background);
+    padding: var(--spacing-m) 0;
+    .lrn_widget {
+        margin: 0;
+        padding: 0;
+    }
+}
+
 .v-enter-active {
     transition: opacity 0.3s ease;
 }
