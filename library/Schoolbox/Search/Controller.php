@@ -12,6 +12,8 @@ use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -27,13 +29,20 @@ class Controller extends Base
     protected static $rosettaStone;
 
     /**
+     * @var UserMapper
+     */
+    protected static $userMapper;
+
+    /**
      * Let's build this thing!
      */
     public function __construct(
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        UserMapper $userMapper
     ) {
         self::$l10nMapper = L10nMapper::getInstance();
         self::$rosettaStone = $rosettaStone;
+        self::$userMapper = $userMapper;
     }
 
     /**
@@ -50,15 +59,44 @@ class Controller extends Base
         $filterFromUrlJson = $this->requestQuery->get('filter');
 
         try {
-            $filterFromUrl = json_decode($filterFromUrlJson, true);
+            $filterFromUrl = $filterFromUrlJson === null ? null : json_decode($filterFromUrlJson, true);
         } catch (Exception $e) {
             // Could not decode JSON from URL, so ignore.
             $filterFromUrl = null;
         }
 
-        $filterFromUrl = null; // TODO: Get rid of this.
+        // Quick validation.
+        if ($filterFromUrl !== null) {
+            if (
+                count($filterFromUrl) !== 3 ||
+                !array_key_exists('creator', $filterFromUrl) ||
+                !array_key_exists('date', $filterFromUrl) ||
+                !array_key_exists('types', $filterFromUrl)
+            ) {
+                // Unexpected data format in filter from URL, so just ignore it.
+                $filterFromUrl = null;
+            }
+        }
 
-        // TODO: Validate $filterFromUrl?
+        if ($filterFromUrl !== null && isset($filterFromUrl['creator']['id'])) {
+            // Add creator name to filters array, since this is needed by the front-end, but not included in the URL.
+
+            try {
+                $creator = self::$userMapper->findById($filterFromUrl['creator']['id']);
+            } catch (Exception $e) {
+                // Creator user not found or deleted, so just ignore URL parameter.
+                $creator = null;
+            }
+
+            if ($creator === null) {
+                $filterFromUrl['creator'] = null;
+            } else {
+                $filterFromUrl['creator']['name'] = (
+                    // The format of creator name must match that used by the Vue front-end.
+                    $creator->getFullName() . ' - ' . $creator->getRole()->getName() . ' (' . $creator->getExternalId() . ')'
+                );
+            }
+        }
 
         $this->response = $this->responseFromTemplate(
             "@search/search.twig",
@@ -75,7 +113,7 @@ class Controller extends Base
                     ]
                     : $this->getDefaultDateRangeFilterValues()
                 ),
-                'filterCreator' => (
+                'filterCreatorValue' => (
                     ($filterFromUrl !== null)
                     ? $filterFromUrl['creator']
                     : null

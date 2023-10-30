@@ -7,6 +7,7 @@ import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
 import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
 import { useFilterDateRangeStore, FilterDateRange, EMPTY_DATE } from "../filters/store/spFilterDateRangeStore";
+import { useFilterCreatorsStore, Creator } from "../filters/store/spFilterCreatorsStore";
 
 const SINGLE_COLUMN_BREAKPOINT = 800;
 
@@ -14,23 +15,35 @@ export const useStore = defineStore("searchPage", () => {
     let endpoint = ""; // the endpoint to use for searching
 
     const isSingleColumn = window.Vue.ref(true); // whether to use a single column layout
+    const filterCreatorsStore = useFilterCreatorsStore();
     const filterDateRangeStore = useFilterDateRangeStore();
+    const filterTypesStore = useFilterTypesStore();
 
     /**
      * store any passed through properties
      * @param {string} $endpoint - the search api url
-     * @param {FilterType[]} $filterTypes - the filter types
-     * @param {FilterDateRange} $defaultFilterDateRange - the default date range filter
+     * @param {FilterDateRange} $selectedFilterDateRange - the selected date range filter
+     * @param {Creator|null} $creator - the selected creator
+     * @param {FilterType[]} $filterTypesAvailable - the available filter types
+     * @param {string[]} $filterTypesSelected - the selected filter types
      */
-    function init($endpoint: string, $filterTypes: FilterType[], $defaultFilterDateRange: FilterDateRange) {
+    function init(
+        $endpoint: string,
+        $selectedFilterDateRange: FilterDateRange,
+        $creator: Creator | null,
+        $filterTypesAvailable: FilterType[],
+        $filterTypesSelected: string[]
+    ) {
         endpoint = $endpoint;
-        useFilterTypesStore().allTypes = $filterTypes;
 
-        // Only set dates to default if neither date was specified in the URL.
-        if (filterDateRangeStore.startDate === EMPTY_DATE && filterDateRangeStore.endDate === EMPTY_DATE) {
-            filterDateRangeStore.startDate = $defaultFilterDateRange.startDate;
-            filterDateRangeStore.endDate = $defaultFilterDateRange.endDate;
+        if ($creator !== null) {
+            filterCreatorsStore.creator = [$creator];
         }
+
+        filterDateRangeStore.startDate = $selectedFilterDateRange.startDate;
+        filterDateRangeStore.endDate = $selectedFilterDateRange.endDate;
+        filterTypesStore.allTypes = $filterTypesAvailable;
+        filterTypesStore.activeTypes = $filterTypesSelected;
     }
 
     /**

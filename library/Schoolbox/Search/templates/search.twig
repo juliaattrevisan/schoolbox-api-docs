@@ -3,15 +3,17 @@ Expected data items:
  - filterTypes: List of filter types (used for building the empty form).
  - keywordValue: For populating the form.
  - filterDateRangeValues: An object containing 'startDate' and 'endDate' for populating the form.
- - filterCreator: An object containing 'id' and 'name' for populating the form.
+ - filterCreatorValue: An object containing 'id' and 'name' for populating the form.
  - filterTypesValues: An array of filter type strings for populating the form.
  #}
 
 <div id="search-page-container">
     <search-page
         endpoint="/api/search"
-        :filter-types="{{ filterTypes|json_encode }}"
+        :filter-types-available="{{ filterTypes|json_encode }}"
+        :filter-types-selected="{{ filterTypesValues|json_encode }}"
         :filter-date-range="{{ filterDateRangeValues|json_encode }}"
+        :filter-creator="{{ filterCreatorValue|json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
