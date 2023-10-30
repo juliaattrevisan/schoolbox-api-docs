@@ -297,9 +297,7 @@ class Hydrator extends BaseHydrator
         // 'lesson_plan_field.title LIKE :assessmentKeywordLike',             // Assessment\LessonPlan\Model->getField()->getTitle() HtmlContent
         // 'lesson_plan_field.body LIKE :assessmentKeywordLike'               // Assessment\LessonPlan\Model->getField()->getBody()  HtmlContent
 
-        $keywordLower = strtolower($keyword);
-
-        if (mb_stripos($assessment->getTitle(), $keywordLower, 0, 'UTF-8') !== false) {
+        if (mb_stripos($assessment->getTitle(), $keyword, 0, 'UTF-8') !== false) {
             return false; // Found match on assessment.title or assess.title.
         }
 
@@ -337,7 +335,6 @@ class Hydrator extends BaseHydrator
         $treatViewerAsStudent = !($viewer->isSuperuser() || $viewer->getRole()->isStaff());
 
         $fieldContentHtmlToReturn = null;
-        $keywordLower = strtolower($keyword);
 
         // Find visible content that contains the search keyword.
         foreach ($lessonPlan->getFields() as $field) {
