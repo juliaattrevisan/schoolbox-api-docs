@@ -1578,3 +1578,8 @@ span.lrn-i-previous,
 span.lrn-i-next {
     color: var(--content-ui-foreground);
 }
+
+/* updatle the uploader button */
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-asset-uploader {
+    transform: unset;
+}
