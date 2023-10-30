@@ -98,13 +98,18 @@ config:
   clickview_school_id: {value: '', hide: true}
   kami_api_key: { hide: true }
   rubicon_atlas_api_token: {value: '', hide: true}
-  canvas_data_api_key: {value: '', hide: true}
   office365_tenant: { hide: false }
   office365_tenant_id : { hide : false }
   office365_immersive_reader_name : { hide : false }
   googleapps_api_key: { hide: false }
   turnitin_api_key: {value: '', hide: true}
   turnitin_api_host: {value: '', hide: true}
+
+  # 3rd party configs
+  canvas_data2_secret : { value : '', hide : true }
+  canvas_data2_client_id : { value : '', hide : true }
+  canvas_url : { value : '', hide : true }
+  canvas_data_api_key : { value : '', hide : true }
 
 topMenu:
   hide:
