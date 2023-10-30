@@ -457,9 +457,9 @@ class Controller extends Base
             'user_id' => (string)$this->getUser()->getId(),
         ];
 
-        /* Exam mode settings
+        /* Prompts And Feedback mode settings
          */
-        if ($quiz->getExamMode()) {
+        if (!$quiz->getPromptsMode()) {
             /* Hide stuff that might normally appear client-side
              */
             $payload['config']['ignore_question_attributes'] = [

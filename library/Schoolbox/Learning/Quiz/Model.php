@@ -119,7 +119,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     /**
      * @var int
      */
-    private $examMode;
+    private $promptsMode;
 
     /**
     * @var int
@@ -489,18 +489,18 @@ class Model implements ISoftDeletable, IAssessableDataModel
     /**
      * @return int
      */
-    public function getExamMode()
+    public function getPromptsMode()
     {
-        return $this->examMode;
+        return $this->promptsMode;
     }
 
     /**
-     * @param int|null $examMode
+     * @param int|null $promptsMode
      * @return $this
      */
-    public function setExamMode(?int $examMode)
+    public function setPromptsMode(?int $promptsMode)
     {
-        $this->examMode = $examMode;
+        $this->promptsMode = $promptsMode;
         return $this;
     }
 

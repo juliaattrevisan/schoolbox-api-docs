@@ -176,12 +176,12 @@
                 </label>
             </div>
         </div>
-        {# Exam Mode #}
+        {# Prompts And Feedback Mode #}
         <div class="small-12 medium-6 columns">
-            <label for="examMode" class="inline-block">Exam Mode<span class="hint has-tip tip-top" data-tooltip title="You can ensure more browser security during strict exams as this mode supports secure browser usage.">?</span></label>
+            <label for="promptsMode" class="inline-block">Prompts And Feedback Mode<span class="hint has-tip tip-top" data-tooltip title="This will allow prompts and feedback to display during a quiz.">?</span></label>
             <div class="switch">
-                <input name="examMode" id="examMode" type="checkbox" {% if assessment.examMode %}checked="checked"{% endif %} value="1" />
-                <label for="examMode">
+                <input name="promptsMode" id="promptsMode" type="checkbox" {% if assessment.promptsMode %}checked="checked"{% endif %} value="1" />
+                <label for="promptsMode">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
