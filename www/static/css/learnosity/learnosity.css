@@ -1052,6 +1052,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     font-size: 1rem;
     font-weight: 400;
     text-transform: unset;
+    border-radius: 0px;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
     color: var(--content-ui-foreground) !important;
@@ -1564,4 +1565,16 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn-i-trash:before {
     content: "\e61b";
     font-family: "schoolbox";
+}
+
+/* update the pagination styles */
+.lrn .lrn-author-ui .lrn-pagination ul {
+    background: var(--body-background);
+    border-top: none;
+    border-bottom: none;
+}
+span.lrn-pagination-btn-txt,
+span.lrn-i-previous,
+span.lrn-i-next {
+    color: var(--content-ui-foreground);
 }
