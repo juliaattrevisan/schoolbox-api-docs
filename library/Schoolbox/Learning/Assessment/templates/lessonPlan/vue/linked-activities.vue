@@ -201,7 +201,7 @@ window.Vue.onMounted(() => {
                                             :source-id="props.sourceId"
                                         ></linked-activities-modal-item>
                                     </li>
-                                    <li
+                                    <li v-else
                                         v-for="subActivity in activity.assessments"
                                         :key="subActivity.id"
                                         :data-unit-assessment="subActivity.id"
@@ -210,6 +210,7 @@ window.Vue.onMounted(() => {
                                         <linked-activities-modal-item
                                             :activity="subActivity"
                                             :source-id="props.sourceId"
+                                            :project-activity="activity"
                                         ></linked-activities-modal-item>
                                     </li>
                                 </template>

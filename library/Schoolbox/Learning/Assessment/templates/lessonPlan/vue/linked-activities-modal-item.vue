@@ -6,6 +6,7 @@ import { Activity } from "./linkedActivitiesTypes";
 interface Props {
     activity: Activity;
     sourceId: number;
+    projectActivity?: Activity;
 }
 
 const props = defineProps<Props>();
@@ -43,7 +44,12 @@ function toggleActivitySelection() {
         </div>
         <div class="small-12 compact card wrap-down">
             <span :class="'icon-' + kebabCase(props.activity.assessmentType)"></span>
-            <p>{{ props.activity.title }}</p>
+            <p>
+                <template v-if="props.projectActivity">
+                    {{ props.projectActivity.title }} |
+                </template>
+                {{ props.activity.title }}
+            </p>
             <p v-if="props.activity.closeAt !== null" class="meta">
                 <span class="unit-task-due-date"> Due {{ props.activity.closeAtFormatted }} </span>
             </p>
