@@ -45,7 +45,7 @@ abstract class Base
      *
      * @param Access $accessor The object that is used to determine whether a user has access to a resource.
      */
-    public function __construct(public Access $accessor)
+    public function __construct(protected Access $accessor)
     {
         $this->setResult(new Collection());
     }

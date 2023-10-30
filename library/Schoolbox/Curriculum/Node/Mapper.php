@@ -22,7 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
  */
-class Mapper extends BaseMapper implements BaseMapper\Searchable
+class Mapper extends BaseMapper
 {
     /** @var int limit depth to recursively sort nodes */
     private const SORT_MAX_DEPTH = 50;

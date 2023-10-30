@@ -13,7 +13,6 @@ use Schoolbox\IHomepageCleanable;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Textbox\Search\Result;
 use Schoolbox\User;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
@@ -24,7 +23,7 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
  * @method Model createModel($idValue = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  */
-class Mapper extends \Schoolbox\Mapper implements Searchable, IHomepageCleanable
+class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
 {
     /**
      * Textbox Homepage Controller classname
