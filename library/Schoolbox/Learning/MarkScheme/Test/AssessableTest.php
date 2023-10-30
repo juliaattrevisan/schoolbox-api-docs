@@ -1209,7 +1209,7 @@ class AssessableTest extends TestCase
                 [$quiz, $this->getDummyStudent(1), null],
                 [$quiz, $this->getDummyStudent(2), '1 / 2'],
                 [$quiz, $this->getDummyStudent(3), '1 / 2'],
-                [$quiz, $this->getDummyStudent(4), '2 / 2'],
+                [$quiz, $this->getDummyStudent(4), '1 / 2'],
                 [$quiz, $this->getDummyStudent(5), '2 / 2'],
             ];
         }
@@ -1217,7 +1217,7 @@ class AssessableTest extends TestCase
             [$quiz, $this->getDummyStudent(1), null],
             [$quiz, $this->getDummyStudent(2), '1 / 2'],
             [$quiz, $this->getDummyStudent(3), '1 / 2'],
-            [$quiz, $this->getDummyStudent(4), '2 / 2'],
+            [$quiz, $this->getDummyStudent(4), '1 / 2'],
             [$quiz, $this->getDummyStudent(5), '2 / 2'],
         ];
     }
