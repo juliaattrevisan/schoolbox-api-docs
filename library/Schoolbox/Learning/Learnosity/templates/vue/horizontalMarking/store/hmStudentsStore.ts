@@ -152,14 +152,12 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * To update a student
-     * @param {StudentItem} item - the item to update
+     * To update the score of a response
+     * @param {StudentItemResponse} response - the response to update
      * @param {number} score - the score to update
-     * @param {string} comment - the comment to update
      */
-    function updateStudentItemReview(item: StudentItem, score: number, comment: string) {
-        item.response.score = score;
-        item.response.comment = comment;
+    function updateResponseScore(response: StudentItemResponse, score: number) {
+        response.score = score;
     }
 
     /**
@@ -199,7 +197,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         toggleAllStudents,
         reportLoaded,
         progressReport,
-        updateStudentItemReview,
+        updateResponseScore,
         updateStudentFinalReview,
         clearHasFocus,
     };

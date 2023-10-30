@@ -7,7 +7,7 @@ import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
 import hmStudentsStudentItemResponse from "./hm-students-student-item-response.vue";
-import hmStudentsStudentItemReview from "./hm-students-student-item-review.vue";
+import hmStudentsStudentItemComment from "./hm-students-student-item-comment.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -34,15 +34,16 @@ const isActive = window.Vue.computed(() => {
             <div class="l-flex-col l-gap-m">
                 <div class="item-responses l-flex-col l-gap-m">
                     <hm-students-student-item-response
-                        v-for="response in props.item.responses"
+                        v-for="(response, index) in props.item.responses"
                         :key="response.learnosityReference"
                         :student="props.student"
                         :item="props.item"
+                        :question="props.item.questions[index]"
                         :response="response"
                         :container="props.container"
                     />
                 </div>
-                <hm-students-student-item-review :student="props.student" :item="props.item" />
+                <hm-students-student-item-comment :student="props.student" :item="props.item" />
             </div>
         </div>
     </transition>

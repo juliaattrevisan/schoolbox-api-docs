@@ -4,22 +4,25 @@
  */
 
 import { useFocus } from "@vueuse/core";
+import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
+import type { Question } from "../types/Question";
 import type { StudentItemResponse } from "../types/StudentItemResponse";
 
 interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item to display
+    question: Question; // the question that's displayed
     response: StudentItemResponse; // the response to display
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
+const studentsStore = useStudentsStore();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
 const { focused } = useFocus(scoreEl);
 const score = window.Vue.ref<number>(props.response.score ?? 0);
-const isSaving = window.Vue.ref<boolean>(false);
 
 /**
  * Save the score
@@ -34,72 +37,15 @@ async function saveScore() {
     });
 }
 
+/**
+ * save the score on focus loss
+ */
 window.Vue.watch(focused, async ($focused) => {
     if (!$focused) {
-        if (isSaving.value) {
-            return;
-        }
+        studentsStore.updateResponseScore(props.response, score.value);
         await saveScore();
     }
 });
-
-/**
- * Save the score and comment, and then move to the next student
- */
-// async function onSaveSelected() {
-//     // studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
-//     // studentsStore.progressReport(props.student);
-//     isSaving.value = true;
-//     await saveScore();
-//     isSaving.value = false;
-// }
-
-/**
- * Update the styles of the response element to match the rest of the page
- * @param {HTMLDivElement} response - the response element to update the styles of
- */
-// function updateResponseStyles(response: HTMLDivElement) {
-//     const rowEl = response.querySelector(".row") as HTMLDivElement;
-//     rowEl.className = "";
-//     const colEl = response.querySelector(".col-xs-12") as HTMLDivElement;
-//     colEl.className = "l-flex-col l-gap-m";
-// }
-
-/**
- * Add any sample answers to the questions in the items
- * @param {HTMLDivElement} response - the response element to add the sample answers to
- */
-// function addSampleAnswers(response: HTMLDivElement) {
-//     props.item.questions.forEach((question) => {
-//         if (question.metadata.sample_answer) {
-//             const addHtml = `
-//                 <label>Sample Answer:</label> <em>${question.metadata.sample_answer}</em>
-//             `;
-//             const sampleAnswerEl = document.createElement("div");
-//             sampleAnswerEl.innerHTML = addHtml;
-//             const questionEl = response.querySelector(
-//                 `[data-lrn-widget-container="${question.response_id}"]`
-//             ) as HTMLDivElement;
-//             questionEl.appendChild(sampleAnswerEl);
-//         }
-//     });
-// }
-
-/**
- *
- * @param {HTMLDivElement} response - the response element to add the scores to
- */
-// function addScores(response: HTMLDivElement) {
-//     props.item.questions.forEach((question) => {
-//         const scoreElement = document.querySelector(
-//             `[data-learnosity-reference-score="${question.response_id}"]`
-//         ) as HTMLDivElement;
-//         const questionEl = response.querySelector(
-//             `[data-lrn-widget-container="${question.response_id}"]`
-//         ) as HTMLDivElement;
-//         questionEl.appendChild(scoreElement);
-//     });
-// }
 
 /**
  * Mve the item response element from the entire quiz response into our own container
@@ -109,13 +55,6 @@ window.Vue.onMounted(() => {
         `[data-lrn-widget-container="${props.response.learnosityReference}"]`
     ) as HTMLDivElement;
     responsesEl.value?.appendChild(response);
-    if (response.dataset.hasMounted === undefined) {
-        // we only need to run these methods once, otherwise we'll get duplicate sample answers etc
-        // updateResponseStyles(response);
-        // addSampleAnswers(response);
-        // addScores(response);
-    }
-    response.dataset.hasMounted = "true";
 });
 
 /**
@@ -132,7 +71,11 @@ window.Vue.onBeforeUnmount(() => {
 <template>
     <div class="l-flex-col l-gap-m">
         <div ref="responsesEl"></div>
-        <div :data-learnosity-reference-score="props.response.learnosityReference" class="response-score">
+        <div v-if="question.metadata.sample_answer">
+            <label>Sample answer</label>
+            <input type="text" :value="question.metadata.sample_answer" disabled />
+        </div>
+        <div>
             <label>Update Score (max score: {{ props.response.maxScore }})</label>
             <input
                 :id="`customise-score-${props.response.learnosityReference}`"
