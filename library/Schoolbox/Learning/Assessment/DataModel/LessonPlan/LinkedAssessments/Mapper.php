@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments;
 
+use InvalidArgumentException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -55,6 +56,7 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
             'assessmentModel',
         );
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertAssessmentNotProject']);
     }
 
     protected function getSelectString()
@@ -69,6 +71,29 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
             INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
         ";
+    }
+
+    /**
+     * Assert that the linked assessment is not a project.
+     *
+     * This prohibition is in place due to the possibility of creating a cyclic
+     * reference. Otherwise:
+     * * projects could contain assessments, including lesson plans
+     * * lesson plans have linked assessments, which could be the project above
+     *
+     * Attempting to load this reference currently leads to an infinite loop:
+     * this might be fixable, but for now it's easier to simply prohibit the
+     * behavior which causes the loop.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    protected function assertAssessmentNotProject(Model $model): bool
+    {
+        if ($model->getAssessmentModel()->getProject()) {
+            throw new InvalidArgumentException('Projects may not be linked to lesson plans');
+        }
+        return true;
     }
 
     /**
