@@ -121,13 +121,6 @@ window.Vue.watch(
 </template>
 
 <style lang="scss" scoped>
-.student {
-    grid-template-rows: v-bind(containerHeight);
-    transition: grid-template-rows 300ms;
-    &__inner-container {
-        overflow: hidden;
-    }
-}
 .toggle-button {
     background: none;
     color: var(--content-ui-foreground);

@@ -6,7 +6,7 @@
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
-import hmStudentsStudentItemResponse from "./hm-students-student-item-response.vue";
+import hmStudentsStudentItemResponses from "./hm-students-student-item-responses.vue";
 import hmStudentsStudentItemReview from "./hm-students-student-item-review.vue";
 
 interface Props {
@@ -32,7 +32,7 @@ const isActive = window.Vue.computed(() => {
     <transition>
         <div v-if="isActive">
             <div class="l-flex-col l-gap-m">
-                <hm-students-student-item-response
+                <hm-students-student-item-responses
                     :student="props.student"
                     :item="props.item"
                     :container="props.container"
