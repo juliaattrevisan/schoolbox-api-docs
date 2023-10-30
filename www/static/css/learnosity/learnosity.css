@@ -1561,3 +1561,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn .lrn-author-ui a.lrn-btn {
     border-radius: 0px;
 }
+.lrn-i-trash:before {
+    content: "\e61b";
+    font-family: "schoolbox";
+}
