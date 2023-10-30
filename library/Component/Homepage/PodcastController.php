@@ -110,7 +110,7 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                 }
 
                 // Get file type information
-                $fileType = (new Mimetype())->setMime($item->enclosure->attributes()->type ?? '');
+                $fileType = (new Mimetype())->setMime((string)($item->enclosure->attributes()->type ?? ''));
 
                 if ($fileType->isAudio() || $fileType->isVideo()) {
                     $this->setVar(
