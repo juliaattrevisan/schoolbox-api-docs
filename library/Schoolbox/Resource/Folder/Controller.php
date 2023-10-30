@@ -548,7 +548,7 @@ class Controller extends BaseController
         // update role permission
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
 
-        // update folder order
+        // update folder sequence
         $folder->setSequence($sequence);
 
         $folder->setUpdatedBy($user->getId());
