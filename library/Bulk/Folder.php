@@ -224,13 +224,6 @@ class Bulk_Folder
         //set template id to default
         $templateId = $this->templateID;
 
-        // NOTE: $orderColumnIndex is the rightmost column index.
-        if ($orderColumnIndex !== count($row) - 1) {
-            throw new UnexpectedValueException(
-                "The number of columns in data row " . ($rowIdx - 1) . " does not match the number of column headings."
-            );
-        }
-
         //if template has been set in the csv
         if ($templateColumnIndex >= 0 && '' !== trim($row[$templateColumnIndex])) {
             //if template name is 'No template' then set to default 0, else check db list
