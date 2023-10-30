@@ -73,7 +73,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
             const deleteRequests = removedActivities.map((removedActivity) =>
                 fetch(`/learning/assessments/${sourceId.value}/activities/${removedActivity.id}`, {
                     method: "DELETE",
-                })
+                }).then(throwErrorOnInvalidResponse)
             );
 
             await Promise.all(deleteRequests);
@@ -82,7 +82,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
             const postRequests = addedActivities.map((addedActivity) =>
                 fetch(`/learning/assessments/${sourceId.value}/activities/${addedActivity.id}`, {
                     method: "POST",
-                })
+                }).then(throwErrorOnInvalidResponse)
             );
 
             await Promise.all(postRequests);
@@ -99,6 +99,18 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         // Close any open modals
         isOpen.value = false;
         isSingleUnlinkOpen.value = false;
+    }
+
+    /**
+     * Raise some sort of error if a request from `fetch` does not return a
+     * success response.
+     *
+     * @param {Response} response
+     */
+    function throwErrorOnInvalidResponse(response: Response) {
+        if (!response.ok) {
+            throw new Error('Something went wrong (response code: ' + String(response.status) + ')');
+        }
     }
 
     /**
