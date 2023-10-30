@@ -52,6 +52,16 @@
 </style>
 {% endif %}
 
+<style>
+    {# Hide this random search thing that's broken by design
+     # The Search for Question Types can find hidden/deprecated items intentionally
+     # Also removed via js for surety
+     #}
+    .lrn-qe-tiles-nav [data-lrn-qe-tiles-search-outlet] {
+        display: none;
+    }
+</style>
+
 {% autoescape 'js' %}
 <script>
     /**
@@ -59,6 +69,14 @@
      */
     const authorAppCallback = {
         readyListener: function () {
+            {# Hide this random search thing that's broken by design
+             # The Search for Question Types can find hidden/deprecated items intentionally
+             # Also hidden via css for surety
+             #}
+            authorApp.on('widgetedit:editor:ready', function(event) {
+                document.querySelector('.lrn-qe-tiles-nav [data-lrn-qe-tiles-search-outlet]')?.remove();
+            });
+
             /**
              * Force tagging to occur immediately
              * tags_on_create requires you to hit the save button or authorApp.saveActivity()
