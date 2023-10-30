@@ -92,9 +92,9 @@ class Hydrator extends BaseHydrator
                 // Eliminate those kinds of matches.
                 if (
                     mb_stripos($event->getTitle(), $keyword, 0, 'UTF-8') === false &&
-                    mb_stripos($event->getLocation(), $keyword) === false
+                    mb_stripos($event->getLocation(), $keyword, 0, 'UTF-8') === false
                 ) {
-                    if (mb_stripos($eventDetailTextOnly, $keyword, 0, 'UTF-8')) {
+                    if (mb_stripos($eventDetailTextOnly, $keyword, 0, 'UTF-8') === false) {
                         return null;
                     }
                 }
