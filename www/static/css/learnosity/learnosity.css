@@ -1583,3 +1583,8 @@ span.lrn-i-next {
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-asset-uploader {
     transform: unset;
 }
+
+/* add padding to the quiz title in the player view */
+.lrn.lrn-assess .lrn-top-left-region .test_title_element .test-title-text {
+    padding: 1rem;
+}
