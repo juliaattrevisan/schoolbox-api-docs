@@ -44,6 +44,8 @@ class Controller extends Base
 
     /**
      * Display pastoral group management page
+     *
+     * @api /pastoral/management/groups
      */
     public function getGroups()
     {
@@ -68,6 +70,7 @@ class Controller extends Base
     /**
      * Display form to allow insert/update of a pastoral group
      *
+     * @api /pastoral/management/groups/modify/{group}
      * @param PastoralGroup $group
      */
     public function getGroupsModify(PastoralGroup $group): void
