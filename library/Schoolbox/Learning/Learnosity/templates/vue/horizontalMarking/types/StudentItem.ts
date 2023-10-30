@@ -8,5 +8,5 @@ export type StudentItem = {
     reference: string;
     questions: Question[];
     response_ids: string[];
-    response: StudentItemResponse;
+    responses: StudentItemResponse[]; // the responses for each question within this item
 };

@@ -33,13 +33,13 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * Get the response for a student item
-     * @param {string} learnosityReference - the learnosity reference to link the item response to
+     * @param {string} itemReference - the learnosity reference to link the item response to
      * @returns {StudentItemResponse} - the response
      */
-    function getItemResponse(learnosityReference: string) {
-        return useStore().itemResponses.find(
-            (itemResponse) => itemResponse.learnosityReference === learnosityReference
-        ) as StudentItemResponse;
+    function getItemResponses(itemReference: string) {
+        return useStore().itemResponses.filter(
+            (itemResponse) => itemResponse.itemReference === itemReference
+        ) as StudentItemResponse[];
     }
 
     /**
@@ -67,20 +67,20 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
      * @param {string} reportId - the report id
-     * @param {StudentItem[]} items - the items to add
+     * @param {StudentItem[]} $items - the items to add
      */
-    function addItems(reportId: string, items: StudentItem[]) {
-        const itemsWithQuestionsOnly = items.filter((item) => item.questions.length > 0);
+    function addItems(reportId: string, $items: StudentItem[]) {
+        const items = $items.filter((item) => item.questions.length > 0); // remove any items that don't have questions
         const selectedStudent = students.value.find((student) => student.elementId === reportId);
         if (selectedStudent) {
             const studentItems: StudentItem[] = [];
-            itemsWithQuestionsOnly.forEach((item) => {
+            items.forEach((item) => {
                 // for each item, we only want to store the below properties, removing any others Learnosity may have provided
                 studentItems.push({
                     reference: item.reference,
                     questions: item.questions,
                     response_ids: item.response_ids,
-                    response: getItemResponse(item.response_ids[0]),
+                    responses: getItemResponses(item.reference),
                 });
             });
             selectedStudent.items = studentItems;

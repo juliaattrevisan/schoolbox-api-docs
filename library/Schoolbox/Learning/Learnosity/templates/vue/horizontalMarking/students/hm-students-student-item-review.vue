@@ -17,8 +17,8 @@ const studentsStore = useStudentsStore();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
-const score = window.Vue.ref<number>(props.item.response.score ?? 0);
-const comment = useEditor(props.item.response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+// const score = window.Vue.ref<number>(props.item.response.score ?? 0);
+const comment = useEditor(props.item.responses[0].comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref<boolean>(false);
 const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "Save and continue"));
 
@@ -27,8 +27,8 @@ const buttonTitle = window.Vue.computed(() => (isSaving.value ? "Saving..." : "S
  */
 async function saveScore() {
     const formData = new FormData();
-    formData.append("learnosityReference", props.item.response.learnosityReference);
-    formData.append("score", score.value.toString());
+    // formData.append("learnosityReference", props.item.response.learnosityReference);
+    // formData.append("score", score.value.toString());
     await fetch(props.student.urls.score, {
         method: "POST",
         body: formData,
@@ -40,7 +40,7 @@ async function saveScore() {
  */
 async function saveComment() {
     const formData = new FormData();
-    formData.append("learnosityReference", props.item.response.learnosityReference);
+    formData.append("learnosityReference", props.item.responses[0].learnosityReference);
     formData.append("comment", comment.value);
     await fetch(props.student.urls.comment, {
         method: "POST",
@@ -52,7 +52,7 @@ async function saveComment() {
  * Save the score and comment, and then move to the next student
  */
 async function onSaveSelected() {
-    studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
+    // studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
     // studentsStore.progressReport(props.student);
     isSaving.value = true;
     await saveScore();
@@ -74,12 +74,12 @@ window.Vue.onMounted(() => {
  * Back end changes are saved via the fetch requests above
  */
 window.Vue.onUnmounted(() => {
-    studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
+    // studentsStore.updateStudentItemReview(props.item, score.value, comment.value);
 });
 </script>
 
 <template>
-    <div>
+    <!-- <div>
         <label>Update Score (max score: {{ props.item.response.maxScore }})</label>
         <input
             :id="`customise-score-${props.item.reference}`"
@@ -89,7 +89,7 @@ window.Vue.onUnmounted(() => {
             min="0"
             :max="props.item.response.maxScore"
         />
-    </div>
+    </div> -->
     <div>
         <label>Comment</label>
         <textarea :id="editorId"></textarea>
