@@ -141,7 +141,7 @@ class Bulk_Folder
         $folderCodeColumns  = $this->determineColumnIndexes($headerRow, 'code');
         $yearLevelColumns   = $this->determineColumnIndexes($headerRow, 'year');
         $templateColumn     = $this->determineColumnIndex($headerRow, 'template', false);
-        $orderColumn        = $this->determineColumnIndex($headerRow, 'order', false);
+        $sequenceColumn        = $this->determineColumnIndex($headerRow, 'sequence', false);
 
         // Check no overlapping matches
         $this->assertColumnIndexesAreUnique([$parentColumn, $folderNameColumn], $folderCodeColumns, $yearLevelColumns);
@@ -162,7 +162,7 @@ class Bulk_Folder
                 $yearLevels,
                 $perform,
                 $templateColumn,
-                $orderColumn
+                $sequenceColumn
             );
         }
 
@@ -184,9 +184,9 @@ class Bulk_Folder
      * @param GenericCollection $yearLevels Indexed by yearLevel.name
      * @param bool              $perform
      * @param int               $templateColumnIndex
+     * @param int               $SequenceColumnIndex
      * @return array
      * @throws MapperException
-     * @throws UnexpectedValueException
      */
     private function processCsvRow(
         int $rowIdx,
@@ -200,7 +200,7 @@ class Bulk_Folder
         GenericCollection $yearLevels,
         bool $perform,
         int $templateColumnIndex,
-        int $orderColumnIndex
+        int $sequenceColumnIndex
     ): array {
 
         $parentId   = trim($row[$parentColumnIndex]);
@@ -314,10 +314,10 @@ class Bulk_Folder
             return $result;
         }
 
-        // Folder Order
-        $folderOrder = $orderColumnIndex >= 0 ? trim($row[$orderColumnIndex]) : '';
-        if (!empty($folderOrder)) {
-            $newFolder->setOrder($folderOrder);
+        // Folder Sequence
+        $folderSequence = $sequenceColumnIndex >= 0 ? trim($row[$sequenceColumnIndex]) : '';
+        if (!empty($folderSequence)) {
+            $newFolder->setSequence($folderSequence);
         }
 
         // Persist models to DB.
@@ -535,7 +535,7 @@ class Bulk_Folder
         throw new UnexpectedValueException(
             "Please ensure the following column headings exist in the CSV file:\n" .
             // NOTE: The column headings below must those in the template CSV file downloadable from https://vagrant.dev.schoolbox.cloud/adminv2/import/folder.
-            "(Parent ID, Folder Name, Folder Colour, Folder Image, Folder Code 1, Folder Code 2, Folder Code 3, YearLevel, YearLevel, Template, Order).\n\n" .
+            "(Parent ID, Folder Name, Folder Colour, Folder Image, Folder Code 1, Folder Code 2, Folder Code 3, YearLevel, YearLevel, Template, Sequence).\n\n" .
             "Note also that extra Folder Code and YearLevel columns may be added."
         );
     }

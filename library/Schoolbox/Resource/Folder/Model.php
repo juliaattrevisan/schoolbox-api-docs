@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
 use Schoolbox\Mapper\Traits\Model\DeletedBy;
+use Schoolbox\Mapper\Traits\Model\HasSequence;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 use Schoolbox\Resource;
@@ -131,9 +132,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $assessables;
 
     /**
-     * used for sequencing / ordering folders on the summative report
+     * used for sequencing folders on the summative report
      */
-    private null|int $order = null;
+    private null|int $sequence = null;
 
     /**
      * Does this category have a homepage?
@@ -734,22 +735,22 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * Get the order for the summative report
+     * Get the sequence for the summative report
      * @return null|int
      */
-    public function getOrder(): null|int
+    public function getSequence(): null|int
     {
-        return $this->order;
+        return $this->sequence;
     }
 
     /**
-     * Sets the order for the summative report
-     * @param null|int $order
+     * Sets the sequence for the summative report
+     * @param null|int $sequence
      * @return self
      */
-    public function setOrder(null|int $order): self
+    public function setSequence(null|int $sequence): self
     {
-        $this->order = $order;
+        $this->sequence = $sequence;
         return $this;
     }
 }
