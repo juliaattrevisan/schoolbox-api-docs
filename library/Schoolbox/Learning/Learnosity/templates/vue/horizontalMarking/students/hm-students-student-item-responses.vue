@@ -3,16 +3,17 @@
  * Contains a students response to an item
  */
 
+import hmStudentsStudentItemResponsesScore from "./hm-students-student-item-responses-score.vue";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 
 interface Props {
     student: Student; // the student to display
-    item: StudentItem; //
+    item: StudentItem; // the item to display
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
-const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 
 /**
  * Update the styles of the response element to match the rest of the page
@@ -46,15 +47,32 @@ function addSampleAnswers(response: HTMLDivElement) {
 }
 
 /**
+ *
+ * @param {HTMLDivElement} response - the response element to add the scores to
+ */
+function addScores(response: HTMLDivElement) {
+    props.item.questions.forEach((question) => {
+        const scoreElement = document.querySelector(
+            `[data-learnosity-reference-score="${question.response_id}"]`
+        ) as HTMLDivElement;
+        const questionEl = response.querySelector(
+            `[data-lrn-widget-container="${question.response_id}"]`
+        ) as HTMLDivElement;
+        questionEl.appendChild(scoreElement);
+    });
+}
+
+/**
  * Mve the item response element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
     const response = props.container.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
-    responseEl.value?.appendChild(response);
+    responsesEl.value?.appendChild(response);
     if (response.dataset.hasMounted === undefined) {
         // we only need to run these methods once, otherwise we'll get duplicate sample answers etc
         updateResponseStyles(response);
         addSampleAnswers(response);
+        addScores(response);
     }
     response.dataset.hasMounted = "true";
 });
@@ -63,17 +81,25 @@ window.Vue.onMounted(() => {
  * Move the item response element back into the entire quiz response, so we keep it around for possible later use
  */
 window.Vue.onBeforeUnmount(() => {
-    const response = responseEl.value?.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
+    const response = responsesEl.value?.querySelector(`[data-reference="${props.item.reference}"]`) as HTMLDivElement;
     props.container.appendChild(response);
 });
 </script>
 
 <template>
-    <div ref="responseEl" class="item-response"></div>
+    <div ref="responsesEl" class="item-responses"></div>
+    <!--these scores are added in between each question response within responsesEl -->
+    <hm-students-student-item-responses-score
+        v-for="response in props.item.responses"
+        :key="response.learnosityReference"
+        :student="props.student"
+        :item="props.item"
+        :response="response"
+    />
 </template>
 
 <style lang="scss">
-.item-response {
+.item-responses {
     border-top: 1px solid var(--body-background);
     border-bottom: 1px solid var(--body-background);
     padding: var(--spacing-m) 0;
