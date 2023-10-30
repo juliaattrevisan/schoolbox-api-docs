@@ -79,14 +79,12 @@ class Hydrator extends BaseHydrator
                 }
 
                 $blogBodyTextOnly = (new ToText($blog->getBody()))->getText();
-                $blogBodyTextOnlyLowercase = strtolower($blogBodyTextOnly);
-                $keywordLowercase = strtolower($keyword);
 
                 // Because the blog body contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (!str_contains(strtolower($blog->getHeading()), $keywordLowercase)) {
-                    if (!str_contains($blogBodyTextOnlyLowercase, $keywordLowercase)) {
+                if (mb_stripos($blog->getHeading(), $keyword) === false) {
+                    if (mb_stripos($blogBodyTextOnly, $keyword) === false) {
                         return null;
                     }
                 }

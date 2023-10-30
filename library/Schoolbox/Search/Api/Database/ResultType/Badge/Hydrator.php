@@ -81,14 +81,12 @@ class Hydrator extends BaseHydrator
                 }
 
                 $badgeBodyTextOnly = (new ToText($badge->getBody()))->getText();
-                $badgeBodyTextOnlyLowercase = strtolower($badgeBodyTextOnly);
-                $keywordLowercase = strtolower($keyword);
 
                 // Because the badge body contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (!str_contains(strtolower($badge->getName()), $keywordLowercase)) {
-                    if (!str_contains($badgeBodyTextOnlyLowercase, $keywordLowercase)) {
+                if (mb_stripos($badge->getName(), $keyword, 0, 'UTF-8')) {
+                    if (mb_stripos($badgeBodyTextOnly, $keyword, 0, 'UTF-8')) {
                         return null;
                     }
                 }

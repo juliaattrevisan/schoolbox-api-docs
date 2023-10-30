@@ -86,17 +86,15 @@ class Hydrator extends BaseHydrator
                 }
 
                 $eventDetailTextOnly = (new ToText($event->getDetail()))->getText();
-                $eventDetailTextOnlyLowercase = strtolower($eventDetailTextOnly);
-                $keywordLowercase = strtolower($keyword);
 
                 // Because the badge event detail HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
                 if (
-                    !str_contains(strtolower($event->getTitle()), $keywordLowercase) &&
-                    !str_contains(strtolower($event->getLocation()), $keywordLowercase)
+                    mb_stripos($event->getTitle(), $keyword, 0, 'UTF-8') === false &&
+                    mb_stripos($event->getLocation(), $keyword) === false
                 ) {
-                    if (!str_contains($eventDetailTextOnlyLowercase, $keywordLowercase)) {
+                    if (mb_stripos($eventDetailTextOnly, $keyword, 0, 'UTF-8')) {
                         return null;
                     }
                 }
