@@ -50,6 +50,12 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * The minimum amount of characters required when searching for a pastoral record
+     */
+    const MIN_CHARACTER_LIMIT = 2;
+
+
     /** @var array $filters Used in report builder only */
     private $filters = [];
 
@@ -483,7 +489,7 @@ class Mapper extends BaseMapper
         $database = $this->getDatabase();
 
         foreach (explode(' ', $search) as $word) {
-            if (strlen($word) >= Results::MIN_SEARCH_LENGTH) {
+            if (strlen($word) >= self::MIN_CHARACTER_LIMIT) {
                 $words[] = "%{$database->getQuoter()->escapeForLike($word)}%";
             }
         }

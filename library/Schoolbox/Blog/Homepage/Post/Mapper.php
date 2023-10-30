@@ -13,13 +13,10 @@ namespace Schoolbox\Blog\Homepage\Post;
 use PDO;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -29,7 +26,7 @@ use Schoolbox\UserMapper;
 /**
  * @method Model createModel($idValue = null)
  */
-class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, IHomepageCleanable
+class Mapper extends BaseMapper implements FeedableMapperInterface, IHomepageCleanable
 {
     /**
      * Setup mapper
@@ -121,82 +118,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
     }
 
     /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return void
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
-     */
-    public function search(
-        ArticleResolver $articleResolver,
-        $user,
-        $keyword,
-        $offset = 0,
-        $limit = self::DEFAULT_LIMIT,
-        $sortProperty = '',
-        $sortDirection = 'DESC'
-    ) {
-        $sortBy  = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->getIdentifierColumn();
-        $sortDir = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
-
-        $offset = (int)$offset;
-        $limit  = (int)$limit;
-
-        $stmt = $this->database->prepare(
-            "
-			SELECT
-				{$this->getColumnString('b')},
-				{$this->getJoinMapper('owner')->getColumnString('u')},
-				{$this->getJoinMapper('folder')->getColumnString('c')}
-				MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
-			FROM
-				`{$this->getTable()}` `b`
-				LEFT JOIN {$this->getJoinSql('owner', 'b', 'u')}
-				INNER JOIN {$this->getJoinSql('folder', 'b', 'c')}
-				LEFT JOIN {$this->getJoinSql('perms', 'b', 'p')}
-					AND p.gid = :role_id
-					AND p.type > :min_access
-				LEFT JOIN {$this->getJoinSql('userAccess', 'b', 'a')}
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND b.deleted_at IS NULL
-				AND MATCH(`heading`,`body`) AGAINST (:keyword)
-			ORDER BY $sortBy $sortDir
-			LIMIT $offset, $limit
-		"
-        );
-
-        $stmt->execute(
-            [
-                'keyword'    => $keyword,
-                'role_id'    => $user->getRole()->getId(),
-                'service'    => UserAccess::SERVICE_HOMEPAGE,
-                'min_access' => UserAccess::ACCESS_READ,
-                'user_id'    => $user->getId(),
-            ]
-        );
-
-        $collection = $this->createCollection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $collection->add(
-                $this->hydrate($r, 'b')
-                     ->setOwner($this->hydrateJoin($r, 'owner', 'u'))
-                     ->setFolder($this->hydrateJoin($r, 'folder', 'c'))
-            );
-        }
-    }
-
-    /**
      * @param int $folderId
      * @param int $limit
      * @param int $offset
@@ -250,58 +171,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
             $blog = $this->hydrate($r, 'b');
             $blog->setOwner($user);
             $blog->setFolder($folder);
-            $c->add($blog);
-        }
-
-        return $c;
-    }
-
-    /**
-     * Find all the blog entries for a homepage
-     *
-     * TODO: But I don't think this is used?
-     *
-     * @param FolderModel $folder
-     * @param int|null    $limit
-     * @return Collection
-     */
-    public function findForCategory(FolderModel $folder, $limit = 0)
-    {
-        $query =
-            "
-			SELECT
-				{$this->getColumnString('b')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM `{$this->getTable()}` AS `b`
-            LEFT JOIN {$this->getJoinSql('owner', 'b', 'u')}
-			WHERE `b`.`deleted_at` IS NULL
-				AND `b`.`folder_id` = :folder_id
-			ORDER BY `b`.`created_at` DESC
-		";
-
-        if (is_numeric($limit) && $limit) {
-            $limitValue = (int)$limit;
-
-            $query .= " LIMIT {$limitValue}";
-        }
-
-        $stmt = $this->database->prepare($query);
-
-        $stmt->execute(
-            [
-                'folder_id' => $folder->getId(),
-            ]
-        );
-
-        $c = $this->createCollection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var User $user */
-            $user = $this->hydrateJoin($r, 'owner', 'u');
-
-            /** @var BlogModel $blog */
-            $blog = $this->hydrate($r, 'b');
-            $blog->setOwner($user);
             $c->add($blog);
         }
 

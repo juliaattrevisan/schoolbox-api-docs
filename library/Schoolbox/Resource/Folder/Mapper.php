@@ -24,7 +24,6 @@ use PDOException;
 use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -33,7 +32,6 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Resource\AbstractFolderMapper;
@@ -46,7 +44,6 @@ use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Routing\Subscription\Loader;
 use Schoolbox\Resource\File;
-use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfig;
@@ -83,7 +80,7 @@ use function strnatcasecmp;
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = [])
  */
-class Mapper extends AbstractFolderMapper implements ILocator, Searchable
+class Mapper extends AbstractFolderMapper implements ILocator
 {
     /**
      * Interface with external user database.
@@ -1783,35 +1780,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
         throw new MapperException\NotFound();
     }
-
-
-    /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * This also returns a count of all the items found in the search, not limited
-     * by params
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return Result
-     */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
-    {
-        if ($limit == 0) {
-            $limit = self::DEFAULT_LIMIT;
-        }
-
-        $searcher = new Result();
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
-
-        return $searcher;
-    }
-
 
     /* Getters/Setters
      */

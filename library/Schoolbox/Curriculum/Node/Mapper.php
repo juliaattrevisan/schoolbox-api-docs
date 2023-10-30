@@ -9,7 +9,6 @@
 namespace Schoolbox\Curriculum\Node;
 
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -23,7 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
  */
-class Mapper extends BaseMapper implements BaseMapper\Searchable
+class Mapper extends BaseMapper
 {
     /** @var int limit depth to recursively sort nodes */
     private const SORT_MAX_DEPTH = 50;
@@ -173,7 +172,6 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     }
 
     /**
-     * @param ArticleResolver $articleResolver
      * @param \Schoolbox\User $user
      * @param string          $keyword
      * @param int             $offset
@@ -184,7 +182,6 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      * @return Collection|Model[]
      */
     public function search(
-        ArticleResolver $articleResolver,
         $user,
         $keyword,
         $offset = 0,

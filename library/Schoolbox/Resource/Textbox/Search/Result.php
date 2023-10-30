@@ -13,7 +13,6 @@ namespace Schoolbox\Resource\Textbox\Search;
 use Component_Config_Collapse;
 use Component_Config_ShowComponentTitle;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\Sanitiser;
@@ -38,14 +37,13 @@ class Result extends Base
     /**
      * Get all the search results
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param Mapper          $mapper
      * @param Sanitiser       $sanitiser
      * @return Collection
      * @throws Mapper\Exception
      */
-    protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser)
+    protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         /** @var \Schoolbox\Resource\Textbox\Mapper $mapper */
         [$componentJoin, $componentParams, $componentColumn] = $this->getComponentJoin($mapper);
@@ -94,14 +92,13 @@ class Result extends Base
     /**
      * The total number of items found by the search
      *
-     * @param ArticleResolver   $articleResolver
      * @param User              $user
      * @param \Schoolbox\Mapper $mapper
      * @param Sanitiser         $sanitiser
      * @return int
      * @throws Mapper\DefinitionException
      */
-    protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser)
+    protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         /** @var \Schoolbox\Resource\Textbox\Mapper $mapper */
         [$componentJoin, $componentParams, $componentColumn] = $this->getComponentJoin($mapper);
@@ -145,10 +142,10 @@ class Result extends Base
                     && ((int)$row['collapse'] === 0 || (int)$row['show_title'] === 1)
                 ) {
                     // if component exists and it's not hidden, read only user can see this
-                    return $this->getAccessor()->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_DENY;
+                    return $this->accessor->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_DENY;
                 } else {
                     // if component doesn't exist, only write+ user can see this
-                    return $this->getAccessor()->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_READ;
+                    return $this->accessor->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_READ;
                 }
             }
         );

@@ -8,11 +8,11 @@
 
 namespace Schoolbox\Resource\Textbox;
 
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\GenericCollection;
+use Schoolbox\IHomepageCleanable;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Textbox\Search\Result;
 use Schoolbox\User;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
@@ -23,8 +23,13 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
  * @method Model createModel($idValue = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  */
-class Mapper extends \Schoolbox\Mapper implements Searchable
+class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
 {
+    /**
+     * The number of results returned when searching for this object
+     */
+    private const DEFAULT_LIMIT = 20;
+
     /**
      * Textbox Homepage Controller classname
      */
@@ -263,7 +268,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * This also returns a count of all the items found in the search, not limited by params.
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param string          $keyword
      * @param int             $offset
@@ -272,15 +276,26 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param string          $sortDirection
      * @return Result
      */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
         if ($limit == 0) {
             $limit = self::DEFAULT_LIMIT;
         }
 
-        $searcher = new Result();
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+        $searcher = new Result(Access::getInstance());
+        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
+    }
+
+    /**
+     * Soft-deletes blog for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid): void
+    {
+        $this->deleteByColumn('categoryID', $cid);
     }
 }

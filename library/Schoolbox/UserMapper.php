@@ -46,8 +46,15 @@ use UnexpectedValueException;
  */
 class UserMapper extends Mapper
 {
-    // The username of the special 'Alaress Admin' user used by Schoolbox staff
+    /**
+     * The username of the special 'Alaress Admin' user used by Schoolbox staff
+     */
     public const USERNAME_ALARESS_ADMIN = 'alaress';
+
+    /**
+     * The minimum amount of characters required when searching for a user
+     */
+    public const MIN_CHARACTER_LIMIT = 2;
 
     /**
      * If in use (ie not null), this should mirror all non-softDeleted users in DB.
@@ -620,7 +627,7 @@ class UserMapper extends Mapper
 
         $foundValidKeyword = false;
 
-        if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
+        if (strlen($search) >= self::MIN_CHARACTER_LIMIT) {
             // Only search if there are X or more characters
 
             $keywordArray = explode(' ', $search);
@@ -628,7 +635,7 @@ class UserMapper extends Mapper
             $pb = $this->getPredicateBuilder();
 
             foreach ($keywordArray as $keyword) {
-                if (strlen($keyword) >= Results::MIN_SEARCH_LENGTH) {
+                if (strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
                     // Each keyword must be long enough to search
 
                     $foundValidKeyword = true;

@@ -14,24 +14,16 @@ use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Search\Results;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    /** PastoralGroupMapper */
-    private PastoralGroupMapper $pastoralGroupMapper;
-
-    /** PastoralGroupMemberMapper */
-    private PastoralGroupMemberMapper $pastoralGroupMemberMapper;
-
-    /** UserMapper */
-    private UserMapper $userMapper;
-
-    /** RoleMapper */
-    private RoleMapper $roleMapper;
+    /**
+    * The smallest amount of characters to allow when searching for users
+    */
+    const MIN_CHARACTER_LIMIT = 2;
 
 
     /**
@@ -43,19 +35,17 @@ class Controller extends Base
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
      */
     public function __construct(
-        UserMapper $userMapper,
-        RoleMapper $roleMapper,
-        PastoralGroupMapper $pastoralGroupMapper,
-        PastoralGroupMemberMapper $pastoralGroupMemberMapper
+        private UserMapper $userMapper,
+        private RoleMapper $roleMapper,
+        private PastoralGroupMapper $pastoralGroupMapper,
+        private PastoralGroupMemberMapper $pastoralGroupMemberMapper
     ) {
-        $this->userMapper                = $userMapper;
-        $this->roleMapper                = $roleMapper;
-        $this->pastoralGroupMapper       = $pastoralGroupMapper;
-        $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
     }
 
     /**
      * Display pastoral group management page
+     *
+     * @api /pastoral/management/groups
      */
     public function getGroups()
     {
@@ -80,6 +70,7 @@ class Controller extends Base
     /**
      * Display form to allow insert/update of a pastoral group
      *
+     * @api /pastoral/management/groups/modify/{group}
      * @param PastoralGroup $group
      */
     public function getGroupsModify(PastoralGroup $group): void
@@ -99,7 +90,7 @@ class Controller extends Base
                 'roleTypes'           => null,
                 'roles'               => $roles,
                 'moderatorIds'        => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
-                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+                'minimumSearchLength' => self::MIN_CHARACTER_LIMIT,
             ],
             'Update Pastoral Group',
         );

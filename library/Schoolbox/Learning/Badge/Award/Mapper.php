@@ -38,6 +38,11 @@ use Schoolbox\UserMapper;
 class Mapper extends \Schoolbox\Mapper
 {
     /**
+     * The minimum amount of characters required when searching for a user
+     */
+    private const MIN_CHARACTER_LIMIT = 2;
+
+    /**
      * @inheritDoc
      */
     protected function mapping(): void
@@ -444,7 +449,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* No keyword provided; nothing to search
          */
-        if (strlen($keyword) < Results::MIN_SEARCH_LENGTH) {
+        if (strlen($keyword) < self::MIN_CHARACTER_LIMIT) {
             return [];
         }
 

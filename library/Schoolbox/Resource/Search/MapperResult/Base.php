@@ -12,7 +12,6 @@ use CallbackFilterIterator;
 use IteratorIterator;
 use LimitIterator;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -27,49 +26,34 @@ use Traversable;
  */
 abstract class Base
 {
-
     /**
      * Search results
      *
-     * @var \Schoolbox\Collection
+     * @var Collection
      */
     protected $result;
-
 
     /**
      * Total count of items without limits
      *
      * @var int
      */
-    protected $count = 0;
-
-
-    /**
-     * The object that is used to determine whether a user has access to a resource.
-     *
-     * @var Access
-     */
-    protected $accessor;
-
+    protected int $count = 0;
 
     /**
      * Constructor
      *
-     * @param Access $accessor
+     * @param Access $accessor The object that is used to determine whether a user has access to a resource.
      */
-    public function __construct(Access $accessor = null)
+    public function __construct(protected Access $accessor)
     {
         $this->setResult(new Collection());
-        // TODO make $accessor injection mandatory
-        $this->setAccessor(($accessor instanceof Access) ? $accessor : Access::getInstance());
     }
 
 
     /**
      * Execute search
-     * Execute search count
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param Mapper          $mapper
      * @param string          $keyword
@@ -78,7 +62,7 @@ abstract class Base
      * @param int             $offset
      * @param int             $limit
      */
-    public function search(ArticleResolver $articleResolver, User $user, Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
+    public function search(User $user, Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
     {
 
         /* Sanitise inputs
@@ -87,7 +71,7 @@ abstract class Base
 
         /* Collect search results
          */
-        $this->setResult($this->executeSearch($articleResolver, $user, $mapper, $sanitiser));
+        $this->setResult($this->executeSearch($user, $mapper, $sanitiser));
 
         /* You can save a db request by using the $setResult() outcome and
          * traversing to $currentPage-1 manually in php, manually constructing
@@ -96,32 +80,30 @@ abstract class Base
 
         /* Collect search results count without limit/offset params
          */
-        $this->setCount($this->executeSearchCount($articleResolver, $user, $mapper, $sanitiser));
+        $this->setCount($this->executeSearchCount($user, $mapper, $sanitiser));
     }
 
 
     /**
      * Get all the search results
      *
-     * @param ArticleResolver $articleResolver
      * @param User            $user
      * @param Mapper          $mapper
      * @param Sanitiser       $sanitiser
      * @return Collection
      */
-    abstract protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser);
+    abstract protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser);
 
 
     /**
      * The total number of items found by the search
      *
-     * @param ArticleResolver   $articleResolver
      * @param User              $user
      * @param \Schoolbox\Mapper $mapper
      * @param Sanitiser         $sanitiser
      * @return int
      */
-    abstract protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser);
+    abstract protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser);
 
 
     /**
@@ -172,7 +154,7 @@ abstract class Base
         return new CallbackFilterIterator(
             new IteratorIterator($rawResult),
             function ($row) use ($user, $folderColumn) {
-                return $this->getAccessor()->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_DENY;
+                return $this->accessor->getFolderAccess($user, (int)$row[$folderColumn]) > UserAccess::ACCESS_DENY;
             }
         );
     }
@@ -203,7 +185,7 @@ abstract class Base
     /**
      * Set result
      *
-     * @param \Schoolbox\Collection $result
+     * @param Collection $result
      */
     protected function setResult($result)
     {
@@ -213,28 +195,10 @@ abstract class Base
     /**
      * Get result
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
     public function getResult()
     {
         return $this->result;
-    }
-
-    /**
-     * @return Access
-     */
-    public function getAccessor()
-    {
-        return $this->accessor;
-    }
-
-    /**
-     * @param Access $accessor
-     * @return static
-     */
-    public function setAccessor($accessor)
-    {
-        $this->accessor = $accessor;
-        return $this;
     }
 }

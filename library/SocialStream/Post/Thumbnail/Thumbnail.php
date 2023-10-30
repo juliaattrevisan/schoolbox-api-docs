@@ -19,7 +19,6 @@ use SocialStream\Post\Player\Player;
  */
 abstract class Thumbnail
 {
-
     /**
      * XML output
      *
@@ -40,16 +39,6 @@ abstract class Thumbnail
      * @var Player|bool
      */
     protected $next = false;
-
-    /**
-     * An instance of FileType
-     *
-     * This checks whether a url contains a valid image or not
-     * by checking file extension
-     *
-     * @var \FileType|null
-     */
-    protected $fileType = null;
 
     /**
      * The xpath query
@@ -76,7 +65,6 @@ abstract class Thumbnail
     {
         $this->setXml($xml);
         $this->setUrl($url);
-        $this->setFileType(new \FileType($url));
     }
 
     /**
@@ -157,26 +145,6 @@ abstract class Thumbnail
     protected function getUrl(): string
     {
         return $this->url;
-    }
-
-    /**
-     * Set file type
-     *
-     * @param \FileType|null $fileType
-     */
-    protected function setFileType($fileType): void
-    {
-        $this->fileType = $fileType;
-    }
-
-    /**
-     * Get file type
-     *
-     * @return \FileType|null
-     */
-    protected function getFileType(): ?\FileType
-    {
-        return $this->fileType;
     }
 
     /**

@@ -11,15 +11,12 @@ namespace Schoolbox\Resource;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\ILocator;
 use Schoolbox\User;
-use Schoolbox\Resource\Link\Search\Result;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -31,7 +28,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  * @method Link hydrate(array $row, $alias = '', $callback = null)
  * @method Link createModel($idValue = null)
  */
-class LinkMapper extends Mapper implements ILocator, Searchable
+class LinkMapper extends Mapper implements ILocator
 {
     /**
      * Mapping
@@ -261,35 +258,6 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         $notif = Notifactory::create(Notif::TOPIC_CMS);
         $notif->notice('CRUD', $logEntry);
     }
-
-
-    /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * This also returns a count of all the items found in the search, not limited
-     * by params
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return Result
-     */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
-    {
-        if ($limit === 0) {
-            $limit = self::DEFAULT_LIMIT;
-        }
-
-        $searcher = new Result();
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
-
-        return $searcher;
-    }
-
 
     /**
      * Return the files contained within the folder with the given ID

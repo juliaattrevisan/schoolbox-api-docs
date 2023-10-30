@@ -8,14 +8,12 @@
 
 namespace Schoolbox\Comms\News;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\StickyStatus\Corrector;
@@ -25,7 +23,6 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
@@ -48,7 +45,7 @@ use function is_array;
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model[]|GenericCollection createCollection($contents = [])
  */
-class Mapper extends \Schoolbox\Mapper implements Searchable
+class Mapper extends \Schoolbox\Mapper
 {
     /**
      * This const represents "all topics", as an int id
@@ -665,37 +662,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement->execute($pb->getParams());
         return $statement->fetchAll(PDO::FETCH_COLUMN);
     }
-
-
-    /**
-     * Performs a search with the given parameters, and returns a Collection of the resultant set.
-     *
-     * @param ArticleResolver $articleResolver
-     * @param User            $user
-     * @param string          $keyword
-     * @param int             $offset
-     * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
-     * @return Search\Result
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     */
-    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC'): Search\Result
-    {
-        if (!$limit) {
-            $limit = self::DEFAULT_LIMIT;
-        }
-
-        // TODO snap this outside the mapper
-        /** @var IConnector $database */
-        $database = self::getDi()->get('databaseInternal');
-        $l10n = self::getDi()->get('l10n');
-        $searcher = new Search\Result($database, $l10n);
-        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
-
-        return $searcher;
-    }
-
 
     /**
      * Performs a check whether the homepage has at least one archived news.
