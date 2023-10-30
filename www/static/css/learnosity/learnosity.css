@@ -775,6 +775,9 @@ span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
 .lrn .lrn_btn:is(.lds-btn-secondary):hover {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
 }
 .lds-btn-secondary,
 .lrn .lrn_btn:is(.lds-btn-secondary):focus {
@@ -940,15 +943,17 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 
 /* show answers button */
-.lrn .lrn-author-ui .lrn-author-validate-questions-toggle {
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle,
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle:hover,
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked,
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked:hover {
     background-color: var(--content-ui-background);
     color: var(--content-ui-foreground);
     border: 0px;
-}
-.lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked {
-    background-color: var(--content-ui-background);
-    color: var(--content-ui-foreground);
-    border: 0px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
+    font-weight: 400;
 }
 .lrn .lrn-author-ui-no-preview button:focus {
     outline: none;
@@ -987,6 +992,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 .lrn.lrn-author .lrn-author-region-sidebar-open .lrn-author-region-sidebar {
     box-shadow: none;
+    width: auto;
 }
 .lrn .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-i-"] {
     border-top-color: transparent;
@@ -1104,9 +1110,6 @@ button.lrn-btn-save-dropdown {
     overflow: hidden;
     vertical-align: middle;
 }
-button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
-    color: var(--content-ui-foreground);
-}
 .lrn .lrn-author-ui .lrn-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
     padding-left: 30px;
     color: var(--content-ui-foreground) !important;
@@ -1119,10 +1122,15 @@ button.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
 .lrn .lrn-author-ui .lrn-btn-save:hover:enabled .lrn-i-save:before {
     transform: none;
 }
-.lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary {
+.lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary,
+.lrn .lrn-author-ui .lrn-btn-success[disabled],
+.lrn .lrn-author-ui .lrn-btn-success[disabled]:hover,
+.lrn .lrn-author-ui .lrn-btn-success[disabled]:focus {
     color: var(--content-ui-submit-foreground);
     background-color: var(--content-ui-submit-background);
     width: 100%;
+    min-height: 2.5rem !important;
+    padding: 0.5rem !important;
 }
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
@@ -1310,13 +1318,13 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 /* change create and find card positions */
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
-    right: 145px;
-    top: 45px;
+    right: 170px;
+    top: 55px;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 20px;
-    top: 45px;
+    top: 55px;
 }
 span.lrn-author-name-wrapper {
     border: 1px solid var(--form-border-color);
@@ -1365,7 +1373,8 @@ span.lrn-author-name-wrapper {
     vertical-align: middle !important;
     color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-background) !important;
-    width: 98% !important;
+    width: 99% !important;
+    margin: auto;
 }
 /* replaced trash icon */
 .lrn-qe .lrn-qe-ui .lrn-qe-i-trash:before {
@@ -1502,4 +1511,21 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 /* update search button text transformation from uppercase to unset  */
 .lrn.lrn-author .lrn-tool-panel-search .lrn-btn-lg {
     text-transform: unset;
+}
+
+/* updated font sizes */
+.lrn-author-toolbar-toggle .lrn-author-toggle-part,
+.lrn-author-activity-button {
+    font-size: 1rem !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-weight: 400;
+}
+.lrn .lrn-author-ui-no-preview,
+.lrn .lrn-author-ui-no-preview input,
+.lrn .lrn-author-ui-no-preview button {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
+    font-weight: 400;
 }
