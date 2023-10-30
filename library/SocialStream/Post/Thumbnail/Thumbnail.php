@@ -19,7 +19,6 @@ use SocialStream\Post\Player\Player;
  */
 abstract class Thumbnail
 {
-
     /**
      * XML output
      *
