@@ -10,11 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
-use DateTimeInterface;
-use InvalidArgumentException;
-use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Application\Exception\NotFound;
+use Exception;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
@@ -70,10 +66,22 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $keyword = trim((string)$this->requestQuery['keyword']);
-        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
-        $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
-        $cursor  = null;
+        $keyword = (string)($this->requestQuery['keyword'] ?? '');
+
+        try {
+            $filter = new SearchFilter\DataObject(
+                $this->requestQuery['filter'] ?? null,
+                null,
+                $this->userMapper
+            );
+        } catch (Exception $e) {
+            // The filter data in the URL was invalid, so ignore the data and create an empty filter.
+            $filter = new SearchFilter\DataObject(null,null, $this->userMapper);
+        }
+
+        $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
+        $cursor = null;
+
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
@@ -197,7 +205,18 @@ class Controller extends Base
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
-        $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, $folder);
+
+        try {
+            $filter  = new SearchFilter\DataObject(
+                $this->requestQuery['filter'] ?? null,
+                $folder,
+                $this->userMapper
+            );
+        } catch (Exception $e) {
+            // The filter data in the URL was invalid, so ignore the data and create an empty filter.
+            $filter = new SearchFilter\DataObject(null,null, $this->userMapper);
+        }
+
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
@@ -218,75 +237,6 @@ class Controller extends Base
         } else {
             $this->sendJsonError('Search keyword must be at least 2 characters', 400);
         }
-    }
-
-    /**
-     * Build a search filter data object, for passing into the cursor.
-     *
-     * @param string|null       $filterQueryString The filter from the query string, if any.
-     * @param Folder\Model|null $folder            If provided, the folder to filter search results to.
-     *                                             (This is never provided via the query string.)
-     * @return SearchFilter\DataObject
-     * @throws Exception if the filter has invalid data
-     * @throws NotFound  if the creator is set, and cannot be found
-     */
-    private function buildSearchFilter(?string $filterQueryString, ?Folder\Model $folder): SearchFilter\DataObject
-    {
-        if (!isset($filterQueryString)) {
-            return new SearchFilter\DataObject(null, null, null, null, $folder);
-        }
-        $decodedFilter = json_decode($filterQueryString, true);
-
-        $types = null;
-        if (isset($decodedFilter['types'])) {
-            if (is_array($decodedFilter['types']) && array_is_list($decodedFilter['types'])) {
-                $types = $decodedFilter['types'];
-            } else {
-                throw new Exception('Invalid filter: types is not a list of valid types');
-            }
-        }
-
-        $fromDate = null;
-        if (isset($decodedFilter['date']['from'])) {
-            if (strlen($decodedFilter['date']['from']) === 10) {
-                // Assume date has been supplied in 'Y-m-d' format, so add default time (start of day) in expected format.
-                $decodedFilter['date']['from'] .= 'T00:00:00' . date('P');
-            }
-            try {
-                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], DateTimeInterface::RFC3339);
-            } catch (InvalidArgumentException $e) {
-                throw new Exception('Invalid filter: date.from is not a RFC3339 date', 0, $e);
-            }
-        }
-
-        $toDate = null;
-        if (isset($decodedFilter['date']['to'])) {
-            if (strlen($decodedFilter['date']['to']) === 10) {
-                // Assume date has been supplied in 'Y-m-d' format, so add default time (end of day) in expected format.
-                $decodedFilter['date']['to'] .= 'T23:59:59' . date('P');
-            }
-            try {
-                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], DateTimeInterface::RFC3339);
-            } catch (InvalidArgumentException $e) {
-                throw new Exception('Invalid filter: date.to is not a RFC3339 date', 0, $e);
-            }
-        }
-
-        $creator = null;
-        if (isset($decodedFilter['creator']['id'])) {
-            if (!is_int($decodedFilter['creator']['id'])) {
-                throw new Exception('Invalid filter: creator.id is not an integer');
-            }
-            try {
-                $creator = $this->userMapper->findById($decodedFilter['creator']['id']);
-            } catch (MapperException $e) {
-                // Can't search for things created by an unknown user:
-                // raise an error?
-                throw new NotFound('Invalid filter: creator.id does not match known user', 0, $e);
-            }
-        }
-
-        return new SearchFilter\DataObject($types, $fromDate, $toDate, $creator, $folder);
     }
 
     /**

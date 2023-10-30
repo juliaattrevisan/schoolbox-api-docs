@@ -12,8 +12,8 @@ use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\UserMapper;
+use Schoolbox\Search\Api\SearchFilter;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -57,40 +57,24 @@ class Controller extends Base
     {
         $keywordFromUrl = $this->requestQuery->get('keyword');
         $filterFromUrlJson = $this->requestQuery->get('filter');
-        $filterFromUrl = $filterFromUrlJson === null ? null : json_decode($filterFromUrlJson, true);
 
-        // Quick validation.
-        if ($filterFromUrl !== null) {
-            if (
-                count($filterFromUrl) !== 3 ||
-                !array_key_exists('creator', $filterFromUrl) ||
-                !array_key_exists('date', $filterFromUrl) ||
-                !array_key_exists('types', $filterFromUrl)
-            ) {
-                // Unexpected data format in filter from URL, so just ignore it.
-                $filterFromUrl = null;
-            }
+        try {
+            $filterFromUrl = new SearchFilter\DataObject(
+                $filterFromUrlJson,
+                null,
+                self::$userMapper
+            );
+        } catch (Exception $e) {
+            // The filter data in the URL was invalid, so ignore the data and create an empty filter.
+            $filterFromUrl = new SearchFilter\DataObject(null,null, self::$userMapper);
         }
 
-        if ($filterFromUrl !== null && isset($filterFromUrl['creator']['id'])) {
-            // Add creator name to filters array, since this is needed by the front-end, but not included in the URL.
-
-            try {
-                $creator = self::$userMapper->findById($filterFromUrl['creator']['id']);
-            } catch (Exception $e) {
-                // Creator user not found or deleted, so just ignore URL parameter.
-                $creator = null;
-            }
-
-            if ($creator === null) {
-                $filterFromUrl['creator'] = null;
-            } else {
-                $filterFromUrl['creator']['name'] = (
-                    // The format of creator name must match that used by the Vue front-end.
-                    $creator->getFullName() . ' - ' . $creator->getRole()->getName() . ' (' . $creator->getExternalId() . ')'
-                );
-            }
-        }
+        $filterFromUrlIsEmpty = (
+            $filterFromUrl->fromDate === null &&
+            $filterFromUrl->toDate === null &&
+            $filterFromUrl->creator === null &&
+            $filterFromUrl->types === []
+        );
 
         $this->response = $this->responseFromTemplate(
             "@search/search.twig",
@@ -100,22 +84,30 @@ class Controller extends Base
 
                 'keywordValue' => $keywordFromUrl,
                 'filterDateRangeValues' => (
-                    ($filterFromUrl !== null)
-                    ? [
-                        'startDate' => $filterFromUrl['date']['from'],
-                        'endDate' => $filterFromUrl['date']['to']
+                    ($filterFromUrlIsEmpty)
+                    ? $this->getDefaultDateRangeFilterValues()
+                    : [
+                        'startDate' => $filterFromUrl->fromDate->toRfc3339String(),
+                        'endDate' => $filterFromUrl->toDate->toRfc3339String()
                     ]
-                    : $this->getDefaultDateRangeFilterValues()
                 ),
                 'filterCreatorValue' => (
-                    ($filterFromUrl !== null)
-                    ? $filterFromUrl['creator']
-                    : null
+                    ($filterFromUrlIsEmpty)
+                    ? null
+                    : [
+                        'id' => $filterFromUrl->creator->getId(),
+                        'name' => (
+                            // The format of creator name must match that used by the Vue front-end.
+                            $filterFromUrl->creator->getFullName() . ' - ' .
+                            $filterFromUrl->creator->getRole()->getName() .
+                            ' (' . $filterFromUrl->creator->getExternalId() . ')'
+                        )
+                    ]
                 ),
                 'filterTypesValues' => (
-                    ($filterFromUrl !== null)
-                    ? $filterFromUrl['types']
-                    : []
+                    ($filterFromUrlIsEmpty)
+                    ? []
+                    : $filterFromUrl->types
                 )
             ]
         );
