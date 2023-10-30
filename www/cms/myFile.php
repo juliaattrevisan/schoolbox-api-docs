@@ -113,8 +113,6 @@ if ($this->arg[0] == 'new') {
 
     $zone->attachFiles(array($myFileId));
 
-    $ft = new FileType('', $file['mime_type'] ?? null);
-
     $this->setTitle('Modify File');
     $this->setVar('browse_row_block', '');
 

@@ -26,6 +26,11 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
 class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
 {
     /**
+     * The number of results returned when searching for this object
+     */
+    private const DEFAULT_LIMIT = 20;
+
+    /**
      * Textbox Homepage Controller classname
      */
     public const HOMEPAGE_COMPONENT_CONTROLLER = Controller::class;
