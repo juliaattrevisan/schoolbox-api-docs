@@ -57,13 +57,7 @@ class Controller extends Base
     {
         $keywordFromUrl = $this->requestQuery->get('keyword');
         $filterFromUrlJson = $this->requestQuery->get('filter');
-
-        try {
-            $filterFromUrl = $filterFromUrlJson === null ? null : json_decode($filterFromUrlJson, true);
-        } catch (Exception $e) {
-            // Could not decode JSON from URL, so ignore.
-            $filterFromUrl = null;
-        }
+        $filterFromUrl = $filterFromUrlJson === null ? null : json_decode($filterFromUrlJson, true);
 
         // Quick validation.
         if ($filterFromUrl !== null) {
