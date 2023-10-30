@@ -66,7 +66,7 @@ class Controller extends Base
             );
         } catch (Exception $e) {
             // The filter data in the URL was invalid, so ignore the data and create an empty filter.
-            $filterFromUrl = new SearchFilter\DataObject(null,null, self::$userMapper);
+            $filterFromUrl = new SearchFilter\DataObject(null, null, self::$userMapper);
         }
 
         $filterFromUrlIsEmpty = (

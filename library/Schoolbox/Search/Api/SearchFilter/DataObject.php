@@ -39,7 +39,7 @@ class DataObject
      * @throws Exception if the filter has invalid data
      * @throws NotFound  if the creator is set, and cannot be found
      */
-    function __construct(?string $filterQueryString, ?Folder\Model $folder, UserMapper $userMapper)
+    public function __construct(?string $filterQueryString, ?Folder\Model $folder, UserMapper $userMapper)
     {
         if (!isset($filterQueryString)) {
             $this->types = [];
@@ -107,5 +107,4 @@ class DataObject
         $this->creator = $creator;
         $this->folder = $folder;
     }
-
 }
