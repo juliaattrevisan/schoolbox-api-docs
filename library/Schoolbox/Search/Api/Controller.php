@@ -67,18 +67,11 @@ class Controller extends Base
     public function getSearch(): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
-
-        try {
-            $filter = new SearchFilter\DataObject(
-                $this->requestQuery['filter'] ?? null,
-                null,
-                $this->userMapper
-            );
-        } catch (Exception $e) {
-            // The filter data in the URL was invalid, so ignore the data and create an empty filter.
-            $filter = new SearchFilter\DataObject(null,null, $this->userMapper);
-        }
-
+        $filter = new SearchFilter\DataObject(
+            $this->requestQuery['filter'] ?? null,
+            null,
+            $this->userMapper
+        );
         $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         $cursor = null;
 
@@ -205,19 +198,13 @@ class Controller extends Base
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $filter  = new SearchFilter\DataObject(
+            $this->requestQuery['filter'] ?? null,
+            $folder,
+            $this->userMapper
+        );
+        $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
 
-        try {
-            $filter  = new SearchFilter\DataObject(
-                $this->requestQuery['filter'] ?? null,
-                $folder,
-                $this->userMapper
-            );
-        } catch (Exception $e) {
-            // The filter data in the URL was invalid, so ignore the data and create an empty filter.
-            $filter = new SearchFilter\DataObject(null,null, $this->userMapper);
-        }
-
-        $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
