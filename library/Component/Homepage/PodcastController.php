@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\File\Mimetype;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_PodcastController extends Component_Homepage_ControllerAbstract
@@ -109,7 +110,7 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                 }
 
                 // Get file type information
-                $fileType = new FileType($item->enclosure->attributes()->url, $item->enclosure->attributes()->type);
+                $fileType = (new Mimetype())->setMime($item->enclosure->attributes()->type ?? '');
 
                 if ($fileType->isAudio() || $fileType->isVideo()) {
                     $this->setVar(
