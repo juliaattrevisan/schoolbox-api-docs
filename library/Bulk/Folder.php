@@ -184,7 +184,7 @@ class Bulk_Folder
      * @param GenericCollection $yearLevels Indexed by yearLevel.name
      * @param bool              $perform
      * @param int               $templateColumnIndex
-     * @param int               $SequenceColumnIndex
+     * @param int               $sequenceColumnIndex
      * @return array
      * @throws MapperException
      */
