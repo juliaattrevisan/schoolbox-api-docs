@@ -88,13 +88,16 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
             await Promise.all(postRequests);
 
             toastEl.value.timeout("Saved", true, 2000);
+
+            // Only update linked if all activities are updated successfully.
+            // This means that if one fails but others succeed, then the
+            // activity list is out of sync with the backend.
+            linkedActivities.value = [...selectedActivities.value];
         } catch (error) {
             toastEl.value.timeout("Save failed", false, 5000);
         } finally {
             saveInProgress.value = false;
         }
-
-        linkedActivities.value = [...selectedActivities.value];
 
         // Close any open modals
         isOpen.value = false;
