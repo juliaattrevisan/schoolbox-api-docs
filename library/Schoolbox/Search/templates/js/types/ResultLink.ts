@@ -6,4 +6,5 @@ export type ResultLink = {
     url: string;
     title: string;
     icon?: string;
+    action?: string;
 };
