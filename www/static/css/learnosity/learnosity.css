@@ -1562,6 +1562,9 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn .lrn-author-ui a.lrn-btn {
     border-radius: 0px;
 }
+.lrn_widget input {
+    border-radius: 0px;
+}
 .lrn-i-trash:before {
     content: "\e61b";
     font-family: "schoolbox";
@@ -1587,4 +1590,13 @@ span.lrn-i-next {
 /* add padding to the quiz title in the player view */
 .lrn.lrn-assess .lrn-top-left-region .test_title_element .test-title-text {
     padding: 1rem;
+}
+
+/* fixed file upload button in preview questions */
+.lrn_widget.lrn_fileupload .lrn-fileupload-input-wrapper .lrn-disabled {
+    opacity: unset;
+    z-index: 3;
+}
+.lrn.lrn-assess .app-layout .lrn_btn_blue:after {
+    border-radius: 0px;
 }
