@@ -350,9 +350,9 @@ class Controller extends Base
                     $this->outputRows($rows, $outstream);
                 }
             } elseif (null === $lastAssessmentInfo) {
-                /* FIXME First iteration
-                 *  Find the list of students for this assessment spec id and then subtract guys from it
-                 *  when their feedbacks are encountered
+                /* First iteration
+                 * Find the list of students for this assessment spec id and then subtract guys from it
+                 * when their feedbacks are encountered
                  */
                 $studentList = $this->findStudents($assessmentInfo['assessmentSpecId']);
             }
