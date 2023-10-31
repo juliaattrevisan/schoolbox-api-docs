@@ -299,28 +299,64 @@ class Controller extends Base
          */
         $start = microtime(true);
 
+        $studentList = [];
         $lastAssessmentInfo = null;
 
         while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
-            /* FIXME for every assessment spec,
-             *  find all the classes that have a corresponding assessment implementation,
-             *  get a list of guys from Synergetic and collate them for each class,
-             *  then subtract anyone with feedback from that list of guys.
-             *  The remainder are people who should have done that assessment but never received feedback
-             *  and we pump them onto the end of the list per assessment spec
+            /* For every assessment spec,
+             * find all the classes that have a corresponding assessment implementation,
+             * get a list of guys from Synergetic and collate them for each class,
+             * then subtract anyone with feedback from that list of guys.
+             * The remainder are people who should have done that assessment but never received feedback
+             * and we pump them onto the end of the list per assessment spec
              *
              * FIXME maintain a static list of externalIds in case we need to reuse them
              */
             if (null !== $lastAssessmentInfo && $lastAssessmentInfo['assessmentSpecId'] !== $assessmentInfo['assessmentSpecId']) {
-                /* FIXME Find everyone who didn't get a feedback for $lastAssessmentInfo['assessmentSpecId'],
-                 *  find their context/curriculum nodes,
-                 *  and push them through the same combine() method
+                /* Find everyone who didn't get a feedback for $lastAssessmentInfo['assessmentSpecId'],
+                 * find their context/curriculum nodes,
+                 * and push them through the same combine() method
                  */
+
+                /* Find all the ancestry info about the assessment: course, unit
+                 */
+                $context = $this->contextLookup->find((int)$lastAssessmentInfo['assessment_id']);
+
+                /* Feedback data
+                 */
+                $feedback = [
+                    'normalised' => '',
+                    'humanReadable' => '',
+                ];
+
+                /* Curriculum nodes
+                 */
+                $curriculumNodes = $this->findCurriculumNodes((int)$lastAssessmentInfo['assessmentSpecId']);
+
+                foreach ($studentList as $externalId => $data) {
+                    /* Combine all that into a set of csv rows
+                     */
+                    $rows = $this->combine($assessmentInfo, $curriculumNodes, $context, $feedback);
+
+                    /* Pump it to an fputcsv
+                     */
+                    if ($this->perform) {
+                        foreach ($rows as $row) {
+                            fputcsv($outstream, $row);
+                        }
+                    } else {
+                        foreach ($rows as $row) {
+                            $numRows++;
+                            new \Alaress_Probe($row);
+                        }
+                    }
+                }
             } elseif (null === $lastAssessmentInfo) {
                 /* FIXME First iteration
                  *  Find the list of students for this assessment spec id and then subtract guys from it
                  *  when their feedbacks are encountered
                  */
+                $studentList = $this->findStudents($assessmentInfo['assessmentSpecId']);
             }
 
             try {
@@ -360,6 +396,10 @@ class Controller extends Base
                     new \Alaress_Probe($row);
                 }
             }
+
+            /* Remember we saw this guy
+             */
+            unset($studentList[$assessmentInfo['synergy_id']]);
         }
 
         $end = microtime(true);
