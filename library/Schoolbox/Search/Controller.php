@@ -13,9 +13,8 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Search\Api\SearchFilter\DataObjectFactory;
-use Schoolbox\UserMapper;
 use Schoolbox\Search\Api\SearchFilter;
+use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -59,7 +58,7 @@ class Controller extends Base
     {
         $keywordFromUrl = $this->requestQuery->get('keyword');
 
-        $dataObjectFactory = new DataObjectFactory(self::$userMapper);
+        $dataObjectFactory = new SearchFilter\DataObjectFactory(self::$userMapper);
 
         try {
             $filterFromUrl = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, null);

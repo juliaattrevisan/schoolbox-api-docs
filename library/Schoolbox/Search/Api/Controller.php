@@ -18,7 +18,6 @@ use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
-use Schoolbox\Search\Api\SearchFilter\DataObjectFactory;
 use Schoolbox\Search\Api\Source\ISource;
 use Schoolbox\UserMapper;
 
@@ -69,7 +68,7 @@ class Controller extends Base
     public function getSearch(): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
-        $dataObjectFactory = new DataObjectFactory($this->userMapper);
+        $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, null);
         $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         $cursor = null;
@@ -197,7 +196,7 @@ class Controller extends Base
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
-        $dataObjectFactory = new DataObjectFactory($this->userMapper);
+        $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, $folder);
         $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
 
