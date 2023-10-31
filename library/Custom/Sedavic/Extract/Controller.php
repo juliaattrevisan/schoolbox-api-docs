@@ -354,7 +354,7 @@ class Controller extends Base
                  * Find the list of students for this assessment spec id and then subtract guys from it
                  * when their feedbacks are encountered
                  */
-                $studentList = $this->findStudents($assessmentInfo['assessmentSpecId']);
+                $studentList = $this->findStudents((int)$assessmentInfo['assessmentSpecId']);
             }
 
             try {
