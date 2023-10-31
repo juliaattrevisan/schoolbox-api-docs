@@ -151,10 +151,9 @@ class Controller extends Base
     private const QUERY_CLASSES = "
         SELECT DISTINCT fc.code
         FROM assessment_specification_implementation asi
-        INNER JOIN v_assessment_relation var ON asi.implementation_assessment_id = var.assessment_id
-        INNER JOIN folder_code fc ON fc.folder_id = var.folder_id
+        INNER JOIN mv_assessment_relation mvar ON asi.implementation_assessment_id = mvar.assessment_id
+        INNER JOIN folder_code fc ON fc.folder_id = mvar.folder_id
         WHERE asi.specification_assessment_id = :assessmentSpecId
-
     ";
 
 
