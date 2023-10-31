@@ -195,14 +195,6 @@ class Controller extends Base
 
 
     /**
-     * A list of students involved in class codes
-     *
-     * @var array
-     */
-    private array $classList = [];
-
-
-    /**
      * A list of random problems with their data
      *
      * @var array
@@ -393,6 +385,10 @@ class Controller extends Base
             /* Remember we saw this guy
              */
             unset($studentList[$assessmentInfo['synergy_id']]);
+
+            /* Get ready for next iteration
+             */
+            $lastAssessmentInfo = $assessmentInfo;
         }
 
         /* Gather some stats
