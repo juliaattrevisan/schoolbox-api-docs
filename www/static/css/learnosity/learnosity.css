@@ -846,6 +846,8 @@ td.lrn-report-area {
     color: var(--content-ui-foreground);
     border: none;
     background: var(--content-ui-background);
+    border-radius: 0px !important;
+    font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-btn-primary:hover,
 .lrn .lrn-author-ui .lrn-btn-sec:hover,
@@ -861,6 +863,7 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
     box-shadow: none;
     cursor: default;
     opacity: 0.5;
+    border-radius: 0px;
 }
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
     color: var(--content-ui-foreground);
@@ -1169,18 +1172,42 @@ button.lrn-btn-save-dropdown {
     outline: none;
 }
 
-/*hide layout and selection, extra and more options, sections
+/*hide layout and selection, extra and more options, sections */
 [data-lrn-qe-section="layout.heading"] {
     display: none;
 }
 [data-lrn-qe-section="layout.content"] {
     display: none !important;
 }
-[data-lrn-qe-section="details.heading"] {
+[data-lrn-qe-label-path="metadata.acknowledgements"] {
     display: none;
 }
-[data-lrn-qe-section="details.content"] {
-    display: none !important;
+[data-lrn-qe-input-path="metadata.acknowledgements"] {
+    display: none;
+}
+[data-lrn-qe-label-path="metadata.rubric_reference"] {
+    display: none;
+}
+[data-lrn-qe-input-path="metadata.rubric_reference"] {
+    display: none;
+}
+[data-lrn-qe-input-path="metadata.distractor_rationale"] {
+    display: none;
+}
+[data-lrn-qe-label-path="stimulus_review"] {
+    display: none;
+}
+[data-lrn-qe-input-path="stimulus_review"] {
+    display: none;
+}
+[data-lrn-qe-label-path="instructor_stimulus"] {
+    display: none;
+}
+[data-lrn-qe-input-path="instructor_stimulus"] {
+    display: none;
+}
+[data-lrn-qe-label-path="metadata.distractor_rationale"] {
+    display: none;
 }
 [data-lrn-qe-label-path="metadata.distractor_rationale_response_level"] {
     display: none;
@@ -1191,7 +1218,9 @@ button.lrn-btn-save-dropdown {
 [data-lrn-qe-layout-wrapper="is_math"] {
     display: none;
 }
-*/
+[data-lrn-qe-section="details.heading"] {
+    display: none;
+}
 /* hide tags from questions list */
 
 .lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
@@ -1231,6 +1260,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 
 .lrn-qe .lrn-qe-ui .lrn-qe-tile-header {
     background: var(--content-ui-foreground);
+    border-radius: 0px;
 }
 /* removed gap from hearder */
 .lrn .lrn-author-ui .lrn-author-item-toolbar-controls,
@@ -1326,12 +1356,12 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 /* change create and find card positions */
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
-    right: 170px;
+    right: 150px;
     top: 55px;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
-    right: 20px;
+    right: 0px;
     top: 55px;
 }
 span.lrn-author-name-wrapper {
@@ -1418,11 +1448,6 @@ a.button {
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
     border-radius: 0px;
-}
-
-/* aligned left buttons */
-.lrn .lrn-author-ui .lrn-author-activity-toolbar {
-    padding: 0px 20px 0px 0px;
 }
 
 /* search pages styles */
@@ -1645,4 +1670,32 @@ span.lrn-list-view-empty-label {
 .lrn-list-view-empty.lrn-author-ui-no-preview::after {
     content: "\A You have no cards yet. A card is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
     white-space: pre;
+}
+
+/* fixed right alignment */
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-item-for-activity-list,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-item-for-activity-list,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-item-for-activity-list {
+    margin-right: 0px;
+}
+.island .content,
+.island .calendar-list li.row,
+.calendar-list .island li.row,
+.island .calendar-list label,
+.calendar-list .island label,
+.island .matching-pairs p,
+.matching-pairs .island p,
+.island .resource-browser .meta-panel,
+.resource-browser .island .meta-panel {
+    padding: 0px;
+}
+.lrn .lrn-author-ui .lrn-author-item-toolbar-right,
+.lrn .lrn-author-ui .lrn-author-activity-toolbar-right {
+    padding-right: 0px;
+}
+
+/* removed horizontal scrol on question view */
+.lrn.lrn-author .lrn-author-region-hide-overflow .lrn-author-widget-wrapper-inner {
+    overflow: visible !important;
 }
