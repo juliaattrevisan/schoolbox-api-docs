@@ -56,7 +56,8 @@ class DataObjectFactory
         if (isset($decodedFilter['date']['from'])) {
             if (strlen($decodedFilter['date']['from']) === 10) {
                 // Assume date has been supplied in 'Y-m-d' format, so add default time (start of day) in expected format.
-                $decodedFilter['date']['from'] .= 'T00:00:00' . date('P');
+                $dateObj = new Alaress_Date_Format($decodedFilter['date']['from'], 'Y-m-d');
+                $decodedFilter['date']['from'] = $dateObj->startOfDay()->toRfc3339String();
             }
             try {
                 $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], DateTimeInterface::RFC3339);
@@ -69,7 +70,8 @@ class DataObjectFactory
         if (isset($decodedFilter['date']['to'])) {
             if (strlen($decodedFilter['date']['to']) === 10) {
                 // Assume date has been supplied in 'Y-m-d' format, so add default time (end of day) in expected format.
-                $decodedFilter['date']['to'] .= 'T23:59:59' . date('P');
+                $dateObj = new Alaress_Date_Format($decodedFilter['date']['to'], 'Y-m-d');
+                $decodedFilter['date']['to'] = $dateObj->endOfDay()->toRfc3339String();
             }
             try {
                 $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], DateTimeInterface::RFC3339);
