@@ -22,7 +22,9 @@ use Schoolbox\Resource\Folder;
  */
 class DataObjectFactory
 {
-    public function __construct(private UserMapper $userMapper) {}
+    public function __construct(private UserMapper $userMapper)
+    {
+    }
 
     /**
      * Build a search filter data object, for passing into the cursor.
