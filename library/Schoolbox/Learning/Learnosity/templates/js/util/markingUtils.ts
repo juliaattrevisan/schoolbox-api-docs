@@ -1,5 +1,5 @@
 /**
- *
+ * Various marking utilities to help with marking, primarily to merge Learnosity data with Schoolbox data
  */
 
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
@@ -14,7 +14,7 @@ import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
  * @param {string} responseId - the response id to get the response for
  * @returns {StudentItemQuestionResponse} - the response
  */
-export function getItemResponse(itemResponses: StudentItemQuestionResponse[], responseId: string) {
+function getItemResponse(itemResponses: StudentItemQuestionResponse[], responseId: string) {
     return itemResponses.find(
         (itemResponse) => itemResponse.learnosityReference === responseId
     ) as StudentItemQuestionResponse;
@@ -22,13 +22,14 @@ export function getItemResponse(itemResponses: StudentItemQuestionResponse[], re
 
 /**
  * Get the response for a student item linked to a question
+ * @param {StudentItemQuestionResponse[]} itemResponses - the item responses to get the response from
  * @param {StudentItemQuestion} $questions - the questions to get the responses for
  * @returns {StudentItemQuestion[]} - the questions with linked responses
  */
-export function getItemQuestions($questions: StudentItemQuestion[]) {
+export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $questions: StudentItemQuestion[]) {
     // for each question, we also want to add in the relevant response
     const questions = $questions.map((question) => {
-        const response = getItemResponse(store.itemResponses, question.response_id);
+        const response = getItemResponse(itemResponses, question.response_id);
         return {
             ...question,
             response,

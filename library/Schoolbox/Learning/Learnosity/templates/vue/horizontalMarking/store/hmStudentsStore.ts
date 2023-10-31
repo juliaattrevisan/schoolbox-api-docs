@@ -6,9 +6,7 @@ import { defineStore } from "pinia";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
-import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
-import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
+import { getItemQuestions, getAttemptResponse, getIsMarked, getUrls } from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
 
@@ -34,67 +32,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * Get the response for a student item question
-     * @param {StudentItemQuestionResponse[]} itemResponses - the item responses to get the response from
-     * @param {string} responseId - the response id to get the response for
-     * @returns {StudentItemQuestionResponse} - the response
-     */
-    function getItemResponse(itemResponses: StudentItemQuestionResponse[], responseId: string) {
-        return itemResponses.find(
-            (itemResponse) => itemResponse.learnosityReference === responseId
-        ) as StudentItemQuestionResponse;
-    }
-
-    /**
-     * Get the response for a student item linked to a question
-     * @param {StudentItemQuestion} $questions - the questions to get the responses for
-     * @returns {StudentItemQuestion[]} - the questions with linked responses
-     */
-    function getItemQuestions($questions: StudentItemQuestion[]) {
-        // for each question, we also want to add in the relevant response
-        const questions = $questions.map((question) => {
-            const response = getItemResponse(store.itemResponses, question.response_id);
-            return {
-                ...question,
-                response,
-            };
-        });
-        return questions;
-    }
-
-    /**
-     * Get the response for a student attempt
-     * @param {StudentAttemptComment[]} attemptComments - the attempt comments to get the response from
-     * @param {number} studentId - the student id to get the response for
-     * @returns {StudentAttemptComment} - the response attempt
-     */
-    function getAttemptResponse(attemptComments: StudentAttemptComment[], studentId: number) {
-        return attemptComments.find(
-            (attemptComment) => attemptComment.studentId === studentId
-        ) as StudentAttemptComment;
-    }
-
-    /**
-     * Whether the item is marked, loop through all questions and check if they are all marked
-     * @param {StudentItem} item - the item to check
-     * @returns {boolean} - whether the item is marked
-     */
-    function getIsMarked(item: StudentItem) {
-        const allQuestionsMarked = item.questions.every(($question) => $question.response.score !== null);
-        return allQuestionsMarked;
-    }
-
-    /**
-     * Get the urls for the student
-     * @param {StudentUrls[]} urls - the urls to get the response from
-     * @param {number} studentId - the student id to get the response for
-     * @returns {StudentUrls} - the urls
-     */
-    function getUrls(urls: StudentUrls[], studentId: number) {
-        return urls.find((urlsItem) => urlsItem.studentId === studentId) as StudentUrls;
-    }
-
-    /**
      * Add items to a student
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
@@ -110,7 +47,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 // for each item, we only want to store the below properties, removing any others Learnosity may have provided
                 studentItems.push({
                     reference: item.reference,
-                    questions: getItemQuestions(item.questions),
+                    questions: getItemQuestions(store.itemResponses, item.questions),
                 });
             });
             selectedStudent.items = studentItems;
