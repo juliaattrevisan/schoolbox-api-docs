@@ -135,7 +135,14 @@ class Broker implements IBroker
         $amqpPayload = $context ? json_encode([$storageKey, $context]) : $storageKey;
 
         // ...then advise AMQP to pick it up (on the default exchange)
-        $this->amqp->publish($amqpPayload, $routingKey, ['exchange' => $exchange]);
+        $this->amqp->publish(
+            $amqpPayload,
+            $routingKey,
+            [
+                'exchange'   => $exchange,
+                'expiration' => $ttl,
+            ],
+        );
     }
 
 
