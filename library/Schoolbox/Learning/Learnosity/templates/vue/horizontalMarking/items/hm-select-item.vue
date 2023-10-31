@@ -3,8 +3,10 @@
  * To move between the items (called cards in sbx)
  */
 
+import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 
+const store = useStore();
 const itemsStore = useItemsStore();
 
 /**
@@ -18,15 +20,20 @@ function onChange(event: Event) {
 </script>
 
 <template>
-    <select @change="onChange">
-        <option
-            v-for="item in itemsStore.items"
-            :key="item.id"
-            :value="item.reference"
-            :selected="itemsStore.activeItem.reference === item.reference"
-        >
-            {{ item.title }}
-        </option>
+    <select :disabled="!store.isLoaded" @change="onChange">
+        <template v-if="store.isLoaded">
+            <option
+                v-for="item in itemsStore.items"
+                :key="item.id"
+                :value="item.reference"
+                :selected="itemsStore.activeItem.reference === item.reference"
+            >
+                {{ item.title }}
+            </option>
+        </template>
+        <template v-else>
+            <option>Loading cards...</option>
+        </template>
     </select>
 </template>
 

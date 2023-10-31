@@ -12,7 +12,7 @@ import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { loadReports } from "./util/loadReports";
-import HmSelectItem from "./items/hm-select-item.vue";
+import HmCardsHeader from "./hm-cards-header.vue";
 import HmStudents from "./students/hm-students.vue";
 import HmPreviousItem from "./items/hm-previous-item.vue";
 import HmNextItem from "./items/hm-next-item.vue";
@@ -27,6 +27,8 @@ interface Props {
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
 }
 const props = defineProps<Props>();
+const store = useStore();
+const itemsStore = useItemsStore();
 
 const hasStudents = window.Vue.computed(() => {
     return props.students && Object.keys(props.students).length > 0;
@@ -37,8 +39,8 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    useStore().init(props.itemResponses, props.attemptComments, props.urls);
-    useItemsStore().init(props.items);
+    store.init(props.itemResponses, props.attemptComments, props.urls);
+    itemsStore.init(props.items);
     useStudentsStore().init(props.students);
     await window.Vue.nextTick();
     loadReports(props.reportPayloads);
@@ -48,15 +50,16 @@ window.Vue.onMounted(async () => {
 <template>
     <div></div>
     <div class="l-flex-col l-gap-m f-no-margins">
+        <h1>Horizontal Marking for {{ props.title }}</h1>
         <!-- Title. But add the metadata etc. when you get up to that bit -->
-        <div class="l-flex-row l-flex--justify-space">
-            <h1>Horizontal Marking for {{ props.title }}</h1>
-            <div class="text-right">
+        <!-- <div class="l-flex-row l-flex--justify-space"> -->
+
+        <!-- <div class="text-right">
                 <label class="inline-block">Hide marked attempts</label>
                 <div class="long switch f-no-margins">
                     <input
                         id="show-only-enabled"
-                        v-model="useItemsStore().hideMarkedAttempts"
+                        v-model="itemsStore.hideMarkedAttempts"
                         type="checkbox"
                         data-test-show-only-enabled
                     />
@@ -65,13 +68,11 @@ window.Vue.onMounted(async () => {
                         <span>Shown</span>
                     </label>
                 </div>
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
         <template v-if="hasStudents">
-            <div v-if="useStore().isLoaded">
-                <h2 class="subheader">Cards</h2>
-                <hm-select-item />
-            </div>
+            <hm-cards-header />
+            <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
             <hm-students />
             <div class="l-flex-row l-flex--no-wrap l-gap-m">
                 <hm-previous-item />
