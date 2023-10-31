@@ -4,6 +4,7 @@
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
@@ -22,6 +23,14 @@ const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
 /**
+ * The current item being displayed, loop through the student items to find the relevant one linked to the item via the reference
+ * @returns {StudentItem} - the current item
+ */
+const currentItem = window.Vue.computed(() => {
+    return props.student.items.find((item) => item.reference === itemsStore.activeItem.reference) as StudentItem;
+});
+
+/**
  * To show/hide the response when selected
  */
 function onToggleSelected() {
@@ -33,9 +42,9 @@ function onToggleSelected() {
  * @returns {string} - the height of the response container
  */
 const responseHeight = window.Vue.computed(() => {
-    if (itemsStore.hideMarkedAttempts) {
-        return "0fr";
-    }
+    // if (!itemsStore.showMarkedAttempts && currentItem.value?.isMarked) {
+    //     return "0fr";
+    // }
     return props.student.isExpanded ? "1fr" : "0fr";
 });
 
@@ -47,6 +56,18 @@ window.Vue.watch(
     async () => {
         onToggleSelected();
         await window.Vue.nextTick();
+    }
+);
+
+/**
+ * Watch for any changes to determine whether to show toggle button
+ */
+window.Vue.watch(
+    () => itemsStore.activeItem,
+    () => {
+        // if (props.student.hasFocus) {
+        //     studentEl.value?.scrollIntoView({ behavior: "smooth" });
+        // }
     }
 );
 
