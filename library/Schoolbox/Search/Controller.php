@@ -103,7 +103,7 @@ class Controller extends Base
                     ]
                 ),
                 'filterTypesValues' => (
-                    ($filterFromUrlIsEmpty)
+                    ($filterFromUrl->types === null)
                     ? []
                     : $filterFromUrl->types
                 )
