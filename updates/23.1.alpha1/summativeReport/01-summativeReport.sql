@@ -6,3 +6,6 @@ WHERE _options IS NULL AND options<>'';
 
 # Clear contents of `options`
 UPDATE summative_report SET options='';
+
+### add an sequence to the folder table for ordering folders in summatve summative_report
+ALTER TABLE folder ADD COLUMN `sequence` int(11) NOT NULL DEFAULT 0;

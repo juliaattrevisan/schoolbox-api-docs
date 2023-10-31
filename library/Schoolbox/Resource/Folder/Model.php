@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
 use Schoolbox\Mapper\Traits\Model\DeletedBy;
+use Schoolbox\Mapper\Traits\Model\HasSequence;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 use Schoolbox\Resource;
@@ -33,6 +34,7 @@ use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
+use Schoolbox\Sequential;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
@@ -53,13 +55,14 @@ use function preg_match;
  * @package Schoolbox\Resource\Folder
  * @method null|Model getParent()
  */
-class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel, Sequential
 {
     use CreatedAtDate;
     use CreatedBy;
     use UpdatedAtDate;
     use UpdatedBy;
     use DeletedBy; // Note that DeletedAtDate is used in the base class.
+    use HasSequence;
 
     use Node\Traits\HasCurriculumNodes;
     use CreateCollection;

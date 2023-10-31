@@ -113,6 +113,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
 
         $this->uses('colour', self::TYPE_COLOR);
 
+        // used for sequencing / ordering folders on the summative report
+        $this->uses('sequence', self::TYPE_INTEGER);
+
         // Joins:
         $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'coverImage', 'coverImage');
 
@@ -206,6 +209,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
             return true;
         });
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateUnit']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequenceIfUnset']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
@@ -2412,5 +2416,20 @@ class Mapper extends AbstractFolderMapper implements ILocator
          */
         $folder->setDeletedBy($this->getSessionUser()->getId());
         $this->save($folder);
+    }
+
+    /**
+     * Sets the model's sequence to 0 if not already set
+     *
+     * @param Model $model
+     * @return bool
+     */
+    protected function setSequenceIfUnset(Model $model): bool
+    {
+        if (null === $model->getSequence()) {
+            $model->setSequence(0);
+        }
+
+        return true;
     }
 }

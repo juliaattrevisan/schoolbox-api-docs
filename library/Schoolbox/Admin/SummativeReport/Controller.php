@@ -951,6 +951,8 @@ class Controller extends ConfigController
             }
         }
 
+        // order folders based on folder sequence (if it is set, else use title natural sort)
+        $folders = $folders->sortByMultiFields(['sequence' => 'desc', 'title' => 'asc']);
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['workType']);
 
