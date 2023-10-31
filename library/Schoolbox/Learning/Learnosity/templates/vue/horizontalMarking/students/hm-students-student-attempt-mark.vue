@@ -3,8 +3,8 @@
  * Display the total mark for a students entire response
  */
 
-import type { Student } from "../types/Student";
-import { StudentItemMarkTypes } from "../types/StudentItemMarkTypes";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 
 interface Props {
     student: Student; // the item to display

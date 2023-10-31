@@ -3,9 +3,9 @@
  */
 
 import { defineStore } from "pinia";
-import type { StudentItemQuestionResponse } from "../types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "../types/StudentAttemptComment";
-import type { StudentUrls } from "../types/StudentUrls";
+import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
+import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 
 export const useStore = defineStore("horizontalMarking", () => {
     const isProcessing = window.Vue.ref<boolean>(false); // to disable various events while processing, like trying to mark the next card before the current one has finished marking

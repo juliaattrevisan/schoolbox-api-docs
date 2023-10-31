@@ -3,15 +3,15 @@
  * To use horizontal marking when assessing a quiz
  */
 
+import type { Item } from "@schoolboxLearnosity/js/types/Item";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
+import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { loadReports } from "./util/loadReports";
-import type { Item } from "./types/Item";
-import type { Student } from "./types/Student";
-import type { StudentItemQuestionResponse } from "./types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "./types/StudentAttemptComment";
-import type { StudentUrls } from "./types/StudentUrls";
 import HmSelectItem from "./items/hm-select-item.vue";
 import HmStudents from "./students/hm-students.vue";
 import HmPreviousItem from "./items/hm-previous-item.vue";

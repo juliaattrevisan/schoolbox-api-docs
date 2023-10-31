@@ -3,18 +3,19 @@
  */
 
 import { defineStore } from "pinia";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
+import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
+import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
-import type { Student } from "../types/Student";
-import type { StudentItem } from "../types/StudentItem";
-import type { StudentItemQuestion } from "../types/StudentItemQuestion";
-import type { StudentItemQuestionResponse } from "../types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "../types/StudentAttemptComment";
-import type { StudentUrls } from "../types/StudentUrls";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
     const isExpanded = window.Vue.ref<boolean>(true);
+    const store = useStore();
 
     /**
      * store any passed through properties
@@ -34,11 +35,12 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * Get the response for a student item question
+     * @param {StudentItemQuestionResponse[]} itemResponses - the item responses to get the response from
      * @param {string} responseId - the response id to get the response for
      * @returns {StudentItemQuestionResponse} - the response
      */
-    function getItemResponse(responseId: string) {
-        return useStore().itemResponses.find(
+    function getItemResponse(itemResponses: StudentItemQuestionResponse[], responseId: string) {
+        return itemResponses.find(
             (itemResponse) => itemResponse.learnosityReference === responseId
         ) as StudentItemQuestionResponse;
     }
@@ -51,7 +53,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     function getItemQuestions($questions: StudentItemQuestion[]) {
         // for each question, we also want to add in the relevant response
         const questions = $questions.map((question) => {
-            const response = getItemResponse(question.response_id);
+            const response = getItemResponse(store.itemResponses, question.response_id);
             return {
                 ...question,
                 response,
@@ -62,17 +64,18 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * Get the response for a student attempt
+     * @param {StudentAttemptComment[]} attemptComments - the attempt comments to get the response from
      * @param {number} studentId - the student id to get the response for
      * @returns {StudentAttemptComment} - the response attempt
      */
-    function getAttemptResponse(studentId: number) {
-        return useStore().attemptComments.find(
+    function getAttemptResponse(attemptComments: StudentAttemptComment[], studentId: number) {
+        return attemptComments.find(
             (attemptComment) => attemptComment.studentId === studentId
         ) as StudentAttemptComment;
     }
 
     /**
-     * Whether the item is marked
+     * Whether the item is marked, loop through all questions and check if they are all marked
      * @param {StudentItem} item - the item to check
      * @returns {boolean} - whether the item is marked
      */
@@ -83,11 +86,12 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * Get the urls for the student
+     * @param {StudentUrls[]} urls - the urls to get the response from
      * @param {number} studentId - the student id to get the response for
      * @returns {StudentUrls} - the urls
      */
-    function getUrls(studentId: number) {
-        return useStore().urls.find((urlsItem) => urlsItem.studentId === studentId) as StudentUrls;
+    function getUrls(urls: StudentUrls[], studentId: number) {
+        return urls.find((urlsItem) => urlsItem.studentId === studentId) as StudentUrls;
     }
 
     /**
@@ -114,8 +118,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             selectedStudent.items.forEach((item) => {
                 item.isMarked = getIsMarked(item);
             });
-            selectedStudent.attemptComment = getAttemptResponse(selectedStudent.id);
-            selectedStudent.urls = getUrls(selectedStudent.id);
+            selectedStudent.attemptComment = getAttemptResponse(store.attemptComments, selectedStudent.id);
+            selectedStudent.urls = getUrls(store.urls, selectedStudent.id);
         }
     }
 
@@ -154,10 +158,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         if (studentLoaded) {
             studentLoaded.isReportLoaded = true;
         }
-        // check if all student reports are loaded and if so, set the central store to loaded
-        if (students.value.every((student) => student.isReportLoaded)) {
-            useStore().isLoaded = true;
-        }
+        // check if all student reports are loaded and if so, set the central store can be considered loaded
+        store.isLoaded = students.value.every((student) => student.isReportLoaded);
     }
 
     /**
@@ -166,10 +168,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {StudentItemQuestion} question - the question to update
      * @param {number} score - the score to update
      */
-    function updateResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
+    function updateItemResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
         question.response.score = score;
-        // loop through all questions and check if they are all marked
-        // const allQuestionsMarked = item.questions.every(($question) => $question.response.score !== null);
         item.isMarked = getIsMarked(item);
     }
 
@@ -227,7 +227,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         toggleStudent,
         toggleAllStudents,
         reportLoaded,
-        updateResponseScore,
+        updateItemResponseScore,
         updateItemComment,
         updateItemIsMarked,
         updateAttemptComment,

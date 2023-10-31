@@ -4,10 +4,10 @@
  */
 
 import { useFocus } from "@vueuse/core";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import { useStudentsStore } from "../store/hmStudentsStore";
-import type { Student } from "../types/Student";
-import type { StudentItem } from "../types/StudentItem";
-import type { StudentItemQuestion } from "../types/StudentItemQuestion";
 
 interface Props {
     student: Student; // the student to display
@@ -29,7 +29,7 @@ async function saveScore() {
     if (score.value === "") {
         return;
     }
-    studentsStore.updateResponseScore(props.item, props.question, parseInt(score.value, 10));
+    studentsStore.updateItemResponseScore(props.item, props.question, parseInt(score.value, 10));
     const formData = new FormData();
     formData.append("learnosityReference", props.question.response.learnosityReference);
     formData.append("score", score.value);

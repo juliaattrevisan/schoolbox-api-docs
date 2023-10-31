@@ -5,7 +5,7 @@
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import type { Student } from "../types/Student";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {

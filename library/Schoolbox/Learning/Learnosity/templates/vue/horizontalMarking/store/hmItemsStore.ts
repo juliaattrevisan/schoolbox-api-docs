@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import type { Item } from "../types/Item";
+import type { Item } from "@schoolboxLearnosity/js/types/Item";
 
 export const useItemsStore = defineStore("hmItems", () => {
     const items = window.Vue.ref<Item[]>([]);

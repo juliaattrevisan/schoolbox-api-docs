@@ -4,10 +4,10 @@
  */
 
 import { gsap } from "gsap";
-import type { StudentItem } from "../types/StudentItem";
+import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
-import { StudentItemMarkTypes } from "../types/StudentItemMarkTypes";
 
 interface Props {
     item: StudentItem; // the item to display

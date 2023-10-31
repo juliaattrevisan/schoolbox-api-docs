@@ -3,8 +3,8 @@
  * Contains a students response to an item, (only one item is shown at a time)
  */
 
-import type { Student } from "../types/Student";
-import type { StudentItem } from "../types/StudentItem";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
 import hmStudentsStudentItemQuestion from "./hm-students-student-item-question.vue";
 import hmStudentsStudentItemComment from "./hm-students-student-item-comment.vue";

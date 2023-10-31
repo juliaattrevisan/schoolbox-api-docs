@@ -3,9 +3,9 @@
  * Display a single student's responses
  */
 
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
-import type { Student } from "../types/Student";
 import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
 import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";

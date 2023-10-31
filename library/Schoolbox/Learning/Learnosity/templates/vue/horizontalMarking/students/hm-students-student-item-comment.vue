@@ -3,11 +3,10 @@
  * To allow the teacher to review the item, to customise the score and add a comment
  */
 
-// import { useFocus } from "@vueuse/core";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import type { Student } from "../types/Student";
-import type { StudentItem } from "../types/StudentItem";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
