@@ -11,20 +11,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 const badgeAwardStore = useSPBadgeAwardStore();
-
-/**
- * To open the award achievement modal
- */
-function onAwardAchievement() {
-    badgeAwardStore.setSelectedBadge(props.result, "achievement");
-}
-
-/**
- * To open the set goal modal
- */
-function onSetGoal() {
-    badgeAwardStore.setSelectedBadge(props.result, "goal");
-}
 </script>
 
 <template>
@@ -33,10 +19,20 @@ function onSetGoal() {
         <li v-for="link in props.result._links" :key="link.id">
             <a v-if="link.action === undefined" :href="link.url" :class="link.icon">{{ link.title }}</a>
             <template v-else-if="link.action === 'awardAchievementModal'">
-                <a :class="link.icon" @click.prevent="onAwardAchievement">{{ link.title }}</a>
+                <a
+                    :class="link.icon"
+                    @click.prevent="
+                        badgeAwardStore.setSelectedBadge(props.result, 'achievement', link.data!.achievementExpiry!)
+                    "
+                    >{{ link.title }}</a
+                >
             </template>
             <template v-else-if="link.action === 'setGoalModal'">
-                <a :class="link.icon" @click.prevent="onSetGoal">{{ link.title }}</a>
+                <a
+                    :class="link.icon"
+                    @click.prevent="badgeAwardStore.setSelectedBadge(props.result, 'goal', link.data!.goalExpiry!)"
+                    >{{ link.title }}</a
+                >
             </template>
         </li>
     </ul>

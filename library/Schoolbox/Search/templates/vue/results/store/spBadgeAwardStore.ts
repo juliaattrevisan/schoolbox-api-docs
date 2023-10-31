@@ -3,8 +3,7 @@ import type { Result } from "../../../js/types/Result";
 
 type BadgeAward = {
     id: number;
-    achievementExpiry: number | null;
-    goalExpiry: number | null;
+    expiry: number | null;
     name: string;
     type: "achievement" | "goal";
     _links: {
@@ -17,16 +16,14 @@ export const useSPBadgeAwardStore = defineStore("spBadgeAwardStore", () => {
 
     /**
      * Set the selected badge
-     * @param badge The badge to set
-     * @param awardType The type of award, either "achievement" or "goal"
+     * @param {Result} badge The badge to set
+     * @param {BadgeAward["type"]} awardType The type of award, either "achievement" or "goal"
+     * @param {BadgeAward["expiry"]} awardExpiry The expiry of the award
      */
-    function setSelectedBadge(badge: Result, awardType: BadgeAward["type"]) {
+    function setSelectedBadge(badge: Result, awardType: BadgeAward["type"], awardExpiry: BadgeAward["expiry"]) {
         selectedBadge.value = {
             id: badge.id,
-            // achievementExpiry: badge.achievementExpiry,
-            // goalExpiry: badge.goalExpiry,
-            achievementExpiry: null,
-            goalExpiry: null,
+            expiry: awardExpiry,
             name: badge.title,
             type: awardType,
             _links: {

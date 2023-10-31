@@ -20,6 +20,7 @@ const badgeAwardStore = useSPBadgeAwardStore();
                     :key="`awardAchievement-${badgeAwardStore.selectedBadge.id}`"
                     type="achievement"
                     :badge="badgeAwardStore.selectedBadge"
+                    :expiry="badgeAwardStore.selectedBadge.expiry"
                     :endpoint="`/learning/badge/award/${badgeAwardStore.selectedBadge.id}/achievement`"
                     :is-modal-open="true"
                     placeholder="Search for users to award achievement to"
@@ -29,7 +30,6 @@ const badgeAwardStore = useSPBadgeAwardStore();
                     @cancel="badgeAwardStore.unsetSelectedBadge()"
                     @done="badgeAwardStore.unsetSelectedBadge()"
                 >
-                    <!-- :expiry="currentBadge.achievementExpiry" -->
                     <template #header="slotProps">
                         <h2>
                             Award &lsquo;<b>{{ slotProps.badge.name }}</b
@@ -50,6 +50,7 @@ const badgeAwardStore = useSPBadgeAwardStore();
                     :key="`setGoal-${badgeAwardStore.selectedBadge.id}`"
                     type="goal"
                     :badge="badgeAwardStore.selectedBadge"
+                    :expiry="badgeAwardStore.selectedBadge.expiry"
                     :endpoint="`/learning/badge/award/${badgeAwardStore.selectedBadge.id}/goal`"
                     :is-modal-open="true"
                     placeholder="Search for users to award achievement to"
@@ -59,7 +60,6 @@ const badgeAwardStore = useSPBadgeAwardStore();
                     @cancel="badgeAwardStore.unsetSelectedBadge()"
                     @done="badgeAwardStore.unsetSelectedBadge()"
                 >
-                    <!-- :expiry="currentBadge.goalExpiry" -->
                     <template #header="slotProps">
                         <h2>
                             Set &lsquo;<b>{{ slotProps.badge.name }}</b
