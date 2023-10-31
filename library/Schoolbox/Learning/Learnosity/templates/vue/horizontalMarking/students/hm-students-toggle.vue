@@ -3,8 +3,10 @@
  * Show/hide all students toggle
  */
 
+import { useStore } from "../store/horizontalMarkingStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
+const store = useStore();
 const studentsStore = useStudentsStore();
 
 const buttonText = window.Vue.computed(() => {
@@ -21,6 +23,7 @@ function onSelected() {
 
 <template>
     <button
+        :disabled="!store.isLoaded"
         :class="`button ${studentsStore.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
         @click.prevent="onSelected"
     >

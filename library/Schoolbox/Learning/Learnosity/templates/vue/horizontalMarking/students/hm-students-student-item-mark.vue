@@ -48,6 +48,7 @@ window.Vue.onMounted(() => {
     if (mark) {
         (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
         markEl.value?.appendChild(mark);
+        gsap.from(markEl.value, { duration: 0.3, opacity: 0 });
         // checkIsMarked();
     }
 });
@@ -140,7 +141,6 @@ function updateStyles(statusElement: HTMLDivElement) {
     const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-")); // find any classes on statusElement that contain 'lrn-circle-*'
     classes.forEach((c) => statusElement.classList.remove(c)); // remove all classes that contain 'lrn-circle-*'
     statusElement.classList.add(`lrn-circle-${status.value}`); // add the correct class
-    gsap.from(statusElement, { duration: 0.3, opacity: 0 });
 }
 
 /**
@@ -153,6 +153,7 @@ function updateScoreDisplay() {
     updateSpanElement(statusElement);
     updateHiddenElement(statusElement);
     updateStyles(statusElement);
+    gsap.from(markEl.value, { duration: 0.3, opacity: 0 });
 }
 
 /**

@@ -3,8 +3,10 @@
  * To move to the next item (card) if available
  */
 
+import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 
+const store = useStore();
 const itemsStore = useItemsStore();
 
 /**
@@ -30,7 +32,11 @@ function onSelected() {
 </script>
 
 <template>
-    <button class="button full-width icon-next" :disabled="!itemsStore.hasNextItem" @click.prevent="onSelected">
+    <button
+        class="button full-width icon-next"
+        :disabled="!store.isLoaded || !itemsStore.hasNextItem"
+        @click.prevent="onSelected"
+    >
         {{ buttonTitle }}
     </button>
 </template>

@@ -50,26 +50,8 @@ window.Vue.onMounted(async () => {
 <template>
     <div></div>
     <div class="l-flex-col l-gap-m f-no-margins">
-        <h1>Horizontal Marking for {{ props.title }}</h1>
         <!-- Title. But add the metadata etc. when you get up to that bit -->
-        <!-- <div class="l-flex-row l-flex--justify-space"> -->
-
-        <!-- <div class="text-right">
-                <label class="inline-block">Hide marked attempts</label>
-                <div class="long switch f-no-margins">
-                    <input
-                        id="show-only-enabled"
-                        v-model="itemsStore.hideMarkedAttempts"
-                        type="checkbox"
-                        data-test-show-only-enabled
-                    />
-                    <label for="show-only-enabled">
-                        <span>Hidden</span>
-                        <span>Shown</span>
-                    </label>
-                </div>
-            </div> -->
-        <!-- </div> -->
+        <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
             <hm-cards-header />
             <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
