@@ -124,17 +124,14 @@ class Hydrator extends BaseHydrator
 
                 $bodyTextOnly = (new ToText($article->getBody()))->getText();
                 $blurbTextOnly = (new ToText($article->getBlurb()))->getText();
-                $bodyTextOnlyLowercase = strtolower($bodyTextOnly);
-                $blurbTextOnlyLowercase = strtolower($blurbTextOnly);
-                $keywordLowercase = strtolower($keyword);
 
                 // Because the article body and blurb can contain HTML, this match might have come about only because
                 // the keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (!str_contains(strtolower($article->getTitle()), $keywordLowercase)) {
+                if (mb_stripos($article->getTitle(), $keyword, 0, 'UTF-8') === false) {
                     if (
-                        !str_contains($bodyTextOnlyLowercase, $keywordLowercase) &&
-                        !str_contains($blurbTextOnlyLowercase, $keywordLowercase)
+                        mb_stripos($bodyTextOnly, $keyword, 0, 'UTF-8') === false &&
+                        mb_stripos($blurbTextOnly, $keyword, 0, 'UTF-8') === false
                     ) {
                         return null;
                     }
@@ -148,7 +145,7 @@ class Hydrator extends BaseHydrator
                 // * the generated description
                 $descriptionTextOnly = $this->generateDescriptionForArticle($keyword, $blurbTextOnly, $bodyTextOnly);
                 // Check for case-insensitive matches to match the behaviour of an SQL 'LIKE' condition.
-                if (!isset($descriptionTextOnly) && !str_contains(strtolower($article->getTitle()), $keywordLowercase)) {
+                if (!isset($descriptionTextOnly) && mb_stripos($article->getTitle(), $keyword, 0, 'UTF-8') === false) {
                     return null;
                 }
 

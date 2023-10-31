@@ -97,14 +97,12 @@ class Hydrator extends BaseHydrator
             $textboxRootFolder = $textbox->getCategory();
 
             $textboxBodyTextOnly = (new ToText($textbox->getBody()))->getText();
-            $textboxBodyTextOnlyLowercase = strtolower($textboxBodyTextOnly);
-            $keywordLowercase = strtolower($keyword);
 
             // Because the textbox body contains HTML, this match might have come about only because the
             // keyword was found in HTML code that is invisible to the user (eg. 'style=').
             // Eliminate those kinds of matches.
-            if (!str_contains(strtolower($textbox->getHeading()), $keywordLowercase)) {
-                if (!str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)) {
+            if (mb_stripos($textbox->getHeading(), $keyword, 0, 'UTF-8') === false) {
+                if (mb_stripos($textboxBodyTextOnly, $keyword, 0, 'UTF-8') === false) {
                     continue;
                 }
             }
@@ -197,7 +195,7 @@ class Hydrator extends BaseHydrator
                 if (
                     $textboxAccess === UserAccess::ACCESS_READ &&
                     !$showTitleToReadOnlyUsers &&
-                    !str_contains($textboxBodyTextOnlyLowercase, $keywordLowercase)
+                    mb_stripos($textboxBodyTextOnly, $keyword, 0, 'UTF-8') === false
                 ) {
                     continue;
                 }

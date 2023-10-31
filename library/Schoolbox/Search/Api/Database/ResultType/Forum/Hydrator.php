@@ -105,16 +105,13 @@ class Hydrator extends BaseHydrator
 
                 $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()] ?? 0;
                 $matchingPostString = $nMatchingPostsInThread > 1 ? "(+$nMatchingPostsInThread more matching posts)" : '';
-
                 $postBodyTextOnly = (new ToText($post->getBody()))->getText();
-                $postBodyTextOnlyLowercase = strtolower($postBodyTextOnly);
-                $keywordLowercase = strtolower($keyword);
 
                 // Because the blog body contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (!str_contains(strtolower($postThread->getTitle()), $keywordLowercase)) {
-                    if (!str_contains($postBodyTextOnlyLowercase, $keywordLowercase)) {
+                if (mb_stripos($postThread->getTitle(), $keyword, 0, 'UTF-8') === false) {
+                    if (mb_stripos($postBodyTextOnly, $keyword, 0, 'UTF-8') === false) {
                         return null;
                     }
                 }

@@ -101,7 +101,7 @@ class Hydrator extends BaseHydrator
                     "Posted {$file->getModifiedAt()->getRelativeTime()} by {$file->getOwner()->getFullName()}",
                     (
                         // Image? show thumbnail, otherwise show mimetype thumb.
-                        (str_contains(strtolower($file->getMimetype()->__toString()), 'image'))
+                        $file->getMimetype()->isImage()
                         ? $this->buildStorageImageUrl($file)->__toString()
                         : $this->prefixGenerator->generate() . '/images/mime/' . $file->getMimetype()->getIconFile()
                     ),
