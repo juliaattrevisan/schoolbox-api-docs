@@ -77,7 +77,9 @@ region = ap-southeast-2
 sso_region = ap-southeast-2
 sso_start_url = $aws_start_url" > /root/.aws/config
 
-  aws sso login --no-browser
+  if ! aws configure list > /dev/null; then
+    aws sso login --no-browser
+  fi
 }
 
 function create_cache_dir() {
