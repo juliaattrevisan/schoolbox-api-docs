@@ -178,6 +178,15 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * To update the overall comment response to an attempt
+     * @param {Student} student - the student to update
+     * @param {string} comment - the comment to update
+     */
+    function updateAttemptComment(student: Student, comment: string) {
+        student.attemptResponse.comment = comment;
+    }
+
+    /**
      * To clear the focus from all students
      */
     function clearHasFocus() {
@@ -207,6 +216,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         updateResponseScore,
         updateItemComment,
         updateItemIsMarked,
+        updateAttemptComment,
         clearHasFocus,
     };
 });

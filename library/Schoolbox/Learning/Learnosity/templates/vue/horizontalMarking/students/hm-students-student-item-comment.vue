@@ -35,7 +35,7 @@ async function saveComment() {
 }
 
 /**
- *
+ * Start listening for the editor to be created and then listen for focus changes to save the comment
  */
 window.Vue.onMounted(() => {
     const ckeditorElement = document.getElementById(editorId) as HTMLElement;

@@ -8,7 +8,7 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
 import HmStudentsStudentMark from "./hm-students-student-mark.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
-import HmStudentsStudentFinalReview from "./hm-students-student-final-review.vue";
+import HmStudentsStudentAttemptResponse from "./hm-students-student-attempt-response.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -112,8 +112,8 @@ window.Vue.watch(
                                 :item="item"
                                 :container="(responseContentEl as HTMLDivElement)"
                             />
-                            <hm-students-student-final-review
-                                v-if="itemsStore.isFinalReview"
+                            <hm-students-student-attempt-response
+                                v-if="itemsStore.isAttemptResponse"
                                 :student="props.student"
                             />
                         </template>
