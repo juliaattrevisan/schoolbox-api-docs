@@ -460,6 +460,7 @@ export default {
                                             <input
                                                 :name="'textbox[' + String(index) + '][heading]'"
                                                 type="text"
+                                                maxlength="100"
                                                 v-model="usage.textbox.heading"
                                                 @change="markAsDirty(index)"
                                             />
