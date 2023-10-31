@@ -6,6 +6,7 @@
 import { useResultsStore } from "./store/spResultsStore";
 import SpResultsResult from "./sp-results-result.vue";
 import SpResultsLoadMore from "./sp-results-load-more.vue";
+import SpBadgeAward from "./sp-badge-award.vue";
 
 const resultsStore = useResultsStore();
 </script>
@@ -20,6 +21,7 @@ const resultsStore = useResultsStore();
         />
         <sp-results-load-more />
     </div>
+    <sp-badge-award />
 </template>
 
 <style scoped></style>

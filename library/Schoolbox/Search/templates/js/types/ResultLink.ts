@@ -6,4 +6,9 @@ export type ResultLink = {
     url: string;
     title: string;
     icon?: string;
+    action?: string;
+    data?: {
+        achievementExpiry?: number | null;
+        goalExpiry?: number | null;
+    };
 };

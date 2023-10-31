@@ -146,6 +146,10 @@ class Hydrator extends BaseHydrator
                 'title' => 'Award Achievement',
                 'icon' => 'icon-badge',
                 'url' => '',
+                'data' => [
+                    // Extra data required by the modal.
+                    'achievementExpiry' => $badge->getAchievementExpiry(),
+                ],
                 'action' => 'awardAchievementModal' // This asks the client to create a modal like the one used on the learning/badge page.
             ];                                      // The modal prompts the user to supply the students to whom the achievement should be awarded.
         }
@@ -155,6 +159,10 @@ class Hydrator extends BaseHydrator
                 'title' => 'Set Goal',
                 'icon' => 'icon-goal',
                 'url' => '',
+                'data' => [
+                    // Extra data required by the modal.
+                    'goalExpiry' => $badge->getGoalExpiry()
+                ],
                 'action' => 'setGoalModal' // This asks the client to create a modal like the one used on the learning/badge page.
             ];                             // The modal prompts the user to supply the students for whom the goal should be set.
         }
