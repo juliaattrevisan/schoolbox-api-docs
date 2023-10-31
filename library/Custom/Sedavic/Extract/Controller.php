@@ -15,6 +15,7 @@ use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
 use DebugBar\DebugBarException;
+use Schoolbox\Mapper\Exception\NotFound;
 
 class Controller extends Base
 {
@@ -148,12 +149,30 @@ class Controller extends Base
      * to have done these assessments
      */
     private const QUERY_CLASSES = "
-        SELECT DISTINCT var.folder_id, fc.code
+        SELECT DISTINCT fc.code
         FROM assessment_specification_implementation asi
         INNER JOIN v_assessment_relation var ON asi.implementation_assessment_id = var.assessment_id
         INNER JOIN folder_code fc ON fc.folder_id = var.folder_id
         WHERE asi.specification_assessment_id = :assessmentSpecId
 
+    ";
+
+
+    /**
+     * Find schoolbox fields yearLevel and house, given an externalId
+     *
+     * FIXME probably need to do an check on /group Role ids here in case
+     *  a student has the same externalId as a staff - or can we assume
+     *  this isn't happening at this particular school?
+     */
+    private const QUERY_USER_DETAIL = "
+        SELECT
+            h.house,
+            lyl.name AS yearLevel
+        FROM `user` u
+        LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
+        LEFT JOIN house h ON u.house = h.id
+        WHERE u.synergy_id = :externalId
     ";
 
 
@@ -167,11 +186,20 @@ class Controller extends Base
     private \Alaress\Database\Statement\Query\Base|IQuery $dueworkFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $quizFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $classesStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $userDetailStatement;
 
     /**
      * @var ContextLookup
      */
     private ContextLookup $contextLookup;
+
+
+    /**
+     * A list of students involved in class codes
+     *
+     * @var array
+     */
+    private array $classList = [];
 
 
     /**
@@ -208,6 +236,7 @@ class Controller extends Base
         /* Class list manifests
          */
         $this->classesStatement = $database->prepareQuery(self::QUERY_CLASSES);
+        $this->userDetailStatement = $database->prepareQuery(self::QUERY_USER_DETAIL);
     }
 
 
@@ -287,6 +316,11 @@ class Controller extends Base
                  *  find their context/curriculum nodes,
                  *  and push them through the same combine() method
                  */
+            } elseif (null === $lastAssessmentInfo) {
+                /* FIXME First iteration
+                 *  Find the list of students for this assessment spec id and then subtract guys from it
+                 *  when their feedbacks are encountered
+                 */
             }
 
             try {
@@ -352,17 +386,58 @@ class Controller extends Base
 
     /**
      * For the given assessment spec id,
-     * Find all its implementations and homepages that contain said implementations,
+     * Find all its implementations and folders that contain said implementations,
      * then find all the guys in each of those homepages
      *
      * These are the list of people who are SUPPOSED to have received feedback for
      * the assessments that descended from the given assessment spec
      *
      * @param int $assessmentSpecId
-     * @return void
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws NotFound
      */
-    private function findClassList(int $assessmentSpecId) {
+    private function findStudents(int $assessmentSpecId): array {
+        $this->classesStatement->execute([
+            'assessmentSpecId' => $assessmentSpecId
+        ]);
 
+        $studentList = [];
+
+        while ($folder = $this->classesStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $folderCode = $folder['code'];
+
+            /* Find the students in each folder code
+             */
+            $students = $this->externalClass->getStudents($folderCode);
+
+            foreach ($students as $student) {
+                $externalId = $student['synergy_id'];
+
+                /* Find house and year level from their schoolbox account
+                 * since seda hijacked these fields for their own purposes
+                 */
+                $this->userDetailStatement->execute([
+                    'externalId' => $externalId
+                ]);
+
+                $user = $this->userDetailStatement->fetch(\PDO::FETCH_ASSOC);
+
+                /* Add this student info into the stack, uniquely, by externalId
+                 * Probably need to do a separate query to find out their house
+                 * in schoolbox.user though.
+                 */
+                $studentList[$externalId] = [
+                    'externalId' => $externalId,
+                    'firstname' => $student['firstname'],
+                    'lastname' => $student['lastname'],
+                    'house_sb' => $user['house'],
+                    'year' => $user['yearLevel']
+                ];
+            }
+        }
+
+        return $studentList;
     }
 
 
