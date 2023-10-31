@@ -317,7 +317,8 @@ class Controller extends Base
              * The remainder are people who should have done that assessment but never received feedback
              * and we pump them onto the end of the list per assessment spec
              *
-             * FIXME maintain a static list of externalIds in case we need to reuse them
+             * Maintain a static list of externalIds in case we need to reuse them
+             * from the previous iteration.
              */
             if (null !== $lastAssessmentInfo && $lastAssessmentInfo['assessmentSpecId'] !== $assessmentInfo['assessmentSpecId']) {
                 /* Find everyone who didn't get a feedback for $lastAssessmentInfo['assessmentSpecId'],
@@ -349,11 +350,14 @@ class Controller extends Base
                      */
                     $this->outputRows($rows, $outstream);
                 }
-            } elseif (null === $lastAssessmentInfo) {
-                /* First iteration
-                 * Find the list of students for this assessment spec id and then subtract guys from it
-                 * when their feedbacks are encountered
-                 */
+
+                $studentList = null;
+            }
+
+            /* Find the list of students for this assessment spec id and then subtract guys from it
+             * when their feedbacks are encountered
+             */
+            if (null === $studentList) {
                 $studentList = $this->findStudents((int)$assessmentInfo['assessmentSpecId']);
             }
 
