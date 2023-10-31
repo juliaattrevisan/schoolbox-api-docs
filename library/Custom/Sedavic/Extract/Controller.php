@@ -427,7 +427,8 @@ class Controller extends Base
      * @return void
      * @throws DebugBarException
      */
-    private function outputRows(array $rows, mixed $outstream): void {
+    private function outputRows(array $rows, mixed $outstream): void
+    {
         if ($this->perform) {
             foreach ($rows as $row) {
                 fputcsv($outstream, $row);
@@ -451,10 +452,10 @@ class Controller extends Base
      *
      * @param int $assessmentSpecId
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws NotFound
+     * @throws Exception
      */
-    private function findStudents(int $assessmentSpecId): array {
+    private function findStudents(int $assessmentSpecId): array
+    {
         $this->classesStatement->execute([
             'assessmentSpecId' => $assessmentSpecId
         ]);
