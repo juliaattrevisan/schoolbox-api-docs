@@ -211,6 +211,14 @@ class Controller extends Base
 
 
     /**
+     * The number of rows we obtained
+     *
+     * @var int
+     */
+    private int $numRows = 0;
+
+
+    /**
      * Controller constructor.
      *
      * @param IConnector     $database
@@ -256,7 +264,6 @@ class Controller extends Base
     {
         $this->perform = !$this->requestQuery->get('exploreData');
         $outstream = null;
-        $numRows = 0;
 
         /* Set up file download thing
          */
@@ -340,16 +347,7 @@ class Controller extends Base
 
                     /* Pump it to an fputcsv
                      */
-                    if ($this->perform) {
-                        foreach ($rows as $row) {
-                            fputcsv($outstream, $row);
-                        }
-                    } else {
-                        foreach ($rows as $row) {
-                            $numRows++;
-                            new \Alaress_Probe($row);
-                        }
-                    }
+                    $this->outputRows($rows, $outstream);
                 }
             } elseif (null === $lastAssessmentInfo) {
                 /* FIXME First iteration
@@ -386,22 +384,15 @@ class Controller extends Base
 
             /* Pump it to an fputcsv
              */
-            if ($this->perform) {
-                foreach ($rows as $row) {
-                    fputcsv($outstream, $row);
-                }
-            } else {
-                foreach ($rows as $row) {
-                    $numRows++;
-                    new \Alaress_Probe($row);
-                }
-            }
+            $this->outputRows($rows, $outstream);
 
             /* Remember we saw this guy
              */
             unset($studentList[$assessmentInfo['synergy_id']]);
         }
 
+        /* Gather some stats
+         */
         $end = microtime(true);
 
         if ($this->perform) {
@@ -416,11 +407,33 @@ class Controller extends Base
             new \Alaress_Probe(sprintf(
                 '%s seconds for %s rows of data',
                 $end - $start,
-                $numRows
+                $this->numRows
             ));
         }
 
         exit;
+    }
+
+
+    /**
+     * Dunno the type definition of fopen("php://output", 'r');
+     *
+     * @param array $rows
+     * @param mixed $outstream
+     * @return void
+     * @throws DebugBarException
+     */
+    private function outputRows(array $rows, mixed $outstream): void {
+        if ($this->perform) {
+            foreach ($rows as $row) {
+                fputcsv($outstream, $row);
+            }
+        } else {
+            foreach ($rows as $row) {
+                $this->numRows++;
+                new \Alaress_Probe($row);
+            }
+        }
     }
 
 
