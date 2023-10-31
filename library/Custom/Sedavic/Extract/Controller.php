@@ -143,6 +143,21 @@ class Controller extends Base
 
 
     /**
+     * All the classes' codes that had an assessment descended from the given
+     * assessment spec id - you need this to build a list of guys who were meant
+     * to have done these assessments
+     */
+    private const QUERY_CLASSES = "
+        SELECT DISTINCT var.folder_id, fc.code
+        FROM assessment_specification_implementation asi
+        INNER JOIN v_assessment_relation var ON asi.implementation_assessment_id = var.assessment_id
+        INNER JOIN folder_code fc ON fc.folder_id = var.folder_id
+        WHERE asi.specification_assessment_id = :assessmentSpecId
+
+    ";
+
+
+    /**
      * Prepared statements. For some reason the typehints tell you
      * it's an IQuery, but it's actually a one of these...what kind
      * of sloanish witchery is this??
@@ -151,7 +166,7 @@ class Controller extends Base
     private \Alaress\Database\Statement\Query\Base|IQuery $nodeStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $dueworkFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $quizFeedbackStatement;
-
+    private \Alaress\Database\Statement\Query\Base|IQuery $classesStatement;
 
     /**
      * @var ContextLookup
@@ -189,6 +204,10 @@ class Controller extends Base
          */
         $this->dueworkFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_DUEWORK);
         $this->quizFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_QUIZ);
+
+        /* Class list manifests
+         */
+        $this->classesStatement = $database->prepareQuery(self::QUERY_CLASSES);
     }
 
 
