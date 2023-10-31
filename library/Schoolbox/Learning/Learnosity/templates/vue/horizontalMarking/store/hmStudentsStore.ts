@@ -67,7 +67,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      */
     function getAttemptResponse(studentId: number) {
         return useStore().attemptComments.find(
-            (attemptResponse) => attemptResponse.studentId === studentId
+            (attemptComment) => attemptComment.studentId === studentId
         ) as StudentAttemptComment;
     }
 
@@ -114,9 +114,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             selectedStudent.items.forEach((item) => {
                 item.isMarked = getIsMarked(item);
             });
-            // add currentTotalScore, we need to run through each item and add the score
-            // add maxTotalScore
-            selectedStudent.attemptResponse = getAttemptResponse(selectedStudent.id);
+            selectedStudent.attemptComment = getAttemptResponse(selectedStudent.id);
             selectedStudent.urls = getUrls(selectedStudent.id);
         }
     }
@@ -199,7 +197,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {string} comment - the comment to update
      */
     function updateAttemptComment(student: Student, comment: string) {
-        student.attemptResponse.comment = comment;
+        student.attemptComment.comment = comment;
     }
 
     /**

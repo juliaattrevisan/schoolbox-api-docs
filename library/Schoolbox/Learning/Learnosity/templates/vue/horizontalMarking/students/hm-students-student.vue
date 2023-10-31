@@ -106,7 +106,7 @@ window.Vue.watch(
                 <div class="response l-grid">
                     <div class="response__inner-container">
                         <div ref="responseContentEl" class="response__content">
-                            <!-- this is the div Learnosity look for to insert the response content into, it will be completely replaced -->
+                            <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
                             <div :id="props.student.elementId"></div>
                         </div>
                         <template v-if="props.student.isReportLoaded">

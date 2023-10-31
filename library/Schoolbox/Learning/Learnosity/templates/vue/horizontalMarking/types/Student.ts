@@ -17,8 +17,6 @@ export type Student = {
     isExpanded: boolean;
     hasFocus: boolean; // to indicate if the student has focus
     items: StudentItem[];
-    attemptResponse: StudentAttemptComment;
+    attemptComment: StudentAttemptComment;
     urls: StudentUrls;
-    // currentTotalScore?: number; // the total score of the item
-    // maxTotalScore?: number; // the total max score of the item
 };
