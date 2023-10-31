@@ -10,14 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
-use Exception;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
+use Schoolbox\Search\Api\SearchFilter\DataObjectFactory;
 use Schoolbox\Search\Api\Source\ISource;
 use Schoolbox\UserMapper;
 
@@ -59,19 +60,17 @@ class Controller extends Base
     /**
      * Search for all results which match a keyword.
      *
+     * @return void
+     * @throws NotFound
      * @api GET /api/search
      * @since 23.1
      *
-     * @return void
      */
     public function getSearch(): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
-        $filter = new SearchFilter\DataObject(
-            $this->requestQuery['filter'] ?? null,
-            null,
-            $this->userMapper
-        );
+        $dataObjectFactory = new DataObjectFactory($this->userMapper);
+        $filter = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, null);
         $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         $cursor = null;
 
@@ -183,7 +182,7 @@ class Controller extends Base
                 ]
             );
         } else {
-            $this->sendJsonError('Search keyword must be at least 2 characters', 400);
+            $this->sendJsonError('Search keyword must be at least ' . self::MIN_CHARACTER_LIMIT . ' characters', 400);
         }
     }
 
@@ -198,14 +197,11 @@ class Controller extends Base
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
         $keyword = (string)($this->requestQuery['keyword'] ?? '');
-        $filter  = new SearchFilter\DataObject(
-            $this->requestQuery['filter'] ?? null,
-            $folder,
-            $this->userMapper
-        );
+        $dataObjectFactory = new DataObjectFactory($this->userMapper);
+        $filter = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, $folder);
         $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
 
-        if (mb_strlen($keyword) >= 2) {
+        if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
             // Finally output the response
@@ -222,7 +218,7 @@ class Controller extends Base
                 ]
             );
         } else {
-            $this->sendJsonError('Search keyword must be at least 2 characters', 400);
+            $this->sendJsonError('Search keyword must be at least ' . self::MIN_CHARACTER_LIMIT . ' characters', 400);
         }
     }
 

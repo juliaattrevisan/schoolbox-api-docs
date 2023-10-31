@@ -5,9 +5,9 @@
 import { defineStore } from "pinia";
 import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
-import { useFilterTypesStore, FilterType } from "../filters/store/spFilterTypesStore";
-import { useFilterDateRangeStore, FilterDateRange, EMPTY_DATE } from "../filters/store/spFilterDateRangeStore";
-import { useFilterCreatorsStore, Creator } from "../filters/store/spFilterCreatorsStore";
+import { FilterType, useFilterTypesStore } from "../filters/store/spFilterTypesStore";
+import { EMPTY_DATE, FilterDateRange, useFilterDateRangeStore } from "../filters/store/spFilterDateRangeStore";
+import { Creator, useFilterCreatorsStore } from "../filters/store/spFilterCreatorsStore";
 
 const SINGLE_COLUMN_BREAKPOINT = 800;
 
@@ -38,6 +38,16 @@ export const useStore = defineStore("searchPage", () => {
 
         if ($creator !== null) {
             filterCreatorsStore.creator = [$creator];
+        }
+
+        // Empty dates are null at the server, and EMPTY_DATE at the client.  So we must convert.
+        if ($selectedFilterDateRange.startDate === null) {
+            $selectedFilterDateRange.startDate = EMPTY_DATE;
+        }
+
+        // Empty dates are null at the server, and EMPTY_DATE at the client.  So we must convert.
+        if ($selectedFilterDateRange.endDate === null) {
+            $selectedFilterDateRange.endDate = EMPTY_DATE;
         }
 
         filterDateRangeStore.startDate = $selectedFilterDateRange.startDate;
@@ -71,8 +81,7 @@ export const useStore = defineStore("searchPage", () => {
      */
     function getEndpointWithParams() {
         const newQueryParams = getQueryParams();
-        const endpointWithParams = `${endpoint}?${newQueryParams.toString()}`;
-        return endpointWithParams;
+        return `${endpoint}?${newQueryParams.toString()}`;
     }
 
     /**

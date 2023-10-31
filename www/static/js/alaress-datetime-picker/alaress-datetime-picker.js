@@ -266,8 +266,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     // Set the initial date value if there is one
     if (adtp.getValue(element, "data-datepicker-initial-value")) {
+        // Function getValue() returns true when the attribute value is a blank string.
+        // If the attribute value is a blank string, there is no initial value to set.
         const initialDate = adtp.getValue(element, "data-datepicker-initial-value");
-        setValue(element, options, false, false, initialDate);
+        if (initialDate !== true) {
+            setValue(element, options, false, false, initialDate);
+        }
     }
 
     // Create click event to open the modal for the element

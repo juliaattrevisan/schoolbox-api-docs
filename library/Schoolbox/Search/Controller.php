@@ -12,6 +12,8 @@ use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Search\Api\SearchFilter\DataObjectFactory;
 use Schoolbox\UserMapper;
 use Schoolbox\Search\Api\SearchFilter;
 use Twig\Error\Error;
@@ -48,32 +50,29 @@ class Controller extends Base
     /**
      * Entry point for the main search page.
      *
-     * @api GET /search
-     * @since 23.1
-     * @throws Error
      * @return void
+     * @throws NotFound
+     * @throws Error*@since 23.1
+     * @api GET /search
      */
     public function search(): void
     {
         $keywordFromUrl = $this->requestQuery->get('keyword');
-        $filterFromUrlJson = $this->requestQuery->get('filter');
+
+        $dataObjectFactory = new DataObjectFactory(self::$userMapper);
 
         try {
-            $filterFromUrl = new SearchFilter\DataObject(
-                $filterFromUrlJson,
-                null,
-                self::$userMapper
-            );
+            $filterFromUrl = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, null);
         } catch (Exception $e) {
             // The filter data in the URL was invalid, so ignore the data and create an empty filter.
-            $filterFromUrl = new SearchFilter\DataObject(null, null, self::$userMapper);
+            $filterFromUrl = $dataObjectFactory->build(null, null);
         }
 
         $filterFromUrlIsEmpty = (
             $filterFromUrl->fromDate === null &&
             $filterFromUrl->toDate === null &&
             $filterFromUrl->creator === null &&
-            $filterFromUrl->types === []
+            $filterFromUrl->types === null
         );
 
         $this->response = $this->responseFromTemplate(
@@ -84,15 +83,15 @@ class Controller extends Base
 
                 'keywordValue' => $keywordFromUrl,
                 'filterDateRangeValues' => (
-                    ($filterFromUrlIsEmpty)
+                    ($filterFromUrlIsEmpty) // Only use the default date range if no filter was specified in the URL.
                     ? $this->getDefaultDateRangeFilterValues()
                     : [
-                        'startDate' => $filterFromUrl->fromDate->toRfc3339String(),
-                        'endDate' => $filterFromUrl->toDate->toRfc3339String()
+                        'startDate' => $filterFromUrl->fromDate?->toRfc3339String(),
+                        'endDate' => $filterFromUrl->toDate?->toRfc3339String()
                     ]
                 ),
                 'filterCreatorValue' => (
-                    ($filterFromUrlIsEmpty)
+                    ($filterFromUrl->creator === null)
                     ? null
                     : [
                         'id' => $filterFromUrl->creator->getId(),

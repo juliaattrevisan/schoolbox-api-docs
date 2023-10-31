@@ -3,7 +3,7 @@
  * To filter the search results to a date range
  */
 
-import { useFilterDateRangeStore, EMPTY_DATE } from "./store/spFilterDateRangeStore";
+import { useFilterDateRangeStore, EMPTY_DATE, INVALID_DATE } from "./store/spFilterDateRangeStore";
 
 const filterDateRangeStore = useFilterDateRangeStore();
 
@@ -53,10 +53,12 @@ function initDatePickers() {
         }
     });
     $("#sp-start-date-input").on("change", (event) => {
-        filterDateRangeStore.startDate = getDateFormatted((event.currentTarget as HTMLInputElement).value);
+        const dateFromDom = (event.currentTarget as HTMLInputElement).value;
+        filterDateRangeStore.startDate = dateFromDom === EMPTY_DATE ? EMPTY_DATE : getDateFormatted(dateFromDom);
     });
     $("#sp-end-date-input").on("change", (event) => {
-        filterDateRangeStore.endDate = getDateFormatted((event.currentTarget as HTMLInputElement).value);
+        const dateFromDom = (event.currentTarget as HTMLInputElement).value;
+        filterDateRangeStore.endDate = dateFromDom === EMPTY_DATE ? EMPTY_DATE : getDateFormatted(dateFromDom);
     });
 }
 
