@@ -392,7 +392,7 @@ class Controller extends Base
 
             /* Remember we saw this guy
              */
-            unset($studentList[$assessmentInfo['synergy_id']]);
+            unset($studentList[(string)$assessmentInfo['synergy_id']]);
 
             /* Get ready for next iteration
              */
@@ -478,7 +478,7 @@ class Controller extends Base
                 $students = $this->externalClass->getStudents($folderCode);
 
                 foreach ($students as $student) {
-                    $externalId = $student['synergy_id'];
+                    $externalId = (string)$student['synergy_id'];
 
                     /* Find house and year level from their schoolbox account
                      * since seda hijacked these fields for their own purposes
@@ -510,7 +510,16 @@ class Controller extends Base
             $studentList = array_merge($studentList, $this->classList[$folderCode]);
         }
 
-        return array_values($studentList);
+        /* You'd think that array_merge or array_merge_recursive would preserve keys
+         * but it doesn't. For whatever reason I have to compile this manually?
+         */
+        $indexed = [];
+
+        foreach ($studentList as $student) {
+            $indexed[$student['externalId']] = $student;
+        }
+
+        return $indexed;
     }
 
 
