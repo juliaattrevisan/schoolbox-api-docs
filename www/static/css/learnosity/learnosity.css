@@ -1169,7 +1169,7 @@ button.lrn-btn-save-dropdown {
     outline: none;
 }
 
-/*hide layout and selection, extra and more options, sections */
+/*hide layout and selection, extra and more options, sections
 [data-lrn-qe-section="layout.heading"] {
     display: none;
 }
@@ -1191,7 +1191,7 @@ button.lrn-btn-save-dropdown {
 [data-lrn-qe-layout-wrapper="is_math"] {
     display: none;
 }
-
+*/
 /* hide tags from questions list */
 
 .lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
@@ -1592,11 +1592,57 @@ span.lrn-i-next {
     padding: 1rem;
 }
 
-/* fixed file upload button in preview questions */
+/* fixed file upload button styles in preview questions */
 .lrn_widget.lrn_fileupload .lrn-fileupload-input-wrapper .lrn-disabled {
     opacity: unset;
     z-index: 3;
 }
 .lrn.lrn-assess .app-layout .lrn_btn_blue:after {
     border-radius: 0px;
+}
+
+/* create empty state */
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list {
+    margin-top: 10px;
+}
+span.lrn-list-view-empty-label {
+    display: none;
+}
+.lrn .lrn-author-ui .lrn-activity-view-empty-img,
+.lrn .lrn-author-ui .lrn-list-view-empty-img {
+    background-image: unset;
+}
+.lrn .lrn-author-ui .lrn-list-view-empty-img {
+    background-image: unset;
+}
+.lrn .lrn-author-ui .lrn-list-view-empty {
+    font-size: 1rem;
+}
+.lrn .lrn-author-ui .lrn-activity-view-empty-img::after,
+.lrn .lrn-author-ui .lrn-list-view-empty-img::after {
+    white-space: pre;
+    font-family: "schoolbox";
+    content: "\e658";
+}
+.lrn-list-view-empty.lrn-author-ui-no-preview {
+    background-color: #ddd;
+    padding: 2rem;
+    color: #999;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    width: 100%;
+    font-size: 1rem;
+    font-style: italic;
+}
+.lrn .lrn-author-ui .lrn-activity-view-empty-img,
+.lrn .lrn-author-ui .lrn-list-view-empty-img {
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    font-style: normal !important;
+}
+.lrn-list-view-empty.lrn-author-ui-no-preview::after {
+    content: "\A You have no cards yet. A card is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
+    white-space: pre;
 }
