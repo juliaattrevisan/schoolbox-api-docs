@@ -7,7 +7,8 @@ import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
-import type { StudentItemResponse } from "../types/StudentItemResponse";
+import type { StudentItemQuestion } from "../types/StudentItemQuestion";
+import type { StudentItemQuestionResponse } from "../types/StudentItemQuestionResponse";
 import type { StudentAttemptResponse } from "../types/StudentAttemptResponse";
 import type { StudentUrls } from "../types/StudentUrls";
 
@@ -32,20 +33,37 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * Get the response for a student item
-     * @param {string} itemReference - the learnosity reference to link the item response to
-     * @returns {StudentItemResponse} - the response
+     * Get the response for a student item question
+     * @param {string} responseId - the response id to get the response for
+     * @returns {StudentItemQuestionResponse} - the response
      */
-    function getItemResponses(itemReference: string) {
-        return useStore().itemResponses.filter(
-            (itemResponse) => itemResponse.itemReference === itemReference
-        ) as StudentItemResponse[];
+    function getItemResponse(responseId: string) {
+        return useStore().itemResponses.find(
+            (itemResponse) => itemResponse.learnosityReference === responseId
+        ) as StudentItemQuestionResponse;
+    }
+
+    /**
+     * Get the response for a student item linked to a question
+     * @param {StudentItemQuestion} $questions - the questions to get the responses for
+     * @returns {StudentItemQuestion[]} - the questions with linked responses
+     */
+    function getItemQuestions($questions: StudentItemQuestion[]) {
+        // for each question, we also want to add in the relevant response
+        const questions = $questions.map((question) => {
+            const response = getItemResponse(question.response_id);
+            return {
+                ...question,
+                response,
+            };
+        });
+        return questions;
     }
 
     /**
      * Get the response for a student attempt
      * @param {number} studentId - the student id to get the response for
-     * @returns {StudentItemResponse} - the response attempt
+     * @returns {StudentAttemptResponse} - the response attempt
      */
     function getAttemptResponse(studentId: number) {
         return useStore().attemptResponses.find(
@@ -78,9 +96,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 // for each item, we only want to store the below properties, removing any others Learnosity may have provided
                 studentItems.push({
                     reference: item.reference,
-                    questions: item.questions,
-                    response_ids: item.response_ids,
-                    responses: getItemResponses(item.reference),
+                    questions: getItemQuestions(item.questions),
                 });
             });
             selectedStudent.items = studentItems;
@@ -131,42 +147,34 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * To move to the next student response, if that's the last student, move to the next item
-     * @param {Student} student - the student to move from
-     */
-    function progressReport(student: Student) {
-        student.hasFocus = false;
-        const studentIndex = students.value.findIndex(($student) => $student.elementId === student.elementId);
-        if (studentIndex < students.value.length - 1) {
-            const nextStudent = students.value[studentIndex + 1];
-            nextStudent.isExpanded = true;
-            nextStudent.hasFocus = true;
-            return;
-        }
-        if (studentIndex === students.value.length - 1 && useItemsStore().hasNextItem) {
-            useItemsStore().toNextItem();
-            const nextStudent = students.value[0];
-            nextStudent.isExpanded = true;
-            nextStudent.hasFocus = true;
-        }
-    }
-
-    /**
      * To update the score of a response
-     * @param {StudentItemResponse} response - the response to update
+     * @param {StudentItem} item - the item that contains the question to update
+     * @param {StudentItemQuestion} question - the question to update
      * @param {number} score - the score to update
      */
-    function updateResponseScore(response: StudentItemResponse, score: number) {
-        response.score = score;
+    function updateResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
+        question.response.score = score;
+        // loop through all questions and check if they are all marked
+        const allQuestionsMarked = item.questions.every(($question) => $question.response.score !== null);
+        item.isMarked = allQuestionsMarked;
     }
 
     /**
      * To update the comment of a response
-     * @param {StudentItemResponse} response - the response to update
+     * @param {StudentItemQuestion} question - the question to update
      * @param {string} comment - the comment to update
      */
-    function updateItemComment(response: StudentItemResponse, comment: string) {
-        response.comment = comment;
+    function updateItemComment(question: StudentItemQuestion, comment: string) {
+        question.response.comment = comment;
+    }
+
+    /**
+     * To update the mark status of the item
+     * @param {StudentItem} item - the item to update
+     * @param {boolean} isMarked - the score to update
+     */
+    function updateItemIsMarked(item: StudentItem, isMarked: boolean) {
+        item.isMarked = isMarked;
     }
 
     /**
@@ -196,9 +204,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         toggleStudent,
         toggleAllStudents,
         reportLoaded,
-        progressReport,
         updateResponseScore,
         updateItemComment,
+        updateItemIsMarked,
         clearHasFocus,
     };
 });

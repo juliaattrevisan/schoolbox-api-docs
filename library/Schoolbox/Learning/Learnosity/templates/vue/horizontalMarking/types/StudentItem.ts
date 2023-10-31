@@ -1,12 +1,10 @@
 /**
- * An item (called a card in sbx), that is also linked to a students response
+ * An item (called a card in sbx) linked to a student, so it contains the questions and responses for that student
  */
-import type { Question } from "./Question";
-import type { StudentItemResponse } from "./StudentItemResponse";
+import type { StudentItemQuestion } from "./StudentItemQuestion";
 
 export type StudentItem = {
-    reference: string;
-    questions: Question[];
-    response_ids: string[];
-    responses: StudentItemResponse[]; // the responses for each question within this item
+    reference: string; // the Learnosity reference id of the item (card in sbx)
+    questions: StudentItemQuestion[]; // the questions within this item
+    isMarked?: boolean; // whether the item has been marked
 };

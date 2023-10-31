@@ -1,10 +1,10 @@
 /**
  * The response for a question within an item
  */
-export type StudentItemResponse = {
+export type StudentItemQuestionResponse = {
     itemReference: string;
     learnosityReference: string;
-    score: number;
+    score?: number;
     maxScore?: number;
     comment?: string;
 };

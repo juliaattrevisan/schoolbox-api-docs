@@ -39,7 +39,7 @@ const responseHeight = window.Vue.computed(() => {
 });
 
 /**
- * Display the student item was the report has been loaded
+ * Display the student now the linked report has been loaded
  */
 window.Vue.watch(
     () => props.student.isReportLoaded,
@@ -50,7 +50,7 @@ window.Vue.watch(
 );
 
 /**
- * Highlight that focus has shifted to this student after a previous item has been marked
+ * Highlight that focus has shifted to this student to prompt marking
  */
 window.Vue.watch(
     () => props.student.hasFocus,
@@ -65,11 +65,7 @@ window.Vue.watch(
 <template>
     <div class="student l-grid">
         <div class="student__inner-container">
-            <div
-                ref="studentEl"
-                :class="`c-island l-flex-col l-pad-m ${$props.student.isExpanded ? 'l-gap-m' : ''}`"
-                :data-has-focus="props.student.hasFocus"
-            >
+            <div ref="studentEl" class="c-island l-flex-col l-pad-m l-gap-m" :data-has-focus="props.student.hasFocus">
                 <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
                     <div class="l-flex-row l-flex--align-center l-gap-m">
                         <button
@@ -81,13 +77,21 @@ window.Vue.watch(
                             @click.prevent="onToggleSelected"
                         ></button>
                         <span v-else class="loader"></span>
+                        <div class="c-img c-img--round c-img--s">
+                            <div class="c-img__wrapper">
+                                <img
+                                    :src="`/portrait.php?id=${props.student.id}&size=square32`"
+                                    :alt="`Photo of ${props.student.name}`"
+                                />
+                            </div>
+                        </div>
                         <h2>{{ props.student.name }}</h2>
                     </div>
                     <div>
                         <template v-if="props.student.isReportLoaded">
                             <hm-students-student-mark
-                                v-for="item in itemsStore.items"
-                                :key="item.id"
+                                v-for="item in props.student.items"
+                                :key="item.reference"
                                 :item="item"
                                 :container="(responseContentEl as HTMLDivElement)"
                             />

@@ -36,31 +36,19 @@ async function saveComment() {
  * Update the response of the item
  */
 async function onSaveSelected() {
-    studentsStore.updateStudentFinalReview(props.student, comment.value);
-    studentsStore.progressReport(props.student);
+    // studentsStore.updateStudentFinalReview(props.student, comment.value);
+    // studentsStore.progressReport(props.student);
     isSaving.value = true;
     await saveComment();
     isSaving.value = false;
 }
 
 /**
- * If it's been assigned focus as this student is the first to mark in the new item group
- */
-window.Vue.onMounted(() => {
-    if (props.student.hasFocus) {
-        // listen for the editor to be created then assign focus
-        editorEl.value?.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
-            event.detail.editor.editing.view.focus();
-        });
-    }
-});
-
-/**
  * Save any unsaved changes in the front end only
  * Back end changes are saved via the fetch requests above
  */
 window.Vue.onUnmounted(() => {
-    studentsStore.updateStudentFinalReview(props.student, comment.value);
+    // studentsStore.updateStudentFinalReview(props.student, comment.value);
 });
 </script>
 

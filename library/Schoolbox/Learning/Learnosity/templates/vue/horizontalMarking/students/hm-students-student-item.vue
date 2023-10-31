@@ -6,12 +6,12 @@
 import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
-import hmStudentsStudentItemResponse from "./hm-students-student-item-response.vue";
+import hmStudentsStudentItemQuestion from "./hm-students-student-item-question.vue";
 import hmStudentsStudentItemComment from "./hm-students-student-item-comment.vue";
 
 interface Props {
     student: Student; // the student to display
-    item: StudentItem; //
+    item: StudentItem; // the item that's displayed
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
@@ -32,13 +32,13 @@ const isActive = window.Vue.computed(() => {
     <transition>
         <div v-if="isActive">
             <div class="l-flex-col l-gap-m">
-                <div class="item-responses l-flex-col l-gap-m">
-                    <hm-students-student-item-response
-                        v-for="(response, index) in props.item.responses"
-                        :key="response.learnosityReference"
+                <div class="item-questions l-flex-col l-gap-m">
+                    <hm-students-student-item-question
+                        v-for="question in props.item.questions"
+                        :key="question.response_id"
                         :student="props.student"
-                        :question="props.item.questions[index]"
-                        :response="response"
+                        :item="props.item"
+                        :question="question"
                         :container="props.container"
                     />
                 </div>
@@ -49,10 +49,7 @@ const isActive = window.Vue.computed(() => {
 </template>
 
 <style lang="scss">
-.item-responses {
-    border-top: 1px solid var(--body-background);
-    border-bottom: 1px solid var(--body-background);
-    padding: var(--spacing-m) 0;
+.item-questions {
     .lrn_widget {
         margin: 0;
         padding: 0;

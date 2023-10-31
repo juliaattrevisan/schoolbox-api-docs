@@ -3,15 +3,19 @@
  * Contains a students mark linked to an item, (only one item is shown at a time)
  */
 
-import type { Item } from "../types/Item";
+import { gsap } from "gsap";
+import type { StudentItem } from "../types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
+import { useStudentsStore } from "../store/hmStudentsStore";
+import { StudentItemMarkTypes } from "../types/StudentItemMarkTypes";
 
 interface Props {
-    item: Item; // the item to display
+    item: StudentItem; // the item to display
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
+const studentsStore = useStudentsStore();
 const markEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 
 /**
@@ -22,6 +26,21 @@ const display = window.Vue.computed(() => {
 });
 
 /**
+ * We need to directly query the returned DOM element as the only reliable way to check if the item is marked
+ */
+function checkIsMarked() {
+    const statusElement = markEl.value?.querySelector("[data-status]");
+    if (statusElement) {
+        const status = statusElement.getAttribute("data-status") as string;
+        const isMarked =
+            status === StudentItemMarkTypes.CORRECT ||
+            status === StudentItemMarkTypes.INCORRECT ||
+            status === StudentItemMarkTypes.PARTIAL;
+        studentsStore.updateItemIsMarked(props.item, isMarked);
+    }
+}
+
+/**
  * Move the item mark element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
@@ -29,11 +48,93 @@ window.Vue.onMounted(() => {
     if (mark) {
         (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
         markEl.value?.appendChild(mark);
+        checkIsMarked();
     }
 });
+
+/**
+ * Get the current total score for the item
+ */
+const totalScore = window.Vue.computed(() => {
+    return props.item.questions.reduce((total, question) => {
+        if (question.response.score) {
+            return total + question.response.score;
+        }
+        return total;
+    }, 0);
+});
+
+/**
+ * Get the max score for the item
+ */
+const maxScore = window.Vue.computed(() => {
+    return props.item.questions.reduce((total, question) => {
+        if (question.response.maxScore) {
+            return total + question.response.maxScore;
+        }
+        return total;
+    }, 0);
+});
+
+/**
+ * Get the current total score for the item
+ */
+const status = window.Vue.computed(() => {
+    if (totalScore.value === maxScore.value) {
+        return StudentItemMarkTypes.CORRECT;
+    }
+    if (totalScore.value === 0) {
+        return StudentItemMarkTypes.INCORRECT;
+    }
+    return StudentItemMarkTypes.PARTIAL;
+});
+
+/**
+ * Get the current total score for the item
+ */
+const tooltip = window.Vue.computed(() => {
+    if (status.value === StudentItemMarkTypes.CORRECT) {
+        return "Correct";
+    }
+    if (status.value === StudentItemMarkTypes.INCORRECT) {
+        return "Incorrect";
+    }
+    return "Partially correct";
+});
+
+/**
+ * Update the score display anytime the score is changed
+ */
+function updateScoreDisplay() {
+    const statusElement = markEl.value?.querySelector("[data-status]") as HTMLDivElement;
+    const spanElement = statusElement?.querySelector("span") as HTMLSpanElement;
+    spanElement.textContent = `${totalScore.value}/${maxScore.value}`;
+    statusElement.setAttribute("data-status", status.value);
+    statusElement.setAttribute("data-original-title", tooltip.value);
+    // find any classes on statusElement that contain 'lrn-circle-*'
+    const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-"));
+    // remove all classes that contain 'lrn-circle-*'
+    classes.forEach((c) => statusElement.classList.remove(c));
+    // add the correct class
+    statusElement.classList.add(`lrn-circle-${status.value}`);
+    gsap.from(statusElement, { duration: 0.3, opacity: 0 });
+}
+
+/**
+ * Need to watch the item questions for any score updates, if any questions score changes we need to total up the new score and display
+ * We also need to to check if the item is marked or not again based on if all questions that can be scored are now scored
+ */
+window.Vue.watch(
+    () => props.item.questions,
+    () => {
+        updateScoreDisplay();
+    },
+    { deep: true }
+);
 </script>
 
 <template>
+    <!-- these classes are so the correct learnosity styles can be applied -->
     <div ref="markEl" class="lrn learnosity-report session-detail-by-item mark"></div>
 </template>
 
