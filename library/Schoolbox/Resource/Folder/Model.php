@@ -34,6 +34,7 @@ use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
+use Schoolbox\Sequential;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
@@ -54,13 +55,14 @@ use function preg_match;
  * @package Schoolbox\Resource\Folder
  * @method null|Model getParent()
  */
-class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel, Sequential
 {
     use CreatedAtDate;
     use CreatedBy;
     use UpdatedAtDate;
     use UpdatedBy;
     use DeletedBy; // Note that DeletedAtDate is used in the base class.
+    use HasSequence;
 
     use Node\Traits\HasCurriculumNodes;
     use CreateCollection;
@@ -130,11 +132,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @var GenericCollection<IAssessable>
      */
     private $assessables;
-
-    /**
-     * used for sequencing folders on the summative report
-     */
-    private null|int $sequence = null;
 
     /**
      * Does this category have a homepage?
@@ -732,25 +729,5 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function getLocationTitle(): string
     {
         return $this->getTitle();
-    }
-
-    /**
-     * Get the sequence for the summative report
-     * @return null|int
-     */
-    public function getSequence(): null|int
-    {
-        return $this->sequence;
-    }
-
-    /**
-     * Sets the sequence for the summative report
-     * @param null|int $sequence
-     * @return self
-     */
-    public function setSequence(null|int $sequence): self
-    {
-        $this->sequence = $sequence;
-        return $this;
     }
 }

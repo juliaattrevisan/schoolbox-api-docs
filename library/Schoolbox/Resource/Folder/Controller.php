@@ -408,8 +408,7 @@ class Controller extends BaseController
                 $classCodes,
                 $yearLevels,
                 (bool)($post['recursive-year-levels'] ?? false),
-                $this->getUser(),
-                ('' !== $post['sequence'] ?? '') ? (int)$post['sequence'] : null
+                $this->getUser()
             );
 
             /* If Inherit Permissions is on, don't create group
@@ -450,7 +449,6 @@ class Controller extends BaseController
      * @param array       $yearLevelIds       Comma-separated YearLevel ids
      * @param bool        $recurseYearLevels  If true
      * @param User        $user               the effecting user
-     * @param null|int    $sequence           the display sequence on the summative report
      * @return Model                          Representing the freshly saved folder
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -473,8 +471,7 @@ class Controller extends BaseController
         array $classCodes,
         array $yearLevelIds,
         bool $recurseYearLevels,
-        User $user,
-        null|int $sequence = null
+        User $user
     ): Model {
 
         /* Folders must have a name
@@ -547,9 +544,6 @@ class Controller extends BaseController
 
         // update role permission
         $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
-
-        // update folder sequence
-        $folder->setSequence($sequence);
 
         $folder->setUpdatedBy($user->getId());
 
