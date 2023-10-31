@@ -212,6 +212,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return true;
         });
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateUnit']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequenceIfUnset']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
@@ -2447,5 +2448,20 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
          */
         $folder->setDeletedBy($this->getSessionUser()->getId());
         $this->save($folder);
+    }
+
+    /**
+     * Sets the model's sequence to 0 if not already set
+     *
+     * @param Model $model
+     * @return bool
+     */
+    protected function setSequenceIfUnset(Model $model): bool
+    {
+        if (null === $model->getSequence()) {
+            $model->setSequence(0);
+        }
+
+        return true;
     }
 }
