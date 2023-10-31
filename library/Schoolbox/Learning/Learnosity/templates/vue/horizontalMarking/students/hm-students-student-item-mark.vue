@@ -28,17 +28,17 @@ const display = window.Vue.computed(() => {
 /**
  * We need to directly query the returned DOM element as the only reliable way to check if the item is marked
  */
-function checkIsMarked() {
-    const statusElement = markEl.value?.querySelector("[data-status]");
-    if (statusElement) {
-        const status = statusElement.getAttribute("data-status") as string;
-        const isMarked =
-            status === StudentItemMarkTypes.CORRECT ||
-            status === StudentItemMarkTypes.INCORRECT ||
-            status === StudentItemMarkTypes.PARTIAL;
-        studentsStore.updateItemIsMarked(props.item, isMarked);
-    }
-}
+// function checkIsMarked() {
+//     const statusElement = markEl.value?.querySelector("[data-status]");
+//     if (statusElement) {
+//         const status = statusElement.getAttribute("data-status") as string;
+//         const isMarked =
+//             status === StudentItemMarkTypes.CORRECT ||
+//             status === StudentItemMarkTypes.INCORRECT ||
+//             status === StudentItemMarkTypes.PARTIAL;
+//         studentsStore.updateItemIsMarked(props.item, isMarked);
+//     }
+// }
 
 /**
  * Move the item mark element from the entire quiz response into our own container
@@ -48,7 +48,7 @@ window.Vue.onMounted(() => {
     if (mark) {
         (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
         markEl.value?.appendChild(mark);
-        checkIsMarked();
+        // checkIsMarked();
     }
 });
 
@@ -113,16 +113,33 @@ const tooltip = window.Vue.computed(() => {
 });
 
 /**
+ * Update the span element with the current score
+ * @param {HTMLDivElement} statusElement - the element to update
+ */
+function updateSpanElement(statusElement: HTMLDivElement) {
+    const spanElement = statusElement?.querySelector("span") as HTMLSpanElement;
+    spanElement.textContent = `${totalScore.value}/${maxScore.value}`;
+}
+
+/**
+ * Update the hidden element which is used for accessibility
+ * @param {HTMLDivElement} statusElement - the element to update
+ */
+function updateHiddenElement(statusElement: HTMLDivElement) {
+    const hiddenElement = (statusElement?.parentElement as HTMLDivElement).querySelector(
+        ".visually-hidden"
+    ) as HTMLSpanElement;
+    hiddenElement.textContent = ` ${tooltip.value} ${totalScore.value}/${maxScore.value}`;
+}
+
+/**
  * Update the styles when the score changes
  * @param {HTMLDivElement} statusElement - the element to update
  */
 function updateStyles(statusElement: HTMLDivElement) {
-    // find any classes on statusElement that contain 'lrn-circle-*'
-    const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-"));
-    // remove all classes that contain 'lrn-circle-*'
-    classes.forEach((c) => statusElement.classList.remove(c));
-    // add the correct class
-    statusElement.classList.add(`lrn-circle-${status.value}`);
+    const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-")); // find any classes on statusElement that contain 'lrn-circle-*'
+    classes.forEach((c) => statusElement.classList.remove(c)); // remove all classes that contain 'lrn-circle-*'
+    statusElement.classList.add(`lrn-circle-${status.value}`); // add the correct class
     gsap.from(statusElement, { duration: 0.3, opacity: 0 });
 }
 
@@ -131,10 +148,10 @@ function updateStyles(statusElement: HTMLDivElement) {
  */
 function updateScoreDisplay() {
     const statusElement = markEl.value?.querySelector("[data-status]") as HTMLDivElement;
-    const spanElement = statusElement?.querySelector("span") as HTMLSpanElement;
-    spanElement.textContent = `${totalScore.value}/${maxScore.value}`;
     statusElement.setAttribute("data-status", status.value);
     statusElement.setAttribute("data-original-title", tooltip.value);
+    updateSpanElement(statusElement);
+    updateHiddenElement(statusElement);
     updateStyles(statusElement);
 }
 

@@ -1,19 +1,15 @@
 <script setup lang="ts">
 /**
- * Is the total mark for a students entire response
+ * Display the total mark for a students entire response
  */
 
 import type { Student } from "../types/Student";
-import { useItemsStore } from "../store/hmItemsStore";
-import { useStudentsStore } from "../store/hmStudentsStore";
 import { StudentItemMarkTypes } from "../types/StudentItemMarkTypes";
 
 interface Props {
     student: Student; // the item to display
 }
 const props = defineProps<Props>();
-const itemsStore = useItemsStore();
-const studentsStore = useStudentsStore();
 
 /**
  * Get the current total score for all items, so the total of all questions within each item
@@ -88,7 +84,7 @@ const tooltip = window.Vue.computed(() => {
     <!-- this is the matched DOM structure of a Learnosity score -->
     <div class="lrn learnosity-report session-detail-by-item mark">
         <h3 class="lrn-report-item-title" data-reference-title="c97b309a-a33d-473c-868e-72e5bbd7e2b5">
-            <span class="visually-hidden"> Correct 3/3</span>
+            <span class="visually-hidden"> {{ tooltip }} {{ totalScore }}/{{ maxScore }}</span>
             <div
                 aria-hidden="true"
                 :class="`lrn-circle pull-right lrn-circle-${status}`"
