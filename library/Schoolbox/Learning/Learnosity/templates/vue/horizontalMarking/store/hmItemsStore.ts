@@ -68,7 +68,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     }
 
     /**
-     * Set the previous card
+     * Set the previous item
      */
     function toPreviousItem() {
         if (hasPreviousItem.value) {
@@ -78,7 +78,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     }
 
     /**
-     * Set the next card
+     * Set the next item
      */
     function toNextItem() {
         if (hasNextItem.value) {
