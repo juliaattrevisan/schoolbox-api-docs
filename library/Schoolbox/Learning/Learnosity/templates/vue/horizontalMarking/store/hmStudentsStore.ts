@@ -114,6 +114,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             selectedStudent.items.forEach((item) => {
                 item.isMarked = getIsMarked(item);
             });
+            // add currentTotalScore, we need to run through each item and add the score
+            // add maxTotalScore
             selectedStudent.attemptResponse = getAttemptResponse(selectedStudent.id);
             selectedStudent.urls = getUrls(selectedStudent.id);
         }

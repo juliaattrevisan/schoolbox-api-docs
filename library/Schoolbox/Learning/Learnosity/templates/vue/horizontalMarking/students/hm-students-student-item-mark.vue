@@ -54,6 +54,7 @@ window.Vue.onMounted(() => {
 
 /**
  * Get the current total score for the item
+ * @returns {number} - the total score
  */
 const totalScore = window.Vue.computed(() => {
     return props.item.questions.reduce((total, question) => {
@@ -66,6 +67,7 @@ const totalScore = window.Vue.computed(() => {
 
 /**
  * Get the max score for the item
+ * @returns {number} - the max score
  */
 const maxScore = window.Vue.computed(() => {
     return props.item.questions.reduce((total, question) => {
@@ -78,6 +80,7 @@ const maxScore = window.Vue.computed(() => {
 
 /**
  * Get the current status for the item
+ * @returns {StudentItemMarkTypes} - the current status
  */
 const status = window.Vue.computed(() => {
     if (!props.item.isMarked) {
@@ -94,6 +97,7 @@ const status = window.Vue.computed(() => {
 
 /**
  * Get the current tooltip for the item
+ * @returns {string} - the current tooltip
  */
 const tooltip = window.Vue.computed(() => {
     if (status.value === StudentItemMarkTypes.NOT_MARKED) {

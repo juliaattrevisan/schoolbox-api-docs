@@ -89,7 +89,7 @@ window.Vue.watch(
                         <h2>{{ props.student.name }}</h2>
                     </div>
                     <div>
-                        <!-- <template v-if="props.student.isReportLoaded">
+                        <template v-if="props.student.isReportLoaded">
                             <hm-students-student-item-mark
                                 v-for="item in props.student.items"
                                 :key="item.reference"
@@ -100,7 +100,7 @@ window.Vue.watch(
                                 v-if="itemsStore.isAttemptComment"
                                 :student="props.student"
                             />
-                        </template> -->
+                        </template>
                     </div>
                 </div>
                 <div class="response l-grid">

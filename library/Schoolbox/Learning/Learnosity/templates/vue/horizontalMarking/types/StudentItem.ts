@@ -7,6 +7,4 @@ export type StudentItem = {
     reference: string; // the Learnosity reference id of the item (card in sbx)
     questions: StudentItemQuestion[]; // the questions within this item
     isMarked?: boolean; // whether the item has been marked
-    currentTotalScore?: number; // the total score of the item
-    maxTotalScore?: number; // the total max score of the item
 };

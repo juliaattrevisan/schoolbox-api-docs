@@ -19,4 +19,6 @@ export type Student = {
     items: StudentItem[];
     attemptResponse: StudentAttemptComment;
     urls: StudentUrls;
+    // currentTotalScore?: number; // the total score of the item
+    // maxTotalScore?: number; // the total max score of the item
 };
