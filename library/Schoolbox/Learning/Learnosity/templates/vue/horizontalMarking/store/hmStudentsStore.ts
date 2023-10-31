@@ -72,6 +72,16 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * Whether the item is marked
+     * @param {StudentItem} item - the item to check
+     * @returns {boolean} - whether the item is marked
+     */
+    function getIsMarked(item: StudentItem) {
+        const allQuestionsMarked = item.questions.every(($question) => $question.response.score !== null);
+        return allQuestionsMarked;
+    }
+
+    /**
      * Get the urls for the student
      * @param {number} studentId - the student id to get the response for
      * @returns {StudentUrls} - the urls
@@ -100,6 +110,10 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 });
             });
             selectedStudent.items = studentItems;
+            // need to do after as we rely on questions and responses being set first
+            selectedStudent.items.forEach((item) => {
+                item.isMarked = getIsMarked(item);
+            });
             selectedStudent.attemptResponse = getAttemptResponse(selectedStudent.id);
             selectedStudent.urls = getUrls(selectedStudent.id);
         }
@@ -155,8 +169,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     function updateResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
         question.response.score = score;
         // loop through all questions and check if they are all marked
-        const allQuestionsMarked = item.questions.every(($question) => $question.response.score !== null);
-        item.isMarked = allQuestionsMarked;
+        // const allQuestionsMarked = item.questions.every(($question) => $question.response.score !== null);
+        item.isMarked = getIsMarked(item);
     }
 
     /**

@@ -9,7 +9,7 @@ import { useStudentsStore } from "./store/hmStudentsStore";
 import { loadReports } from "./util/loadReports";
 import type { Item } from "./types/Item";
 import type { Student } from "./types/Student";
-import type { StudentItemResponse } from "./types/StudentItemResponse";
+import type { StudentItemQuestionResponse } from "./types/StudentItemQuestionResponse";
 import type { StudentAttemptComment } from "./types/StudentAttemptComment";
 import type { StudentUrls } from "./types/StudentUrls";
 import HmSelectItem from "./items/hm-select-item.vue";
@@ -21,7 +21,7 @@ interface Props {
     title: string; // the title of the quiz
     items: Item[]; // the items linked to quiz
     students: Student[]; // the students who have attempted the quiz
-    itemResponses: StudentItemResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
+    itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
     attemptComments: StudentAttemptComment[]; // all the overall attempt comments for the quiz
     urls: StudentUrls[]; // the urls to use for the students to update their scores and comments
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API

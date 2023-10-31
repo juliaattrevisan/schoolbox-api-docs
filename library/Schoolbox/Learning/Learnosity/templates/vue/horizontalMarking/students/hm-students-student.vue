@@ -7,6 +7,7 @@ import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
 import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
+import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
 import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";
 
@@ -88,14 +89,18 @@ window.Vue.watch(
                         <h2>{{ props.student.name }}</h2>
                     </div>
                     <div>
-                        <template v-if="props.student.isReportLoaded">
+                        <!-- <template v-if="props.student.isReportLoaded">
                             <hm-students-student-item-mark
                                 v-for="item in props.student.items"
                                 :key="item.reference"
                                 :item="item"
                                 :container="(responseContentEl as HTMLDivElement)"
                             />
-                        </template>
+                            <hm-students-student-attempt-mark
+                                v-if="itemsStore.isAttemptComment"
+                                :student="props.student"
+                            />
+                        </template> -->
                     </div>
                 </div>
                 <div class="response l-grid">
