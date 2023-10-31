@@ -195,6 +195,15 @@ class Controller extends Base
 
 
     /**
+     * A cache of everyone whose in a particular folder code
+     * to dodge around some synergetic latency
+     *
+     * @var array
+     */
+    private array $classList = [];
+
+
+    /**
      * A list of random problems with their data
      *
      * @var array
@@ -461,37 +470,48 @@ class Controller extends Base
         while ($folder = $this->classesStatement->fetch(\PDO::FETCH_ASSOC)) {
             $folderCode = $folder['code'];
 
-            /* Find the students in each folder code
+            /* If we never encountered $folderCode's list of students,
+             * go find them and remember their scalar data
              */
-            $students = $this->externalClass->getStudents($folderCode);
-
-            foreach ($students as $student) {
-                $externalId = $student['synergy_id'];
-
-                /* Find house and year level from their schoolbox account
-                 * since seda hijacked these fields for their own purposes
+            if (!isset($this->classList[$folderCode])) {
+                /* Find the students in each folder code
                  */
-                $this->userDetailStatement->execute([
-                    'externalId' => $externalId
-                ]);
+                $students = $this->externalClass->getStudents($folderCode);
 
-                $user = $this->userDetailStatement->fetch(\PDO::FETCH_ASSOC);
+                foreach ($students as $student) {
+                    $externalId = $student['synergy_id'];
 
-                /* Add this student info into the stack, uniquely, by externalId
-                 * Probably need to do a separate query to find out their house
-                 * in schoolbox.user though.
-                 */
-                $studentList[$externalId] = [
-                    'externalId' => $externalId,
-                    'firstname' => $student['firstname'],
-                    'lastname' => $student['lastname'],
-                    'house_sb' => $user['house'],
-                    'year' => $user['yearLevel']
-                ];
+                    /* Find house and year level from their schoolbox account
+                     * since seda hijacked these fields for their own purposes
+                     */
+                    $this->userDetailStatement->execute([
+                        'externalId' => $externalId
+                    ]);
+
+                    $user = $this->userDetailStatement->fetch(\PDO::FETCH_ASSOC);
+
+                    /* Add this student info into the stack, uniquely, by externalId
+                     * Probably need to do a separate query to find out their house
+                     * in schoolbox.user though.
+                     */
+                    $studentDetails = [
+                        'externalId' => $externalId,
+                        'firstname' => $student['firstname'],
+                        'lastname' => $student['lastname'],
+                        'house_sb' => $user['house'],
+                        'year' => $user['yearLevel']
+                    ];
+
+                    $this->classList[$folderCode][$externalId] = $studentDetails;
+                }
             }
+
+            /* Add it to the crew
+             */
+            $studentList = array_merge($studentList, $this->classList[$folderCode]);
         }
 
-        return $studentList;
+        return array_values($studentList);
     }
 
 
