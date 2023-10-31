@@ -5,7 +5,7 @@
  # @param array $itemReferences     A set of (item reference, item title) tuples for rendering the table of contents
  # @param array $students           A set of (user data, dom element id) tuples used to render Learnosity app anchor divs
  # @param string $itemResponses     A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
- # @param string $attemptResponses  A base64_encoded set of (student id, item reference, attempt comment) tuples that contain overall comments for a person's attempt
+ # @param string $attemptComments  A base64_encoded set of (student id, item reference, attempt comment) tuples that contain overall comments for a person's attempt
  # @param array $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  # @param IAssessable $assessment   Our schoolbgox quiz instance
  #}
@@ -19,7 +19,7 @@
         :items="{{ itemReferences|json_encode }}"
         :students="{{ students|json_encode }}"
         :item-responses="{{ itemResponses|json_encode }}"
-        :attempt-responses="{{ attemptResponses|json_encode }}"
+        :attempt-comments="{{ attemptComments|json_encode }}"
         :urls="{{ urls|json_encode }}"
         :report-payloads="{{ reportPayloads }}"
     />

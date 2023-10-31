@@ -10,7 +10,7 @@ import { loadReports } from "./util/loadReports";
 import type { Item } from "./types/Item";
 import type { Student } from "./types/Student";
 import type { StudentItemResponse } from "./types/StudentItemResponse";
-import type { StudentAttemptResponse } from "./types/StudentAttemptResponse";
+import type { StudentAttemptComment } from "./types/StudentAttemptComment";
 import type { StudentUrls } from "./types/StudentUrls";
 import HmSelectItem from "./items/hm-select-item.vue";
 import HmStudents from "./students/hm-students.vue";
@@ -22,7 +22,7 @@ interface Props {
     items: Item[]; // the items linked to quiz
     students: Student[]; // the students who have attempted the quiz
     itemResponses: StudentItemResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
-    attemptResponses: StudentAttemptResponse[]; // all the overall attempt responses for the quiz
+    attemptComments: StudentAttemptComment[]; // all the overall attempt comments for the quiz
     urls: StudentUrls[]; // the urls to use for the students to update their scores and comments
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
 }
@@ -37,7 +37,7 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    useStore().init(props.itemResponses, props.attemptResponses, props.urls);
+    useStore().init(props.itemResponses, props.attemptComments, props.urls);
     useItemsStore().init(props.items);
     useStudentsStore().init(props.students);
     await window.Vue.nextTick();

@@ -12,13 +12,13 @@ export const useItemsStore = defineStore("hmItems", () => {
         reference: "",
         title: "",
         questions: [],
-        isAttemptResponse: false,
+        isAttemptComment: false,
     });
     const activeItemIndex = window.Vue.ref<number>(0);
     const hasPreviousItem = window.Vue.computed(() => activeItemIndex.value > 0);
     const hasNextItem = window.Vue.computed(() => activeItemIndex.value < items.value.length - 1);
-    const isNextFinalReview = window.Vue.computed(() => items.value[activeItemIndex.value + 1]?.isAttemptResponse);
-    const isAttemptResponse = window.Vue.computed(() => activeItem.value.isAttemptResponse === true);
+    const isNextFinalReview = window.Vue.computed(() => items.value[activeItemIndex.value + 1]?.isAttemptComment);
+    const isAttemptComment = window.Vue.computed(() => activeItem.value.isAttemptComment === true);
     const hideMarkedAttempts = window.Vue.ref<boolean>(false);
 
     /**
@@ -30,7 +30,7 @@ export const useItemsStore = defineStore("hmItems", () => {
             items.value.push({
                 ...item,
                 questions: [],
-                isAttemptResponse: false,
+                isAttemptComment: false,
             });
         });
         // we add in an 'dummy' item for the final 'item' which allows the opportunity to provide final feedback for each student
@@ -39,7 +39,7 @@ export const useItemsStore = defineStore("hmItems", () => {
             reference: "final-review",
             title: "Attempt Comments",
             questions: [],
-            isAttemptResponse: true,
+            isAttemptComment: true,
         };
         items.value.push(lastItemForReview);
     }
@@ -54,7 +54,7 @@ export const useItemsStore = defineStore("hmItems", () => {
             items.value[index].questions = item.questions;
         });
         // only show those items with questions and the final review
-        items.value = items.value.filter((item) => item.questions.length > 0 || item.isAttemptResponse);
+        items.value = items.value.filter((item) => item.questions.length > 0 || item.isAttemptComment);
         activeItem.value = { ...items.value[0] };
     }
 
@@ -93,7 +93,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         hasPreviousItem,
         hasNextItem,
         isNextFinalReview,
-        isAttemptResponse,
+        isAttemptComment,
         hideMarkedAttempts,
         init,
         addQuestions,

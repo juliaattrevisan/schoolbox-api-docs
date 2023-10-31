@@ -9,7 +9,7 @@ import type { Student } from "../types/Student";
 import type { StudentItem } from "../types/StudentItem";
 import type { StudentItemQuestion } from "../types/StudentItemQuestion";
 import type { StudentItemQuestionResponse } from "../types/StudentItemQuestionResponse";
-import type { StudentAttemptResponse } from "../types/StudentAttemptResponse";
+import type { StudentAttemptComment } from "../types/StudentAttemptComment";
 import type { StudentUrls } from "../types/StudentUrls";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
@@ -63,12 +63,12 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     /**
      * Get the response for a student attempt
      * @param {number} studentId - the student id to get the response for
-     * @returns {StudentAttemptResponse} - the response attempt
+     * @returns {StudentAttemptComment} - the response attempt
      */
     function getAttemptResponse(studentId: number) {
-        return useStore().attemptResponses.find(
+        return useStore().attemptComments.find(
             (attemptResponse) => attemptResponse.studentId === studentId
-        ) as StudentAttemptResponse;
+        ) as StudentAttemptComment;
     }
 
     /**

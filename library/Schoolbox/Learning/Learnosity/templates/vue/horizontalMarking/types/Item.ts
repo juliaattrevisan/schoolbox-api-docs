@@ -6,5 +6,5 @@ export type Item = {
     id: string;
     reference: string;
     title: string;
-    isAttemptResponse: boolean;
+    isAttemptComment: boolean;
 };

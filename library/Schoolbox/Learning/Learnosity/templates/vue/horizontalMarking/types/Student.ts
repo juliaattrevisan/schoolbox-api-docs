@@ -3,7 +3,7 @@
  */
 
 import type { StudentItem } from "./StudentItem";
-import type { StudentAttemptResponse } from "./StudentAttemptResponse";
+import type { StudentAttemptComment } from "./StudentAttemptComment";
 import type { StudentUrls } from "./StudentUrls";
 
 export type Student = {
@@ -17,6 +17,6 @@ export type Student = {
     isExpanded: boolean;
     hasFocus: boolean; // to indicate if the student has focus
     items: StudentItem[];
-    attemptResponse: StudentAttemptResponse;
+    attemptResponse: StudentAttemptComment;
     urls: StudentUrls;
 };

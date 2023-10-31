@@ -21,7 +21,7 @@ const itemsStore = useItemsStore();
  * To display the item when it's the active item
  */
 const isActive = window.Vue.computed(() => {
-    if (itemsStore.isAttemptResponse) {
+    if (itemsStore.isAttemptComment) {
         return false;
     }
     return props.item.reference === itemsStore.activeItem?.reference;

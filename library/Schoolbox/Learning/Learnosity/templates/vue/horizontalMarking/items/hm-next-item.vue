@@ -11,7 +11,7 @@ const itemsStore = useItemsStore();
  * Hide the button if there is no next item
  */
 const opacity = window.Vue.computed(() => {
-    return itemsStore.isAttemptResponse ? 0 : 1;
+    return itemsStore.isAttemptComment ? 0 : 1;
 });
 
 /**
