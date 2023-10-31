@@ -342,9 +342,15 @@ class Controller extends Base
                 $curriculumNodes = $this->findCurriculumNodes((int)$lastAssessmentInfo['assessmentSpecId']);
 
                 foreach ($studentList as $externalId => $data) {
+                    /* Manufacture a placeholder payload containing students' data for
+                     * those who didn't get feedback
+                     */
+                    $temp = $data;
+                    $temp['assessment'] = $lastAssessmentInfo['title'];
+
                     /* Combine all that into a set of csv rows
                      */
-                    $rows = $this->combine($assessmentInfo, $curriculumNodes, $context, $feedback);
+                    $rows = $this->combine($temp, $curriculumNodes, $context, $feedback);
 
                     /* Pump it to an fputcsv
                      */
