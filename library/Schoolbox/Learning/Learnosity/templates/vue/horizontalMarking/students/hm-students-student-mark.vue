@@ -77,9 +77,12 @@ const maxScore = window.Vue.computed(() => {
 });
 
 /**
- * Get the current total score for the item
+ * Get the current status for the item
  */
 const status = window.Vue.computed(() => {
+    if (!props.item.isMarked) {
+        return StudentItemMarkTypes.NOT_MARKED;
+    }
     if (totalScore.value === maxScore.value) {
         return StudentItemMarkTypes.CORRECT;
     }
@@ -90,9 +93,12 @@ const status = window.Vue.computed(() => {
 });
 
 /**
- * Get the current total score for the item
+ * Get the current tooltip for the item
  */
 const tooltip = window.Vue.computed(() => {
+    if (status.value === StudentItemMarkTypes.NOT_MARKED) {
+        return "Not marked";
+    }
     if (status.value === StudentItemMarkTypes.CORRECT) {
         return "Correct";
     }
@@ -103,6 +109,20 @@ const tooltip = window.Vue.computed(() => {
 });
 
 /**
+ * Update the styles when the score changes
+ * @param {HTMLDivElement} statusElement - the element to update
+ */
+function updateStyles(statusElement: HTMLDivElement) {
+    // find any classes on statusElement that contain 'lrn-circle-*'
+    const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-"));
+    // remove all classes that contain 'lrn-circle-*'
+    classes.forEach((c) => statusElement.classList.remove(c));
+    // add the correct class
+    statusElement.classList.add(`lrn-circle-${status.value}`);
+    gsap.from(statusElement, { duration: 0.3, opacity: 0 });
+}
+
+/**
  * Update the score display anytime the score is changed
  */
 function updateScoreDisplay() {
@@ -111,13 +131,7 @@ function updateScoreDisplay() {
     spanElement.textContent = `${totalScore.value}/${maxScore.value}`;
     statusElement.setAttribute("data-status", status.value);
     statusElement.setAttribute("data-original-title", tooltip.value);
-    // find any classes on statusElement that contain 'lrn-circle-*'
-    const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-"));
-    // remove all classes that contain 'lrn-circle-*'
-    classes.forEach((c) => statusElement.classList.remove(c));
-    // add the correct class
-    statusElement.classList.add(`lrn-circle-${status.value}`);
-    gsap.from(statusElement, { duration: 0.3, opacity: 0 });
+    updateStyles(statusElement);
 }
 
 /**
