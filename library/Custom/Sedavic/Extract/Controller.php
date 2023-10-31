@@ -169,8 +169,11 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     *
+     * @param IConnector     $database
+     * @param External_Class $externalClass  Used to get class lists
      */
-    public function __construct(private IConnector $database)
+    public function __construct(private IConnector $database, private External_Class $externalClass)
     {
         /* To figure out course names from their spec or impl
          * Carefully abducted from Learnosity prototype

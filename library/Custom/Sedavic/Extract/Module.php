@@ -82,6 +82,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('databaseInternal'),
+            $this->injector->get('externalClass'),
         );
     }
 
