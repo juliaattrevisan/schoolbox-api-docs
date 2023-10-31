@@ -6,7 +6,7 @@
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import type { Student } from "../types/Student";
-import HmStudentsStudentMark from "./hm-students-student-mark.vue";
+import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
 import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";
 
@@ -89,7 +89,7 @@ window.Vue.watch(
                     </div>
                     <div>
                         <template v-if="props.student.isReportLoaded">
-                            <hm-students-student-mark
+                            <hm-students-student-item-mark
                                 v-for="item in props.student.items"
                                 :key="item.reference"
                                 :item="item"
