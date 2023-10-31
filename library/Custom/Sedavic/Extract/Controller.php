@@ -86,7 +86,7 @@ class Controller extends Base
         AND vmrf.published_at <= :to
         AND ai.deleted_at IS NULL
         AND u.deleted_at IS NULL
-        ORDER BY lastname, firstname
+        ORDER BY asi.specification_assessment_id, lastname, firstname
     ";
 
 
