@@ -913,6 +913,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     background-color: var(--content-ui-background);
     border: none;
     color: var(--content-ui-foreground);
+    border-radius: 0px !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
@@ -994,6 +995,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn.lrn-author .lrn-author-region-sidebar,
 .lrn.lrn-author .lrn-author-widget-sidebar {
     border-left: none;
+    background: transparent !important;
 }
 .lrn.lrn-author .lrn-author-region-sidebar-open .lrn-author-region-sidebar {
     box-shadow: none;
@@ -1049,7 +1051,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     vertical-align: middle !important;
     color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-background) !important;
-    width: 98% !important;
+    width: 100% !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
         Arial, sans-serif !important;
     font-size: 1rem;
@@ -1096,9 +1098,6 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:hover,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:focus {
     border-color: var(--content-ui-foreground);
-}
-.lrn-qe .lrn-qe-ui .lrn-qe-btn-default {
-    background: var(--content-ui-background);
 }
 span.lrn-qe-i-trash {
     color: var(--content-ui-foreground);
@@ -1695,7 +1694,13 @@ span.lrn-list-view-empty-label {
     padding-right: 0px;
 }
 
-/* removed horizontal scrol on question view */
-.lrn.lrn-author .lrn-author-region-hide-overflow .lrn-author-widget-wrapper-inner {
+/* removed horizontal scroll on question view */
+.lrn-author-widget-wrapper-inner {
     overflow: visible !important;
+}
+
+/* update the pen icon */
+.lrn-i-edit::before {
+    content: "\e645";
+    font-family: "schoolbox";
 }
