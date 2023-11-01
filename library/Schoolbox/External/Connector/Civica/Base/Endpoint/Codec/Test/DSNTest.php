@@ -3,7 +3,7 @@
 /**
  * DSNCodecTest
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @author      Justin Clarke <justin.clarke@schoolbox.education>
  * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
@@ -19,7 +19,7 @@ use Schoolbox\External\Connector\Civica\Base\Endpoint\Codec\DSN;
 /**
  * Class DSNCodecTest
  *
- * @package Schoolbox\External\Connector\Veracross\Base\Endpoint\Test
+ * @package Schoolbox\External\Connector\Civica\Base\Endpoint\Test
  */
 class DSNTest extends TestCase
 {

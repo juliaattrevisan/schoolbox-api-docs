@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @author      Justin Clarke <justin.clarke@schoolbox.education>
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -10,10 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 
-use DomainException;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
-use RuntimeException;
 use SensitiveParameter;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
 
@@ -73,14 +71,12 @@ class Api implements IApi
     private Client $client;
 
     /**
-     * A Veracross Access Token generator, in case you needed to
+     * A Civica Access Token generator, in case you needed to
      * make a new one somewhere along the way
      *
      * @var AccessTokenGenerator
      */
-    private AccessTokenGenerator $accessTokenJurisdictionGenerator;
-    private AccessTokenGenerator $accessTokenSchoolGenerator;
-
+    private AccessTokenGenerator $accessTokenGenerator;
 
     /**
      * The base uri that consists of host and school identifier
@@ -127,7 +123,7 @@ class Api implements IApi
          * Remember this, because we need to remove it in ApiUsage
          * for it to report unique endpoints properly
          *
-         * other than the license/status endpoint, all other endpoints require a schoolID, so dump that in now.
+         * other than the license endpoint, all other endpoints require a schoolID, so dump that in now.
          *
          * Ensure this baseUri ends in just one /
          */
@@ -140,19 +136,13 @@ class Api implements IApi
 
         /* Access Token Generator
          */
-        $this->accessTokenJurisdictionGenerator = new AccessTokenGenerator(
+        $this->accessTokenGenerator = new AccessTokenGenerator(
             $credentials['idp'],
             $credentials['username'],
             $credentials['password']
         );
-//        $this->accessTokenSchoolGenerator = new AccessTokenGenerator(
-//            $credentials['idp'],
-//            $credentials['usernameschool'],
-//            $credentials['passwordschool']
-//        );
-        $this->accessTokenSchoolGenerator = $this->accessTokenJurisdictionGenerator;
 
-        $accessToken = ($this->accessTokenJurisdictionGenerator->generate())->getToken();
+        $accessToken = ($this->accessTokenGenerator->generate())->getToken();
 
         $headers = [
             'Authorization' => "Bearer {$accessToken}",
@@ -183,7 +173,6 @@ class Api implements IApi
      *
      * @param string $method
      * @param string $endpoint
-     * @param bool   $jurisdiction are we getting data from a school endpoint or Jurisdiction
      * @param array  $params
      * @param int    $pageSize
      * @return \Generator
@@ -191,7 +180,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, bool $jurisdiction = false, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    public function retrieve(string $method, string $endpoint, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
     {
         $pageNum = 1;
         $payload = null;
@@ -208,7 +197,7 @@ class Api implements IApi
                 'pageNumber' => $pageNum,
                 'pageSize'  => $pageSize
             ]);
-            $payload = $this->retrieveOne($method, $endpoint, $jurisdiction, $params);
+            $payload = $this->retrieveOne($method, $endpoint, $params);
 
             $pageNum++;
             $n++;
@@ -223,22 +212,17 @@ class Api implements IApi
      *
      * @param string $method
      * @param string $endpoint
-     * @param bool $jurisdiction are we getting data from a school endpoint or Jurisdiction
      * @param array  $params
      * @return array
      * @throws \RuntimeException
      * @throws \DomainException
      * @throws \JsonException
      */
-    public function retrieveOne(string $method, string $endpoint, bool $jurisdiction = false, array $params = []): array
+    public function retrieveOne(string $method, string $endpoint, array $params = []): array
     {
         $response = null;
-        if ($jurisdiction) {
-            $endpoint = sprintf("%s/Jurisdiction", $endpoint);
-            $accessToken = ($this->accessTokenJurisdictionGenerator->generate())->getToken();
-        } else {
-            $accessToken = ($this->accessTokenSchoolGenerator->generate())->getToken();
-        }
+
+        $accessToken = ($this->accessTokenGenerator->generate())->getToken();
 
         /* Record endpoint usage
          */

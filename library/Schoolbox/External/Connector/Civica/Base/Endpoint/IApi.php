@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -21,11 +21,10 @@ interface IApi
      *
      * @param string $method
      * @param string $endpoint
-     * @param bool   $jurisdiction are we getting data from a school endpoint or Jurisdiction
      * @param array  $params
      * @return \Generator
      */
-    public function retrieve(string $method, string $endpoint, bool $jurisdiction = false, array $params = []): \Generator;
+    public function retrieve(string $method, string $endpoint, array $params = []): \Generator;
 
 
     /**

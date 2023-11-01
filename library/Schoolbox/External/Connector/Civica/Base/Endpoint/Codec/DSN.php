@@ -18,15 +18,16 @@ use function count;
 /**
  * Class DSN
  *
- * Veracross configuration requires two identifying pieces:
- *  - School route, which is used as part of the endpoint's host url
- *  - Client Id, provided by the Veracross guys
- *  - Client Secret, also provided by the Veracross guys
+ * Civica configuration requires four identifying pieces:
+ *  - IDP url, which is used to authenticate against and generate the access token
+ *  - School ID, Internal CES school identifier
+ *  - Username
+ *  - Password
  *
- * School Route is used in every request, but client id and client secret
+ * School ID is used in every request, but IDP, Username, Password
  * are used to periodically generate access tokens
  *
- * @package Schoolbox\External\Connector\Veracross\Base\Endpoint
+ * @package Schoolbox\External\Connector\Civica\Base\Endpoint
  */
 class DSN implements IDSN
 {
@@ -80,7 +81,7 @@ class DSN implements IDSN
     /**
      * Encode a dsn string
      *
-     * $parts consists of (school route, client id, client secret) tuples
+     * $parts consists of (idp, school id, username, password) tuples
      *
      * @param array $parts
      * @return string

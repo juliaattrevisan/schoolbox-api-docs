@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint\AccessToken;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
-use GuzzleHttp\RequestOptions;
 
 /**
  * Class Generator
@@ -214,7 +213,7 @@ class Generator
         if ($response) {
             throw new \RuntimeException(
                 sprintf(
-                    'Bad endpoint %s: %s %s after %s retries, attempting to generate access token. Check Jurisdiction credentials for your Civica instance',
+                    'Bad endpoint %s: %s %s after %s retries, attempting to generate access token. Check credentials for your Civica instance',
                     $endpoint,
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),

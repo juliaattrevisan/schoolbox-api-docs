@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2020, Schoolbox Pty Ltd
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Laminas\Uri\Exception\InvalidUriPartException;
-use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 use SensitiveParameter;
 
@@ -43,7 +42,7 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
-        (new Api($this->host, $this->key))->retrieveOne('GET', 'Students', true, ['pageSize' => 1]);
+        (new Api($this->host, $this->key))->retrieveOne('GET', 'Students/Jurisdiction', ['pageSize' => 1]);
         return true;
     }
 

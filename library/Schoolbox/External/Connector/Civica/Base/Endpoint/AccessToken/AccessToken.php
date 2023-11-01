@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint\AccessToken;
 
 /**
- * Veracross Access Token
+ * Civica Access Token
  *
- * These have a 3600 second lifetime after which they must be regenerated
+ * These have a 2700 second lifetime after which they must be regenerated
  *
- * Also store a copy of the payload Veracross sent to us, as a receipt
+ * Also store a copy of the payload Civica sent to us, as a receipt
  * for diagnostics I guess
  */
 class AccessToken
@@ -75,7 +75,7 @@ class AccessToken
 
 
     /**
-     * Return the actual payload Veracross gave to us, for inspection
+     * Return the actual payload Civica gave to us, for inspection
      *
      * @return array
      */
