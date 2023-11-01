@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Learning\Learnosity;
+namespace Schoolbox\Learning\Learnosity;
 
 class RateLimitException extends \RuntimeException
 {

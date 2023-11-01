@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Lumberjack\Logger;
-use Learning\Learnosity\RateLimitException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Request\DataApi;
 use LearnositySdk\Request\Init;
