@@ -90,9 +90,8 @@ abstract class BaseHydrator implements IHydrator
      *
      * @param string $keyword  The search keyword.
      * @param string $content  The content to truncate.
-     * @param int    $maxChars The max character count to include in the
-     *                         description: allows for an equal number of
-     *                         characters before and after the keyword.
+     * @param int    $maxChars The max character count to include in the description (not including the keyword length).
+     *                         Allows for an equal number of characters before and after the keyword.
      *
      * @return string|null
      */
@@ -132,7 +131,7 @@ abstract class BaseHydrator implements IHydrator
                 preg_replace(
                     '/\s+/',
                     ' ',
-                    mb_strcut($content, $cutStart, $maxChars, self::ENCODING),
+                    mb_strcut($content, $cutStart, $cutFinish, self::ENCODING),
                 )
             );
             if ($startTruncated) {
