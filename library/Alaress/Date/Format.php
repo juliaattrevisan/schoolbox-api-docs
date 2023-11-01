@@ -1963,6 +1963,23 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * Get a relative time without midnight
+     * Matches behaviour of getRelativeDay but removes ' at 11:59pm' if present
+     *
+     * @param Alaress_Date_Format $now
+     * @return string
+     */
+    public function getRelativeDayWithoutMidnight(Alaress_Date_Format $now = null)
+    {
+        $relativeTime = $this->getRelativeDay($now);
+
+        // Remove the 'at 11:59pm' part if it exists
+        $relativeTime = str_replace(' at 11:59pm', '', $relativeTime);
+
+        return $relativeTime;
+    }
+
+    /**
      * Outputs this string as a recognisable string representation of a date,
      * including timezone data.
      *

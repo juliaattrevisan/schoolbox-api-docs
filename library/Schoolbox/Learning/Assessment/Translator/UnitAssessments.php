@@ -70,7 +70,7 @@ class UnitAssessments
             'unit'              => $assessment->getBaseContext()->getTitle(),
             'projectName'       => $projectName,
             'closeAt'           => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
-            'closeAtFormatted'  => str_replace(' at 11:59pm', '', $assessment->getCloseAt()?->getRelativeDay()),
+            'closeAtFormatted'  => $assessment->getCloseAt()?->getRelativeDayWithoutMidnight(),
             '_links'            => $links,
             'assessments'       => $assessments?->reindex()->map($this),
         ];
