@@ -418,8 +418,8 @@ class Sessions implements IStrategy
                         foreach ($session['customFieldsData'] as $key => $value) {
                             /* Look up what this was meant to be called
                              */
-                            if (!key_exists($key, $customFieldsMetadata)) {
-                                $this->log->debug(sprintf('Skipping custom field "%s"; because no metdata exists', $key));
+                            if (!array_key_exists($key, $customFieldsMetadata)) {
+                                $this->log->debug(sprintf('Skipping custom field "%s"; because no metadata exists', $key));
                                 continue;
                             }
 
