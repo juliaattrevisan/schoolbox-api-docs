@@ -14,6 +14,7 @@ use Tests\Support\Page\Homepage;
 use Exception;
 use Tests\Support\Page\Homepage\ManageAllTextbox;
 use Tests\Support\Page\Resources\Resources;
+use Tests\Support\Page\Search\SearchPage;
 
 /**
  * Test for attaching a textbox to a page.
@@ -152,20 +153,21 @@ class TextboxCest
         $folderName = "Test TextBox Homepage";
         $common = new Common($i);
         $manageAll = new ManageAllTextbox($i);
+        $searchPage = new SearchPage($i);
 
         $i->amGoingTo("As Jack Coles search for a  textbox and ensure it is presented in the search results grid");
         $i->impersonate('Jack Coles');
         $common->search('Jana Reed');
-        $i->click('Clear all filters');
+        $i->click('Clear filters');
         $common->clickSearchTypeCheckbox('textbox');
-        $i->click('Apply filters and search');
+        $i->click('Search');
         $i->waitForElementVisible('div.alert-box');
         $i->canSee('Jana Reed', 'mark');
         $i->canSee('Third Text Box');
         $common->search('Test');
-        $i->click('Clear all filters');
+        $i->click('Clear filters');
         $common->clickSearchTypeCheckbox('textbox');
-        $i->click('Apply filters and search');
+        $i->click('Search');
         $i->waitForElementVisible('div.alert-box');
         $i->canSee('Second Text Box', '//h6/a');
         $i->canSee('Test', 'mark');
@@ -175,19 +177,19 @@ class TextboxCest
         $i->amGoingTo("As Jana Reed search for a  textbox and check whether it is presented in the search results grid or not");
         $i->impersonate('Jana Reed');
         $common->search('Jana Reed');
-        $i->click('Clear all filters');
+        $i->click('Clear filters');
         $common->clickSearchTypeCheckbox('textbox');
-        $i->click('Apply filters and search');
-        $i->waitForElementVisible('div.alert-box');
+        $i->click('Search');
+        $i->amGoingTo('expect to see an empty results warning');
+        $searchPage->verifyNoResults();
         $i->cantSee('Jana Reed', 'mark');
         $i->cantSee('Third Text Box', '//h6/a');
         $common->search('Test');
-        $i->click('Clear all filters');
+        $i->click('Clear filters');
         $common->clickSearchTypeCheckbox('textbox');
-        $i->click('Apply filters and search');
+        $i->click('Search');
         $i->waitForElementVisible('div.alert-box');
         $i->cantSee('Second Text Box', '//h6/a');
-        $i->cantSee('Test', 'mark');
         $i->canSee('Test Text Box Title', '//h6/a');
         $i->canSee('I am textbox content', '//article/p');
 
@@ -211,13 +213,14 @@ class TextboxCest
         $i->amGoingTo("As Jana Reed search for textboxes and check whether its is presented or not");
         $i->impersonate('Jana Reed');
         $common->search('Jamal');
-        $i->click('Clear all filters');
+        $i->click('Clear filters');
         $common->clickSearchTypeCheckbox('textbox');
-        $i->click('Apply filters and search');
+        $i->click('Search');
         $i->canSee('Jamal to be presented', '//article/p');
         $common->search('Jana');
-        $i->click('Apply filters and search');
-        $i->canSee('No results for');
+        $i->click('Search');
+        $i->amGoingTo('expect to see an empty results warning');
+        $searchPage->verifyNoResults();
         $i->amGoingTo("Navigate to the Test TextBox Homepage to check whether the textbox is presented or not");
         $i->amOnPage('/homepage/' . $homepageId);
         $i->canSee('Jamal to be presented');
