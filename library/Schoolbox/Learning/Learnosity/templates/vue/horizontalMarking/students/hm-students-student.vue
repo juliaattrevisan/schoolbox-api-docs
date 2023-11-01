@@ -5,7 +5,6 @@
 
 import { gsap } from "gsap";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
@@ -25,15 +24,6 @@ const responseInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); //
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
-
-/**
- * To show/hide the entire student container, hiding if the student has been marked
- * and the option to show marked attempts is unchecked
- * @returns {string} - the height of the response container
- */
-// const containerHeight = window.Vue.computed(() => {
-//     return props.student.isMarked && !studentsStore.showMarkedAttempts ? "0fr" : "1fr";
-// });
 
 /**
  * To show/hide the entire student container, hiding if the student has been marked
