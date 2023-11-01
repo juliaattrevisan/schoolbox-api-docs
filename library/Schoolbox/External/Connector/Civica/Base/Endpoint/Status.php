@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 
 use GuzzleHttp\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use SensitiveParameter;
@@ -52,8 +51,6 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function getReport(): array
     {
