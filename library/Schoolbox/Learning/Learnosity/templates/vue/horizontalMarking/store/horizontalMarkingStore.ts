@@ -3,39 +3,25 @@
  */
 
 import { defineStore } from "pinia";
-import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
-import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
+import Toast from "@schoolboxVue/components/toast.vue";
 
 export const useStore = defineStore("horizontalMarking", () => {
     const isProcessing = window.Vue.ref<boolean>(false); // to disable various events while processing, like trying to mark the next card before the current one has finished marking
     const isLoaded = window.Vue.ref<boolean>(false); // to show the loading spinner while the reports are loading
-    const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]);
-    const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]);
-    const urls = window.Vue.ref<StudentUrls[]>([]);
+    const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
 
     /**
      * store any passed through properties
-     * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptComment[]} $attemptComments - the attempt responses
-     * @param {StudentUrls[]} $urls - the urls
+     * @param { ref } toastElement - the toast element that can pop up
      */
-    function init(
-        $itemResponses: StudentItemQuestionResponse[],
-        $attemptComments: StudentAttemptComment[],
-        $urls: StudentUrls[]
-    ) {
-        itemResponses.value = $itemResponses;
-        attemptComments.value = $attemptComments;
-        urls.value = $urls;
+    function init(toastElement: typeof Toast) {
+        toastEl.value = toastElement;
     }
 
     return {
         isProcessing,
         isLoaded,
-        itemResponses,
-        attemptComments,
-        urls,
         init,
+        toastEl,
     };
 });

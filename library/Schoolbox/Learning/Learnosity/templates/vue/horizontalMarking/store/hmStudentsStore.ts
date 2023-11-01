@@ -6,6 +6,9 @@ import { defineStore } from "pinia";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
+import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
+import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import {
     getItemQuestions,
     getAttemptResponse,
@@ -19,15 +22,26 @@ import { useItemsStore } from "./hmItemsStore";
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
     const isExpanded = window.Vue.ref<boolean>(true);
-    const store = useStore();
+    const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]);
+    const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]);
+    const urls = window.Vue.ref<StudentUrls[]>([]);
     const showMarkedAttempts = window.Vue.ref<boolean>(true);
     const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked));
+    const store = useStore();
 
     /**
      * store any passed through properties
      * @param {object} $students - the students
+     * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
+     * @param {StudentAttemptComment[]} $attemptComments - the attempt responses
+     * @param {StudentUrls[]} $urls - the urls
      */
-    function init($students: Student[]) {
+    function init(
+        $students: Student[],
+        $itemResponses: StudentItemQuestionResponse[],
+        $attemptComments: StudentAttemptComment[],
+        $urls: StudentUrls[]
+    ) {
         $students.forEach((student) => {
             students.value.push({
                 ...student,
@@ -37,6 +51,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 items: [],
             });
         });
+        itemResponses.value = $itemResponses;
+        attemptComments.value = $attemptComments;
+        urls.value = $urls;
     }
 
     /**
@@ -55,7 +72,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 // for each item, we only want to store the below properties, removing any others Learnosity may have provided
                 studentItems.push({
                     reference: item.reference,
-                    questions: getItemQuestions(store.itemResponses, item.questions),
+                    questions: getItemQuestions(itemResponses.value, item.questions),
                 });
             });
             selectedStudent.items = studentItems;
@@ -64,8 +81,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 item.isMarked = getItemIsMarked(item);
             });
             selectedStudent.isMarked = getStudentIsMarked(selectedStudent);
-            selectedStudent.attemptComment = getAttemptResponse(store.attemptComments, selectedStudent.id);
-            selectedStudent.urls = getUrls(store.urls, selectedStudent.id);
+            selectedStudent.attemptComment = getAttemptResponse(attemptComments.value, selectedStudent.id);
+            selectedStudent.urls = getUrls(urls.value, selectedStudent.id);
         }
     }
 

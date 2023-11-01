@@ -12,10 +12,11 @@ import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { loadReports } from "./util/loadReports";
-import HmCardsHeader from "./hm-cards-header.vue";
+import HmItemsHeader from "./items/hm-items-header.vue";
 import HmStudents from "./students/hm-students.vue";
 import HmPreviousItem from "./items/hm-previous-item.vue";
 import HmNextItem from "./items/hm-next-item.vue";
+import Toast from "@schoolboxVue/components/toast.vue";
 
 interface Props {
     title: string; // the title of the quiz
@@ -29,6 +30,7 @@ interface Props {
 const props = defineProps<Props>();
 const store = useStore();
 const itemsStore = useItemsStore();
+const toastEl = window.Vue.ref<Toast | null>(null);
 
 const hasStudents = window.Vue.computed(() => {
     return props.students && Object.keys(props.students).length > 0;
@@ -39,21 +41,20 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.itemResponses, props.attemptComments, props.urls);
+    store.init(toastEl);
     itemsStore.init(props.items);
-    useStudentsStore().init(props.students);
+    useStudentsStore().init(props.students, props.itemResponses, props.attemptComments, props.urls);
     await window.Vue.nextTick();
     loadReports(props.reportPayloads);
 });
 </script>
 
 <template>
-    <div></div>
     <div class="l-flex-col l-gap-m f-no-margins">
         <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
-            <hm-cards-header />
+            <hm-items-header />
             <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
             <hm-students />
             <div class="l-flex-row l-flex--no-wrap l-gap-m">
@@ -68,6 +69,7 @@ window.Vue.onMounted(async () => {
             </div>
         </template>
     </div>
+    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped></style>

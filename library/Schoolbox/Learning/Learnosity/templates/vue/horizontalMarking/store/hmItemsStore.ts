@@ -35,8 +35,8 @@ export const useItemsStore = defineStore("hmItems", () => {
         // we add in an 'dummy' item for the final 'item' which allows the opportunity to provide final feedback for each student
         const lastItemForReview = {
             id: "0",
-            reference: "final-review",
-            title: "Attempt Comments",
+            reference: "attempt-comments",
+            title: "- Attempt Comments",
             questions: [],
             isAttemptComment: true,
         };
