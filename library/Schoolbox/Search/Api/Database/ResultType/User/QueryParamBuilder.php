@@ -57,7 +57,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // Probably shouldn't allow any searches on < 2 chars, but shrug
         $keywordSearchParts = ['u.synergy_id = :userKeyword'];
         $params             = ['userKeyword' => $keyword];
-        if (mb_strlen($keyword, 'UTF-8') >= 2) {
+        if (mb_strlen($keyword, self::ENCODING) >= 2) {
             $keywordSearchParts[]      = "u.username LIKE :userKeywordLike";
             $keywordSearchParts[]      = "u.firstname LIKE :userKeywordLike";
             $keywordSearchParts[]      = "u.preferred_name LIKE :userKeywordLike";

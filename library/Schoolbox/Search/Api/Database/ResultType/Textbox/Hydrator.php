@@ -100,8 +100,8 @@ class Hydrator extends BaseHydrator
             // Because the textbox body contains HTML, this match might have come about only because the
             // keyword was found in HTML code that is invisible to the user (eg. 'style=').
             // Eliminate those kinds of matches.
-            if (mb_stripos($textbox->getHeading(), $keyword, 0, 'UTF-8') === false) {
-                if (mb_stripos($textboxBodyTextOnly, $keyword, 0, 'UTF-8') === false) {
+            if (mb_stripos($textbox->getHeading(), $keyword, 0, self::ENCODING) === false) {
+                if (mb_stripos($textboxBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
                     continue;
                 }
             }
@@ -194,7 +194,7 @@ class Hydrator extends BaseHydrator
                 if (
                     $textboxAccess === UserAccess::ACCESS_READ &&
                     !$showTitleToReadOnlyUsers &&
-                    mb_stripos($textboxBodyTextOnly, $keyword, 0, 'UTF-8') === false
+                    mb_stripos($textboxBodyTextOnly, $keyword, 0, self::ENCODING) === false
                 ) {
                     continue;
                 }

@@ -133,7 +133,7 @@ class Hydrator extends BaseHydrator
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
                 if ($this->assessmentMatchesKeywordOnlyOnHtmlContent($assessment, $keyword, $assessmentContentHtml)) {
-                    if (mb_stripos($assessmentContentTextOnly, $keyword, 0, 'UTF-8') === false) {
+                    if (mb_stripos($assessmentContentTextOnly, $keyword, 0, self::ENCODING) === false) {
                         return null;
                     }
                 }
@@ -157,7 +157,7 @@ class Hydrator extends BaseHydrator
                         // The keyword was not found in any field content visible to the user.
 
                         // If the keyword is found in the lesson plan title, then the match is still good.
-                        if (mb_stripos($assessment->getTitle(), $keyword, 0, 'UTF-8') !== false) {
+                        if (mb_stripos($assessment->getTitle(), $keyword, 0, self::ENCODING) !== false) {
                             // Set the search result context to the content of the first field.
                             $searchResultContextHtml = (
                                 $this->consistentlyFormatLessonPlanFieldContent($assessment->getFields()->first())
@@ -296,25 +296,25 @@ class Hydrator extends BaseHydrator
         // 'lesson_plan_field.title LIKE :assessmentKeywordLike',             // Assessment\LessonPlan\Model->getField()->getTitle() HtmlContent
         // 'lesson_plan_field.body LIKE :assessmentKeywordLike'               // Assessment\LessonPlan\Model->getField()->getBody()  HtmlContent
 
-        if (mb_stripos($assessment->getTitle(), $keyword, 0, 'UTF-8') !== false) {
+        if (mb_stripos($assessment->getTitle(), $keyword, 0, self::ENCODING) !== false) {
             return false; // Found match on assessment.title or assess.title.
         }
 
         if ($assessment instanceof Assessment\Lti\Model) {
             if (
-                mb_stripos($assessment->getLtiAssessmentUrl(), $keyword, 0, 'UTF-8') !== false ||
-                mb_stripos($assessment->getLtiAssessmentTitle(), $keyword, 0, 'UTF-8') !== false
+                mb_stripos($assessment->getLtiAssessmentUrl(), $keyword, 0, self::ENCODING) !== false ||
+                mb_stripos($assessment->getLtiAssessmentTitle(), $keyword, 0, self::ENCODING) !== false
             ) {
                 return false; // Found match on lti_assessment.lti_assessment_url or lti_assessment.lti_assessment_title.
             }
         } elseif ($assessment instanceof Assessment\Task\Model) {
-            if (mb_stripos($assessment->getUrl(), $keyword, 0, 'UTF-8') !== false) {
+            if (mb_stripos($assessment->getUrl(), $keyword, 0, self::ENCODING) !== false) {
                 return false; // Found match on task.link.
             }
         }
 
         // No other match found, so return true if the keyword matches on the HTML content.
-        return (mb_stripos($assessmentContentHtml, $keyword, 0, 'UTF-8') !== false);
+        return (mb_stripos($assessmentContentHtml, $keyword, 0, self::ENCODING) !== false);
     }
 
     /**
@@ -344,8 +344,8 @@ class Hydrator extends BaseHydrator
 
             if (
                 // Use case-insensitive search to match behaviour of SQL LIKE condition.
-                mb_stripos($field->getTitle(), $keyword, 0, 'UTF-8') !== false ||
-                mb_stripos($field->getBody(), $keyword, 0, 'UTF-8') !== false
+                mb_stripos($field->getTitle(), $keyword, 0, self::ENCODING) !== false ||
+                mb_stripos($field->getBody(), $keyword, 0, self::ENCODING) !== false
             ) {
                 // Found the keyword in text that is visible to the user, so this field's text is safe to
                 // use as the search result context text.

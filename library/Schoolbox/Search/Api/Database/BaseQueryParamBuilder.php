@@ -19,6 +19,11 @@ use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 {
     /**
+     * For use in multibyte string manipulations.
+     */
+    public const ENCODING = 'UTF-8';
+
+    /**
      * @inheritdoc
      */
     public function buildMatchQueryParams(

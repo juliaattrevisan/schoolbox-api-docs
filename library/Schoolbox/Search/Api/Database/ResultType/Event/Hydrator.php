@@ -90,10 +90,10 @@ class Hydrator extends BaseHydrator
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
                 if (
-                    mb_stripos($event->getTitle(), $keyword, 0, 'UTF-8') === false &&
-                    mb_stripos($event->getLocation(), $keyword, 0, 'UTF-8') === false
+                    mb_stripos($event->getTitle(), $keyword, 0, self::ENCODING) === false &&
+                    mb_stripos($event->getLocation(), $keyword, 0, self::ENCODING) === false
                 ) {
-                    if (mb_stripos($eventDetailTextOnly, $keyword, 0, 'UTF-8') === false) {
+                    if (mb_stripos($eventDetailTextOnly, $keyword, 0, self::ENCODING) === false) {
                         return null;
                     }
                 }
