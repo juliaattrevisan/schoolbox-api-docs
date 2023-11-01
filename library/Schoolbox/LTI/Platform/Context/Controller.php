@@ -181,6 +181,8 @@ class Controller extends BaseController
             $additionalClaims,
         );
 
+        $this->setAllowBackToTheFuture(false);
+
         // Send the request
         $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
