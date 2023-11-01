@@ -356,6 +356,10 @@ class Factory implements IFactory
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
 
+            // TODO: Civica Endpoint/Factory
+            case self::CIVICA:
+                return null;
+
             default:
                 // Use manual csv imports
                 return null;
