@@ -28,7 +28,7 @@ function onChange(event: Event) {
                 :value="item.reference"
                 :selected="itemsStore.activeItem.reference === item.reference"
             >
-                {{ item.title }}
+                {{ !item.isMarked && !item.isAttemptComment ? "Contains unmarked attempts: " : "" }} {{ item.title }}
             </option>
         </template>
         <template v-else>

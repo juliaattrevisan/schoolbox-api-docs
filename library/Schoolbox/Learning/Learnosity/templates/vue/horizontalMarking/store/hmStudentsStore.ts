@@ -65,8 +65,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      */
     function addItems(reportId: string, $items: StudentItem[]) {
         const items = $items.filter((item) => item.questions.length > 0); // remove any items that don't have questions
-        const selectedStudent = students.value.find((student) => student.elementId === reportId);
-        if (selectedStudent) {
+        const student = students.value.find(($student) => $student.elementId === reportId);
+        if (student) {
             const studentItems: StudentItem[] = [];
             items.forEach((item) => {
                 // for each item, we only want to store the below properties, removing any others Learnosity may have provided
@@ -75,14 +75,14 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                     questions: getItemQuestions(itemResponses.value, item.questions),
                 });
             });
-            selectedStudent.items = studentItems;
+            student.items = studentItems;
             // need to do after as we rely on questions and responses being set first
-            selectedStudent.items.forEach((item) => {
+            student.items.forEach((item) => {
                 item.isMarked = getItemIsMarked(item);
             });
-            selectedStudent.isMarked = getStudentIsMarked(selectedStudent);
-            selectedStudent.attemptComment = getAttemptResponse(attemptComments.value, selectedStudent.id);
-            selectedStudent.urls = getUrls(urls.value, selectedStudent.id);
+            student.isMarked = getStudentIsMarked(student);
+            student.attemptComment = getAttemptResponse(attemptComments.value, student.id);
+            student.urls = getUrls(urls.value, student.id);
         }
     }
 
@@ -123,6 +123,15 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         }
         // check if all student reports are loaded and if so, set the central store can be considered loaded
         store.isLoaded = students.value.every((student) => student.isReportLoaded);
+        if (store.isLoaded) {
+            // for each item within the store, check if all students have been marked for that item
+            useItemsStore().items.forEach((item) => {
+                item.isMarked = students.value.every((student) => {
+                    const studentItem = student.items.find(($item) => $item.reference === item.reference);
+                    return studentItem ? studentItem.isMarked : false;
+                });
+            });
+        }
     }
 
     /**

@@ -10,4 +10,5 @@ export type Item = {
     title: string;
     isAttemptComment: boolean;
     questions: StudentItemQuestion[];
+    isMarked?: boolean;
 };
