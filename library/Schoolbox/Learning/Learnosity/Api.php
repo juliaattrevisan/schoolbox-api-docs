@@ -223,7 +223,7 @@ class Api
 
                 /* Rate Limit exceeded; take a nap for a while before trying again
                  */
-                if ($response->getStatusCode() === 429 ) {
+                if ($response->getStatusCode() === 429) {
                     throw new RateLimitException();
                 }
 
