@@ -88,6 +88,9 @@ class Factory
             case Endpoint\Factory::VERACROSS:
                 return new Connector\Veracross\Base\Endpoint\Status($this->host, $this->key);
 
+            case Endpoint\Factory::CIVICA:
+                return new Connector\Civica\Base\Endpoint\Status($this->host, $this->key);
+
             default:
                 // Use manual csv imports
                 return null;
