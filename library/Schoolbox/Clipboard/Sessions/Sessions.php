@@ -418,7 +418,12 @@ class Sessions implements IStrategy
                         foreach ($session['customFieldsData'] as $key => $value) {
                             /* Look up what this was meant to be called
                              */
-                            $label = $customFieldsMetadata[$key]['label'];
+                            if (!key_exists($key, $customFieldsMetadata)) {
+                                $this->log->debug(sprintf('Skipping custom field "%s"; because no metdata exists', $key));
+                                continue;
+                            }
+
+                            $label = (string)$customFieldsMetadata[$key]['label'];
 
                             /* We only care when Custom Fields are viewable by schoolbox users:
                              *     * guardian
