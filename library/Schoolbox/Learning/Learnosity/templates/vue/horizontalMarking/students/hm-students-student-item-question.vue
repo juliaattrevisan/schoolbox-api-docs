@@ -23,10 +23,13 @@ const { focused } = useFocus(scoreEl);
 const score = window.Vue.ref<string>(props.question.response.score?.toString() ?? "");
 
 /**
- * Save the score
+ * Save the score if it's changed
  */
 async function saveScore() {
     if (score.value === "") {
+        return;
+    }
+    if (score.value === props.question.response.score?.toString()) {
         return;
     }
     studentsStore.updateItemResponseScore(props.student, props.item, props.question, parseInt(score.value, 10));
@@ -40,7 +43,7 @@ async function saveScore() {
 }
 
 /**
- * save the score on focus loss
+ * save the score on focus loss if the score has changed
  */
 window.Vue.watch(focused, async ($focused) => {
     if (!$focused) {

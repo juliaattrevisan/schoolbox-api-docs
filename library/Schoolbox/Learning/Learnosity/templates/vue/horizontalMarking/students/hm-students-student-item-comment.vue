@@ -20,9 +20,12 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 const comment = useEditor(props.item.questions[0].response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 
 /**
- * Save the comment
+ * Save the comment if it's changed
  */
 async function saveComment() {
+    if (comment.value === props.item.questions[0].response.comment) {
+        return;
+    }
     studentsStore.updateItemComment(props.item.questions[0], comment.value);
     const formData = new FormData();
     formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
@@ -41,7 +44,7 @@ window.Vue.onMounted(() => {
     ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
         const editor = event.detail.editor;
         editor.ui.focusTracker.on("change:isFocused", (event, name, isFocused) => {
-            if (!isFocused) {
+            if (!isFocused && comment.value !== props.item.questions[0].response.comment) {
                 saveComment();
             }
         });

@@ -19,9 +19,12 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
 
 /**
- * Save the comment
+ * Save the comment if it's changed
  */
 async function saveComment() {
+    if (comment.value === props.student.attemptComment.comment) {
+        return;
+    }
     studentsStore.updateAttemptComment(props.student, comment.value);
     const formData = new FormData();
     formData.append("comment", comment.value);
