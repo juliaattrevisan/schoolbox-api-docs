@@ -113,6 +113,19 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * For each item within the store, check if all students have been marked for that item
+     */
+    function updateItemsIsMarked() {
+        //
+        useItemsStore().items.forEach((item) => {
+            item.isMarked = students.value.every((student) => {
+                const studentItem = student.items.find(($item) => $item.reference === item.reference);
+                return studentItem ? studentItem.isMarked : false;
+            });
+        });
+    }
+
+    /**
      * To notify that a report linked to a student has been loaded
      * @param {number} reportId - the report id
      */
@@ -124,13 +137,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         // check if all student reports are loaded and if so, set the central store can be considered loaded
         store.isLoaded = students.value.every((student) => student.isReportLoaded);
         if (store.isLoaded) {
-            // for each item within the store, check if all students have been marked for that item
-            useItemsStore().items.forEach((item) => {
-                item.isMarked = students.value.every((student) => {
-                    const studentItem = student.items.find(($item) => $item.reference === item.reference);
-                    return studentItem ? studentItem.isMarked : false;
-                });
-            });
+            updateItemsIsMarked();
         }
     }
 
@@ -150,6 +157,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         question.response.score = score;
         item.isMarked = getItemIsMarked(item);
         student.isMarked = getStudentIsMarked(student);
+        updateItemsIsMarked();
     }
 
     /**

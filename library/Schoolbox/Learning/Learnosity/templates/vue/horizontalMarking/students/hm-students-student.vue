@@ -24,6 +24,7 @@ const responseInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); //
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
+const isFirstMarkedAttemptsChange = window.Vue.ref(true);
 
 /**
  * To show/hide the entire student container, hiding if the student has been marked
@@ -32,10 +33,16 @@ const studentsStore = useStudentsStore();
 window.Vue.watch(
     () => studentsStore.showMarkedAttempts,
     () => {
+        // we only want to do this on the first change, as gsap doesn't know the value of grid-template-rows yet
+        if (isFirstMarkedAttemptsChange.value) {
+            isFirstMarkedAttemptsChange.value = false;
+            studentEl.value?.style.setProperty("grid-template-rows", "1fr");
+        }
         gsap.to(studentEl.value, {
             gridTemplateRows: props.student.isMarked && !studentsStore.showMarkedAttempts ? "0fr" : "1fr",
             duration: 0.3,
             onStart: () => {
+                // debugger;
                 studentInnerContainerEl.value?.style.setProperty("overflow", "hidden");
             },
             onComplete: () => {
