@@ -60,7 +60,7 @@ class Api
      * multiple requests inevitably occurring again at the same time
      * to cause another rate limit
      */
-    private const JITTER_LOWER = 1;
+    private const JITTER_LOWER = 0;
     private const JITTER_UPPER = 3;
 
 
@@ -208,6 +208,8 @@ class Api
          */
         while ($fails < self::NUM_RETRY) {
             try {
+                throw new RateLimitException();
+
                 $response = (new DataApi())->request(
                     $url,
                     [
@@ -223,7 +225,7 @@ class Api
 
                 /* Rate Limit exceeded; take a nap for a while before trying again
                  */
-                if ($response->getStatusCode() === 429) {
+                if ($response->getStatusCode() === 429 ) {
                     throw new RateLimitException();
                 }
 
@@ -253,30 +255,48 @@ class Api
                  */
                 return $json;
             } catch (RateLimitException $e) {
+                $jitter = 0;
+
+                /* If we've failed previously, jitter litter some extra seconds
+                 * to randomise a bit more so we don't all try to start again
+                 * at the same time (always naps 5sec the first time we fail)
+                 */
+                if ($fails) {
+                    $jitter = random_int(self::JITTER_LOWER, self::JITTER_UPPER);
+                }
+
                 /* Rate limit reached; retry after napping
                  */
                 $fails++;
 
-                /* "some random jitter" is randomly between 1 and 3 sec by default
+                /* "some random jitter" is randomly between 0 and 3 sec by default
                  *
-                 * Sleep for 3+1 seconds (2^0) + some random jitter
-                 * then 3+2 seconds (2^1) + some random jitter
-                 * then 3+4 seconds (2^2) + some random jitter
-                 * then 3+8 seconds (2^3) + some random jitter
-                 * then 3+16 seconds (2^4) + some random jitter
+                 * Sleep for 3+2 seconds
+                 * then 3+4 seconds (2^2) + some random jitter,
+                 * then 3+8 seconds (2^3) + some random jitter,
+                 * then 3+16 seconds (2^4) + some random jitter,
+                 * then 3+32 seconds (2^5) + some random jitter...
                  *
-                 * then give up after multiple full rate limited cycles
+                 * ...then give up after multiple full rate limited cycles
                  */
-                $napTime = self::NAP_TIMEOUT + 2^$fails + random_int(self::JITTER_LOWER, self::JITTER_UPPER);
+                $napTime = self::NAP_TIMEOUT + pow(2, $fails) + $jitter;
 
-                $this->logger->debug(sprintf(
-                    'Rate limit reached for Data API: napping for %s seconds',
+                new \Alaress_Probe(
+                    self::NAP_TIMEOUT,
+                    pow(2, $fails),
+                    random_int(self::JITTER_LOWER, self::JITTER_UPPER),
                     $napTime
-                ));
+                );
 
-                /* Nack to sleep Jeffrey
-                 */
-                sleep($napTime);
+//                new \Alaress_Probe(sprintf(
+//                    'Rate limit reached for Data API on request %s: napping for %s seconds',
+//                    $fails,
+//                    $napTime
+//                ));
+
+//                /* Nack to sleep Jeffrey
+//                 */
+//                sleep($napTime);
 
                 continue;
             }
