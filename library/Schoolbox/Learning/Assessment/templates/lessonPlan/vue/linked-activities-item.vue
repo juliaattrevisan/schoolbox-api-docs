@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
+import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
-import { Activity } from "./linkedActivitiesTypes";
 
 interface Props {
     activity: Activity;
@@ -48,7 +48,7 @@ function handleUnlinkClick() {
         <p class="meta">
             {{ getActivityMeta(activity) }}
         </p>
-        <p class="meta">Due {{ activity.closeAtFormatted }}</p>
+        <p class="meta">Due {{ activity.dueAtFormatted }}</p>
     </div>
     <nav v-if="isInstructor">
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>

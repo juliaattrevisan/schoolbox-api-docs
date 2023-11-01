@@ -1693,9 +1693,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function compare($other)
     {
-//        if ($this->isNull() || $other->isNull()) {
-//            return 0;
-//        }
+        //        if ($this->isNull() || $other->isNull()) {
+        //            return 0;
+        //        }
         if ($this->lt($other)) {
             return -1;
         }
@@ -1954,10 +1954,27 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             $relativeTime = $this->getShortDateOnly();
         }
 
-        // Add the time if the date is within 30 days and isn't 23:59:59
+        // Add the time if the date is within 30 days
         if ($diffInDays <= 30) {
             $relativeTime .= ' at ' . $this->getTimeOnly();
         }
+
+        return $relativeTime;
+    }
+
+    /**
+     * Get a relative time without midnight
+     * Matches behaviour of getRelativeDay but removes ' at 11:59pm' if present
+     *
+     * @param Alaress_Date_Format $now
+     * @return string
+     */
+    public function getRelativeDayWithoutMidnight(Alaress_Date_Format $now = null)
+    {
+        $relativeTime = $this->getRelativeDay($now);
+
+        // Remove the 'at 11:59pm' part if it exists
+        $relativeTime = str_replace(' at 11:59pm', '', $relativeTime);
 
         return $relativeTime;
     }

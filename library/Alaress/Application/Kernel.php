@@ -1094,9 +1094,6 @@ abstract class Kernel
                         )
                     );
 
-                    // Relative date function
-                    $twig->addFilter(new TwigFilter('relativeDate', new AlaressFilter\RelativeDate()));
-
                     // Global access to config object and localisation
                     // TODO capitalize globals
                     $twig->addGlobal('config', $config);
@@ -1374,8 +1371,7 @@ abstract class Kernel
                     ->addSubTranslator(new AssessmentDataModelTranslator\Quiz())
                     ->addSubTranslator(new AssessmentDataModelTranslator\Lti())
                     ->addSubTranslator(new AssessmentDataModelTranslator\LessonPlan())
-                    ->addSubTranslator(new AssessmentDataModelTranslator\Project($translator))
-                ;
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Project($translator));
                 return $translator;
             })
         );
@@ -1638,9 +1634,9 @@ abstract class Kernel
         // injectable module auth rules
         $di->set('rule:isLoggedIn', $di->lazyNew(Rule\IsLoggedIn::class));
         $di->set('rule:isSuperuser', $di->lazyNew(Rule\IsSuperuser::class));
-        $di->set('rule:isStaff', $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]));
-        $di->set('rule:isStudent', $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]));
-        $di->set('rule:isParent', $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]));
+        $di->set('rule:isStaff', $di->lazyNew(Rule\HasRole::class, ['role' => Role::STAFF]));
+        $di->set('rule:isStudent', $di->lazyNew(Rule\HasRole::class, ['role' => Role::STUDENT]));
+        $di->set('rule:isParent', $di->lazyNew(Rule\HasRole::class, ['role' => Role::PARENT]));
 
         // composite rules
         $di->set('rule:isStaffOrSuper', $di->lazy(function () use ($di) {
@@ -1897,7 +1893,7 @@ abstract class Kernel
             'lti.tools',
             $di->lazy(function () use ($mapperFactory) {
                 return $mapperFactory->get(ToolMapper::class)
-                                     ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3);
+                    ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3);
             })
         );
         $di->set(

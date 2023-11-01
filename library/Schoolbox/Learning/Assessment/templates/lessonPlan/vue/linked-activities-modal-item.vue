@@ -45,13 +45,11 @@ function toggleActivitySelection() {
         <div class="small-12 compact card wrap-down">
             <span :class="'icon-' + kebabCase(props.activity.assessmentType)"></span>
             <p>
-                <template v-if="props.projectActivity">
-                    {{ props.projectActivity.title }} |
-                </template>
+                <template v-if="props.projectActivity"> {{ props.projectActivity.title }} | </template>
                 {{ props.activity.title }}
             </p>
-            <p v-if="props.activity.closeAt !== null" class="meta">
-                <span class="unit-task-due-date"> Due {{ props.activity.closeAtFormatted }} </span>
+            <p v-if="props.activity.dueAt !== null" class="meta">
+                <span class="unit-task-due-date"> Due {{ props.activity.dueAtFormatted }} </span>
             </p>
         </div>
     </div>

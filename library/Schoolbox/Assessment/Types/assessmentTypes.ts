@@ -5,8 +5,8 @@ export type Activity = {
     projectName: string;
     assessmentType: string;
     assessments: Activity[] | null;
-    closeAt: string | null;
-    closeAtFormatted: string | null;
+    dueAt: string | null;
+    dueAtFormatted: string | null;
     _links: {
         status: string;
     };

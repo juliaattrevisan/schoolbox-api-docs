@@ -69,8 +69,8 @@ class UnitAssessments
             'course'            => $this->getCourseName($assessment),
             'unit'              => $assessment->getBaseContext()->getTitle(),
             'projectName'       => $projectName,
-            'closeAt'           => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
-            'closeAtFormatted'  => str_replace(' at 11:59pm', '', $assessment->getCloseAt()?->getRelativeDay()),
+            'dueAt'             => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
+            'dueAtFormatted'    => $assessment->getDueAt()?->getRelativeDayWithoutMidnight(),
             '_links'            => $links,
             'assessments'       => $assessments?->reindex()->map($this),
         ];

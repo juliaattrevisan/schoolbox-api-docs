@@ -61,8 +61,6 @@ to these globals:
   [date format](https://www.php.net/manual/en/datetime.format.php) to a format
   which [Day.js](https://day.js.org/) understands
 - `ireplace`: case-insensitive string replacement
-- `relativeDate`: output a date object in a format relative to now
-  (e.g. "today at 2:00pm")
 
 #### Globals
 - `config`: the instance's
