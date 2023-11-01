@@ -42,7 +42,6 @@ window.Vue.watch(
             gridTemplateRows: props.student.isMarked && !studentsStore.showMarkedAttempts ? "0fr" : "1fr",
             duration: 0.3,
             onStart: () => {
-                // debugger;
                 studentInnerContainerEl.value?.style.setProperty("overflow", "hidden");
             },
             onComplete: () => {

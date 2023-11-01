@@ -6,15 +6,18 @@
 import { useStudentsStore } from "../store/hmStudentsStore";
 
 const studentsStore = useStudentsStore();
+const containerHeight = window.Vue.ref("0fr");
 
 /**
- * To show/hide the entire student container, hiding if the student has been marked
+ * To show/hide the all marked container, showing if all the students have already been marked
  * and the option to show marked attempts is unchecked
- * @returns {string} - the height of the response container
  */
-const containerHeight = window.Vue.computed(() => {
-    return studentsStore.allStudentsMarked && !studentsStore.showMarkedAttempts ? "1fr" : "0fr";
-});
+window.Vue.watch(
+    () => studentsStore.showMarkedAttempts,
+    () => {
+        containerHeight.value = studentsStore.allStudentsMarked && !studentsStore.showMarkedAttempts ? "1fr" : "0fr";
+    }
+);
 </script>
 
 <template>
@@ -31,7 +34,7 @@ const containerHeight = window.Vue.computed(() => {
 <style lang="scss" scoped>
 .all-marked {
     grid-template-rows: v-bind(containerHeight);
-    transition: grid-template-rows 300ms;
+    transition: grid-template-rows 0.3s;
     &__inner-container {
         overflow: hidden;
     }
