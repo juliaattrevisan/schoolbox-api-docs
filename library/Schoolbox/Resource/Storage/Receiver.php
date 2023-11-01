@@ -127,6 +127,10 @@ class Receiver implements IReceiver
         // By default files uploaded this way are public
         $storage->setPublic($public);
 
+        // Run the virus scanner
+        $scanner = new Virus\Scanner();
+        $scanner->scan($tempLocation);
+
         $helper    = new Sanitizer\Helper($this->sanitizer);
         $sanitized = $helper->sanitize(
             $this->tempFilesystem,
