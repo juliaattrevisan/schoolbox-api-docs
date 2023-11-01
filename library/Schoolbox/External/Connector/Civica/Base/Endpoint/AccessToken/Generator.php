@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Civica\Base\Endpoint\AccessTokenJurisdiction;
+namespace Schoolbox\External\Connector\Civica\Base\Endpoint\AccessToken;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;

@@ -15,7 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
 use SensitiveParameter;
-use Schoolbox\External\Connector\Civica\Base\Endpoint\AccessTokenJurisdiction\Generator as AccessTokenJurisdictionGenerator;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
 
 /**
  * Class Api
@@ -47,6 +47,20 @@ class Api implements IApi
     private const NUM_RETRY = 3;
 
 
+
+    /**
+     * Decide how big each page size should be
+     * Civica's default response is 1000
+     */
+    private const PAGE_SIZE = 1000;
+
+
+    /**
+     * Maximum number of pages to obtain from an endpoint
+     * to safeguard against infinite loops
+     */
+    private const MAX_PAYLOADS = 100;
+
     /**
      * @var ApiUsage
      */
@@ -62,9 +76,10 @@ class Api implements IApi
      * A Veracross Access Token generator, in case you needed to
      * make a new one somewhere along the way
      *
-     * @var AccessTokenJurisdictionGenerator
+     * @var AccessTokenGenerator
      */
-    private AccessTokenJurisdictionGenerator $accessTokenJurisdictionGenerator;
+    private AccessTokenGenerator $accessTokenJurisdictionGenerator;
+    private AccessTokenGenerator $accessTokenSchoolGenerator;
 
 
     /**
@@ -125,11 +140,17 @@ class Api implements IApi
 
         /* Access Token Generator
          */
-        $this->accessTokenJurisdictionGenerator = new AccessTokenJurisdictionGenerator(
+        $this->accessTokenJurisdictionGenerator = new AccessTokenGenerator(
             $credentials['idp'],
             $credentials['username'],
             $credentials['password']
         );
+//        $this->accessTokenSchoolGenerator = new AccessTokenGenerator(
+//            $credentials['idp'],
+//            $credentials['usernameschool'],
+//            $credentials['passwordschool']
+//        );
+        $this->accessTokenSchoolGenerator = $this->accessTokenJurisdictionGenerator;
 
         $accessToken = ($this->accessTokenJurisdictionGenerator->generate())->getToken();
 
@@ -151,19 +172,73 @@ class Api implements IApi
     }
 
     /**
+     * Yield one page of the return payload per iteration,
+     * spawning new payloads while Civica has data for it
+     *
+     * You'll incur an API request cost when payload size equals page size,
+     * and the next request is empty. This is by Civica design, sadly,
+     * and you'll have paid for an empty payload. This is because when the
+     * payload == page size, you can't tell if there's more or if that's
+     * exactly the amount there was.
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param bool   $jurisdiction are we getting data from a school endpoint or Jurisdiction
+     * @param array  $params
+     * @param int    $pageSize
+     * @return \Generator
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function retrieve(string $method, string $endpoint, bool $jurisdiction = false, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    {
+        $pageNum = 1;
+        $payload = null;
+        $n = 0;
+
+        /* Iterate all pages from Civica.
+         *
+         * 1. Check base case, to prevent infinite loopage.
+         * 2. If you're requesting your first payload
+         * 3. The payload size == page size
+         */
+        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['values']) === self::PAGE_SIZE)) {
+            $params = array_merge($params, [
+                'pageNumber' => $pageNum,
+                'pageSize'  => $pageSize
+            ]);
+            $payload = $this->retrieveOne($method, $endpoint, $jurisdiction, $params);
+
+            $pageNum++;
+            $n++;
+
+            yield $payload;
+        }
+    }
+
+
+    /**
      * @inheritDoc
      *
      * @param string $method
      * @param string $endpoint
+     * @param bool $jurisdiction are we getting data from a school endpoint or Jurisdiction
      * @param array  $params
      * @return array
      * @throws \RuntimeException
      * @throws \DomainException
      * @throws \JsonException
      */
-    public function retrieve(string $method, string $endpoint, array $params = []): array
+    public function retrieveOne(string $method, string $endpoint, bool $jurisdiction = false, array $params = []): array
     {
         $response = null;
+        if ($jurisdiction) {
+            $endpoint = sprintf("%s/Jurisdiction", $endpoint);
+            $accessToken = ($this->accessTokenJurisdictionGenerator->generate())->getToken();
+        } else {
+            $accessToken = ($this->accessTokenSchoolGenerator->generate())->getToken();
+        }
 
         /* Record endpoint usage
          */
@@ -172,8 +247,6 @@ class Api implements IApi
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
         $fails = 0;
-
-        $accessToken = ($this->accessTokenJurisdictionGenerator->generate())->getToken();
 
         $headers = [
             'Authorization' => "Bearer {$accessToken}",
@@ -225,6 +298,20 @@ class Api implements IApi
                     }
 
                     return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    /* Couldn't decode json, or server refused something, or something else died
+                     * noop; just increase the $fails counter
+                     */
+                }
+            } elseif (404 === $response->getStatusCode()) {
+                try {
+                    /*
+                     * when iterating through pages and hit one with no data, you will get a 404 with some helpful body data
+                     */
+                    $content = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+                    if ('Endpoint was found but returned no results.' === $content['Error']) {
+                        return [];
+                    }
                 } catch (\JsonException $e) {
                     /* Couldn't decode json, or server refused something, or something else died
                      * noop; just increase the $fails counter

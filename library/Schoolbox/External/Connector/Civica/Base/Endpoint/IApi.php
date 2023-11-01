@@ -21,10 +21,11 @@ interface IApi
      *
      * @param string $method
      * @param string $endpoint
+     * @param bool   $jurisdiction are we getting data from a school endpoint or Jurisdiction
      * @param array  $params
-     * @return array
+     * @return \Generator
      */
-    public function retrieve(string $method, string $endpoint, array $params = []): array;
+    public function retrieve(string $method, string $endpoint, bool $jurisdiction = false, array $params = []): \Generator;
 
 
     /**
