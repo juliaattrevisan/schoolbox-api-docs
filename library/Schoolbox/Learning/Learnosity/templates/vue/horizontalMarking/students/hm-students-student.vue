@@ -3,6 +3,7 @@
  * Display a single student's responses
  */
 
+import { gsap } from "gsap";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
@@ -17,7 +18,10 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const studentEl = window.Vue.ref<HTMLDivElement | null>(null); //
+const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the entire student container
+const studentInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // the entire student container
+const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the response container
+const responseInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // the response container
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
@@ -27,9 +31,32 @@ const studentsStore = useStudentsStore();
  * and the option to show marked attempts is unchecked
  * @returns {string} - the height of the response container
  */
-const containerHeight = window.Vue.computed(() => {
-    return props.student.isMarked && !studentsStore.showMarkedAttempts ? "0fr" : "1fr";
-});
+// const containerHeight = window.Vue.computed(() => {
+//     return props.student.isMarked && !studentsStore.showMarkedAttempts ? "0fr" : "1fr";
+// });
+
+/**
+ * To show/hide the entire student container, hiding if the student has been marked
+ * and the option to show marked attempts is unchecked
+ */
+window.Vue.watch(
+    () => studentsStore.showMarkedAttempts,
+    () => {
+        gsap.to(studentEl.value, {
+            gridTemplateRows: props.student.isMarked && !studentsStore.showMarkedAttempts ? "0fr" : "1fr",
+            duration: 0.3,
+            onStart: () => {
+                studentInnerContainerEl.value?.style.setProperty("overflow", "hidden");
+            },
+            onComplete: () => {
+                // otherwise the ckeditor pop outs can be hidden
+                if (studentsStore.showMarkedAttempts) {
+                    studentInnerContainerEl.value?.style.setProperty("overflow", "visible");
+                }
+            },
+        });
+    }
+);
 
 /**
  * To show/hide the response when selected
@@ -39,14 +66,6 @@ function onToggleSelected() {
 }
 
 /**
- * To show/hide the response container
- * @returns {string} - the height of the response container
- */
-const responseHeight = window.Vue.computed(() => {
-    return props.student.isExpanded ? "1fr" : "0fr";
-});
-
-/**
  * Display the student now the linked report has been loaded
  */
 window.Vue.watch(
@@ -54,6 +73,28 @@ window.Vue.watch(
     async () => {
         onToggleSelected();
         await window.Vue.nextTick();
+    }
+);
+
+/**
+ * To show/hide the response container
+ */
+window.Vue.watch(
+    () => props.student.isExpanded,
+    () => {
+        gsap.to(responseEl.value, {
+            gridTemplateRows: props.student.isExpanded ? "1fr" : "0fr",
+            duration: 0.3,
+            onStart: () => {
+                responseInnerContainerEl.value?.style.setProperty("overflow", "hidden");
+            },
+            onComplete: () => {
+                // otherwise the ckeditor pop outs can be hidden
+                if (props.student.isExpanded) {
+                    responseInnerContainerEl.value?.style.setProperty("overflow", "visible");
+                }
+            },
+        });
     }
 );
 
@@ -71,8 +112,8 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="student l-grid">
-        <div class="student__inner-container">
+    <div ref="studentEl" class="student l-grid">
+        <div ref="studentInnerContainerEl" class="student__inner-container">
             <div ref="studentEl" class="c-island l-flex-col l-pad-m l-gap-m" :data-has-focus="props.student.hasFocus">
                 <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
                     <div class="l-flex-row l-flex--align-center l-gap-m">
@@ -110,8 +151,8 @@ window.Vue.watch(
                         </template>
                     </div>
                 </div>
-                <div class="response l-grid">
-                    <div class="response__inner-container">
+                <div ref="responseEl" class="response l-grid">
+                    <div ref="responseInnerContainerEl" class="response__inner-container">
                         <div ref="responseContentEl" class="response__content">
                             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
                             <div :id="props.student.elementId"></div>
@@ -138,8 +179,6 @@ window.Vue.watch(
 
 <style lang="scss" scoped>
 .student {
-    grid-template-rows: v-bind(containerHeight);
-    transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;
     }
@@ -156,8 +195,6 @@ window.Vue.watch(
     width: 2.5rem;
 }
 .response {
-    grid-template-rows: v-bind(responseHeight);
-    transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;
     }
