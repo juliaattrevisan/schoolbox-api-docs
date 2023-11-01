@@ -208,8 +208,6 @@ class Api
          */
         while ($fails < self::NUM_RETRY) {
             try {
-                throw new RateLimitException();
-
                 $response = (new DataApi())->request(
                     $url,
                     [
@@ -281,22 +279,15 @@ class Api
                  */
                 $napTime = self::NAP_TIMEOUT + pow(2, $fails) + $jitter;
 
-                new \Alaress_Probe(
-                    self::NAP_TIMEOUT,
-                    pow(2, $fails),
-                    random_int(self::JITTER_LOWER, self::JITTER_UPPER),
+                $this->logger->debug(sprintf(
+                    'Rate limit reached for Data API on request %s: napping for %s seconds',
+                    $fails,
                     $napTime
-                );
+                ));
 
-//                new \Alaress_Probe(sprintf(
-//                    'Rate limit reached for Data API on request %s: napping for %s seconds',
-//                    $fails,
-//                    $napTime
-//                ));
-
-//                /* Nack to sleep Jeffrey
-//                 */
-//                sleep($napTime);
+                /* Nack to sleep Jeffrey
+                 */
+                sleep($napTime);
 
                 continue;
             }
