@@ -92,8 +92,27 @@ class Helper
     private function reformatEvent(Value $currentEvent): array
     {
         $date = date('Y-m-d', strtotime($currentEvent->me['struct']['Date']->me['dateTime.iso8601']));
-        $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
-        $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
+
+        /* Sometimes StartTime isn't there...
+         * Sometimes EndTime isn't there...
+         *
+         * ...so start with an all-day default assumption, I guess, for lack
+         * of any other meaningful interpretation
+         */
+        $startDateTime = "{$date} 00:00:00";
+        $endDateTime = "{$date} 23:59:59";
+
+        /* If StartTime was provided amend accordingly
+         */
+        if (isset($currentEvent->me['struct']['StartTime']->me['string'])) {
+            $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
+        }
+
+        /* If EndTime was provided amend accordingly
+         */
+        if (isset($currentEvent->me['struct']['EndTime']->me['string'])) {
+            $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
+        }
 
         /* Recompile everything
          */
@@ -128,8 +147,16 @@ class Helper
         /* Assemble Students
          */
         if (isset($currentEvent->me['struct']['Students'])) {
-            foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
-                $restructured['students'][] = (string)$currentStudent->me['string'];
+            if (isset($currentEvent->me['struct']['Students']->me['string'])) {
+                /* Sometimes they're a csv...
+                 */
+                $restructured['students'] = explode(',', $currentEvent->me['struct']['Students']->me['string']);
+            } elseif (isset($currentEvent->me['struct']['Students']->me['array'])) {
+                /* Sometimes they're an array...
+                 */
+                foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
+                    $restructured['students'][] = (string)$currentStudent->me['string'];
+                }
             }
         }
 
