@@ -2,6 +2,7 @@
  # Introduction screen and list of previous attempts
  #
  # @param IAssessable $assessment              Our schoolbgox quiz instance
+ # @param Schoolbox\Learning\Quiz\Model $quiz  The representation of schoolbox.assess row
  # @param User $student                        The guy currently at the intro screen
  # @param Attempt\Model[] $attempts            A list of previous attempts
  # @param Attempt\Model|null $existingattempt  An attempt that hasn't been finished
@@ -28,7 +29,13 @@
                 <time>{{ assessment.durationNeatly(assessment.duration) }}</time>
             </li>
             <li class="icon-home" title="Homepage"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a></li>
-            <li class="icon-staff-students" title="Author"><!-- BEGIN author_link_open --><a href="/search/user/{ASSESS_AUTHOR_ID}"><!-- END author_link_open -->{ASSESS_AUTHOR}<!-- BEGIN author_link_close --></a><!-- END author_link_close --></li>
+            <li class="icon-staff-students" title="Author">{% apply spaceless %}
+                {% if quiz.user.deleted %}
+                    {{ quiz.user.fullname }}
+                {% else %}
+                    <a href="/search/user/{{ quiz.user.id }}">{{ quiz.user.fullname }}</a>
+                {% endif %}
+            {% endapply %}</li>
         </ul>
     </div>
     {% if statusRoute or modifyRoute or modifyContentsRoute %}

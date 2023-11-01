@@ -308,10 +308,11 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@learnosity/intro.twig', [
             'assessment' => $assessment,
+            'quiz' => $quiz,
             'student' => $student,
             'attempts' => $attempts,
             'existingAttempt' => $existingAttempt,
-            'plan' => $plan
+            'plan' => $plan,
         ], "Start {$assessment->getTitle()}");
     }
 
