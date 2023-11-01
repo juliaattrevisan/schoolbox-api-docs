@@ -7,8 +7,8 @@ import type { Results } from "../../../js/types/Results";
 import type { Result } from "../../../js/types/Result";
 import { useHasMoreResults } from "../composable/useHasMoreResults";
 
-export const RESULT_LIMIT = 10; // number of results returned by the api on a single call
-export const SUB_RESULT_LIMIT = 10; // number of sub results returned by the api on a single call
+export const RESULT_LIMIT = 10; // Number of results returned by the api on a single call (must match Search/Api/Controller::MAX_RESULT_LIMIT).
+export const SUB_RESULT_LIMIT = 10; // Number of sub results returned by the api on a single call (must match Search/Api/Controller::MAX_RESULT_LIMIT).
 const EMPTY_RESULTS = { data: [], metadata: { cursor: { next: "" } } }; // empty results to initialise the store
 
 export const useResultsStore = defineStore("spResults", () => {
