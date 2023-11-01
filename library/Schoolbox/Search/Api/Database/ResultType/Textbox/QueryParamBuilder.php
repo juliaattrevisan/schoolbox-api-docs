@@ -136,7 +136,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(): ?string
     {
-        return null;
+        return 'tb.created_by';
     }
 
     /**

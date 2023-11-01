@@ -58,6 +58,8 @@ class Controller extends Base
     public function createTextboxInFolder(Folder\Model $folder): void
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
+        $model->setCreatedAt(\Alaress_Date_Format::now());
+        $model->setCreatedBy($this->getUser()->getId());
         $this->mapper->save($model);
         $this->response = $this->responseAsJson($model);
     }
@@ -76,6 +78,8 @@ class Controller extends Base
     public function createTextboxInFolderAndComponent(Folder\Model $folder, Component_Instance $component): void
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
+        $model->setCreatedAt(\Alaress_Date_Format::now());
+        $model->setCreatedBy($this->getUser()->getId());
         $this->mapper->save($model);
 
 
@@ -125,6 +129,8 @@ class Controller extends Base
      */
     public function deleteTextbox(Model $textbox): void
     {
+        $textbox->setDeletedBy($this->getUser()->getId());
+        $this->mapper->save($textbox);
         $this->mapper->delete($textbox);
 
         // Empty response
@@ -142,6 +148,8 @@ class Controller extends Base
         $data = $this->request->getParsedBody();
         return $model->setHeading($data['heading'])
                      ->setBody($data['body'])
+                     ->setUpdatedAt(\Alaress_Date_Format::now())
+                     ->setUpdatedBy($this->getUser()->getId())
                      ->setDeletedAt(null);
     }
 

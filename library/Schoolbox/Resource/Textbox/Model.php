@@ -14,8 +14,11 @@ use Alaress\Json\Serializable;
 use Alaress\Json\SerializeTrait;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\CreatedBy;
+use Schoolbox\Mapper\Traits\Model\DeletedBy;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Model implements ISoftDeletable, Serializable
@@ -23,6 +26,10 @@ class Model implements ISoftDeletable, Serializable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use CreatedBy;
+    use UpdatedBy;
+    use DeletedBy;
+
     use SerializeTrait;
 
     /**
