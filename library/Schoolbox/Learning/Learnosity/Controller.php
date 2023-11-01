@@ -42,7 +42,14 @@ class Controller extends Base
     private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT = 300;
 
 
-
+    /**
+     * Some interactivities/questions/features are only available in certain plans
+     * we don't blacklist things we want to hide; we whitelist things we want to show
+     * because that's just...the way learnosity built it
+     *
+     * This means you have a bunch of random template_reference strings here which
+     * correspond to stuff that you can see on screen.
+     */
     private const LEARNOSITY_QUESTION_GROUP_PLANS = [
         'elite' => [
             'question_type_groups' => [
