@@ -46,7 +46,7 @@
                 {% if modifyRoute %}
                     {% if assessable is quiz %}
                         {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessable.id}) %}
-                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Quiz</a></li>
+                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
                         <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
                     {% else %}
                         <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>

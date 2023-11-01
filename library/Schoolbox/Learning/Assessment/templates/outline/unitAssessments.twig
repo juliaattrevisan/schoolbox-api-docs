@@ -141,7 +141,7 @@
                             {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                             {% if assessment is quiz %}
                                 {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessment.id}) %}
-                                <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify Quiz</a></li>
+                                <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify Settings</a></li>
                                 <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }} contents">Modify Contents</a></li>
                             {% else %}
                                 <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify</a></li>
