@@ -64,7 +64,7 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $keyword = trim((string)$this->requestQuery['keyword']) ?? '';
+        $keyword = trim((string)$this->requestQuery['keyword']);
         $filter  = $this->buildSearchFilter($this->requestQuery['filter'] ?? null, null);
         $limit   = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
         $cursor  = null;
