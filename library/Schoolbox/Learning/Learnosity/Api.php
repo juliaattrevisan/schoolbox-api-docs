@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity;
 
 use Alaress\Lumberjack\Logger;
+use Learning\Learnosity\RateLimitException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Request\DataApi;
 use LearnositySdk\Request\Init;
@@ -35,6 +36,33 @@ class Api
      */
     private const DATA_API_HOST_READ = 'https://data-au.learnosity.com/v2023.2.LTS/';
     private const DATA_API_HOST_WRITE = 'https://data-or.learnosity.com/v2023.2.LTS/';
+
+
+    /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     */
+    private const NAP_TIMEOUT = 3;
+
+
+    /**
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
+     */
+    private const NUM_RETRY = 5;
+
+
+    /**
+     * Jitter litter that gets appended to an exponential backoff
+     * to kind of randomise when a request can be retried, to prevent
+     * multiple requests inevitably occurring again at the same time
+     * to cause another rate limit
+     */
+    private const JITTER_LOWER = 1;
+    private const JITTER_UPPER = 3;
 
 
     /**
@@ -165,6 +193,7 @@ class Api
      * @throws ValidationException
      * @throws \JsonException
      * @throws \RuntimeException
+     * @throws \Exception
      */
     private function dataRequest(string $host, string $endpoint, array $payload, string $actionType): mixed
     {
@@ -172,35 +201,93 @@ class Api
          */
         $url = $host . trim($endpoint, '/');
 
-        $response = (new DataApi())->request(
-            $url,
-            [
-                'domain'       => $this->serverName,
-                'consumer_key' => $this->consumerKey
-            ],
-            $this->consumerSecret,
-            $payload,
-            $actionType
-        );
-
-        $json = $response->json();
-
-        /* There was some kind of error and you didn't get a valid json response
-         * The place where the json response would be contains some random text string instead
+        /* Mine out an error message if you try to access a thing that doesn't exist
          */
-        if (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
-            $errorPayload = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $fails = 0;
 
-            throw new \RuntimeException(sprintf(
-                "%s %s: %s.\n\nHTTP %s %s",
-                $actionType,
-                $url,
-                $errorPayload['meta']['message'],
-                $response->getStatusCode(),
-                $response->getBody()
-            ));
+        /* Try multiple times in case sis dies for a random reason
+         */
+        while ($fails < self::NUM_RETRY) {
+            try {
+                $response = (new DataApi())->request(
+                    $url,
+                    [
+                        'domain' => $this->serverName,
+                        'consumer_key' => $this->consumerKey
+                    ],
+                    $this->consumerSecret,
+                    $payload,
+                    $actionType
+                );
+
+                $json = $response->json();
+
+                if ($response->getStatusCode() === 429) {
+                    /* Rate Limit exceeded; take a nap for a while before trying again
+                     */
+                    throw new RateLimitException();
+                } elseif (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
+                    /* There was some kind of error and you didn't get a valid json response
+                     * The place where the json response would be contains some random text string instead
+                     */
+                    $errorPayload = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+                    /* Some other unrecoverable error; retrying won't help
+                     * Just surface this exception
+                     */
+                    throw new \RuntimeException(sprintf(
+                        "%s %s: %s.\n\nHTTP %s %s",
+                        $actionType,
+                        $url,
+                        $errorPayload['meta']['message'],
+                        $response->getStatusCode(),
+                        $response->getBody()
+                    ));
+                }
+
+                /* No exceptions/rate limits encountered:
+                 * leave with the data we requested
+                 *
+                 * Success!
+                 */
+                return $json;
+            } catch (RateLimitException $e) {
+                /* Rate limit reached; retry after napping
+                 */
+                $fails++;
+
+                /* "some random jitter" is randomly between 1 and 3 sec by default
+                 *
+                 * Sleep for 3+1 seconds (2^0) + some random jitter
+                 * then 3+2 seconds (2^1) + some random jitter
+                 * then 3+4 seconds (2^2) + some random jitter
+                 * then 3+8 seconds (2^3) + some random jitter
+                 * then 3+16 seconds (2^4) + some random jitter
+                 *
+                 * then give up after multiple full rate limited cycles
+                 */
+                $napTime = self::NAP_TIMEOUT + 2^$fails + random_int(self::JITTER_LOWER, self::JITTER_UPPER);
+
+                $this->logger->debug(sprintf(
+                    'Rate limit reached for Data API: napping for %s seconds',
+                    $napTime
+                ));
+
+                /* Nack to sleep Jeffrey
+                 */
+                sleep($napTime);
+
+                continue;
+            }
         }
 
-        return $json;
+        /* Couldn't recover
+         */
+        throw new \RuntimeException(sprintf(
+            '%s %s failed after %s retries',
+            $actionType,
+            $url,
+            self::NUM_RETRY
+        ));
     }
 }
