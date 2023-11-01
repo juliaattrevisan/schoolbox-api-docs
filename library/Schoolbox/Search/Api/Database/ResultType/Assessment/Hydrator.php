@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Html\ToText;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
@@ -128,7 +127,7 @@ class Hydrator extends BaseHydrator
                 }
 
                 $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
-                $assessmentContentTextOnly = (new ToText($assessmentContentHtml))->getText(); // Remove HTML tags.
+                $assessmentContentTextOnly = $this->htmlToText($assessmentContentHtml);
 
                 // Because the assessment content might contain HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
@@ -170,7 +169,7 @@ class Hydrator extends BaseHydrator
                         }
                     }
 
-                    $searchResultContext = (new ToText($searchResultContextHtml))->getText(); // Remove HTML tags.
+                    $searchResultContext = $this->htmlToText($searchResultContextHtml);
                 }
 
                 $assessmentCreator = $assessment->getCreator();

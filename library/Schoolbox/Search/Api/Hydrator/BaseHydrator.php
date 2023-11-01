@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Hydrator;
 
+use Alaress\Html\ToText;
 use Alaress\Image\Transformation\Storage;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Resource\Storage\IStorage;
@@ -79,6 +80,18 @@ abstract class BaseHydrator implements IHydrator
                     'size' => $size,
                 ])
             );
+    }
+
+    /**
+     * Convert HTML to text, being careful not to introduce any artifacts that could prevent the search from working.
+     * @param string $html - A full or partial HTML document.
+     * @returns string - A text-only representation of the supplied HTML.
+     */
+    public function htmlToText(string $html): string
+    {
+        // Set line width to zero (unrestricted) to avoid introducing newlines into the text-only string.
+        // Extra newlines prevent the search from working if the keyword spans multiple lines.
+        return (new ToText($html, ['width' => 0]))->getText();
     }
 
     /**

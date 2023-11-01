@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Event;
 
-use Alaress\Html\ToText;
 use Calendar;
 use Calendar\Event\Type\Day\Event as DayEvent;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -85,7 +84,7 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $eventDetailTextOnly = (new ToText($event->getDetail()))->getText();
+                $eventDetailTextOnly = $this->htmlToText($event->getDetail());
 
                 // Because the badge event detail HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').

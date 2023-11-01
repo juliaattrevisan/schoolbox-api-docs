@@ -11,7 +11,6 @@ namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Html\ToText;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -80,7 +79,7 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $badgeBodyTextOnly = (new ToText($badge->getBody()))->getText();
+                $badgeBodyTextOnly = $this->htmlToText($badge->getBody());
 
                 // Because the badge body contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').

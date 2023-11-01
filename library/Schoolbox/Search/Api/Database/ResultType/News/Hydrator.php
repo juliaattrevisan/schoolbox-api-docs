@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Html\ToText;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
@@ -122,8 +121,8 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $bodyTextOnly = (new ToText($article->getBody()))->getText();
-                $blurbTextOnly = (new ToText($article->getBlurb()))->getText();
+                $bodyTextOnly = $this->htmlToText($article->getBody());
+                $blurbTextOnly = $this->htmlToText($article->getBlurb());
 
                 // Because the article body and blurb can contain HTML, this match might have come about only because
                 // the keyword was found in HTML code that is invisible to the user (eg. 'style=').
