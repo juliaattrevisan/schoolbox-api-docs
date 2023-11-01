@@ -23,20 +23,12 @@ const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
 /**
- * To show/hide the response container
+ * To show/hide the entire student container, hiding if the student has been marked
+ * and the option to show marked attempts is unchecked
  * @returns {string} - the height of the response container
  */
 const containerHeight = window.Vue.computed(() => {
-    return "1fr";
-    // return props.student.isExpanded ? "1fr" : "0fr";
-});
-
-/**
- * The current item being displayed, loop through the student items to find the relevant one linked to the item via the reference
- * @returns {StudentItem} - the current item
- */
-const currentItem = window.Vue.computed(() => {
-    return props.student.items.find((item) => item.reference === itemsStore.activeItem.reference) as StudentItem;
+    return props.student.isMarked && !studentsStore.showMarkedAttempts ? "0fr" : "1fr";
 });
 
 /**

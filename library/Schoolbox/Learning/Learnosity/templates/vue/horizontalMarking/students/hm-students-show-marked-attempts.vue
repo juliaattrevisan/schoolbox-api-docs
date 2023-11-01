@@ -4,20 +4,22 @@
  */
 
 import { useStore } from "../store/horizontalMarkingStore";
-import { useItemsStore } from "../store/hmItemsStore";
+import { useStudentsStore } from "../store/hmStudentsStore";
 
 const store = useStore();
-const itemsStore = useItemsStore();
+const studentsStore = useStudentsStore();
 </script>
 
 <template>
     <div class="checklist">
         <ul class="option-list l-mar--0">
             <li>
-                <input id="show-marked-attempts" v-model="itemsStore.showMarkedAttempts" type="checkbox" /><label
-                    for="show-marked-attempts"
-                    >Show marked attempts</label
-                >
+                <input
+                    id="show-marked-attempts"
+                    v-model="studentsStore.showMarkedAttempts"
+                    type="checkbox"
+                    :disabled="!store.isLoaded"
+                /><label for="show-marked-attempts">Show marked attempts</label>
             </li>
         </ul>
     </div>

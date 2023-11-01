@@ -20,6 +20,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
     const isExpanded = window.Vue.ref<boolean>(true);
     const store = useStore();
+    const showMarkedAttempts = window.Vue.ref<boolean>(true);
+    const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked));
 
     /**
      * store any passed through properties
@@ -166,6 +168,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         addItems,
         students,
         isExpanded,
+        showMarkedAttempts,
+        allStudentsMarked,
         toggleStudent,
         toggleAllStudents,
         reportLoaded,

@@ -1,18 +1,13 @@
 <script setup lang="ts">
 /**
- * The list of students to display
+ * Display the latest attempt of any student who has submitted
  */
 
-import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsToggle from "./hm-students-toggle.vue";
 import HmStudentsShowMarkedAttempts from "./hm-students-show-marked-attempts.vue";
 import HmStudentsAllMarked from "./hm-students-all-marked.vue";
 import HmStudentsStudent from "./hm-students-student.vue";
-
-// const allStudentsAttempted = window.Vue.computed(() => {
-//     return useItemsStore().hideMarkedAttempts;
-// });
 
 const studentsStore = useStudentsStore();
 </script>
