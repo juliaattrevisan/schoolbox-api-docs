@@ -128,8 +128,16 @@ class Helper
         /* Assemble Students
          */
         if (isset($currentEvent->me['struct']['Students'])) {
-            foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
-                $restructured['students'][] = (string)$currentStudent->me['string'];
+            if (isset($currentEvent->me['struct']['Students']->me['string'])) {
+                /* Sometimes they're a csv...
+                 */
+                $restructured['students'] = explode(',', $currentEvent->me['struct']['Students']->me['string']);
+            } elseif (isset($currentEvent->me['struct']['Students']->me['array'])) {
+                /* Sometimes they're an array...
+                 */
+                foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
+                    $restructured['students'][] = (string)$currentStudent->me['string'];
+                }
             }
         }
 
