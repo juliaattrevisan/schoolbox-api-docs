@@ -23,6 +23,15 @@ const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
 /**
+ * To show/hide the response container
+ * @returns {string} - the height of the response container
+ */
+const containerHeight = window.Vue.computed(() => {
+    return "1fr";
+    // return props.student.isExpanded ? "1fr" : "0fr";
+});
+
+/**
  * The current item being displayed, loop through the student items to find the relevant one linked to the item via the reference
  * @returns {StudentItem} - the current item
  */
@@ -42,9 +51,6 @@ function onToggleSelected() {
  * @returns {string} - the height of the response container
  */
 const responseHeight = window.Vue.computed(() => {
-    // if (!itemsStore.showMarkedAttempts && currentItem.value?.isMarked) {
-    //     return "0fr";
-    // }
     return props.student.isExpanded ? "1fr" : "0fr";
 });
 
@@ -56,18 +62,6 @@ window.Vue.watch(
     async () => {
         onToggleSelected();
         await window.Vue.nextTick();
-    }
-);
-
-/**
- * Watch for any changes to determine whether to show toggle button
- */
-window.Vue.watch(
-    () => itemsStore.activeItem,
-    () => {
-        // if (props.student.hasFocus) {
-        //     studentEl.value?.scrollIntoView({ behavior: "smooth" });
-        // }
     }
 );
 
@@ -151,6 +145,13 @@ window.Vue.watch(
 </template>
 
 <style lang="scss" scoped>
+.student {
+    grid-template-rows: v-bind(containerHeight);
+    transition: grid-template-rows 300ms;
+    &__inner-container {
+        overflow: hidden;
+    }
+}
 .toggle-button {
     background: none;
     color: var(--content-ui-foreground);

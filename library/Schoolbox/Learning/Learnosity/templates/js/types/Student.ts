@@ -19,4 +19,5 @@ export type Student = {
     items: StudentItem[];
     attemptComment: StudentAttemptComment;
     urls: StudentUrls;
+    isMarked?: boolean;
 };

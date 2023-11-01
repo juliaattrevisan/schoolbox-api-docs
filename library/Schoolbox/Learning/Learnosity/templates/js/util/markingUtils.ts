@@ -2,6 +2,7 @@
  * Various marking utilities to help with marking, primarily to merge Learnosity data with Schoolbox data
  */
 
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
@@ -53,9 +54,17 @@ export function getAttemptResponse(attemptComments: StudentAttemptComment[], stu
  * @param {StudentItem} item - the item to check
  * @returns {boolean} - whether the item is marked
  */
-export function getIsMarked(item: StudentItem) {
-    const allQuestionsMarked = item.questions.every(($question) => $question.response.score !== null);
-    return allQuestionsMarked;
+export function getItemIsMarked(item: StudentItem) {
+    return item.questions.every(($question) => $question.response.score !== null);
+}
+
+/**
+ * Whether the student is marked, loop through all items and check if they are all marked
+ * @param {Student} student - the student to check
+ * @returns {boolean} - whether the student is marked
+ */
+export function getStudentIsMarked(student: Student) {
+    return student.items.every((item) => item.isMarked);
 }
 
 /**

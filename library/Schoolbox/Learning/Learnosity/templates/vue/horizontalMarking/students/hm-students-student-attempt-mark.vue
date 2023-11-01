@@ -48,9 +48,7 @@ const maxScore = window.Vue.computed(() => {
  * @returns {string} - the status
  */
 const status = window.Vue.computed(() => {
-    // loop through all items and check if all are marked
-    const allItemsMarked = props.student.items.every((item) => item.isMarked);
-    if (!allItemsMarked) {
+    if (!props.student.isMarked) {
         return StudentItemMarkTypes.NOT_MARKED;
     }
     if (totalScore.value === maxScore.value) {

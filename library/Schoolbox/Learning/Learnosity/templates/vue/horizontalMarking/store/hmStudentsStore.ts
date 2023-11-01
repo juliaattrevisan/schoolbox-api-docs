@@ -6,7 +6,13 @@ import { defineStore } from "pinia";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
-import { getItemQuestions, getAttemptResponse, getIsMarked, getUrls } from "@schoolboxLearnosity/js/util/markingUtils";
+import {
+    getItemQuestions,
+    getAttemptResponse,
+    getItemIsMarked,
+    getStudentIsMarked,
+    getUrls,
+} from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./horizontalMarkingStore";
 import { useItemsStore } from "./hmItemsStore";
 
@@ -53,8 +59,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             selectedStudent.items = studentItems;
             // need to do after as we rely on questions and responses being set first
             selectedStudent.items.forEach((item) => {
-                item.isMarked = getIsMarked(item);
+                item.isMarked = getItemIsMarked(item);
             });
+            selectedStudent.isMarked = getStudentIsMarked(selectedStudent);
             selectedStudent.attemptComment = getAttemptResponse(store.attemptComments, selectedStudent.id);
             selectedStudent.urls = getUrls(store.urls, selectedStudent.id);
         }
@@ -100,32 +107,30 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * To update the score of a response
+     * To update the score of a question
+     * @param {Student} student - the student to update
      * @param {StudentItem} item - the item that contains the question to update
      * @param {StudentItemQuestion} question - the question to update
      * @param {number} score - the score to update
      */
-    function updateItemResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
+    function updateItemResponseScore(
+        student: Student,
+        item: StudentItem,
+        question: StudentItemQuestion,
+        score: number
+    ) {
         question.response.score = score;
-        item.isMarked = getIsMarked(item);
+        item.isMarked = getItemIsMarked(item);
+        student.isMarked = getStudentIsMarked(student);
     }
 
     /**
-     * To update the comment of a response
+     * To update the comment of an item
      * @param {StudentItemQuestion} question - the question to update
      * @param {string} comment - the comment to update
      */
     function updateItemComment(question: StudentItemQuestion, comment: string) {
         question.response.comment = comment;
-    }
-
-    /**
-     * To update the mark status of the item
-     * @param {StudentItem} item - the item to update
-     * @param {boolean} isMarked - the score to update
-     */
-    function updateItemIsMarked(item: StudentItem, isMarked: boolean) {
-        item.isMarked = isMarked;
     }
 
     /**
@@ -166,7 +171,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         reportLoaded,
         updateItemResponseScore,
         updateItemComment,
-        updateItemIsMarked,
         updateAttemptComment,
         clearHasFocus,
     };

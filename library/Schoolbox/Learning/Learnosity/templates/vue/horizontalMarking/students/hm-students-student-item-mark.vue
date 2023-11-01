@@ -15,7 +15,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
-const studentsStore = useStudentsStore();
 const markEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 
 /**
@@ -26,21 +25,6 @@ const display = window.Vue.computed(() => {
 });
 
 /**
- * We need to directly query the returned DOM element as the only reliable way to check if the item is marked
- */
-// function checkIsMarked() {
-//     const statusElement = markEl.value?.querySelector("[data-status]");
-//     if (statusElement) {
-//         const status = statusElement.getAttribute("data-status") as string;
-//         const isMarked =
-//             status === StudentItemMarkTypes.CORRECT ||
-//             status === StudentItemMarkTypes.INCORRECT ||
-//             status === StudentItemMarkTypes.PARTIAL;
-//         studentsStore.updateItemIsMarked(props.item, isMarked);
-//     }
-// }
-
-/**
  * Move the item mark element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
@@ -49,7 +33,6 @@ window.Vue.onMounted(() => {
         (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
         markEl.value?.appendChild(mark);
         gsap.from(markEl.value, { duration: 0.3, opacity: 0 });
-        // checkIsMarked();
     }
 });
 

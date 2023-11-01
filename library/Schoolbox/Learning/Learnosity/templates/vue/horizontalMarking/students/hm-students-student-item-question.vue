@@ -29,7 +29,7 @@ async function saveScore() {
     if (score.value === "") {
         return;
     }
-    studentsStore.updateItemResponseScore(props.item, props.question, parseInt(score.value, 10));
+    studentsStore.updateItemResponseScore(props.student, props.item, props.question, parseInt(score.value, 10));
     const formData = new FormData();
     formData.append("learnosityReference", props.question.response.learnosityReference);
     formData.append("score", score.value);
