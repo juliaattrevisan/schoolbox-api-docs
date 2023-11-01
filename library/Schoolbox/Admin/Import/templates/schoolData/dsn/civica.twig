@@ -1,0 +1,41 @@
+{##
+ # Civica SUDS Configuration fragment
+ #
+ # A list of dsn pieces for this suds connector are provided by their key names already
+ # via the include of this template
+ #
+ # @param string|null $idp
+ # @param string|null $schoolid
+ # @param string|null $username
+ # @param string|null $password
+ #}
+<div data-data-source="civica" style="display:none">
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <h3>Civica Configuration</h3>
+
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <label class="required">IDP</label>
+                        <input type="text" class='required suds-crypto' name="dsn[civica][idp]" value="{{ idp ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label class="required">School ID</label>
+                        <input type="text" class='required suds-crypto' name="dsn[civica][schoolid]" value="{{ schoolid ?? ''}}" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <label class="required">Jurisdiction Username</label>
+                        <input type="text" class='required suds-crypto' name="dsn[civica][username]" value="{{ username ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label class="required">Jurisdiction Password</label>
+                        <input type="text" class='required suds-crypto' name="dsn[civica][password]" value="{{ password ?? ''}}" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </section>
+</div>

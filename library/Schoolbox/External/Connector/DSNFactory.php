@@ -55,6 +55,9 @@ class DSNFactory
 
             case \Schoolbox\External\Importer\Endpoint\Factory::VERACROSS:
                 return new \Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec\DSN();
+
+            case \Schoolbox\External\Importer\Endpoint\Factory::CIVICA:
+                return new \Schoolbox\External\Connector\Civica\Base\Endpoint\Codec\DSN();
         }
 
         return null;
