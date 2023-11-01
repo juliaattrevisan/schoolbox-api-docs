@@ -222,14 +222,16 @@ class Api
 
                 $json = $response->json();
 
+                /* Rate Limit exceeded; take a nap for a while before trying again
+                 */
                 if ($response->getStatusCode() === 429) {
-                    /* Rate Limit exceeded; take a nap for a while before trying again
-                     */
                     throw new RateLimitException();
-                } elseif (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
-                    /* There was some kind of error and you didn't get a valid json response
-                     * The place where the json response would be contains some random text string instead
-                     */
+                }
+
+                /* There was some kind of error and you didn't get a valid json response
+                 * The place where the json response would be contains some random text string instead
+                 */
+                if (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
                     $errorPayload = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
                     /* Some other unrecoverable error; retrying won't help
