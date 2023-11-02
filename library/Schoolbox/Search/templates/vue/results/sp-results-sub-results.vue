@@ -65,11 +65,8 @@ async function loadMore() {
     } else {
         useResultsStore().setMoreSubResults(loadedResults.data, props.result.id);
         moreResultsCount.value += 1;
-        // check if we have loaded all results yet
-        if (
-            props.result._subResults &&
-            props.result._subResults.data.length < RESULT_LIMIT * (moreResultsCount.value + 1)
-        ) {
+        // If cursor.next has not been supplied with the sub-results, we have loaded all sub-results.
+        if (props.result._subResults && props.result._subResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
         }
     }
