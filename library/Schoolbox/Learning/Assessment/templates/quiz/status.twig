@@ -196,16 +196,16 @@
             {% set buttons %}
                 {% if canDelete  %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt">Delete Attempt</a>{% endif %}
                 {% if canFinish  %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>{% endif %}
-                {% if canPublish %}<a class="button" data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>{% endif %}
+                {% if canPublish and latestResponse %}<a class="button" data-interaction-review="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: participant.user.id, learnositySessionReference: latestResponse.learnosityReference}) }}">Review Attempt</a>{% endif %}
             {% endset %}
         {% endapply %}
 
-    {% include '@learningAssessment/fragments/actionBar.twig' with {
-        actionStyle:  actionStyle,
-        massActions:  massActions,
-        buttons:      buttons,
-        participant:  participant
-    } only %}
+        {% include '@learningAssessment/fragments/actionBar.twig' with {
+            actionStyle:  actionStyle,
+            massActions:  massActions,
+            buttons:      buttons,
+            participant:  participant
+        } only %}
     </li>
 {% endblock %}
 

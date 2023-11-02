@@ -117,12 +117,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setAssessable((new Quiz())->setId($attempt->getQuiz()->getAssessmentModel()->getId()))
                 ->setSubmittedBy($attempt->getUser())
                 ->setSubmittedOnBehalfOf($attempt->getUser())
+                ->setLearnosityReference($attempt->getLearnosityReference())
                 ->setCreatedAt($attempt->getStart())
                 ->setSubmittedAt($attempt->getFinish())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($updatedAt)
             ;
-
             // TODO populate individual answers
             $quizResponses->add($response);
         }
@@ -161,6 +161,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setUser($domainObject->getSubmittedOnBehalfOf())
                 ->setStart($domainObject->getCreatedAt())
                 ->setFinish($domainObject->getUpdatedAt())
+                ->setLearnosityReference($domainObject->getLearnosityReference())
                 ->setDeleted($domainObject->getDeletedAt());
                 // TODO reviewed field probably needs to be set somehow
 //                ->setReviewed($domainObject->getPublishedAt());
