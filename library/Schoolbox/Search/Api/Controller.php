@@ -275,6 +275,7 @@ class Controller extends Base
                 break;
             }
         }
+
         return ['results' => $fullResults, 'nextCursor' => $nextCursor];
     }
 }
