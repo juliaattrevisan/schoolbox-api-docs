@@ -161,6 +161,17 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * To update the isMarked property of an item and student
+     * @param {Student} student - the student to update
+     * @param {StudentItem} item - the item to update
+     */
+    function updateIsMarked(student: Student, item: StudentItem) {
+        item.isMarked = getItemIsMarked(item);
+        student.isMarked = getStudentIsMarked(student);
+        updateItemsIsMarked();
+    }
+
+    /**
      * To update the score of a question
      * @param {Student} student - the student to update
      * @param {StudentItem} item - the item that contains the question to update
@@ -175,9 +186,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     ) {
         question.response.score = score;
         question.response.isMarked = true;
-        item.isMarked = getItemIsMarked(item);
-        student.isMarked = getStudentIsMarked(student);
-        updateItemsIsMarked();
+        updateIsMarked(student, item);
     }
 
     /**
@@ -192,10 +201,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(($question) => $question.response.maxScore === null);
         questionsWithoutMaxScore.forEach(($question) => {
-            $question.response.isMarked = comment !== null && comment !== "";
+            $question.response.isMarked = true;
         });
-        item.isMarked = getItemIsMarked(item);
-        student.isMarked = getStudentIsMarked(student);
+        updateIsMarked(student, item);
     }
 
     /**
@@ -206,25 +214,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     function updateAttemptComment(student: Student, comment: string) {
         student.attemptComment.comment = comment;
     }
-
-    /**
-     * To clear the focus from all students
-     */
-    function clearHasFocus() {
-        students.value.forEach((student) => {
-            student.hasFocus = false;
-        });
-    }
-
-    /**
-     * Clear focus every time a change is made, progressReport will set the focus to the next student
-     */
-    window.Vue.watch(
-        () => useItemsStore().activeItem,
-        () => {
-            clearHasFocus();
-        }
-    );
 
     return {
         init,
@@ -239,6 +228,5 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         updateItemResponseScore,
         updateItemComment,
         updateAttemptComment,
-        clearHasFocus,
     };
 });

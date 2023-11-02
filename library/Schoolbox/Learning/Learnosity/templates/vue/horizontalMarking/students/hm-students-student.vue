@@ -93,24 +93,12 @@ window.Vue.watch(
         });
     }
 );
-
-/**
- * Highlight that focus has shifted to this student to prompt marking
- */
-window.Vue.watch(
-    () => props.student.hasFocus,
-    () => {
-        if (props.student.hasFocus) {
-            studentEl.value?.scrollIntoView({ behavior: "smooth" });
-        }
-    }
-);
 </script>
 
 <template>
     <div ref="studentEl" class="student l-grid">
         <div ref="studentInnerContainerEl" class="student__inner-container">
-            <div ref="studentEl" class="c-island l-flex-col l-pad-m l-gap-m" :data-has-focus="props.student.hasFocus">
+            <div ref="studentEl" class="c-island l-flex-col l-pad-m l-gap-m">
                 <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
                     <div class="l-flex-row l-flex--align-center l-gap-m">
                         <button
@@ -201,25 +189,6 @@ window.Vue.watch(
     &__content {
         // this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items
         display: none;
-    }
-}
-
-[data-has-focus="true"] {
-    @extend .change-animation;
-    animation-name: hasFocusAnimation;
-}
-
-.change-animation {
-    animation-duration: 2s;
-    animation-iteration-count: 1;
-}
-
-@keyframes hasFocusAnimation {
-    0% {
-        background-color: var(--content-ui-selected);
-    }
-    100% {
-        background-color: var(--foreground-colour);
     }
 }
 </style>
