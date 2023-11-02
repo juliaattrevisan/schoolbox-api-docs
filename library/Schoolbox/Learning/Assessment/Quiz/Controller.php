@@ -307,8 +307,10 @@ class Controller extends Assessment\Controller
             /* All the older summary screen stuff is below
              */
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
-            'canAttempt' => $canAttempt,
+            /* What is this andyland stuff?
+             */
             // User may only attempt quiz from here if viewing own summary
+            'canAttempt' => $canAttempt,
             'canReview' => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
             'canStudentReview' => $actionValidator->canReviewAttemptsReadonly(
                 $this->getUser(),
