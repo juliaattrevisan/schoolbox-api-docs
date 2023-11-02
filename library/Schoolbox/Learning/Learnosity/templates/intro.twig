@@ -14,7 +14,7 @@
 <script src="https://items-au.learnosity.com/?v2023.2.LTS"></script>
 
 {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
-{% set modifySettingsRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+{% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
 {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessment.id}) %}
 
 <div class="actions-small-2 row">
@@ -46,7 +46,7 @@
         {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}">View Status</a></li>{% endif %}
 
         {# Learnosity Quiz has two parts: Modify Settings and Modify Contents #}
-        {% if modifySettingsRoute %}<li><a class="icon-modify" href="{{ modifySettingsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>{% endif %}
+        {% if modifyRoute %}<li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>{% endif %}
         {% if modifyContentsRoute %}<li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>{% endif %}
     </ul>
     {% endif %}
