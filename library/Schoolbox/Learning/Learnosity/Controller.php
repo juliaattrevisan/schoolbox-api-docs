@@ -20,12 +20,10 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -266,58 +264,6 @@ class Controller extends Base
 
 
     /**
-     * Just use our Welcome screen for now
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @return void
-     * @throws Deleted
-     * @throws Error
-     * @throws Exception
-     * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function getIntro(IAssessable $assessment, \Schoolbox\User $student): void
-    {
-        /* The intro also has a list of attempts from which you can resume.
-         * We can do this by using the Learnosity session id in getAttempt()
-         */
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
-        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
-            'order' => [
-                'start' => 'desc'
-            ]
-        ]);
-
-        /* Decide if there was an existing attempt, to rename the call to action
-         */
-        $existingAttempt = $this->attemptMapper->findExistingUnfinished($assessment->getId(), $student->getId());
-
-        /* Special case: participation isn't guaranteed at this point
-         * so we can't get a Plan in all cases e.g. visiting from Course Import as an instructor
-         */
-        $plan = [];
-
-        // Does session user have a participation? If so, use CAP details.
-        $participant         = $assessment->getParticipantIfExtant($student);
-        $plan['description'] = trim($participant ? $participant->getDescription() : $assessment->getDescription());
-        $plan['start']       = $participant ? $participant->getOpenDate() : $assessment->getOpenAt();
-        $plan['finish']      = $participant ? $participant->getDueDate() : $assessment->getDueAt();
-        $plan['close']       = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
-
-        $this->response = $this->responseFromTemplate('@learnosity/intro.twig', [
-            'assessment' => $assessment,
-            'quiz' => $quiz,
-            'student' => $student,
-            'attempts' => $attempts,
-            'existingAttempt' => $existingAttempt,
-            'plan' => $plan,
-        ], "Start {$assessment->getTitle()}");
-    }
-
-
-    /**
      * Let a student do an attempt in a Learnosity quiz
      *
      * @param IAssessable $assessment
@@ -382,7 +328,7 @@ class Controller extends Base
                      * saves your session ahd kicks you out, I guess? At least it
                      * can prompt you to Resume Quiz from there.
                      */
-                    'onsave_redirect_url' => $this->router->getGenerator()->generate('learnosity.getIntro', [
+                    'onsave_redirect_url' => $this->router->getGenerator()->generate('learningAssessment.getSummary', [
                         'assessmentId' => $assessment->getId(),
                         'studentId' => $student->getId(),
                     ]),
