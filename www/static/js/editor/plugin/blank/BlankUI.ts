@@ -7,7 +7,6 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import fontBackgroundColorIcon from "@ckeditor/ckeditor5-font/theme/icons/font-background.svg";
 import { MAKE_BLANK } from "./Blank";
-import { getCopyOnEnterAttributes } from "@ckeditor/ckeditor5-enter/src/utils";
 
 export default class BlankUI extends Plugin {
     /**

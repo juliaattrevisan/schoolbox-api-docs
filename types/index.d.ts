@@ -21,6 +21,8 @@ declare global {
             imageLightboxLicenseKey: string;
             imageSlideshows: { [key: string]: any };
             colourDefaults: { [key: string]: any };
+            MAX_BYTES_MYSQL_TEXT: number;
+            MAX_BYTES_MYSQL_MEDIUMTEXT: number;
         };
         schoolboxUser: {
             id: number;

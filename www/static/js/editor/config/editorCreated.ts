@@ -10,7 +10,6 @@ import { insertWordCount } from "@js/editor/settings/wordCountSettings";
 /**
  * Add the editor to the global scope so it can be accessed
  * in other twig files etc
- *
  * @param { Editor } editor - the CKEditor instance
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  */
@@ -25,7 +24,6 @@ function addToGlobalScope(editor: Editor, sourceElement: HTMLElement) {
 /**
  * For the simple editor, we need to disable the drag and drop
  * and the ability for the editor to auto embed media
- *
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
@@ -39,7 +37,6 @@ function disableAutoMedia(editor: Editor, config: EditorConfig) {
 /**
  * Prevent jquery.validator trying to access ckeditor instances
  * as it throws an error on focus in / out
- *
  * @todo - review this, there may be a better way to handle this
  */
 function removeValidation() {
@@ -52,7 +49,6 @@ function removeValidation() {
 
 /**
  * Once the iFramely script has loaded, we can add in the event listener
- *
  * @param { Editor } editor - the CKEditor instance
  */
 function onIframelyLoaded(editor: Editor) {
@@ -88,7 +84,6 @@ function onIframelyLoaded(editor: Editor) {
 /**
  * Add the iFramely embed code in order for iframe embeds to work
  * For more info: https://iframely.com/docs/ckeditor
- *
  * @param { EditorConfig } config - the CKEditor config object
  * @param { Editor } editor - the CKEditor instance
  */
@@ -113,7 +108,6 @@ async function addIframelyEmbed(config: EditorConfig, editor: Editor) {
  * The process.env.NODE_ENV is built into node/webpack:
  * https://webpack.js.org/configuration/mode/
  * so it will only be imported in development mode, not in production
- *
  * @param { Editor } editor - the CKEditor instance
  */
 async function attachInspector(editor: Editor) {

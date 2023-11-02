@@ -1,6 +1,5 @@
 /**
  * Returns the settings for the Images
- *
  * @todo - there's currently an issue with preserving extra attributes on the imageBlock element
  * as imageInline appears to work fine, all images are currently set to imageInline, so all imageBlock
  * related functionality is currently disabled
@@ -69,7 +68,6 @@ export function getImageSettings() {
  * Add the data-schoolboxresource-fullwidth attribute to any images that have the class full-width
  * This is so any images marked full width in CKEditor 4 are also marked full width in CKEditor 5,
  * so the full width UI is accruate
- *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - the sourceElement content as HTML with the data-schoolboxresource-fullwidth attribute added to any images that have the class full-width
  */
@@ -86,7 +84,6 @@ export function addFullWidthAttributes(sourceElementHTML: HTMLElement) {
 /**
  * The height style property was added to video thumbnails in CKEditor 4, however in CKEditor 5
  * it interferes with the resize widget and can create display issues if the thumbnail is resized.
- *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - the sourceElement content as HTML with the height style property removed from any video thumbnails
  */

@@ -3,7 +3,7 @@
  * dragged and dropped into the editor
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
 import { slideUp } from "@js/util/animateUtils";
 import { isHtmlIncluded } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";

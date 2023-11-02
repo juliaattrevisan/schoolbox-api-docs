@@ -9,7 +9,6 @@ import { removeParagraphsInLists } from "@js/editor/settings/listSettings";
 
 /**
  * Parse the content as HTML so we can run .querySelectorAll etc on it
- *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @returns { HTMLElement } - the sourceElement content as HTML
  */

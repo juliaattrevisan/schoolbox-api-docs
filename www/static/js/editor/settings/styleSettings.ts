@@ -1,6 +1,5 @@
 /**
  * Returns the settings for the Styles dropdown
- *
  * @returns { object } - the style settings
  */
 export function getStyleSettings() {

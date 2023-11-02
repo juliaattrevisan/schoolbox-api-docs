@@ -2,7 +2,7 @@
  * Handles the insertion of a resource into the editor
  */
 
-import Command from "@ckeditor/ckeditor5-core/src/command";
+import { Command } from "@ckeditor/ckeditor5-core";
 import { addResource } from "./resourceUtils";
 import type { Resource } from "./resourceUtils";
 

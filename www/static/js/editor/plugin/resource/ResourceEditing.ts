@@ -7,9 +7,10 @@
  * related functionality is currently disabled
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
 import InsertResourceCommand from "./InsertResourceCommand";
 import { ResourceType, getExtraAttributes } from "./resourceUtils";
+
 export default class ResourceEditing extends Plugin {
     /**
      * Runs on startup, defines the schema and converters

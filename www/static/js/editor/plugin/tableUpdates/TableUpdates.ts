@@ -3,7 +3,7 @@
  * back inline with CKEditor4, which our users are used to.
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
 
 export default class TableUpdates extends Plugin {
     isCK5Attribute = "data-is-ckeditor5-table";

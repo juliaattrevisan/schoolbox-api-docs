@@ -3,8 +3,8 @@
  * within the SB context should be added here.
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { getOptimalPosition } from "@ckeditor/ckeditor5-utils/";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import { getOptimalPosition } from "@ckeditor/ckeditor5-utils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 
 export default class PanelTweaks extends Plugin {

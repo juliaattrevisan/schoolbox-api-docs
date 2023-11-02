@@ -3,8 +3,8 @@
  * and to trigger he insertResource command on selection
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import { ButtonView } from "@ckeditor/ckeditor5-ui";
 import { insertElementAfter } from "@js/util/domUtils";
 
 export default class ResourceUI extends Plugin {

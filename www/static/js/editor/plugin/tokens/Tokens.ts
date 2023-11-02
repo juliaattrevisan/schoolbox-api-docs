@@ -3,7 +3,7 @@
  * an alternative to using the @mention plugin inline
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
 import TokensUI from "./TokensUI";
 
 export default class Tokens extends Plugin {

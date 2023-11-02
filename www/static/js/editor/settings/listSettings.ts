@@ -1,7 +1,6 @@
 /**
  * As <p> tags with <li> are stripped from CKditor5, we should remove them prior to their instertion.
  * Otherwise the <li> tags are stripped instead, which results in the loss of the list.
- *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - the html with the <p> tags removed from the <li> tags
  */

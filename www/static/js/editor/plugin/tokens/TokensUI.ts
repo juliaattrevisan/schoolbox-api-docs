@@ -3,9 +3,9 @@
  *
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui/src/dropdown/utils";
-import Collection from "@ckeditor/ckeditor5-utils/src/collection";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui";
+import { Collection } from "@ckeditor/ckeditor5-utils";
 import Model from "@ckeditor/ckeditor5-ui/src/model";
 
 /**

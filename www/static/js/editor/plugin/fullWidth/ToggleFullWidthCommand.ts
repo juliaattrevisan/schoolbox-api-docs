@@ -2,7 +2,7 @@
  * Handles the toggling on/off to make the selected media full width
  */
 
-import Command from "@ckeditor/ckeditor5-core/src/command";
+import { Command } from "@ckeditor/ckeditor5-core";
 
 export default class ToggleFullWidthCommand extends Command {
     constructor(editor) {

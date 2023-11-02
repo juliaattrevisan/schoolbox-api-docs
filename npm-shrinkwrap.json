@@ -13,6 +13,7 @@
                 "@ckeditor/ckeditor5-alignment": "~40.0.0",
                 "@ckeditor/ckeditor5-basic-styles": "~40.0.0",
                 "@ckeditor/ckeditor5-block-quote": "~40.0.0",
+                "@ckeditor/ckeditor5-core": "~40.0.0",
                 "@ckeditor/ckeditor5-editor-classic": "~40.0.0",
                 "@ckeditor/ckeditor5-essentials": "~40.0.0",
                 "@ckeditor/ckeditor5-find-and-replace": "~40.0.0",
@@ -33,7 +34,9 @@
                 "@ckeditor/ckeditor5-style": "~40.0.0",
                 "@ckeditor/ckeditor5-table": "~40.0.0",
                 "@ckeditor/ckeditor5-theme-lark": "~40.0.0",
+                "@ckeditor/ckeditor5-ui": "~40.0.0",
                 "@ckeditor/ckeditor5-upload": "~40.0.0",
+                "@ckeditor/ckeditor5-utils": "~40.0.0",
                 "@ckeditor/ckeditor5-widget": "~40.0.0",
                 "@ckeditor/ckeditor5-word-count": "~40.0.0",
                 "@floating-ui/dom": "^1.4.5",
@@ -14335,37 +14338,6 @@
             "integrity": "sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==",
             "engines": {
                 "node": ">=0.8.0"
-            }
-        },
-        "node_modules/escodegen": {
-            "version": "1.14.3",
-            "resolved": "https://registry.npmjs.org/escodegen/-/escodegen-1.14.3.tgz",
-            "integrity": "sha512-qFcX0XJkdg+PB3xjZZG/wKSuT1PnQWx57+TVSjIMmILd2yC/6ByYElPwJnslDsuWuSAp4AwJGumarAAmJch5Kw==",
-            "dev": true,
-            "dependencies": {
-                "esprima": "^4.0.1",
-                "estraverse": "^4.2.0",
-                "esutils": "^2.0.2",
-                "optionator": "^0.8.1"
-            },
-            "bin": {
-                "escodegen": "bin/escodegen.js",
-                "esgenerate": "bin/esgenerate.js"
-            },
-            "engines": {
-                "node": ">=4.0"
-            },
-            "optionalDependencies": {
-                "source-map": "~0.6.1"
-            }
-        },
-        "node_modules/escodegen/node_modules/estraverse": {
-            "version": "4.3.0",
-            "resolved": "https://registry.npmjs.org/estraverse/-/estraverse-4.3.0.tgz",
-            "integrity": "sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==",
-            "dev": true,
-            "engines": {
-                "node": ">=4.0"
             }
         },
         "node_modules/eslint": {
@@ -31113,6 +31085,25 @@
                     "integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
                     "dev": true
                 },
+                "escodegen": {
+                    "version": "1.14.3",
+                    "resolved": "https://registry.npmjs.org/escodegen/-/escodegen-1.14.3.tgz",
+                    "integrity": "sha512-qFcX0XJkdg+PB3xjZZG/wKSuT1PnQWx57+TVSjIMmILd2yC/6ByYElPwJnslDsuWuSAp4AwJGumarAAmJch5Kw==",
+                    "dev": true,
+                    "requires": {
+                        "esprima": "^4.0.1",
+                        "estraverse": "^4.2.0",
+                        "esutils": "^2.0.2",
+                        "optionator": "^0.8.1",
+                        "source-map": "~0.6.1"
+                    }
+                },
+                "estraverse": {
+                    "version": "4.3.0",
+                    "resolved": "https://registry.npmjs.org/estraverse/-/estraverse-4.3.0.tgz",
+                    "integrity": "sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==",
+                    "dev": true
+                },
                 "fs-extra": {
                     "version": "8.1.0",
                     "resolved": "https://registry.npmjs.org/fs-extra/-/fs-extra-8.1.0.tgz",
@@ -40065,27 +40056,6 @@
             "version": "1.0.5",
             "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz",
             "integrity": "sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg=="
-        },
-        "escodegen": {
-            "version": "1.14.3",
-            "resolved": "https://registry.npmjs.org/escodegen/-/escodegen-1.14.3.tgz",
-            "integrity": "sha512-qFcX0XJkdg+PB3xjZZG/wKSuT1PnQWx57+TVSjIMmILd2yC/6ByYElPwJnslDsuWuSAp4AwJGumarAAmJch5Kw==",
-            "dev": true,
-            "requires": {
-                "esprima": "^4.0.1",
-                "estraverse": "^4.2.0",
-                "esutils": "^2.0.2",
-                "optionator": "^0.8.1",
-                "source-map": "~0.6.1"
-            },
-            "dependencies": {
-                "estraverse": {
-                    "version": "4.3.0",
-                    "resolved": "https://registry.npmjs.org/estraverse/-/estraverse-4.3.0.tgz",
-                    "integrity": "sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==",
-                    "dev": true
-                }
-            }
         },
         "eslint": {
             "version": "8.41.0",

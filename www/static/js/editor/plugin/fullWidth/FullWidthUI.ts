@@ -3,8 +3,8 @@
  * and to trigger the toggleFullWidth command on selection
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import { ButtonView } from "@ckeditor/ckeditor5-ui";
 
 export default class FullWidthUI extends Plugin {
     /**
