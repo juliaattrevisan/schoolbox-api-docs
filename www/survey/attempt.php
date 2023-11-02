@@ -99,7 +99,7 @@ if (!is_numeric($attempt['attempt_id'])) {
 
 /* Check if Attempt ran out of time
  */
-if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Survey_Main::UNLIMITED_DURATION)) {
     error(122);
 }
 
