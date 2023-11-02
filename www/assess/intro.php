@@ -131,7 +131,7 @@ exit;
 //        $attemptEndTime       = $attemptStartTime + $assess['duration'];
 //        if (($attemptTimeRemaining < 0)
 //            && ($attemptStartTime > 0)
-//            && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)
+//            && ($assess['duration'] != Evaluation_Main::UNLIMITED_DURATION)
 //        ) {
 //            // Close off the last attempt first (at the time it would have ended naturally)
 //            $closeTime = new Alaress_Date_Format($attemptEndTime, 'U');
@@ -199,7 +199,7 @@ exit;
 //    'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
 //    'ASSESS_FOLDER' => Scrub::text($folder->getName() . ($folder->getCodeString() ? ' ('.$folder->getCodeString().')': '')),
 //    'ASSESS_FOLDER_ID' => $folder->getId(),
-//    'ASSESS_DURATION' => (int)$assess['duration'] === Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms((int)$assess['duration']),
+//    'ASSESS_DURATION' => (int)$assess['duration'] === Evaluation_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms((int)$assess['duration']),
 //    'READ_ONLY' => $readOnly,
 //));
 //

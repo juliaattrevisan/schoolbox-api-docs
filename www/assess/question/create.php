@@ -155,7 +155,7 @@ if (!empty($_POST)) {
         'ASSESS_KIND'           => 'Quiz',
         'ASSESS_CATEGORY_ID'    => $folder->getId(),
         'ASSESS_CATEGORY_NAME'  => Scrub::text($folder->getName()),
-        'ASSESS_DURATION'       => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+        'ASSESS_DURATION'       => $assess['duration'] == Evaluation_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
         'SECTION_ID'            => $this->arg[0],
         'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
         'SEQUENCE'              => $questionHandler->getNextSequence($section['section_id']),

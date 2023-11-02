@@ -135,7 +135,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             if (
                                 !$attempt['finish']
                                 && ($attemptTimeRemaining < 0
-                                    || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION
+                                    || $currentSurvey['duration'] == Evaluation_Main::UNLIMITED_DURATION
                                 )
                             ) {
                                 $this->setVar(

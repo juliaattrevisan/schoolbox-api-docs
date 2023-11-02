@@ -127,7 +127,7 @@ if (!is_numeric($attempt['attempt_id'])) {
 
 /* Check if Attempt ran out of time
  */
-if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Evaluation_Main::UNLIMITED_DURATION)) {
     SitePage::localRedir('/assess/end/' . $assess['assess_id']);
 }
 
@@ -155,7 +155,7 @@ $this->setVar(array(
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_ID' => $attempt['attempt_id'],
     'ATTEMPT_START' => $attemptStartDate->getShort(),
-    'ATTEMPT_END' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
+    'ATTEMPT_END' => $assess['duration'] == Evaluation_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
     'SECTION_TITLE' => Scrub::text($section['title']),
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
     'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
