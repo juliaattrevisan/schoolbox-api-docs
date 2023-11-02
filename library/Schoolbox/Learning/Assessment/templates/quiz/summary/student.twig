@@ -9,7 +9,9 @@
  # @param array $plan                          A set of dates for custom assessment participation
  # @param array $breadcrumbs                   A trail of breadcrumbs
  # @param bool $canAttempt                     Whether users can start/resume attempts
-#}
+ # @param bool $canReview                      Whether users can provide feedback on an attempt
+ # @param bool $canStudentReview               Whether users can see what they responded with, in their attempt
+ #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
@@ -143,13 +145,16 @@
                             —
                         {% endif %}
                     </td>
-                    <td class="actions-small-3">
+                    <td class="actions-small-2">
                         <nav>
                             {% if not finished and canAttempt %}
                                 <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                             {% else %}
-                                <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
-                                <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                                {% if canStudentReview %}
+                                    <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
+                                {% elseif canReview %}
+                                    <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                                {% endif %}
                             {% endif %}
 
                             {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
