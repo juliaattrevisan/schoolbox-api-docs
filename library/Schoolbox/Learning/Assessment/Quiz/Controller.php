@@ -243,7 +243,10 @@ class Controller extends Assessment\Controller
          */
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
-        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
+        $attempts = $this->attemptMapper->findByColumnList([
+            'assess_id' => $quiz->getId(),
+            'user_id' => $student->getId()
+        ], [
             'order' => [
                 'start' => 'desc'
             ]
