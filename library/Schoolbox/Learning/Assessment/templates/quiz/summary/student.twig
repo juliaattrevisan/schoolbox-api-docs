@@ -69,25 +69,19 @@
             </section>
         {% endif %}
     </div>
-</div>
 
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <article>{{ assessment.description | purify }}</article>
-        </section>
-
+    {# Start/Resume an attempt #}
+    {% if canAttempt %}
+    <div class="small-12 columns">
         {# Decide the name of the start button #}
         {% set callToAction = 'Start Quiz' %}
 
         {% if existingAttempt %}
             {% set callToAction = 'Resume Quiz' %}
         {% endif %}
-
-        {% if canAttempt %}
         <a class="button submit" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}">{{ callToAction }}</a>
-        {% endif %}
     </div>
+    {% endif %}
 </div>
 
 {# This is mostly a direct steal from the existing quiz/summary.twig #}
