@@ -24,7 +24,9 @@
             <!-- BEGIN has_assess_due -->
             <li class="icon-calendar" title="Due">Due <time>{{ plan.finish.short }}</time></li>
             <!-- END has_assess_due -->
-            <li class="icon-time-value" title="Allowed Time">Allowed time: <time>{ASSESS_DURATION}</time></li>
+            <li class="icon-time-value" title="Allowed Time">Allowed time:
+                <time>{{ assessment.durationNeatly(assessment.duration) }}</time>
+            </li>
             <li class="icon-home" title="Homepage"><a href="/homepage/{ASSESS_FOLDER_ID}">{ASSESS_FOLDER}</a></li>
             <li class="icon-staff-students" title="Author"><!-- BEGIN author_link_open --><a href="/search/user/{ASSESS_AUTHOR_ID}"><!-- END author_link_open -->{ASSESS_AUTHOR}<!-- BEGIN author_link_close --></a><!-- END author_link_close --></li>
         </ul>
