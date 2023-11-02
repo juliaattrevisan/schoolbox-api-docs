@@ -18,12 +18,17 @@ use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -117,12 +122,24 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     * @param Factory $urlFactory
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentDataSource
+     * @param Mapper $resultCacheMapper
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
+     * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+     * @param Feedback\Mapper $feedbackMapper
+     * @throws \DomainException
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
+        private AssessmentMapperProxy $assessmentDataSource,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $resultCacheMapper,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
         private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper
@@ -1344,5 +1361,43 @@ class Controller extends Base
         }
 
         return $quiz;
+    }
+
+
+    /**
+     * Soft deletes all the attempt ids in $attemptIds
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Deleted
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postDeleteAttempt(IAssessable $assessment): void
+    {
+        $attemptIds = $this->requestPost->get('attemptIds');
+
+        /* Find the users associated with each attempt id;
+         * we need it to update any project caches that exist
+         */
+        $attempts = $this->attemptMapper->findByColumn('attempt_id', $attemptIds);
+
+        /* Delete them
+         */
+        $this->attemptMapper->deleteByColumn('attempt_id', $attemptIds);
+
+        /* Update project result caches for each person who's going to be affected
+         * by what we just did...
+         */
+        foreach ($attempts as $attempt) {
+            /* Update project result cache
+             */
+            (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
+        }
     }
 }
