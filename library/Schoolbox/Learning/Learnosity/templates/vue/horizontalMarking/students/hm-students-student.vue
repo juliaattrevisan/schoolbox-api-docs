@@ -7,8 +7,7 @@ import { gsap } from "gsap";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
-import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
-import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
+import HmStudentsStudentHeader from "./hm-students-student-header.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
 import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";
 
@@ -99,46 +98,11 @@ window.Vue.watch(
     <div ref="studentEl" class="student l-grid">
         <div ref="studentInnerContainerEl" class="student__inner-container">
             <div ref="studentEl" class="c-island l-flex-col l-pad-m l-gap-m">
-                <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
-                    <div class="l-flex-row l-flex--align-center l-gap-m">
-                        <button
-                            v-if="props.student.isReportLoaded"
-                            :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
-                                props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
-                            }`"
-                            :disabled="!props.student.isReportLoaded"
-                            @click.prevent="onToggleSelected"
-                        ></button>
-                        <span v-else class="loader"></span>
-                        <div class="c-img c-img--round c-img--s">
-                            <div class="c-img__wrapper">
-                                <img
-                                    :src="`/portrait.php?id=${props.student.id}&size=square32`"
-                                    :alt="`Photo of ${props.student.name}`"
-                                />
-                            </div>
-                        </div>
-                        <h2>
-                            <a :href="props.student.urls?.teacherFeedback" title="View students response">{{
-                                props.student.name
-                            }}</a>
-                        </h2>
-                    </div>
-                    <div>
-                        <template v-if="props.student.isReportLoaded">
-                            <hm-students-student-item-mark
-                                v-for="item in props.student.items"
-                                :key="item.reference"
-                                :item="item"
-                                :container="(responseContentEl as HTMLDivElement)"
-                            />
-                            <hm-students-student-attempt-mark
-                                v-if="itemsStore.isAttemptComment"
-                                :student="props.student"
-                            />
-                        </template>
-                    </div>
-                </div>
+                <hm-students-student-header
+                    :student="props.student"
+                    :container="(responseContentEl as HTMLDivElement)"
+                    @toggle="onToggleSelected"
+                />
                 <div ref="responseEl" class="response l-grid">
                     <div ref="responseInnerContainerEl" class="response__inner-container">
                         <div ref="responseContentEl" class="response__content">
@@ -171,17 +135,7 @@ window.Vue.watch(
         overflow: hidden;
     }
 }
-.toggle-button {
-    background: none;
-    color: var(--content-ui-foreground);
-    height: 2.5rem;
-    width: 2.5rem;
-}
 
-.loader {
-    height: 2.5rem;
-    width: 2.5rem;
-}
 .response {
     &__inner-container {
         overflow: hidden;

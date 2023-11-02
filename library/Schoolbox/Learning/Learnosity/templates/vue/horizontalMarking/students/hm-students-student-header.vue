@@ -1,0 +1,83 @@
+<script setup lang="ts">
+/**
+ * The student header, containing the toggle, student photo, name and item mark for each item
+ */
+
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import { useItemsStore } from "../store/hmItemsStore";
+import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
+import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
+
+interface Props {
+    student: Student; // the student to display
+    container: HTMLDivElement | null; // the element that the report is rendered into
+}
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+    toggle: [value: Student];
+}>();
+
+const itemsStore = useItemsStore();
+
+/**
+ * To show/hide the response when selected
+ */
+function onToggleSelected() {
+    emit("toggle", props.student);
+}
+</script>
+
+<template>
+    <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
+        <div class="l-flex-row l-flex--align-center l-gap-m">
+            <button
+                v-if="props.student.isReportLoaded"
+                :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
+                    props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
+                }`"
+                :disabled="!props.student.isReportLoaded"
+                @click.prevent="onToggleSelected"
+            ></button>
+            <span v-else class="loader"></span>
+            <div class="c-img c-img--round c-img--s">
+                <div class="c-img__wrapper">
+                    <img
+                        :src="`/portrait.php?id=${props.student.id}&size=square32`"
+                        :alt="`Photo of ${props.student.name}`"
+                    />
+                </div>
+            </div>
+            <h2>
+                <a :href="props.student.urls?.teacherFeedback" title="View students response">{{
+                    props.student.name
+                }}</a>
+            </h2>
+        </div>
+        <div>
+            <template v-if="props.student.isReportLoaded">
+                <hm-students-student-item-mark
+                    v-for="item in props.student.items"
+                    :key="item.reference"
+                    :item="item"
+                    :container="(container as HTMLDivElement)"
+                />
+                <hm-students-student-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
+            </template>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+.toggle-button {
+    background: none;
+    color: var(--content-ui-foreground);
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
+.loader {
+    height: 2.5rem;
+    width: 2.5rem;
+}
+</style>
