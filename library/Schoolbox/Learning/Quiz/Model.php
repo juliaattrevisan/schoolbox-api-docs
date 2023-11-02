@@ -55,7 +55,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      *
      * @var int
      */
-    const DURATION_UNLIMITED = -1;
+    const DURATION_UNLIMITED = 0;
 
     /**
     * @var Folder
@@ -432,7 +432,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  int $duration
+    * @param  int|null $duration
     *
     * @return $this
     */
@@ -443,7 +443,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @return int
+    * @return int|null
     */
     public function getDuration()
     {
