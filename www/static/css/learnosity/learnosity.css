@@ -785,3 +785,32 @@ span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
 .lrn.lrn-assess .toc .lrn-pager li.pagination-active a {
     background: var(--content-ui-background);
 }
+
+/* Result page styles update*/
+table.lrn-report-table {
+    border: none !important;
+}
+td.lrn-report-area {
+    font-weight: bold;
+}
+.lrn .table-bordered > thead > tr > th,
+.lrn .table-bordered > thead > tr > td,
+.lrn .table-bordered > tbody > tr > th,
+.lrn .table-bordered > tbody > tr > td,
+.lrn .table-bordered > tfoot > tr > th,
+.lrn .table-bordered > tfoot > tr > td {
+    border-bottom: 1px solid var(--body-background);
+    border-left: 0px;
+    border-right: 0px;
+    border-top: 0px;
+}
+.lrn .table-striped > tbody > tr:nth-child(odd) > td,
+.lrn .table-striped > tbody > tr:nth-child(odd) > th,
+.lrn .table-striped > tbody > tr:nth-child(even) > td,
+.lrn .table-striped > tbody > tr:nth-child(even) > th {
+    background-color: #fff;
+    color: #000000;
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    padding: 0.625rem;
+}
