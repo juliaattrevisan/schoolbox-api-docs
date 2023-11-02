@@ -1021,6 +1021,7 @@ class Controller extends Base
                     'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
                     'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
                     'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+                    'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
                 ];
             }
         }

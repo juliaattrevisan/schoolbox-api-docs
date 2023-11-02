@@ -6,4 +6,5 @@ export type StudentUrls = {
     score: string;
     comment: string;
     attemptComment: string;
+    teacherFeedback: string;
 };

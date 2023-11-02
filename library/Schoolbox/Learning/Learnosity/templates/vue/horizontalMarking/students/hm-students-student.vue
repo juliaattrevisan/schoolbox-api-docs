@@ -131,7 +131,9 @@ window.Vue.watch(
                             </div>
                         </div>
                         <h2>
-                            <a href="#" title="View students response">{{ props.student.name }}</a>
+                            <a :href="props.student.urls?.teacherFeedback" title="View students response">{{
+                                props.student.name
+                            }}</a>
                         </h2>
                     </div>
                     <div>
