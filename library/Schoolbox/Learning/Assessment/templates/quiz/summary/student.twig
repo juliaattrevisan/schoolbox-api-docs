@@ -1,3 +1,15 @@
+{##
+ # Introduction screen and list of previous attempts
+ #
+ # @param IAssessable $assessment              Our schoolbgox quiz instance
+ # @param Schoolbox\Learning\Quiz\Model $quiz  The representation of schoolbox.assess row
+ # @param User $student                        The guy currently at the intro screen
+ # @param Attempt\Model[] $attempts            A list of previous attempts
+ # @param Attempt\Model|null $existingattempt  An attempt that hasn't been finished
+ # @param array $plan                          A set of dates for custom assessment participation
+ # @param array $breadcrumbs                   A trail of breadcrumbs
+ # @param bool $canAttempt                     Whether users can start/resume attempts
+#}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
@@ -65,7 +77,9 @@
             {% set callToAction = 'Resume Quiz' %}
         {% endif %}
 
+        {% if canAttempt %}
         <a class="button submit" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}">{{ callToAction }}</a>
+        {% endif %}
     </div>
 </div>
 
@@ -131,7 +145,7 @@
                     </td>
                     <td class="actions-small-3">
                         <nav>
-                            {% if not finished %}
+                            {% if not finished and canAttempt %}
                                 <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                             {% else %}
                                 <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
