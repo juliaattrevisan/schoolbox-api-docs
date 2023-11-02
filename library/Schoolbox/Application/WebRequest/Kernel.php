@@ -66,12 +66,12 @@ class Kernel extends WebKernelAbstract
 
 
     /**
-    * @param bool $bool
-    * @throws RuntimeException
-    */
+     * @param bool $bool
+     * @throws RuntimeException
+     */
     public function setDebugMode($bool)
     {
-     // only allow once
+        // only allow once
         if (is_null($this->debugMode)) {
             $this->debugMode = !!$bool;
         } else {
@@ -81,8 +81,8 @@ class Kernel extends WebKernelAbstract
 
 
     /**
-    * @return bool
-    */
+     * @return bool
+     */
     public function inDebugMode()
     {
         return $this->debugMode;
@@ -194,7 +194,7 @@ class Kernel extends WebKernelAbstract
                 // TODO replace this with standard outputError (ApiProblem style payload)
                 (new Outputter())->output(
                     $responseFactory
-                        ->buildJson(['error' => 'Unauthenticated'])
+                        ->buildJson(['error' => $e->getMessage()])
                         ->withStatus($code)
                 );
             } else {
@@ -384,8 +384,7 @@ class Kernel extends WebKernelAbstract
          * json output should not be in the history
          */
         if (
-            $session && !(
-                $controller->isXhrRequest()
+            $session && !($controller->isXhrRequest()
                 || $redirect
                 || !$controller->getAllowBackToTheFuture()
                 || $isJson
@@ -406,8 +405,8 @@ class Kernel extends WebKernelAbstract
             // "Content-Length" could be set.
             // I don't think this is necessary; at least I've seen no difference
             // if it's enabled or not.
-//            header('Content-Encoding: none');
-//            header("Content-Length: " . strlen($output));
+            //            header('Content-Encoding: none');
+            //            header("Content-Length: " . strlen($output));
 
             // Finish the request
             fastcgi_finish_request();
