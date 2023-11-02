@@ -814,3 +814,8 @@ td.lrn-report-area {
     line-height: 1.125rem;
     padding: 0.625rem;
 }
+
+/* Styles of Authoring */
+.lrn-author-activity-resource-item.lrn-col-xs-12.lrn-col-sm-12.lrn-col-md-4 {
+    display: none;
+}
