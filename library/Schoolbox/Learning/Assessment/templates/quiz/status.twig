@@ -30,7 +30,7 @@
 
 {% block headerOptions %}
     <li>
-        <a class="icon-class-list" href="{{ routeLookup('learningQuiz.getQuizReviewHorizontal', { assessmentId: assessment.id }) }}">Review horizontally</a>
+        <a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a>
     </li>
     <li>
         <a class="icon-download" href="{{ routeLookup('learningQuiz.getExportAttempts', { assessmentId: assessment.id }) }}?format=csv">Download All</a>
