@@ -106,7 +106,7 @@
             <tbody>
             {% for attempt in attempts %}
                 {% set finished = attempt.finish %}
-                <tr>
+                <tr data-attempt>
                     <td>{{ attempt.user.fullname }}</td>
                     <td>{{ attempt.start.short }}</td>
                     <td>
@@ -200,7 +200,6 @@
 
                                     if (!attemptList.find('tbody tr').length) {
                                         $('#attempts').hide();
-                                        $('#attempt-list-empty-state').removeClass('hide');
                                     }
                                 }
                             });
