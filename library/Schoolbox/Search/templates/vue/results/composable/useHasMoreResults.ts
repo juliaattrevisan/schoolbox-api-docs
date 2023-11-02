@@ -21,7 +21,7 @@ export function useHasMoreResults(hasLoadedAllResults: Ref<boolean>, results: Re
         if (hasLoadedAllResults.value) {
             return false;
         }
-        // if we are showing the current limit, its assumed we have more results to show
+        // If the latest result set included a cursor, there are still more results.
         if (results.value.metadata.cursor.next !== null) {
             return true;
         }
