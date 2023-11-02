@@ -84,7 +84,7 @@ class CanSeeParticipation extends AbstractParticipationRule
         }
 
         // All uses should be able to view lesson plans (there is no participation on these)
-        if ($assessable instanceof LessonPlan\Model) {
+        if ($assessable->isImplementation() && $assessable instanceof LessonPlan\Model) {
             return true;
         }
 
