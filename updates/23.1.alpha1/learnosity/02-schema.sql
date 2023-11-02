@@ -36,7 +36,7 @@ ALTER TABLE `course_unit_specification`
 
 -- Add Reading Time
 ALTER TABLE `assess`
-    ADD COLUMN `reading_time_duration` INT NULL AFTER `duration`;
+    ADD COLUMN `reading_time_duration` INT NOT NULL DEFAULT 0 AFTER `duration`;
 
 -- Add Shuffle Items
 ALTER TABLE `assess`
