@@ -17,6 +17,7 @@ import HmItemsHeader from "./items/hm-items-header.vue";
 import HmStudents from "./students/hm-students.vue";
 import HmPreviousItem from "./items/hm-previous-item.vue";
 import HmNextItem from "./items/hm-next-item.vue";
+import HmFinaliseReview from "./items/hm-finalise-review.vue";
 
 interface Props {
     title: string; // the title of the quiz
@@ -60,6 +61,7 @@ window.Vue.onMounted(async () => {
             <div class="l-flex-row l-flex--no-wrap l-gap-m">
                 <hm-previous-item />
                 <hm-next-item />
+                <hm-finalise-review />
             </div>
         </template>
         <template v-else>

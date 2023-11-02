@@ -23,7 +23,7 @@ const { focused } = useFocus(scoreEl);
 const score = window.Vue.ref<string>(props.question.response.score?.toString() ?? "");
 
 /**
- * Save the score if it's changed
+ * Save the score if it's changed and valid
  */
 async function saveScore() {
     if (score.value === "") {

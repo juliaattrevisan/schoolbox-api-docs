@@ -10,13 +10,6 @@ const store = useStore();
 const itemsStore = useItemsStore();
 
 /**
- * Hide the button if there is no next item
- */
-const opacity = window.Vue.computed(() => {
-    return itemsStore.isAttemptComment ? 0 : 1;
-});
-
-/**
  * The title of the button, will change when next is attempt comments
  */
 const buttonTitle = window.Vue.computed(() => {
@@ -33,6 +26,7 @@ function onSelected() {
 
 <template>
     <button
+        v-if="!itemsStore.isAttemptComment"
         class="button full-width icon-next"
         :disabled="!store.isLoaded || !itemsStore.hasNextItem"
         @click.prevent="onSelected"
@@ -40,9 +34,3 @@ function onSelected() {
         {{ buttonTitle }}
     </button>
 </template>
-
-<style scoped>
-.button {
-    opacity: v-bind(opacity);
-}
-</style>
