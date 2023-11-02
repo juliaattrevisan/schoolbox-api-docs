@@ -1027,6 +1027,8 @@ class ListController extends Web\Controller\Base
             )
         );
 
+        $this->setAllowBackToTheFuture(false);
+
         // Launches:
         // should automatically redirect, but contain a button if they do not
         $this->response = $this->responseFromTemplateUnthemed(
