@@ -8,9 +8,13 @@
 namespace Schoolbox\Search;
 
 use Alaress\Web\Controller\Base;
+use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Search\Api\SearchFilter;
+use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -26,25 +30,83 @@ class Controller extends Base
     protected static $rosettaStone;
 
     /**
+     * @var UserMapper
+     */
+    protected static $userMapper;
+
+    /**
      * Let's build this thing!
      */
     public function __construct(
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        UserMapper $userMapper
     ) {
         self::$l10nMapper = L10nMapper::getInstance();
         self::$rosettaStone = $rosettaStone;
+        self::$userMapper = $userMapper;
     }
 
     /**
-     * @throws Error
+     * Entry point for the main search page.
+     *
+     * @return void
+     * @throws NotFound
+     * @throws Error*@since 23.1
+     * @api GET /search
      */
     public function search(): void
     {
+        $keywordFromUrl = $this->requestQuery->get('keyword');
+
+        $dataObjectFactory = new SearchFilter\DataObjectFactory(self::$userMapper);
+
+        try {
+            $filterFromUrl = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, null);
+        } catch (Exception $e) {
+            // The filter data in the URL was invalid, so ignore the data and create an empty filter.
+            $filterFromUrl = $dataObjectFactory->build(null, null);
+        }
+
+        $filterFromUrlIsEmpty = (
+            $filterFromUrl->fromDate === null &&
+            $filterFromUrl->toDate === null &&
+            $filterFromUrl->creator === null &&
+            $filterFromUrl->types === null
+        );
+
         $this->response = $this->responseFromTemplate(
             "@search/search.twig",
             [
+                // List of filter types (used for building the empty form).
                 'filterTypes' => $this->getFiltersRawArray(),
-                'filterDateRange' => $this->getDateRangeFilter(),
+
+                'keywordValue' => $keywordFromUrl,
+                'filterDateRangeValues' => (
+                    ($filterFromUrlIsEmpty) // Only use the default date range if no filter was specified in the URL.
+                    ? $this->getDefaultDateRangeFilterValues()
+                    : [
+                        'startDate' => $filterFromUrl->fromDate?->toRfc3339String(),
+                        'endDate' => $filterFromUrl->toDate?->toRfc3339String()
+                    ]
+                ),
+                'filterCreatorValue' => (
+                    ($filterFromUrl->creator === null)
+                    ? null
+                    : [
+                        'id' => $filterFromUrl->creator->getId(),
+                        'name' => (
+                            // The format of creator name must match that used by the Vue front-end.
+                            $filterFromUrl->creator->getFullName() . ' - ' .
+                            $filterFromUrl->creator->getRole()->getName() .
+                            ' (' . $filterFromUrl->creator->getExternalId() . ')'
+                        )
+                    ]
+                ),
+                'filterTypesValues' => (
+                    ($filterFromUrl->types === null)
+                    ? []
+                    : $filterFromUrl->types
+                )
             ]
         );
     }
@@ -187,7 +249,7 @@ class Controller extends Base
      * To set the default date range filter
      * @return array - { startDate: string, endDate: string }
      */
-    private function getDateRangeFilter(): array
+    private function getDefaultDateRangeFilterValues(): array
     {
         switch ($this->getConfigLoader()->get('date_range_search_filter')) {
             case 0: // School year

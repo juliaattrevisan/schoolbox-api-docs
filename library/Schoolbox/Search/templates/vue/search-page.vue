@@ -14,17 +14,26 @@ import type { FilterType } from "./filters/store/spFilterTypesStore";
 import type { FilterDateRange } from "./filters/store/spFilterDateRangeStore";
 import { useSearchStore } from "./store/spSearchStore";
 import { useResultsStore } from "./results/store/spResultsStore";
+import { Creator } from "./filters/store/spFilterCreatorsStore";
 import { SEARCH_PARAM } from "./store/spQueryStore";
 
 interface Props {
-    endpoint: string; // the search api endpoint
-    filterTypes: FilterType[]; // the filter types available, will vary depending on SB plan
-    filterDateRange: FilterDateRange; // the default date range for the date filter
+    endpoint: string; // The search api endpoint.
+    filterTypesAvailable: FilterType[]; // The filter types available, will vary depending on SB plan.
+    filterTypesSelected: string[]; // The selected filter types.
+    filterDateRange: FilterDateRange; // The default date range for the date filter.
+    filterCreator: object; // The selected user - object {id: number, name: string}
 }
 const props = defineProps<Props>();
 
 const store = useStore();
-store.init(props.endpoint, props.filterTypes, props.filterDateRange); // initialise the store
+store.init(
+    props.endpoint,
+    props.filterDateRange,
+    props.filterCreator as Creator,
+    props.filterTypesAvailable,
+    props.filterTypesSelected
+); // initialise the store
 
 const searchStore = useSearchStore();
 const resultsStore = useResultsStore();

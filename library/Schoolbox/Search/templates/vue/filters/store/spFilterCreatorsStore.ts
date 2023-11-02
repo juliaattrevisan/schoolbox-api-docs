@@ -22,7 +22,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
 
     /**
      * Get the creator filter data
-     * @returns {string} - the creator filter data
+     * @returns {object} - the creator filter data
      */
     function getFormData() {
         // only add creator filter if it is set

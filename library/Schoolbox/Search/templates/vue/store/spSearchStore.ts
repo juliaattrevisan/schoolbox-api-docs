@@ -52,18 +52,12 @@ export const useSearchStore = defineStore("spSearch", () => {
         .json();
 
     /**
-     * To record the active query and filters at the time of the search
-     */
-    function setActive() {
-        useQueryStore().setActive();
-    }
-
-    /**
      * search for nodes that match
      */
     async function search() {
-        setActive();
+        useQueryStore().setActive();
         useResultsStore().clear();
+        useStore().setQueryParams();
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
         await execute();
