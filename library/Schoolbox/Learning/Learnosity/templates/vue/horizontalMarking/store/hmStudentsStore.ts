@@ -66,7 +66,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         item.questions.forEach((question) => {
             if (question.response.maxScore === null) {
                 question.response.isMarked =
-                    item.questions[0].response.comment !== null && item.questions[0].response.comment !== "";
+                    item.questions[0].response.comment &&
+                    item.questions[0].response.comment !== null &&
+                    item.questions[0].response.comment !== "";
             } else {
                 question.response.isMarked = question.response.score !== null;
             }

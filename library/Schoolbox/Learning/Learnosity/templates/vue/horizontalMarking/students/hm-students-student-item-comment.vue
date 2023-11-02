@@ -28,7 +28,7 @@ async function saveComment() {
     if (comment.value === props.item.questions[0].response.comment) {
         return;
     }
-    studentsStore.updateItemComment(props.studen, props.item, props.item.questions[0], comment.value);
+    studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment.value);
     const formData = new FormData();
     formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
     formData.append("comment", comment.value);
@@ -59,9 +59,6 @@ window.Vue.onMounted(() => {
 window.Vue.onUnmounted(async () => {
     await saveComment();
 });
-
-// if there's no max score, the question is considered marked when a comment is added to the item
-// this applies to any question within an item with no max score
 </script>
 
 <template>

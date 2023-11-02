@@ -16,6 +16,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
+const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
 
 /**
  * To display the item when it's the active item
@@ -32,6 +33,10 @@ const isActive = window.Vue.computed(() => {
     <transition>
         <div v-if="isActive">
             <div class="l-flex-col l-gap-m">
+                <div v-if="hasQuestionsWithNoScore" class="alert-box f-no-margins">
+                    Any questions within a card that don't have a score are considered marked when a comment is added to
+                    the card.
+                </div>
                 <div class="item-questions l-flex-col l-gap-m">
                     <hm-students-student-item-question
                         v-for="question in props.item.questions"
