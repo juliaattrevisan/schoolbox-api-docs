@@ -239,6 +239,8 @@ class Controller extends BaseController
             $this->buildAdditionalClaims($folder, null, null),
         );
 
+        $this->setAllowBackToTheFuture(false);
+
         // Build a DL request to this tool
         $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
