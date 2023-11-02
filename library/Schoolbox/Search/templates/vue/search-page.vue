@@ -55,8 +55,7 @@ window.onpopstate = async (event) => {
     const searchParams = new URLSearchParams(document.location.search);
     console.info("search-page.vue onPopState() searchParams: ", searchParams);
     if (searchParams.has(SEARCH_PARAM)) {
-        // TODO: Initiate search using searchParams retrieved above.
-        // await searchStore.search(false);
+        document.location.reload();
     }
 };
 
