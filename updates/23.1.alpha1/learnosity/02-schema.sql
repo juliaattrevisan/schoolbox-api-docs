@@ -44,4 +44,4 @@ ALTER TABLE `assess`
 
 -- Add Exam Mode
 ALTER TABLE `assess`
-    ADD COLUMN `exam_mode` TINYINT(1) NOT NULL DEFAULT 0 AFTER `shuffle_items`;
+    ADD COLUMN `prompts_mode` TINYINT(1) NOT NULL DEFAULT 0 AFTER `shuffle_items`;

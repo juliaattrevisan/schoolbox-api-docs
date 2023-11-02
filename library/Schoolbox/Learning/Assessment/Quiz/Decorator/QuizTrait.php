@@ -40,7 +40,7 @@ trait QuizTrait
     /**
      * @var int
      */
-    protected int $examMode;
+    protected int $promptsMode;
 
     /**
      * @var int
@@ -148,18 +148,18 @@ trait QuizTrait
     /**
      * @return int
      */
-    public function getExamMode()
+    public function getPromptsMode()
     {
-        return $this->examMode;
+        return $this->promptsMode;
     }
 
     /**
-     * @param int $examMode
+     * @param int $promptsMode
      * @return $this
      */
-    public function setExamMode($examMode)
+    public function setPromptsMode($promptsMode)
     {
-        $this->examMode = $examMode;
+        $this->promptsMode = $promptsMode;
         return $this;
     }
 

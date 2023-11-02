@@ -69,7 +69,7 @@ class Model extends AbstractAssessment
      *
      * @var int
      */
-    protected $examMode;
+    protected $promptsMode;
 
 
     /**
@@ -459,18 +459,18 @@ class Model extends AbstractAssessment
     /**
      * @return int
      */
-    public function getExamMode()
+    public function getPromptsMode()
     {
-        return $this->examMode;
+        return $this->promptsMode;
     }
 
     /**
-     * @param $examMode
+     * @param $promptsMode
      * @return $this
      */
-    public function setExamMode($examMode)
+    public function setPromptsMode($promptsMode)
     {
-        $this->examMode = $examMode;
+        $this->promptsMode = $promptsMode;
         return $this;
     }
 
