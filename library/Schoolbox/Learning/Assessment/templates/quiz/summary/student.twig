@@ -11,6 +11,10 @@
  # @param bool $canAttempt                     Whether users can start/resume attempts
  # @param bool $canReview                      Whether users can provide feedback on an attempt
  # @param bool $canStudentReview               Whether users can see what they responded with, in their attempt
+ # @param string $externalRedirectUrl          A url in a third party system (newington canvas) that is relevant to this quiz
+ # @param array $lastViews                     A set of (roletype, info) tuples about when a student/parent visited this page
+ # @param Participant $participant             A participant of this assessment, used to figure out exclusions and special CAP stuff
+ # @param string $returnUrlEncoded             An encoded url to visit when navigating between screens and you finsih a workflow somehwere
  #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
