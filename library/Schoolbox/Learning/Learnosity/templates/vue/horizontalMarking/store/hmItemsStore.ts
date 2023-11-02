@@ -36,7 +36,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         const lastItemForReview = {
             id: "0",
             reference: "attempt-comments",
-            title: "- Attempt Comments",
+            title: "Attempt Comments",
             questions: [],
             isAttemptComment: true,
         };
