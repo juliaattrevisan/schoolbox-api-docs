@@ -1594,6 +1594,22 @@ class Controller extends Base
         ], 'Example Activity List');
     }
 
+    /**
+     * Callback for copying a quiz's contents from one quiz to another.
+     *
+     * @api   POST /learning/learnosity/{sourceId}/copy/{destinationId}
+     * @since 23.1
+     *
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @return void
+     * @throws ValidationException
+     */
+    public function postCopyQuizConstituents(IAssessable $source, IAssessable $destination): void
+    {
+        $this->quizMapper->copyQuizConstituents($source, $destination);
+        $this->response = $this->responseEmpty();
+    }
 
     /**
      * TODO Literally copypasta'd
