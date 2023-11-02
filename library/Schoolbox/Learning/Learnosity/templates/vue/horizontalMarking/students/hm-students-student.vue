@@ -130,7 +130,9 @@ window.Vue.watch(
                                 />
                             </div>
                         </div>
-                        <h2>{{ props.student.name }}</h2>
+                        <h2>
+                            <a href="#" title="View students response">{{ props.student.name }}</a>
+                        </h2>
                     </div>
                     <div>
                         <template v-if="props.student.isReportLoaded">
