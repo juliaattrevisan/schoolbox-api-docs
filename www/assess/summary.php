@@ -116,7 +116,7 @@ $assessHandler->renderAssessContents($assess['assess_id'], $this);
 $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
 $this->setVar(array(
-    'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'ASSESS_DURATION' => $assess['duration'] == Evaluation_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 $this->parse('delete_quiz_block', 'delete_quiz');

@@ -118,22 +118,22 @@
         <div class="small-5 medium-2 columns">
             <label for="hasDuration" class="inline-block">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting a quiz, students will have this much time to complete it. Switch off for no limit.">?</span></label>
             <div class="switch">
-                <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration != -1 %}checked="checked"{% endif %} />
+                <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration %}checked="checked"{% endif %} />
                 <label for="hasDuration">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
             </div>
         </div>
-        <div class="small-7 medium-10 columns no-pad {% if assessment.duration == -1 %}hide{% endif %}" id="durationPanel">
+        <div class="small-7 medium-10 columns no-pad {% if not assessment.duration %}hide{% endif %}" id="durationPanel">
             <div class="small-6 columns">
                 <label>Hours
-                    <input name='durationHours' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents(assessment.duration).hours ?? '' }}{% endif %}" />
+                    <input name='durationHours' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).hours ?? '' }}{% endif %}" />
                 </label>
             </div>
             <div class="small-6 columns">
                 <label>Minutes
-                    <input name='durationMinutes' type="text" value="{% if assessment.duration != -1 %}{{ assessment.durationComponents(assessment.duration).minutes ?? '' }}{% endif %}" />
+                    <input name='durationMinutes' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).minutes ?? '' }}{% endif %}" />
                 </label>
             </div>
         </div>
@@ -142,22 +142,22 @@
         <div class="small-5 medium-2 columns">
             <label for="hasReadingTimeDuration" class="inline-block">Reading Time<span class="hint has-tip tip-top" data-tooltip title="The amount of time students have to examine the quiz before starting. Switch off to disable.">?</span></label>
             <div class="switch">
-                <input name="hasReadingTimeDuration" id="hasReadingTimeDuration" type="checkbox" {% if assessment.readingTimeDuration != -1 %}checked="checked"{% endif %} />
+                <input name="hasReadingTimeDuration" id="hasReadingTimeDuration" type="checkbox" {% if assessment.readingTimeDuration %}checked="checked"{% endif %} />
                 <label for="hasReadingTimeDuration">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
             </div>
         </div>
-        <div class="small-7 medium-10 columns no-pad {% if assessment.readingTimeDuration == -1 %}hide{% endif %}" id="readingTimeDurationPanel">
+        <div class="small-7 medium-10 columns no-pad {% if not assessment.readingTimeDuration %}hide{% endif %}" id="readingTimeDurationPanel">
             <div class="small-6 columns">
                 <label>Hours
-                    <input name='readingTimeDurationHours' type="text" value="{% if assessment.readingTimeDuration != -1 %}{{ assessment.durationComponents(assessment.readingTimeDuration).hours ?? '' }}{% endif %}" />
+                    <input name='readingTimeDurationHours' type="text" value="{% if assessment.readingTimeDuration %}{{ assessment.durationComponents(assessment.readingTimeDuration).hours ?? '' }}{% endif %}" />
                 </label>
             </div>
             <div class="small-6 columns">
                 <label>Minutes
-                    <input name='readingTimeDurationMinutes' type="text" value="{% if assessment.readingTimeDuration != -1 %}{{ assessment.durationComponents(assessment.readingTimeDuration).minutes ?? '' }}{% endif %}" />
+                    <input name='readingTimeDurationMinutes' type="text" value="{% if assessment.readingTimeDuration %}{{ assessment.durationComponents(assessment.readingTimeDuration).minutes ?? '' }}{% endif %}" />
                 </label>
             </div>
         </div>

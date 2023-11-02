@@ -44,7 +44,7 @@ class Model extends AbstractAssessment
      *
      * @var int
      */
-    const DURATION_UNLIMITED = -1;
+    const DURATION_UNLIMITED = 0;
 
 
     /**
@@ -264,12 +264,12 @@ class Model extends AbstractAssessment
      * The number of hours and minutes that is represented by getDuration()
      * (which is the duration represented in seconds)
      *
-     * @param int $duration
+     * @param int|null $duration
      * @return array
      */
-    public function getDurationComponents(int $duration): array
+    public function getDurationComponents(?int $duration): array
     {
-        if ($duration) {
+        if ($duration && $duration > 0) {
             return [
                 'hours'   => floor($duration / 3600),
                 'minutes' => ($duration % 3600) / 60

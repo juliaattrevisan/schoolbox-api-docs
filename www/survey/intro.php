@@ -82,7 +82,7 @@ if (!$attempt) {
     $attemptStartTime = strtotime($attempt['start']);
     $attemptTimeRemaining = $attemptStartTime + $survey['duration'] - time();
     $attemptEndTime = $attemptStartTime + $survey['duration'];
-    if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+    if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Evaluation_Main::UNLIMITED_DURATION)) {
         error(122);
     }
 }
@@ -115,7 +115,7 @@ $this->setVar(array(
     'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
     'ASSESS_FOLDER' => Scrub::text($folder->getName() . ( $folder->getCodeString() ? ' (' . $folder->getCodeString() . ')' : '')),
     'ASSESS_FOLDER_ID' => $folder->getId(),
-    'ASSESS_DURATION' => $survey['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
+    'ASSESS_DURATION' => $survey['duration'] == Evaluation_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
 ));
 $survey['description'] = trim($survey['description']);
 if (empty($survey['description'])) {

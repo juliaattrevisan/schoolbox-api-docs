@@ -46,7 +46,7 @@ if (!empty($_POST)) {
             'description'        => $_POST['description'],
             'start'              => $start->getDatabase(),
             'finish'             => $finish->getDatabase(),
-            'duration'           => Survey_Main::UNLIMITED_DURATION,
+            'duration'           => Evaluation_Main::UNLIMITED_DURATION,
             'availability'       => 'survey',
             'anonymous_result'   => (int)($_POST['anonymous_result'] ?? false),
             'notify_author'      => (int)($_POST['notify_author'] ?? false),

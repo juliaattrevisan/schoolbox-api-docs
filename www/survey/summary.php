@@ -77,7 +77,7 @@ if (empty($survey['description'])) {
 $surveyHandler->renderAssessContents($survey['assess_id'], $this);
 $this->parse('allQuestions_block', 'assessContentsFragment', true);
 $this->setVar(array(
-    'ASSESS_DURATION' => $survey['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
+    'ASSESS_DURATION' => $survey['duration'] == Evaluation_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
 ));
 $this->setVar('delete_quiz_block', '');
 $this->parse('delete_survey_block', 'delete_survey');

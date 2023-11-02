@@ -52,7 +52,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
     /**
      * Const that represents an unlimited duration for people doing the quiz/survey
      */
-    public const UNLIMITED_DURATION        = -1;
+    public const UNLIMITED_DURATION        = 0;
 
     /**
      * @var string
