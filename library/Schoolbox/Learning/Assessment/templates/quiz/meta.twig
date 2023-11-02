@@ -8,18 +8,25 @@
 <ul class="meta">
     {% include '@learning/fragments/meta/dueDate.twig' %}
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
-    <li class="icon-time-value" title="Allowed Time">Allowed time:
-        <time>
-            {% if not canAttempt %}
-                You cannot attempt this quiz
-            {% elseif assessment.durationUnlimited %}
-                Unlimited
-            {% else %}
-                {{ duration.secondsToHoursAndMinutes(assessment.duration) }}
-            {% endif %}
-        </time>
-    </li>
+
+    {# (optional) Allowed time #}
+    <li class="icon-time-value" title="Allowed Time">{% apply spaceless %}
+        {% if not canAttempt %}
+            You cannot attempt this quiz
+        {% else %}
+            Allowed time: <time>{{ assessment.durationNeatly(assessment.duration) }}</time>
+        {% endif %}
+        {% endapply %}</li>
+
+    {# (optional) Reading time #}
+    {% if assessment.readingTimeDuration and canAttempt %}
+    <li class="icon-time-value" title="Reading Time">{% apply spaceless %}
+        Reading time: <time>{{ assessment.durationNeatly(assessment.readingTimeDuration) }}</time>
+    {% endapply %}</li>
+    {% endif %}
+
     {% include '@learning/fragments/meta/workType.twig' %}
+
     {# joining student name with lastView data #}
     {% if student.id != USER.id %}
         <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">{% apply spaceless %}

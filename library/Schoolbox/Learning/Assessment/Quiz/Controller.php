@@ -243,6 +243,10 @@ class Controller extends Assessment\Controller
          */
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
+        /* Apparently this is a thing
+         */
+        $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
+
         $attempts = $this->attemptMapper->findByColumnList([
             'assess_id' => $quiz->getId(),
             'user_id' => $student->getId()

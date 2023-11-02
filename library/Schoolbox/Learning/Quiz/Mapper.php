@@ -534,60 +534,20 @@ class Mapper extends BaseMapper
         if ($quiz->isDurationUnlimited()) {
             return;
         }
+
         $duration = $quiz->getDuration();
+
         foreach ($quiz->getAttempts() as $attempt) {
             if (!$attempt->isFinished()) {
                 // Has it passed its duration?
                 $expiry = (clone $attempt->getStart())->addSeconds($duration);
+
                 if ($expiry->lt($now)) {
                     $attempt->setFinish($expiry);
                     $this->getJoinMapper('attempt')->save($attempt);
                 }
             }
         }
-    }
-
-
-    /**
-     * Loads sections and their questions into this quiz.
-     *
-     * @param Model $quiz
-     * @return Model
-     * @throws BaseMapper\DefinitionException
-     * @throws \DomainException
-     */
-    public function loadSectionsAndQuestions(Model $quiz): Model
-    {
-        // Load sections
-        $sectionMapper = $this->getJoinMapper('sections');
-        $quiz->setSections(
-            $sectionMapper->findByColumn(
-                'assess_id',
-                $quiz->getId(),
-                ['order' => ['sequence' => 'asc']]
-            )
-        );
-
-        // Load questions into sections
-        // TODO question mapper should be part of section mapper
-        $questionMapper   = QuizQuestionMapper::getInstance();
-        $sectionQuestions = $questionMapper
-            ->findByColumn(
-                'section_id',
-                $quiz->getSections()->getPropertyValues('id')
-            )
-            ->groupByCallback(function (QuizQuestionModel $q) {
-                return $q->getSection()->getId();
-            });
-        foreach ($quiz->getSections() as $section) {
-            if (isset($sectionQuestions[$section->getId()])) {
-                $section->setQuestions($sectionQuestions[$section->getId()]);
-            } else {
-                $section->setQuestions($questionMapper->createCollection());
-            }
-        }
-
-        return $quiz;
     }
 
 
@@ -605,29 +565,12 @@ class Mapper extends BaseMapper
         $attemptMapper = $this->getJoinMapper('attempt');
         $attemptFilter = ['assess_id' => $quiz->getId(),];
         $attemptOrder  = ['order' => ['start' => 'desc']];
+
         if ($student) {
             $attemptFilter['user_id'] = $student->getId();
         }
-        $quiz->setAttempts($attemptMapper->findByColumnList($attemptFilter, $attemptOrder));
 
-        // Load answers (which include questions) into attempts
-        // TODO answer mapper should be part of attempt mapper
-        $answerMapper   = QuizAnswerMapper::getInstance();
-        $attemptAnswers = $answerMapper
-            ->findByColumn(
-                'attempt_id',
-                $quiz->getAttempts()->getPropertyValues('id')
-            )
-            ->groupByCallback(function (QuizAnswerModel $a) {
-                return $a->getAttempt()->getId();
-            });
-        foreach ($quiz->getAttempts() as $attempt) {
-            if (isset($attemptAnswers[$attempt->getId()])) {
-                $attempt->setAnswers($attemptAnswers[$attempt->getId()]);
-            } else {
-                $attempt->setAnswers($answerMapper->createCollection());
-            }
-        }
+        $quiz->setAttempts($attemptMapper->findByColumnList($attemptFilter, $attemptOrder));
 
         return $quiz;
     }
