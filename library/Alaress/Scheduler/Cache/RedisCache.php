@@ -64,7 +64,8 @@ class RedisCache implements ICache
 
             // Fetch from Redis
             $value = $this->redis->get($itemKey);
-            if (!$value || ($this->redis->ttl($itemKey) === RedisQueue::TTL_EXPIRED)) {
+            $ttl   = $this->redis->ttl($itemKey);
+            if (!$value || ($ttl === RedisQueue::TTL_EXPIRED)) {
                 $this->log->warning(sprintf("Key %s is no longer valid, removing ", $itemKey));
                 $this->redis->srem($this->getNamespacedKey('index'), $itemKey);
                 continue;
@@ -101,7 +102,14 @@ class RedisCache implements ICache
             // Restore
             $context     = ["msg:{$this->instanceId}:"];
             $amqpPayload = json_encode([$itemKey, $context]);
-            $mq->publish($amqpPayload, Broker::QUEUE, ['exchange' => '']);
+            $mq->publish(
+                $amqpPayload,
+                Broker::QUEUE,
+                [
+                    'exchange'   => '',
+                    'expiration' => $ttl,
+                ],
+            );
             $this->log->debug(sprintf("Restoring event in key %s", $itemKey));
             ++$i;
         }
