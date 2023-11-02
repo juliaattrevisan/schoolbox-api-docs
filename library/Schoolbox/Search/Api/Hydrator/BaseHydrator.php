@@ -144,7 +144,7 @@ abstract class BaseHydrator implements IHydrator
                 preg_replace(
                     '/\s+/',
                     ' ',
-                    mb_strcut($content, $cutStart, $cutFinish, self::ENCODING),
+                    mb_strcut($content, $cutStart, $cutFinish - $cutStart, self::ENCODING),
                 )
             );
             if ($startTruncated) {
