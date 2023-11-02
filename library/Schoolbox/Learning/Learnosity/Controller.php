@@ -1378,7 +1378,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postDeleteAttempt(IAssessable $assessment): void
+    public function postDeleteAttempts(IAssessable $assessment): void
     {
         $attemptIds = $this->requestPost->get('attemptIds');
 

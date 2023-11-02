@@ -194,7 +194,7 @@
         {# Buttons #}
         {% apply spaceless %}
             {% set buttons %}
-                {% if canDelete  %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt">Delete Attempt</a>{% endif %}
+                {% if canDelete  %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookup('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
                 {% if canFinish  %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>{% endif %}
                 {% if canPublish and latestResponse %}<a class="button" data-interaction-review="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: participant.user.id, learnositySessionReference: latestResponse.learnosityReference}) }}">Review Attempt</a>{% endif %}
             {% endset %}
@@ -328,7 +328,7 @@
                     confirmLabel: 'Delete',
                     confirmEvent: function () {
                         $.post(
-                            '/assess/deleteAttempt',
+                            '{{ routeLookup('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}',
                             { attemptIds: [ $a.attr('data-interaction-delete') ]}
                         ).done(function () {
                             // We must reload page to populate the action bar with the previous attempt

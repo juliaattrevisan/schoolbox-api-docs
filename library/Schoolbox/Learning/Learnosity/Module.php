@@ -84,7 +84,7 @@ class Module extends BaseModule
 
         /* Delete an attempt
          */
-        $this->register('POST', '/{assessmentId}/attempt/delete', 'postDeleteAttempts', $instructorPerms, null);
+        $this->register('POST', '/{assessmentId}/attempt/delete', 'postDeleteAttempts', $instructorPerms, $preloadAssessment);
 
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
