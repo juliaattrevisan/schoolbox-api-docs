@@ -57,6 +57,23 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
+     * loop through each question in the item and check for a score to determine if the question is already marked
+     * if there is no maxScore, we assume that the question is considered marked if the first question contains a comment
+     * so the first question comment covers isMarked for any questions within the item that don't have a maxScore
+     * @param { StudentItem } item - the item to check
+     */
+    function setInitialQuestionIsMarked(item: StudentItem) {
+        item.questions.forEach((question) => {
+            if (question.response.maxScore === null) {
+                question.response.isMarked =
+                    item.questions[0].response.comment !== null && item.questions[0].response.comment !== "";
+            } else {
+                question.response.isMarked = question.response.score !== null;
+            }
+        });
+    }
+
+    /**
      * Add items to a student
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
@@ -78,6 +95,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             student.items = studentItems;
             // need to do after first loop as we rely on questions and responses being set first
             student.items.forEach((item) => {
+                setInitialQuestionIsMarked(item);
                 item.isMarked = getItemIsMarked(item);
             });
             student.isMarked = getStudentIsMarked(student);
@@ -116,7 +134,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * For each item within the store, check if all students have been marked for that item
      */
     function updateItemsIsMarked() {
-        //
         useItemsStore().items.forEach((item) => {
             item.isMarked = students.value.every((student) => {
                 const studentItem = student.items.find(($item) => $item.reference === item.reference);
@@ -167,6 +184,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      */
     function updateItemComment(question: StudentItemQuestion, comment: string) {
         question.response.comment = comment;
+        // if the item contains questions that have a null max score, we can run through and mark each of those questions as marked
     }
 
     /**

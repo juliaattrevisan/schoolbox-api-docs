@@ -45,9 +45,9 @@ window.Vue.onMounted(() => {
     const ckeditorElement = document.getElementById(editorId) as HTMLElement;
     ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
         const editor = event.detail.editor;
-        editor.ui.focusTracker.on("change:isFocused", (event, name, isFocused) => {
+        editor.ui.focusTracker.on("change:isFocused", async (event, name, isFocused) => {
             if (!isFocused && comment.value !== props.item.questions[0].response.comment) {
-                saveComment();
+                await saveComment();
             }
         });
     });
@@ -59,6 +59,9 @@ window.Vue.onMounted(() => {
 window.Vue.onUnmounted(async () => {
     await saveComment();
 });
+
+// if there's no max score, the question is considered marked when a comment is added to the item
+// this applies to any question within an item with no max score
 </script>
 
 <template>

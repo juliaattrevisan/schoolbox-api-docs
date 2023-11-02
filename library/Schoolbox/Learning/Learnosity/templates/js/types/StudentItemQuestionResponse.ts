@@ -7,4 +7,5 @@ export type StudentItemQuestionResponse = {
     score?: number;
     maxScore?: number;
     comment?: string;
+    isMarked?: boolean; // whether the question is considered marked
 };

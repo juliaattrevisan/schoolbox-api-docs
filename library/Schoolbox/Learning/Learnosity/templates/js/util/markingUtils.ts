@@ -55,7 +55,7 @@ export function getAttemptResponse(attemptComments: StudentAttemptComment[], stu
  * @returns {boolean} - whether the item is marked
  */
 export function getItemIsMarked(item: StudentItem) {
-    return item.questions.every(($question) => $question.response.score !== null);
+    return item.questions.every(($question) => $question.response.isMarked);
 }
 
 /**

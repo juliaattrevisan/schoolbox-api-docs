@@ -89,7 +89,7 @@ function onItemSelected(reference: string) {
 .select-button {
     background: var(--foreground-colour);
     border: 1px solid var(--form-border-color);
-    justify-content: start;
+    justify-content: space-between;
     padding: var(--spacing-xs) var(--spacing-m);
     text-align: left;
     width: 100%;
