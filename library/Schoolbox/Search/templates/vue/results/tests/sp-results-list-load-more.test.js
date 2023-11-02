@@ -3,6 +3,8 @@ import SpResultsListLoadMore from "../sp-results-list-load-more.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { useResultsStore } from "../store/spResultsStore";
 
+// TODO: These tests are broken.  Fix them.
+
 let wrapper; // so we don't need to pass it into every test
 
 beforeEach(() => {
