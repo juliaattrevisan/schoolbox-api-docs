@@ -60,7 +60,7 @@ export const useSearchStore = defineStore("spSearch", () => {
         useStore().setQueryParams(simulateRedirect);
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
-        console.info("spSearchStore.ts search() url: ", url);
+
         await execute();
         try {
             useResultsStore().setFirstResults(data.value as Results);
