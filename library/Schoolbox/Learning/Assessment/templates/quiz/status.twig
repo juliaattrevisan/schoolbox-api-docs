@@ -16,8 +16,16 @@
 {% set labelPending    = 'Review required' %}
 {% set labelReviewed   = 'Reviewed' %}
 
-{# Override default route #}
-{% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+{% block routeModify %}
+    {% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+
+    {% if routeModify %}
+        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessment.id}) %}
+        <li><a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
+        <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
+    {% endif %}
+{% endblock %}
+
 {% set responseHistory = locale.attemptHistory.proper %}
 
 {% block headerOptions %}
