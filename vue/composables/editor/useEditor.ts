@@ -1,22 +1,21 @@
 /**
- * Loads and display the ckeditor, and once loaded prefill the initialValue if it's available
+ * Loads and display the ckeditor, and once loaded prefill the currentValue if it's available
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  */
 
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
-import type { Ref } from "vue";
+import { EditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * Initialise the composable
- * @param { string } $initialValue - the initial string value to input into the ckeditor
+ * @param { string } $currentValue - the initial string value to input into the ckeditor
  * @param { string } ckeditorSelector - the selector to target the CKEditor
- * @param { Ref<boolean> } isMaxCharCountExceeded - Vue reference to boolean
- *  - true if the CKEditor field content storage limit was found to have been exceeded at last check
- * @returns { string } - the initial value
+ * @param { EditorConfig } editorConfig - the config to use when creating the editor
+ * @returns { string } - the current value of the editor input
  */
-export function useEditor($initialValue: string, ckeditorSelector: string, isMaxCharCountExceeded: Ref<boolean>) {
-    const initialValue = window.Vue.ref($initialValue);
+export function useEditor($currentValue: string, ckeditorSelector: string, editorConfig: EditorConfig) {
+    const currentValue = window.Vue.ref($currentValue);
 
     /**
      * When a new editor is created
@@ -24,25 +23,11 @@ export function useEditor($initialValue: string, ckeditorSelector: string, isMax
      */
     function onEditorCreated(event: object) {
         const editor = event.detail.editor as object;
-
-        if (initialValue.value !== null) {
-            editor.setData(initialValue.value); // set the initial data
+        if (currentValue.value !== null) {
+            editor.setData(currentValue.value); // set the initial data
         }
-
         editor.model.document.on("change:data", () => {
-            initialValue.value = editor.getData() as string;
-        });
-
-        const ckeditorElement = document.getElementById(ckeditorSelector) as HTMLElement;
-
-        // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
-        ckeditorElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
-            isMaxCharCountExceeded.value = true;
-        });
-
-        // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
-        ckeditorElement.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
-            isMaxCharCountExceeded.value = false;
+            currentValue.value = editor.getData() as string;
         });
     }
 
@@ -62,11 +47,11 @@ export function useEditor($initialValue: string, ckeditorSelector: string, isMax
 
             document.dispatchEvent(
                 new CustomEvent(EditorEvent.EDITOR__CREATE, {
-                    detail: {
-                        targetElements: [`#${ckeditorSelector}`],
-                        removeFromToolbar: ["mediaEmbed"],
-                        addMaxCharCountDefaultEventListeners: false,
-                    },
+                    detail: editorConfig,
+                    // detail: {
+                    //     targetElements: [`#${ckeditorSelector}`],
+                    //     hasTokens: true,
+                    // },
                 })
             );
         } catch (error) {
@@ -78,5 +63,5 @@ export function useEditor($initialValue: string, ckeditorSelector: string, isMax
         await loadCKEditor();
     });
 
-    return initialValue;
+    return currentValue;
 }

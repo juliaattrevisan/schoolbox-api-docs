@@ -16,8 +16,10 @@ interface Props {
 const props = defineProps<Props>();
 const studentsStore = useStudentsStore();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
-const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
-const comment = useEditor(props.item.questions[0].response.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+const comment = useEditor(props.item.questions[0].response.comment ?? "", editorId, {
+    targetElements: [`#${editorId}`],
+    hasTokens: true,
+}); // Use a ckeditor for the comments field
 
 /**
  * Save the comment if it's changed
@@ -62,6 +64,10 @@ window.Vue.onUnmounted(async () => {
 <template>
     <div>
         <label>Comment</label>
+        <p class="meta">
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
+            on creation.
+        </p>
         <textarea :id="editorId"></textarea>
     </div>
 </template>
