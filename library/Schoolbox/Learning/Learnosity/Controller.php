@@ -1400,4 +1400,39 @@ class Controller extends Base
             (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
         }
     }
+
+
+    /**
+     * Soft deletes all unreviewed attempts for the given $assessment
+     * and set of $userIds; fortunately this has no effect on project
+     * caches since none of these attempts should have been contributing
+     * any marks
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws \UnderflowException
+     */
+    public function postDeleteUnreviewedAttempts(IAssessable $assessment): void
+    {
+        $userIds = $this->requestPost->get('userIds');
+
+        /* We need this lol for the predicate builder
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        /* Find all the unreviewed attempts that haven't already been deleted
+         * for the set of $userIds provided
+         */
+        $pb = $this->attemptMapper->getPredicateBuilder()
+            ->equals('assess_id', $quiz->getId())
+            ->in('user_id', $userIds)
+            ->isNull('deleted_at')
+            ->isNull('reviewed_at');
+
+        /* Delete them
+         */
+        $this->attemptMapper->deleteByPredicates($pb);
+    }
 }

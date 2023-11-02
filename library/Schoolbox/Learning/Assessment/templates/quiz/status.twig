@@ -309,8 +309,8 @@
                     var userList = toDelete.map(function () { return $(this).closest('[data-participant]').attr('data-participant') }).get();
 
                     $.post(
-                        '/assess/deleteAttempt',
-                        { userIds: userList, assessmentId: {{ assessment.id }} }
+                        '{{ routeLookup('learnosity.postDeleteUnreviewedAttempts', {assessmentId: assessment.id }) }}',
+                        { userIds: userList }
                     ).always(function () {
                         location.reload();
                     });
