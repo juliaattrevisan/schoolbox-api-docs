@@ -91,7 +91,7 @@ abstract class BaseHydrator implements IHydrator
     {
         // Set line width to zero (unrestricted) to avoid introducing newlines into the text-only string.
         // Extra newlines prevent the search from working if the keyword spans multiple lines.
-        return (new ToText($html, ['width' => 0]))->getText();
+        return (new ToText($html, ['width' => 0, 'do_links' => 'none']))->getText();
     }
 
     /**
