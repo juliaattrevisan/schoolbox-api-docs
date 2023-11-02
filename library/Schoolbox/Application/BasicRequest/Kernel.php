@@ -8,8 +8,12 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
+use Alaress\Codec\Json\Base64;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
+use Alaress\Redis\Cache\ItemPool;
+use Alaress\Redis\Cache\KeyGenerator;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
 use League\Flysystem\Filesystem;
@@ -462,6 +466,24 @@ class Kernel extends WebKernelAbstract
                     new Sanitizer\Exif($config)
                 );
             })
+        );
+
+        // OIDC things which aren't related to LTI
+        // This is the cache for the response from the OIDC discovery and JWKS
+        // requests.
+        $di->set(
+            'oidc.cache',
+            $di->lazy(
+                function () use ($di) {
+                    return new SimpleCacheBridge(
+                        new ItemPool(
+                            $di->get('redis.cache'),
+                            new Base64(),
+                            new KeyGenerator('oidc', INSTANCE_ID),
+                        )
+                    );
+                }
+            )
         );
 
         // Filesystems
