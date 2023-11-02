@@ -26,6 +26,13 @@ const studentsStore = useStudentsStore();
 const isFirstMarkedAttemptsChange = window.Vue.ref(true);
 
 /**
+ * To show/hide the response when selected
+ */
+function onToggleSelected() {
+    studentsStore.toggleStudent(props.student);
+}
+
+/**
  * To show/hide the entire student container, hiding if the student has been marked
  * and the option to show marked attempts is unchecked
  */
@@ -52,13 +59,6 @@ window.Vue.watch(
         });
     }
 );
-
-/**
- * To show/hide the response when selected
- */
-function onToggleSelected() {
-    studentsStore.toggleStudent(props.student);
-}
 
 /**
  * Display the student now the linked report has been loaded
@@ -97,7 +97,7 @@ window.Vue.watch(
 <template>
     <div ref="studentEl" class="student l-grid">
         <div ref="studentInnerContainerEl" class="student__inner-container">
-            <div ref="studentEl" class="c-island l-flex-col l-pad-m l-gap-m">
+            <div ref="studentEl" class="c-island l-flex-col l-gap-m">
                 <hm-students-student-header
                     :student="props.student"
                     :container="(responseContentEl as HTMLDivElement)"

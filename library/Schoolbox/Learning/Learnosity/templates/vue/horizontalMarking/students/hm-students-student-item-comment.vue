@@ -62,7 +62,7 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div>
+    <div class="l-pad-m--horiz">
         <label>Comment</label>
         <p class="meta">
             Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details

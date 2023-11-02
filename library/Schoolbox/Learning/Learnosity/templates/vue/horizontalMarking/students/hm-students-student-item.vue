@@ -8,6 +8,7 @@ import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useItemsStore } from "../store/hmItemsStore";
 import hmStudentsStudentItemQuestion from "./hm-students-student-item-question.vue";
 import hmStudentsStudentItemComment from "./hm-students-student-item-comment.vue";
+import hmStudentsStudentItemFooter from "./hm-students-student-item-footer.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -31,24 +32,25 @@ const isActive = window.Vue.computed(() => {
 
 <template>
     <transition>
-        <div v-if="isActive">
-            <div class="l-flex-col l-gap-m">
-                <div v-if="hasQuestionsWithNoScore" class="alert-box f-no-margins">
+        <div v-if="isActive" class="l-flex-col l-gap-m">
+            <div v-if="hasQuestionsWithNoScore" class="l-pad-m--horiz">
+                <div class="alert-box f-no-margins">
                     Any questions within a card that don't have a score are considered marked when a comment is added to
                     the card.
                 </div>
-                <div class="item-questions l-flex-col l-gap-m">
-                    <hm-students-student-item-question
-                        v-for="question in props.item.questions"
-                        :key="question.response_id"
-                        :student="props.student"
-                        :item="props.item"
-                        :question="question"
-                        :container="props.container"
-                    />
-                </div>
-                <hm-students-student-item-comment :student="props.student" :item="props.item" />
             </div>
+            <div class="item-questions l-flex-col l-gap-m l-pad-m--horiz">
+                <hm-students-student-item-question
+                    v-for="question in props.item.questions"
+                    :key="question.response_id"
+                    :student="props.student"
+                    :item="props.item"
+                    :question="question"
+                    :container="props.container"
+                />
+            </div>
+            <hm-students-student-item-comment :student="props.student" :item="props.item" />
+            <hm-students-student-item-footer :student="props.student" :item="props.item" />
         </div>
     </transition>
 </template>
