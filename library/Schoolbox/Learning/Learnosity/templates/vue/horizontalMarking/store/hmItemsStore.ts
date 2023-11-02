@@ -49,8 +49,11 @@ export const useItemsStore = defineStore("hmItems", () => {
      * @param {Item[]} $items - the items to reference
      */
     function addQuestions($items: Item[]) {
-        $items.forEach((item, index) => {
-            items.value[index].questions = item.questions;
+        // we cant assume the items are coming in from the API in the same order as the items we have stored
+        // we'll need to match them up by reference
+        $items.forEach((item) => {
+            const matchedItem = items.value.find((storedItem) => storedItem.reference === item.reference) as Item;
+            matchedItem.questions = item.questions;
         });
         // only show those items with questions and the final review
         items.value = items.value.filter((item) => item.questions.length > 0 || item.isAttemptComment);
