@@ -68,9 +68,10 @@ class Controller extends Base
     public function getSearch(): void
     {
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
-        $filter  = $this->buildSearchFilter($this->requestQuery->get('filter'), null);
-        $limit   = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
-        $cursor  = null;
+        $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
+        $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
+        $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
+        $cursor = null;
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
