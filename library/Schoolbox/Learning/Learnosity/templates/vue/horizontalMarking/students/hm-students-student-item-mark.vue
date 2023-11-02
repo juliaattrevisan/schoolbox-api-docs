@@ -25,15 +25,11 @@ const display = window.Vue.computed(() => {
 });
 
 /**
- * Move the item mark element from the entire quiz response into our own container
+ * If the item only contains questions that don't have a maxScore, we don't want to show any score
+ * @returns {boolean} - the total score
  */
-window.Vue.onMounted(() => {
-    const mark = props.container.querySelector(`[data-reference-title="${props.item.reference}"]`) as HTMLDivElement;
-    if (mark) {
-        (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
-        markEl.value?.appendChild(mark);
-        gsap.from(markEl.value, { duration: 0.3, opacity: 0 });
-    }
+const noScore = window.Vue.computed(() => {
+    return props.item.questions.every((question) => question.response.maxScore === null);
 });
 
 /**
@@ -70,6 +66,10 @@ const status = window.Vue.computed(() => {
     if (!props.item.isMarked) {
         return StudentItemMarkTypes.NOT_MARKED;
     }
+    // use the 'partial' status for now if the item is marked but has no score
+    if (props.item.isMarked && noScore.value) {
+        return StudentItemMarkTypes.PARTIAL;
+    }
     if (totalScore.value === maxScore.value) {
         return StudentItemMarkTypes.CORRECT;
     }
@@ -87,6 +87,9 @@ const tooltip = window.Vue.computed(() => {
     if (status.value === StudentItemMarkTypes.NOT_MARKED) {
         return "Not marked";
     }
+    if (props.item.isMarked && noScore.value) {
+        return "Marked";
+    }
     if (status.value === StudentItemMarkTypes.CORRECT) {
         return "Correct";
     }
@@ -102,6 +105,11 @@ const tooltip = window.Vue.computed(() => {
  */
 function updateSpanElement(statusElement: HTMLDivElement) {
     const spanElement = statusElement?.querySelector("span") as HTMLSpanElement;
+    // if the item contains only questions that don't have a max score, we don't want to show any score
+    if (noScore.value) {
+        spanElement.textContent = "-";
+        return;
+    }
     spanElement.textContent = `${totalScore.value}/${maxScore.value}`;
 }
 
@@ -113,6 +121,11 @@ function updateHiddenElement(statusElement: HTMLDivElement) {
     const hiddenElement = (statusElement?.parentElement as HTMLDivElement).querySelector(
         ".visually-hidden"
     ) as HTMLSpanElement;
+    // if the item contains only questions that don't have a max score, we don't want to show any score
+    if (noScore.value) {
+        hiddenElement.textContent = "Marked";
+        return;
+    }
     hiddenElement.textContent = ` ${tooltip.value} ${totalScore.value}/${maxScore.value}`;
 }
 
@@ -138,6 +151,18 @@ function updateScoreDisplay() {
     updateStyles(statusElement);
     gsap.from(markEl.value, { duration: 0.3, opacity: 0 });
 }
+
+/**
+ * Move the item mark element from the entire quiz response into our own container
+ */
+window.Vue.onMounted(() => {
+    const mark = props.container.querySelector(`[data-reference-title="${props.item.reference}"]`) as HTMLDivElement;
+    if (mark) {
+        (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
+        markEl.value?.appendChild(mark);
+        updateScoreDisplay();
+    }
+});
 
 /**
  * Need to watch the item questions for any score updates, if any questions score changes we need to total up the new score and display

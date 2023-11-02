@@ -28,6 +28,7 @@ function onSelected() {
     <button
         v-if="!itemsStore.isAttemptComment"
         class="button full-width icon-next"
+        :style="`${itemsStore.isNextFinalReview ? 'font-weight: bold' : ''}`"
         :disabled="!store.isLoaded || !itemsStore.hasNextItem"
         @click.prevent="onSelected"
     >
