@@ -15,8 +15,10 @@ const props = defineProps<Props>();
 const studentsStore = useStudentsStore();
 const editorEl = window.Vue.ref<HTMLTextAreaElement | null>(null);
 const editorId = `final-review-comment-${props.student.elementId}`;
-const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
-const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, isMaxCharCountExceeded); // Use a ckeditor for the comments field
+const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, {
+    targetElements: [`#${editorId}`],
+    hasTokens: true,
+}); // Use a ckeditor for the comments field
 
 /**
  * Save the comment if it's changed

@@ -75,12 +75,12 @@ function onItemSelected(reference: string) {
             }`"
             @click.prevent="onItemSelected(item.reference)"
         >
-            <span>
-                {{ item.title }}
-            </span>
             <span v-if="!item.isMarked && !item.isAttemptComment" class="unsubmitted label"
                 >Contains unmarked attempts</span
             >
+            <span>
+                {{ item.title }}
+            </span>
         </button>
     </div>
 </template>
@@ -89,6 +89,8 @@ function onItemSelected(reference: string) {
 .select-button {
     background: var(--foreground-colour);
     border: 1px solid var(--form-border-color);
+    justify-content: start;
+    padding: var(--spacing-xs) var(--spacing-m);
     text-align: left;
     width: 100%;
     &:hover,
@@ -109,9 +111,14 @@ function onItemSelected(reference: string) {
     max-height: 250px;
     overflow-y: scroll;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     &__button {
         background: var(--foreground-colour);
+        display: inline-flex;
+        justify-content: start;
+        gap: var(--spacing-s);
+        padding: var(--spacing-s) var(--spacing-m);
+        text-align: left;
         width: 100%;
         &:last-child {
             font-weight: bold;
