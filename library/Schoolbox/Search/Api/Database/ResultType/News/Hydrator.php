@@ -196,13 +196,14 @@ class Hydrator extends BaseHydrator
     {
         // Find keyword in blurb, then body.
         if ($blurbTextOnly !== '') {
-            $truncatedBlurb = $this->truncateAroundKeyword($keyword, $blurbTextOnly) ?? $this->truncate($blurbTextOnly);
-            if ($truncatedBlurb) {
+            $truncatedBlurb = $this->truncateAroundKeyword($keyword, $blurbTextOnly); // Here we want null if keyword not found.
+            if ($truncatedBlurb !== null) {
                 return $truncatedBlurb;
             }
         }
         if ($bodyTextOnly !== '') {
-            return $this->truncateAroundKeyword($keyword, $bodyTextOnly) ?? $this->truncate($bodyTextOnly);
+            // If keyword not found in body, return blurb because blurb is a better short description of the search result.
+            return $this->truncateAroundKeyword($keyword, $bodyTextOnly) ?? $this->truncate($blurbTextOnly);
         }
 
         return null;
