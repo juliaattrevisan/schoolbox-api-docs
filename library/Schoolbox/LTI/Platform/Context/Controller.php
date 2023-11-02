@@ -181,6 +181,8 @@ class Controller extends BaseController
             $additionalClaims,
         );
 
+        $this->setAllowBackToTheFuture(false);
+
         // Send the request
         $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
@@ -236,6 +238,8 @@ class Controller extends BaseController
             $this->buildRoles($folder),
             $this->buildAdditionalClaims($folder, null, null),
         );
+
+        $this->setAllowBackToTheFuture(false);
 
         // Build a DL request to this tool
         $this->response = $this->responseFromTemplateUnthemed(

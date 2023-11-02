@@ -96,6 +96,8 @@ class Controller extends Base
             $this->userAuthenticator,
         ))->build($this->request);
 
+        $this->setAllowBackToTheFuture(false);
+
         $this->response = $this->responseFromTemplateUnthemed(
             '@ltiPlatform/messageForm.twig',
             ['message' => $message,]

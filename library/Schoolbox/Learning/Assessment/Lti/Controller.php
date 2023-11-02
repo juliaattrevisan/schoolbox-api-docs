@@ -401,6 +401,8 @@ class Controller extends Assessment\Controller
     {
         $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $this->getUser());
 
+        $this->setAllowBackToTheFuture(false);
+
         // And send message to template, where it's POSTed
         $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/lti/messageForm.twig',
@@ -471,6 +473,8 @@ class Controller extends Assessment\Controller
     public function getLaunchAssessmentAsStudent(Model $assessment, User $student): void
     {
         $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $student);
+
+        $this->setAllowBackToTheFuture(false);
 
         // And send message to template, where it's POSTed
         $this->response = $this->responseFromTemplateUnthemed(
