@@ -22,6 +22,7 @@
         :attempt-comments="{{ attemptComments|json_encode }}"
         :urls="{{ urls|json_encode }}"
         :report-payloads="{{ reportPayloads }}"
+        status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>

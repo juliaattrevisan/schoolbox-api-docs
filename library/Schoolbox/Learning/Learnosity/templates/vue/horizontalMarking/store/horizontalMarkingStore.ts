@@ -10,13 +10,16 @@ export const useStore = defineStore("horizontalMarking", () => {
     const isLoaded = window.Vue.ref<boolean>(false); // to show the loading spinner while the reports are loading
     const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
+    const statusPage = window.Vue.ref<string>(""); // to show the finalise review modal
 
     /**
      * store any passed through properties
      * @param { ref } toastElement - the toast element that can pop up
+     * @param { string } $statusPage - the link to the status page
      */
-    function init(toastElement: typeof Toast) {
+    function init(toastElement: typeof Toast, $statusPage: string) {
         toastEl.value = toastElement;
+        statusPage.value = $statusPage;
     }
 
     return {
@@ -25,5 +28,6 @@ export const useStore = defineStore("horizontalMarking", () => {
         init,
         toastEl,
         isFinaliseReviewModalOpen,
+        statusPage,
     };
 });

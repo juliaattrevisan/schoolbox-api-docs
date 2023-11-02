@@ -28,7 +28,7 @@ window.Vue.watch(
  */
 function onSelected() {
     if (studentsStore.allStudentsMarked) {
-        // navigate to appropriate URL
+        window.location.href = store.statusPage;
     } else {
         store.isFinaliseReviewModalOpen = true;
     }
@@ -38,7 +38,7 @@ function onSelected() {
  * Navigate to appropriate URL
  */
 function onConfirmSelected() {
-    // navigate to appropriate URL
+    window.location.href = store.statusPage;
 }
 
 /**
