@@ -45,7 +45,7 @@ use Schoolbox\Permission\Access\UserAccess;
 class Survey_Main extends Evaluation_Main
 {
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
-    const UNLIMITED_DURATION = -1;
+    const UNLIMITED_DURATION = 0;
 
 
     /**
