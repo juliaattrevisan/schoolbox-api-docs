@@ -8,7 +8,7 @@ import type { Item } from "../types/Item";
 
 /**
  * To move the marks (which are in the title div) out of the response container into <hm-students-student-mark>
- * we need to add an attribute to the title div so it can be properly targeted, as they all just have the same class name
+ * we need to add an attribute to each title div so it can be properly targeted, as they all just have the same class name
  * @param {string} reportId - the report id
  */
 function addTargetsToMarks(reportId: string) {

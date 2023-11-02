@@ -8,6 +8,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
 import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
+import Toast from "@schoolboxVue/components/toast.vue";
 import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
@@ -16,7 +17,6 @@ import HmItemsHeader from "./items/hm-items-header.vue";
 import HmStudents from "./students/hm-students.vue";
 import HmPreviousItem from "./items/hm-previous-item.vue";
 import HmNextItem from "./items/hm-next-item.vue";
-import Toast from "@schoolboxVue/components/toast.vue";
 
 interface Props {
     title: string; // the title of the quiz

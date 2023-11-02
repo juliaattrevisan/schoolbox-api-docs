@@ -65,7 +65,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      */
     function addItems(reportId: string, $items: StudentItem[]) {
         const items = $items.filter((item) => item.questions.length > 0); // remove any items that don't have questions
-        const student = students.value.find(($student) => $student.elementId === reportId);
+        const student = students.value.find(($student) => $student.elementId === reportId); // find the student that matches the report
         if (student) {
             const studentItems: StudentItem[] = [];
             items.forEach((item) => {
@@ -76,7 +76,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 });
             });
             student.items = studentItems;
-            // need to do after as we rely on questions and responses being set first
+            // need to do after first loop as we rely on questions and responses being set first
             student.items.forEach((item) => {
                 item.isMarked = getItemIsMarked(item);
             });

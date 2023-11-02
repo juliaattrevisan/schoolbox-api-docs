@@ -32,6 +32,10 @@ async function saveScore() {
     if (score.value === props.question.response.score?.toString()) {
         return;
     }
+    if (Number.isNaN(parseInt(score.value, 10))) {
+        score.value = "";
+        return;
+    }
     studentsStore.updateItemResponseScore(props.student, props.item, props.question, parseInt(score.value, 10));
     const formData = new FormData();
     formData.append("learnosityReference", props.question.response.learnosityReference);
@@ -41,6 +45,18 @@ async function saveScore() {
         body: formData,
     });
 }
+
+/**
+ * add some quick validation to prevent the score input going below 0 and above the max score
+ */
+window.Vue.watch(score, (newScore) => {
+    if (parseFloat(newScore) < 0) {
+        score.value = "0";
+    }
+    if (props.question.response.maxScore && parseFloat(newScore) > props.question.response.maxScore) {
+        score.value = props.question.response.maxScore.toString();
+    }
+});
 
 /**
  * save the score on focus loss if the score has changed
