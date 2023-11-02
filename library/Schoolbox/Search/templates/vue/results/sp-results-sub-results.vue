@@ -8,7 +8,7 @@ import { useFetch } from "@vueuse/core";
 import { Results } from "../../js/types/Results";
 import { Result } from "../../js/types/Result";
 import { useStore } from "../store/searchPageStore";
-import { useResultsStore, SUB_RESULT_LIMIT } from "./store/spResultsStore";
+import { useResultsStore } from "./store/spResultsStore";
 import { useHasMoreResults } from "./composable/useHasMoreResults";
 import SpResultsError from "./sp-results-error.vue";
 import SpResultsSubResult from "./sp-results-sub-result.vue";
@@ -32,11 +32,12 @@ const {
  * To show that there are more results that can be loaded
  * @returns {boolean}
  */
+const RESULT_LIMIT = 5;
 const { hasMoreResults } = useHasMoreResults(
     hasLoadedAllResults,
     window.Vue.ref((props.result._subResults as Results).data),
     moreResultsCount,
-    SUB_RESULT_LIMIT
+    RESULT_LIMIT
 );
 
 /**
@@ -71,9 +72,10 @@ async function loadMore() {
         useResultsStore().setMoreSubResults(loadedResults.data, props.result.id);
         moreResultsCount.value += 1;
         // check if we have loaded all results yet
+        const RESULT_LIMIT = 5;
         if (
             props.result._subResults &&
-            props.result._subResults.data.length < SUB_RESULT_LIMIT * (moreResultsCount.value + 1)
+            props.result._subResults.data.length < RESULT_LIMIT * (moreResultsCount.value + 1)
         ) {
             hasLoadedAllResults.value = true;
         }

@@ -29,7 +29,7 @@ class Controller extends Base
     /**
      * Maximum number of search results to return per call.
      */
-    private const MAX_RESULT_LIMIT = 20; // Must match spResultsStore.ts RESULT_LIMIT.
+    private const MAX_RESULT_LIMIT = 5;
 
     /**
      * Minimum number of characters required to complete a search

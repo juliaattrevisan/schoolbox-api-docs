@@ -7,8 +7,6 @@ import type { Results } from "../../../js/types/Results";
 import type { Result } from "../../../js/types/Result";
 import { useHasMoreResults } from "../composable/useHasMoreResults";
 
-export const RESULT_LIMIT = 20; // Number of results returned by the api on a single call (must match Search/Api/Controller::MAX_RESULT_LIMIT).
-export const SUB_RESULT_LIMIT = 20; // Number of sub results returned by the api on a single call (must match Search/Api/Controller::MAX_RESULT_LIMIT).
 const EMPTY_RESULTS = { data: [], metadata: { cursor: { next: "" } } }; // empty results to initialise the store
 
 export const useResultsStore = defineStore("spResults", () => {
@@ -37,6 +35,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * To show that there are more results that can be loaded
      * @returns {boolean}
      */
+    const RESULT_LIMIT = 5;
     const { hasMoreResults } = useHasMoreResults(hasLoadedAllResults, allResults, moreResultsCount, RESULT_LIMIT);
 
     /**
@@ -47,8 +46,9 @@ export const useResultsStore = defineStore("spResults", () => {
         hasLoadedAllResults.value = false;
         allResults.value = firstResults.data;
         latestResults.value = firstResults;
-        // if we have less results than the limit, we have loaded all results
-        if (allResults.value.length < RESULT_LIMIT) {
+
+        // If cursor.next has not been supplied, we have loaded all results.
+        if (firstResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
         }
     }
@@ -61,8 +61,9 @@ export const useResultsStore = defineStore("spResults", () => {
         allResults.value = [...allResults.value, ...moreResults.data];
         latestResults.value = moreResults;
         moreResultsCount.value += 1;
-        // check if we have loaded all results yet
-        if (allResults.value.length < RESULT_LIMIT * (moreResultsCount.value + 1)) {
+
+        // If cursor.next has not been supplied, we have loaded all results.
+        if (moreResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
         }
     }
