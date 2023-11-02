@@ -91,6 +91,9 @@ abstract class BaseHydrator implements IHydrator
     {
         // Set line width to zero (unrestricted) to avoid introducing newlines into the text-only string.
         // Extra newlines prevent the search from working if the keyword spans multiple lines.
+        // Note this method was chosen over Scrub::html2text() because that method results in table cell content in
+        // neighboring cells being concatenated into a single string, while ToText separates cell content with a space.
+        // (e.g. '<td>Key</td><td>word</td>' becomes 'Keyword' when Scrub::html2text() is used).
         return (new ToText($html, ['width' => 0, 'do_links' => 'none']))->getText();
     }
 
