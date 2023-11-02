@@ -114,6 +114,15 @@ $app = new class extends CliTool\App {
                                             and assess_question.deleted_at is null
                                           group by assess.assess_id
                                           having numQuestions > 49) as numQuestions;',
+            'quiz_questions_over_100'   => 'SELECT COUNT(*) from (select distinct count(*) as numQuestions
+                                          from assess
+                                                   inner join assess_section on assess.assess_id = assess_section.assess_id
+                                                   inner join assess_question on assess_section.section_id = assess_question.section_id
+                                          where assess.deleted_at is null
+                                            and assess_section.deleted_at is null
+                                            and assess_question.deleted_at is null
+                                          group by assess.assess_id
+                                          having numQuestions > 99) as numQuestions;',
             'quiz_random_sections'      => '
                                         select distinct count(*) as num
                                         from assess
