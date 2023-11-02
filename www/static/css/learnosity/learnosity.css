@@ -1245,9 +1245,6 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     background: #fff;
 }
 
-.island section {
-    background: var(--body-background);
-}
 .lrn.lrn-author .lrn-author-item-nav {
     background: var(--body-background);
     position: absolute;
@@ -1677,17 +1674,6 @@ span.lrn-list-view-empty-label {
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-item-for-activity-list,
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-item-for-activity-list {
     margin-right: 0px;
-}
-.island .content,
-.island .calendar-list li.row,
-.calendar-list .island li.row,
-.island .calendar-list label,
-.calendar-list .island label,
-.island .matching-pairs p,
-.matching-pairs .island p,
-.island .resource-browser .meta-panel,
-.resource-browser .island .meta-panel {
-    padding: 0px;
 }
 .lrn .lrn-author-ui .lrn-author-item-toolbar-right,
 .lrn .lrn-author-ui .lrn-author-activity-toolbar-right {
