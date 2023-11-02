@@ -22,21 +22,21 @@
     {% include '@learning/fragments/meta/workType.twig' %}
     {# joining student name with lastView data #}
     {% if student.id != USER.id %}
-        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">
+        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">{% apply spaceless %}
             <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {% if lastViews is not empty %}
                 {{ lastViews.student.status }}
                 {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
             {% endif %}
-        </li>
+        {% endapply %}</li>
     {% endif %}
     {% if lastViews is not empty %}
         {% for parent in lastViews.parents %}
             {% if parent.date is not null %}
-                <li class="icon-staff" title="{{ parent.date }}">
+                <li class="icon-staff" title="{{ parent.date }}">{% apply spaceless %}
                     <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
                     {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
-                </li>
+                {% endapply %}</li>
             {% endif %}
         {% endfor %}
     {% endif %}
