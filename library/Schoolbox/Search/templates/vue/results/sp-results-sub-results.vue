@@ -32,13 +32,7 @@ const {
  * To show that there are more results that can be loaded
  * @returns {boolean}
  */
-const RESULT_LIMIT = 5;
-const { hasMoreResults } = useHasMoreResults(
-    hasLoadedAllResults,
-    window.Vue.ref((props.result._subResults as Results).data),
-    moreResultsCount,
-    RESULT_LIMIT
-);
+const { hasMoreResults } = useHasMoreResults(hasLoadedAllResults, window.Vue.ref(props.result._subResults as Results));
 
 /**
  * To show the load more button when appropriate
@@ -72,7 +66,6 @@ async function loadMore() {
         useResultsStore().setMoreSubResults(loadedResults.data, props.result.id);
         moreResultsCount.value += 1;
         // check if we have loaded all results yet
-        const RESULT_LIMIT = 5;
         if (
             props.result._subResults &&
             props.result._subResults.data.length < RESULT_LIMIT * (moreResultsCount.value + 1)

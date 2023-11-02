@@ -35,8 +35,7 @@ export const useResultsStore = defineStore("spResults", () => {
      * To show that there are more results that can be loaded
      * @returns {boolean}
      */
-    const RESULT_LIMIT = 5;
-    const { hasMoreResults } = useHasMoreResults(hasLoadedAllResults, allResults, moreResultsCount, RESULT_LIMIT);
+    const { hasMoreResults } = useHasMoreResults(hasLoadedAllResults, latestResults);
 
     /**
      * Set the first results

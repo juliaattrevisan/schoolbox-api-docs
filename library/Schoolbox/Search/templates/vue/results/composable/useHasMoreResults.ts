@@ -4,22 +4,15 @@
  */
 
 import type { Ref } from "vue";
-import type { Result } from "../../../js/types/Result";
+import type { Results } from "../../../js/types/Results";
 
 /**
  * To show that whether there are more results that can be loaded
  * @param {Ref<boolean>} hasLoadedAllResults - whether all results have been loaded
- * @param {Ref<Result[]>} results - the current results
- * @param {Ref<number>} moreResultsCount - the number of subsequent result sets that have been loaded
- * @param {number} resultLimit - the number of results returned by the api on a single call
+ * @param {Ref<Results>} results - the current results
  * @returns {boolean} - whether there are more results that can be loaded
  */
-export function useHasMoreResults(
-    hasLoadedAllResults: Ref<boolean>,
-    results: Ref<Result[]>,
-    moreResultsCount: Ref<number>,
-    resultLimit: number
-) {
+export function useHasMoreResults(hasLoadedAllResults: Ref<boolean>, results: Ref<Results>) {
     /**
      * To show that there are more results that can be loaded
      * @returns {boolean}
@@ -29,7 +22,7 @@ export function useHasMoreResults(
             return false;
         }
         // if we are showing the current limit, its assumed we have more results to show
-        if (results.value.length === resultLimit * (moreResultsCount.value + 1)) {
+        if (results.value.metadata.cursor.next !== null) {
             return true;
         }
         return false;
