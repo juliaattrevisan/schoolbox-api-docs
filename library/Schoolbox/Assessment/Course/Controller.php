@@ -212,7 +212,7 @@ class Controller extends Base\Base
                     'folder_id',
                     $courseFolder->getId(),
                     [
-                    'deleted' => true,
+                        'deleted' => true,
                     ]
                 );
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
@@ -441,7 +441,12 @@ class Controller extends Base\Base
             $this->validateCourseData(trim($post['name']), (int)trim($post['parent']), null);
 
             // Template
-            $template = $this->courseTemplateMapper->findById($post['template']);
+            try {
+                $template = $this->courseTemplateMapper->findById($post['template']);
+            } catch (Deleted $e) {
+                $this->sendError('It appears this template no longer exists. Please refresh your page to re-select.');
+                return;
+            }
 
             // Create new CourseFolder
             $courseFolder = $this->persistFolder(
@@ -914,8 +919,8 @@ class Controller extends Base\Base
                 'linkToUnits'      => false,
                 'hasBreadcrumb'    => false,
                 'encodedReturnUrl' => $query->get('encodedReturnUrl'),
-                'folder'           => [ 'id' => $query->get('folder') ],
-                'component'        => [ 'id' => $query->get('component') ],
+                'folder'           => ['id' => $query->get('folder')],
+                'component'        => ['id' => $query->get('component')],
             ];
         } else {
             $options = [
