@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
 use Aura\Router\Exception\RouteNotFound;
+use Closure;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
@@ -30,10 +31,10 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 use Schoolbox\Learning\Course\DataModel\AbstractUnit;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -54,15 +55,15 @@ class Controller extends Assessment\Controller
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
-        CourseSpecificationMapper $courseSpecificationMapper,
-        UnitSpecificationMapper $unitSpecificationMapper,
+        CourseSpecification\Mapper $courseSpecificationMapper,
+        UnitSpecification\Mapper $unitSpecificationMapper,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
         Project\ResultCache\Mapper $projectResultCacheMapper,
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        private CourseImplementationMapper $courseImplementationMapper,
-        private UnitImplementationMapper $unitImplementationMapper,
+        private CourseImplementation\Mapper $courseImplementationMapper,
+        private UnitImplementation\Mapper $unitImplementationMapper,
         private LinkedAssessmentsMapper $linkedAssessmentsMapper
     ) {
         parent::__construct(
@@ -241,7 +242,9 @@ class Controller extends Assessment\Controller
         $linkedAssessmentIds = ($assessment->getLinkedAssessments()?->getPropertyValues('id')) ?? [];
         $linkedAssessments   = null;
         if ($linkedAssessmentIds) {
-            $linkedAssessments = $this->getAssessmentMapper()->findAllByIds($linkedAssessmentIds, ['cache' => false,]);
+            $linkedAssessments = $this->getAssessmentMapper()
+                                      ->findAllByIds($linkedAssessmentIds, ['cache' => false,])
+                                      ->sortByCallback(Closure::fromCallable([$this, 'sortLinkedAssessments']));
         }
 
         $twigData = [
@@ -269,6 +272,72 @@ class Controller extends Assessment\Controller
         );
     }
 
+    /**
+     * Sort callback for linked assessments.
+     *
+     * @param IAssessable $a
+     * @param IAssessable $b
+     * @return int
+     */
+    private function sortLinkedAssessments(IAssessable $a, IAssessable $b): int
+    {
+        $aSortValues = $this->deriveSortValues($a);
+        $bSortValues = $this->deriveSortValues($b);
+        if (isset($aSortValues, $bSortValues)) {
+            // Pair sort values together
+            foreach ($aSortValues as $i => $aSortValue) {
+                $bSortValue = $bSortValues[$i] ?? null;
+                if (!isset($bSortValue)) {
+                    break;
+                }
+                if ($aSortValue !== $bSortValue) {
+                    return $aSortValue <=> $bSortValue;
+                }
+            }
+        }
+
+        // All else fails: just compare their sequences
+        return $a->getSequence() <=> $b->getSequence();
+    }
+
+    /**
+     * Derive sort values for this assessment.
+     *
+     * This ordering is supposed to mirror their ordering in either a course
+     * builder or course outline:
+     * * if a course builder, order by the unit's ID first
+     * * if a course outline, order by the unit's due date first
+     *
+     * Then:
+     * * if the assessment is in a project: order by its project's sequence then
+     *   the assessment's sequence
+     * * otherwise, order by the assessment's sequence
+     *
+     * @param IAssessable $assessment
+     * @return array|null
+     */
+    private function deriveSortValues(IAssessable $assessment): ?array
+    {
+        $sortValues  = [];
+        $baseContext = $assessment->getBaseContext();
+        if ($baseContext instanceof UnitSpecification\Model) {
+            $sortValues[] = $baseContext->getId();
+        } elseif ($baseContext instanceof UnitImplementation\Model) {
+            $sortValues[] = $baseContext->getDueDate()->getUnixTimeStamp();
+        } else {
+            return null;
+        }
+
+        $context = $assessment->getContext();
+        if ($context instanceof Project) {
+            $sortValues[] = $context->getSequence();
+            $sortValues[] = $assessment->getSequence();
+        } else {
+            $sortValues[] = $assessment->getSequence();
+            $sortValues[] = 0;
+        }
+        return $sortValues;
+    }
 
     /**
      * Lesson Plans don't have any responses.
