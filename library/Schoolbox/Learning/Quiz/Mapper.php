@@ -289,12 +289,23 @@ class Mapper extends BaseMapper
                 ]
             ]);
 
+            // Assign and save Learnosity reference
             /* FIXME projects need some special treatment of some kind,
              *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
              *  which won't have a Learnosity Reference field...weird behaviours
              *  But Why?
              */
             $destination->setLearnosityReference($newLearnosityReference);
+            if ($destination->getId()) {
+                $this->database->prepareQuery(
+                    "
+                        UPDATE {$this->database->getQuoter()->quoteIdentifier($this->table)}
+                        SET learnosity_reference = ?
+                        WHERE assessment_id = ?
+                    ",
+                    [$newLearnosityReference, $destination->getId()],
+                )->execute();
+            }
 
             /* TODO Also redefine the tags in the cloned thing...but how?
              *  You don't know when it finishes the cloning.
