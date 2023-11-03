@@ -9,6 +9,6 @@ export type Results = {
         cursor: {
             next: string | null;
         };
-        url: string;
+        url?: string;
     };
 };
