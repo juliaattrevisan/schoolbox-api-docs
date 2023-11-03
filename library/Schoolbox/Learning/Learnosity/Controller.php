@@ -30,6 +30,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -131,6 +132,7 @@ class Controller extends Base
      * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
      * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
      * @param Feedback\Mapper $feedbackMapper
+     * @param UserMapper $userMapper
      * @throws \DomainException
      */
     public function __construct(
@@ -142,7 +144,8 @@ class Controller extends Base
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $resultCacheMapper,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
-        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper
+        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
+        private \Schoolbox\UserMapper $userMapper
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -1434,5 +1437,70 @@ class Controller extends Base
         /* Delete them
          */
         $this->attemptMapper->deleteByPredicates($pb);
+    }
+
+
+    /**
+     * Sets reviewed_at for all the attempt ids in $attemptIds
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postMassReviewAttempts(IAssessable $assessment): void
+    {
+        $attemptIds = $this->requestPost->get('attemptIds');
+
+        /* Find the users associated with each attempt id;
+         * we need it to update any project caches that exist
+         */
+        $attempts = $this->attemptMapper->findByColumn('attempt_id', $attemptIds);
+
+        /* You can't mass-save or mass-update via predicates, afaict?
+         * Traverse individually
+         *
+         * Note that sometimes we'll skip processing attempts:
+         * attempt authors might have been deleted/excluded via another tab via multiplayer
+         * schoolbox, but it's not really apparent anymore why we cared enough to do this
+         * only for this workflow and not others...or why we cared enough to do it at all?
+         * Were we trying to service 0.01% of the edge cases or what?
+         */
+        foreach ($attempts as $attempt) {
+            /* Author nonexistent? skip 'em
+             */
+            try {
+                $user = $this->userMapper->findById($attempt->getUser()->getId());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                continue;
+            }
+
+            /* Author excluded? skip 'em
+             * Shanked out of that random andyland ActionValidator class, because we need
+             * to know all the participants - not just the quiz itself
+             */
+            $quiz ??= $this->assessmentDataSource->findByQuizId($attempt->getQuiz()->getId());
+
+            if (!$quiz->isParticipant($attempt->getUser())) {
+                continue;
+            }
+
+            /* Anyway, set the reviewer and timestamp as usual
+             */
+            $attempt->setReviewer($this->getUser())
+                ->setReviewed(\Alaress_Date_Format::now());
+
+            $this->attemptMapper->save($attempt);
+
+            /* Update project result cache
+             */
+            (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
+        }
     }
 }

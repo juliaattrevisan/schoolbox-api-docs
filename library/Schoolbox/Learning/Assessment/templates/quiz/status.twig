@@ -280,11 +280,13 @@
                 userList: $participantList,
                 userSelector: '[data-mass-review]',
                 onSubmit: function (toReview) {
-                    var list = toReview.map(function () { return $(this).find('[data-interaction-review]').attr('data-interaction-review') }).get();
+                    let list = toReview.map(function () {
+                        return $(this).find('[data-interaction-review]').attr('data-interaction-review') }
+                    ).get();
 
                     $.post(
-                        '/assess/reviewAttempt',
-                        { selectedIds: list }
+                        '{{ routeLookup('learnosity.postMassReviewAttempts', {assessmentId: assessment.id }) }}',
+                        { attemptIds: list }
                     ).done(function () {
                         location.reload();
                     });
@@ -321,7 +323,7 @@
             $participantList.on('click', '[data-interaction-delete]', function (e) {
                 e.preventDefault();
 
-                var $a = $(this);
+                let $a = $(this);
 
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this attempt?',
@@ -341,7 +343,7 @@
             {# Submit/Finish an unfinished/unsubmitted/in-progress quiz attempt #}
             $participantList.on('click', '[data-interaction-finish]', function (e) {
                 e.preventDefault();
-                var $a = $(this);
+                let $a = $(this);
 
                 $.post(
                     $a.attr('href'),

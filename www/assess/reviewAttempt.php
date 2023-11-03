@@ -1,89 +1,89 @@
 <?php
-
-/**
- * Bulk assessment attempt review
- */
-
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Quiz\ActionValidator;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
-
-$assessHandler   = new Assess_Main();
-$attemptHandler  = new Assess_Attempt();
-$responseHandler = new Assess_Response();
-$groupHandler    = new Group();
-
-$allAttempts = [];
-
-/** @var MapperProxy $assessmentDataSource */
-$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-$quizzes              = [];
-
-foreach ($_POST['selectedIds'] as $currentAttempt) {
-    if (is_numeric($currentAttempt)) {
-        $attempt = $attemptHandler->getByID($currentAttempt);
-
-        if (!$assessHandler->isValidUrlAccess($attempt['assess_id'])) {
-            $this->pageNotFound();
-        }
-
-        /* Author nonexistent? skip 'em
-         */
-        try {
-            $user = UserMapper::getInstance()->findById($attempt['user_id']);
-        } catch (Mapper\Exception $e) {
-            continue;
-        }
-
-        /* Excluded participant? skip 'em
-         */
-        $actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
-
-        $quizzes[$attempt['assess_id']] ??= $assessmentDataSource->findByQuizId($attempt['assess_id']);
-        if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $quizzes[$attempt['assess_id']])) {
-            $this->pageNotFound();
-        }
-
-        $attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
-
-        /* Arbitrarily hijack this array a little bit so we know the context of this attempt's quiz.
-         * If the context is a project, we need to invalidate its result cache
-         */
-        $attempt['quiz'] = $quizzes[$attempt['assess_id']];
-        $attempt['user'] = $user;
-
-        $allAttempts[] = $attempt;
-
-        if (!$assessHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < UserAccess::ACCESS_WRITE)) {
-            error(142);
-        }
-    }
-}
-
-/* Update attempts
- */
-$data          = [
-    'action'  => 'reload',
-    'updated' => [],
-];
-$attemptMapper = QuizAttemptMapper::getInstance();
-foreach ($allAttempts as $currentAttempt) {
-    try {
-        $attempt                                        = $attemptMapper->findById($currentAttempt['attempt_id']);
-        $result                                         = $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
-        $data['updated'][$currentAttempt['attempt_id']] = ($result !== false);
-
-        /* Update project result cache
-         */
-        (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
-    } catch (Exception $e) {
-        // noop;
-    }
-}
-header('Content-Type: application/json');
-die(json_encode($data));
+//
+///**
+// * Bulk assessment attempt review
+// */
+//
+//use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+//use Schoolbox\Learning\Assessment\Project;
+//use Schoolbox\Learning\Quiz\ActionValidator;
+//use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+//use Schoolbox\Mapper;
+//use Schoolbox\Permission\Access\Access;
+//use Schoolbox\Permission\Access\UserAccess;
+//use Schoolbox\UserMapper;
+//
+//$assessHandler   = new Assess_Main();
+//$attemptHandler  = new Assess_Attempt();
+//$responseHandler = new Assess_Response();
+//$groupHandler    = new Group();
+//
+//$allAttempts = [];
+//
+///** @var MapperProxy $assessmentDataSource */
+//$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+//$quizzes              = [];
+//
+//foreach ($_POST['selectedIds'] as $currentAttempt) {
+//    if (is_numeric($currentAttempt)) {
+//        $attempt = $attemptHandler->getByID($currentAttempt);
+//
+//        if (!$assessHandler->isValidUrlAccess($attempt['assess_id'])) {
+//            $this->pageNotFound();
+//        }
+//
+//        /* Author nonexistent? skip 'em
+//         */
+//        try {
+//            $user = UserMapper::getInstance()->findById($attempt['user_id']);
+//        } catch (Mapper\Exception $e) {
+//            continue;
+//        }
+//
+//        /* Excluded participant? skip 'em
+//         */
+//        $actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
+//
+//        $quizzes[$attempt['assess_id']] ??= $assessmentDataSource->findByQuizId($attempt['assess_id']);
+//        if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $quizzes[$attempt['assess_id']])) {
+//            $this->pageNotFound();
+//        }
+//
+//        $attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
+//
+//        /* Arbitrarily hijack this array a little bit so we know the context of this attempt's quiz.
+//         * If the context is a project, we need to invalidate its result cache
+//         */
+//        $attempt['quiz'] = $quizzes[$attempt['assess_id']];
+//        $attempt['user'] = $user;
+//
+//        $allAttempts[] = $attempt;
+//
+//        if (!$assessHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < UserAccess::ACCESS_WRITE)) {
+//            error(142);
+//        }
+//    }
+//}
+//
+///* Update attempts
+// */
+//$data = [
+//    'action'  => 'reload',
+//    'updated' => [],
+//];
+//$attemptMapper = QuizAttemptMapper::getInstance();
+//foreach ($allAttempts as $currentAttempt) {
+//    try {
+//        $attempt                                        = $attemptMapper->findById($currentAttempt['attempt_id']);
+//        $result                                         = $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
+//        $data['updated'][$currentAttempt['attempt_id']] = ($result !== false);
+//
+//        /* Update project result cache
+//         */
+//        (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
+//    } catch (Exception $e) {
+//        // noop;
+//    }
+//}
+//header('Content-Type: application/json');
+//die(json_encode($data));
