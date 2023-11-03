@@ -1,10 +1,14 @@
 <script setup lang="ts">
 /**
- * To allow the teacher to review the item, to customise the score and add a comment
+ * To add or update the comment of an item
+ * Note that any questions without a score are considered marked when a comment is added to the item
+ * The comment is linked to the first question in the item.
+ * So the first comment is considered the comment for the entire item regardless of how many questions are in the item
  */
 
+import debounce from "lodash/debounce";
+import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
-import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { useStudentsStore } from "../store/hmStudentsStore";
@@ -20,6 +24,30 @@ const comment = useEditor(props.item.questions[0].response.comment ?? "", editor
     targetElements: [`#${editorId}`],
     hasTokens: true,
 }); // Use a ckeditor for the comments field
+const isSaving = window.Vue.ref(false);
+const isSavedDelay = window.Vue.ref(false);
+
+/**
+ * To notify of the current save status
+ * @returns {string} - the text to display
+ */
+const saveText = window.Vue.computed(() => {
+    if (isSaving.value) {
+        return "Saving...";
+    }
+    return "Comment saved";
+});
+
+/**
+ * To open and close the save status
+ * @returns {string} - the grid-template-rows
+ */
+const saveContainerHeight = window.Vue.computed(() => {
+    if (isSaving.value || isSavedDelay.value) {
+        return "1fr";
+    }
+    return "0fr";
+});
 
 /**
  * Save the comment if it's changed
@@ -28,7 +56,7 @@ async function saveComment() {
     if (comment.value === props.item.questions[0].response.comment) {
         return;
     }
-    studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment.value);
+    isSaving.value = true;
     const formData = new FormData();
     formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
     formData.append("comment", comment.value);
@@ -36,21 +64,25 @@ async function saveComment() {
         method: "POST",
         body: formData,
     });
+    studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment.value);
+    isSavedDelay.value = true;
+    isSaving.value = false;
+    await timeout(2000);
+    isSavedDelay.value = false;
 }
 
 /**
- * Start listening for the editor to be created and then listen for focus changes to save the comment
+ * debounce to avoid constant polling while the user is typing
  */
-window.Vue.onMounted(() => {
-    const ckeditorElement = document.getElementById(editorId) as HTMLElement;
-    ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
-        const editor = event.detail.editor;
-        editor.ui.focusTracker.on("change:isFocused", async (event, name, isFocused) => {
-            if (!isFocused && comment.value !== props.item.questions[0].response.comment) {
-                await saveComment();
-            }
-        });
-    });
+const debounceSave = debounce(() => {
+    void saveComment();
+}, 1000);
+
+/**
+ * save the comment when it's changed
+ */
+window.Vue.watch(comment, () => {
+    debounceSave();
 });
 
 /**
@@ -69,5 +101,22 @@ window.Vue.onUnmounted(async () => {
             on creation.
         </p>
         <textarea :id="editorId"></textarea>
+        <div class="save-container l-grid">
+            <div class="save-container__inner-container">
+                <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                    <em>{{ saveText }}</em>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.save-container {
+    grid-template-rows: v-bind(saveContainerHeight);
+    transition: grid-template-rows 300ms;
+    &__inner-container {
+        overflow: hidden;
+    }
+}
+</style>

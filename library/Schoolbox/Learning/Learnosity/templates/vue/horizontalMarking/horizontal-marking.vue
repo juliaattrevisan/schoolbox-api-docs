@@ -75,4 +75,9 @@ window.Vue.onMounted(async () => {
     <toast ref="toastEl"></toast>
 </template>
 
-<style scoped></style>
+<style>
+/* remove the bottom margin so the save status can butt up against the bottom of the editor */
+.ck.ck-editor {
+    margin-bottom: 0 !important;
+}
+</style>

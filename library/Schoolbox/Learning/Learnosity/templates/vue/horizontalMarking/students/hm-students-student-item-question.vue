@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Contains a students response to an item and a score if available
+ * Contains a students response to a question and will save the score if updated
  */
 
 import debounce from "lodash/debounce";
@@ -24,6 +24,10 @@ const score = window.Vue.ref<string>(props.question.response.score?.toString() ?
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
+/**
+ * To notify of the current save status
+ * @returns {string} - the text to display
+ */
 const saveText = window.Vue.computed(() => {
     if (isSaving.value) {
         return "Saving...";
@@ -31,6 +35,10 @@ const saveText = window.Vue.computed(() => {
     return "Score saved";
 });
 
+/**
+ * To open and close the save status
+ * @returns {string} - the grid-template-rows
+ */
 const saveContainerHeight = window.Vue.computed(() => {
     if (isSaving.value || isSavedDelay.value) {
         return "1fr";
@@ -68,15 +76,25 @@ async function saveScore() {
 }
 
 /**
- * add some quick validation to prevent the score input going below 0 and above the max score
+ * debounce to avoid constant polling while the user is typing
+ */
+const debounceSave = debounce(() => {
+    void saveScore();
+}, 300);
+
+/**
+ * add some quick validation to prevent the score input going below 0 and above the max score and save the score
  */
 window.Vue.watch(score, (newScore) => {
     if (parseFloat(newScore) < 0) {
         score.value = "0";
+        return;
     }
     if (props.question.response.maxScore && parseFloat(newScore) > props.question.response.maxScore) {
         score.value = props.question.response.maxScore.toString();
+        return;
     }
+    debounceSave();
 });
 
 /**
@@ -100,20 +118,6 @@ window.Vue.onBeforeUnmount(async () => {
     props.container.appendChild(response);
     await saveScore();
 });
-
-/**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSave = debounce(() => {
-    void saveScore();
-}, 300);
-
-/**
- * start searching once the search is active, watching the query string for input
- */
-window.Vue.watch(score, () => {
-    debounceSave();
-});
 </script>
 
 <template>
@@ -125,7 +129,7 @@ window.Vue.watch(score, () => {
             <input type="text" :value="question.metadata.sample_answer" readonly />
         </div>
         <div v-if="props.question.response.maxScore">
-            <label>Update Score (max score: {{ props.question.response.maxScore }})</label>
+            <label>Score (max score: {{ props.question.response.maxScore }})</label>
             <input
                 :id="`customise-score-${props.question.response.learnosityReference}`"
                 ref="scoreEl"
