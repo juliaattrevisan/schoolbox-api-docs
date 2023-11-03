@@ -1545,7 +1545,7 @@ class Controller extends Assessment\Controller
             ];
             $code = 403;
         }
-        $this->response = $this->responseAsJson($data)->withStatus(403);
+        $this->response = $this->responseAsJson($data)->withStatus($code);
     }
 
 
