@@ -56,13 +56,13 @@ class DataObjectFactory
         if (isset($decodedFilter['date']['from'])) {
             if (strlen($decodedFilter['date']['from']) === 10) {
                 // Assume date has been supplied in 'Y-m-d' format, so add default time (start of day) in expected format.
-                $dateObj = new Alaress_Date_Format($decodedFilter['date']['from'], 'Y-m-d');
-                $decodedFilter['date']['from'] = $dateObj->startOfDay()->toRfc3339String();
+                $decodedFilter['date']['from'] .= '00:00:00';
             }
+
             try {
-                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], DateTimeInterface::RFC3339);
+                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], 'Y-m-d H:i:s');
             } catch (InvalidArgumentException $e) {
-                throw new Exception("Invalid filter: date.from ('{$decodedFilter['date']['from']}') is not an RFC3339 date", 0, $e);
+                throw new Exception("Invalid filter: date.from ('{$decodedFilter['date']['from']}') is not in expected format", 0, $e);
             }
         }
 
@@ -70,13 +70,12 @@ class DataObjectFactory
         if (isset($decodedFilter['date']['to'])) {
             if (strlen($decodedFilter['date']['to']) === 10) {
                 // Assume date has been supplied in 'Y-m-d' format, so add default time (end of day) in expected format.
-                $dateObj = new Alaress_Date_Format($decodedFilter['date']['to'], 'Y-m-d');
-                $decodedFilter['date']['to'] = $dateObj->endOfDay()->toRfc3339String();
+                $decodedFilter['date']['to'] .= '23:59:59';
             }
             try {
-                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], DateTimeInterface::RFC3339);
+                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], 'Y-m-d H:i:s');
             } catch (InvalidArgumentException $e) {
-                throw new Exception("Invalid filter: date.to ('{$decodedFilter['date']['to']}') is not an RFC3339 date", 0, $e);
+                throw new Exception("Invalid filter: date.to ('{$decodedFilter['date']['to']}') is not in expected format", 0, $e);
             }
         }
 
