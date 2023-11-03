@@ -97,6 +97,10 @@ class Module extends \Alaress\Module\Module
             $assessmentDataSource,
             $this->getMapperFactory()->get(QuizMapper::class),
             $this->getMapperFactory()->get(RubricDataSource::class),
+            $this->injector->get('httpFactory'),
+            $this->injector->get('taskd.httpRequestMessageFactory'),
+            $this->injector->get('taskd.messageProducer'),
+            $this->getRouter()->getGenerator(),
         );
         $importFactory = new ImportFactory(
             $assessmentDataSource,
