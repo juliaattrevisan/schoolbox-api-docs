@@ -1607,8 +1607,8 @@ class Controller extends Base
      */
     public function postCopyQuizConstituents(IAssessable $source, IAssessable $destination): void
     {
-        $this->quizMapper->copyQuizConstituents($source, $destination);
-        $this->response = $this->responseEmpty();
+        $jobId = $this->quizMapper->copyQuizConstituents($source, $destination);
+        $this->response = $this->responseAsJson(['jobId' => $jobId]);
     }
 
     /**
