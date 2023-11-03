@@ -170,6 +170,7 @@ use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
 use Schoolbox\TaskDaemon\ProducerFactory;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory as HttpRequestMessageFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
@@ -445,6 +446,20 @@ abstract class Kernel
                     'instance'     => $di->lazyGet('instance'),
                     'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
                 ],
+            )
+        );
+        $di->set(
+            'taskd.httpRequestMessageFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var Instance $instance */
+                    $instance = $di->get('instance');
+
+                    /** @var Jwt $tokenBuilder */
+                    $tokenBuilder = $di->get('user.tokenBuilder');
+
+                    return new HttpRequestMessageFactory($instance, $tokenBuilder);
+                }
             )
         );
         $di->set(

@@ -8,6 +8,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Lumberjack\Logger;
+use Aura\Router\Generator;
+use Http\Discovery\Psr17Factory;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -15,6 +17,8 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
 
 /**
@@ -23,14 +27,24 @@ use Schoolbox\User;
 class Overwriter
 {
     /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param QuizMapper            $quizMapper
-     * @param RubricDataSource      $rubricMapper
+     * Constructor
+     *
+     * @param AssessmentMapperProxy $assessmentMapperProxy for querying assessments
+     * @param QuizMapper            $quizMapper            for performing actions on quizzes
+     * @param RubricDataSource      $rubricMapper          for performing actions on rubrics
+     * @param Psr17Factory          $httpFactory           for building HTTP requests to send in taskd messages
+     * @param MessageFactory        $messageFactory        for building messages to send to taskd
+     * @param Producer              $messageProducer       for sending messages to taskd
+     * @param Generator             $routeGenerator        for building URLs for HTTP requests to send to taskd
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private QuizMapper $quizMapper,
         private RubricDataSource $rubricMapper,
+        private Psr17Factory $httpFactory,
+        private MessageFactory $messageFactory,
+        private Producer $messageProducer,
+        private Generator $routeGenerator,
     ) {
     }
 
@@ -117,12 +131,30 @@ class Overwriter
             return;
         }
 
-        /* Clone an existing Learnosity Activity
-         * Get the cloned activity's Learnosity Reference
-         * Assign this new Learnosity Reference to $destination's instance
-         * Save it
-         */
-        $this->quizMapper->copyQuizConstituents($source, $destination);
+        // Callback to URL which replicates constituents
+        $message = $this->messageFactory->setRequest(
+            $this->httpFactory->createRequest(
+                'POST',
+                (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified()->withPath(
+                    $this->routeGenerator->generate(
+                        'learnosity.postCopyQuizConstituents',
+                        [
+                            'sourceId'      => $source->getId(),
+                            'destinationId' => $destination->getId(),
+                        ],
+                    )
+                )
+            )
+        )->build();
+        $this->messageProducer->send($message);
+
+
+//        /* Clone an existing Learnosity Activity
+//         * Get the cloned activity's Learnosity Reference
+//         * Assign this new Learnosity Reference to $destination's instance
+//         * Save it
+//         */
+//        $this->quizMapper->copyQuizConstituents($source, $destination);
     }
 
     /**
