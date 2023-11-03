@@ -134,7 +134,7 @@ class Controller extends Base
      */
     private const QUERY_FEEDBACK_QUIZ = "
         SELECT 
-            mark/max_mark AS normalised,
+            100 * mark/max_mark AS normalised,
             CONCAT(mark, ' / ', max_mark) AS humanReadable
         FROM assess_attempt
         WHERE attempt_id = :feedbackId
