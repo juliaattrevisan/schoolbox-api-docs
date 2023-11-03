@@ -134,7 +134,7 @@ class Session extends BaseSession
         $authSession = $this->getSegment(null);
         if ($this->config->get('track_ip')) {
             $sessionIpAddress = $authSession->get('ip');
-            if ($sessionIpAddress && $sessionIpAddress !== \Session::getIP()) {
+            if ($sessionIpAddress && $sessionIpAddress !== \Session::getIP() && !$authSession->get(\Session::BYPASS_IP_TRACKING, false)) {
                 return false;
             }
         }
