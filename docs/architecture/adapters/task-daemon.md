@@ -72,7 +72,8 @@ $messageFactory = new \Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory(
 /** @var \Http\Discovery\Psr17Factory $httpFactory */
 $uri     = new Schoolbox\Url\Uri('https://example.com');
 $message = $httpRequestMessageFactory
-    ->setRequest($httpFactory->createRequest('GET', $uri));
+    ->setRequest($httpFactory->createRequest('GET', $uri))
+    ->build();
 $messageProducer->send($message);
 ```
 
