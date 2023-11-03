@@ -14,14 +14,14 @@
         {% if not canAttempt %}
             You cannot attempt this quiz
         {% else %}
-            Allowed time: <time>{{ assessment.durationNeatly(assessment.duration) }}</time>
+            Allowed time: <time>{{ duration.secondsToHoursAndMinutes(assessment.duration) }}</time>
         {% endif %}
         {% endapply %}</li>
 
     {# (optional) Reading time #}
     {% if assessment.readingTimeDuration and canAttempt %}
     <li class="icon-time-value" title="Reading Time">{% apply spaceless %}
-        Reading time: <time>{{ assessment.durationNeatly(assessment.readingTimeDuration) }}</time>
+        Reading time: <time>{{ duration.secondsToHoursAndMinutes(assessment.readingTimeDuration) }}</time>
     {% endapply %}</li>
     {% endif %}
 
