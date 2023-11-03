@@ -8,7 +8,6 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
 import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
@@ -32,7 +31,6 @@ interface Props {
 const props = defineProps<Props>();
 const store = useStore();
 const itemsStore = useItemsStore();
-const toastEl = window.Vue.ref<Toast | null>(null);
 
 const hasStudents = window.Vue.computed(() => {
     return props.students && Object.keys(props.students).length > 0;
@@ -43,7 +41,7 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(toastEl, props.statusPage);
+    store.init(props.statusPage);
     itemsStore.init(props.items);
     useStudentsStore().init(props.students, props.itemResponses, props.attemptComments, props.urls);
     await window.Vue.nextTick();
@@ -72,7 +70,6 @@ window.Vue.onMounted(async () => {
             </div>
         </template>
     </div>
-    <toast ref="toastEl"></toast>
 </template>
 
 <style>
