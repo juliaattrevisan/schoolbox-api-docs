@@ -50,6 +50,13 @@ function initResizeObserver() {
     resizeObserver.observe(searchPageEl.value as HTMLDivElement);
 }
 
+window.onpopstate = async (event) => {
+    const searchParams = new URLSearchParams(document.location.search);
+    if (searchParams.has(SEARCH_PARAM)) {
+        document.location.reload();
+    }
+};
+
 /**
  * start a search straight away if a keyword has been passed through
  */
@@ -57,7 +64,7 @@ window.Vue.onMounted(async () => {
     const searchParams = new URLSearchParams(document.location.search);
     initResizeObserver();
     if (searchParams.has(SEARCH_PARAM)) {
-        await searchStore.search();
+        await searchStore.search(false);
     }
 });
 </script>

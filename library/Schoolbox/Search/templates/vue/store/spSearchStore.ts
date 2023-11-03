@@ -54,12 +54,13 @@ export const useSearchStore = defineStore("spSearch", () => {
     /**
      * search for nodes that match
      */
-    async function search() {
+    async function search(simulateRedirect: boolean) {
         useQueryStore().setActive();
         useResultsStore().clear();
-        useStore().setQueryParams();
+        useStore().setQueryParams(simulateRedirect);
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
+
         await execute();
         try {
             useResultsStore().setFirstResults(data.value as Results);
@@ -73,7 +74,7 @@ export const useSearchStore = defineStore("spSearch", () => {
      */
     async function clearFiltersAndSearch() {
         useFiltersStore().clear();
-        await search();
+        await search(true);
     }
 
     return {

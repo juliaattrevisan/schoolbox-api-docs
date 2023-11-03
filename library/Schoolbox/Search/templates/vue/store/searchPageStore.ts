@@ -70,7 +70,11 @@ export const useStore = defineStore("searchPage", () => {
     /**
      * To update the url with the current query params
      */
-    function setQueryParams() {
+    function setQueryParams(simulateRedirect: boolean) {
+        if (simulateRedirect) {
+            window.history.pushState({}, "", window.location.href);
+        }
+
         const newQueryParams = getQueryParams();
         window.history.replaceState({}, "", `${window.location.pathname}?${newQueryParams.toString()}`);
     }
