@@ -131,6 +131,7 @@
 /* the progress bar at the top, which moves across with question progress */
 .lrn-assess .items .progress span {
     background-color: var(--content-ui-foreground);
+    color: var(--content-ui-foreground);
 }
 
 /* the vertical menu running down the right hand side */
@@ -182,8 +183,8 @@
 .lrn_widget input[type="radio"],
 .lrn_widget input[type="checkbox"] {
     height: auto;
-    opacity: 1;
     min-height: auto;
+    opacity: 1;
     position: static;
     width: auto;
 }
@@ -305,15 +306,14 @@ input[type="checkbox"] {
 
 /* updated the drop down styles*/
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
-    color: var(--content-ui-foreground);
-    border: 1px solid var(--content-ui-foreground);
     background-color: #fff;
+    border: 1px solid var(--content-ui-foreground);
+    color: var(--content-ui-foreground);
     margin: 10px 0px;
     padding: 0px 20px 0px 10px;
 }
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:hover,
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:focus {
-    color: var(--form-bg-hover-color-contrast);
     background-color: var(--form-bg-hover-color);
     border-color: hsla(
         var(--form-border-color-h),
@@ -321,6 +321,7 @@ input[type="checkbox"] {
         calc(var(--form-border-color-l) - 15%),
         var(--form-border-color-a)
     );
+    color: var(--form-bg-hover-color-contrast);
     outline: none;
 }
 
@@ -426,14 +427,14 @@ input[type="checkbox"] {
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar {
-    border-bottom: 1px solid var(--content-ui-foreground);
     background: #ffff;
+    border-bottom: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
 .lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
 .lrn_widget.lrn_longtextV2 .lrn-divider:after {
-    transform: translate(0, -50%);
     border-right: 1px solid var(--content-ui-foreground);
+    transform: translate(0, -50%);
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar-footer,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar-footer,
@@ -447,8 +448,8 @@ input[type="checkbox"] {
 .lrn_widget.lrn_formulaessayV2 .lrn_texteditor_editable.lrn_active,
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable.lrn_active {
-    outline: none;
     box-shadow: 1px 1px 2px #0000001a inset;
+    outline: none;
 }
 
 /* plaintext styles*/
@@ -468,9 +469,9 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     background-color: #fff;
 }
 .lrn_texteditor > .lrn_toolbar {
-    border-top: 1px solid var(--content-ui-foreground);
     border-left: 1px solid var(--content-ui-foreground);
     border-right: 1px solid var(--content-ui-foreground);
+    border-top: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget .lrn_texteditor_editable:focus {
     border: 1px solid var(--content-ui-foreground);
@@ -525,8 +526,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 }
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):hover,
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):focus {
-    border-color: var(--content-ui-foreground);
     background: var(--content-ui-selected);
+    border-color: var(--content-ui-foreground);
 }
 .lrn .lrn_btn_arrow:active:after,
 .lrn .lrn_btn_arrow.lrn_active:after {
@@ -543,27 +544,27 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     border-color: var(--content-ui-foreground);
 }
 .lrn_wid .lrn_widget.lrn_fileupload .lrn-toolbar {
-    border-bottom: 1px solid var(--content-ui-foreground);
     background: #fff;
+    border-bottom: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_fileupload .lrn-toolbar-footer {
     background: #fff;
     border-top: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_fileupload .lrn-toolbar {
-    border-bottom: 1px solid var(--content-ui-foreground);
     background: #fff;
+    border-bottom: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
-    border-right: 1px solid var(--content-ui-foreground);
     border-bottom: 1px solid var(--content-ui-foreground);
     border-left: 1px solid var(--content-ui-foreground);
+    border-right: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_imageupload .lrn_toolbar {
+    border: 1px solid var(--content-ui-foreground);
     touch-action: none;
     -ms-touch-action: none;
-    border: 1px solid var(--content-ui-foreground);
 }
 
 /* update rating styles */
@@ -606,8 +607,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn .lrn_btn.lrn_active,
 .lrn .lrn_btn:focus {
     background-color: var(--content-ui-selected);
-    color: var(--content-ui-foreground);
     box-shadow: unset;
+    color: var(--content-ui-foreground);
 }
 
 /* update the border radius to 0px */
@@ -663,8 +664,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     border-bottom: 1px dashed var(--content-ui-foreground);
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-top: 1px dashed var(--content-ui-foreground);
     border-left: 1px dashed var(--content-ui-foreground);
+    border-top: 1px dashed var(--content-ui-foreground);
 }
 .lrn_widget.lrn_classification
     .lrn_response
@@ -723,8 +724,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn-formula-keyboard-menu-container.lrn-formula-keyboard-menu-groups
     > .lrn_dropdown.lrn_theme_primary
     button.lrn_btn.lrn_dropdown_toggle {
-    top: -4px;
     background: transparent;
+    top: -4px;
 }
 .lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:focus,
 .lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:hover {
@@ -774,6 +775,9 @@ span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
 .lrn .lrn_btn:is(.lds-btn-secondary):hover {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
 }
 .lds-btn-secondary,
 .lrn .lrn_btn:is(.lds-btn-secondary):focus {
@@ -813,4 +817,868 @@ td.lrn-report-area {
     font-size: 0.8125rem;
     line-height: 1.125rem;
     padding: 0.625rem;
+}
+
+/* Styles of Authoring */
+
+/* hide the resources section */
+.lrn-author-activity-resource-item.lrn-col-xs-12.lrn-col-sm-12.lrn-col-md-4 {
+    display: none;
+}
+
+/* edit/preview tabs styles */
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
+    background-color: var(--content-ui-background);
+    border: none;
+    border-radius: 0px;
+    color: var(--content-ui-foreground);
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-active,
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:not(:checked) ~ .lrn-author-toggle-right,
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:checked ~ .lrn-author-toggle-left {
+    background-color: var(--content-ui-selected);
+    color: var(--content-ui-foreground);
+}
+
+/* author primary and secondary and disabled button styles */
+.lrn .lrn-author-ui .lrn-btn-primary,
+.lrn .lrn-author-ui .lrn-btn-sec {
+    background: var(--content-ui-background);
+    border-radius: 0px !important;
+    border: none;
+    color: var(--content-ui-foreground);
+    font-size: 1rem;
+}
+.lrn .lrn-author-ui .lrn-btn-primary:hover,
+.lrn .lrn-author-ui .lrn-btn-sec:hover,
+.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec):hover {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+    text-decoration: none !important;
+}
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.lrn-author-disabled {
+    background-color: var(--content-ui-background);
+    border-color: transparent;
+    border-radius: 0px;
+    box-shadow: none;
+    color: var(--content-ui-foreground);
+    cursor: default;
+    opacity: 0.5;
+}
+.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
+    background: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
+}
+
+/* Save button styles */
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
+    color: var(--content-ui-submit-foreground);
+    background-color: var(--content-ui-submit-background);
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save:hover {
+    background-color: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
+    border: none;
+    color: var(--content-ui-submit-foreground);
+}
+
+/* hide player, detauls,tags tabs */
+
+ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
+    display: none;
+}
+
+/* hide setting button in questions */
+button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-outline.lrn-btn-icon-left.lrn-btn-responsive.lrn-btn-i-xs.lrn-btn {
+    display: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
+    background: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-btn.lrn-qe-checkbox-btn,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button {
+    background-color: var(--content-ui-background);
+    border-radius: 0px !important;
+    border: none;
+    color: var(--content-ui-foreground);
+    font-size: 12px;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
+    background-color: var(--content-ui-selected);
+    border: 0px;
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-dropdown .lrn-qe-custom-dropdown-toggle:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn span:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-btn.lrn-qe-checkbox-btn span:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate span:focus::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate span:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left:focus::after,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right:focus::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-left:focus::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right:focus::after {
+    border: none;
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part::after {
+    border: none;
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part:hover {
+    background-color: var(--content-ui-hover);
+}
+
+/* hide warning message */
+.lrn-author-message.lrn-author-message-warning.lrn-author-dependent-count-warning-wrapper {
+    display: none;
+}
+.lrn-author-message.lrn-author-message-warning {
+    display: none;
+}
+
+/* show answers button */
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle,
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle:hover,
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked,
+.lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked:hover {
+    background-color: var(--content-ui-background);
+    border-radius: 0px;
+    border: 0px;
+    color: var(--content-ui-foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
+    font-weight: 400;
+}
+.lrn .lrn-author-ui-no-preview button:focus {
+    outline: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span {
+    background-color: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:hover:enabled {
+    background-color: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover {
+    background: var(--content-ui-background);
+}
+.lrn-qe .lrn-qe-modal-footer .lrn-qe-btn.lrn-qe-btn-default:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-remove.lrn-qe-btn-default:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-default:focus,
+.cke_dialog_container_qe .cke_dialog_ui_button_cancel:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus {
+    border-radius: 0;
+    outline: none;
+    outline-offset: 0;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after,
+.lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after {
+    border: none;
+}
+/* question edit view styles */
+.lrn.lrn-author .lrn-author-region-sidebar,
+.lrn.lrn-author .lrn-author-widget-sidebar {
+    background: transparent !important;
+    border-left: none;
+}
+.lrn.lrn-author .lrn-author-region-sidebar-open .lrn-author-region-sidebar {
+    box-shadow: none;
+    width: auto;
+}
+.lrn .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-i-"] {
+    border-top-color: transparent;
+    color: var(--content-ui-foreground);
+}
+.lrn .lrn-author-ui .lrn-author-widget-sidebar button:hover,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar button:focus,
+.lrn .lrn-author-ui .lrn-author-widget-sidebar button:active {
+    background: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+}
+
+/* hide source and help button from edit question */
+[aria-label="View widget source"] {
+    display: none;
+}
+[aria-label="View widget help"] {
+    display: none;
+}
+
+/* form styles */
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control:hover {
+    background-color: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    color: var(--form-bg-hover-color-contrast);
+    outline: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
+    border: 1px solid var(--form-border-color);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
+    background-color: var(--content-ui-background) !important;
+    background: var(--content-ui-background);
+    border-radius: 0px;
+    border: none;
+    color: var(--content-ui-foreground) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: inherit !important;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    text-align: center !important;
+    text-transform: unset;
+    vertical-align: middle !important;
+    width: 100% !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
+    background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
+    text-decoration: none !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-switch-trigger {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_textarea_inline:focus {
+    background: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    outline: none;
+}
+/* more options styles */
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options {
+    background: var(--content-ui-background);
+    color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:hover,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:focus {
+    border-color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:hover,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:focus,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options.lrn-active:hover,
+.lrn-qe .lrn-qe-ui button.lrn-qe-more-options.lrn-active:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:active:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options:active:focus,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:focus {
+    border-color: var(--content-ui-foreground);
+}
+span.lrn-qe-i-trash {
+    color: var(--content-ui-foreground);
+}
+
+/* top bar background color */
+.lrn.lrn-author .lrn-author-item-nav {
+    background-color: #fff;
+}
+
+/* save button background color */
+.lrn .lrn-author-ui .lrn-author-save-button-group {
+    background: transparent;
+}
+button.lrn-btn-save-dropdown {
+    display: none;
+}
+.lrn-author-item-nav-left {
+    overflow: hidden;
+    position: relative;
+    vertical-align: middle;
+}
+.lrn .lrn-author-ui .lrn-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
+    background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
+    padding-left: 30px;
+    text-decoration: none !important;
+}
+.lrn.lrn-author .lrn-author-item-nav .lrn-btn {
+    text-transform: none;
+}
+.lrn .lrn-author-ui .lrn-btn-save:hover:enabled .lrn-i-save:before {
+    transform: none;
+}
+.lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary,
+.lrn .lrn-author-ui .lrn-btn-success[disabled],
+.lrn .lrn-author-ui .lrn-btn-success[disabled]:hover,
+.lrn .lrn-author-ui .lrn-btn-success[disabled]:focus {
+    background-color: var(--content-ui-submit-background);
+    color: var(--content-ui-submit-foreground);
+    min-height: 2.5rem !important;
+    padding: 0.5rem !important;
+    width: 100%;
+}
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
+    background-color: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
+    color: var(--content-ui-submit-foreground);
+}
+
+/* select drop down styles */
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:hover,
+.lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus {
+    background-color: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    color: var(--form-bg-hover-color-contrast);
+    outline: none;
+}
+
+/*hide layout and selection, extra and more options, sections */
+[data-lrn-qe-section="layout.heading"] {
+    display: none;
+}
+[data-lrn-qe-section="layout.content"] {
+    display: none !important;
+}
+[data-lrn-qe-label-path="metadata.acknowledgements"] {
+    display: none;
+}
+[data-lrn-qe-input-path="metadata.acknowledgements"] {
+    display: none;
+}
+[data-lrn-qe-label-path="metadata.rubric_reference"] {
+    display: none;
+}
+[data-lrn-qe-input-path="metadata.rubric_reference"] {
+    display: none;
+}
+[data-lrn-qe-input-path="metadata.distractor_rationale"] {
+    display: none;
+}
+[data-lrn-qe-label-path="stimulus_review"] {
+    display: none;
+}
+[data-lrn-qe-input-path="stimulus_review"] {
+    display: none;
+}
+[data-lrn-qe-label-path="instructor_stimulus"] {
+    display: none;
+}
+[data-lrn-qe-input-path="instructor_stimulus"] {
+    display: none;
+}
+[data-lrn-qe-label-path="metadata.distractor_rationale"] {
+    display: none;
+}
+[data-lrn-qe-label-path="metadata.distractor_rationale_response_level"] {
+    display: none;
+}
+[data-lrn-qe-action-add-path="metadata.distractor_rationale_response_level"] {
+    display: none;
+}
+[data-lrn-qe-layout-wrapper="is_math"] {
+    display: none;
+}
+[data-lrn-qe-section="details.heading"] {
+    display: none;
+}
+/* hide tags from questions list */
+
+.lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
+    display: none;
+}
+.lrn-list-view-alternative-reference.lrn-ellipses {
+    display: none;
+}
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-details {
+    border: none;
+}
+ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
+    background: #fff;
+    border-bottom: 1px solid var(--body-background) !important;
+    list-style: none;
+    max-width: none;
+    overflow: visible;
+    position: relative;
+    transition: background-color 0.3s ease-in;
+    width: auto;
+}
+
+.lrn.lrn-author .lrn-author-item-nav {
+    background: var(--body-background);
+    margin-top: 10px;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 100%;
+}
+
+.lrn-qe .lrn-qe-ui .lrn-qe-tile-header {
+    background: var(--content-ui-foreground);
+    border-radius: 0px;
+}
+/* removed gap from hearder */
+.lrn .lrn-author-ui .lrn-author-item-toolbar-controls,
+.lrn .lrn-author-ui .lrn-author-activity-toolbar-controls {
+    min-height: 0px;
+}
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-list-divider > li,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-divider > li,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-list-divider > li,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-divider > li {
+    margin-bottom: 1px;
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
+    width: 100%;
+}
+.lrn.lrn-author .lrn-author-item-nav-left,
+.lrn.lrn-author .lrn-author-item-nav-right {
+    display: flex;
+    width: 100%;
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
+    width: 100%;
+}
+.lrn .lrn-author-ui .lrn-author-save-button-group {
+    width: 100%;
+}
+
+/* replace icons with sb icons */
+.lrn-i-preview::before {
+    color: var(--content-ui-foreground);
+    content: "\e62f";
+    font-family: "schoolbox";
+}
+.lrn .lrn-author-ui .lrn-list-view-item .lrn-btn-default {
+    background: transparent;
+    border: none;
+}
+.lrn-i-drag::before {
+    content: "\e62f";
+    font-family: "schoolbox";
+    color: var(--content-ui-foreground);
+}
+.lrn .lrn-author-ui .lrn-btn:focus,
+.lrn .lrn-author-ui a.lrn-btn:focus {
+    outline: none;
+}
+/* added right border to the cards row */
+.lrn.lrn-author
+    .lrn-item-for-activity-list.lrn-item-for-activity-list-edit
+    .lrn-list-view-item
+    .lrn-list-view-col-first {
+    border-right: 1px solid var(--body-background);
+}
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span {
+    border: 1px solid var(--form-border-color);
+    border-radius: 0px;
+    color: transparent;
+}
+/* change checkbox and rows selection background color */
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-input:checked + .lrn-check-box-span {
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-background);
+}
+.lrn.lrn-author
+    .lrn-item-for-activity-list
+    .lrn-check-box-wrapper
+    .lrn-check-box-input:checked
+    + .lrn-check-box-span:hover {
+    background-color: var(--form-border-color);
+}
+.lrn
+    .lrn-author-ui
+    .lrn-author-activity-edit
+    [data-tab-content="adaptive"]
+    .lrn-list-selected-activity
+    .lrn-list-details,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-selected-activity .lrn-list-details,
+.lrn
+    .lrn-author-ui
+    .lrn-author-activity-edit
+    [data-tab-content="templateDragAndDrop"]
+    .lrn-list-selected-activity
+    .lrn-list-details,
+.lrn
+    .lrn-author-ui
+    .lrn-author-activity-edit
+    [data-tab-content="details"]
+    .lrn-list-selected-activity
+    .lrn-list-details {
+    background-color: var(--content-ui-background);
+}
+
+/* change create and find card positions */
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
+    position: absolute;
+    right: 150px;
+    top: 55px;
+}
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
+    position: absolute;
+    right: 0px;
+    top: 55px;
+}
+span.lrn-author-name-wrapper {
+    border: 1px solid var(--form-border-color);
+}
+
+/* add new question button styles */
+.lrn .lrn-author-ui .lrn-author-widget-button-more .lrn-author-widget-icon:before {
+    color: var(--content-ui-foreground);
+    font-size: initial;
+}
+.lrn .lrn-author-ui .lrn-author-widget-icon:before {
+    color: var(--content-ui-foreground);
+    font-size: initial;
+}
+[data-authorapi-selector="add-button"] {
+    background-color: var(--content-ui-background) !important;
+    border: 0 !important;
+    color: var(--content-ui-foreground) !important;
+    line-height: inherit !important;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    vertical-align: middle !important;
+    width: 100% !important;
+}
+.lrn .lrn-author-ui .lrn-author-widget-text {
+    bottom: 0px;
+    color: var(--content-ui-foreground);
+    font-size: initial;
+    top: 0px;
+}
+[data-authorapi-selector="show-shared-passages-button"] {
+    display: none !important;
+}
+.lrn.lrn-author .lrn-author-item-content {
+    min-height: auto;
+}
+.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
+    background-color: var(--content-ui-background) !important;
+    color: var(--content-ui-foreground) !important;
+    line-height: inherit !important;
+    margin: auto;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    width: 99% !important;
+}
+/* replaced trash icon */
+.lrn-qe .lrn-qe-ui .lrn-qe-i-trash:before {
+    content: "\e61b";
+    font-family: "schoolbox";
+}
+
+/* hide back to home button */
+a.button {
+    display: none;
+}
+
+/* questions and features button styles */
+.lrn .lrn-author-ui .lrn-author-btn-outline {
+    background-color: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
+    line-height: inherit;
+    min-height: 2.5rem;
+    overflow: hidden;
+    padding: 0.5rem;
+    position: relative;
+    vertical-align: middle;
+}
+.lrn .lrn-author-ui .lrn-author-btn-outline:hover {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+    text-decoration: none !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link.lrn-active {
+    background: var(--content-ui-selected);
+    border-left-color: var(--content-ui-foreground);
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
+    border-radius: 0px;
+}
+
+/* search pages styles */
+li.lrn-list-view-item.lrn-flyout-wrapper {
+    background: #fff;
+    border-bottom: 1px solid var(--body-background) !important;
+    list-style: none;
+    max-width: none;
+    overflow: visible;
+    position: relative;
+    transition: background-color 0.3s ease-in;
+    width: auto;
+}
+[data-authorapi-view="tags-all"] {
+    display: none !important;
+}
+.lrn.lrn-author .lrn-tool-panel {
+    background: transparent;
+}
+.lrn.lrn-author .lrn-tool-panel-search {
+    padding: 0px;
+}
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-item-for-activity-pagination-top .lrn-pagination ul {
+    background: var(--body-background);
+}
+.lrn.lrn-author
+    .lrn-item-for-activity-list
+    .lrn-item-for-activity-pagination-top
+    .lrn-pagination
+    ul
+    > li
+    > button.lrn-btn.lrn-pagination-btn {
+    display: none;
+}
+.lrn-pagination-sort-wrapper {
+    margin-bottom: 10px;
+}
+.lrn .lrn-author-ui .lrn-form-control-padded,
+.lrn .lrn-author-ui .lrn-form-control {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-input-group-btn {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-input-group .lrn-form-control {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-btn-save.lrn-btn-saving {
+    color: var(--content-ui-foreground);
+}
+.lrn-i-cross::before {
+    color: var(--content-ui-foreground);
+}
+/* removed min-height for add question section */
+.lrn.lrn-author {
+    min-height: unset;
+}
+.lrn.lrn-author .lrn-author-item-edit {
+    min-height: unset;
+}
+
+/*removed the horizontal scroll on the set correct question section */
+.lrn .lrn-qe-form-group-wrapper.question .lrn-qe-question-container {
+    overflow-x: visible;
+}
+
+/* update the info massage styles */
+.lds-message--info {
+    background-color: var(--content-ui-background);
+    border-radius: 0;
+    border: none;
+    color: var(--content-ui-foreground);
+    font-size: 16px;
+}
+
+/* update search form dropdown styles */
+.lrn .lrn-author-ui .lrn-custom-select select {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+.lrn .lrn-author-ui .lrn-custom-select select:hover {
+    background-color: var(--form-bg-hover-color);
+    border-color: var(--form-border-color);
+    color: #000000;
+}
+.lrn .lrn-author-ui .lrn-sort-button {
+    border: 1px solid var(--form-border-color);
+    border-color: var(--form-border-color);
+}
+
+/* update search button text transformation from uppercase to unset  */
+.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-lg {
+    text-transform: unset;
+}
+
+/* updated font sizes */
+.lrn .lrn-author-ui-no-preview,
+.lrn .lrn-author-ui-no-preview input,
+.lrn .lrn-author-ui-no-preview button,
+.lrn-author-toolbar-toggle .lrn-author-toggle-part,
+.lrn-author-activity-button {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+/* add "Add" before icon for adding question to a card */
+button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-widget-icon.lrn-i-plus:after {
+    content: " Add";
+}
+.lrn .lrn-author-ui .lrn-author-widget-button:hover .lrn-author-widget-icon:before {
+    color: var(--content-ui-foreground);
+    text-shadow: none;
+}
+button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
+    background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
+    text-decoration: none !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
+.lrn-qe .lrn-qe-ui a.lrn-qe-btn:focus {
+    outline: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-tile-preview {
+    border-radius: 0px;
+}
+.lrn .lrn-author-ui .lrn-btn,
+.lrn .lrn-author-ui a.lrn-btn {
+    border-radius: 0px;
+}
+.lrn_widget input {
+    border-radius: 0px;
+}
+.lrn-i-trash:before {
+    content: "\e61b";
+    font-family: "schoolbox";
+}
+
+/* update the pagination styles */
+.lrn .lrn-author-ui .lrn-pagination ul {
+    background: var(--body-background);
+    border-bottom: none;
+    border-top: none;
+}
+span.lrn-pagination-btn-txt,
+span.lrn-i-previous,
+span.lrn-i-next {
+    color: var(--content-ui-foreground);
+}
+
+/* updatle the uploader button */
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-asset-uploader {
+    transform: unset;
+}
+
+/* add padding to the quiz title in the player view */
+.lrn.lrn-assess .lrn-top-left-region .test_title_element .test-title-text {
+    padding: 1rem;
+}
+
+/* fixed file upload button styles in preview questions */
+.lrn_widget.lrn_fileupload .lrn-fileupload-input-wrapper .lrn-disabled {
+    opacity: unset;
+    z-index: 3;
+}
+.lrn.lrn-assess .app-layout .lrn_btn_blue:after {
+    border-radius: 0px;
+}
+
+/* create empty state */
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list {
+    margin-top: 10px;
+}
+span.lrn-list-view-empty-label {
+    display: none;
+}
+.lrn .lrn-author-ui .lrn-list-view-empty-img {
+    background-image: unset;
+}
+.lrn .lrn-author-ui .lrn-list-view-empty {
+    font-size: 1rem;
+}
+.lrn .lrn-author-ui .lrn-activity-view-empty-img::after,
+.lrn .lrn-author-ui .lrn-list-view-empty-img::after {
+    content: "\e658";
+    font-family: "schoolbox";
+    white-space: pre;
+}
+.lrn-list-view-empty.lrn-author-ui-no-preview {
+    background-color: #ddd;
+    color: #999;
+    font-size: 1rem;
+    font-style: italic;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    padding: 2rem;
+    text-align: center;
+    width: 100%;
+}
+.lrn .lrn-author-ui .lrn-activity-view-empty-img,
+.lrn .lrn-author-ui .lrn-list-view-empty-img {
+    background-image: unset;
+    font-style: normal !important;
+    height: auto;
+    margin: 0 auto;
+    width: auto;
+}
+.lrn-list-view-empty.lrn-author-ui-no-preview::after {
+    content: "\A You have no cards yet. A card is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
+    white-space: pre;
+}
+
+/* fixed right alignment */
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-item-for-activity-list,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-item-for-activity-list,
+.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-item-for-activity-list {
+    margin-right: 0px;
+}
+.lrn .lrn-author-ui .lrn-author-item-toolbar-right,
+.lrn .lrn-author-ui .lrn-author-activity-toolbar-right {
+    padding-right: 0px;
+}
+
+/* removed horizontal scroll on question view */
+.lrn-author-widget-wrapper-inner {
+    overflow: visible !important;
+}
+
+/* update the pen icon */
+.lrn-i-edit::before {
+    content: "\e645";
+    font-family: "schoolbox";
 }
