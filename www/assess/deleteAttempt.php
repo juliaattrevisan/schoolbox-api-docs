@@ -1,5 +1,5 @@
 <?php
-//
+
 ///**
 // * Assessment Attempt deletion. Responses are all softdeleted if
 // * the Attempt is softdeleted.
