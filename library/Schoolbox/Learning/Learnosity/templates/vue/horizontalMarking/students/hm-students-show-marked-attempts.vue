@@ -24,5 +24,3 @@ const studentsStore = useStudentsStore();
         </ul>
     </div>
 </template>
-
-<style scoped></style>

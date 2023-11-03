@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The student header, containing the toggle, student photo, name and item mark for each item
+ * The student header, containing the toggle, student photo, name and mark for each item
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";

@@ -57,9 +57,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     }
 
     /**
-     * loop through each question in the item and check for a score to determine if the question is already marked
-     * if there is no maxScore, we assume that the question is considered marked if the first question contains a comment
-     * so the first question comment covers isMarked for any questions within the item that don't have a maxScore
+     * Loop through each question in the item and check for a score to determine if the question is already marked.
+     * If there is no maxScore, we assume that the question is considered marked if the first question contains a comment.
+     * So the first question comment covers isMarked for any questions within the item that don't have a maxScore
      * @param { StudentItem } item - the item to check
      */
     function setInitialQuestionIsMarked(item: StudentItem) {
@@ -153,7 +153,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         if (studentLoaded) {
             studentLoaded.isReportLoaded = true;
         }
-        // check if all student reports are loaded and if so, set the central store can be considered loaded
+        // check if all student reports are loaded and if so, the central store can be considered loaded
         store.isLoaded = students.value.every((student) => student.isReportLoaded);
         if (store.isLoaded) {
             updateItemsIsMarked();

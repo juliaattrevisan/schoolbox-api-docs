@@ -1,5 +1,5 @@
 /**
- * Student type
+ * A Student that has made a response
  */
 
 import type { StudentItem } from "./StudentItem";

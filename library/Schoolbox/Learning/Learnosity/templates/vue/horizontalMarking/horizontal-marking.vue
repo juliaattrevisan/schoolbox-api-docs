@@ -48,7 +48,7 @@ window.Vue.onMounted(async () => {
     store.init(props.statusPage);
     itemsStore.init(props.items);
     useStudentsStore().init(props.students, props.itemResponses, props.attemptComments, props.urls);
-    await window.Vue.nextTick();
+    await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReports(props.reportPayloads);
 });
 </script>

@@ -1,5 +1,6 @@
 /**
  * The urls to be used for the student when updating score, comment, or attempt comment
+ * and also the link to the teacher feedback (direct student attempt link)
  */
 export type StudentUrls = {
     studentId: number;
