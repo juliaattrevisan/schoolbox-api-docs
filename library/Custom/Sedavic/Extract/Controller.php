@@ -130,11 +130,12 @@ class Controller extends Base
 
     /**
      * Find a particular feedback here
+     * Interestingly, max_mark being 0 results in mark/max_mark equating to null
      */
     private const QUERY_FEEDBACK_QUIZ = "
         SELECT 
-            norm_mark AS normalised,
-            mark AS humanReadable
+            mark/max_mark AS normalised,
+            CONCAT(mark, ' / ', max_mark) AS humanReadable
         FROM assess_attempt
         WHERE attempt_id = :feedbackId
         LIMIT 1
