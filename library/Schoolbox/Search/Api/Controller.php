@@ -154,7 +154,8 @@ class Controller extends Base
                                 'next'    => null,
                             ],
                             'url' => $this->routeGenerator->generate(
-                                'searchApi.getSearchWithinFolder', ['folderId' => $folder->getId()]
+                                'searchApi.getSearchWithinFolder',
+                                ['folderId' => $folder->getId()]
                             )
                         ]
                     ];
