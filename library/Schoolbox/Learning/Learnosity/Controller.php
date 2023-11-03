@@ -368,15 +368,6 @@ class Controller extends Base
                     'reading_mode' => [
                         'reading_time' => $quiz->getReadingTimeDuration()
                     ],
-                    /* Shuffle Items
-                     * Use the current microtime() as a seed so everyone gets a random ordering
-                     * https://reference.learnosity.com/items-api/initialization/config.configuration.shuffle_items
-                     */
-                    'shuffle_items' => sprintf(
-                        '%s-%s',
-                        microtime(true),
-                        random_int(0, 1000000)
-                    )
                 ],
                 "navigation" => [
                     "auto_save" => [
@@ -467,6 +458,18 @@ class Controller extends Base
                 'metadata.sample_answer',
                 'validation'
             ];
+        }
+
+        /* Shuffle Items
+         * Use the current microtime() as a seed so everyone gets a random ordering
+         * https://reference.learnosity.com/items-api/initialization/config.configuration.shuffle_items
+         */
+        if ($quiz->getShuffleItems()) {
+            $payload['config']['configuration']['shuffle_items'] = sprintf(
+                '%s-%s',
+                microtime(true),
+                random_int(0, 1000000)
+            );
         }
 
         $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
