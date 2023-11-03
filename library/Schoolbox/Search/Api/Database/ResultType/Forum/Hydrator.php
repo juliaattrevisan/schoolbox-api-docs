@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
-use Alaress\Html\ToText;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Forum\Post as PostModel;
@@ -105,13 +104,13 @@ class Hydrator extends BaseHydrator
 
                 $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()] ?? 0;
                 $matchingPostString = $nMatchingPostsInThread > 1 ? "(+$nMatchingPostsInThread more matching posts)" : '';
-                $postBodyTextOnly = (new ToText($post->getBody()))->getText();
+                $postBodyTextOnly = $this->htmlToText($post->getBody());
 
                 // Because the blog body contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (mb_stripos($postThread->getTitle(), $keyword, 0, 'UTF-8') === false) {
-                    if (mb_stripos($postBodyTextOnly, $keyword, 0, 'UTF-8') === false) {
+                if (mb_stripos($postThread->getTitle(), $keyword, 0, self::ENCODING) === false) {
+                    if (mb_stripos($postBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
                         return null;
                     }
                 }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Blog;
 
-use Alaress\Html\ToText;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as Blog;
 use Schoolbox\Permission\Access\Access;
@@ -78,13 +77,13 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $blogBodyTextOnly = (new ToText($blog->getBody()))->getText();
+                $blogBodyTextOnly = $this->htmlToText($blog->getBody());
 
                 // Because the blog body contains HTML, this match might have come about only because the
                 // keyword was found in HTML code that is invisible to the user (eg. 'style=').
                 // Eliminate those kinds of matches.
-                if (mb_stripos($blog->getHeading(), $keyword, 0, 'UTF-8') === false) {
-                    if (mb_stripos($blogBodyTextOnly, $keyword, 0, 'UTF-8') === false) {
+                if (mb_stripos($blog->getHeading(), $keyword, 0, self::ENCODING) === false) {
+                    if (mb_stripos($blogBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
                         return null;
                     }
                 }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -61,16 +62,17 @@ class Controller extends Base
      *
      * @return void
      * @throws NotFound
+     * @throws RouteNotFound
      * @api GET /api/search
      * @since 23.1
      *
      */
     public function getSearch(): void
     {
-        $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
-        $filter = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, null);
-        $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
+        $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
+        $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
         $cursor = null;
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
@@ -151,6 +153,10 @@ class Controller extends Base
                                 'current' => null,
                                 'next'    => null,
                             ],
+                            'url' => $this->routeGenerator->generate(
+                                'searchApi.getSearchWithinFolder',
+                                ['folderId' => $folder->getId()]
+                            )
                         ]
                     ];
                     $translatedResults[$folderResultKey]['_subResults']['data'][] = $translatedResult;
@@ -188,19 +194,20 @@ class Controller extends Base
     /**
      * Search for all results which match a keyword within a folder.
      *
+     * @return void
+     * @throws NotFound
      * @api GET /api/search/folder/{folderId}
      * @since 23.1
      *
-     * @return void
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
-        $keyword = (string)($this->requestQuery['keyword'] ?? '');
+        $keyword = trim($this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
-        $filter = $dataObjectFactory->build($this->requestQuery['filter'] ?? null, $folder);
-        $limit = (int)($this->requestQuery['limit'] ?? self::MAX_RESULT_LIMIT);
+        $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), $folder);
+        $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
 
-        if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
+        if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
 
             // Finally output the response
@@ -245,7 +252,7 @@ class Controller extends Base
         // even if the hydrator filters out results.
         $i             = 0;
         $fullResults   = [];
-        $nextCursor    = $this->requestQuery['cursor'] ?? null;
+        $nextCursor    = $this->requestQuery->get('cursor');
         while (count($fullResults) < $limit && $i++ < 100) {
             // Get next set of raw results, and the cursor for the next
             // iteration.

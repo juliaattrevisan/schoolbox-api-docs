@@ -7,7 +7,8 @@ export type Results = {
     data: Result[];
     metadata: {
         cursor: {
-            next: string;
+            next: string | null;
         };
+        url?: string;
     };
 };

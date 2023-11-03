@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Html\ToText;
 use Component_Config_Collapse;
 use Component_Config_ShowComponentTitle;
 use Aura\Router\Exception\RouteNotFound;
@@ -96,13 +95,13 @@ class Hydrator extends BaseHydrator
             // It is the folder on whose 'Manage Textboxes' page the textbox will appear.
             $textboxRootFolder = $textbox->getCategory();
 
-            $textboxBodyTextOnly = (new ToText($textbox->getBody()))->getText();
+            $textboxBodyTextOnly = $this->htmlToText($textbox->getBody());
 
             // Because the textbox body contains HTML, this match might have come about only because the
             // keyword was found in HTML code that is invisible to the user (eg. 'style=').
             // Eliminate those kinds of matches.
-            if (mb_stripos($textbox->getHeading(), $keyword, 0, 'UTF-8') === false) {
-                if (mb_stripos($textboxBodyTextOnly, $keyword, 0, 'UTF-8') === false) {
+            if (mb_stripos($textbox->getHeading(), $keyword, 0, self::ENCODING) === false) {
+                if (mb_stripos($textboxBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
                     continue;
                 }
             }
@@ -195,7 +194,7 @@ class Hydrator extends BaseHydrator
                 if (
                     $textboxAccess === UserAccess::ACCESS_READ &&
                     !$showTitleToReadOnlyUsers &&
-                    mb_stripos($textboxBodyTextOnly, $keyword, 0, 'UTF-8') === false
+                    mb_stripos($textboxBodyTextOnly, $keyword, 0, self::ENCODING) === false
                 ) {
                     continue;
                 }

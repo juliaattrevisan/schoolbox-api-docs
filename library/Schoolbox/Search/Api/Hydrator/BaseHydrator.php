@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Hydrator;
 
+use Alaress\Html\ToText;
 use Alaress\Image\Transformation\Storage;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Resource\Storage\IStorage;
@@ -82,6 +83,21 @@ abstract class BaseHydrator implements IHydrator
     }
 
     /**
+     * Convert HTML to text, being careful not to introduce any artifacts that could prevent the search from working.
+     * @param string $html - A full or partial HTML document.
+     * @returns string - A text-only representation of the supplied HTML.
+     */
+    public function htmlToText(string $html): string
+    {
+        // Set line width to zero (unrestricted) to avoid introducing newlines into the text-only string.
+        // Extra newlines prevent the search from working if the keyword spans multiple lines.
+        // Note this method was chosen over Scrub::html2text() because that method results in table cell content in
+        // neighboring cells being concatenated into a single string, while ToText separates cell content with a space.
+        // (e.g. '<td>Key</td><td>word</td>' becomes 'Keyword' when Scrub::html2text() is used).
+        return (new ToText($html, ['width' => 0, 'do_links' => 'none']))->getText();
+    }
+
+    /**
      * Truncates `$content` around the first occurrence of `$keyword`, to a max
      * of `$maxChars / 2` characters either side.
      *
@@ -90,9 +106,8 @@ abstract class BaseHydrator implements IHydrator
      *
      * @param string $keyword  The search keyword.
      * @param string $content  The content to truncate.
-     * @param int    $maxChars The max character count to include in the
-     *                         description: allows for an equal number of
-     *                         characters before and after the keyword.
+     * @param int    $maxChars The max character count to include in the description (not including the keyword length).
+     *                         Allows for an equal number of characters before and after the keyword.
      *
      * @return string|null
      */
@@ -132,7 +147,7 @@ abstract class BaseHydrator implements IHydrator
                 preg_replace(
                     '/\s+/',
                     ' ',
-                    mb_strcut($content, $cutStart, $maxChars, self::ENCODING),
+                    mb_strcut($content, $cutStart, $cutFinish - $cutStart, self::ENCODING),
                 )
             );
             if ($startTruncated) {

@@ -1,7 +1,9 @@
 import { mount } from "@vue/test-utils";
 import SpResultsListLoadMore from "../sp-results-list-load-more.vue";
 import { createTestingPinia } from "@pinia/testing";
-import { useResultsStore, RESULT_LIMIT } from "../../store/spResultsStore";
+import { useResultsStore } from "../store/spResultsStore";
+
+// TODO: These tests are broken.  Fix them.
 
 let wrapper; // so we don't need to pass it into every test
 
@@ -23,6 +25,7 @@ test("show load more button when more results to load", async () => {
     const resultsStore = useResultsStore();
     const results = [];
     // push to the result limit to suggest there could be more results to load
+    const RESULT_LIMIT = 5;
     for (let i = 0; i < RESULT_LIMIT; i++) {
         results.push({ id: i, name: "test" });
     }

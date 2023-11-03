@@ -8,7 +8,7 @@ import { useFetch } from "@vueuse/core";
 import { Results } from "../../js/types/Results";
 import { Result } from "../../js/types/Result";
 import { useStore } from "../store/searchPageStore";
-import { useResultsStore, SUB_RESULT_LIMIT } from "./store/spResultsStore";
+import { useResultsStore } from "./store/spResultsStore";
 import { useHasMoreResults } from "./composable/useHasMoreResults";
 import SpResultsError from "./sp-results-error.vue";
 import SpResultsSubResult from "./sp-results-sub-result.vue";
@@ -32,12 +32,7 @@ const {
  * To show that there are more results that can be loaded
  * @returns {boolean}
  */
-const { hasMoreResults } = useHasMoreResults(
-    hasLoadedAllResults,
-    window.Vue.ref((props.result._subResults as Results).data),
-    moreResultsCount,
-    SUB_RESULT_LIMIT
-);
+const { hasMoreResults } = useHasMoreResults(hasLoadedAllResults, window.Vue.ref(props.result._subResults as Results));
 
 /**
  * To show the load more button when appropriate
@@ -54,8 +49,9 @@ const showLoadMore = window.Vue.computed(() => {
 function getEndpointWithParams() {
     const newQueryParams = useStore().getQueryParams();
     newQueryParams.append("cursor", props.result._subResults?.metadata?.cursor.next as string);
-    const endpointWithParams = `${props.result._links.subResults as string}?${newQueryParams.toString()}`;
-    return endpointWithParams;
+    return props.result._subResults === undefined
+        ? ""
+        : `${props.result._subResults.metadata.url}?${newQueryParams.toString()}`;
 }
 
 /**
@@ -70,11 +66,8 @@ async function loadMore() {
     } else {
         useResultsStore().setMoreSubResults(loadedResults.data, props.result.id);
         moreResultsCount.value += 1;
-        // check if we have loaded all results yet
-        if (
-            props.result._subResults &&
-            props.result._subResults.data.length < SUB_RESULT_LIMIT * (moreResultsCount.value + 1)
-        ) {
+        // If cursor.next has not been supplied with the sub-results, we have loaded all sub-results.
+        if (loadedResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
         }
     }
