@@ -183,8 +183,8 @@
 .lrn_widget input[type="radio"],
 .lrn_widget input[type="checkbox"] {
     height: auto;
-    opacity: 1;
     min-height: auto;
+    opacity: 1;
     position: static;
     width: auto;
 }
@@ -306,15 +306,14 @@ input[type="checkbox"] {
 
 /* updated the drop down styles*/
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
-    color: var(--content-ui-foreground);
-    border: 1px solid var(--content-ui-foreground);
     background-color: #fff;
+    border: 1px solid var(--content-ui-foreground);
+    color: var(--content-ui-foreground);
     margin: 10px 0px;
     padding: 0px 20px 0px 10px;
 }
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:hover,
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:focus {
-    color: var(--form-bg-hover-color-contrast);
     background-color: var(--form-bg-hover-color);
     border-color: hsla(
         var(--form-border-color-h),
@@ -322,6 +321,7 @@ input[type="checkbox"] {
         calc(var(--form-border-color-l) - 15%),
         var(--form-border-color-a)
     );
+    color: var(--form-bg-hover-color-contrast);
     outline: none;
 }
 
@@ -427,14 +427,14 @@ input[type="checkbox"] {
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar {
-    border-bottom: 1px solid var(--content-ui-foreground);
     background: #ffff;
+    border-bottom: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
 .lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
 .lrn_widget.lrn_longtextV2 .lrn-divider:after {
-    transform: translate(0, -50%);
     border-right: 1px solid var(--content-ui-foreground);
+    transform: translate(0, -50%);
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar-footer,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar-footer,
@@ -448,8 +448,8 @@ input[type="checkbox"] {
 .lrn_widget.lrn_formulaessayV2 .lrn_texteditor_editable.lrn_active,
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_longtextV2 .lrn_texteditor_editable.lrn_active {
-    outline: none;
     box-shadow: 1px 1px 2px #0000001a inset;
+    outline: none;
 }
 
 /* plaintext styles*/
@@ -469,9 +469,9 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     background-color: #fff;
 }
 .lrn_texteditor > .lrn_toolbar {
-    border-top: 1px solid var(--content-ui-foreground);
     border-left: 1px solid var(--content-ui-foreground);
     border-right: 1px solid var(--content-ui-foreground);
+    border-top: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget .lrn_texteditor_editable:focus {
     border: 1px solid var(--content-ui-foreground);
@@ -526,8 +526,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 }
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):hover,
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):focus {
-    border-color: var(--content-ui-foreground);
     background: var(--content-ui-selected);
+    border-color: var(--content-ui-foreground);
 }
 .lrn .lrn_btn_arrow:active:after,
 .lrn .lrn_btn_arrow.lrn_active:after {
@@ -544,27 +544,27 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     border-color: var(--content-ui-foreground);
 }
 .lrn_wid .lrn_widget.lrn_fileupload .lrn-toolbar {
-    border-bottom: 1px solid var(--content-ui-foreground);
     background: #fff;
+    border-bottom: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_fileupload .lrn-toolbar-footer {
     background: #fff;
     border-top: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_fileupload .lrn-toolbar {
-    border-bottom: 1px solid var(--content-ui-foreground);
     background: #fff;
+    border-bottom: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
-    border-right: 1px solid var(--content-ui-foreground);
     border-bottom: 1px solid var(--content-ui-foreground);
     border-left: 1px solid var(--content-ui-foreground);
+    border-right: 1px solid var(--content-ui-foreground);
 }
 .lrn_widget.lrn_imageupload .lrn_toolbar {
+    border: 1px solid var(--content-ui-foreground);
     touch-action: none;
     -ms-touch-action: none;
-    border: 1px solid var(--content-ui-foreground);
 }
 
 /* update rating styles */
@@ -607,8 +607,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn .lrn_btn.lrn_active,
 .lrn .lrn_btn:focus {
     background-color: var(--content-ui-selected);
-    color: var(--content-ui-foreground);
     box-shadow: unset;
+    color: var(--content-ui-foreground);
 }
 
 /* update the border radius to 0px */
@@ -664,8 +664,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     border-bottom: 1px dashed var(--content-ui-foreground);
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-top: 1px dashed var(--content-ui-foreground);
     border-left: 1px dashed var(--content-ui-foreground);
+    border-top: 1px dashed var(--content-ui-foreground);
 }
 .lrn_widget.lrn_classification
     .lrn_response
@@ -724,8 +724,8 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn-formula-keyboard-menu-container.lrn-formula-keyboard-menu-groups
     > .lrn_dropdown.lrn_theme_primary
     button.lrn_btn.lrn_dropdown_toggle {
-    top: -4px;
     background: transparent;
+    top: -4px;
 }
 .lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:focus,
 .lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:hover {
@@ -830,8 +830,8 @@ td.lrn-report-area {
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
     background-color: var(--content-ui-background);
     border: none;
-    color: var(--content-ui-foreground);
     border-radius: 0px;
+    color: var(--content-ui-foreground);
 }
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-active,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:not(:checked) ~ .lrn-author-toggle-right,
@@ -843,32 +843,32 @@ td.lrn-report-area {
 /* author primary and secondary and disabled button styles */
 .lrn .lrn-author-ui .lrn-btn-primary,
 .lrn .lrn-author-ui .lrn-btn-sec {
-    color: var(--content-ui-foreground);
-    border: none;
     background: var(--content-ui-background);
     border-radius: 0px !important;
+    border: none;
+    color: var(--content-ui-foreground);
     font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-btn-primary:hover,
 .lrn .lrn-author-ui .lrn-btn-sec:hover,
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec):hover {
-    color: var(--content-ui-foreground);
     background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
     text-decoration: none !important;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.lrn-author-disabled {
     background-color: var(--content-ui-background);
     border-color: transparent;
-    color: var(--content-ui-foreground);
+    border-radius: 0px;
     box-shadow: none;
+    color: var(--content-ui-foreground);
     cursor: default;
     opacity: 0.5;
-    border-radius: 0px;
 }
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
-    color: var(--content-ui-foreground);
-    border: none;
     background: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
 }
 
 /* Save button styles */
@@ -877,14 +877,14 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
     background-color: var(--content-ui-submit-background);
 }
 .lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save:hover {
-    border: none;
-    color: var(--content-ui-submit-foreground);
     background-color: rgba(
         calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
         calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
         calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
         var(--content-ui-submit-background-a)
     );
+    border: none;
+    color: var(--content-ui-submit-foreground);
 }
 
 /* hide player, detauls,tags tabs */
@@ -899,9 +899,9 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
-    color: var(--content-ui-foreground);
-    border: none;
     background: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-btn.lrn-qe-checkbox-btn,
@@ -909,17 +909,17 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button {
-    font-size: 12px;
     background-color: var(--content-ui-background);
+    border-radius: 0px !important;
     border: none;
     color: var(--content-ui-foreground);
-    border-radius: 0px !important;
+    font-size: 12px;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
     background-color: var(--content-ui-selected);
-    color: var(--content-ui-foreground);
     border: 0px;
+    color: var(--content-ui-foreground);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-dropdown .lrn-qe-custom-dropdown-toggle:focus::after,
 .lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn span:focus::after,
@@ -953,13 +953,13 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked,
 .lrn .lrn-author-ui .lrn-author-validate-questions-toggle.checked:hover {
     background-color: var(--content-ui-background);
-    color: var(--content-ui-foreground);
+    border-radius: 0px;
     border: 0px;
+    color: var(--content-ui-foreground);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
         Arial, sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
-    border-radius: 0px;
 }
 .lrn .lrn-author-ui-no-preview button:focus {
     outline: none;
@@ -983,9 +983,9 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .cke_dialog_container_qe .cke_dialog_ui_button_cancel:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:focus {
+    border-radius: 0;
     outline: none;
     outline-offset: 0;
-    border-radius: 0;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked:focus span::after {
@@ -994,8 +994,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 /* question edit view styles */
 .lrn.lrn-author .lrn-author-region-sidebar,
 .lrn.lrn-author .lrn-author-widget-sidebar {
-    border-left: none;
     background: transparent !important;
+    border-left: none;
 }
 .lrn.lrn-author .lrn-author-region-sidebar-open .lrn-author-region-sidebar {
     box-shadow: none;
@@ -1008,8 +1008,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:hover,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:focus,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:active {
-    color: var(--content-ui-foreground);
     background: var(--content-ui-background);
+    color: var(--content-ui-foreground);
 }
 
 /* hide source and help button from edit question */
@@ -1026,7 +1026,6 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border-color: var(--form-border-color);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control:hover {
-    color: var(--form-bg-hover-color-contrast);
     background-color: var(--form-bg-hover-color);
     border-color: hsla(
         var(--form-border-color-h),
@@ -1034,34 +1033,35 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
         calc(var(--form-border-color-l) - 15%),
         var(--form-border-color-a)
     );
+    color: var(--form-bg-hover-color-contrast);
     outline: none;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
     border: 1px solid var(--form-border-color);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
-    background: var(--content-ui-background);
-    border: none;
-    text-align: center !important;
-    min-height: 2.5rem !important;
-    padding: 0.5rem !important;
-    line-height: inherit !important;
-    position: relative !important;
-    overflow: hidden !important;
-    vertical-align: middle !important;
-    color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-background) !important;
-    width: 100% !important;
+    background: var(--content-ui-background);
+    border-radius: 0px;
+    border: none;
+    color: var(--content-ui-foreground) !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
         Arial, sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
+    line-height: inherit !important;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    text-align: center !important;
     text-transform: unset;
-    border-radius: 0px;
+    vertical-align: middle !important;
+    width: 100% !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
-    color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-switch-trigger {
@@ -1116,14 +1116,14 @@ button.lrn-btn-save-dropdown {
     display: none;
 }
 .lrn-author-item-nav-left {
-    position: relative;
     overflow: hidden;
+    position: relative;
     vertical-align: middle;
 }
 .lrn .lrn-author-ui .lrn-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
-    padding-left: 30px;
-    color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
+    padding-left: 30px;
     text-decoration: none !important;
 }
 .lrn.lrn-author .lrn-author-item-nav .lrn-btn {
@@ -1136,21 +1136,21 @@ button.lrn-btn-save-dropdown {
 .lrn .lrn-author-ui .lrn-btn-success[disabled],
 .lrn .lrn-author-ui .lrn-btn-success[disabled]:hover,
 .lrn .lrn-author-ui .lrn-btn-success[disabled]:focus {
-    color: var(--content-ui-submit-foreground);
     background-color: var(--content-ui-submit-background);
-    width: 100%;
+    color: var(--content-ui-submit-foreground);
     min-height: 2.5rem !important;
     padding: 0.5rem !important;
+    width: 100%;
 }
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
-    color: var(--content-ui-submit-foreground);
     background-color: rgba(
         calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
         calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
         calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
         var(--content-ui-submit-background-a)
     );
+    color: var(--content-ui-submit-foreground);
 }
 
 /* select drop down styles */
@@ -1160,7 +1160,6 @@ button.lrn-btn-save-dropdown {
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:hover,
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus {
-    color: var(--form-bg-hover-color-contrast);
     background-color: var(--form-bg-hover-color);
     border-color: hsla(
         var(--form-border-color-h),
@@ -1168,6 +1167,7 @@ button.lrn-btn-save-dropdown {
         calc(var(--form-border-color-l) - 15%),
         var(--form-border-color-a)
     );
+    color: var(--form-bg-hover-color-contrast);
     outline: none;
 }
 
@@ -1235,22 +1235,22 @@ button.lrn-btn-save-dropdown {
     border: none;
 }
 ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
-    max-width: none;
-    width: auto;
-    border-bottom: 1px solid var(--body-background) !important;
-    position: relative;
-    overflow: visible;
-    list-style: none;
-    transition: background-color 0.3s ease-in;
     background: #fff;
+    border-bottom: 1px solid var(--body-background) !important;
+    list-style: none;
+    max-width: none;
+    overflow: visible;
+    position: relative;
+    transition: background-color 0.3s ease-in;
+    width: auto;
 }
 
 .lrn.lrn-author .lrn-author-item-nav {
     background: var(--body-background);
-    position: absolute;
-    top: 100%;
-    right: 0;
     margin-top: 10px;
+    position: absolute;
+    right: 0;
+    top: 100%;
     width: 100%;
 }
 
@@ -1286,9 +1286,9 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 
 /* replace icons with sb icons */
 .lrn-i-preview::before {
-    content: "\e901";
-    font-family: "schoolbox";
     color: var(--content-ui-foreground);
+    content: "\e62f";
+    font-family: "schoolbox";
 }
 .lrn .lrn-author-ui .lrn-list-view-item .lrn-btn-default {
     background: transparent;
@@ -1311,8 +1311,8 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     border-right: 1px solid var(--body-background);
 }
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span {
-    border-radius: 0px;
     border: 1px solid var(--form-border-color);
+    border-radius: 0px;
     color: transparent;
 }
 /* change checkbox and rows selection background color */
@@ -1366,30 +1366,30 @@ span.lrn-author-name-wrapper {
 
 /* add new question button styles */
 .lrn .lrn-author-ui .lrn-author-widget-button-more .lrn-author-widget-icon:before {
-    font-size: initial;
     color: var(--content-ui-foreground);
+    font-size: initial;
 }
 .lrn .lrn-author-ui .lrn-author-widget-icon:before {
-    font-size: initial;
     color: var(--content-ui-foreground);
+    font-size: initial;
 }
 [data-authorapi-selector="add-button"] {
-    width: 100% !important;
-    border: 0 !important;
-    min-height: 2.5rem !important;
-    padding: 0.5rem !important;
-    line-height: inherit !important;
-    position: relative !important;
-    overflow: hidden !important;
-    vertical-align: middle !important;
-    color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-background) !important;
+    border: 0 !important;
+    color: var(--content-ui-foreground) !important;
+    line-height: inherit !important;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    vertical-align: middle !important;
+    width: 100% !important;
 }
 .lrn .lrn-author-ui .lrn-author-widget-text {
     bottom: 0px;
+    color: var(--content-ui-foreground);
     font-size: initial;
     top: 0px;
-    color: var(--content-ui-foreground);
 }
 [data-authorapi-selector="show-shared-passages-button"] {
     display: none !important;
@@ -1398,17 +1398,17 @@ span.lrn-author-name-wrapper {
     min-height: auto;
 }
 .lrn-btn.lrn-btn-default.lrn-btn-icon-left {
-    text-align: center !important;
-    min-height: 2.5rem !important;
-    padding: 0.5rem !important;
-    line-height: inherit !important;
-    position: relative !important;
-    overflow: hidden !important;
-    vertical-align: middle !important;
-    color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-background) !important;
-    width: 99% !important;
+    color: var(--content-ui-foreground) !important;
+    line-height: inherit !important;
     margin: auto;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    width: 99% !important;
 }
 /* replaced trash icon */
 .lrn-qe .lrn-qe-ui .lrn-qe-i-trash:before {
@@ -1423,24 +1423,24 @@ a.button {
 
 /* questions and features button styles */
 .lrn .lrn-author-ui .lrn-author-btn-outline {
-    border: none;
-    min-height: 2.5rem;
-    padding: 0.5rem;
-    line-height: inherit;
-    position: relative;
-    overflow: hidden;
-    vertical-align: middle;
-    color: var(--content-ui-foreground);
     background-color: var(--content-ui-background);
+    border: none;
+    color: var(--content-ui-foreground);
+    line-height: inherit;
+    min-height: 2.5rem;
+    overflow: hidden;
+    padding: 0.5rem;
+    position: relative;
+    vertical-align: middle;
 }
 .lrn .lrn-author-ui .lrn-author-btn-outline:hover {
-    color: var(--content-ui-foreground);
     background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link.lrn-active {
-    border-left-color: var(--content-ui-foreground);
     background: var(--content-ui-selected);
+    border-left-color: var(--content-ui-foreground);
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
     border-radius: 0px;
@@ -1448,14 +1448,14 @@ a.button {
 
 /* search pages styles */
 li.lrn-list-view-item.lrn-flyout-wrapper {
-    max-width: none;
-    width: auto;
-    border-bottom: 1px solid var(--body-background) !important;
-    position: relative;
-    overflow: visible;
-    list-style: none;
-    transition: background-color 0.3s ease-in;
     background: #fff;
+    border-bottom: 1px solid var(--body-background) !important;
+    list-style: none;
+    max-width: none;
+    overflow: visible;
+    position: relative;
+    transition: background-color 0.3s ease-in;
+    width: auto;
 }
 [data-authorapi-view="tags-all"] {
     display: none !important;
@@ -1516,8 +1516,8 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 /* update the info massage styles */
 .lds-message--info {
     background-color: var(--content-ui-background);
-    border: none;
     border-radius: 0;
+    border: none;
     color: var(--content-ui-foreground);
     font-size: 16px;
 }
@@ -1529,8 +1529,8 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 }
 .lrn .lrn-author-ui .lrn-custom-select select:hover {
     background-color: var(--form-bg-hover-color);
-    color: #000000;
     border-color: var(--form-border-color);
+    color: #000000;
 }
 .lrn .lrn-author-ui .lrn-sort-button {
     border: 1px solid var(--form-border-color);
@@ -1543,16 +1543,11 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 }
 
 /* updated font sizes */
-.lrn-author-toolbar-toggle .lrn-author-toggle-part,
-.lrn-author-activity-button {
-    font-size: 1rem !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
-        Arial, sans-serif !important;
-    font-weight: 400;
-}
 .lrn .lrn-author-ui-no-preview,
 .lrn .lrn-author-ui-no-preview input,
-.lrn .lrn-author-ui-no-preview button {
+.lrn .lrn-author-ui-no-preview button,
+.lrn-author-toolbar-toggle .lrn-author-toggle-part,
+.lrn-author-activity-button {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
         Arial, sans-serif !important;
     font-size: 1rem;
@@ -1564,12 +1559,12 @@ button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-
     content: " Add";
 }
 .lrn .lrn-author-ui .lrn-author-widget-button:hover .lrn-author-widget-icon:before {
-    text-shadow: none;
     color: var(--content-ui-foreground);
+    text-shadow: none;
 }
 button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
-    color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
@@ -1594,8 +1589,8 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 /* update the pagination styles */
 .lrn .lrn-author-ui .lrn-pagination ul {
     background: var(--body-background);
-    border-top: none;
     border-bottom: none;
+    border-top: none;
 }
 span.lrn-pagination-btn-txt,
 span.lrn-i-previous,
@@ -1629,10 +1624,6 @@ span.lrn-i-next {
 span.lrn-list-view-empty-label {
     display: none;
 }
-.lrn .lrn-author-ui .lrn-activity-view-empty-img,
-.lrn .lrn-author-ui .lrn-list-view-empty-img {
-    background-image: unset;
-}
 .lrn .lrn-author-ui .lrn-list-view-empty-img {
     background-image: unset;
 }
@@ -1641,27 +1632,28 @@ span.lrn-list-view-empty-label {
 }
 .lrn .lrn-author-ui .lrn-activity-view-empty-img::after,
 .lrn .lrn-author-ui .lrn-list-view-empty-img::after {
-    white-space: pre;
-    font-family: "schoolbox";
     content: "\e658";
+    font-family: "schoolbox";
+    white-space: pre;
 }
 .lrn-list-view-empty.lrn-author-ui-no-preview {
     background-color: #ddd;
-    padding: 2rem;
     color: #999;
-    padding: 1rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    width: 100%;
     font-size: 1rem;
     font-style: italic;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    padding: 2rem;
+    text-align: center;
+    width: 100%;
 }
 .lrn .lrn-author-ui .lrn-activity-view-empty-img,
 .lrn .lrn-author-ui .lrn-list-view-empty-img {
-    width: auto;
+    background-image: unset;
+    font-style: normal !important;
     height: auto;
     margin: 0 auto;
-    font-style: normal !important;
+    width: auto;
 }
 .lrn-list-view-empty.lrn-author-ui-no-preview::after {
     content: "\A You have no cards yet. A card is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
