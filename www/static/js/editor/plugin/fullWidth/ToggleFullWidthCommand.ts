@@ -3,6 +3,8 @@
  */
 
 import { Command, type Editor } from "@ckeditor/ckeditor5-core";
+import type { Element } from "@ckeditor/ckeditor5-engine";
+import type { ImageResizeHandles, ImageResizeButtons } from "@ckeditor/ckeditor5-image";
 
 export default class ToggleFullWidthCommand extends Command {
     constructor(editor: Editor) {
@@ -19,7 +21,7 @@ export default class ToggleFullWidthCommand extends Command {
         const { editor } = this;
         const { model } = editor;
         const imageUtils = editor.plugins.get("ImageUtils");
-        const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection);
+        const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as Element;
         if (imageElement.getAttribute("data-schoolboxresource-fullwidth") === "true") {
             // if the image is full width, remove the full width styling
             editor.execute("resizeImage", { width: null });
@@ -47,18 +49,18 @@ export default class ToggleFullWidthCommand extends Command {
         const { editor } = this;
         const { model } = editor;
         const imageUtils = editor.plugins.get("ImageUtils");
-        const imageResizeHandles = editor.plugins.get("ImageResizeHandles");
-        const imageResizeButtons = editor.plugins.get("ImageResizeButtons");
+        const imageResizeHandles = editor.plugins.get("ImageResizeHandles") as ImageResizeHandles;
+        const imageResizeButtons = editor.plugins.get("ImageResizeButtons") as ImageResizeButtons;
         const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection);
         if (imageElement && imageElement.getAttribute("data-schoolboxresource-fullwidth") === "true") {
             this.set("isOn", true);
             // when full width is active disable the resize handles and buttons
-            imageResizeHandles.forceDisabled();
-            imageResizeButtons.forceDisabled();
+            imageResizeHandles.forceDisabled("fullWidth");
+            imageResizeButtons.forceDisabled("fullWidth");
         } else {
             this.set("isOn", false);
-            imageResizeHandles.clearForceDisabled();
-            imageResizeButtons.clearForceDisabled();
+            imageResizeHandles.clearForceDisabled("fullWidth");
+            imageResizeButtons.clearForceDisabled("fullWidth");
         }
     }
 }
