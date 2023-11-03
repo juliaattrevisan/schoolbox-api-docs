@@ -17,11 +17,6 @@ export function getStyleSettings() {
                     element: "tt",
                     classes: [""],
                 },
-                /* {
-                    name: "Computer Code",
-                    element: "code",
-                    classes: [""],
-                }, */
                 {
                     name: "Highlighted Note",
                     element: "p",

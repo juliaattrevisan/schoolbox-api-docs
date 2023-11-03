@@ -22,7 +22,6 @@ const DEFAULT_TOKENS = [
 
 /**
  * If tokens are enabled, return the tokens settings
- *
  * @param { EditorConfig } config - the config to use when creating the editor
  * @returns { object } - the tokens settings
  */

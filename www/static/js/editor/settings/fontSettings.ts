@@ -2,7 +2,6 @@ import { fontColourSwatches, fontBackgroundColourSwatches } from "./colourSettin
 
 /**
  * Returns the settings for the font options
- *
  * @returns { object } - the font settings
  */
 export function getFontSettings() {

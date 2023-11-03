@@ -1,6 +1,5 @@
 /**
  * Returns the settings for the headings dropdown
- *
  * @returns { object } - the headings settings
  */
 export function getHeadingSettings() {
@@ -20,7 +19,6 @@ export function getHeadingSettings() {
 
 /**
  * Replace the heading/pre elements with a span/tt
- *
  * @param { HTMLLIElement } listItem - the list item to replace the element in
  * @param { string } existingTag - the tag to replace
  * @param { string } newTag - the tag to replace with
@@ -42,7 +40,6 @@ function replaceElement(listItem: HTMLLIElement, existingTag: string, newTag: st
 /**
  * CKEditor5 does not allow headings to exist within <li> elements, this wraps any heading/pre elements within lists
  * in a <span> or <tt> element to mimic the behaviour of CKEditor4
- *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - the html with the listed headings wrapped in a span element
  */
