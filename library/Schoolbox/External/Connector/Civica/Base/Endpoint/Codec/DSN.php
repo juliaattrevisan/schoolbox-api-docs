@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Codec;
+
+use DomainException;
+use Schoolbox\External\Importer\Endpoint\IDSN;
+use SensitiveParameter;
+
+use function count;
+
+/**
+ * Class DSN
+ *
+ * Civica configuration requires four identifying pieces:
+ *  - IDP url, which is used to authenticate against and generate the access token
+ *  - School ID, Internal CES school identifier
+ *  - Username
+ *  - Password
+ *
+ * School ID is used in every request, but IDP, Username, Password
+ * are used to periodically generate access tokens
+ *
+ * @package Schoolbox\External\Connector\Civica\Base\Endpoint
+ */
+class DSN implements IDSN
+{
+    /**
+     * DSN format
+     */
+    private const DSN_FORMAT = '/username=([^;]+);password=([^;]+);schoolid=([^;]+);idp=([^;]+)/';
+
+
+    /**
+     * The expected key-value tuples
+     */
+    private const EXPECTED_TUPLE = ['username', 'password', 'schoolid', 'idp'];
+
+
+    /**
+     * Decode a dsn string
+     *
+     * @param string $dsn
+     * @return array
+     * @throws DomainException
+     */
+    public function decode(#[SensitiveParameter] string $dsn): array
+    {
+        $matches = [];
+        preg_match(self::DSN_FORMAT, $dsn, $matches);
+
+        /* Check the dsn format matches correctly
+         */
+        if (!count($matches)) {
+            throw new DomainException('Civica API DSN: could not decode; missing all credentials/bad format.');
+        }
+
+        /* Check that each module comes with the expected number of key-value pairs
+         *
+         * original dsn string + \count(expected_tuple) = 1 + 4 = 5
+         */
+        if (count($matches) !== count(self::EXPECTED_TUPLE) + 1) {
+            throw new DomainException('Civica API DSN: could not decode; missing some credentials.');
+        }
+
+        return [
+            'username' => $matches[1],
+            'password' => $matches[2],
+            'schoolid' => $matches[3],
+            'idp'      => $matches[4],
+        ];
+    }
+
+
+    /**
+     * Encode a dsn string
+     *
+     * $parts consists of (idp, school id, username, password) tuples
+     *
+     * @param array $parts
+     * @return string
+     */
+    public function encode(#[SensitiveParameter] array $parts): string
+    {
+        return "username={$parts['username']};password={$parts['password']};schoolid={$parts['schoolid']};idp={$parts['idp']}";
+    }
+}

@@ -55,6 +55,8 @@ class Factory implements IFactory
     public const WONDE = 'wonde';
     public const LISS = 'liss';
     public const VERACROSS = 'veracross';
+
+    public const CIVICA = 'civica';
     public const CSV = 'csv';
 
 
@@ -70,6 +72,7 @@ class Factory implements IFactory
         self::WONDE => 'Wonde',
         self::LISS => 'LISS',
         self::VERACROSS => 'Veracross',
+        self::CIVICA => 'Civica',
         self::CSV => 'External',
 
         /* When you've not chosen a SUDS Data Source
@@ -352,6 +355,10 @@ class Factory implements IFactory
                     TimetablePeriodMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
+
+            // TODO: Civica Endpoint/Factory
+            case self::CIVICA:
+                return null;
 
             default:
                 // Use manual csv imports
