@@ -85,18 +85,14 @@ class Replicator
             $newAssessment->setSequence($sequence);
         }
 
-        /* Cloning a quiz means we need the new Learnosity Reference identifier
-         * that can only really be obtained after sending it to Learnosity; we
-         * store the Learnosity Reference in the $assessment itself, thus making
-         * Learnosity content cloning have a sequential dependency here.
-         */
-        $this->replicateQuizConstituents($source, $newAssessment);
-
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
         $destinationContext->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $newAssessment);
+
+        // Copy Quiz Sections/Questions/Solutions
+        $this->replicateQuizConstituents($source, $newAssessment);
 
         return $newAssessment;
     }

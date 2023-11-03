@@ -99,18 +99,14 @@ class Overwriter
          */
         $this->deleteQuizConstituents($updatedDestination);
 
-        /* Cloning a quiz means we need the new Learnosity Reference identifier
-         * that can only really be obtained after sending it to Learnosity; we
-         * store the Learnosity Reference in the $assessment itself, thus making
-         * Learnosity content cloning have a sequential dependency here.
-         */
-        $this->replicateQuizConstituents($source, $updatedDestination);
-
         // Save
         $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
 
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $updatedDestination);
+
+        // Copy Quiz Sections/Questions/Solutions
+        $this->replicateQuizConstituents($source, $updatedDestination);
 
         return $updatedDestination;
     }
