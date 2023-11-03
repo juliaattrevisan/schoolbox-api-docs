@@ -450,6 +450,9 @@ class Controller extends Assessment\Controller
                 )
             ])
             ->add(['Create Response for ' . $assessment->getTitle(), '']);
+
+        $this->setAllowBackToTheFuture(false);
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/ltiCreateResponse.twig',
             [
