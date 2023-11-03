@@ -274,7 +274,7 @@ class Kernel extends WebKernelAbstract
                 throw new Unauthenticated();
             }
 
-            if (!$session->isSessionIpAddressValid()) {
+            if (!$session->isSessionIpAddressValid() && !$session->get(\Session::BYPASS_IP_TRACKING, false)) {
                 $session->destroy();
                 throw new Unauthenticated();
             }
