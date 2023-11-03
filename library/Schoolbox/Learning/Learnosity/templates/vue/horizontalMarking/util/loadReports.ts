@@ -2,9 +2,9 @@
  * To load the reports data and pass it to the other stores
  */
 
+import type { Item } from "@schoolboxLearnosity/js/types/Item";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
-import type { Item } from "../types/Item";
 
 /**
  * To move the marks (which are in the title div) out of the response container into <hm-students-student-mark>

@@ -21,12 +21,12 @@ import { useItemsStore } from "./hmItemsStore";
 
 export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
-    const isExpanded = window.Vue.ref<boolean>(true);
-    const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]);
-    const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]);
-    const urls = window.Vue.ref<StudentUrls[]>([]);
-    const showMarkedAttempts = window.Vue.ref<boolean>(true);
-    const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked));
+    const isExpanded = window.Vue.ref<boolean>(true); // if all students are expanded
+    const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
+    const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]); // all attempt comments from the backend
+    const urls = window.Vue.ref<StudentUrls[]>([]); // the urls for each student to save score, comment and attempt comment
+    const showMarkedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
+    const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
     const store = useStore();
 
     /**

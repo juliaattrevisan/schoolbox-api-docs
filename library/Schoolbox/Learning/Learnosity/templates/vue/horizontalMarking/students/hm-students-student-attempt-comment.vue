@@ -14,7 +14,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 const studentsStore = useStudentsStore();
-const editorEl = window.Vue.ref<HTMLTextAreaElement | null>(null);
 const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, {
     targetElements: [`#${editorId}`],
@@ -93,7 +92,7 @@ window.Vue.onUnmounted(async () => {
         <div class="l-flex-col l-gap-m">
             <div>
                 <label>Comment</label>
-                <textarea :id="editorId" ref="editorEl"></textarea>
+                <textarea :id="editorId"></textarea>
                 <div class="save-container l-grid">
                     <div class="save-container__inner-container">
                         <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">

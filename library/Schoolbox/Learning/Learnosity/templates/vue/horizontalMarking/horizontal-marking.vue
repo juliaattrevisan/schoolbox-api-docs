@@ -32,6 +32,10 @@ const props = defineProps<Props>();
 const store = useStore();
 const itemsStore = useItemsStore();
 
+/**
+ * To check if there are any students, otherwise display an empty state
+ * @returns {boolean} - true if there are students
+ */
 const hasStudents = window.Vue.computed(() => {
     return props.students && Object.keys(props.students).length > 0;
 });

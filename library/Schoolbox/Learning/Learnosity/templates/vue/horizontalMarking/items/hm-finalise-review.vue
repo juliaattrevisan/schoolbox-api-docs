@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To move to the next item (card) if available
+ * To finalise review, first notifying if there are any items that have not been marked
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
@@ -11,7 +11,7 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 const store = useStore();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
-const modalEl = window.Vue.ref(null);
+const modalEl = window.Vue.ref<typeof RevealModal | null>();
 
 /**
  * to open the modal when requested
@@ -19,7 +19,11 @@ const modalEl = window.Vue.ref(null);
 window.Vue.watch(
     () => store.isFinaliseReviewModalOpen,
     (isOpen) => {
-        isOpen ? modalEl.value.open() : modalEl.value.close();
+        if (isOpen) {
+            modalEl.value?.open();
+        } else {
+            modalEl.value?.close();
+        }
     }
 );
 
