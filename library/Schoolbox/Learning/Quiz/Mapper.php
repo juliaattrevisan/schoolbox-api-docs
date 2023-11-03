@@ -229,12 +229,12 @@ class Mapper extends BaseMapper
      *
      * @param IAssessable $source
      * @param IAssessable $destination
-     * @return bool
+     * @return string|null The Learnosity job ID for duplicating activities
      * @throws \DomainException
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function copyQuizConstituents(IAssessable $source, IAssessable $destination): bool
+    public function copyQuizConstituents(IAssessable $source, IAssessable $destination): ?string
     {
         $learnosityVersion = $this->getConfigLoader()->get('learnosity_version');
         $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
@@ -312,6 +312,9 @@ class Mapper extends BaseMapper
              *
              * FIXME Add Polling Mechanism
              */
+
+            // Return whatever the job ID from Learnosity was
+            return $response['data']['job_reference'] ?? null;
         }
 
 
@@ -352,7 +355,7 @@ class Mapper extends BaseMapper
         //            }
         //        }
 
-        return true;
+        return null;
     }
 
     /**
