@@ -248,7 +248,7 @@ class Module extends BaseModule
     protected function preloadAssessmentAndDestinationAssessment(array $params, User $student = null): array
     {
         $sourceAssessment      = $this->preloadAssessment(
-            ['assessmentId' => $params['destinationId']],
+            ['assessmentId' => $params['sourceId']],
             $student
         )['assessment'];
         $destinationAssessment = $this->preloadAssessment(
