@@ -13,10 +13,10 @@ import { insertWordCount } from "@js/editor/settings/wordCountSettings";
  * @param { Editor } editor - the CKEditor instance
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  */
-function addToGlobalScope(editor: Editor, sourceElement: HTMLElement) {
+function addToGlobalScope(editor: Editor, sourceElement: HTMLTextAreaElement) {
     if (sourceElement.id) {
         window.sbProps.editors[sourceElement.id] = editor;
-    } else if ((sourceElement as HTMLTextAreaElement).name) {
+    } else if (sourceElement.name) {
         window.sbProps.editors[sourceElement.name] = editor;
     }
 }
@@ -56,7 +56,7 @@ function onIframelyLoaded(editor: Editor) {
      * Track copy/paste to add an extra undo step if the link fails to unfurl
      */
     let isCopied = false;
-    editor.editing.view.document.on("clipboardInput", (event, data) => {
+    editor.editing.view.document.on("clipboardInput", () => {
         isCopied = true;
     });
     /**

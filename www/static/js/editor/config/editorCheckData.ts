@@ -23,7 +23,6 @@ function getSourceElementHTML(sourceElement: HTMLElement) {
 
 /**
  * Run through any checks required on the data before it's loaded into the editor
- *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { EditorConfig } config - the config to use when creating the editor
  * @returns { HTMLElement } - the sourceElement content as HTML
@@ -44,8 +43,26 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
 }
 
 /**
+ * This function can be called by other pages to run the wrapTokens function on the editor,
+ * this might happen if a page has changed the data in the form with .setData and needs to re-run the function
+ * It's currently only called within the Add Pastoral Record page, where it only needs to check
+ * for tokens when a pastoral type or sub-type change is triggered.
+ * @param { CustomEvent } event - the custom event
+ */
+function onEditorCheckData(event: CustomEvent) {
+    if (event.target === null) {
+        return;
+    }
+    const editor = window.sbProps.editors[event.target.id || event.target.name];
+    if (editor.config.get("sbConfig").hasTokens) {
+        const parser = new DOMParser();
+        const sourceElementHTML = parser.parseFromString(editor.getData(), "text/html").body;
+        editor.setData(runChecks(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
+    }
+}
+
+/**
  * This function is called when the editor is created, it checks the data and manipulates as required
- *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { EditorConfig } config - the config to use when creating the editor
  */
@@ -56,25 +73,8 @@ export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) 
     if ((sourceElement as HTMLTextAreaElement).value) {
         (sourceElement as HTMLTextAreaElement).value = sourceElementHTML.innerHTML;
     }
-
     // Adds an event listener to allow pages to run the same check when they need to
-    sourceElement.addEventListener(EditorEvent.EDITOR__CHECK_DATA, onEditorCheckData);
-}
-
-/**
- * This function can be called by other pages to run the wrapTokens function on the editor,
- * this might happen if a page has changed the data in the form with .setData and needs to re-run the function
- * It's currently only called within the Add Pastoral Record page, where it only needs to check
- * for tokens when a pastoral type or sub-type change is triggered.
- *
- * @param { CustomEvent } event - the custom event
- */
-function onEditorCheckData(event: CustomEvent) {
-    const editor = window.sbProps.editors[event.target.id || event.target.name];
-    if (editor.config.get("sbConfig").hasTokens) {
-        const parser = new DOMParser();
-        const sourceElementHTML = parser.parseFromString(editor.getData(), "text/html").body;
-
-        editor.setData(runChecks(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
-    }
+    sourceElement.addEventListener(EditorEvent.EDITOR__CHECK_DATA, (event) => {
+        onEditorCheckData(event as CustomEvent);
+    });
 }
