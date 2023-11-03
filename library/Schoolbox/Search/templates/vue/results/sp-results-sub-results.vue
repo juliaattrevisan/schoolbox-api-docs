@@ -49,8 +49,9 @@ const showLoadMore = window.Vue.computed(() => {
 function getEndpointWithParams() {
     const newQueryParams = useStore().getQueryParams();
     newQueryParams.append("cursor", props.result._subResults?.metadata?.cursor.next as string);
-    const endpointWithParams = `${props.result._links.subResults as string}?${newQueryParams.toString()}`;
-    return endpointWithParams;
+    return props.result._subResults === undefined
+        ? ""
+        : `${props.result._subResults.metadata.url}?${newQueryParams.toString()}`;
 }
 
 /**
@@ -66,7 +67,7 @@ async function loadMore() {
         useResultsStore().setMoreSubResults(loadedResults.data, props.result.id);
         moreResultsCount.value += 1;
         // If cursor.next has not been supplied with the sub-results, we have loaded all sub-results.
-        if (props.result._subResults && props.result._subResults.metadata.cursor.next === null) {
+        if (loadedResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
         }
     }

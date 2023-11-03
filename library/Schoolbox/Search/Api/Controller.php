@@ -151,6 +151,7 @@ class Controller extends Base
                                 'current' => null,
                                 'next'    => null,
                             ],
+                            'url' => 'api/search/folder/' . $folder->getId()
                         ]
                     ];
                     $translatedResults[$folderResultKey]['_subResults']['data'][] = $translatedResult;
