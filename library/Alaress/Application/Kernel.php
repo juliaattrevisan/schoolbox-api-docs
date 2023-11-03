@@ -1565,6 +1565,10 @@ abstract class Kernel
                             'assessmentMapperProxy' => $di->lazyGet('assessmentDataSource'),
                             'quizMapper'            => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
                             'rubricMapper'          => $di->lazyNew(DataSource::class),
+                            'httpFactory'           => $di->lazyGet('httpFactory'),
+                            'messageFactory'        => $di->lazyGet('taskd.httpRequestMessageFactory'),
+                            'messageProducer'       => $di->lazyGet('taskd.messageProducer'),
+                            'routeGenerator'        => $di->lazyGet('router.generator'),
                         ]
                     ),
                     'lessonPlanActivitiesReplicator' => $di->lazyNew(
