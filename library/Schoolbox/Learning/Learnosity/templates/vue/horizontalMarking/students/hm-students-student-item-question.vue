@@ -3,7 +3,8 @@
  * Contains a students response to an item and a score if available
  */
 
-import { useFocus } from "@vueuse/core";
+import debounce from "lodash/debounce";
+import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
@@ -19,24 +20,39 @@ const props = defineProps<Props>();
 const studentsStore = useStudentsStore();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
-const { focused } = useFocus(scoreEl);
 const score = window.Vue.ref<string>(props.question.response.score?.toString() ?? "");
+const isSaving = window.Vue.ref(false);
+const isSavedDelay = window.Vue.ref(false);
+
+const saveText = window.Vue.computed(() => {
+    if (isSaving.value) {
+        return "Saving...";
+    }
+    return "Score saved";
+});
+
+const saveContainerHeight = window.Vue.computed(() => {
+    if (isSaving.value || isSavedDelay.value) {
+        return "1fr";
+    }
+    return "0fr";
+});
 
 /**
  * Save the score if it's changed and valid
  */
 async function saveScore() {
-    if (score.value === "") {
+    if (score.value.toString() === "") {
         return;
     }
-    if (score.value === props.question.response.score?.toString()) {
+    if (score.value.toString() === props.question.response.score?.toString()) {
         return;
     }
     if (Number.isNaN(parseInt(score.value, 10))) {
         score.value = "";
         return;
     }
-    studentsStore.updateItemResponseScore(props.student, props.item, props.question, parseInt(score.value, 10));
+    isSaving.value = true;
     const formData = new FormData();
     formData.append("learnosityReference", props.question.response.learnosityReference);
     formData.append("score", score.value);
@@ -44,6 +60,11 @@ async function saveScore() {
         method: "POST",
         body: formData,
     });
+    studentsStore.updateItemResponseScore(props.student, props.item, props.question, parseInt(score.value, 10));
+    isSavedDelay.value = true;
+    isSaving.value = false;
+    await timeout(2000);
+    isSavedDelay.value = false;
 }
 
 /**
@@ -55,15 +76,6 @@ window.Vue.watch(score, (newScore) => {
     }
     if (props.question.response.maxScore && parseFloat(newScore) > props.question.response.maxScore) {
         score.value = props.question.response.maxScore.toString();
-    }
-});
-
-/**
- * save the score on focus loss if the score has changed
- */
-window.Vue.watch(focused, async ($focused) => {
-    if (!$focused) {
-        await saveScore();
     }
 });
 
@@ -88,6 +100,20 @@ window.Vue.onBeforeUnmount(async () => {
     props.container.appendChild(response);
     await saveScore();
 });
+
+/**
+ * debounce to avoid constant polling while the user is typing
+ */
+const debounceSave = debounce(() => {
+    void saveScore();
+}, 300);
+
+/**
+ * start searching once the search is active, watching the query string for input
+ */
+window.Vue.watch(score, () => {
+    debounceSave();
+});
 </script>
 
 <template>
@@ -108,11 +134,25 @@ window.Vue.onBeforeUnmount(async () => {
                 min="0"
                 :max="props.question.response.maxScore"
             />
+            <div class="save-container l-grid">
+                <div class="save-container__inner-container">
+                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                        <em>{{ saveText }}</em>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+.save-container {
+    grid-template-rows: v-bind(saveContainerHeight);
+    transition: grid-template-rows 300ms;
+    &__inner-container {
+        overflow: hidden;
+    }
+}
 .question {
     border-bottom: 4px solid var(--body-background);
 }
