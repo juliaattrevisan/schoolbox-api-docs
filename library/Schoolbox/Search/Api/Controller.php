@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -61,6 +62,7 @@ class Controller extends Base
      *
      * @return void
      * @throws NotFound
+     * @throws RouteNotFound
      * @api GET /api/search
      * @since 23.1
      *
@@ -151,7 +153,9 @@ class Controller extends Base
                                 'current' => null,
                                 'next'    => null,
                             ],
-                            'url' => 'api/search/folder/' . $folder->getId()
+                            'url' => $this->routeGenerator->generate(
+                                'searchApi.getSearchWithinFolder', ['folderId' => $folder->getId()]
+                            )
                         ]
                     ];
                     $translatedResults[$folderResultKey]['_subResults']['data'][] = $translatedResult;
