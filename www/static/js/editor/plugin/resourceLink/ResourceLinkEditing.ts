@@ -7,7 +7,7 @@ import InsertResourceLinkCommand from "./InsertResourceLinkCommand";
 
 export default class ResourceLinkEditing extends Plugin {
     /**
-     * Define the new comand
+     * Define the new command
      */
     init() {
         this.editor.commands.add("insertResourceLink", new InsertResourceLinkCommand(this.editor));
