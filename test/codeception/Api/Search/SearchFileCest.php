@@ -104,7 +104,7 @@ class SearchFileCest
             'filter'  => [
                 'types' => ['file'],
                 'date'  => [
-                    'from' => $file->getCreatedAt()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'from' => $file->getCreatedAt()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,
@@ -114,7 +114,7 @@ class SearchFileCest
             'filter'  => [
                 'types' => ['file'],
                 'date'  => [
-                    'to' => (\Alaress_Date_Format::now())->addDays(1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'to' => (\Alaress_Date_Format::now())->addDays(1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,

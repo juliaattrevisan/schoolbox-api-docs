@@ -124,7 +124,7 @@ class SearchEventCest
             'filter'  => [
                 'types' => [self::SEARCH_TYPE],
                 'date'  => [
-                    'from' => $event->getStartDateTime()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'from' => $event->getStartDateTime()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,
@@ -134,7 +134,7 @@ class SearchEventCest
             'filter'  => [
                 'types' => [self::SEARCH_TYPE],
                 'date'  => [
-                    'to' => $event->getStartDateTime()->addDays(+1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'to' => $event->getStartDateTime()->addDays(+1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,

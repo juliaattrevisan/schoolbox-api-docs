@@ -104,7 +104,7 @@ class SearchPageCest
             'filter'  => [
                 'types' => ['page'],
                 'date'  => [
-                    'from' => (\Alaress_Date_Format::now())->addDays(-1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'from' => (\Alaress_Date_Format::now())->addDays(-1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,
@@ -115,7 +115,7 @@ class SearchPageCest
             'filter'  => [
                 'types' => ['page'],
                 'date'  => [
-                    'to' => (\Alaress_Date_Format::now())->addDays(1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'to' => (\Alaress_Date_Format::now())->addDays(1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,

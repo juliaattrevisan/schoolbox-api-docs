@@ -108,7 +108,7 @@ class SearchNewsCest
             'filter'  => [
                 'types' => ['news'],
                 'date'  => [
-                    'from' => '2010-01-30T21:00:00Z',
+                    'from' => '2010-01-30',
                 ],
             ],
             'valid'   => true,
@@ -118,7 +118,7 @@ class SearchNewsCest
             'filter'  => [
                 'types' => ['news'],
                 'date'  => [
-                    'to' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'to' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,
