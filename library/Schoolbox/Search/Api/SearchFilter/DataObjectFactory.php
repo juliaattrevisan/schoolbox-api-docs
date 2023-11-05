@@ -54,13 +54,8 @@ class DataObjectFactory
 
         $fromDate = null;
         if (isset($decodedFilter['date']['from'])) {
-            if (strlen($decodedFilter['date']['from']) === 10) {
-                // Assume date has been supplied in 'Y-m-d' format, so add default time (start of day) in expected format.
-                $decodedFilter['date']['from'] .= '00:00:00';
-            }
-
             try {
-                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], 'Y-m-d H:i:s');
+                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], 'Y-m-d');
             } catch (InvalidArgumentException $e) {
                 throw new Exception("Invalid filter: date.from ('{$decodedFilter['date']['from']}') is not in expected format", 0, $e);
             }
@@ -68,12 +63,8 @@ class DataObjectFactory
 
         $toDate = null;
         if (isset($decodedFilter['date']['to'])) {
-            if (strlen($decodedFilter['date']['to']) === 10) {
-                // Assume date has been supplied in 'Y-m-d' format, so add default time (end of day) in expected format.
-                $decodedFilter['date']['to'] .= '23:59:59';
-            }
             try {
-                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], 'Y-m-d H:i:s');
+                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], 'Y-m-d');
             } catch (InvalidArgumentException $e) {
                 throw new Exception("Invalid filter: date.to ('{$decodedFilter['date']['to']}') is not in expected format", 0, $e);
             }
