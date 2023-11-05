@@ -7,6 +7,11 @@ import type { Element } from "@ckeditor/ckeditor5-engine";
 import type { ImageResizeHandles, ImageResizeButtons } from "@ckeditor/ckeditor5-image";
 
 export default class ToggleFullWidthCommand extends Command {
+    /**
+     * Whether the button is on or off
+     */
+    public declare isOn: boolean;
+
     constructor(editor: Editor) {
         super(editor);
         // add an isOn property that will be used to determine if the button is on or off
@@ -25,7 +30,7 @@ export default class ToggleFullWidthCommand extends Command {
         if (imageElement.getAttribute("data-schoolboxresource-fullwidth") === "true") {
             // if the image is full width, remove the full width styling
             editor.execute("resizeImage", { width: null });
-            editor.execute("imageStyle", { value: false });
+            editor.execute("imageStyle", { value: "" });
             model.change((writer) => {
                 writer.setAttribute("data-schoolboxresource-fullwidth", "false", imageElement);
             });
