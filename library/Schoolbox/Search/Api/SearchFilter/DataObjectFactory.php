@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\SearchFilter;
 
 use Alaress_Date_Format;
-use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -55,7 +54,7 @@ class DataObjectFactory
         $fromDate = null;
         if (isset($decodedFilter['date']['from'])) {
             try {
-                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], 'Y-m-d');
+                $fromDate = new Alaress_Date_Format($decodedFilter['date']['from'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
             } catch (InvalidArgumentException $e) {
                 throw new Exception("Invalid filter: date.from ('{$decodedFilter['date']['from']}') is not in expected format", 0, $e);
             }
@@ -64,7 +63,7 @@ class DataObjectFactory
         $toDate = null;
         if (isset($decodedFilter['date']['to'])) {
             try {
-                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], 'Y-m-d');
+                $toDate = new Alaress_Date_Format($decodedFilter['date']['to'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
             } catch (InvalidArgumentException $e) {
                 throw new Exception("Invalid filter: date.to ('{$decodedFilter['date']['to']}') is not in expected format", 0, $e);
             }
