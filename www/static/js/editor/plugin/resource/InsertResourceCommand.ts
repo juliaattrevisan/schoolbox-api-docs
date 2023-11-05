@@ -13,7 +13,7 @@ export default class InsertResourceCommand extends Command {
      * display the resource modal and listen for if a resource is returned
      */
     execute() {
-        this.diplayModal();
+        this.displayModal();
     }
 
     /**
@@ -27,15 +27,15 @@ export default class InsertResourceCommand extends Command {
     /**
      * Display the resource modal to select a file from
      */
-    diplayModal() {
+    displayModal() {
         /**
          * Homepages have a hidden input field containing the homepage id
          * If that exists, use it; otherwise assume root node 0
          */
         const defaultFolderSelector = $("#categoryID").val() ? $("#categoryID").val() : 0;
         /**
-         * Ensure that selected files are not recieved by other event listeners made by other schoolboxResource functions on the page
-         * For example, this prevents file drops from recieving the file selected in the editor.
+         * Ensure that selected files are not received by other event listeners made by other schoolboxResource functions on the page
+         * For example, this prevents file drops from receiving the file selected in the editor.
          */
         $(window).unbind("message");
         /**
@@ -65,7 +65,6 @@ export default class InsertResourceCommand extends Command {
      * audio/video will be used to display outside editing mode.
      *
      * See www/static/js/editor/jquery.proxy-replacement.js for how this occurs
-     *
      * @param { string } hash - the hash of the stored file
      */
     async getResourceInfo(hash: string) {
@@ -86,7 +85,6 @@ export default class InsertResourceCommand extends Command {
 
     /**
      * Handle the returned resource from the resource modal
-     *
      * @param { MessageEvent } event - the event
      */
     onResourceReturned(event: MessageEvent) {

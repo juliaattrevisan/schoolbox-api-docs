@@ -4,11 +4,11 @@
 
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { Element } from "@ckeditor/ckeditor5-engine";
 import { getWithoutExtension } from "@js/util/fileUtils";
 
 /**
  * Get the url of the resource, and if we have specified a baseHref, to then use that
- *
  * @param { string } url - the url to reformat
  * @param { EditorConfig } config - the CKEditor instance config
  * @returns { URL|string } - the url with the baseHref conditionally added
@@ -23,7 +23,6 @@ export function getURL(url: string, config: EditorConfig) {
 
 /**
  * Returns the extra data attributes that are used to play embedded audio/video
- *
  * @returns { string[] } The data attributes
  */
 export function getExtraAttributes() {
@@ -65,13 +64,13 @@ export type Resource = {
         | ResourceType.AUDIO
         | ResourceType.FOLDER
         | ResourceType.DOCUMENT
+        | ResourceType.MEETING_URL
         | ResourceType.OTHER;
-    id?: string; // id will only be availalbe on an already existing resource
+    id?: string; // id will only be available on an already existing resource
 };
 
 /**
  * Get the image src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the image src
@@ -82,7 +81,6 @@ function getImageSrc(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the image attributes
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the image attributes
@@ -97,7 +95,6 @@ function getImageAttributes(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the video src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the video src
@@ -109,7 +106,6 @@ function getVideoSrc(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the video thumbnail src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the video thumbnail src
@@ -123,7 +119,6 @@ function getVideoThumb(resource: Resource, config: EditorConfig) {
 /**
  * Get the video attributes, with the src as a thumbnail of the loaded video or the
  * "video processing" image if the video is not yet ready
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the image attributes
@@ -146,7 +141,6 @@ function getVideoAttributes(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the audio src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the audio src
@@ -158,7 +152,6 @@ function getAudioSrc(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the audio thumbnail src, which is just a generic speaker
- *
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the audio thumbnail src
  */
@@ -171,7 +164,6 @@ function getAudioThumb(config: EditorConfig) {
 
 /**
  * Get the audio attributes, with the src just being of a speaker
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the audio attributes
@@ -193,7 +185,6 @@ function getAudioAttributes(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the document attributes
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the document attributes
@@ -210,7 +201,6 @@ function getDocumentAttributes(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the other attributes, which is a file type for "other" files...
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the document attributes
@@ -227,18 +217,16 @@ function getOtherAttributes(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the folder src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the folder src
  */
 function getFolderSrc(resource: Resource, config: EditorConfig) {
-    return getURL(`/homepage/${resource.id}`, config);
+    return getURL(`/homepage/${resource.id as string}`, config);
 }
 
 /**
  * Get the storage src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the storage src
@@ -249,7 +237,6 @@ function getStorageSrc(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the web dav src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the web dav src
@@ -260,7 +247,6 @@ function getWebDavSrc(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the file src
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { string } - the file src
@@ -271,7 +257,6 @@ function getFileSrc(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the resource attributes
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the resource attributes
@@ -297,7 +282,6 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
 
 /**
  * Get the resource attributes
- *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the resource attributes
@@ -340,25 +324,24 @@ export function getSrc(resource: Resource, config: EditorConfig) {
     if (resource.type === ResourceType.MEETING_URL) {
         return resource.id;
     }
-    // Default assumption (not sure where this manifests anymore, sorry)
+    // Default assumption (not sure where this manifests any more, sorry)
     return getFileSrc(resource, config);
 }
 
 /**
  * Add a resource into the editor
- *
  * @param { Editor } editor - the ckeditor instance
  * @param { Resource } resource - the resource
  */
 export function addResource(editor: Editor, resource: Resource) {
-    const config = editor.config.get("sbConfig");
+    const config = editor.config.get("sbConfig") as EditorConfig;
     const imageUtils = editor.plugins.get("ImageUtils");
     editor.model.change((writer) => {
         const image = imageUtils.insertImage(
             getAttributes(resource, config),
-            editor.model.document.selection,
+            editor.model.document.selection.getFirstPosition(),
             "imageInline"
-        );
+        ) as Element;
         writer.setSelection(image, "after"); // deselect the selected image, otherwise further actions will overwrite it
         if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
