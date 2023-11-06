@@ -3,8 +3,7 @@
  * at least still persist and behave the same way in display view.
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import { Plugin, type Editor } from "@ckeditor/ckeditor5-core";
 import type { AttributeElement, DowncastConversionApi, ViewElement } from "@ckeditor/ckeditor5-engine";
 
 /**

@@ -2,8 +2,7 @@
  * Handles the insertion of a resource into the editor
  */
 
-import { Command } from "@ckeditor/ckeditor5-core";
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import { Command, type Editor } from "@ckeditor/ckeditor5-core";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
