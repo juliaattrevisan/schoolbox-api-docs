@@ -949,7 +949,7 @@ class Controller extends Base
         /* Get a list of attempts sorted by finish date
          * This gives us the most recent attempt for a quiz, if a student did multiple attempts
          *
-         * TODO What was supposed to happen for multiple attempts in a horizontal marking context?
+         * Horizontal marking always users the most recent attempt.
          */
         $pb = $this->attemptMapper->getPredicateBuilder()
             ->equals('assess_id', $quiz->getId())
