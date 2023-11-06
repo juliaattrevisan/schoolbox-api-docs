@@ -163,6 +163,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildFromStatement(): string
     {
+        // Each row of this query will represent a textbox instance - that is a textbox in a component in a folder.
+        // Each textbox instance will be uniquely identified by the following compound ID:
+        //  * CONCAT(tb.textBoxID, "-", cci.component_instance_id, "-", fo.id)
+        //  * Example with named variables: "$textboxId-$componentInstanceId-$folderId"
+        //  * Example with integer IDs    : "1-4081-80"
         return '
             FROM component_config_instance cci
             JOIN component_instance ci ON ci.id=cci.component_instance_id

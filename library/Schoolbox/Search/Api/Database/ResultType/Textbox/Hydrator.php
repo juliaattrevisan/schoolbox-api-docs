@@ -74,18 +74,21 @@ class Hydrator extends BaseHydrator
             return [];
         }
 
-        // For all textboxIds, get information on all the places where $textboxId has been instantiated.
-        // Each textbox could be on multiple pages, or even in multiple components within the same page.
-        // This is done outside the main loop to reduce the number of SQL queries run.
-        $textboxInstanceInfoByTextboxId = $this->getTextboxInstanceInfoByTextboxId($textboxIds);
-
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
+
+        $textboxInstanceIds = [];
+        foreach ($matches as $match) {
+            $textboxInstanceIds[] = $match->id;
+        }
+
+        $configJsonByTextBoxInstanceId = $this->getComponentConfigForTextboxInstance($textboxInstanceIds);
 
         $fullResults = [];
 
         foreach ($matches as $match) {
-            list($textboxId, $componentInstanceId, $folderId) = explode('-', $match->id);
+            $textboxInstanceId = $match->id;
+            [$textboxId, $componentInstanceId, $folderId] = explode('-', $textboxInstanceId);
             $textbox = $textboxes->getBy('id', $textboxId);
 
             if (!($textbox instanceof TextboxModel)) {
@@ -165,8 +168,7 @@ class Hydrator extends BaseHydrator
             // After json_decode, $componentConfig will be an array with the following optional keys:
             //  * Component_Config_Collapse::KEY,
             //  * Component_Config_ShowComponentTitle::KEY
-//            $componentConfigJson = $this->getComponentConfigForTextboxInstance($textboxId, $componentInstanceId, $folderId);
-            $componentConfigJson = '{}';
+            $componentConfigJson = $configJsonByTextBoxInstanceId[$textboxInstanceId];
             $componentConfig = json_decode($componentConfigJson, true);
 
             if ($componentConfig === null) {
@@ -227,80 +229,34 @@ class Hydrator extends BaseHydrator
     }
 
     /**
-     * Return an array of arrays containing config information for the textbox components matching $textboxIds.
-     *
-     * Example of returned array:
-     * [
-     *     116 => [ // Key is textboxId.
-     *         [
-     *             'folder_id' => 83,
-     *             'component_instance_id' => 4409,
-     *             'config_json' => '{"collapse": 1, "showComponentTitle": 0}' // Both keys are optional.
-     *         ],
-     *         ...
-     *     ]
-     * ]
-     *
-     * @param $textboxIds
+     * @param array $textboxInstanceIds
      * @return array
      */
-    private function getTextboxInstanceInfoByTextboxId($textboxIds): array
+    private function getComponentConfigForTextboxInstance(array $textboxInstanceIds): array
     {
         $db = $this->textboxMapper->getDatabase();
-        $rows = $db->executeQuery(
-            // The same textbox can be instantiated on multiple pages, and even multiple times on the same page
-            // (in different components).
-            //
-            // The basic idea of the query is to start with a table of "textboxId, folderId, component_instance_id",
-            // and join to a table of "component_instance_id, config_json" to get config_json.
-            //
-            // Note the purpose of using JSON syntax here is to get all the config items for a textbox into a single
-            // row, while limiting the number of joined subqueries to one.
-            //
-            // Note also that the query below limits results to textboxes in homepage modules only.
-            // Textboxes can also appear on homepage_templates for example, but these textboxes will not show up in
-            // search results at the moment because of the 'ci.module="homepage"' WHERE condition.
-            'SELECT
-            cci.value AS textbox_id,
-            ci.identifier AS folder_id,
-            cci.component_instance_id,
-            IFNULL(component_configJson.config_json, "{}") AS config_json
-            FROM component_config_instance cci
-            JOIN component_instance ci ON ci.id=cci.component_instance_id
-            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-            LEFT JOIN (
-                SELECT
-                cci2.component_instance_id,
-                JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS config_json
-                FROM component_config_instance cci2
-                LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
-                WHERE ccd2.key IN (:collapse, :showComponentTitle)
-                GROUP BY cci2.component_instance_id
-            ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
-            WHERE ccd.key=:componentKey
-            AND ci.module="homepage"
-            AND cci.value IN (' . implode(',', array_map('intval', $textboxIds)) . ')',
-            [
-                ':componentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
-                ':collapse' => Component_Config_Collapse::KEY,
-                ':showComponentTitle' => Component_Config_ShowComponentTitle::KEY
-            ]
-        );
 
-        $rowsByTextboxId = [];
-
-        foreach ($rows as $row) {
-            $textboxId = $row['textbox_id'];
-            unset($row['textbox_id']);
-
-            if (!array_key_exists($textboxId, $rowsByTextboxId)) {
-                $rowsByTextboxId[$textboxId] = [];
-            }
-
-            $rowsByTextboxId[$textboxId][] = $row;
-        }
-
-        return $rowsByTextboxId;
+        // TODO: This is probably very inefficient.  Split the component IDs out of $textboxInstanceIds and write a more efficient query.
+        return $db->executeQuery(
+        'SELECT
+             CONCAT(cci.value, "-", cci.component_instance_id, "-", ci.identifier) AS textboxInstanceId,
+             IFNULL(component_configJson.config_json, "{}") AS configJson
+             FROM component_config_instance cci
+             JOIN component_instance ci ON ci.id=cci.component_instance_id
+             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+             LEFT JOIN (
+                 SELECT
+                 cci2.component_instance_id,
+                 JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS config_json
+                 FROM component_config_instance cci2
+                 LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
+                 WHERE ccd2.key IN ("' . Component_Config_Collapse::KEY . '", "' . Component_Config_ShowComponentTitle::KEY . '")
+                 GROUP BY cci2.component_instance_id
+             ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
+             WHERE ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"
+             AND ci.module="homepage"
+             AND CONCAT(cci.value, "-", cci.component_instance_id, "-", ci.identifier) IN ("' . implode('","', $textboxInstanceIds) . '")'
+        )->fetchColumnArray('configJson', 'textboxInstanceId');
     }
 
     /**
@@ -311,7 +267,6 @@ class Hydrator extends BaseHydrator
      * @param TextboxModel $textbox
      * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
      * @throws RouteNotFound
-     * @throws Exception
      */
     private function getSearchResultLinks(TextboxModel $textbox, User $viewer): array
     {
