@@ -236,9 +236,9 @@ class Hydrator extends BaseHydrator
     {
         $db = $this->textboxMapper->getDatabase();
 
-        // TODO: This is probably very inefficient.  Split the component IDs out of $textboxInstanceIds and write a more efficient query.
-        return $db->executeQuery(
-        'SELECT
+        $query = (
+            // TODO: This is probably very inefficient.  Split the component IDs out of $textboxInstanceIds and write a more efficient query.
+            'SELECT
              CONCAT(cci.value, "-", cci.component_instance_id, "-", ci.identifier) AS textboxInstanceId,
              IFNULL(component_configJson.config_json, "{}") AS configJson
              FROM component_config_instance cci
@@ -256,7 +256,9 @@ class Hydrator extends BaseHydrator
              WHERE ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"
              AND ci.module="homepage"
              AND CONCAT(cci.value, "-", cci.component_instance_id, "-", ci.identifier) IN ("' . implode('","', $textboxInstanceIds) . '")'
-        )->fetchColumnArray('configJson', 'textboxInstanceId');
+        );
+
+        return $db->executeQuery($query)->fetchColumnArray('configJson', 'textboxInstanceId');
     }
 
     /**
