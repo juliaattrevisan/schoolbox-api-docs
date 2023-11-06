@@ -19,7 +19,6 @@ use PHPUnit\Framework\TestCase;
 
 class SanitiseScoresTest extends TestCase
 {
-
     /**
      * @dataProvider providerValidMark
      * @param mixed $mark
