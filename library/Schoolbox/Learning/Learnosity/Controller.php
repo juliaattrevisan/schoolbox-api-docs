@@ -50,6 +50,18 @@ class Controller extends Base
 
 
     /**
+     * Saves intermittently every 300 seconds by default
+     */
+    private const LEARNOSITY_SAVE_INTERVAL = 300;
+
+
+    /**
+     * Alert students 60 seconds before it kicks you out
+     */
+    private const LEARNOSITY_WARNING_TIME = 60;
+
+
+    /**
      * Some interactivities/questions/features are only available in certain plans
      * we don't blacklist things we want to hide; we whitelist things we want to show
      * because that's just...the way learnosity built it
@@ -361,9 +373,7 @@ class Controller extends Base
                 ],
                 "navigation" => [
                     "auto_save" => [
-                        /* TODO Decide on this value and const it
-                         */
-                        "save_interval_duration" => 300
+                        "save_interval_duration" => self::LEARNOSITY_SAVE_INTERVAL
                     ],
                     "show_intro" => false,
                     "show_outro" => false
@@ -411,7 +421,7 @@ class Controller extends Base
                 'time' => [
                     'max_time' => $quiz->getDuration(),
                     'limit_type' => 'hard',
-                    'warning_time' => 60
+                    'warning_time' => self::LEARNOSITY_WARNING_TIME
                 ],
                 /* This is our Quiz title, I guess
                  */
