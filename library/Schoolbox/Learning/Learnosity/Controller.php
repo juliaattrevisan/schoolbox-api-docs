@@ -491,9 +491,6 @@ class Controller extends Base
             ]),
             'learnositySessionReference' => $attempt->getLearnosityReference(),
         ], "Attempt {$assessment->getTitle()}");
-
-        /* TODO Record the automated result somewhere (idk where)
-         */
     }
 
 
