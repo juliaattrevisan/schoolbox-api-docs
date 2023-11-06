@@ -1083,8 +1083,8 @@ class Controller extends Base
              * (because $items is in some non-sequenced order)
              */
             foreach ($itemReferences as &$itemReference) {
-                /* FIXME Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                 *  we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                 * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
                  */
                 if (!is_array($itemReference)) {
                     $itemReference = [
