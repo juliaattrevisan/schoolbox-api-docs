@@ -78,6 +78,7 @@ window.Vue.onMounted(() => {
                 data-datepicker-buttontext
                 data-datesync-enddate="#sp-end-date-input"
                 :data-datepicker-initial-value="filterDateRangeStore.startDate"
+                data-datepicker-hide-timetable="true"
             />
         </div>
         <div class="l-flex-col l-flex__item--1">
@@ -90,7 +91,14 @@ window.Vue.onMounted(() => {
                 data-datepicker-buttontext
                 data-datesync-startdate="#sp-start-date-input"
                 :data-datepicker-initial-value="filterDateRangeStore.endDate"
+                data-datepicker-hide-timetable="true"
             />
         </div>
     </div>
 </template>
+<style>
+/* temporary front end only solution for hiding the loaded timetable tab */
+#date-picker-tabs {
+    display: none;
+}
+</style>
