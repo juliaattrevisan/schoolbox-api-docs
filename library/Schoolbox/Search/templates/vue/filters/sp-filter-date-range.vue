@@ -8,6 +8,17 @@ import { useFilterDateRangeStore, EMPTY_DATE, INVALID_DATE } from "./store/spFil
 const filterDateRangeStore = useFilterDateRangeStore();
 
 /**
+ * Ensure the error message is hidden on clear filters
+ * @param {string} selector - The selector for the error message
+ */
+function clearErrorMessage(selector: string) {
+    const dateError = document.querySelector(selector) as HTMLDivElement;
+    if (dateError) {
+        dateError.style.display = "none";
+    }
+}
+
+/**
  * Clear the start date if the filters have been reset
  */
 window.Vue.watch(
@@ -15,6 +26,7 @@ window.Vue.watch(
     (newValue) => {
         if (newValue === EMPTY_DATE) {
             $("#sp-start-date-input").val(EMPTY_DATE);
+            clearErrorMessage("#sp-start-date-input-error");
         }
     }
 );
@@ -27,6 +39,7 @@ window.Vue.watch(
     (newValue) => {
         if (newValue === EMPTY_DATE) {
             $("#sp-end-date-input").val(EMPTY_DATE);
+            clearErrorMessage("#sp-end-date-input-error");
         }
     }
 );
