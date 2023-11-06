@@ -24,7 +24,7 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div id='quiz-container' class="small-12 island">
         <section class="content">
             <div id="learnosity-author"></div>
         </section>
@@ -41,7 +41,7 @@
  #
  # Hide them in css, then remove the li with javascript since the li elements
  # reserve a 33% width in the learnosity ui lol and I can't css-selector those
-#}
+ #}
 {% if 'elite' != config.site_plan|lower %}
 <style>
     [data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"],
@@ -131,6 +131,20 @@
                     authorApp.navigate(window.location.hash.replace(/^#/, ""));
                 }
             };
+        },
+        /* Log errors to console and to screen for users
+         */
+        errorListener: function(error) {
+            let errorElement = document.createElement('div');
+            errorElement.classList.add('alert-box', 'warning');
+            errorElement.innerHTML = '<p>There was a problem loading this quiz.</p>';
+            errorElement.innerHTML += '<p>' + error + '</p>';
+
+            document.getElementById('learnosity-author').replaceWith(errorElement);
+            document.getElementById('quiz-container').classList.remove('island');
+            document.getElementById('quiz-container').classList.add('columns');
+
+            console.log(error);
         }
     };
 
@@ -138,6 +152,5 @@
         {{ initOptions | raw }},
         authorAppCallback
     );
-
 </script>
 {% endautoescape %}
