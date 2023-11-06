@@ -1166,6 +1166,7 @@ class Controller extends Base
      * @return void
      * @throws ValidationException
      * @throws \DomainException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function postFeedbackScore(
