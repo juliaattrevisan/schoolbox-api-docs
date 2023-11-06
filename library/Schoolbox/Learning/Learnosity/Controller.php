@@ -884,6 +884,16 @@ class Controller extends Base
             $mark = $sanitisedScore['score'];
             $maxMark = $sanitisedScore['max_score'];
 
+            /* If the new score is also null, skip it
+             *
+             * This would happen if frontend validation failed and allowed users
+             * to pass a value that equated to null, such as the string "cat"
+             * Consult unit tests for other reasons
+             */
+            if (null === $maxMark) {
+                continue;
+            }
+
             /* Get ready to send it back to Learnosity land
              */
             $updatedResponse['score'] = $mark;
