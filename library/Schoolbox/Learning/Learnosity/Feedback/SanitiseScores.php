@@ -57,8 +57,8 @@ class SanitiseScores
         if (is_numeric($inputScore) && is_numeric($inputMaxScore)) {
             /* Artificially cast to floats which solves a few random problems
              */
-            $score = (float)$inputScore;
-            $maxScore = (float)$inputMaxScore;
+            $score = round((float)$inputScore, 2);
+            $maxScore = round((float)$inputMaxScore, 2);
 
             /* Negative values get rounded up to 0
              */
