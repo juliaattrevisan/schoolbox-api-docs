@@ -4,7 +4,7 @@
 
 import { Essentials } from "@ckeditor/ckeditor5-essentials";
 import { Bold, Italic, Underline, Strikethrough } from "@ckeditor/ckeditor5-basic-styles";
-import { List } from "@ckeditor/ckeditor5-list";
+import { DocumentList } from "@ckeditor/ckeditor5-list";
 import { BlockQuote } from "@ckeditor/ckeditor5-block-quote";
 import { GeneralHtmlSupport } from "@ckeditor/ckeditor5-html-support";
 import { PasteFromOffice } from "@ckeditor/ckeditor5-paste-from-office";
@@ -14,7 +14,6 @@ import Legacy from "@js/editor/plugin/legacy/Legacy";
 
 /**
  * All the core plugins
- *
  * @returns { object } - the core plugins
  */
 export function getCorePlugins() {
@@ -25,7 +24,7 @@ export function getCorePlugins() {
         Underline,
         Strikethrough,
         Link,
-        List,
+        DocumentList,
         BlockQuote,
         GeneralHtmlSupport,
         Legacy,
