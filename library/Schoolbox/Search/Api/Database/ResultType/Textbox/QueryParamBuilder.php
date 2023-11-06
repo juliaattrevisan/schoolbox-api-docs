@@ -11,6 +11,9 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
+use Component_Config_Collapse;
+use Component_Config_ShowComponentTitle;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
 /**
@@ -39,6 +42,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildBaseWhereParams(string $keyword): array
     {
         $whereParts         = [
+            'ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"',
+            'ci.module="homepage"',
             'tb.deleted_at IS NULL',
             'fo.deleted_at IS NULL',
         ];
@@ -116,7 +121,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(): string
     {
-        return 'tb.textBoxID';
+        // Return a compound id "$textboxId-$componentInstanceId-$folderId".
+        // This value will be unique for each textbox instance - meaning a texbox positioned in a component in a folder.
+        return 'CONCAT(tb.textBoxID, "-", cci.component_instance_id, "-", fo.id)';
     }
 
     /**
@@ -157,8 +164,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildFromStatement(): string
     {
         return '
-            FROM textBox tb
-            INNER JOIN folder fo ON tb.categoryID = fo.id
+            FROM component_config_instance cci
+            JOIN component_instance ci ON ci.id=cci.component_instance_id
+            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            JOIN textBox tb ON tb.textBoxID=cci.value
+            JOIN folder fo ON fo.id=ci.identifier
+            LEFT JOIN (
+                SELECT
+                cci2.component_instance_id,
+                JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS config_json
+                FROM component_config_instance cci2
+                LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
+                WHERE ccd2.key IN ("' . Component_Config_Collapse::KEY . '", "' . Component_Config_ShowComponentTitle::KEY . '")
+                GROUP BY cci2.component_instance_id
+            ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
         ';
     }
 }

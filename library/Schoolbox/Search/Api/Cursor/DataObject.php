@@ -23,13 +23,13 @@ class DataObject
      * @param float  $relevance The relevance of the last result: should be a value between 0 and 1.
      * @param string $title     The title of the last result.
      * @param string $type      The type of the last result.
-     * @param int    $id        The ID of the last result.
+     * @param string $id        The ID of the last result (string not int because we need to accommodate compound IDs).
      */
     public function __construct(
         public float $relevance,
         public string $title,
         public string $type,
-        public int $id,
+        public string $id,
     ) {
     }
 }

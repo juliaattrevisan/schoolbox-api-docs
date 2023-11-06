@@ -21,13 +21,13 @@ class RawResult
     /**
      * Constructor
      *
-     * @param int    $id        The ID of the search result subject.
+     * @param string $id        The ID of the search result subject (string not int because we need to accommodate compound IDs)
      * @param string $title     The title of the search result.
      * @param string $type      The type of search result.
      * @param float  $relevance A relevancy score for this result: should be between 0 and 1
      */
     public function __construct(
-        public int $id,
+        public string $id,
         public string $title,
         public string $type,
         public float $relevance,

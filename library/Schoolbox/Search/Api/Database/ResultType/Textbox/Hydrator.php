@@ -85,7 +85,8 @@ class Hydrator extends BaseHydrator
         $fullResults = [];
 
         foreach ($matches as $match) {
-            $textbox = $textboxes->getBy('id', $match->id);
+            list($textboxId, $componentInstanceId, $folderId) = explode('-', $match->id);
+            $textbox = $textboxes->getBy('id', $textboxId);
 
             if (!($textbox instanceof TextboxModel)) {
                 continue;
@@ -106,126 +107,120 @@ class Hydrator extends BaseHydrator
                 }
             }
 
-            // Find all the instances of $textbox.
-            $textboxInstanceInfo = $textboxInstanceInfoByTextboxId[$textbox->getId()] ?? [];
+// TODO: Write another query to find textboxes that are not used on any page.
+//
+//            if (count($textboxInstanceInfo) === 0) {
+//                // This textbox is not used on any page.
+//
+//                // Textboxes not currently used in any component should be shown
+//                // only to users with write access to the textbox's main folder.
+//                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxRootFolder->getId());
+//                if ($textboxAccess < UserAccess::ACCESS_WRITE) {
+//                    continue;
+//                }
+//
+//                // Create search result with link to the textbox's 'Manage Textboxes' page.
+//                $fullResults[] = new FullResult(
+//                    $match,
+//                    $match->id,
+//                    // No component, so no config, so:
+//                    //  * $componentIsCollapsed does not apply,
+//                    //  * $showTitleToReadOnlyUsers will have default value, true.
+//                    // Conclusion: No reason not to display heading.
+//                    $textbox->getHeading(),
+//                    $this->buildBaseUrl()
+//                         ->withPath("/textbox/folder/{$textboxRootFolder->getId()}")
+//                         ->withFragment("textbox-" . $textbox->getId())
+//                         ->__toString(),
+//                    $match->type,
+//                    $match->relevance,
+//                    $textbox->getUpdatedAt(),
+//                    $textboxRootFolder,
+//                    'Hidden from view',
+//                    null,
+//                    'textbox',
+//                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
+//                    null,
+//                    [$textboxRootFolder,], // Context: textbox's folder.
+//                    [], // texbox: none.
+//                );
+//            }
 
-            if (count($textboxInstanceInfo) === 0) {
-                // This textbox is not used on any page.
-
-                // Textboxes not currently used in any component should be shown
-                // only to users with write access to the textbox's main folder.
-                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxRootFolder->getId());
-                if ($textboxAccess < UserAccess::ACCESS_WRITE) {
-                    continue;
-                }
-
-                // Create search result with link to the textbox's 'Manage Textboxes' page.
-                $fullResults[] = new FullResult(
-                    $match,
-                    $match->id,
-                    // No component, so no config, so:
-                    //  * $componentIsCollapsed does not apply,
-                    //  * $showTitleToReadOnlyUsers will have default value, true.
-                    // Conclusion: No reason not to display heading.
-                    $textbox->getHeading(),
-                    $this->buildBaseUrl()
-                         ->withPath("/textbox/folder/{$textboxRootFolder->getId()}")
-                         ->withFragment("textbox-" . $textbox->getId())
-                         ->__toString(),
-                    $match->type,
-                    $match->relevance,
-                    $textbox->getUpdatedAt(),
-                    $textboxRootFolder,
-                    'Hidden from view',
-                    null,
-                    'textbox',
-                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
-                    null,
-                    [$textboxRootFolder,], // Context: textbox's folder.
-                    [], // texbox: none.
-                );
+            try {
+                $textboxFolder = $this->folderMapper->findById($folderId); // This is the page on which the textbox component is used.
+            } catch (Exception\Deleted $e) {
+                // We have found a soft-deleted folder.  Skip this textbox instance.
+                // Note that it is difficult to JOIN the `folder` table to the SQL query used in this->getTextboxInstanceInfoByTextboxId(),
+                // because of the way components are defined (and enum field determines the table to join for different modules).
+                // Easier to just skip deleted folders here.
+                continue;
             }
 
-            foreach ($textboxInstanceInfo as $tio) {
-                $folderId = $tio['folder_id'];
-
-                try {
-                    $textboxFolder = $this->folderMapper->findById($folderId); // This is the page on which the textbox component is used.
-                } catch (Exception\Deleted $e) {
-                    // We have found a soft-deleted folder.  Skip this textbox instance.
-                    // Note that it is difficult to JOIN the `folder` table to the SQL query used in this->getTextboxInstanceInfoByTextboxId(),
-                    // because of the way components are defined (and enum field determines the table to join for different modules).
-                    // Easier to just skip deleted folders here.
-                    continue;
-                }
-
-                // Check if user has access to textbox's folder
-                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxFolder->getId());
-                if ($textboxAccess < UserAccess::ACCESS_READ) {
-                    continue;
-                }
-
-                $componentInstanceId = $tio['component_instance_id'];
-
-                // After json_decode, $componentConfig will be an array with the following optional keys:
-                //  * Component_Config_Collapse::KEY,
-                //  * Component_Config_ShowComponentTitle::KEY
-                $componentConfigJson = $tio['config_json'];
-                $componentConfig = json_decode($componentConfigJson, true);
-
-                if ($componentConfig === null) {
-                    throw new UnexpectedValueException('Component config JSON could not be decoded.');
-                }
-
-                // Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
-                // To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
-                $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
-                $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
-
-                // Textboxes that have been hidden to read-only users (by having title hidden and body collapsed)
-                // should appear in search results only for users with write access.
-                if (!$showTitleToReadOnlyUsers && $componentIsCollapsed && $textboxAccess < UserAccess::ACCESS_WRITE) {
-                    continue;
-                }
-
-                // Matches whose component title is hidden should only count as matches if they match on something other
-                // than the title.  The only other thing textbox matches might match against is the body.
-                // (See match criteria for textboxes in QueryParamBuilder->buildBaseWhereParams()).
-                if (
-                    $textboxAccess === UserAccess::ACCESS_READ &&
-                    !$showTitleToReadOnlyUsers &&
-                    mb_stripos($textboxBodyTextOnly, $keyword, 0, self::ENCODING) === false
-                ) {
-                    continue;
-                }
-
-                // Create search result with link to the homepage on which the textbox has been used.
-                $fullResults[] = new FullResult(
-                    $match,
-                    $match->id,
-                    (
-                        // Hide title if it should be hidden.
-                        ($textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
-                        ? 'Untitled Textbox'
-                        : $textbox->getHeading()
-                    ),
-                    $this->buildBaseUrl()
-                        ->withPath('/homepage/' . $textboxFolder->getId())
-                        ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
-                        ->__toString(),
-                    $match->type,
-                    $match->relevance,
-                    $textbox->getUpdatedAt(),
-                    $textboxFolder,
-                    null, // Could put the heading of $textboxRootFolder here, but probably not relevant to the user.
-                    null,
-                    'textbox',
-                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
-                    null,
-                    [$textbox->getCategory(),], // Context: textbox's folder
-                    $this->getSearchResultLinks($textbox, $viewer)
-                );
+            // Check if user has access to textbox's folder
+            $textboxAccess = $this->access->getFolderAccess($viewer, $textboxFolder->getId());
+            if ($textboxAccess < UserAccess::ACCESS_READ) {
+                continue;
             }
+
+            // After json_decode, $componentConfig will be an array with the following optional keys:
+            //  * Component_Config_Collapse::KEY,
+            //  * Component_Config_ShowComponentTitle::KEY
+//            $componentConfigJson = $this->getComponentConfigForTextboxInstance($textboxId, $componentInstanceId, $folderId);
+            $componentConfigJson = '{}';
+            $componentConfig = json_decode($componentConfigJson, true);
+
+            if ($componentConfig === null) {
+                throw new UnexpectedValueException('Component config JSON could not be decoded.');
+            }
+
+            // Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
+            // To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
+            $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
+            $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
+
+            // Textboxes that have been hidden to read-only users (by having title hidden and body collapsed)
+            // should appear in search results only for users with write access.
+            if (!$showTitleToReadOnlyUsers && $componentIsCollapsed && $textboxAccess < UserAccess::ACCESS_WRITE) {
+                continue;
+            }
+
+            // Matches whose component title is hidden should only count as matches if they match on something other
+            // than the title.  The only other thing textbox matches might match against is the body.
+            // (See match criteria for textboxes in QueryParamBuilder->buildBaseWhereParams()).
+            if (
+                $textboxAccess === UserAccess::ACCESS_READ &&
+                !$showTitleToReadOnlyUsers &&
+                mb_stripos($textboxBodyTextOnly, $keyword, 0, self::ENCODING) === false
+            ) {
+                continue;
+            }
+
+            // Create search result with link to the homepage on which the textbox has been used.
+            $fullResults[] = new FullResult(
+                $match,
+                $match->id,
+                (
+                    // Hide title if it should be hidden.
+                    ($textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
+                    ? 'Untitled Textbox'
+                    : $textbox->getHeading()
+                ),
+                $this->buildBaseUrl()
+                    ->withPath('/homepage/' . $textboxFolder->getId())
+                    ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
+                    ->__toString(),
+                $match->type,
+                $match->relevance,
+                $textbox->getUpdatedAt(),
+                $textboxFolder,
+                null, // Could put the heading of $textboxRootFolder here, but probably not relevant to the user.
+                null,
+                'textbox',
+                $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
+                null,
+                [$textbox->getCategory(),], // Context: textbox's folder
+                $this->getSearchResultLinks($textbox, $viewer)
+            );
         }
 
         return $fullResults;
