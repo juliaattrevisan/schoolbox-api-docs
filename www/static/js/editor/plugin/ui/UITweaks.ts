@@ -4,29 +4,34 @@
  */
 
 import { Plugin } from "@ckeditor/ckeditor5-core";
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { getOptimalPosition } from "@ckeditor/ckeditor5-utils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
+import type { DropdownView } from "@ckeditor/ckeditor5-ui";
+import type ViewCollection from "@ckeditor/ckeditor5-ui/src/viewcollection";
+import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
+import { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
 
 export default class PanelTweaks extends Plugin {
     /**
      * We need to ensure everything has been set up before we can start modifying the panels
      */
     init() {
-        this.editor.sourceElement.addEventListener(EditorEvent.EDITOR__CREATED, () => {
+        (this.editor as ClassicEditor).sourceElement?.addEventListener(EditorEvent.EDITOR__CREATED, () => {
             this.updateDropdownPositions();
             this.checkForModal();
         });
     }
 
     /**
-     * Be default the <body> element is used to check if the entire dropown is visible when open.
+     * Be default the <body> element is used to check if the entire dropdown is visible when open.
      * This is problematic when we have either the side menu or the notifications panel open as
      * part of the dropdown may appear behind them. To resolve we pass in the #content element
      * into the getOptimalPosition method used.
      */
     updateDropdownPositions() {
-        const toolbarItems = this.editor.ui.view.toolbar.items;
-        const dropDownItems = toolbarItems.filter((item) => item.panelPosition); // get only those toolbar items that are dropdowns
+        const toolbarItems = (this.editor as ClassicEditor).ui.view.toolbar.items as ViewCollection<DropdownView>;
+        const dropDownItems = toolbarItems.filter((item) => item.panelPosition !== null); // get only those toolbar items that are dropdowns
         dropDownItems.forEach((item) => {
             this.updateDropdownPosition(item);
         });
@@ -38,9 +43,9 @@ export default class PanelTweaks extends Plugin {
      * after the listener assigned within the toolbar item.
      * We just replicate the logic used in https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#function-render
      * but add .limiter to the getOptimalPosition util method.
-     * @param {DropdownButtonView} item - the dropdown item
+     * @param {DropdownView} item - the dropdown item
      */
-    updateDropdownPosition(item) {
+    updateDropdownPosition(item: DropdownView) {
         item.on("change:isOpen", (eventInfo, name, isOpen) => {
             if (!isOpen) {
                 return;
@@ -49,19 +54,20 @@ export default class PanelTweaks extends Plugin {
              * We also need to account for dropdowns within dropdowns.
              */
             if (item.toolbarView) {
-                const innerItems = item.toolbarView.itemsView.children;
-                const innerDropDownItems = innerItems.filter((item) => item.panelPosition); // get only those toolbar items that are dropdowns
-                innerDropDownItems.forEach((item) => {
-                    this.updateDropdownPosition(item);
+                const innerItems = item.toolbarView.itemsView.children as ViewCollection<DropdownView>;
+                const innerDropDownItems = innerItems.filter(($item) => $item.panelPosition !== null); // get only those toolbar items that are dropdowns
+                innerDropDownItems.forEach(($item) => {
+                    this.updateDropdownPosition($item);
                 });
             }
-            item.panelView.position = getOptimalPosition({
-                element: item.panelView.element,
-                target: item.buttonView.element,
+            const optimalPosition = getOptimalPosition({
+                element: item.panelView.element as HTMLElement,
+                target: item.buttonView.element as HTMLElement,
                 fitInViewport: true,
                 limiter: document.getElementById("content"),
                 positions: item._panelPositions,
-            }).name;
+            }) as Position;
+            item.panelView.position = optimalPosition.name as PanelPosition;
         });
     }
 
@@ -72,15 +78,15 @@ export default class PanelTweaks extends Plugin {
     checkForModal() {
         // a modal is typically set to 1005, so we need to be higher than that
         const zIndex = "1010";
-        if (this.editor.sourceElement.closest("[data-reveal]")) {
+        if ((this.editor as ClassicEditor).sourceElement?.closest("[data-reveal]")) {
             const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
             // fired when the balloon is shown or hidden by any UI
-            contextualBalloon.on("change:visibleView", (eventInfo, name, value) => {
-                const balloonElement = value?.element.parentElement.parentElement.parentElement;
+            contextualBalloon.on("change:visibleView", (eventInfo, name, value: null | HTMLElement) => {
+                const balloonElement = value?.element.parentElement.parentElement.parentElement as HTMLElement;
                 if (balloonElement && balloonElement.style.zIndex !== zIndex) {
                     balloonElement.style.zIndex = zIndex;
                     // we also need to add the editor id to the balloon so we can potentially access it later
-                    balloonElement.setAttribute("data-baloon-editor-id", this.editor.id);
+                    balloonElement.setAttribute("data-balloon-editor-id", this.editor.id);
                 }
             });
         }

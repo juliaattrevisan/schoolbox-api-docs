@@ -200,10 +200,10 @@
                 },
                 "plan-open-date": {
                     required: function () {
-                        return $.inArray("open", options.getAvailableDateFields()) > -1
+                        return $.inArray("open", options.getAvailableDateFields()) > -1;
                     },
                     datepickerDate: function () {
-                        return $.inArray("open", options.getAvailableDateFields()) > -1
+                        return $.inArray("open", options.getAvailableDateFields()) > -1;
                     },
                 },
                 "plan-due-date": {
@@ -212,10 +212,10 @@
                 },
                 "plan-close-date": {
                     required: function () {
-                        return $.inArray("close", options.getAvailableDateFields()) > -1
+                        return $.inArray("close", options.getAvailableDateFields()) > -1;
                     },
                     datepickerDate: function () {
-                        return $.inArray("close", options.getAvailableDateFields()) > -1
+                        return $.inArray("close", options.getAvailableDateFields()) > -1;
                     },
                 },
                 "plan-participants": {
@@ -696,13 +696,13 @@
 
     /**
      * When a resource modal is opened, we need to ensure the
-     * link baloon is also updated so it sits behind  the resource modal
+     * link balloon is also updated so it sits behind  the resource modal
      * We target the specific link balloon by its editor id as there
      * can be multiple editors on a page
      */
     function updateLinkBalloonDepth(depth) {
         const linkBalloon = document.querySelector(
-            `[data-baloon-editor-id="${window.sbProps.editors["plan-desc"].id}"]`
+            `[data-balloon-editor-id="${window.sbProps.editors["plan-desc"].id}"]`
         );
         if (linkBalloon) {
             linkBalloon.style.zIndex = depth;
