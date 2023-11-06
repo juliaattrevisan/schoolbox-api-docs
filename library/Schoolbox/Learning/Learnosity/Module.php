@@ -294,7 +294,10 @@ class Module extends BaseModule
         $participantPreload = $this->preloadAssessmentAndStudent($params);
 
         try {
-            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnositySessionReference']);
+            $attempt = $this->getAttemptMapper()->findOneByColumnList([
+                'user_id' => $params['studentId'],
+                'learnosity_reference' => $params['learnositySessionReference'],
+            ]);
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new NotFound();
         }
