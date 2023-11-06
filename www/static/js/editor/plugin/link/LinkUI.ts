@@ -2,6 +2,8 @@
  * This is primarily a copy of the original LinkUI plugin from CKEditor 5
  * modified to display a browse button that opens our resource modal to select
  * a resource to link to
+ *
+ * Changes: insertResourceLink
  */
 
 /**
@@ -190,6 +192,9 @@ export default class LinkUI extends Plugin {
         // Form elements should be read-only when corresponding commands are disabled.
         formView.urlInputView.bind("isEnabled").to(linkCommand, "isEnabled");
         formView.saveButtonView.bind("isEnabled").to(linkCommand);
+
+        // Open up the resource browser when clicking the "Browse" button
+        formView.resourceButtonView.on("execute", () => editor.execute("insertResourceLink"));
 
         // Execute link command after clicking the "Save" button.
         this.listenTo(formView, "submit", () => {
@@ -467,6 +472,14 @@ export default class LinkUI extends Plugin {
         }
 
         const editor = this.editor;
+
+        /**
+         * while the resource modal is open, prevent the link ui from hiding
+         */
+        const resourceLinkCommand = this.editor.commands.get("insertResourceLink");
+        if (resourceLinkCommand.isOn) {
+            return;
+        }
 
         this.stopListening(editor.ui, "update");
         this.stopListening(this._balloon, "change:visibleView");

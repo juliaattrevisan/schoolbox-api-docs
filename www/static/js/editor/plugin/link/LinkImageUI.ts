@@ -2,6 +2,8 @@
  * This is primarily a copy of the original LinkImageUI plugin from CKEditor 5
  * modified to display a browse button that opens our resource modal to select
  * a resource to link to
+ *
+ * Changes: ImageInlineEditing
  */
 
 /**
@@ -20,7 +22,7 @@ import type { DocumentSelection, Selection, ViewDocumentClickEvent } from "@cked
 import type { ImageUtils } from "@ckeditor/ckeditor5-image";
 
 import LinkUI from "@js/editor/plugin/link/LinkUI";
-import LinkEditing from "@ckeditor/ckeditor5-link";
+import LinkEditing from "@ckeditor/ckeditor5-link/src/linkediting";
 import type LinkCommand from "@ckeditor/ckeditor5-link";
 
 import { LINK_KEYSTROKE } from "@ckeditor/ckeditor5-link/src/utils";
@@ -38,7 +40,7 @@ export default class LinkImageUI extends Plugin {
      * @inheritDoc
      */
     public static get requires() {
-        return [LinkEditing, LinkUI, "ImageBlockEditing"] as const;
+        return [LinkEditing, LinkUI, "ImageInlineEditing"] as const;
     }
 
     /**
