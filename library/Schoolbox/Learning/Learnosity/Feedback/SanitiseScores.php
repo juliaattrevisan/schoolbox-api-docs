@@ -80,10 +80,7 @@ class SanitiseScores
             /* Student got full marks; they can't get bonus marks anymore
              */
             if ($score > $maxScore) {
-                return [
-                    'score' => $maxScore,
-                    'max_score' => $maxScore
-                ];
+                $score = $maxScore;
             }
 
             /* Something less than full marks
