@@ -82,6 +82,7 @@ class CSV extends AbstractCSV
 
     /**
      * Get assessments sorted as displayed in markbook, indexed by assessment.id
+     * whilst removing lessonplans (we don't show lesson plans in markbooks, or markbook exports)
      *
      * @param Markbook $markbook
      * @return GenericCollection|IAssessable[]
@@ -89,7 +90,10 @@ class CSV extends AbstractCSV
     private function getSortedAssessments(Markbook $markbook)
     {
         $sortedAssessments = new GenericCollection(IAssessable::class);
-        foreach ($markbook->getAssessments() as $assessment) {
+        $assessments = $markbook->getAssessments()->filter(static function (IAssessable $assessment) {
+            return "lessonPlan" !== $assessment->getFamilyName();
+        });
+        foreach ($assessments as $assessment) {
             $sortedAssessments[$assessment->getId()] = $assessment;
         }
         return $sortedAssessments;

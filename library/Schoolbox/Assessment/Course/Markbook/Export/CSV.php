@@ -32,7 +32,10 @@ class CSV extends AbstractCSV
     public function export(CourseMarkbook $courseMarkbook, string $filename, bool $showDrafts): void
     {
         $this->initExport($filename);
-        $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
+        // grab assessments, and remove lesson plans
+        $assessmentSpecs = $courseMarkbook->getCollapsedAssessments()->filter(static function (IAssessable $assessment) {
+            return "lessonPlan" !== $assessment->getFamilyName();
+        });
 
         // Column headings
         $this->writeHeader($assessmentSpecs);
