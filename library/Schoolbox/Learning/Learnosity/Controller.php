@@ -797,6 +797,9 @@ class Controller extends Base
          * We knew the max_mark from the attempt table, so it could potentially
          * desync from what Learnosity knows.
          *
+         * FIXME Add Polling Mechanism
+         *  This would otherwise have been processed by the polling thing
+         *
          * Arbitrarily max out $mark if it somehow exceeds the maximum limit
          * ($mark must never exceed $maxMark) and/or otherwise sanitise data
          */
