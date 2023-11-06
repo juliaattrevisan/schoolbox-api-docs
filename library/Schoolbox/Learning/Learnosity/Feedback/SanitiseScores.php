@@ -78,6 +78,13 @@ class SanitiseScores
                     'max_score' => $maxScore
                 ];
             }
+
+            /* Something less than full marks
+             */
+            return [
+                'score' => $score,
+                'max_score' => $maxScore
+            ];
         }
 
         /* Default return scenario
