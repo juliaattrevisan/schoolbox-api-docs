@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Course\Markbook\Export;
 use Schoolbox\Assessment\Course\Markbook\CourseMarkbook;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Markbook\AbstractCSV;
 use Schoolbox\Learning\MarkScheme\Completion;
@@ -34,7 +35,7 @@ class CSV extends AbstractCSV
         $this->initExport($filename);
         // grab assessments, and remove lesson plans
         $assessmentSpecs = $courseMarkbook->getCollapsedAssessments()->filter(static function (IAssessable $assessment) {
-            return "lessonPlan" !== $assessment->getFamilyName();
+            return AssessmentType::TYPE_LESSON_PLAN !== $assessment->getFamilyName();
         });
 
         // Column headings

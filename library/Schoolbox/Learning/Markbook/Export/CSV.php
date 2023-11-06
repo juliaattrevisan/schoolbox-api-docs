@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Markbook\Export;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Markbook\AbstractCSV;
@@ -91,7 +92,7 @@ class CSV extends AbstractCSV
     {
         $sortedAssessments = new GenericCollection(IAssessable::class);
         $assessments = $markbook->getAssessments()->filter(static function (IAssessable $assessment) {
-            return "lessonPlan" !== $assessment->getFamilyName();
+            return AssessmentType::TYPE_LESSON_PLAN !== $assessment->getFamilyName();
         });
         foreach ($assessments as $assessment) {
             $sortedAssessments[$assessment->getId()] = $assessment;
