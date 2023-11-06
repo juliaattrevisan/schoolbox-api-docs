@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
@@ -515,12 +516,13 @@ class Controller extends Base
             ]
         ]);
 
-        $mark = $result['data'][0]['score'];
-        $maxMark = $result['data'][0]['max_score'];
-
-        /* FIXME Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         *  ($mark must never exceed $maxMark) and/or otherwise sanitise data
+        /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
          */
+        $sanitisedScore = (new SanitiseScores())->sanitise($result['data'][0]['score'], $result['data'][0]['max_score']);
+
+        $mark = $sanitisedScore['score'];
+        $maxMark = $sanitisedScore['max_score'];
 
         /* Record it locally for our own usages
          */
@@ -748,11 +750,12 @@ class Controller extends Base
      * Tell Learnosity about what our teachers marked each question
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
      * @throws RouteNotFound
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
@@ -782,17 +785,18 @@ class Controller extends Base
          * ]
          */
 
-        /* FIXME Instead of asking learnosity how it tallied everything, we can
-         *  just...do it ourselves, I guess, and sort-of delete this problem
-         *  We knew the max_mark from the attempt table, so it could potentially
-         *  desync from what Learnosity knows.
+        /* Instead of asking learnosity how it tallied everything, we can
+         * just...do it ourselves, I guess, and sort-of delete this problem
+         * We knew the max_mark from the attempt table, so it could potentially
+         * desync from what Learnosity knows.
+         *
+         * Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
          */
-        $mark = array_sum(array_values($postData['scores']));
-        $maxMark = $attempt->getMaxMark();
+        $sanitisedScore = (new SanitiseScores())->sanitise(array_sum(array_values($postData['scores'])), $attempt->getMaxMark());
 
-        /* FIXME Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         *  ($mark must never exceed $maxMark) and/or otherwise sanitise data
-         */
+        $mark = $sanitisedScore['score'];
+        $maxMark = $sanitisedScore['max_score'];
 
         /* Save the comment and new normalised mark
          */
