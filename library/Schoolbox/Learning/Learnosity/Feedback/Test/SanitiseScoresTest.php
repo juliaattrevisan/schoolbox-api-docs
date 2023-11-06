@@ -268,7 +268,10 @@ class SanitiseScoresTest extends TestCase
             'Null max score 3' => [
                 '12',
                 null,
-                [null, null]
+                [
+                    'score' => null,
+                    'max_score' => null
+                ]
             ],
 
             'Null max score 4' => [
