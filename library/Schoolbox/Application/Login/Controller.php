@@ -147,13 +147,16 @@ class Controller extends Base
         if ($this->samlBlacklist()) {
             $data['requestFromInternalIp'] = true;
             $internalSsoUrl                = new Uri($this->getConfigLoader()->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL));
-            $internalSsoUrlParams          = ['instance_id' => INSTANCE_ID];
+            $internalSsoUrlParams          = [
+                'instance_id' => INSTANCE_ID,
+                'redirect'    => $data['page'],
+                ];
             if ($data['page']) {
                 $internalSsoUrlParams['redirect'] = $data['page'];
             }
             $data['internalSsoUrl'] = $internalSsoUrl
                 ->appendQueryParameters($internalSsoUrlParams)
-                ->withPath('/api/users/jwt');
+                ->withPath('/instances/login');
         }
 
         $this->response = $this->responseFromTemplateUnthemed('@login/login.twig', $data);
