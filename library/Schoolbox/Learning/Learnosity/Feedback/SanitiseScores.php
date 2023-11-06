@@ -80,17 +80,11 @@ class SanitiseScores
             }
         }
 
-
-        /* If $maxMark is meaningful, ensure $mark never exceeds $maxMark
+        /* Default return scenario
          */
-
-        /* Otherwise, return null I guess?
-         * You could make it arbitrarily 0/0 but that looks kinda weird
-         */
-
         return [
-            'score' => $score,
-            'max_score' => $maxScore
+            'score' => null,
+            'max_score' => null
         ];
     }
 }
