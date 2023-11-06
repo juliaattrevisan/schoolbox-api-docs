@@ -494,11 +494,12 @@ class Controller extends Base
      * learnosityReference should not be easily guessed
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
      * @throws Deleted
      * @throws NotFound
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
@@ -516,6 +517,10 @@ class Controller extends Base
 
         $mark = $result['data'][0]['score'];
         $maxMark = $result['data'][0]['max_score'];
+
+        /* FIXME Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         *  ($mark must never exceed $maxMark) and/or otherwise sanitise data
+         */
 
         /* Record it locally for our own usages
          */
@@ -784,6 +789,10 @@ class Controller extends Base
          */
         $mark = array_sum(array_values($postData['scores']));
         $maxMark = $attempt->getMaxMark();
+
+        /* FIXME Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         *  ($mark must never exceed $maxMark) and/or otherwise sanitise data
+         */
 
         /* Save the comment and new normalised mark
          */
