@@ -17,6 +17,13 @@ namespace Schoolbox\Learning\Learnosity\Feedback;
 class SanitiseScores
 {
     /**
+     * Our schema permits two decimal places using the definition
+     * DECIMAL(15,2)
+     */
+    private const SCORE_PRECISION = 2;
+
+
+    /**
      * $mark and $maxMark are mixed values; could be string|float|int|null
      *
      * @param $inputScore
@@ -57,8 +64,8 @@ class SanitiseScores
         if (is_numeric($inputScore) && is_numeric($inputMaxScore)) {
             /* Artificially cast to floats which solves a few random problems
              */
-            $score = round((float)$inputScore, 2);
-            $maxScore = round((float)$inputMaxScore, 2);
+            $score = round((float)$inputScore, self::SCORE_PRECISION);
+            $maxScore = round((float)$inputMaxScore, self::SCORE_PRECISION);
 
             /* Negative values get rounded up to 0
              */
