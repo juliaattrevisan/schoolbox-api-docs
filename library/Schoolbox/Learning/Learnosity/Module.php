@@ -47,8 +47,18 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $instructorPerms = $this->canViewQuiz();
-        $learnerPerms = $this->canAttemptQuiz();
+        /* Staff only
+         */
+        $instructorPerms = $this->instructorPerms();
+
+        /* Any student and any staff
+         */
+        $learnerPerms = $this->learnerPerms();
+
+        /* The current user must match {studentId} in the routes
+         * ie. you're the owner of something in the url
+         */
+        $learnerViewAttemptPerms = $this->learnerViewAttemptPerms();
 
         $preloadAssessment = function ($params) {
             return $this->preloadAssessment($params);
@@ -97,7 +107,7 @@ class Module extends BaseModule
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
-        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerViewAttemptPerms, $preloadAttempt);
 
         /* Provide feedback to a student's attempt
          */
@@ -141,7 +151,7 @@ class Module extends BaseModule
     /**
      * @return Rule\LazyCallback
      */
-    private function canViewQuiz(): Rule\LazyCallback
+    private function instructorPerms(): Rule\LazyCallback
     {
         return new Rule\LazyCallback(function () {
             return new Rule\All(
@@ -158,14 +168,35 @@ class Module extends BaseModule
     /**
      * @return Rule\LazyCallback
      */
-    private function canAttemptQuiz(): Rule\LazyCallback
+    private function learnerPerms(): Rule\LazyCallback
     {
         return new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\HasRole(Role::STUDENT),
-                    new Rule\HasRole(Role::STAFF)
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsUser('studentId')
+                ),
+            );
+        });
+    }
+
+
+    /**
+     * @return Rule\LazyCallback
+     */
+    private function learnerViewAttemptPerms(): Rule\LazyCallback
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\All(
+                        new Rule\HasRole(Role::STUDENT),
+                        new Rule\IsUser('studentId')
+                    )
                 ),
             );
         });
@@ -252,20 +283,11 @@ class Module extends BaseModule
         $participantPreload = $this->preloadAssessmentAndStudent($params);
 
         try {
-            $attempt = $this->getAttemptMapper()->findOneByColumn('learnosity_reference', $params['learnositySessionReference']);
+            $attempt = $this->getAttemptMapper()->findOneByColumnList([
+                'user_id' => $params['studentId'],
+                'learnosity_reference' => $params['learnositySessionReference']
+            ]);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new NotFound();
-        }
-
-        /* Make sure you own it
-         * TODO (or that you're a staff/other perms)
-         */
-        $student = $participantPreload['student'];
-
-        /* Students can see if if they own it
-         * Otherwise get out
-         */
-        if ((int)$student->getId() !== (int)$attempt->getUser()->getId()) {
             throw new NotFound();
         }
 
