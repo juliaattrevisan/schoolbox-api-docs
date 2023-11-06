@@ -244,8 +244,6 @@ class BlueprintBuilder
              * pile them up here
              */
             foreach ($section['_questions'] as $question) {
-                /* FIXME temporary shim while constructing Strategies
-                 */
                 try {
                     $questionStruct = $this->payloadFactory->produce(
                         PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
@@ -473,8 +471,6 @@ class BlueprintBuilder
              * pile them up here
              */
             foreach ($section['_questions'] as $question) {
-                /* FIXME temporary shim while constructing Strategies
-                 */
                 try {
                     $questionStruct = $this->payloadFactory->produce(
                         PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
