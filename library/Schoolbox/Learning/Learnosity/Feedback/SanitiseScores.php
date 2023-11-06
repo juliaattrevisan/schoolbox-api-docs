@@ -19,14 +19,67 @@ class SanitiseScores
     /**
      * $mark and $maxMark are mixed values; could be string|float|int|null
      *
-     * @param $mark
-     * @param $maxMark
+     * @param $inputScore
+     * @param $inputMaxScore
      * @return array
      */
-    public function sanitise($mark, $maxMark): array
+    public function sanitise($inputScore, $inputMaxScore): array
     {
-        $sanitisedMark = $mark;
-        $sanitisedMaxMark = $maxMark;
+        /* Double null
+         */
+        if (null === $inputScore && null === $inputMaxScore) {
+            return [
+                'score' => null,
+                'max_score' => null
+            ];
+        }
+
+        /* Someone is putting strings in here
+         */
+        if (in_array(trim((string)$inputScore), ['', 'e'], true)) {
+            $score = null;
+
+            if ('' === trim((string)$inputMaxScore)) {
+                $maxScore = null;
+            } else {
+                $maxScore = (float)$inputMaxScore;
+            }
+
+            return [
+                'score' => $score,
+                'max_score' => $maxScore
+            ];
+        }
+
+        /* These are numbers so we can process them as such
+         * This should be *most* of the use cases
+         */
+        if (is_numeric($inputScore) && is_numeric($inputMaxScore)) {
+            /* Artificially cast to floats which solves a few random problems
+             */
+            $score = (float)$inputScore;
+            $maxScore = (float)$inputMaxScore;
+
+            /* Negative values get rounded up to 0
+             */
+            if ($score < 0) {
+                $score = 0.00;
+            }
+
+            if ($maxScore < 0) {
+                $maxScore = 0.00;
+            }
+
+            /* Student got full marks; they can't get bonus marks anymore
+             */
+            if ($score > $maxScore) {
+                return [
+                    'score' => $maxScore,
+                    'max_score' => $maxScore
+                ];
+            }
+        }
+
 
         /* If $maxMark is meaningful, ensure $mark never exceeds $maxMark
          */
@@ -36,8 +89,8 @@ class SanitiseScores
          */
 
         return [
-            'mark' => $sanitisedMark,
-            'max_mark' => $sanitisedMaxMark
+            'score' => $score,
+            'max_score' => $maxScore
         ];
     }
 }
