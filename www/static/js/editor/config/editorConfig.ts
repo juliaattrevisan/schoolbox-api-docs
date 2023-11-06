@@ -37,12 +37,10 @@ import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings"
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
-import Blank from "@js/editor/plugin/blank/Blank";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
 
 /**
  * Return the default configuration
- *
  * @param { EditorConfig } config - the default config
  * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
@@ -75,7 +73,6 @@ export function getConfig(config: EditorConfig) {
             WordCount,
             Eqneditor5,
             Resource,
-            Blank,
             UITweaks,
         ],
         extraPlugins: [UploadAdapterPlugin],

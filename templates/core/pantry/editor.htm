@@ -4,7 +4,7 @@
     $(function() {
 
         /**
-         * Demonstrates how the default editor instance can be accssed once it's been created
+         * Demonstrates how the default editor instance can be accessed once it's been created
          */
         document.getElementById("defaultCKEditor").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
         function onDefaultEditorCreated(event) {
@@ -42,7 +42,7 @@
          */
 
         /**
-         * Demonstrates how the comment editor instance can be accssed once it's been created
+         * Demonstrates how the comment editor instance can be accessed once it's been created
          */
         document.getElementById("commentCKEditor").addEventListener("EDITOR__CREATED", onCommentEditorCreated);
         function onCommentEditorCreated(event) {
@@ -62,7 +62,7 @@
         }));
 
         /**
-         * Demonstrates how the comment editor instance can be accssed once it's been created
+         * Demonstrates how the comment editor instance can be accessed once it's been created
          */
         document.getElementById("simpleCKEditor").addEventListener("EDITOR__CREATED", onSimpleEditorCreated);
         function onSimpleEditorCreated(event) {
@@ -78,7 +78,6 @@
             detail: {
                 targetElements: ['#simpleCKEditor'],
                 toolbar: "simple",
-                addToToolbar: ["|", "blank"],
             }
         }));
 
@@ -170,9 +169,6 @@
         <h2 class="subheader">Simple Editor</h2>
         <p class="meta">
             This is the <b>simple</b> usage of our ckeditor. As there's no resource embedding it's designed for places like email usage and blurbs in news.
-        </p>
-        <p class="meta">
-            It also has an extra plugin called <b>Blank</b>, which is added with <b>addToToolbar: ["|", "blank"]</b>. The toolbar can also be tweaked with <b>removeFromToolbar: []</b>
         </p>
     </div>
     <div class="small-12 island">
