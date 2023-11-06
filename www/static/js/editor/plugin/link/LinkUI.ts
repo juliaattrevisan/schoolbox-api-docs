@@ -3,7 +3,11 @@
  * modified to display a browse button that opens our resource modal to select
  * a resource to link to
  *
- * Changes: insertResourceLink
+ * Changes:
+ *  - Update all imports to "@ckeditor/" equivalents
+ *  - Change LinkFormView import to our own plugin
+ *  - Add "insertResourceLink" command into _createFormView()
+ *  - Add resourceLinkCommand.isOn check into _hide()
  */
 
 /**

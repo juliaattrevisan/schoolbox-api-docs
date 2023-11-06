@@ -1,7 +1,12 @@
 /**
  * This is primarily a copy of the original LinkFormView plugin from CKEditor 5
- * modified to display a browse button (resourceButtonView) that opens our resource modal to select
+ * modified to display a browse button that opens our resource modal to select
  * a resource to link to
+ *
+ * Changes:
+ *  - Update all imports to "@ckeditor/" equivalents
+ *  - Import insertElementAfter from @js/util/domUtils
+ *  - Add resourceButtonView
  */
 
 /**
@@ -58,7 +63,8 @@ export default class LinkFormView extends View {
     public urlInputView: LabeledFieldView<InputTextView>;
 
     /**
-     * The resource button.
+     * The resource button that appears next to the url input that
+     * opens our resource modal to select a resource to link to
      */
     public resourceButtonView: ButtonView;
 

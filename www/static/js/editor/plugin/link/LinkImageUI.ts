@@ -3,7 +3,10 @@
  * modified to display a browse button that opens our resource modal to select
  * a resource to link to
  *
- * Changes: ImageInlineEditing
+ * Changes:
+ *  - Update all imports to "@ckeditor/" equivalents
+ *  - Change LinkUI import to our own plugin
+ *  - In requires() change "ImageBlockEditing" to "ImageInlineEditing" (as we don't use ImageBlock)
  */
 
 /**

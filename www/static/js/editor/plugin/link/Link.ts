@@ -2,6 +2,11 @@
  * This is primarily a copy of the original Link plugin from CKEditor 5
  * modified to display a browse button that opens our resource modal to select
  * a resource to link to
+ *
+ * Changes:
+ *  - Update all imports to "@ckeditor/" equivalents
+ *  - Change LinkUI import to our own plugin
+ *  - Import ResourceLinkEditing and add into requires()
  */
 
 /**
