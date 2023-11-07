@@ -256,7 +256,6 @@ class Hydrator extends BaseHydrator
 
         foreach ($rows as $row) {
             $componentInstanceId = $row['component_instance_id'];
-            unset($row['component_instance_id']);
 
             if (!array_key_exists($componentInstanceId, $configByComponentInstanceId)) {
                 $configByComponentInstanceId[$componentInstanceId] = [];
