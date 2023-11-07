@@ -77,12 +77,13 @@ class Hydrator extends BaseHydrator
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
 
-        $textboxInstanceIds = [];
+        $componentInstanceIds = [];
         foreach ($matches as $match) {
-            $textboxInstanceIds[] = $match->id;
+            [$textboxId, $componentInstanceId, $folderId] = explode('-', $match->id);
+            $componentInstanceIds[] = $componentInstanceId;
         }
 
-        $configJsonByTextBoxInstanceId = $this->getComponentConfigForTextboxInstance($textboxInstanceIds);
+        $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
 
         $fullResults = [];
 
@@ -168,8 +169,7 @@ class Hydrator extends BaseHydrator
             // After json_decode, $componentConfig will be an array with the following optional keys:
             //  * Component_Config_Collapse::KEY,
             //  * Component_Config_ShowComponentTitle::KEY
-            $componentConfigJson = $configJsonByTextBoxInstanceId[$textboxInstanceId];
-            $componentConfig = json_decode($componentConfigJson, true);
+            $componentConfig = $configByComponentInstanceId[$componentInstanceId];
 
             if ($componentConfig === null) {
                 throw new UnexpectedValueException('Component config JSON could not be decoded.');
@@ -229,36 +229,39 @@ class Hydrator extends BaseHydrator
     }
 
     /**
-     * @param array $textboxInstanceIds
+     * @param array $componentInstanceIds
      * @return array
      */
-    private function getComponentConfigForTextboxInstance(array $textboxInstanceIds): array
+    private function getConfigByComponentInstanceId(array $componentInstanceIds): array
     {
         $db = $this->textboxMapper->getDatabase();
 
-        $query = (
-            // TODO: This is probably very inefficient.  Split the component IDs out of $textboxInstanceIds and write a more efficient query.
-            'SELECT
-             CONCAT(cci.value, "-", cci.component_instance_id, "-", ci.identifier) AS textboxInstanceId,
-             IFNULL(component_configJson.config_json, "{}") AS configJson
-             FROM component_config_instance cci
-             JOIN component_instance ci ON ci.id=cci.component_instance_id
-             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-             LEFT JOIN (
-                 SELECT
-                 cci2.component_instance_id,
-                 JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS config_json
-                 FROM component_config_instance cci2
-                 LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
-                 WHERE ccd2.key IN ("' . Component_Config_Collapse::KEY . '", "' . Component_Config_ShowComponentTitle::KEY . '")
-                 GROUP BY cci2.component_instance_id
-             ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
-             WHERE ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"
-             AND ci.module="homepage"
-             AND CONCAT(cci.value, "-", cci.component_instance_id, "-", ci.identifier) IN ("' . implode('","', $textboxInstanceIds) . '")'
-        );
+        $rows = $db->executeQuery(
+            'SELECT cci.component_instance_id, ccd.key, cci.value
+            FROM component_config_instance cci
+            LEFT JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            WHERE cci.component_instance_id IN (' . implode(',', array_map('intval', $componentInstanceIds)) . ')
+            AND ccd.key IN (:configCollapseKey, :showComponentTitle)',
+            [
+                ':configCollapseKey' => Component_Config_Collapse::KEY,
+                ':showComponentTitle' => Component_Config_ShowComponentTitle::KEY
+            ]
+        )->fetchAll();
 
-        return $db->executeQuery($query)->fetchColumnArray('configJson', 'textboxInstanceId');
+        $configByComponentInstanceId = [];
+
+        foreach ($rows as $row) {
+            $componentInstanceId = $row['component_instance_id'];
+            unset($row['component_instance_id']);
+
+            if (!array_key_exists($componentInstanceId, $configByComponentInstanceId)) {
+                $configByComponentInstanceId[$componentInstanceId] = [];
+            }
+
+            $configByComponentInstanceId[$componentInstanceId][$row['key']] = $row['value'];
+        }
+
+        return $configByComponentInstanceId;
     }
 
     /**
