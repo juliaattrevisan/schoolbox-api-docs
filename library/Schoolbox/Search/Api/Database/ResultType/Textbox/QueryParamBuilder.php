@@ -11,8 +11,6 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
-use Component_Config_Collapse;
-use Component_Config_ShowComponentTitle;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
