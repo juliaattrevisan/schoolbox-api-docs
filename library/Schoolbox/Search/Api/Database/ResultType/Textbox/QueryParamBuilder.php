@@ -172,7 +172,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             FROM component_config_instance cci
             JOIN component_instance ci ON ci.id=cci.component_instance_id
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
-            JOIN textBox tb ON tb.textBoxID=cci.value
+            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
             JOIN folder fo ON fo.id=ci.identifier
         ';
     }
