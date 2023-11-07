@@ -69,13 +69,17 @@ class AggregateSource implements ISource
             . implode(') UNION ALL (', $queries)
             . ')) AS combined';
 
-        // Apply ordering here too
+        // Apply ordering here too.
+        // IMPORTANT:
+        //  * Order here must match order in library/Schoolbox/Search/Api/Database/BaseQueryParamBuilder->buildMatchQueryParams().
+        //  * The order of `id` is DESC because all other things being equal, we want more recently created rows to
+        //    appear before less recently created rows.
         $queryString .= '
             ORDER BY
                 relevance DESC,
                 title ASC,
                 type ASC,
-                id ASC
+                id DESC
             LIMIT :limit
         ';
         $params['limit'] = $limit;
