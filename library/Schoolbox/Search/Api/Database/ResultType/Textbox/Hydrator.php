@@ -77,12 +77,16 @@ class Hydrator extends BaseHydrator
         // Find the matching textboxes.
         $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
 
-        $componentInstanceIds = [];
-        foreach ($matches as $match) {
-            [$textboxId, $componentInstanceId, $folderId] = explode('-', $match->id);
-            $componentInstanceIds[] = $componentInstanceId;
-        }
+        // Get an array of componentInstanceIds from the compound textboxInstanceIds.
+        $componentInstanceIds = array_map(
+            function ($match) {
+                [$textboxIdThrowaway, $componentInstanceId, $folderIdThrowaway] = explode('-', $match->id);
+                return $componentInstanceId;
+            },
+            $matches
+        );
 
+        // Get config info for each component instance.
         $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
 
         $fullResults = [];
