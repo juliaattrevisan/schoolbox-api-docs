@@ -203,7 +203,7 @@ class Controller extends Base
      */
     public function getExtract(\Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
-        $this->perform = !$this->request->query['exploreData'];
+        $this->perform = !$this->requestQuery->get('exploreData');
         $outstream = null;
         $numRows = 0;
 
