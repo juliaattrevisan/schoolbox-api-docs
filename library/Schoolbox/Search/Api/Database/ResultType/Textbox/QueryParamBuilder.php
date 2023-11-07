@@ -174,15 +174,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             JOIN textBox tb ON tb.textBoxID=cci.value
             JOIN folder fo ON fo.id=ci.identifier
-            LEFT JOIN (
-                SELECT
-                cci2.component_instance_id,
-                JSON_OBJECT(ccd2.key, IFNULL(cci2.value, ccd2.default_value)) AS config_json
-                FROM component_config_instance cci2
-                LEFT JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
-                WHERE ccd2.key IN ("' . Component_Config_Collapse::KEY . '", "' . Component_Config_ShowComponentTitle::KEY . '")
-                GROUP BY cci2.component_instance_id
-            ) AS component_configJson ON (component_configJson.component_instance_id=cci.component_instance_id)
         ';
     }
 }
