@@ -77,7 +77,7 @@ class Controller extends Base
         FROM v_most_recent_feedback vmrf
         INNER JOIN assessment ai ON vmrf.assessment_id = ai.id
         INNER JOIN assessment_specification_implementation asi ON ai.id = asi.implementation_assessment_id
-        INNER JOIN `user` u ON u.id = vmrf.student_id 
+        INNER JOIN `user` u ON u.id = vmrf.student_id
         LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
         LEFT JOIN house h ON u.house = h.id
         LEFT JOIN mv_assessment_relation var ON var.assessment_id = ai.id
@@ -98,14 +98,14 @@ class Controller extends Base
      * hierarchy, never flat.
      */
     private const QUERY_CURRICULUM_NODES = "
-        SELECT 
+        SELECT
             cn.id,
             cn.name,
             cn.code,
             cnp.id AS parentId,
             cnp.name AS parentName,
             cnp.code AS parentCode
-        FROM curriculum_node_for_assessment cnof 
+        FROM curriculum_node_for_assessment cnof
         INNER JOIN curriculum_node cn ON cnof.curriculum_node_id = cn.id
         INNER JOIN curriculum_node cnp ON cn.curriculum_node_parent_id = cnp.id
         WHERE assessment_id = :assessmentId
@@ -119,7 +119,7 @@ class Controller extends Base
      * Find a particular feedback here
      */
     private const QUERY_FEEDBACK_DUEWORK = "
-        SELECT 
+        SELECT
             norm_mark AS normalised,
             mark AS humanReadable
         FROM submission_return
@@ -133,9 +133,9 @@ class Controller extends Base
      * Interestingly, max_mark being 0 results in mark/max_mark equating to null
      */
     private const QUERY_FEEDBACK_QUIZ = "
-        SELECT 
-            100 * mark/max_mark AS normalised,
-            CONCAT(mark, ' / ', max_mark) AS humanReadable
+        SELECT
+            norm_mark AS normalised,
+            mark AS humanReadable
         FROM assess_attempt
         WHERE attempt_id = :feedbackId
         LIMIT 1
