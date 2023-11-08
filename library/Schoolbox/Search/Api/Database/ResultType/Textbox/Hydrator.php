@@ -129,7 +129,12 @@ class Hydrator extends BaseHydrator
             // To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
             $componentIsCollapsed = boolval($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
             $showTitleToReadOnlyUsers = boolval($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
-            $componentName = $componentConfig[Component_Config_Componentname::KEY] ?? null; // If componentName is not set, use textbox heading.
+            $componentName = (
+                // If value is null or blank string, set to null.
+                empty($componentConfig[Component_Config_Componentname::KEY])
+                ? null
+                : $componentConfig[Component_Config_Componentname::KEY]
+            );
             $textboxHeading = (
                 ($textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
                 ? ''
