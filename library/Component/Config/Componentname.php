@@ -8,6 +8,7 @@
  */
 class Component_Config_Componentname extends Component_Config_Abstract
 {
+    public const KEY = 'componentname';
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {

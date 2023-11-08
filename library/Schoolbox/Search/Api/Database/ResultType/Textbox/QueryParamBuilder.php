@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
+use Component_Config_Componentname;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 use Component_Definition;
@@ -132,7 +133,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(): string
     {
-        return 'tb.categoryID';
+        return '`folderId`';
     }
 
     /**
@@ -142,16 +143,23 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildFromStatement(): string
     {
-        // The 1st UNIONED subquery below gets all textbox instances matching the keyword
-        // (a textbox instance is a textbox in a particular component in a particular page).
-        // The 2nd UNIONED subquery below gets all textboxes that are not used in any component.
-        // Each textbox instance will be uniquely identified by the following compound ID:
+        // Notes on 1st UNIONED subquery:
+        //  * this subquery gets all textbox instances matching the keyword
+        //  * a textbox instance is a textbox in a particular component in a particular page
+        //  * a textbox instance's title is the component name if set, otherwise the textbox heading
+        //  * results that match on textbox heading when textbox heading has been overridden by component name will be
+        //    eliminated in the Hydrator.
+        //
+        // Notes on 2nd UNIONED subquery:
+        //  * gets all textboxes that are not used in any component
+        //
+        // Each textbox instance (found in either subquery) will be uniquely identified by the following compound ID:
         //  * "$textboxId-$componentInstanceId-$folderId"
-        //  * Example with integer IDs    : "1-4081-80"
-        //  * Example of textbox not used in any component "94--"
+        //  * Example with integer IDs: "1-4081-80"
+        //  * Example with integer IDs and not used in any component "94--"
         return '
             FROM (
-                SELECT DISTINCT
+                SELECT
                 CONCAT(tb.textBoxID, "-", cci.component_instance_id, "-", fo.id) AS textboxInstanceId,
                 tb.heading AS title,
                 ' . $this->buildLinearDecayExpression(
@@ -159,7 +167,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     'tb.updated_at',
                     7,
                     56
-                ) . ' AS relevance
+                ) . ' AS relevance,
+                fo.id AS folderId
                 FROM component_config_instance cci
                 JOIN component_instance ci ON (
                     ci.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
@@ -174,11 +183,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 WHERE tb.deleted_at IS NULL
                 AND fo.deleted_at IS NULL
                 AND (
-                   tb.heading LIKE :textboxKeywordLike OR
-                   tb.body LIKE :textboxKeywordLike
+                    tb.heading LIKE :textboxKeywordLike OR
+                    tb.body LIKE :textboxKeywordLike OR
+                    EXISTS(
+                        SELECT *
+                        FROM component_config_instance cci2
+                        JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
+                        WHERE cci2.component_instance_id=ci.id
+                        AND ccd2.key = "' . Component_Config_Componentname::KEY . '"
+                        AND cci2.value LIKE :textboxKeywordLike
+                    )
                 )
                 UNION
-                SELECT DISTINCT
+                SELECT
                 CONCAT(tb2.textBoxID, "--") AS textboxInstanceId,
                 tb2.heading AS title,
                 ' . $this->buildLinearDecayExpression(
@@ -186,26 +203,22 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     'tb2.updated_at',
                     7,
                     56
-                ) . ' AS relevance
+                ) . ' AS relevance,
+                NULL AS folderId
                 FROM textBox tb2
-                WHERE tb2.textBoxID NOT IN (
-                    SELECT CAST(cci2.value AS INT)
-                    FROM component_config_instance cci2
-                    JOIN component_instance ci2 ON (
-                        ci2.module="homepage" AND
-                        ci2.id=cci2.component_instance_id
-                    )
-                    WHERE tb2.deleted_at IS NULL
-                    AND ci2.module = "' . Component_Definition::MODULE_HOMEPAGE . '"
-                    AND cci2.value = CAST(tb2.textBoxID AS NCHAR)
-                    AND (
-                       tb2.heading LIKE :textboxKeywordLike OR
-                       tb2.body LIKE :textboxKeywordLike
-                    )
-                )
+                WHERE tb2.deleted_at IS NULL
                 AND (
                    tb2.heading LIKE :textboxKeywordLike OR
                    tb2.body LIKE :textboxKeywordLike
+                )
+                AND tb2.textBoxID NOT IN (
+                    SELECT CAST(cci2.value AS INT)
+                    FROM component_config_instance cci2
+                    JOIN component_instance ci2 ON (
+                        ci2.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
+                        ci2.id=cci2.component_instance_id
+                    )
+                    WHERE cci2.value = CAST(tb2.textBoxID AS NCHAR)
                 )
             ) AS dummy';
     }
