@@ -11,7 +11,6 @@ namespace Custom\Sedavic\Extract\Cli;
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
 use Custom\Sedavic\Extract\ContextLookup;
-use DebugBar\DebugBarException;
 use Schoolbox\Application\CliTool;
 
 class ExtractTool extends CliTool\App
@@ -41,17 +40,11 @@ class ExtractTool extends CliTool\App
 
 
     /**
-     * --to
+     * --max
      *
      * An example arg that has an actual value, denoted by the colon
      */
     private const OPT_LONG_MAX_ASSESSMENTS = 'max:';
-
-
-    /**
-     * Specify filename format with the two dates in it
-     */
-    private const FILENAME = 'extract-%s_%s.csv';
 
 
     /**
@@ -99,7 +92,7 @@ class ExtractTool extends CliTool\App
             vmrf.feedback_id,
             vmrf.feedback_table,
             vmrf.published_at
-        FROM v_most_recent_feedback_2023 vmrf
+        FROM v_most_recent_feedback vmrf
         INNER JOIN assessment ai ON vmrf.assessment_id = ai.id
         INNER JOIN assessment_specification_implementation asi ON ai.id = asi.implementation_assessment_id
         INNER JOIN `user` u ON u.id = vmrf.student_id
@@ -110,7 +103,6 @@ class ExtractTool extends CliTool\App
         AND vmrf.published_at <= :to
         AND ai.deleted_at IS NULL
         AND u.deleted_at IS NULL
-        AND asi.specification_assessment_id = 146061
         ORDER BY asi.specification_assessment_id, lastname, firstname
     ";
 
