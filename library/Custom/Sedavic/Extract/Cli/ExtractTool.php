@@ -334,7 +334,7 @@ HELP;
 
         /* Get the dates out
          */
-        $from = new \Alaress_Date_Format($this->getOpt(self::OPT_LONG_FROM),'Y-m-d');
+        $from = new \Alaress_Date_Format($this->getOpt(self::OPT_LONG_FROM), 'Y-m-d');
         $to = new \Alaress_Date_Format($this->getOpt(self::OPT_LONG_TO), 'Y-m-d');
 
         /* Set up file download thing
