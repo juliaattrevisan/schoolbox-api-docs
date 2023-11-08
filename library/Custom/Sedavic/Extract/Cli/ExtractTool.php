@@ -158,13 +158,13 @@ class ExtractTool extends CliTool\App
     private const QUERY_FEEDBACK_TASK = "
         SELECT
             CASE
-                WHEN completion_status = 3 THEN 100.00,
-                WHEN completion_status = 2 THEN 50.00,
+                WHEN completion_status = 3 THEN 100.00
+                WHEN completion_status = 2 THEN 50.00
                 ELSE 0.00
             END AS normalised,
             CASE
-                WHEN completion_status = 3 THEN 'Completed',
-                WHEN completion_status = 2 THEN 'Self-assessed',
+                WHEN completion_status = 3 THEN 'Completed'
+                WHEN completion_status = 2 THEN 'Self-assessed'
                 ELSE 'Incomplete'
             END AS humanReadable
         FROM task_completion
@@ -229,7 +229,7 @@ class ExtractTool extends CliTool\App
     private \Alaress\Database\Statement\Query\Base|IQuery $assessmentInfoStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $nodeStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $dueworkFeedbackStatement;
-    private \Alaress\Database\Statement\Query\Base $taskFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $taskFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $quizFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $classesStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $userDetailStatement;
