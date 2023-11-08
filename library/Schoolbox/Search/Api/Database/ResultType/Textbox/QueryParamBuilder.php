@@ -113,7 +113,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildDateExpression(): string
     {
-        return 'tb.updated_at';
+        return '`textboxUpdatedAt`';
     }
 
     /**
@@ -176,7 +176,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 CONCAT(tb.textBoxID, "-", cci.component_instance_id, "-", fo.id) AS textboxInstanceId,
                 tb.heading AS title,
                 ' . $linearDecayExpression1 . ' AS relevance,
-                fo.id AS folderId
+                fo.id AS folderId,
+                tb.updated_at AS textboxUpdatedAt
                 FROM component_config_instance cci
                 JOIN component_instance ci ON (
                     ci.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
@@ -207,7 +208,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 CONCAT(tb2.textBoxID, "--") AS textboxInstanceId,
                 tb2.heading AS title,
                 ' . $linearDecayExpression2 . ' AS relevance,
-                NULL AS folderId
+                NULL AS folderId,
+                tb2.updated_at AS textboxUpdatedAt
                 FROM textBox tb2
                 WHERE tb2.deleted_at IS NULL
                 AND (
