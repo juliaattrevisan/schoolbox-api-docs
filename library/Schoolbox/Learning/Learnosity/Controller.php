@@ -904,9 +904,8 @@ class Controller extends Base
         /* TODO Redirect back to the index screen for now
          *  but probably need a returnUrl
          */
-        $redirect = $this->router->getGenerator()->generate('learnosity.getIntro', [
+        $redirect = $this->router->getGenerator()->generate('learningAssessment.getStatus', [
             'assessmentId' => $assessment->getId(),
-            'studentId' => $student->getId()
         ]);
 
         $this->response = $this->redirectFound($redirect);
