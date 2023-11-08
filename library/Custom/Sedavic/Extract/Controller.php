@@ -151,9 +151,11 @@ class Controller extends Base
     private const QUERY_CLASSES = "
         SELECT DISTINCT fc.code
         FROM assessment_specification_implementation asi
-        INNER JOIN mv_assessment_relation mvar ON asi.implementation_assessment_id = mvar.assessment_id
-        INNER JOIN folder_code fc ON fc.folder_id = mvar.folder_id
+        INNER JOIN assessment a ON asi.implementation_assessment_id = a.id
+        INNER JOIN mv_assessment_relation mvar ON a.id = mvar.assessment_id
+        INNER JOIN folder_code fc ON mvar.folder_id = fc.folder_id
         WHERE asi.specification_assessment_id = :assessmentSpecId
+        AND a.deleted_at IS NULL
     ";
 
 
@@ -306,8 +308,13 @@ class Controller extends Base
          */
         $start = microtime(true);
 
-        $studentList = [];
+        $studentList = null;
         $lastAssessmentInfo = null;
+
+        /* Artificial circuit breaker
+         */
+        $nAssessments = 9;
+        $maxAssessments = $this->request->query['maxAssessments'] ?? 10;
 
         while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
             /* For every assessment spec,
@@ -358,6 +365,15 @@ class Controller extends Base
                 }
 
                 $studentList = null;
+
+                /* Artificial circuit breaker
+                 */
+                $nAssessments++;
+
+                if ($nAssessments >= $maxAssessments) {
+                    new \Alaress_Probe('max assessments exceeded');
+                    die();
+                }
             }
 
             /* Find the list of students for this assessment spec id and then subtract guys from it
@@ -380,6 +396,7 @@ class Controller extends Base
                  */
                 $curriculumNodes = $this->findCurriculumNodes((int)$assessmentInfo['assessmentSpecId']);
             } catch (\DomainException | \RuntimeException $e) {
+                new \Alaress_Probe($e->getMessage());
                 /* noop: skip data that randomly died, for now
                  *
                  *   - Assessment Feedback must be one of Due Work, Task or Quiz feedbacks;
@@ -479,6 +496,10 @@ class Controller extends Base
              * go find them and remember their scalar data
              */
             if (!isset($this->classList[$folderCode])) {
+                /* Initialise array element
+                 */
+                $this->classList[$folderCode] = [];
+
                 /* Find the students in each folder code
                  */
                 $students = $this->externalClass->getStudents($folderCode);
