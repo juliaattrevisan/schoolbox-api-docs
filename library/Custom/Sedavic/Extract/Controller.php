@@ -128,6 +128,26 @@ class Controller extends Base
         LIMIT 1
     ";
 
+    /**
+     * Find a particular feedback here
+     */
+    private const QUERY_FEEDBACK_TASK = "
+        SELECT
+            CASE
+                WHEN completion_status = 3 THEN 100.00,
+                WHEN completion_status = 2 THEN 50.00,
+                ELSE 0.00
+            END AS normalised,
+            CASE
+                WHEN completion_status = 3 THEN 'Completed',
+                WHEN completion_status = 2 THEN 'Self-assessed',
+                ELSE 'Incomplete'
+            END AS humanReadable
+        FROM task_completion
+        WHERE id = :feedbackId
+        LIMIT 1
+    ";
+
 
     /**
      * Find a particular feedback here
@@ -185,6 +205,7 @@ class Controller extends Base
     private \Alaress\Database\Statement\Query\Base|IQuery $assessmentInfoStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $nodeStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $dueworkFeedbackStatement;
+    private \Alaress\Database\Statement\Query\Base $taskFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $quizFeedbackStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $classesStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $userDetailStatement;
@@ -241,6 +262,7 @@ class Controller extends Base
         /* Feedback prepared statements
          */
         $this->dueworkFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_DUEWORK);
+        $this->taskFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_TASK);
         $this->quizFeedbackStatement = $database->prepareQuery(self::QUERY_FEEDBACK_QUIZ);
 
         /* Class list manifests
@@ -645,6 +667,13 @@ class Controller extends Base
                 ]);
 
                 return $this->dueworkFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
+
+            case 'task_completion':
+                $this->taskFeedbackStatement->execute([
+                    'feedbackId' => $id
+                ]);
+
+                return $this->taskFeedbackStatement->fetch(\PDO::FETCH_ASSOC);
 
             case 'assess_attempt':
                 $this->quizFeedbackStatement->execute([
