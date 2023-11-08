@@ -117,6 +117,19 @@ class Model extends AbstractAssessment
         return 'Quiz';
     }
 
+    /**
+     * This quiz's clone does not inherit the source object's Learnosity
+     * reference: the Learnosity data will be copied in a separate step.
+     *
+     * @return static
+     */
+    public function cloneForCopy()
+    {
+        /** @var static $clone */
+        $clone = parent::cloneForCopy();
+        $clone->setLearnosityReference(null);
+        return $clone;
+    }
 
     /**
      * Overwrite fields from `$source` into this object.
@@ -131,15 +144,19 @@ class Model extends AbstractAssessment
      * * external ID: this uniquely identifies the base assessment within
      *   another system, so it should not be copied
      *
+     * This implementation clears the Learnosity reference: the Learnosity data
+     * will be copied from `$source` in a separate step.
+     *
      * @param self $source
      * @return $this
      */
     public function overwrite(IAssessable $source): IAssessable
     {
         parent::overwrite($source);
-        $this->completionMessage = $source->completionMessage;
-        $this->duration          = $source->duration;
-        $this->maxAttempts       = $source->maxAttempts;
+        $this->completionMessage   = $source->completionMessage;
+        $this->duration            = $source->duration;
+        $this->maxAttempts         = $source->maxAttempts;
+        $this->learnosityReference = null;
         return $this;
     }
 
