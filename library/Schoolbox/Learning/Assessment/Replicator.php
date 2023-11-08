@@ -114,20 +114,48 @@ class Replicator
         }
 
         // Callback to URL which replicates constituents
-        $message = $this->messageFactory->setRequest(
-            $this->httpFactory->createRequest(
-                'POST',
-                (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified()->withPath(
-                    $this->routeGenerator->generate(
-                        'learnosity.postCopyQuizConstituents',
-                        [
-                            'sourceId'      => $source->getId(),
-                            'destinationId' => $destination->getId(),
-                        ],
-                    )
+        $baseUrl   = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
+        $notifyUrl = $baseUrl
+            ->withPath(
+                $this->routeGenerator->generate(
+                    'apiusernotify.apiUserNotify',
+                    ['userId' => $destination->getCreator()->getId()]
                 )
             )
-        )->build();
+            ->__toString();
+        $message = $this->messageFactory
+            ->setUser($destination->getCreator())
+            ->setRequest(
+                $this->httpFactory
+                    ->createRequest(
+                        'POST',
+                        $baseUrl->withPath(
+                            $this->routeGenerator->generate(
+                                'learnosity.postCopyQuizConstituents',
+                                [
+                                    'sourceId'      => $source->getId(),
+                                    'destinationId' => $destination->getId(),
+                                ],
+                            )
+                        )
+                    )
+                    ->withHeader('accept', 'application/json')
+            )
+            ->setCallbackUrl($notifyUrl)
+            ->setCallbackParams([
+                'message' => sprintf(
+                    'Your quiz %s is duplicated',
+                    $destination->getTitle(),
+                ),
+            ])
+            ->setFailureCallbackUrl($notifyUrl)
+            ->setFailureCallbackParams([
+                'message' => sprintf(
+                    'Your quiz %s is NOT duplicated',
+                    $destination->getTitle(),
+                ),
+            ])
+            ->build();
         $this->messageProducer->send($message);
     }
 
