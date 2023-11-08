@@ -96,7 +96,7 @@ class Controller extends Base
                     // Fallback of the php default title for textbox components
                     $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
                 }
-                $textboxes[strtolower($heading)] = strtolower($heading);
+                $textboxes[strtolower($heading)] = null;
                 $textboxesKeys[strtolower($heading)] = $heading;
             }
 
