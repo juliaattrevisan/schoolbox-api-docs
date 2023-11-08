@@ -104,6 +104,7 @@ use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQu
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
 use Schoolbox\Learning\Assessment\Lti\Feedback\MapperProxy as LtiFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Lti\Response\MapperProxy as LtiResponseMapperProxy;
+use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
@@ -1544,6 +1545,7 @@ abstract class Kernel
             )
         );
 
+        // Transactor for assessments
         $di->set(
             'transactor',
             $di->lazyNew(
@@ -1559,18 +1561,7 @@ abstract class Kernel
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
                     'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
                     'routeGenerator'           => $di->lazyGet('router.generator'),
-                    'replicator'               => $di->lazyNew(
-                        Replicator::class,
-                        [
-                            'assessmentMapperProxy' => $di->lazyGet('assessmentDataSource'),
-                            'quizMapper'            => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
-                            'rubricMapper'          => $di->lazyNew(DataSource::class),
-                            'httpFactory'           => $di->lazyGet('httpFactory'),
-                            'messageFactory'        => $di->lazyGet('taskd.httpRequestMessageFactory'),
-                            'messageProducer'       => $di->lazyGet('taskd.messageProducer'),
-                            'routeGenerator'        => $di->lazyGet('router.generator'),
-                        ]
-                    ),
+                    'replicator'               => $di->lazyGet('assessment.replicator'),
                     'lessonPlanActivitiesReplicator' => $di->lazyNew(
                         \Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator::class,
                         [
@@ -1582,6 +1573,38 @@ abstract class Kernel
                     ),
                 ]
             )
+        );
+
+        // Assessment replication and overwrite classes
+        $di->set(
+            'assessment.replicator',
+            $di->lazyNew(
+                Replicator::class,
+                [
+                    'assessmentMapperProxy' => $di->lazyGet('assessmentDataSource'),
+                    'quizMapper'            => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
+                    'rubricMapper'          => $di->lazyNew(DataSource::class),
+                    'httpFactory'           => $di->lazyGet('httpFactory'),
+                    'messageFactory'        => $di->lazyGet('taskd.httpRequestMessageFactory'),
+                    'messageProducer'       => $di->lazyGet('taskd.messageProducer'),
+                    'routeGenerator'        => $di->lazyGet('router.generator'),
+                ]
+            ),
+        );
+        $di->set(
+            'assessment.overwriter',
+            $di->lazyNew(
+                Overwriter::class,
+                [
+                    'assessmentMapperProxy' => $di->lazyGet('assessmentDataSource'),
+                    'quizMapper'            => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
+                    'rubricMapper'          => $di->lazyNew(DataSource::class),
+                    'httpFactory'           => $di->lazyGet('httpFactory'),
+                    'messageFactory'        => $di->lazyGet('taskd.httpRequestMessageFactory'),
+                    'messageProducer'       => $di->lazyGet('taskd.messageProducer'),
+                    'routeGenerator'        => $di->lazyGet('router.generator'),
+                ]
+            ),
         );
 
         $di->set(
