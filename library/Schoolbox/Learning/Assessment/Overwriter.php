@@ -106,7 +106,7 @@ class Overwriter
         $this->replicateDueWorkRubric($source, $updatedDestination);
 
         // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($source, $updatedDestination);
+        $this->replicateQuizConstituents($source, $updatedDestination, $newOwner);
 
         return $updatedDestination;
     }
@@ -116,12 +116,16 @@ class Overwriter
      * Copy any quiz sections, questions and solutions to `$destination` from
      * `$source`.
      *
+     * Uses `$creator` as the authenticated user for the copy quiz constituents
+     * request.
+     *
      * @param IAssessable $source
      * @param IAssessable $destination
+     * @param User        $creator
      * @return void
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      */
-    private function replicateQuizConstituents(IAssessable $source, IAssessable $destination): void
+    private function replicateQuizConstituents(IAssessable $source, IAssessable $destination, User $creator): void
     {
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
@@ -130,7 +134,7 @@ class Overwriter
         // Callback to URL which replicates constituents
         $baseUrl = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
         $message = $this->messageFactory
-            ->setUser($destination->getCreator())
+            ->setUser($creator)
             ->setRequest(
                 $this->httpFactory
                     ->createRequest(
