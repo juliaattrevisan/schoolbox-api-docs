@@ -128,20 +128,26 @@ class Overwriter
         }
 
         // Callback to URL which replicates constituents
-        $message = $this->messageFactory->setRequest(
-            $this->httpFactory->createRequest(
-                'POST',
-                (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified()->withPath(
-                    $this->routeGenerator->generate(
-                        'learnosity.postCopyQuizConstituents',
-                        [
-                            'sourceId'      => $source->getId(),
-                            'destinationId' => $destination->getId(),
-                        ],
+        $baseUrl = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
+        $message = $this->messageFactory
+            ->setUser($destination->getCreator())
+            ->setRequest(
+                $this->httpFactory
+                    ->createRequest(
+                        'POST',
+                        $baseUrl->withPath(
+                            $this->routeGenerator->generate(
+                                'learnosity.postCopyQuizConstituents',
+                                [
+                                    'sourceId'      => $source->getId(),
+                                    'destinationId' => $destination->getId(),
+                                ],
+                            )
+                        )
                     )
-                )
+                    ->withHeader('accept', 'application/json')
             )
-        )->build();
+            ->build();
         $this->messageProducer->send($message);
     }
 
