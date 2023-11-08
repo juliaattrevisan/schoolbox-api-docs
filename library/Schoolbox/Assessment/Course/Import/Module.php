@@ -93,15 +93,7 @@ class Module extends \Alaress\Module\Module
             $this->getMapperFactory()->get(LinkedAssessmentsMapper::class),
             $assessmentDataSource,
         );
-        $replicator = new Replicator(
-            $assessmentDataSource,
-            $this->getMapperFactory()->get(QuizMapper::class),
-            $this->getMapperFactory()->get(RubricDataSource::class),
-            $this->injector->get('httpFactory'),
-            $this->injector->get('taskd.httpRequestMessageFactory'),
-            $this->injector->get('taskd.messageProducer'),
-            $this->getRouter()->getGenerator(),
-        );
+        $replicator = $this->injector->get('assessment.replicator');
         $importFactory = new ImportFactory(
             $assessmentDataSource,
             $replicator,

@@ -530,15 +530,7 @@ class Module extends BaseModule
             $this->getAccess(),
         );
 
-        $replicator = new Replicator(
-            $assessmentDataSource,
-            $this->getMapperFactory()->get(QuizMapper::class),
-            $this->getMapperFactory()->get(RubricDataSource::class),
-            $this->injector->get('httpFactory'),
-            $this->injector->get('taskd.httpRequestMessageFactory'),
-            $this->injector->get('taskd.messageProducer'),
-            $this->getRouter()->getGenerator(),
-        );
+        $replicator = $this->injector->get('assessment.replicator');
 
         switch ($className) {
             case ListController::class:

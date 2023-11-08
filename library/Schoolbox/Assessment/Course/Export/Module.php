@@ -102,24 +102,8 @@ class Module extends \Alaress\Module\Module
         );
         return new Controller(
             $this->getAssessmentDataSource(),
-            new Replicator(
-                $this->getAssessmentDataSource(),
-                $this->getMapperFactory()->get(Mapper::class),
-                $this->getMapperFactory()->get(RubricDataSource::class),
-                $this->injector->get('httpFactory'),
-                $this->injector->get('taskd.httpRequestMessageFactory'),
-                $this->injector->get('taskd.messageProducer'),
-                $this->getRouter()->getGenerator(),
-            ),
-            new Overwriter(
-                $this->getAssessmentDataSource(),
-                $this->getMapperFactory()->get(Mapper::class),
-                $this->getMapperFactory()->get(RubricDataSource::class),
-                $this->injector->get('httpFactory'),
-                $this->injector->get('taskd.httpRequestMessageFactory'),
-                $this->injector->get('taskd.messageProducer'),
-                $this->getRouter()->getGenerator(),
-            ),
+            $this->injector->get('assessment.replicator'),
+            $this->injector->get('assessment.overwriter'),
             $lessonPlanActivitiesReplicator,
         );
     }

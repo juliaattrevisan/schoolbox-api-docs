@@ -68,15 +68,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
             new ImportFactory(
                 $assessmentDataSource,
-                new Replicator(
-                    $assessmentDataSource,
-                    $this->getMapperFactory()->get(QuizMapper::class),
-                    $this->getMapperFactory()->get(RubricDataSource::class),
-                    $this->injector->get('httpFactory'),
-                    $this->injector->get('taskd.httpRequestMessageFactory'),
-                    $this->injector->get('taskd.messageProducer'),
-                    $this->getRouter()->getGenerator(),
-                ),
+                $this->injector->get('assessment.replicator'),
                 $this->getMapperFactory()->get(CourseImplementationMapper::class),
                 $this->getMapperFactory()->get(UnitImplementationMapper::class),
                 $this->getMapperFactory()->get(Component_InstanceMapper::class),
