@@ -248,7 +248,25 @@ class Controller extends Base
          */
         $start = microtime(true);
 
+        $lastAssessmentInfo = null;
+
         while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
+            /* FIXME for every assessment spec,
+             *  find all the classes that have a corresponding assessment implementation,
+             *  get a list of guys from Synergetic and collate them for each class,
+             *  then subtract anyone with feedback from that list of guys.
+             *  The remainder are people who should have done that assessment but never received feedback
+             *  and we pump them onto the end of the list per assessment spec
+             *
+             * FIXME maintain a static list of externalIds in case we need to reuse them
+             */
+            if (null !== $lastAssessmentInfo && $lastAssessmentInfo['assessmentSpecId'] !== $assessmentInfo['assessmentSpecId']) {
+                /* FIXME Find everyone who didn't get a feedback for $lastAssessmentInfo['assessmentSpecId'],
+                 *  find their context/curriculum nodes,
+                 *  and push them through the same combine() method
+                 */
+            }
+
             try {
                 /* Find all the ancestry info about the assessment: course, unit
                  */
@@ -307,6 +325,22 @@ class Controller extends Base
         }
 
         exit;
+    }
+
+
+    /**
+     * For the given assessment spec id,
+     * Find all its implementations and homepages that contain said implementations,
+     * then find all the guys in each of those homepages
+     *
+     * These are the list of people who are SUPPOSED to have received feedback for
+     * the assessments that descended from the given assessment spec
+     *
+     * @param int $assessmentSpecId
+     * @return void
+     */
+    private function findClassList(int $assessmentSpecId) {
+
     }
 
 
