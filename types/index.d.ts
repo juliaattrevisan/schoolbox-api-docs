@@ -20,6 +20,7 @@ declare global {
             lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };
             imageLightboxLicenseKey: string;
+            ckeditor5LicenseKey: string;
             imageSlideshows: { [key: string]: any };
             colourDefaults: { [key: string]: any };
             MAX_BYTES_MYSQL_TEXT: number;
