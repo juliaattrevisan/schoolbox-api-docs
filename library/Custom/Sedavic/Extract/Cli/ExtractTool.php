@@ -59,6 +59,8 @@ class ExtractTool extends CliTool\App
      * It's probably not exactly what they're after...but ok
      */
     private const HEADINGS = [
+        'Assessment Spec Id',
+        'Assessment Impl Id',
         'Synergetic ID',
         'Firstname',
         'Lastname',
@@ -85,13 +87,14 @@ class ExtractTool extends CliTool\App
      */
     private const QUERY_ASSESSMENT_INFO = "
        SELECT
+            asi.specification_assessment_id AS assessmentSpecId,
+            asi.implementation_assessment_id AS assessmentImplId,
             u.synergy_id AS externalId,
             u.firstname,
             u.lastname,
             h.house,
             lyl.name AS yearLevel,
             ai.title,
-            asi.specification_assessment_id AS assessmentSpecId,
             var.*,
             vmrf.feedback_id,
             vmrf.feedback_table,
@@ -383,6 +386,12 @@ HELP;
              * from the previous iteration.
              */
             if (null !== $lastAssessmentInfo && $lastAssessmentInfo['assessmentSpecId'] !== $assessmentInfo['assessmentSpecId']) {
+                $this->getLogger()->debug(sprintf(
+                    'Was previously looking at %s; now looking at %s.',
+                    $lastAssessmentInfo['assessmentSpecId'],
+                    $assessmentInfo['assessmentSpecId']
+                ));
+
                 /* Find everyone who didn't get a feedback for $lastAssessmentInfo['assessmentSpecId'],
                  * find their context/curriculum nodes,
                  * and push them through the same combine() method
@@ -404,6 +413,13 @@ HELP;
                 $curriculumNodes = $this->findCurriculumNodes((int)$lastAssessmentInfo['assessmentSpecId']);
 
                 foreach ($studentList as $externalId => $data) {
+                    $this->getLogger()->debug(sprintf(
+                        'Backfilling unfeedbacked student %s %s %s',
+                        $externalId,
+                        $data['firstname'],
+                        $data['lastname']
+                    ));
+
                     /* Manufacture a placeholder payload containing students' data for
                      * those who didn't get feedback
                      */
@@ -434,7 +450,7 @@ HELP;
              * when their feedbacks are encountered
              */
             if (null === $studentList) {
-                $studentList = $this->findStudents((int)$assessmentInfo['assessmentSpecId']);
+                $studentList = $this->findStudents((int)$assessmentInfo['assessmentSpecId'], (int)$assessmentInfo['assessmentImplId']);
             }
 
             try {
@@ -526,7 +542,7 @@ HELP;
      * @return array
      * @throws Exception
      */
-    private function findStudents(int $assessmentSpecId): array
+    private function findStudents(int $assessmentSpecId, int $assessmentImplId): array
     {
         $this->classesStatement->execute([
             'assessmentSpecId' => $assessmentSpecId
@@ -567,6 +583,7 @@ HELP;
                      */
                     $studentDetails = [
                         'assessmentSpecId' => $assessmentSpecId,
+                        'assessmentImplId' => $assessmentImplId,
                         'externalId' => $externalId,
                         'firstname' => $student['firstname'],
                         'lastname' => $student['lastname'],
@@ -731,9 +748,9 @@ HELP;
         foreach ($curriculumNodes as $qualificationId => $qualificationData) {
             foreach ($qualificationData['children'] as $unitId => $unitData) {
                 foreach ($unitData['children'] as $outcomeId => $outcomeData) {
-                    print_r($assessmentInfo);
                     $assessmentRow =  [
-                        'specId' => $assessmentInfo['assessmentSpecId'],
+                        'assessmentSpecId' => $assessmentInfo['assessmentSpecId'],
+                        'assessmentImplId' => $assessmentInfo['assessmentImplId'],
                         'externalId' => $assessmentInfo['externalId'],
                         'firstname' => $assessmentInfo['firstname'],
                         'lastname' => $assessmentInfo['lastname'],
