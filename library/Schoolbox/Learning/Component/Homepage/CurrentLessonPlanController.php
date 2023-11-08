@@ -11,6 +11,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
@@ -64,9 +65,9 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
          * Get all Courses for the homepage, so we can use these to hydrate the assessment specification later
          */
         $courses = CourseImplementationMapper::GetInstance()->findByFolderId($this->getContext()->getFolder()->getId())
-                                             ->indexByCallback(function (CourseImplementationModel $course) {
-                                                 return $course->getSpecification()->getId();
-                                             });
+            ->indexByCallback(function (CourseImplementationModel $course) {
+                return $course->getSpecification()->getId();
+            });
 
         // Record if we have courses, for use later
         $this->hasCourses = $courses->count() >= 1;
@@ -102,6 +103,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        $folder = $this->getSource();
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learning/component/lessonPlanHomepage.twig',
@@ -110,6 +112,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
                 'range'             => $this->range,
                 'lessonPlans'       => $this->visibleLessonPlans,
                 'hasCourses'        => $this->hasCourses,
+                'hasUnitSpec'       => $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId(),
                 'returnUrlName'     => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'  => Assessment\Redirect::encode('/homepage/' . $this->getContext()->getFolder()->getId()),
                 'readOnly'          => $this->readOnly,
