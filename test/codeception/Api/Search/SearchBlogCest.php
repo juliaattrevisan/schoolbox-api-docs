@@ -132,7 +132,7 @@ class SearchBlogCest
             'filter'  => [
                 'types' => [self::SEARCH_TYPE],
                 'date'  => [
-                    'from' => $blog->getCreatedAt()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'from' => $blog->getCreatedAt()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,
@@ -142,7 +142,7 @@ class SearchBlogCest
             'filter'  => [
                 'types' => [self::SEARCH_TYPE],
                 'date'  => [
-                    'to' => $blog->getCreatedAt()->addDays(+1)->getUsingFormat(\Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS),
+                    'to' => $blog->getCreatedAt()->addDays(+1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
             ],
             'valid'   => true,

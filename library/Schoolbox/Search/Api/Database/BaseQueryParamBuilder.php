@@ -74,7 +74,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         if ($filter->fromDate) {
             // No date part? Exclude this type of result entirely
             if (isset($datePart)) {
-                $whereParts[]             = "$datePart >= :filterFromDate";
+                $whereParts[]             = "DATE($datePart) >= :filterFromDate";
                 $params['filterFromDate'] = $filter->fromDate->getDatabase();
             } else {
                 return null;
@@ -83,7 +83,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         if ($filter->toDate) {
             // No date part? Exclude this type of result entirely
             if (isset($datePart)) {
-                $whereParts[]           = "$datePart <= :filterToDate";
+                $whereParts[]           = "DATE($datePart) <= :filterToDate";
                 $params['filterToDate'] = $filter->toDate->getDatabase();
             } else {
                 return null;
