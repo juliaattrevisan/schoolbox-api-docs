@@ -123,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(): ?string
     {
-        return 'tb.created_by';
+        return '`textboxCreatedBy`';
     }
 
     /**
@@ -177,7 +177,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 tb.heading AS title,
                 ' . $linearDecayExpression1 . ' AS relevance,
                 fo.id AS folderId,
-                tb.updated_at AS textboxUpdatedAt
+                tb.updated_at AS textboxUpdatedAt,
+                tb.created_by AS textboxCreatedBy
                 FROM component_config_instance cci
                 JOIN component_instance ci ON (
                     ci.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
@@ -209,7 +210,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 tb2.heading AS title,
                 ' . $linearDecayExpression2 . ' AS relevance,
                 NULL AS folderId,
-                tb2.updated_at AS textboxUpdatedAt
+                tb2.updated_at AS textboxUpdatedAt,
+                tb2.created_by AS textboxCreatedBy
                 FROM textBox tb2
                 WHERE tb2.deleted_at IS NULL
                 AND (
