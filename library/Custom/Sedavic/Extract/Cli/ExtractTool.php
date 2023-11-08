@@ -110,6 +110,7 @@ class ExtractTool extends CliTool\App
         AND vmrf.published_at <= :to
         AND ai.deleted_at IS NULL
         AND u.deleted_at IS NULL
+        AND asi.specification_assessment_id = 146061
         ORDER BY asi.specification_assessment_id, lastname, firstname
     ";
 
@@ -501,10 +502,10 @@ HELP;
             $problems = array_keys($this->problems);
 
             foreach ($problems as $problem) {
-                new \Alaress_Probe($problem);
+                $this->getLogger()->warning($problem);
             }
 
-            new \Alaress_Probe(sprintf(
+            $this->getLogger()->warning(sprintf(
                 '%s seconds for %s rows of data',
                 $end - $start,
                 $this->numRows
@@ -526,6 +527,8 @@ HELP;
     {
         foreach ($rows as $row) {
             fputcsv($outstream, $row);
+
+            $this->numRows++;
         }
     }
 
