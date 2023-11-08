@@ -1,3 +1,21 @@
+{##
+ # Introduction screen and list of previous attempts
+ #
+ # @param IAssessable $assessment              Our schoolbgox quiz instance
+ # @param Schoolbox\Learning\Quiz\Model $quiz  The representation of schoolbox.assess row
+ # @param User $student                        The guy currently at the intro screen
+ # @param Attempt\Model[] $attempts            A list of previous attempts
+ # @param Attempt\Model|null $existingattempt  An attempt that hasn't been finished
+ # @param array $plan                          A set of dates for custom assessment participation
+ # @param array $breadcrumbs                   A trail of breadcrumbs
+ # @param bool $canAttempt                     Whether users can start/resume attempts
+ # @param bool $canReview                      Whether users can provide feedback on an attempt
+ # @param bool $canStudentReview               Whether users can see what they responded with, in their attempt
+ # @param string $externalRedirectUrl          A url in a third party system (newington canvas) that is relevant to this quiz
+ # @param array $lastViews                     A set of (roletype, info) tuples about when a student/parent visited this page
+ # @param Participant $participant             A participant of this assessment, used to figure out exclusions and special CAP stuff
+ # @param string $returnUrlEncoded             An encoded url to visit when navigating between screens and you finsih a workflow somehwere
+ #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
@@ -17,7 +35,8 @@
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+
     {% include '@learningAssessment/fragments/modifyTot.twig' with {
         assessment: assessment,
         gradeRoute: false,
@@ -49,150 +68,106 @@
                 </article>
             </section>
         {% endif %}
-
-        {% if quiz.sections|length > 0 %}
-        <div class="scrollable">
-            <table>
-                <thead>
-                <tr>
-                    <th>Section</th>
-                    <th>Number of questions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for section in quiz.sections %}
-                    <tr>
-                        <td>{{ section.title }}</td>
-                        <td>
-                            {% set questionCount = section.questions | length %}
-                            {% if section.pool %}
-                                {{ min(questionCount, section.pool) }}
-                            {% else %}
-                                {{ questionCount }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-            <div class="row">
-                <div class="small-12 columns">
-                    <div class="empty-state">
-                        <i class="icon-quiz"></i>
-                        <p>This quiz does not contain any sections, it cannot be attempted yet.</p>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
     </div>
+
+    {# Start/Resume an attempt #}
+    {% if canAttempt %}
+    <div class="small-12 columns">
+        {# Decide the name of the start button #}
+        {% set callToAction = 'Start Quiz' %}
+
+        {% if existingAttempt %}
+            {% set callToAction = 'Resume Quiz' %}
+        {% endif %}
+        <a class="button submit" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}">{{ callToAction }}</a>
+    </div>
+    {% endif %}
 </div>
 
-{% if canAttempt and quiz.sections|length > 0 %}
-    <div class="row">
-        <div class="small-12 column">
-            {% if attemptInProgress %}
-                <a href="/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="button submit">Resume Quiz</a>
-            {% else %}
-                <a href="/assess/init/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="button submit">Begin Quiz</a>
-            {% endif %}
-        </div>
-    </div>
-{% endif %}
+{# This is mostly a direct steal from the existing quiz/summary.twig #}
+{% if attempts|length %}
+<div id='attempts' class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Attempts</h2>
 
-{# If I'm here I can view attempts #}
-{% if quiz.attempts | length %}
+        <table>
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Start</th>
+                <th>Finish</th>
+                <th>Time Taken</th>
+                <th>Reviewed</th>
+                <th>Reviewer</th>
+                <th>Grade</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for attempt in attempts %}
+                {% set finished = attempt.finish %}
+                <tr data-attempt>
+                    <td>{{ attempt.user.fullname }}</td>
+                    <td>{{ attempt.start.short }}</td>
+                    <td>
+                        {% if finished %}
+                            {{ attempt.finish.short }}
+                        {% else %}
+                            <em>Attempt in progress</em>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if finished %}
+                            {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
+                        {% else %}
+                            <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if attempt.reviewed %}
+                            {{ markVisible.showIfVisible(assessment, attempt.reviewed.short, '—' ) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if attempt.reviewed %}
+                            <a href="/search/user/{{ attempt.reviewer.id }}">{{ attempt.reviewer.fullname }}</a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if attempt.normalisedMark is not null %}
+                            {{ attempt.mark }}/{{ attempt.maxMark }} ({{ attempt.normalisedMark|number_format(2) }}%)
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td class="actions-small-2">
+                        <nav>
+                            {% if not finished and canAttempt %}
+                                <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                            {% else %}
+                                {% if canStudentReview %}
+                                    <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
+                                {% elseif canReview %}
+                                    <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                                {% endif %}
+                            {% endif %}
 
-    {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
-
-    <div class="row">
-        <div class="small-12 columns">
-            <h2 class="subheader">Attempts ({{ quiz.attempts | length }} / {{ assessment.attemptsUnlimited ? 'Unlimited' : assessment.maxAttempts }})</h2>
-            <table id="attempts">
-                <thead>
-                <tr>
-                    <th>Start</th>
-                    <th>Finish</th>
-                    <th>Time Taken</th>
-                    <th>Reviewed</th>
-                    <th>Grade</th>
-                    <th>&nbsp;</th>
+                            {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
+                            {% if deleteRoute %}
+                                <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
+                            {% endif %}
+                        </nav>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for attempt in quiz.attempts %}
-                    {% set finished = attempt.finish %}
-                    <tr data-attempt>
-                        <td>{{ attempt.start.short }}</td>
-                        <td>
-                            {% if finished %}
-                                {{ attempt.finish.short }}
-                            {% else %}
-                                <em>Attempt in progress</em>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if finished %}
-                                {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
-                            {% else %}
-                                <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if attempt.reviewed %}
-                                {{ markVisible.showIfVisible(assessment, attempt.reviewed.short, '—' ) }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if finished and questionCount %}
-                                {% set totalMark       = attempt.maxMark %}
-                                {% set totalMarkGraded = attempt.totalMarkGraded %}
-                                {% if not attempt.isReviewed %}
-                                    {% set totalMark = 0 %}
-                                    {# build the mark based on the question answers (old method) #}
-                                    {% set attemptMark = 0 %}
-                                    {% for answer in attempt.answers %}
-                                        {% set attemptMark = attemptMark + answer.mark %}
-                                        {% set totalMark = totalMark + answer.question.marks %}
-                                    {% endfor %}
-                                    {{ markVisible.showIfVisible(assessment, attemptMark ~ '/' ~ totalMark, '—' ) }}
-                                {% else %}
-                                    {# just grab the reviewed mark from the attempt table in the db #}
-                                    {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, '—' ) }}
-                                {% endif  %}
-                                {% if not attempt.isReviewed and totalMark %}
-                                    {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
-                                    {{ markVisible.showIfVisible(assessment, '(' ~ percentGraded~'% graded' ~ ')', '' ) }}
-                                {% endif %}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td class="actions-small-2">
-                            <nav>
-                                {% if deleteRoute %}
-                                    <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
-                                {% endif %}
-                                {% if finished %}
-                                    {% if canReview %}
-                                        <a href="/assess/review/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
-                                    {% elseif canStudentReview %}
-                                        <a href="/assess/studentReview/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
-                                    {% endif %}
-                                {% elseif canAttempt %}
-                                    <a href='/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}' class="icon-next" title="Resume"></a>
-                                {% endif %}
-                            </nav>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 {% endif %}
 
 <div id="attempt-toast" class="toast"></div>
@@ -225,7 +200,6 @@
 
                                     if (!attemptList.find('tbody tr').length) {
                                         $('#attempts').hide();
-                                        $('#attempt-list-empty-state').removeClass('hide');
                                     }
                                 }
                             });

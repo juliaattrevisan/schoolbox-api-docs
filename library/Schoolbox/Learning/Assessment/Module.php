@@ -634,7 +634,8 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
+                    $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
                 );
 
             case Assessment\Task\Controller::class:

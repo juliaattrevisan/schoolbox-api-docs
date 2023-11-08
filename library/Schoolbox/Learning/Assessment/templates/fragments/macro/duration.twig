@@ -5,6 +5,10 @@
  #}
 {% macro secondsToHoursAndMinutes(seconds) %}
     {% apply spaceless %}
+        {% if 0 == seconds %}
+            Unlimited
+        {% endif %}
+
         {% set hours           = seconds // 3600 %}
         {% set minuteRemainder = (seconds // 60) % 60 %}
         {% set secondRemainder = seconds % 60 %}

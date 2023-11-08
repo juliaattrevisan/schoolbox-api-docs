@@ -70,10 +70,6 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/content', 'getContent', $instructorPerms, $preloadAssessment);
 
-        /* Welcome screen for an attempt
-         */
-        $this->register('GET', '/{assessmentId}/intro/{studentId}', 'getIntro', $learnerPerms, $preloadParticipant);
-
         /* Async complete an attempt (set finished datetime)
          */
         $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerPerms, $preloadParticipant);

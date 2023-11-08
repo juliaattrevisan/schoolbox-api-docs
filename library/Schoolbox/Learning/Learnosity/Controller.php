@@ -42,7 +42,14 @@ class Controller extends Base
     private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT = 300;
 
 
-
+    /**
+     * Some interactivities/questions/features are only available in certain plans
+     * we don't blacklist things we want to hide; we whitelist things we want to show
+     * because that's just...the way learnosity built it
+     *
+     * This means you have a bunch of random template_reference strings here which
+     * correspond to stuff that you can see on screen.
+     */
     private const LEARNOSITY_QUESTION_GROUP_PLANS = [
         'elite' => [
             'question_type_groups' => [
@@ -257,44 +264,6 @@ class Controller extends Base
 
 
     /**
-     * Just use our Welcome screen for now
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @return void
-     * @throws Deleted
-     * @throws Error
-     * @throws Exception
-     * @throws \Alaress\Database\Exception
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function getIntro(IAssessable $assessment, \Schoolbox\User $student): void
-    {
-        /* The intro also has a list of attempts from which you can resume.
-         * We can do this by using the Learnosity session id in getAttempt()
-         */
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
-        $attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId(), [
-            'order' => [
-                'start' => 'desc'
-            ]
-        ]);
-
-        /* Decide if there was an existing attempt, to rename the call to action
-         */
-        $existingAttempt = $this->attemptMapper->findExistingUnfinished($assessment->getId(), $student->getId());
-
-        $this->response = $this->responseFromTemplate('@learnosity/intro.twig', [
-            'assessment' => $assessment,
-            'student' => $student,
-            'attempts' => $attempts,
-            'existingAttempt' => $existingAttempt
-        ], "Start {$assessment->getTitle()}");
-    }
-
-
-    /**
      * Let a student do an attempt in a Learnosity quiz
      *
      * @param IAssessable $assessment
@@ -359,7 +328,7 @@ class Controller extends Base
                      * saves your session ahd kicks you out, I guess? At least it
                      * can prompt you to Resume Quiz from there.
                      */
-                    'onsave_redirect_url' => $this->router->getGenerator()->generate('learnosity.getIntro', [
+                    'onsave_redirect_url' => $this->router->getGenerator()->generate('learningAssessment.getSummary', [
                         'assessmentId' => $assessment->getId(),
                         'studentId' => $student->getId(),
                     ]),
