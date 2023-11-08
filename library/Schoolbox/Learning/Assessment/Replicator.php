@@ -129,13 +129,6 @@ class Replicator
             )
         )->build();
         $this->messageProducer->send($message);
-
-//        /* Clone an existing Learnosity Activity
-//         * Get the cloned activity's Learnosity Reference
-//         * Assign this new Learnosity Reference to $destination's instance
-//         * Save it
-//         */
-//        $this->quizMapper->copyQuizConstituents($source, $destination);
     }
 
 
