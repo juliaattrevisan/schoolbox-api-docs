@@ -82,6 +82,18 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/attempt/{studentId}', 'getAttempt', $learnerPerms, $preloadParticipant);
 
+        /* Delete an attempt
+         */
+        $this->register('POST', '/{assessmentId}/attempt/delete', 'postDeleteAttempts', $instructorPerms, $preloadAssessment);
+
+        /* Delete unreviewed attempts
+         */
+        $this->register('POST', '/{assessmentId}/attempt/delete-unreviewed', 'postDeleteUnreviewedAttempts', $instructorPerms, $preloadAssessment);
+
+        /* Mass-review multiple attempts
+         */
+        $this->register('POST', '/{assessmentId}/attempt/mass-review', 'postMassReviewAttempts', $instructorPerms, $preloadAssessment);
+
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
@@ -300,14 +312,20 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        /** @var AssessmentMapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->injector->get('assessmentDataSource');
+
         return new Controller(
             new \Schoolbox\Url\Factory($this->getConfig()),
             (string)$this->getConfig()->get('learnosity_consumer_key'),
             (string)$this->getConfig()->get('learnosity_consumer_secret'),
             $this->getMapperFactory()->get(ErrorMapper::class),
+            $assessmentDataSource,
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
         );
     }
 

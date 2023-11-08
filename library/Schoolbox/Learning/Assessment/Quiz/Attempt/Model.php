@@ -47,6 +47,15 @@ class Model extends AbstractResponse
 
 
     /**
+     * The Learnosity Reference identifier which associates our quiz
+     * with their quiz. Not to be confused with externalId, which I think
+     * is used specifically for Canvas.
+     *
+     * @var string|null
+     */
+    private ?string $learnosityReference = null;
+
+    /**
      * @return Alaress_Date_Format|null
      */
     public function getSubmittedAt(): ?Alaress_Date_Format
@@ -129,6 +138,25 @@ class Model extends AbstractResponse
     public function setFirstSectionId($firstSectionId)
     {
         $this->firstSectionId = $firstSectionId;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityReference(): ?string
+    {
+        return $this->learnosityReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityReference
+     * @return $this
+     */
+    public function setLearnosityReference(?string $learnosityReference): self
+    {
+        $this->learnosityReference = $learnosityReference;
         return $this;
     }
 }

@@ -18,13 +18,19 @@ use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -117,15 +123,29 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     * @param Factory $urlFactory
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentDataSource
+     * @param Mapper $resultCacheMapper
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
+     * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+     * @param Feedback\Mapper $feedbackMapper
+     * @param UserMapper $userMapper
+     * @throws \DomainException
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
+        private AssessmentMapperProxy $assessmentDataSource,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $resultCacheMapper,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
-        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper
+        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
+        private \Schoolbox\UserMapper $userMapper
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -1347,5 +1367,143 @@ class Controller extends Base
         }
 
         return $quiz;
+    }
+
+
+    /**
+     * Soft deletes all the attempt ids in $attemptIds
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Deleted
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postDeleteAttempts(IAssessable $assessment): void
+    {
+        $attemptIds = $this->requestPost->get('attemptIds');
+
+        /* Find the users associated with each attempt id;
+         * we need it to update any project caches that exist
+         */
+        $attempts = $this->attemptMapper->findByColumn('attempt_id', $attemptIds);
+
+        /* Delete them
+         */
+        $this->attemptMapper->deleteByColumn('attempt_id', $attemptIds);
+
+        /* Update project result caches for each person who's going to be affected
+         * by what we just did...
+         */
+        foreach ($attempts as $attempt) {
+            /* Update project result cache
+             */
+            (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
+        }
+    }
+
+
+    /**
+     * Soft deletes all unreviewed attempts for the given $assessment
+     * and set of $userIds; fortunately this has no effect on project
+     * caches since none of these attempts should have been contributing
+     * any marks
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws \UnderflowException
+     */
+    public function postDeleteUnreviewedAttempts(IAssessable $assessment): void
+    {
+        $userIds = $this->requestPost->get('userIds');
+
+        /* We need this lol for the predicate builder
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        /* Find all the unreviewed attempts that haven't already been deleted
+         * for the set of $userIds provided
+         */
+        $pb = $this->attemptMapper->getPredicateBuilder()
+            ->equals('assess_id', $quiz->getId())
+            ->in('user_id', $userIds)
+            ->isNull('deleted_at')
+            ->isNull('reviewed_at');
+
+        /* Delete them
+         */
+        $this->attemptMapper->deleteByPredicates($pb);
+    }
+
+
+    /**
+     * Sets reviewed_at for all the attempt ids in $attemptIds
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postMassReviewAttempts(IAssessable $assessment): void
+    {
+        $attemptIds = $this->requestPost->get('attemptIds');
+
+        /* Find the users associated with each attempt id;
+         * we need it to update any project caches that exist
+         */
+        $attempts = $this->attemptMapper->findByColumn('attempt_id', $attemptIds);
+
+        /* You can't mass-save or mass-update via predicates, afaict?
+         * Traverse individually
+         *
+         * Note that sometimes we'll skip processing attempts:
+         * attempt authors might have been deleted/excluded via another tab via multiplayer
+         * schoolbox, but it's not really apparent anymore why we cared enough to do this
+         * only for this workflow and not others...or why we cared enough to do it at all?
+         * Were we trying to service 0.01% of the edge cases or what?
+         */
+        foreach ($attempts as $attempt) {
+            /* Author nonexistent? skip 'em
+             */
+            try {
+                $user = $this->userMapper->findById($attempt->getUser()->getId());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                continue;
+            }
+
+            /* Author excluded? skip 'em
+             * Shanked out of that random andyland ActionValidator class, because we need
+             * to know all the participants - not just the quiz itself
+             */
+            $quiz ??= $this->assessmentDataSource->findByQuizId($attempt->getQuiz()->getId());
+
+            if (!$quiz->isParticipant($attempt->getUser())) {
+                continue;
+            }
+
+            /* Anyway, set the reviewer and timestamp as usual
+             */
+            $attempt->setReviewer($this->getUser())
+                ->setReviewed(\Alaress_Date_Format::now());
+
+            $this->attemptMapper->save($attempt);
+
+            /* Update project result cache
+             */
+            (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
+        }
     }
 }
