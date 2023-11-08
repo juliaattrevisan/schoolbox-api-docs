@@ -114,15 +114,7 @@ class Replicator
         }
 
         // Callback to URL which replicates constituents
-        $baseUrl   = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
-        $notifyUrl = $baseUrl
-            ->withPath(
-                $this->routeGenerator->generate(
-                    'apiusernotify.apiUserNotify',
-                    ['userId' => $destination->getCreator()->getId()]
-                )
-            )
-            ->__toString();
+        $baseUrl = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
         $message = $this->messageFactory
             ->setUser($destination->getCreator())
             ->setRequest(
@@ -141,20 +133,6 @@ class Replicator
                     )
                     ->withHeader('accept', 'application/json')
             )
-            ->setCallbackUrl($notifyUrl)
-            ->setCallbackParams([
-                'message' => sprintf(
-                    'Your quiz %s is duplicated',
-                    $destination->getTitle(),
-                ),
-            ])
-            ->setFailureCallbackUrl($notifyUrl)
-            ->setFailureCallbackParams([
-                'message' => sprintf(
-                    'Your quiz %s is NOT duplicated',
-                    $destination->getTitle(),
-                ),
-            ])
             ->build();
         $this->messageProducer->send($message);
     }
