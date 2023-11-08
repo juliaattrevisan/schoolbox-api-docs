@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -52,8 +53,8 @@ class ExtractTool extends CliTool\App
      * It's probably not exactly what they're after...but ok
      */
     private const HEADINGS = [
-        'Assessment Spec Id',
-        'Assessment Impl Id',
+//        'Assessment Spec Id',
+//        'Assessment Impl Id',
         'Synergetic ID',
         'Firstname',
         'Lastname',
@@ -287,11 +288,18 @@ class ExtractTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Write an explanation about what your tool does and what arguments it accepts
+SEDAVIC Extract
 
-Usage: example.php [--flag] [--input mytest.txt]
-        --flag      Example flag (on/off)
-        --input     Example input value (arg which has user-inputted value)
+Finds all the curriculum nodes and assessment specification titles for everyone
+who was supposed to be receiving feedback for those specifications' implementations.
+This was part of an auditing procedure and generates a csv
+
+Usage: extract.php --from=... --to=... [--max=...] > outfile.csv
+        --from      Start date of extraction e.g. 2023-01-01
+        --to        End date of extraction e.g. 2023-12-12
+        
+        --max       Maximum number of assessments to process before arbitrarily exiting
+                    (used for debugging faster)
 
 
 HELP;
@@ -534,6 +542,7 @@ HELP;
      * the assessments that descended from the given assessment spec
      *
      * @param int $assessmentSpecId
+     * @param int $assessmentImplId
      * @return array
      * @throws Exception
      */
@@ -577,8 +586,8 @@ HELP;
                      * in schoolbox.user though.
                      */
                     $studentDetails = [
-                        'assessmentSpecId' => $assessmentSpecId,
-                        'assessmentImplId' => $assessmentImplId,
+//                        'assessmentSpecId' => $assessmentSpecId,
+//                        'assessmentImplId' => $assessmentImplId,
                         'externalId' => $externalId,
                         'firstname' => $student['firstname'],
                         'lastname' => $student['lastname'],
@@ -744,8 +753,8 @@ HELP;
             foreach ($qualificationData['children'] as $unitId => $unitData) {
                 foreach ($unitData['children'] as $outcomeId => $outcomeData) {
                     $assessmentRow =  [
-                        'assessmentSpecId' => $assessmentInfo['assessmentSpecId'],
-                        'assessmentImplId' => $assessmentInfo['assessmentImplId'],
+//                        'assessmentSpecId' => $assessmentInfo['assessmentSpecId'],
+//                        'assessmentImplId' => $assessmentInfo['assessmentImplId'],
                         'externalId' => $assessmentInfo['externalId'],
                         'firstname' => $assessmentInfo['firstname'],
                         'lastname' => $assessmentInfo['lastname'],
