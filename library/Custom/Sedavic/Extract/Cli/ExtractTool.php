@@ -566,6 +566,7 @@ HELP;
                      * in schoolbox.user though.
                      */
                     $studentDetails = [
+                        'assessmentSpecId' => $assessmentSpecId,
                         'externalId' => $externalId,
                         'firstname' => $student['firstname'],
                         'lastname' => $student['lastname'],
@@ -730,7 +731,9 @@ HELP;
         foreach ($curriculumNodes as $qualificationId => $qualificationData) {
             foreach ($qualificationData['children'] as $unitId => $unitData) {
                 foreach ($unitData['children'] as $outcomeId => $outcomeData) {
+                    print_r($assessmentInfo);
                     $assessmentRow =  [
+                        'specId' => $assessmentInfo['assessmentSpecId'],
                         'externalId' => $assessmentInfo['externalId'],
                         'firstname' => $assessmentInfo['firstname'],
                         'lastname' => $assessmentInfo['lastname'],
