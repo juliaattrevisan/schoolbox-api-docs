@@ -198,9 +198,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     EXISTS(
                         SELECT *
                         FROM component_config_instance cci2
-                        JOIN component_config_definition ccd2 ON ccd2.id=cci2.component_config_definition_id
+                        JOIN component_config_definition ccd2 ON (
+                            ccd2.key = "' . Component_Config_Componentname::KEY . '" AND
+                            ccd2.id=cci2.component_config_definition_id
+                        )
                         WHERE cci2.component_instance_id=ci.id
-                        AND ccd2.key = "' . Component_Config_Componentname::KEY . '"
                         AND cci2.value LIKE :textboxKeywordLike
                     )
                 )
@@ -221,10 +223,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 AND tb2.textBoxID NOT IN (
                     SELECT CAST(cci2.value AS INT)
                     FROM component_config_instance cci2
-                    JOIN component_instance ci2 ON (
-                        ci2.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
-                        ci2.id=cci2.component_instance_id
-                    )
                     JOIN component_config_definition ccd2 ON (
                         ccd2.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
                         ccd2.id=cci2.component_config_definition_id
