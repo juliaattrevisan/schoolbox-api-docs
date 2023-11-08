@@ -370,7 +370,7 @@ class Controller extends Base
 
         foreach ($leaves as &$leaf) {
             if ($leaf['parentId'] === $parentId) {
-                $children = $this->buildTree($leaves, $leaf['id']);
+                $children = $this->buildTree($leaves, (string)$leaf['id']);
 
                 if ($children) {
                     $leaf['children'] = $children;
