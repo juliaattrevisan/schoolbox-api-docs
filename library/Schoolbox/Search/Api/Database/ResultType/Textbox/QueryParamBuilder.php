@@ -13,6 +13,7 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
+use Component_Definition;
 
 /**
  * Query parameter builder for textbox searches.
@@ -39,9 +40,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $whereParts         = [
-            'ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"',
-            'ci.module="homepage"',
+        $whereParts = [
             'tb.deleted_at IS NULL',
             'fo.deleted_at IS NULL',
         ];
@@ -49,8 +48,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'tb.heading LIKE :textboxKeywordLike',
             'tb.body LIKE :textboxKeywordLike',
         ];
-        $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
-        $params             = [
+        $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $params = [
             'textboxNow'         => Alaress_Date_Format::now()->getDatabase(),
             'textboxKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
@@ -168,8 +167,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         //  * Example with integer IDs    : "1-4081-80"
         return '
             FROM component_config_instance cci
-            JOIN component_instance ci ON ci.id=cci.component_instance_id
-            JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            JOIN component_instance ci ON (
+                ci.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
+                ci.id=cci.component_instance_id
+            )
+            JOIN component_config_definition ccd ON (
+                ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
+                ccd.id=cci.component_config_definition_id
+            )
             JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
             JOIN folder fo ON fo.id=ci.identifier
         ';
