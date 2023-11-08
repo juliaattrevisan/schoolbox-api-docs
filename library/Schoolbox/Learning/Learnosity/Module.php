@@ -51,14 +51,12 @@ class Module extends BaseModule
          */
         $instructorPerms = $this->instructorPerms();
 
-        /* Any student and any staff
-         */
-        $learnerPerms = $this->learnerPerms();
-
         /* The current user must match {studentId} in the routes
          * ie. you're the owner of something in the url
+         *
+         * (All staff are also allowed here)
          */
-        $learnerViewAttemptPerms = $this->learnerViewAttemptPerms();
+        $learnerIsUserPerms = $this->learnerIsUserPerms();
 
         $preloadAssessment = function ($params) {
             return $this->preloadAssessment($params);
@@ -82,15 +80,15 @@ class Module extends BaseModule
 
         /* Async complete an attempt (set finished datetime)
          */
-        $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerPerms, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerIsUserPerms, $preloadParticipant);
 
         /* Conclude an attempt
          */
-        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getCompleteAttempt', $learnerPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getCompleteAttempt', $learnerIsUserPerms, $preloadAttempt);
 
         /* Start a new attempt
          */
-        $this->register('GET', '/{assessmentId}/attempt/{studentId}', 'getAttempt', $learnerPerms, $preloadParticipant);
+        $this->register('GET', '/{assessmentId}/attempt/{studentId}', 'getAttempt', $learnerIsUserPerms, $preloadParticipant);
 
         /* Delete an attempt
          */
@@ -107,7 +105,7 @@ class Module extends BaseModule
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
-        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerViewAttemptPerms, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerIsUserPerms, $preloadAttempt);
 
         /* Provide feedback to a student's attempt
          */
@@ -166,27 +164,13 @@ class Module extends BaseModule
 
 
     /**
+     * The current user is the $studentId referenced in the url,
+     * or you're a staff (meant to stop students accessing other
+     * student's urls)
+     *
      * @return Rule\LazyCallback
      */
-    private function learnerPerms(): Rule\LazyCallback
-    {
-        return new Rule\LazyCallback(function () {
-            return new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\HasRole(Role::STUDENT),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUser('studentId')
-                ),
-            );
-        });
-    }
-
-
-    /**
-     * @return Rule\LazyCallback
-     */
-    private function learnerViewAttemptPerms(): Rule\LazyCallback
+    private function learnerIsUserPerms(): Rule\LazyCallback
     {
         return new Rule\LazyCallback(function () {
             return new Rule\All(
