@@ -37,7 +37,7 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/type/{type}/element/{element}/id/{id}/value/{value}' => 'getPicker',
+                '/type/{type}/element/{element}/id/{id}/value/{value}{/timetableHide}' => 'getPicker',
                 '/date/{date}'                                         => 'getByDate',
                 '/date/{date}/folder/{folderId}'                       => 'getDueByDate',
                 '/heat/{year}/{month}/folder/{folderId}'               => 'getHeat'
