@@ -143,6 +143,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildFromStatement(): string
     {
+        $linearDecayExpression1 = $this->buildLinearDecayExpression(
+            ':textboxNow',
+            'tb.updated_at',
+            7,
+            56
+        );
+        $linearDecayExpression2 = $this->buildLinearDecayExpression(
+            ':textboxNow',
+            'tb2.updated_at',
+            7,
+            56
+        );
+
         // Notes on 1st UNIONED subquery:
         //  * this subquery gets all textbox instances matching the keyword
         //  * a textbox instance is a textbox in a particular component in a particular page
@@ -162,12 +175,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 SELECT
                 CONCAT(tb.textBoxID, "-", cci.component_instance_id, "-", fo.id) AS textboxInstanceId,
                 tb.heading AS title,
-                ' . $this->buildLinearDecayExpression(
-                    ':textboxNow',
-                    'tb.updated_at',
-                    7,
-                    56
-                ) . ' AS relevance,
+                ' . $linearDecayExpression1 . ' AS relevance,
                 fo.id AS folderId
                 FROM component_config_instance cci
                 JOIN component_instance ci ON (
@@ -198,12 +206,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 SELECT
                 CONCAT(tb2.textBoxID, "--") AS textboxInstanceId,
                 tb2.heading AS title,
-                ' . $this->buildLinearDecayExpression(
-                    ':textboxNow',
-                    'tb2.updated_at',
-                    7,
-                    56
-                ) . ' AS relevance,
+                ' . $linearDecayExpression2 . ' AS relevance,
                 NULL AS folderId
                 FROM textBox tb2
                 WHERE tb2.deleted_at IS NULL

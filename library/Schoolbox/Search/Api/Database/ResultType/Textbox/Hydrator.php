@@ -109,7 +109,8 @@ class Hydrator extends BaseHydrator
             // If the textbox is in a component, the page in which the component has been placed is identified by $folderId.
             // Otherwise, use the textbox's root folder to determine access level.
             $textboxAccess = $this->access->getFolderAccess(
-                $viewer, $folderId ?? $textboxRootFolder->getId()
+                $viewer,
+                $folderId ?? $textboxRootFolder->getId()
             );
 
             // If the user does not have access, eliminate this result.
