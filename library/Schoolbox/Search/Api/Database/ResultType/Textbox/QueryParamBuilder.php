@@ -158,7 +158,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
         // Notes on 1st UNIONED subquery:
         //  * this subquery gets all textbox instances matching the keyword
-        //  * a textbox instance is a textbox in a particular component in a particular page
+        //  * a textbox instance is a textbox in a particular component in a particular homepage
+        //  * we are not interested in textbox components in modules other than homepages
         //  * a textbox instance's title is the component name if set, otherwise the textbox heading
         //  * results that match on textbox heading when textbox heading has been overridden by component name will be
         //    eliminated in the Hydrator.
@@ -179,18 +180,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 fo.id AS folderId,
                 tb.updated_at AS textboxUpdatedAt,
                 tb.created_by AS textboxCreatedBy
-                FROM component_config_instance cci
-                JOIN component_instance ci ON (
-                    ci.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
-                    ci.id=cci.component_instance_id
-                )
+                FROM component_instance ci
+                JOIN component_config_instance cci ON cci.component_instance_id=ci.id
                 JOIN component_config_definition ccd ON (
                     ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
                     ccd.id=cci.component_config_definition_id
                 )
                 JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
                 JOIN folder fo ON fo.id=ci.identifier
-                WHERE tb.deleted_at IS NULL
+                WHERE ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
+                AND tb.deleted_at IS NULL
                 AND fo.deleted_at IS NULL
                 AND (
                     tb.heading LIKE :textboxKeywordLike OR
@@ -222,12 +221,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 )
                 AND tb2.textBoxID NOT IN (
                     SELECT CAST(cci2.value AS INT)
-                    FROM component_config_instance cci2
+                    FROM component_instance ci2
+                    JOIN component_config_instance cci2 ON cci2.component_instance_id=ci2.id
                     JOIN component_config_definition ccd2 ON (
                         ccd2.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
                         ccd2.id=cci2.component_config_definition_id
                     )
-                    WHERE cci2.value = CAST(tb2.textBoxID AS NCHAR)
+                    WHERE ci2.module="' . Component_Definition::MODULE_HOMEPAGE . '"
+                    AND cci2.value = CAST(tb2.textBoxID AS NCHAR)
                 )
             ) AS dummy';
     }
