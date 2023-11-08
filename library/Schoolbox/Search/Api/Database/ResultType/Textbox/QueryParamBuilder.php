@@ -165,7 +165,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         //    eliminated in the Hydrator.
         //
         // Notes on 2nd UNIONED subquery:
-        //  * gets all textboxes that are not used in any component
+        //  * gets all textboxes that are not used in any component on any page (not just homepages)
+        //    (since we are only interested in homepages, we don't want to find textboxes that are used on other types of pages)
         //
         // Each textbox instance (found in either subquery) will be uniquely identified by the following compound ID:
         //  * "$textboxId-$componentInstanceId-$folderId"
@@ -221,14 +222,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 )
                 AND tb2.textBoxID NOT IN (
                     SELECT CAST(cci2.value AS INT)
-                    FROM component_instance ci2
-                    JOIN component_config_instance cci2 ON cci2.component_instance_id=ci2.id
+                    FROM component_config_instance cci2
                     JOIN component_config_definition ccd2 ON (
                         ccd2.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
                         ccd2.id=cci2.component_config_definition_id
                     )
-                    WHERE ci2.module="' . Component_Definition::MODULE_HOMEPAGE . '"
-                    AND cci2.value = CAST(tb2.textBoxID AS NCHAR)
+                    WHERE cci2.value = CAST(tb2.textBoxID AS NCHAR)
                 )
             ) AS dummy';
     }
