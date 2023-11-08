@@ -96,7 +96,7 @@ class ExtractTool extends CliTool\App
             vmrf.feedback_id,
             vmrf.feedback_table,
             vmrf.published_at
-        FROM v_most_recent_feedback vmrf
+        FROM v_most_recent_feedback_2023 vmrf
         INNER JOIN assessment ai ON vmrf.assessment_id = ai.id
         INNER JOIN assessment_specification_implementation asi ON ai.id = asi.implementation_assessment_id
         INNER JOIN `user` u ON u.id = vmrf.student_id
