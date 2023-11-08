@@ -1,30 +1,51 @@
 <?php
-
 /**
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Custom\Sedavic\Extract;
+namespace Custom\Sedavic\Extract\Cli;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
-use Alaress\Web\Controller\Base;
+use Custom\Sedavic\Extract\ContextLookup;
 use DebugBar\DebugBarException;
-use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Application\CliTool;
 
-class Controller extends Base
+class ExtractTool extends CliTool\App
 {
     /**
-     * Skip generating a file, instead printing data to browzer
+     * --help
      *
-     * @var bool
+     * Print help text for those who don't know how to use this tool
      */
-    private bool $perform;
+    private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * --from
+     *
+     * An example arg that has an actual value, denoted by the colon
+     */
+    private const OPT_LONG_FROM = 'from:';
+
+
+    /**
+     * --to
+     *
+     * An example arg that has an actual value, denoted by the colon
+     */
+    private const OPT_LONG_TO = 'to:';
+
+
+    /**
+     * --to
+     *
+     * An example arg that has an actual value, denoted by the colon
+     */
+    private const OPT_LONG_MAX_ASSESSMENTS = 'max:';
 
 
     /**
@@ -210,6 +231,13 @@ class Controller extends Base
     private \Alaress\Database\Statement\Query\Base|IQuery $classesStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $userDetailStatement;
 
+
+    /**
+     * @var \External_Class
+     */
+    private \External_Class $externalClass;
+
+
     /**
      * @var ContextLookup
      */
@@ -242,21 +270,51 @@ class Controller extends Base
 
 
     /**
-     * Controller constructor.
-     *
-     * @param IConnector      $database
-     * @param \External_Class $externalClass  Used to get class lists
+     * @inheritdoc
      */
-    public function __construct(private IConnector $database, private \External_Class $externalClass)
+    public function getLongOpts(): array
     {
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_MAX_ASSESSMENTS,
+            self::OPT_LONG_FROM,
+            self::OPT_LONG_TO,
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Write an explanation about what your tool does and what arguments it accepts
+
+Usage: example.php [--flag] [--input mytest.txt]
+        --flag      Example flag (on/off)
+        --input     Example input value (arg which has user-inputted value)
+
+
+HELP;
+            return;
+        }
+
         /* To figure out course names from their spec or impl
          * Carefully abducted from Learnosity prototype
          */
-        $this->contextLookup = new ContextLookup($this->database);
+        $database = $this->getDatabaseInternal();
+
+        /* Other dependencies
+         */
+        $this->externalClass = new \External_Class();
+        $this->contextLookup = new ContextLookup($database);
 
         /* Basic user and assessment metadata
          */
-        $this->assessmentInfoStatement = $database->prepareQuery(self::QUERY_ASSESSMENT_INFO);
+        $this->assessmentInfoStatement = $this->getDatabaseInternal()->prepareQuery(self::QUERY_ASSESSMENT_INFO);
         $this->nodeStatement = $database->prepareQuery(self::QUERY_CURRICULUM_NODES);
 
         /* Feedback prepared statements
@@ -269,29 +327,19 @@ class Controller extends Base
          */
         $this->classesStatement = $database->prepareQuery(self::QUERY_CLASSES);
         $this->userDetailStatement = $database->prepareQuery(self::QUERY_USER_DETAIL);
-    }
 
+        /* Get the dates out
+         */
+        $from = new \Alaress_Date_Format($this->getOpt(self::OPT_LONG_FROM),'Y-m-d');
+        $to = new \Alaress_Date_Format($this->getOpt(self::OPT_LONG_TO), 'Y-m-d');
 
-    /**
-     * For each student, get all their assessment info and feedback data
-     * and pump it into a csv.
-     *
-     * The date range provided relates to when the feedbacks were published.
-     *
-     * @param \Alaress_Date_Format $from
-     * @param \Alaress_Date_Format $to
-     * @return void
-     * @throws Exception
-     * @throws DebugBarException
-     */
-    public function getExtract(\Alaress_Date_Format $from, \Alaress_Date_Format $to): void
-    {
-        $this->perform = !$this->requestQuery->get('exploreData');
+        $this->getLogger()->info('Script commencing.');
+
         $outstream = null;
 
         /* Set up file download thing
          */
-        if ($this->perform) {
+        if ($this->perform()) {
             $filename = sprintf(
                 self::FILENAME,
                 $from->getDatabaseDate(),
@@ -336,7 +384,7 @@ class Controller extends Base
         /* Artificial circuit breaker
          */
         $nAssessments = 9;
-        $maxAssessments = $this->request->query['maxAssessments'] ?? 10;
+        $maxAssessments = (int)$this->getOpt(self::OPT_LONG_MAX_ASSESSMENTS);
 
         while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
             /* For every assessment spec,
@@ -392,7 +440,7 @@ class Controller extends Base
                  */
                 $nAssessments++;
 
-                if ($nAssessments >= $maxAssessments) {
+                if ($maxAssessments && $nAssessments >= $maxAssessments) {
                     die();
                 }
             }
@@ -446,7 +494,7 @@ class Controller extends Base
          */
         $end = microtime(true);
 
-        if ($this->perform) {
+        if ($this->perform()) {
             fclose($outstream);
         } else {
             $problems = array_keys($this->problems);
@@ -476,7 +524,7 @@ class Controller extends Base
      */
     private function outputRows(array $rows, mixed $outstream): void
     {
-        if ($this->perform) {
+        if ($this->perform()) {
             foreach ($rows as $row) {
                 fputcsv($outstream, $row);
             }
@@ -603,7 +651,7 @@ class Controller extends Base
 
         /* Warning when something is amiss
          */
-        if (!$this->perform && !\count($stack)) {
+        if (!$this->perform() && !\count($stack)) {
             $message = sprintf(
                 'Assessment <a href="/learning/assessments/%s/modify">%s</a> is probably missing curriculum nodes',
                 $assessmentId,
@@ -751,5 +799,19 @@ class Controller extends Base
         }
 
         return '';
+    }
+
+
+    /**
+     * FIXME Decide whether this script must be run as root
+     *  By default, this returns false (see CliTool\App) but if you're using methods that require
+     *  access to special folders (such as when you're creating files) you need to run this as root.
+     *  Otherwise it'll fail with a generic error that might mislead you
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return parent::runAsRoot();
     }
 }
