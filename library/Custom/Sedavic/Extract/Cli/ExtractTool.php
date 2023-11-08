@@ -85,7 +85,7 @@ class ExtractTool extends CliTool\App
      */
     private const QUERY_ASSESSMENT_INFO = "
        SELECT
-            u.synergy_id,
+            u.synergy_id AS externalId,
             u.firstname,
             u.lastname,
             h.house,
@@ -333,28 +333,13 @@ HELP;
         $from = new \Alaress_Date_Format($this->getOpt(self::OPT_LONG_FROM),'Y-m-d');
         $to = new \Alaress_Date_Format($this->getOpt(self::OPT_LONG_TO), 'Y-m-d');
 
-        $this->getLogger()->info('Script commencing.');
-
-        $outstream = null;
-
         /* Set up file download thing
          */
-        if ($this->perform()) {
-            $filename = sprintf(
-                self::FILENAME,
-                $from->getDatabaseDate(),
-                $to->getDatabaseDate()
-            );
+        $outstream = fopen("php://stdout", 'w');
 
-            header('Content-type: text/csv; charset=UTF-8');
-            header("Content-disposition: attachment; filename=\"{$filename}\"");
-
-            $outstream = fopen("php://output", 'r');
-
-            /* Start with header row
-             */
-            fputcsv($outstream, self::HEADINGS);
-        }
+        /* Start with header row
+         */
+        fputcsv($outstream, self::HEADINGS);
 
         /* Find a list of student ids to process one at a time
          * For every student, get all the stuff they need
@@ -483,7 +468,7 @@ HELP;
 
             /* Remember we saw this guy
              */
-            unset($studentList[(string)$assessmentInfo['synergy_id']]);
+            unset($studentList[(string)$assessmentInfo['externalId']]);
 
             /* Get ready for next iteration
              */
@@ -520,19 +505,11 @@ HELP;
      * @param array $rows
      * @param mixed $outstream
      * @return void
-     * @throws DebugBarException
      */
     private function outputRows(array $rows, mixed $outstream): void
     {
-        if ($this->perform()) {
-            foreach ($rows as $row) {
-                fputcsv($outstream, $row);
-            }
-        } else {
-            foreach ($rows as $row) {
-                $this->numRows++;
-                new \Alaress_Probe($row);
-            }
+        foreach ($rows as $row) {
+            fputcsv($outstream, $row);
         }
     }
 
@@ -573,7 +550,7 @@ HELP;
                 $students = $this->externalClass->getStudents($folderCode);
 
                 foreach ($students as $student) {
-                    $externalId = (string)$student['synergy_id'];
+                    $externalId = (string)$student['externalId'];
 
                     /* Find house and year level from their schoolbox account
                      * since seda hijacked these fields for their own purposes
@@ -593,7 +570,7 @@ HELP;
                         'firstname' => $student['firstname'],
                         'lastname' => $student['lastname'],
                         'house_sb' => $user['house'],
-                        'year' => $user['yearLevel']
+                        'yearLevel' => $user['yearLevel']
                     ];
 
                     $this->classList[$folderCode][$externalId] = $studentDetails;
@@ -754,7 +731,7 @@ HELP;
             foreach ($qualificationData['children'] as $unitId => $unitData) {
                 foreach ($unitData['children'] as $outcomeId => $outcomeData) {
                     $assessmentRow =  [
-                        'externalId' => $assessmentInfo['synergy_id'],
+                        'externalId' => $assessmentInfo['externalId'],
                         'firstname' => $assessmentInfo['firstname'],
                         'lastname' => $assessmentInfo['lastname'],
                         'qualification' => $this->renderCurriculumNode((string)$qualificationData['name'], (string)$qualificationData['code']),
