@@ -127,9 +127,3 @@ window.Vue.onMounted(() => {
         </div>
     </div>
 </template>
-<style>
-/* temporary front end only solution for hiding the loaded timetable tab */
-#date-picker-tabs {
-    display: none;
-}
-</style>
