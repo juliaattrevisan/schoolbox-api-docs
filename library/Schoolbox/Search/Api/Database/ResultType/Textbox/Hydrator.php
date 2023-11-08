@@ -25,7 +25,6 @@ use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Hydrator for textbox results.
@@ -63,6 +62,7 @@ class Hydrator extends BaseHydrator
 
     /**
      * @inheritdoc
+     * @throws Exception
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
@@ -100,10 +100,6 @@ class Hydrator extends BaseHydrator
                 continue;
             }
 
-            // The $textboxRootFolder is the folder on which the textbox was originally created.
-            // It is the folder on whose 'Manage Textboxes' page the textbox will appear.
-            $textboxRootFolder = $textbox->getCategory();
-
             $textboxBodyTextOnly = $this->htmlToText($textbox->getBody());
 
             // Because the textbox body contains HTML, this match might have come about only because the
@@ -115,44 +111,53 @@ class Hydrator extends BaseHydrator
                 }
             }
 
-// TODO: Write another query to find textboxes that are not used on any page, and add that into the QueryParamBuilder main query somehow.
-//
-//            if (count($textboxInstanceInfo) === 0) {
-//                // This textbox is not used on any page.
-//
-//                // Textboxes not currently used in any component should be shown
-//                // only to users with write access to the textbox's main folder.
-//                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxRootFolder->getId());
-//                if ($textboxAccess < UserAccess::ACCESS_WRITE) {
-//                    continue;
-//                }
-//
-//                // Create search result with link to the textbox's 'Manage Textboxes' page.
-//                $fullResults[] = new FullResult(
-//                    $match,
-//                    $match->id,
-//                    // No component, so no config, so:
-//                    //  * $componentIsCollapsed does not apply,
-//                    //  * $showTitleToReadOnlyUsers will have default value, true.
-//                    // Conclusion: No reason not to display heading.
-//                    $textbox->getHeading(),
-//                    $this->buildBaseUrl()
-//                         ->withPath("/textbox/folder/{$textboxRootFolder->getId()}")
-//                         ->withFragment("textbox-" . $textbox->getId())
-//                         ->__toString(),
-//                    $match->type,
-//                    $match->relevance,
-//                    $textbox->getUpdatedAt(),
-//                    $textboxRootFolder,
-//                    'Hidden from view',
-//                    null,
-//                    'textbox',
-//                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
-//                    null,
-//                    [$textboxRootFolder,], // Context: textbox's folder.
-//                    [], // texbox: none.
-//                );
-//            }
+            // $componentConfig (if not null) will be an array with the following optional keys:
+            //  * Component_Config_Collapse::KEY,
+            //  * Component_Config_ShowComponentTitle::KEY
+            $componentConfig = $configByComponentInstanceId[$componentInstanceId] ?? null;
+
+            if ($componentConfig === null) {
+                // This textbox is not used on any page.
+
+                // The $textboxRootFolder is the folder on which the textbox was originally created.
+                // It is the folder on whose 'Manage Textboxes' page the textbox will appear.
+                $textboxRootFolder = $textbox->getCategory();
+
+                // Textboxes not currently used in any component should be shown
+                // only to users with write access to the textbox's main folder.
+                $textboxAccess = $this->access->getFolderAccess($viewer, $textboxRootFolder->getId());
+                if ($textboxAccess < UserAccess::ACCESS_WRITE) {
+                    continue;
+                }
+
+                // Create search result with link to the textbox's 'Manage Textboxes' page.
+                $fullResults[] = new FullResult(
+                    $match,
+                    $match->id,
+                    // No component, so no config, so:
+                    //  * $componentIsCollapsed does not apply,
+                    //  * $showTitleToReadOnlyUsers will have default value, true.
+                    // Conclusion: No reason not to display heading.
+                    $textbox->getHeading(),
+                    $this->buildBaseUrl()
+                         ->withPath("/textbox/folder/{$textboxRootFolder->getId()}")
+                         ->withFragment("textbox-" . $textbox->getId())
+                         ->__toString(),
+                    $match->type,
+                    $match->relevance,
+                    $textbox->getUpdatedAt(),
+                    $textboxRootFolder,
+                    'Hidden from view',
+                    null,
+                    'textbox',
+                    $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
+                    null,
+                    [$textboxRootFolder,], // Context: textbox's folder.
+                    [], // texbox: none.
+                );
+
+                continue;
+            }
 
             try {
                 $textboxFolder = $this->folderMapper->findById($folderId); // This is the page on which the textbox component is used.
@@ -168,15 +173,6 @@ class Hydrator extends BaseHydrator
             $textboxAccess = $this->access->getFolderAccess($viewer, $textboxFolder->getId());
             if ($textboxAccess < UserAccess::ACCESS_READ) {
                 continue;
-            }
-
-            // After json_decode, $componentConfig will be an array with the following optional keys:
-            //  * Component_Config_Collapse::KEY,
-            //  * Component_Config_ShowComponentTitle::KEY
-            $componentConfig = $configByComponentInstanceId[$componentInstanceId];
-
-            if ($componentConfig === null) {
-                throw new UnexpectedValueException('Component config JSON could not be decoded.');
             }
 
             // Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies only to read-only users.
