@@ -225,6 +225,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                         ci2.module="' . Component_Definition::MODULE_HOMEPAGE . '" AND
                         ci2.id=cci2.component_instance_id
                     )
+                    JOIN component_config_definition ccd2 ON (
+                        ccd2.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
+                        ccd2.id=cci2.component_config_definition_id
+                    )
                     WHERE cci2.value = CAST(tb2.textBoxID AS NCHAR)
                 )
             ) AS dummy';
