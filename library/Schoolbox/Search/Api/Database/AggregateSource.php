@@ -87,7 +87,7 @@ class AggregateSource implements ISource
         $rawMatches = [];
         foreach ($this->connector->executeQuery($queryString, $params) as $row) {
             $rawMatches[] = new RawResult(
-                $row['id'],
+                (string)$row['id'],
                 $row['title'],
                 $row['type'],
                 (float)$row['relevance'],
