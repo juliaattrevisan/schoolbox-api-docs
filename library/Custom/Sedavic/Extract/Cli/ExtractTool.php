@@ -730,7 +730,6 @@ HELP;
         foreach ($curriculumNodes as $qualificationId => $qualificationData) {
             foreach ($qualificationData['children'] as $unitId => $unitData) {
                 foreach ($unitData['children'] as $outcomeId => $outcomeData) {
-                    print_r($assessmentInfo);
                     $assessmentRow =  [
                         'externalId' => $assessmentInfo['externalId'],
                         'firstname' => $assessmentInfo['firstname'],
