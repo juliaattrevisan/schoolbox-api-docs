@@ -76,6 +76,8 @@ export function getConfig(config: EditorConfig) {
             UITweaks,
         ],
         extraPlugins: [UploadAdapterPlugin],
+        licenseKey:
+            "WXZOWVhuaGgvQ0czc0p4L240NkNDUUlQWVN0a0lzZzI3L0t0NU9tdFFFUlEvM3RrbWxYdGJSc2RhYitob29rSUszSkcvdz09LU1qQXlOREV4TURjPQ==",
         toolbar: getToolbar(config),
         ...getLinkSettings(),
         ...getFontSettings(),

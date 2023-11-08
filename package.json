@@ -24,6 +24,7 @@
         "@ckeditor/ckeditor5-mention": "~40.0.0",
         "@ckeditor/ckeditor5-paragraph": "~40.0.0",
         "@ckeditor/ckeditor5-paste-from-office": "~40.0.0",
+        "@ckeditor/ckeditor5-paste-from-office-enhanced": "~40.0.0",
         "@ckeditor/ckeditor5-remove-format": "~40.0.0",
         "@ckeditor/ckeditor5-source-editing": "~40.0.0",
         "@ckeditor/ckeditor5-special-characters": "~40.0.0",
