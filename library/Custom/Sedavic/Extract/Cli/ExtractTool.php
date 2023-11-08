@@ -408,7 +408,7 @@ HELP;
                      * those who didn't get feedback
                      */
                     $temp = $data;
-                    $temp['assessment'] = $lastAssessmentInfo['title'];
+                    $temp['title'] = $lastAssessmentInfo['title'];
 
                     /* Combine all that into a set of csv rows
                      */
@@ -550,7 +550,7 @@ HELP;
                 $students = $this->externalClass->getStudents($folderCode);
 
                 foreach ($students as $student) {
-                    $externalId = (string)$student['externalId'];
+                    $externalId = (string)$student['synergy_id'];
 
                     /* Find house and year level from their schoolbox account
                      * since seda hijacked these fields for their own purposes
@@ -569,7 +569,7 @@ HELP;
                         'externalId' => $externalId,
                         'firstname' => $student['firstname'],
                         'lastname' => $student['lastname'],
-                        'house_sb' => $user['house'],
+                        'house' => $user['house'],
                         'yearLevel' => $user['yearLevel']
                     ];
 
@@ -730,12 +730,13 @@ HELP;
         foreach ($curriculumNodes as $qualificationId => $qualificationData) {
             foreach ($qualificationData['children'] as $unitId => $unitData) {
                 foreach ($unitData['children'] as $outcomeId => $outcomeData) {
+                    print_r($assessmentInfo);
                     $assessmentRow =  [
                         'externalId' => $assessmentInfo['externalId'],
                         'firstname' => $assessmentInfo['firstname'],
                         'lastname' => $assessmentInfo['lastname'],
                         'qualification' => $this->renderCurriculumNode((string)$qualificationData['name'], (string)$qualificationData['code']),
-                        'year' => $assessmentInfo['yearLevel'],
+                        'yearLevel' => $assessmentInfo['yearLevel'],
                         'house_sb' => $assessmentInfo['house'],
                         'course_sb' => $context['course']['name'],
                         'unit_sb' => $context['unit']['name'],
