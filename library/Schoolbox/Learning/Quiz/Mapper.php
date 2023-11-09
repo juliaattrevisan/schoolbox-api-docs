@@ -317,10 +317,16 @@ class Mapper extends BaseMapper
                     "
                         UPDATE {$this->database->getQuoter()->quoteIdentifier($this->table)}
                         SET learnosity_reference = ?,
-                            learnosity_job_reference = ?
+                            learnosity_job_reference = ?,
+                            learnosity_job_status = ?
                         WHERE assessment_id = ?
                     ",
-                    [$newLearnosityReference, $learnosityJobReference, $destination->getId()],
+                    [
+                        $newLearnosityReference,
+                        $learnosityJobReference,
+                        Model::LEARNOSITY_JOB_STATUS_PROCESSING,
+                        $destination->getId(),
+                    ],
                 )->execute();
             }
 
