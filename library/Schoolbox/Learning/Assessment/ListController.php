@@ -37,7 +37,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
 use Schoolbox\Url\Uri;
