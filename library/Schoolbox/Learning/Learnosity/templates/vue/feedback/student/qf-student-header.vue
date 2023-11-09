@@ -3,29 +3,16 @@
  * The student header, containing the toggle, student photo, name and mark for each item
  */
 
-// import type { Student } from "@schoolboxLearnosity/js/types/Student";
-// import { useItemsStore } from "../store/hmItemsStore";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import { useItemsStore } from "../store/qfItemsStore";
 // import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
 // import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
 
-// interface Props {
-//     student: Student; // the student to display
-//     container: HTMLDivElement | null; // the element that the report is rendered into
-// }
-// const props = defineProps<Props>();
-
-// const emit = defineEmits<{
-//     toggle: [value: Student];
-// }>();
-
-// const itemsStore = useItemsStore();
-
-/**
- * To show/hide the response when selected
- */
-// function onToggleSelected() {
-//     emit("toggle", props.student);
-// }
+interface Props {
+    student: Student; // the student to display
+    container: HTMLDivElement | null; // the element that the report is rendered into
+}
+const props = defineProps<Props>();
 </script>
 
 <template>

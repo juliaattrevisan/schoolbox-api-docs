@@ -41,7 +41,7 @@ window.Vue.onMounted(async () => {
         <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Feedback for {{ props.title }}</h1>
         <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
-        <qf-student />
+        <qf-student :student="useStudentStore().student" />
     </div>
 </template>
 

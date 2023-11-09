@@ -14,7 +14,6 @@ import {
     getAttemptResponse,
     getItemIsMarked,
     getStudentIsMarked,
-    getUrls,
 } from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./quizFeedbackStore";
 import { useItemsStore } from "./qfItemsStore";
@@ -46,7 +45,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
     const isExpanded = window.Vue.ref<boolean>(true); // if all students are expanded
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
     const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]); // all attempt comments from the backend
-    const urls = window.Vue.ref<StudentUrls>(); // the urls for each student to save score, comment and attempt comment
     const showMarkedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
     // const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
     const store = useStore();
@@ -70,10 +68,10 @@ export const useStudentStore = defineStore("qfStudent", () => {
             isExpanded: false,
             hasReport: false,
             items: [],
+            attemptComment: $attemptComment,
+            urls: $urls,
         };
         itemResponses.value = $itemResponses;
-        // attemptComments.value = $attemptComments;
-        urls.value = $urls;
     }
 
     /**
@@ -119,7 +117,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
         });
         student.value.isMarked = getStudentIsMarked(student.value);
         student.value.attemptComment = getAttemptResponse(attemptComments.value, student.value.id);
-        student.value.urls = getUrls(urls.value, student.value.id);
     }
 
     /**
