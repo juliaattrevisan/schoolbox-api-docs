@@ -20,8 +20,8 @@
             <div id="schoolbox-student"></div>
         </section>
 
-        {% if attempt.reviewed %}
-        <div style="display:none">
+        {% if attempt.reviewed and attempt.comment|length %}
+        <div id="overall-comment-container" style="display:none">
             <h2 class="subheader">Overall comments from {{ attempt.reviewer.fullname }}</h2>
             <section class="content">
                 <article>{{ attempt.comment|purify }}</article>
@@ -72,6 +72,10 @@
                             '');
                         });
                     });
+
+                    /* Show container when ready
+                     */
+                    document.getElementById('overall-comment-container').style.display = '';
                 });
             },
             /* Log errors to console and to screen for users
