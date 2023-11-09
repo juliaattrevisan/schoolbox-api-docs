@@ -443,7 +443,8 @@ HELP;
                 $nAssessments++;
 
                 if ($maxAssessments && $nAssessments >= $maxAssessments) {
-                    die();
+                    $this->getLogger()->info('Exiting due to maximum assessments limit being reached.');
+                    break;
                 }
             }
 
