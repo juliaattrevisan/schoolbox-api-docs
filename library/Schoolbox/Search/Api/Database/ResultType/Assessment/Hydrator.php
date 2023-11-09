@@ -145,6 +145,7 @@ class Hydrator extends BaseHydrator
                 ];
 
                 // This permissions check was added because the Visibility check above was found to be insufficient.
+                // Specifically, students were able to view lesson plans that are not in the class - only in the course.
                 if (!$this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                     return null;
                 }
