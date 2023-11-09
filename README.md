@@ -59,10 +59,8 @@ This file is internal use and is not shipped to clients.
   data_filename: "demo.tar.gz"
   external_db: "schoolbox"
   puppet_sync_type: "gitsync"
-  aws_iam_key: xxxx
-  aws_iam_secret: xxxx
 ```
-* You can get your `aws_iam_key` and `aws_iam_secret` from the infrastructure team [#infrastructure-support](https://alaress.slack.com/archives/CTP55SURE)
+
 * Create a `/etc/vbox/networks.conf` on your local computer
 ```
 sudo mkdir -p /etc/vbox/
