@@ -868,7 +868,26 @@ class Controller extends Base
             $responseId = $response['response_id'];
 
             $updatedResponse = $response;
-            $updatedResponse['score'] = $postData['scores'][$responseId];
+
+            /* If $updatedResponse['max_score'] is null...I guess this is unscored/practice
+             * Learnosity fails with http 400 if you try to score an unscorable question
+             */
+            if (null === $updatedResponse['max_score']) {
+                continue;
+            }
+
+            /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
+             * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+             */
+            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$responseId], $updatedResponse['max_score']);
+
+            $mark = $sanitisedScore['score'];
+            $maxMark = $sanitisedScore['max_score'];
+
+            /* Get ready to send it back to Learnosity land
+             */
+            $updatedResponse['score'] = $mark;
+            $updatedResponse['max_score'] = $maxMark;
 
             /* "When setting a non-zero score, the response must also be attempted."
              *    -- https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#updateResponseScores
@@ -876,14 +895,6 @@ class Controller extends Base
              * This includes responses that cannot be automagically calculated
              */
             $updatedResponse['attempted'] = true;
-
-            /* If there's no max score, but the teacher gave a score, I guess
-             * we just assume that to be the max score too...basically bonus
-             * marks in this scenario
-             */
-            if (null === $updatedResponse['max_score']) {
-                $updatedResponse['max_score'] = $updatedResponse['score'];
-            }
 
             $responseData[] = $updatedResponse;
         }
@@ -897,15 +908,17 @@ class Controller extends Base
          * Instead, redirect people to a whole other screen afterwards to
          * artificially force this behaviour
          */
-        $this->api->dataUpdateRequest('/sessions/responses/scores', [
-            'sessions' => [
-                [
-                    'session_id' => $attempt->getLearnosityReference(),
-                    'user_id' => (string)$attempt->getUser()->getId(),
-                    'responses' => $responseData
+        if (\count($responseData)) {
+            $this->api->dataUpdateRequest('/sessions/responses/scores', [
+                'sessions' => [
+                    [
+                        'session_id' => $attempt->getLearnosityReference(),
+                        'user_id' => (string)$attempt->getUser()->getId(),
+                        'responses' => $responseData
+                    ]
                 ]
-            ]
-        ]);
+            ]);
+        }
 
         /* Get the new result back from learnosity
          *
@@ -921,10 +934,9 @@ class Controller extends Base
             ]);
          */
 
-        /* TODO Redirect back to the index screen for now
-         *  but probably need a returnUrl
+        /* Redirect back to summary screen
          */
-        $redirect = $this->router->getGenerator()->generate('learningAssessment.getStatus', [
+        $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
             'assessmentId' => $assessment->getId(),
         ]);
 
