@@ -3,11 +3,10 @@
  * To provide feedback on a individual students attempt at a quiz
  */
 
-// import type { Item } from "@schoolboxLearnosity/js/types/Item";
-// import type { Student } from "@schoolboxLearnosity/js/types/Student";
-// import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-// import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
-// import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
+import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
 import { loadReport } from "./util/loadReport";
@@ -15,10 +14,10 @@ import QfStudent from "./student/qf-student.vue";
 
 interface Props {
     title: string; // the title of the quiz
-    student: object; // Student[] the student who has attempted the quiz
-    itemResponses: object[]; // StudentItemQuestionResponse[] all the item responses for the quiz, which can include multiple questions within the same item
-    attempt: object; // StudentAttemptComment[] all the overall attempt comments for the quiz
-    urls: object; // StudentUrls[] the urls to use for the students to update their scores and comments
+    student: Student; // the student who has attempted the quiz
+    itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
+    attempt: StudentAttemptComment; // StudentAttemptComment all the overall attempt comments for the quiz
+    urls: StudentUrls; // the urls to use for the students to update their scores and comments
     reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
     statusPage: string; // the status page to link to once user has finished marking
 }

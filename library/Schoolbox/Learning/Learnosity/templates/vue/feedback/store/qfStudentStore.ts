@@ -3,19 +3,19 @@
  */
 
 import { defineStore } from "pinia";
-// import type { Student } from "@schoolboxLearnosity/js/types/Student";
-// import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
-// import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
-// import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-// import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
-// import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
-// import {
-//     getItemQuestions,
-//     getAttemptResponse,
-//     getItemIsMarked,
-//     getStudentIsMarked,
-//     getUrls,
-// } from "@schoolboxLearnosity/js/util/markingUtils";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
+import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
+import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
+import {
+    getItemQuestions,
+    getAttemptResponse,
+    getItemIsMarked,
+    getStudentIsMarked,
+    getUrls,
+} from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./quizFeedbackStore";
 import { useItemsStore } from "./qfItemsStore";
 
@@ -96,16 +96,16 @@ export const useStudentStore = defineStore("qfStudent", () => {
             item.isMarked = getItemIsMarked(item);
         });
         student.value.isMarked = getStudentIsMarked(student);
-        student.value.attemptComment = getAttemptResponse(attemptComments.value, student.id);
-        student.value.urls = getUrls(urls.value, student.id);
+        student.value.attemptComment = getAttemptResponse(attemptComments.value, student.value.id);
+        student.value.urls = getUrls(urls.value, student.value.id);
     }
 
     /**
      * To show/hide a student
-     * @param {Student} student - the student to change
+     * @param {Student} $student - the student to change
      */
-    function toggleStudent(student: Student) {
-        student.isExpanded = !student.isExpanded;
+    function toggleStudent($student: Student) {
+        student.value.isExpanded = !$student.isExpanded;
         // if all students are now expanded, set the overall toggle to true
         // if (students.value.every(($student) => $student.isExpanded)) {
         //     isExpanded.value = true;
@@ -121,10 +121,8 @@ export const useStudentStore = defineStore("qfStudent", () => {
      */
     function updateItemsIsMarked() {
         useItemsStore().items.forEach((item) => {
-            item.isMarked = students.value.every((student) => {
-                const studentItem = student.items.find(($item) => $item.reference === item.reference);
-                return studentItem ? studentItem.isMarked : false;
-            });
+            const studentItem = student.value.items.find(($item) => $item.reference === item.reference);
+            item.isMarked = studentItem.isMarked;
         });
     }
 
@@ -140,57 +138,57 @@ export const useStudentStore = defineStore("qfStudent", () => {
 
     /**
      * To update the isMarked property of an item and student
-     * @param {Student} student - the student to update
+     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item to update
      */
-    function updateIsMarked(student: Student, item: StudentItem) {
+    function updateIsMarked($student: Student, item: StudentItem) {
         item.isMarked = getItemIsMarked(item);
-        student.isMarked = getStudentIsMarked(student);
+        student.value.isMarked = getStudentIsMarked(student);
         updateItemsIsMarked();
     }
 
     /**
      * To update the score of a question
-     * @param {Student} student - the student to update
+     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item that contains the question to update
      * @param {StudentItemQuestion} question - the question to update
      * @param {number} score - the score to update
      */
     function updateItemResponseScore(
-        student: Student,
+        $student: Student,
         item: StudentItem,
         question: StudentItemQuestion,
         score: number
     ) {
         question.response.score = score;
         question.response.isMarked = true;
-        updateIsMarked(student, item);
+        updateIsMarked($student, item);
     }
 
     /**
      * To update the comment of an item
-     * @param {Student} student - the student to update
+     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item to update
      * @param {StudentItemQuestion} question - the question to update
      * @param {string} comment - the comment to update
      */
-    function updateItemComment(student: Student, item: StudentItem, question: StudentItemQuestion, comment: string) {
+    function updateItemComment($student: Student, item: StudentItem, question: StudentItemQuestion, comment: string) {
         question.response.comment = comment;
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(($question) => $question.response.maxScore === null);
         questionsWithoutMaxScore.forEach(($question) => {
             $question.response.isMarked = true;
         });
-        updateIsMarked(student, item);
+        updateIsMarked($student, item);
     }
 
     /**
      * To update the overall comment response to an attempt
-     * @param {Student} student - the student to update
+     * @param {Student} $student - the student to update
      * @param {string} comment - the comment to update
      */
-    function updateAttemptComment(student: Student, comment: string) {
-        student.attemptComment.comment = comment;
+    function updateAttemptComment($student: Student, comment: string) {
+        $student.attemptComment.comment = comment;
     }
 
     return {

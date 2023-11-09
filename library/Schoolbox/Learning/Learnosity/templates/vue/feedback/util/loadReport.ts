@@ -4,7 +4,7 @@
 
 import type { Item } from "@schoolboxLearnosity/js/types/Item";
 import { useItemsStore } from "../store/qfItemsStore";
-// import { useStudentStore } from "../store/qfStudentStore";
+import { useStudentStore } from "../store/qfStudentStore";
 
 /**
  * To move the marks (which are in the title div) out of the response container into <hm-students-student-mark>
@@ -50,11 +50,11 @@ export function loadReport(initOptions: object) {
                         items.push(item);
                     });
                     useItemsStore().addItems(items);
-                    // useStudentStore().addItems(items);
+                    useStudentStore().addItems(items);
                     addTargetsToMarks(reportId);
                 });
                 // to notify the report has loaded
-                // useStudentStore().reportLoaded();
+                useStudentStore().reportLoaded();
             });
         },
     };
