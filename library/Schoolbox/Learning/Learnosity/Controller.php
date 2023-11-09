@@ -952,6 +952,7 @@ class Controller extends Base
          */
         $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
             'assessmentId' => $assessment->getId(),
+            'studentId' => $attempt->getUser()->getId(),
         ]);
 
         $this->response = $this->redirectFound($redirect);
