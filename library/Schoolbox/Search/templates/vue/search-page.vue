@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To search Schoolobx
+ * To search Schoolbox
  */
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
@@ -22,7 +22,7 @@ interface Props {
     filterTypesAvailable: FilterType[]; // The filter types available, will vary depending on SB plan.
     filterTypesSelected: string[]; // The selected filter types.
     filterDateRange: FilterDateRange; // The default date range for the date filter.
-    filterCreator: object; // The selected user - object {id: number, name: string}
+    filterCreator: object | null; // The selected user - object {id: number, name: string}
 }
 const props = defineProps<Props>();
 
@@ -50,7 +50,7 @@ function initResizeObserver() {
     resizeObserver.observe(searchPageEl.value as HTMLDivElement);
 }
 
-window.onpopstate = async (event) => {
+window.onpopstate = () => {
     const searchParams = new URLSearchParams(document.location.search);
     if (searchParams.has(SEARCH_PARAM)) {
         document.location.reload();
