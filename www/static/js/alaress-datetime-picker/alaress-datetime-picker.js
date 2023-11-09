@@ -109,6 +109,7 @@
             endDay: adtp.getValue(element, "data-datepicker-endofday"), // Should allday change time to 23:59:59
             endPeriod: adtp.getValue(element, "data-datepicker-endofperiod"), // It will use end of the period to set time through timetable picker
             staller: null,
+            hideTimetable: adtp.getValue(element, "data-datepicker-hide-timetable"), // Hide timetable picker when set
         };
         return elementOptions;
     };
@@ -319,7 +320,8 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     "/id/" +
                     pickerId +
                     "/value/" +
-                    encodeURIComponent(originalValue.format(adtp.dayjsFormats.database)),
+                    encodeURIComponent(originalValue.format(adtp.dayjsFormats.database)) +
+                    `${options.hideTimetable === "true" ? "/hideTimetable/" : ""}`,
                 function () {
                     // Capture closure of modal
                     $(document).on("closed.fndtn.reveal", "#adtp-modal-" + pickerId, function () {
