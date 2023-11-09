@@ -132,7 +132,7 @@ class Replicator
      * @return void
      * @throws \DomainException
      */
-    private function replicateQuizConstituents(IAssessable $source, IAssessable $destination, User $creator): void
+    public function replicateQuizConstituents(IAssessable $source, IAssessable $destination, User $creator): void
     {
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
