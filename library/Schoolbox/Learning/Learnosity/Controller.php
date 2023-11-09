@@ -204,41 +204,14 @@ class Controller extends Base
      */
     public function getContent(IAssessable $assessment): void
     {
+        $this->assertLearnosityImportCompleted($assessment);
+
         /* Tags for presetting without requiring the additional
          * authorApp.saveActivity() upon spawn. "create" (such as
          * in "tags_on_create") is when you first hit the Save button,
          * not when authorApp initialises for the first time
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
-        $quiz       = $this->getQuizForAssessmentId($assessment->getId());
-
-        if ('' === (string)$quiz->getLearnosityReference()) {
-            throw new \RuntimeException(sprintf(
-                'Assessment %s is not in learnosity; try importing it with the cli tool',
-                $assessment->getId()
-            ));
-        }
-
-        // Is there a duplication job? If so block until completed
-        if ($quiz->getLearnosityJobReference()) {
-            $jobStatus = $quiz->getLearnosityJobStatus();
-            if ($jobStatus === Quiz::LEARNOSITY_JOB_STATUS_FAILED) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Assessment %s duplication process has failed; please contact support',
-                        $assessment->getId()
-                    )
-                );
-            }
-            if ($jobStatus !== Quiz::LEARNOSITY_JOB_STATUS_COMPLETED) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Assessment %s duplication process has not yet completed; try again later',
-                        $assessment->getId()
-                    )
-                );
-            }
-        }
 
         $tags = $tagFactory->produceFromAssessment($assessment);
 
@@ -383,6 +356,8 @@ class Controller extends Base
      */
     public function getAttempt(IAssessable $assessment, \Schoolbox\User $student): void
     {
+        $this->assertLearnosityImportCompleted($assessment);
+
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
         /* Generate a session (attempt) identifier
@@ -1947,5 +1922,50 @@ class Controller extends Base
             ->setMark($humanReadableMark)
             ->setNormalisedMark($normalisedMark)
             ->setMaxMark($maxMark);
+    }
+
+    /**
+     * Assert that this assessment:
+     * * is a quiz
+     * * has been imported into Learnosity
+     * * if it's being duplicated: that that duplication process has completed
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws \RuntimeException if any of the above conditions are false
+     */
+    private function assertLearnosityImportCompleted(IAssessable $assessment): void
+    {
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        if ('' === (string)$quiz->getLearnosityReference()) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Assessment %s is not in learnosity; try importing it with the cli tool',
+                    $assessment->getId()
+                )
+            );
+        }
+
+        // Is there a duplication job? If so block until completed
+        if ($quiz->getLearnosityJobReference()) {
+            $jobStatus = $quiz->getLearnosityJobStatus();
+            if ($jobStatus === Quiz::LEARNOSITY_JOB_STATUS_FAILED) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Assessment %s duplication process has failed; please contact support',
+                        $assessment->getId()
+                    )
+                );
+            }
+            if ($jobStatus !== Quiz::LEARNOSITY_JOB_STATUS_COMPLETED) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Assessment %s duplication process has not yet completed; try again later',
+                        $assessment->getId()
+                    )
+                );
+            }
+        }
     }
 }
