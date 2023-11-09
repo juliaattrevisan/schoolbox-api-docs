@@ -37,13 +37,12 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/type/{type}/element/{element}/id/{id}/value/{value}' => 'getPicker',
+                '/type/{type}/element/{element}/id/{id}/value/{value}{/hideTimetable}' => 'getPicker',
                 '/date/{date}'                                         => 'getByDate',
                 '/date/{date}/folder/{folderId}'                       => 'getDueByDate',
                 '/heat/{year}/{month}/folder/{folderId}'               => 'getHeat'
             ],
-            'POST' => [
-            ]
+            'POST' => []
         ];
 
         foreach ($routes['GET'] as $path => $alias) {

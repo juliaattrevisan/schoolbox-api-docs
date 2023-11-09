@@ -98,10 +98,14 @@ class Controller extends Base
      * @param string $element input field that calls a datepicker
      * @param int    $id      The ID number of the javascript picker
      * @param string $value   Default date to display
+     * @param string|null $hideTimetable    whether we should hide the timetable fields
      */
-    public function getPicker($type, $element, $id, $value)
+    public function getPicker($type, $element, $id, $value, string|null $hideTimetable = '')
     {
-        $timetable = $this->getUserTimetable();
+        $timetable = false;
+        if ('hideTimetable' !== $hideTimetable) {
+            $timetable = $this->getUserTimetable();
+        }
 
         $terms = $this->getTerms();
 
@@ -312,7 +316,7 @@ class Controller extends Base
      */
     public function getTerms()
     {
-        return $this->termMapper->findAll([ 'order' => [ 'start' => 'desc' ] ]);
+        return $this->termMapper->findAll(['order' => ['start' => 'desc']]);
     }
 
     /**

@@ -4,8 +4,21 @@
  */
 
 import { useFilterDateRangeStore, EMPTY_DATE, INVALID_DATE } from "./store/spFilterDateRangeStore";
+import { useSearchStore } from "../store/spSearchStore";
 
 const filterDateRangeStore = useFilterDateRangeStore();
+const searchStore = useSearchStore();
+
+/**
+ * Ensure the error message is hidden on clear filters
+ * @param {string} selector - The selector for the error message
+ */
+function clearErrorMessage(selector: string) {
+    const dateError = document.querySelector(selector) as HTMLDivElement;
+    if (dateError) {
+        dateError.style.display = "none";
+    }
+}
 
 /**
  * Clear the start date if the filters have been reset
@@ -15,6 +28,7 @@ window.Vue.watch(
     (newValue) => {
         if (newValue === EMPTY_DATE) {
             $("#sp-start-date-input").val(EMPTY_DATE);
+            clearErrorMessage("#sp-start-date-input-error");
         }
     }
 );
@@ -27,6 +41,23 @@ window.Vue.watch(
     (newValue) => {
         if (newValue === EMPTY_DATE) {
             $("#sp-end-date-input").val(EMPTY_DATE);
+            clearErrorMessage("#sp-end-date-input-error");
+        }
+    }
+);
+
+/**
+ * Clear the invalid date input if we are searching, as if it's invalid we don't search
+ * with the date ranges set, so the UI should reflect that.
+ */
+window.Vue.watch(
+    () => searchStore.isSearching,
+    (isSearching) => {
+        if (isSearching && filterDateRangeStore.startDate === INVALID_DATE) {
+            filterDateRangeStore.startDate = EMPTY_DATE;
+        }
+        if (isSearching && filterDateRangeStore.endDate === INVALID_DATE) {
+            filterDateRangeStore.endDate = EMPTY_DATE;
         }
     }
 );
@@ -78,6 +109,7 @@ window.Vue.onMounted(() => {
                 data-datepicker-buttontext
                 data-datesync-enddate="#sp-end-date-input"
                 :data-datepicker-initial-value="filterDateRangeStore.startDate"
+                data-datepicker-hide-timetable="true"
             />
         </div>
         <div class="l-flex-col l-flex__item--1">
@@ -90,6 +122,7 @@ window.Vue.onMounted(() => {
                 data-datepicker-buttontext
                 data-datesync-startdate="#sp-start-date-input"
                 :data-datepicker-initial-value="filterDateRangeStore.endDate"
+                data-datepicker-hide-timetable="true"
             />
         </div>
     </div>
