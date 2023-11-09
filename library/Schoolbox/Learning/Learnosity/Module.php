@@ -152,6 +152,15 @@ class Module extends BaseModule
             fn ($params) => $this->preloadAssessmentAndDestinationAssessment($params),
         );
 
+        // Async callback for polling quiz import's status
+        $this->register(
+            self::METHOD_POST,
+            '/{assessmentId}/poll',
+            'postPollQuizStatus',
+            $instructorPerms,
+            $preloadAssessment,
+        );
+
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);

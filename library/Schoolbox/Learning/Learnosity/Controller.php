@@ -1597,6 +1597,9 @@ class Controller extends Base
     /**
      * Callback for copying a quiz's contents from one quiz to another.
      *
+     * This callback will in turn create another callback for polling the quiz's
+     * status, setting it to complete or failed appropriately.
+     *
      * @api   POST /learning/learnosity/{sourceId}/copy/{destinationId}
      * @since 23.1
      *
@@ -1609,6 +1612,50 @@ class Controller extends Base
     {
         $jobId = $this->quizMapper->copyQuizConstituents($source, $destination);
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
+
+        // TODO post message to postPollQuizStatus
+    }
+
+    /**
+     * Callback for polling the status of a Learnosity quiz duplication.
+     *
+     * @api   POST /learning/learnosity/{assessmentId}/poll
+     * @since 23.1
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function postPollQuizStatus(IAssessable $assessment): void
+    {
+        // Not a quiz? error
+        // No job ID? error
+        // Job already complete: return 200
+
+        // Otherwise check job:
+        // pending: return status 202
+        // failed: set and return status 4xx
+        // complete: set and return status 200
+
+        // Ask Learnosity for the status of the job associated with this assessment
+        if (!$assessment instanceof Quiz) {
+            // error
+            return;
+        }
+
+        if (!$assessment->getLearnosityJobReference()) {
+            return;
+        }
+
+        $jobStatus    = $assessment->getLearnosityJobStatus();
+        $responseCode = match ($jobStatus) {
+            Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
+            Quiz::LEARNOSITY_JOB_STATUS_FAILED    => 500,
+            Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
+            default => 400,
+        };
+        $this->response = $this
+            ->responseAsJson(['status' => $assessment->getLearnosityJobStatus()])
+            ->withStatus($responseCode);
     }
 
     /**
