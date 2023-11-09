@@ -210,12 +210,34 @@ class Controller extends Base
          * not when authorApp initialises for the first time
          */
         $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+        $quiz       = $this->getQuizForAssessmentId($assessment->getId());
 
-        if ('' === (string)$assessment->getLearnosityReference()) {
+        if ('' === (string)$quiz->getLearnosityReference()) {
             throw new \RuntimeException(sprintf(
                 'Assessment %s is not in learnosity; try importing it with the cli tool',
                 $assessment->getId()
             ));
+        }
+
+        // Is there a duplication job? If so block until completed
+        if ($quiz->getLearnosityJobReference()) {
+            $jobStatus = $quiz->getLearnosityJobStatus();
+            if ($jobStatus === Quiz::LEARNOSITY_JOB_STATUS_FAILED) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Assessment %s duplication process has failed; please contact support',
+                        $assessment->getId()
+                    )
+                );
+            }
+            if ($jobStatus !== Quiz::LEARNOSITY_JOB_STATUS_COMPLETED) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Assessment %s duplication process has not yet completed; try again later',
+                        $assessment->getId()
+                    )
+                );
+            }
         }
 
         $tags = $tagFactory->produceFromAssessment($assessment);
