@@ -13,6 +13,20 @@
 
 <script src="https://reports-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
+
+<div id="quiz-feedback-container">
+    <quiz-feedback
+        :title="'{{ assessment.title }}'"
+        status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/quizFeedback.js?v={{ config.site_version }}"></script>
+<script>
+// to use the new spacing styles
+document.getElementById("container").classList.add("c-container");
+</script>
 
 <div class="row">
     <div class="small-12 island">
