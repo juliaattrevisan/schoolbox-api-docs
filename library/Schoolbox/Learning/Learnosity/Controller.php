@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Http\Discovery\Psr17Factory;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
@@ -32,6 +33,8 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -140,19 +143,21 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param Factory $urlFactory
+     * @param Factory                                 $urlFactory
      * @param BreadcrumbFactory $bakery
      * @param string $learnosityVersion
-     * @param string $learnosityConsumerKey
-     * @param string $learnosityConsumerSecret
-     * @param ErrorMapper $errorMapper
-     * @param AssessmentMapperProxy $assessmentDataSource
-     * @param Mapper $resultCacheMapper
-     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
+     * @param string                                  $learnosityConsumerKey
+     * @param string                                  $learnosityConsumerSecret
+     * @param ErrorMapper                             $errorMapper
+     * @param AssessmentMapperProxy                   $assessmentDataSource
+     * @param Mapper                                  $resultCacheMapper
+     * @param \Schoolbox\Learning\Quiz\Mapper         $quizMapper
      * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
-     * @param Feedback\Mapper $feedbackMapper
-     * @param UserMapper $userMapper
-     * @throws \DomainException
+     * @param Feedback\Mapper                         $feedbackMapper
+     * @param UserMapper                              $userMapper
+     * @param Psr17Factory                            $httpFactory     for creating HTTP requests
+     * @param MessageFactory                          $messageFactory  for creating messages to send to taskd
+     * @param Producer                                $messageProducer for sending messages to taskd
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
@@ -166,7 +171,10 @@ class Controller extends Base
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
         private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
-        private \Schoolbox\UserMapper $userMapper
+        private \Schoolbox\UserMapper $userMapper,
+        private Psr17Factory $httpFactory,
+        private MessageFactory $messageFactory,
+        private Producer $messageProducer,
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -1613,11 +1621,32 @@ class Controller extends Base
         $jobId = $this->quizMapper->copyQuizConstituents($source, $destination);
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
 
-        // TODO post message to postPollQuizStatus
+        // Start polling status of duplication
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $message = $this->messageFactory
+            ->setUser($this->getUser())
+            ->setRequest(
+                $this->httpFactory
+                    ->createRequest(
+                        'POST',
+                        $baseUrl->withPath(
+                            $this->routeGenerator->generate(
+                                'learnosity.postPollQuizStatus',
+                                ['assessmentId' => $destination->getId()]
+                            )
+                        )
+                    )
+                    ->withHeader('accept', 'application/json')
+            )
+            ->build();
+        $this->messageProducer->send($message, delay: 5, maxRequeues: 10);
     }
 
     /**
      * Callback for polling the status of a Learnosity quiz duplication.
+     *
+     * This will also update the status of the assessment: hence this is a POST
+     * request.
      *
      * @api   POST /learning/learnosity/{assessmentId}/poll
      * @since 23.1

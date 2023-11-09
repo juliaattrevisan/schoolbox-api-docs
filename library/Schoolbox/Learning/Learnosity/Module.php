@@ -405,6 +405,9 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->injector->get('httpFactory'),
+            $this->injector->get('taskd.httpRequestMessageFactory'),
+            $this->injector->get('taskd.messageProducer'),
         );
     }
 
