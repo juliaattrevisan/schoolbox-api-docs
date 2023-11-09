@@ -58,7 +58,7 @@ class Module extends BaseModule
             '/folder/{folderId}',
             'getSearchWithinFolder',
             new Rule\HasHomepageAccess(
-                UserAccess::ACCESS_WRITE,
+                UserAccess::ACCESS_READ,
                 fn (array $params = []) => $params['folderId'] ?? null,
                 Access::getInstance(),
             ),
