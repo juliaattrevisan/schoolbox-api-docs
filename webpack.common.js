@@ -155,6 +155,8 @@ module.exports = {
 
         // Assessment
         unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",
+        horizontalMarking:
+            "./library/Schoolbox/Learning/Learnosity/templates/vue/horizontalMarking/horizontalMarking.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",
@@ -396,6 +398,7 @@ module.exports = {
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
             "@schoolboxBadge": path.resolve(__dirname, "library/Schoolbox/Learning/Badge/"),
             "@schoolboxAssessment": path.resolve(__dirname, "library/Schoolbox/Assessment/"),
+            "@schoolboxLearnosity": path.resolve(__dirname, "library/Schoolbox/Learning/Learnosity/templates/"),
             "@schoolboxVue": path.resolve(__dirname, "vue"),
             "@js": path.resolve(__dirname, "www/static/js"),
             "@css": path.resolve(__dirname, "www/static/css"),

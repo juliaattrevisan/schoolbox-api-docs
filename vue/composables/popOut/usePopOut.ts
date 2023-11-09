@@ -86,7 +86,7 @@ export function usePopOut(
      * @param {ComputePositionReturn} position - The position of the content
      */
     function animateOpen(position: ComputePositionReturn) {
-        // dont animate if the user prefers reduced motion
+        // don't animate if the user prefers reduced motion
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches ?? false;
         gsap.from(content, {
             opacity: 0,
@@ -137,6 +137,10 @@ export function usePopOut(
         // the button will always match the colour of the content when open
         button.value.style.backgroundColor = window.getComputedStyle(content).getPropertyValue("background-color");
         cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition as () => void);
+        if (isFullWidth) {
+            // make the content the same width of the button
+            content.style.width = `${button.value.offsetWidth}px`;
+        }
         const position = await getPosition();
         animateOpen(position);
     }
@@ -182,5 +186,5 @@ export function usePopOut(
         }
     });
 
-    return { currentLabel, isOpen, onButtonSelected };
+    return { currentLabel, isOpen, onButtonSelected, close };
 }

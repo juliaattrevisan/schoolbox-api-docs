@@ -59,15 +59,15 @@ class Controller extends Base
     private const LEARNOSITY_QUESTION_GROUP_PLANS = [
         'elite' => [
             'question_type_groups' => [
-                [ 'reference' => 'mcq' ],
-                [ 'reference' => 'cloze' ],
-                [ 'reference' => 'match' ],
-                [ 'reference' => 'writespeak' ],
-                [ 'reference' => 'highlight' ],
-                [ 'reference' => 'graph' ],
-                [ 'reference' => 'math' ],
-                [ 'reference' => 'chart' ],
-                [ 'reference' => 'chemistry' ],
+                ['reference' => 'mcq'],
+                ['reference' => 'cloze'],
+                ['reference' => 'match'],
+                ['reference' => 'writespeak'],
+                ['reference' => 'highlight'],
+                ['reference' => 'graph'],
+                ['reference' => 'math'],
+                ['reference' => 'chart'],
+                ['reference' => 'chemistry'],
                 [
                     'reference' => 'other',
                     'template_references' => [
@@ -78,9 +78,9 @@ class Controller extends Base
         ],
         'default' => [
             'question_type_groups' => [
-                [ 'reference' => 'mcq' ],
-                [ 'reference' => 'cloze' ],
-                [ 'reference' => 'match' ],
+                ['reference' => 'mcq'],
+                ['reference' => 'cloze'],
+                ['reference' => 'match'],
                 [
                     'reference' => 'writespeak',
                     'template_references' => [
@@ -89,8 +89,8 @@ class Controller extends Base
                         '4fe6c726-419c-4aff-b189-4a9756a0ffda',
                     ]
                 ],
-                [ 'reference' => 'highlight' ],
-                [ 'reference' => 'graph' ],
+                ['reference' => 'highlight'],
+                ['reference' => 'graph'],
                 [
                     'reference' => 'math',
                     'template_references' => [
@@ -100,8 +100,8 @@ class Controller extends Base
                         '7b810c2c-9100-4ff1-96de-cda23bf34445',
                     ]
                 ],
-                [ 'reference' => 'chart' ],
-                [ 'reference' => 'chemistry' ],
+                ['reference' => 'chart'],
+                ['reference' => 'chemistry'],
                 [
                     'reference' => 'other',
                     'template_references' => [
@@ -968,17 +968,19 @@ class Controller extends Base
                 /* Find all the comments for this attempt (need it later)
                  */
                 $attemptComments[$attempt->getUser()->getId()] = [
-                    'reference' => $attempt->getLearnosityReference(),
+                    'learnosityReference' => $attempt->getLearnosityReference(),
+                    'studentId' => $attempt->getUser()->getId(),
                     'comment' => $attempt->getComment()
                 ];
 
                 /* ...because Learnosity wants it in this format
                  */
                 $users[$key] = [
-                    'id' => (string)$attempt->getUser()->getId(),
+                    'id' => $attempt->getUser()->getId(),
                     'name' => $attempt->getUser()->getFullName(),
                     'firstname' => $attempt->getUser()->getFirstname(),
-                    'lastname' => $attempt->getUser()->getLastname()
+                    'lastname' => $attempt->getUser()->getLastname(),
+                    'elementId' => $key
                 ];
 
                 /* Collate a report payload for this attempt
@@ -1015,9 +1017,11 @@ class Controller extends Base
                 ];
 
                 $urls[$attempt->getUser()->getId()] = [
-                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
-                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'studentId' => $attempt->getUser()->getId(),
                     'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+                    'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
                 ];
             }
         }
@@ -1100,8 +1104,10 @@ class Controller extends Base
                 $learnosityReference = $response['response_id'];
 
                 $scores[$learnosityReference] = [
+                    'learnosityReference' => $learnosityReference,
                     'score' => $response['score'],
-                    'max' => $response['max_score']
+                    'maxScore' => $response['max_score'],
+                    'itemReference' => $response['item_reference']
                 ];
             }
         }
@@ -1110,23 +1116,26 @@ class Controller extends Base
          */
         $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
 
+        /* New donny thing - combine, restructure and rename vars
+         */
+        $students = array_values($users);
+        $itemResponses = array_values(array_merge_recursive($scores, $responseComments));
+        $attemptComments = array_values($attemptComments);
+        $urls = array_values($urls);
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
-            'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
-            'users' => $users,
-            'usersEncoded' => json_encode($users, JSON_THROW_ON_ERROR),
             'assessment' => $assessment,
+            'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
             'itemReferences' => $itemReferences,
-            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'responseComments' => base64_encode(json_encode($responseComments, JSON_THROW_ON_ERROR)),
+            'students' => $students,
+            'itemResponses' => $itemResponses,
             'attemptComments' => $attemptComments,
-            'attemptReferences' => json_encode(array_values($sessions), JSON_THROW_ON_ERROR),
-            'urls' => json_encode($urls, JSON_THROW_ON_ERROR)
+            'urls' => $urls
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
     }
-
 
     /**
      * Persists a new score back to Learnosity for it to re-tally

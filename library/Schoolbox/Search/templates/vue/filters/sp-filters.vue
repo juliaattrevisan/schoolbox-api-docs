@@ -107,16 +107,16 @@ window.Vue.watch(
                 @click="onSearch"
             />
         </div>
-        <div :class="`c-island c-filters l-flex-col  ${isOpen ? 'l-gap-m' : ''} l-pad-m`">
+        <div :class="`c-island filters l-flex-col  ${isOpen ? 'l-gap-m' : ''} l-pad-m`">
             <button
                 v-if="store.isSingleColumn"
-                :class="`c-filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                :class="`filters__toggle-button ${isOpen ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 @click.prevent="onToggleSelected"
             >
                 {{ titleText }}
             </button>
-            <div class="c-filters__container" :style="{ 'grid-template-rows': containerHeight }">
-                <div class="c-filters__inner-container l-flex-col l-gap-m">
+            <div class="filters__container" :style="{ 'grid-template-rows': containerHeight }">
+                <div class="filters__inner-container l-flex-col l-gap-m">
                     <sp-filter-date-range />
                     <sp-filter-creator />
                     <sp-filter-types />
@@ -143,10 +143,7 @@ window.Vue.watch(
 </template>
 
 <style lang="scss" scoped>
-.c-island {
-    background-color: var(--foreground-colour);
-}
-.c-filters {
+.filters {
     &__container {
         display: grid;
         transition: grid-template-rows 300ms;

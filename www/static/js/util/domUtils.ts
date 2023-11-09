@@ -19,6 +19,28 @@ export function getIndex(element: HTMLElement) {
 }
 
 /**
+ * remove all targeted elements from a container
+ * @param {HTMLElement} element - the DOM element to display none all children
+ * @param {string} selector - the selector to use to find the children
+ */
+export function removeAllFromElement(element: HTMLElement, selector: string) {
+    const elements = element.querySelectorAll(selector);
+    Array.from(elements).forEach((elementItem) => {
+        elementItem.remove();
+    });
+}
+
+/**
+ * display none all children
+ * @param {HTMLElement} element - the DOM element to display: none all children
+ */
+export function hideAllChildren(element: HTMLElement) {
+    Array.from(element.children).forEach((elementItem) => {
+        (elementItem as HTMLDivElement).style.display = "none";
+    });
+}
+
+/**
  * empty the element of children
  * replacement for $(el).empty
  * @param {HTMLElement} element - the DOM element to empty

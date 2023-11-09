@@ -19,6 +19,37 @@
     margin-left: 0;
 }
 
+/* remove the relevant disabled styles on a student response elements within horizontal marking */
+.lrn_response_wrapper :disabled,
+.lrn_response_wrapper input[type="checkbox"]:not(.plain):disabled + label,
+.lrn_response_wrapper input[type="radio"]:not(.plain):disabled + label,
+.lrn_response_wrapper input[type="checkbox"][readonly]:not(.plain) + label,
+.lrn_response_wrapper input[type="radio"][readonly]:not(.plain) + label {
+    opacity: 1;
+}
+
+/* remove the relevant disabled styles on a student response elements within horizontal marking */
+.lrn_response_wrapper input:disabled,
+.lrn_response_wrapper input[disabled],
+.lrn_response_wrapper input[readonly],
+.lrn_response_wrapper textarea:disabled,
+.lrn_response_wrapper textarea[disabled],
+.lrn_response_wrapper textarea[readonly],
+.lrn_response_wrapper select:disabled,
+.lrn_response_wrapper select[disabled],
+.lrn_response_wrapper select[readonly] {
+    background-color: transparent;
+    color: #000;
+}
+
+/* remove the relevant disabled styles on a student response elements within horizontal marking */
+.lrn_response_wrapper input:not([type]):disabled,
+.lrn_response_wrapper input[type="text"]:disabled,
+.lrn_response_wrapper input[type="number"]:disabled,
+.lrn_response_wrapper textarea:disabled {
+    background-color: transparent;
+}
+
 /* change the accessibility modal button colour */
 .lrn-assess .lrn-dialogs-close-btn:after,
 .lrn-assess .lrn-dialogs-close-btn:before {

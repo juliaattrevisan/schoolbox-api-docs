@@ -1,6 +1,6 @@
 /*
     Layout classes to quickly apply standardised gap without having
-    to explicity define a class for it.
+    to explicitly define a class for it.
  */
 
 @use "sass:list";
@@ -21,4 +21,8 @@
     @media #{$small-only} {
         gap: var(--spacing-m);
     }
+}
+
+.l-gap--0 {
+    gap: 0;
 }
