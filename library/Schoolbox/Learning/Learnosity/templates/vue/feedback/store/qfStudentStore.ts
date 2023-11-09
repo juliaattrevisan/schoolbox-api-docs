@@ -33,13 +33,13 @@ export const useStudentStore = defineStore("qfStudent", () => {
      * store any passed through properties
      * @param {Student} $student - the student
      * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptComment[]} $attemptComments - the attempt responses
+     * @param {StudentAttemptComment} $attemptComment - the attempt responses
      * @param {StudentUrls} $urls - the urls
      */
     function init(
         $student: Student,
         $itemResponses: StudentItemQuestionResponse[],
-        $attemptComments: StudentAttemptComment[],
+        $attemptComment: StudentAttemptComment,
         $urls: StudentUrls
     ) {
         student.value = {
@@ -50,7 +50,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             items: [],
         };
         itemResponses.value = $itemResponses;
-        attemptComments.value = $attemptComments;
+        // attemptComments.value = $attemptComments;
         urls.value = $urls;
     }
 

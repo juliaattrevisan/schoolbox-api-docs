@@ -9,6 +9,7 @@
 // import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
 // import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import { useStore } from "./store/quizFeedbackStore";
+import { useStudentStore } from "./store/qfStudentStore";
 import { loadReport } from "./util/loadReport";
 import QfStudent from "./student/qf-student.vue";
 
@@ -30,6 +31,7 @@ const store = useStore();
  */
 window.Vue.onMounted(async () => {
     store.init(props.statusPage);
+    useStudentStore().init(props.student, props.itemResponses, props.attempt, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions);
 });
