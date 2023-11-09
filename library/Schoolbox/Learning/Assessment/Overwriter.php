@@ -23,6 +23,8 @@ use Schoolbox\User;
 
 /**
  * Helper class for overwriting one assessment with the content of another.
+ *
+ * TODO merge this with Replicator: there's a lot of shared code
  */
 class Overwriter
 {
@@ -91,6 +93,8 @@ class Overwriter
                 ->setCloseAt(null);
         }
 
+        $this->preprocessQuiz($destination);
+
         // Delete quiz constituents and rubric
         $this->deleteDueWorkRubric($updatedDestination);
 
@@ -109,6 +113,26 @@ class Overwriter
         $this->replicateQuizConstituents($source, $updatedDestination, $newOwner);
 
         return $updatedDestination;
+    }
+
+
+    /**
+     * Preprocess `$destination` if it's a quiz: setting its Learnosity
+     * references to null, and its job status to Pending.
+     *
+     * @param IAssessable $destination
+     * @return void
+     */
+    private function preprocessQuiz(IAssessable $destination): void
+    {
+        if (!$destination instanceof Quiz) {
+            return;
+        }
+        $destination
+            ->setLearnosityReference(null)
+            ->setLearnosityJobReference(null)
+            ->setLearnosityJobStatus(Quiz::LEARNOSITY_JOB_STATUS_PENDING)
+        ;
     }
 
 

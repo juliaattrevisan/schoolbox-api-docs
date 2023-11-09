@@ -85,6 +85,8 @@ class Replicator
             $newAssessment->setSequence($sequence);
         }
 
+        $this->preprocessQuiz($newAssessment);
+
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
         $destinationContext->getAssessables()->add($newAssessment);
 
@@ -95,6 +97,26 @@ class Replicator
         $this->replicateQuizConstituents($source, $newAssessment, $newOwner);
 
         return $newAssessment;
+    }
+
+
+    /**
+     * Preprocess `$destination` if it's a quiz: setting its Learnosity
+     * references to null, and its job status to Pending.
+     *
+     * @param IAssessable $destination
+     * @return void
+     */
+    private function preprocessQuiz(IAssessable $destination): void
+    {
+        if (!$destination instanceof Quiz) {
+            return;
+        }
+        $destination
+            ->setLearnosityReference(null)
+            ->setLearnosityJobReference(null)
+            ->setLearnosityJobStatus(Quiz::LEARNOSITY_JOB_STATUS_PENDING)
+        ;
     }
 
 
