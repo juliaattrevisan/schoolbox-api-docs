@@ -162,8 +162,8 @@ document.getElementById("container").classList.add("c-container");
         }
     }
 
-    let reportsApp = LearnosityReports.init(
-        {{ initOptions | raw }}, reportCallback
-    );
+    {# let reportsApp = LearnosityReports.init(
+        {{ reportInitOptions | raw }}, reportCallback
+    ); #}
 </script>
 {% endautoescape %}

@@ -5,6 +5,7 @@
 
 import { useStore } from "./store/quizFeedbackStore";
 import { loadReport } from "./util/loadReport";
+import QfStudent from "./student/qf-student.vue";
 
 interface Props {
     title: string; // the title of the quiz
@@ -23,13 +24,18 @@ const store = useStore();
  */
 window.Vue.onMounted(async () => {
     store.init(props.statusPage);
-    // await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
-    // loadReport(props.reportInitOptions);
+    await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
+    loadReport(props.reportInitOptions);
 });
 </script>
 
 <template>
-    <div></div>
+    <div class="l-flex-col l-gap-l f-no-margins">
+        <!-- Title. But add the metadata etc. when you get up to that bit -->
+        <h1>Feedback for {{ props.title }}</h1>
+        <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
+        <qf-student />
+    </div>
 </template>
 
 <style>

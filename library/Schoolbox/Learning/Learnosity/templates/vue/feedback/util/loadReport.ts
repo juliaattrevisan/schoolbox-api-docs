@@ -49,23 +49,24 @@ export function loadReport(initOptions: object) {
             attemptReport.on("ready:itemsApi", (itemsApp) => {
                 // Load the items for the student
                 itemsApp.getItems(($items: object) => {
-                    const items: Item[] = [];
-                    // grab each item object and push it into the items array
-                    Object.values($items).forEach((item: Item) => {
-                        items.push(item);
-                    });
-                    useStudentsStore().addItems(reportId, items);
+                    debugger;
+                    // const items: Item[] = [];
+                    // // grab each item object and push it into the items array
+                    // Object.values($items).forEach((item: Item) => {
+                    //     items.push(item);
+                    // });
+                    // useStudentsStore().addItems(reportId, items);
 
-                    addTargetsToMarks(reportId);
+                    // addTargetsToMarks(reportId);
 
-                    // add the questions to the items, as they aren't included in the initial payload
-                    if (i === 0) {
-                        useItemsStore().addQuestions(items);
-                    }
+                    // // add the questions to the items, as they aren't included in the initial payload
+                    // if (i === 0) {
+                    //     useItemsStore().addQuestions(items);
+                    // }
                 });
 
                 // to notify the report has loaded
-                useStudentsStore().reportLoaded(reportId);
+                // useStudentsStore().reportLoaded(reportId);
             });
         },
     };
