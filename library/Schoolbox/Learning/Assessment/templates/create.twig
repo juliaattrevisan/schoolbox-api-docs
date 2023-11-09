@@ -141,15 +141,6 @@
                  {% endif %}</h1>
          </div>
      </div>
-     {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}
-    {% if assessment is defined and assessment is quiz %}
-    <nav>
-        <sbx-pop-out content-id="header-options"></sbx-pop-out>
-    </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content="">
-        <li><a href="#" id="import" data-reveal-id="import-modal" class="icon-import">Import from XML file</a></li>
-    </ul>
-    {% endif %}
 </div>
 
 
@@ -212,23 +203,6 @@
         </form>
     </div>
 </div>
-
-
-{# TODO - This should be in the quiz fragment, not the parent, but that doesn't work because you can't have a form
-in a form. The template hierachy should be refactored so that quiz EXTENDS the parent, rather than being included.
-#}
-{% if importAttachzone is defined %}
-    <div id="import-modal" class="reveal-modal" data-reveal="">
-        <form action="/assess/import/xml/{{ context.folder.id }}" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="context_type" value="{{ contextType }}">
-            <input type="hidden" name="context_id" value="{{ context.id }}">
-            {% include 'sub/attachzone.twig' with { attachzone: importAttachzone } %}
-            <label>
-                <input type="submit" value="Import from XML file">
-            </label>
-        </form>
-    </div>
-{% endif %}
 
 {# Participation modal w/ form. Must live outside of main form as per above #}
 {% include '@learningAssessment/fragments/participationModal.twig' %}

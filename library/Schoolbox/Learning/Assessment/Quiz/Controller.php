@@ -37,7 +37,6 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -172,7 +171,7 @@ class Controller extends Assessment\Controller
         $returnUrlSuffix = Redirect::queryString($baseUrl);
 
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
 
             /* Need this suffix so we can return to the status screen after
@@ -226,8 +225,10 @@ class Controller extends Assessment\Controller
          */
         $sebDownload = $this->getRouteIfAuthorized(
             'learningAssessment.getSebDownload',
-            ['assessment' => $assessment,
-             'assessmentId' => $assessment->getId()]
+            [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId()
+            ]
         );
 
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
@@ -310,7 +311,7 @@ class Controller extends Assessment\Controller
             'plan' => $plan,
             /* All the older summary screen stuff is below
              */
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             /* What is this andyland stuff?
              */
             // User may only attempt quiz from here if viewing own summary
@@ -402,17 +403,6 @@ class Controller extends Assessment\Controller
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         $data['acceptingResponses'] = true;
-        $data['importAttachzone']   = (new Zone('importXml'))
-            ->setFileVar('importXml[]')
-            ->setThumbnailSize(64)
-            ->setModalTitle('Select XML')
-            ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload XML')
-            ->setMimeFilter('text/xml,application/xml')
-            ->setReadOnly(false)
-            ->setMulti(false)
-            ->useImportExpiryDate()
-            ->getTwigContext();
         return $data;
     }
 
