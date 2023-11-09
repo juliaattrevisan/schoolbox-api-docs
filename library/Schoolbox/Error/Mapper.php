@@ -212,6 +212,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     public const ERROR_INSTALLATION_FAILED = 232;
 
+    public const ERROR_PASTORAL_NO_EXTERNAL_ID = 233;
 
     /**
      * Setup mapping

@@ -1436,15 +1436,11 @@ class Controller extends Base
      */
     private function assertSyncability(): void
     {
-        $message = 'Your user account does not have an external ID, and thus cannot create or modify pastoral records.';
-        if (!$this->getUser()->isSuperuser()) {
-            $message .= ' Please contact your Schoolbox administrator.';
-        }
         if (
             ($this->getUser()->getExternalId() ?? '') === '' &&
             $this->config->get(ConfigMapper::NAME_EXTERNAL_PASTORAL)
         ) {
-            throw $this->errorMapper->generateException(null, null, $message);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NO_EXTERNAL_ID);
         }
     }
 }
