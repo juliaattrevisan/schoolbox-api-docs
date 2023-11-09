@@ -15,12 +15,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Codec\Test;
 
-use \Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
+use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use PHPUnit\Framework\TestCase;
 
 class UserIdentifierTest extends TestCase
 {
-
     /**
      * @dataProvider providerValidUserIdentifier
      * @param mixed $instanceId

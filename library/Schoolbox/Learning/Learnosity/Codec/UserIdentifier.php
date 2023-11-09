@@ -19,7 +19,7 @@ class UserIdentifier
      * Take an instance id and a user id, and make something school-specific
      * out of it. One day it might not be this user id, but some other
      * identifying value like their hash or token or something
-     * 
+     *
      * @param string $instanceId
      * @param string|int $userId
      * @return string
