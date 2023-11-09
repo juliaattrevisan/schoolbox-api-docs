@@ -122,7 +122,6 @@ window.Vue.onBeforeUnmount(async () => {
 
 <template>
     <div class="l-flex-col l-gap-m l-pad-m--bottom question">
-        <h3>Question</h3>
         <div ref="responsesEl"></div>
         <div v-if="props.question.metadata.sample_answer">
             <label>Sample answer</label>
