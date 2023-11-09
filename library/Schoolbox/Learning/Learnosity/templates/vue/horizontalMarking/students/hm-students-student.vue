@@ -86,6 +86,7 @@ window.Vue.watch(
             onComplete: () => {
                 // otherwise the ckeditor pop outs can be hidden
                 if (props.student.isExpanded) {
+                    studentInnerContainerEl.value?.style.setProperty("overflow", "visible");
                     responseInnerContainerEl.value?.style.setProperty("overflow", "visible");
                 }
             },
