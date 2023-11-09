@@ -4,7 +4,7 @@
 
 import { defineStore } from "pinia";
 
-export const useStore = defineStore("horizontalMarking", () => {
+export const useStore = defineStore("quizFeedback", () => {
     const isProcessing = window.Vue.ref<boolean>(false); // to disable various events while processing, like trying to mark the next card before the current one has finished marking
     const isLoaded = window.Vue.ref<boolean>(false); // to show the loading spinner while the reports are loading
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal

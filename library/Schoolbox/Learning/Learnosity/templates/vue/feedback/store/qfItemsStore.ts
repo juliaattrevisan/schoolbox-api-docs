@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import type { Item } from "@schoolboxLearnosity/js/types/Item";
 
-export const useItemsStore = defineStore("hmItems", () => {
+export const useItemsStore = defineStore("qfItems", () => {
     const items = window.Vue.ref<Item[]>([]);
 
     /**
@@ -14,7 +14,7 @@ export const useItemsStore = defineStore("hmItems", () => {
      * @param {Item[]} $items - the items to reference
      */
     function addItems($items: Item[]) {
-        items.values = $items;
+        items.value = $items;
         // only show those items with questions and the final review
         items.value = items.value.filter((item) => item.questions.length > 0 || item.isAttemptComment);
     }

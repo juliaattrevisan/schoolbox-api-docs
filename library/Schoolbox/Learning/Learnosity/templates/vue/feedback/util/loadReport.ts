@@ -2,9 +2,9 @@
  * To load the reports data and pass it to the other stores
  */
 
-// import type { Item } from "@schoolboxLearnosity/js/types/Item";
+import type { Item } from "@schoolboxLearnosity/js/types/Item";
 import { useItemsStore } from "../store/qfItemsStore";
-// import { useStudentsStore } from "../store/hmStudentsStore";
+// import { useStudentStore } from "../store/qfStudentStore";
 
 /**
  * To move the marks (which are in the title div) out of the response container into <hm-students-student-mark>
@@ -50,10 +50,11 @@ export function loadReport(initOptions: object) {
                         items.push(item);
                     });
                     useItemsStore().addItems(items);
+                    // useStudentStore().addItems(items);
                     addTargetsToMarks(reportId);
                 });
                 // to notify the report has loaded
-                // useStudentsStore().reportLoaded(reportId);
+                // useStudentStore().reportLoaded();
             });
         },
     };
