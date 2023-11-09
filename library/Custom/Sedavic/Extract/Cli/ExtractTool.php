@@ -387,55 +387,10 @@ HELP;
              * from the previous iteration.
              */
             if (null !== $lastAssessmentInfo && $lastAssessmentInfo['assessmentSpecId'] !== $assessmentInfo['assessmentSpecId']) {
-                $this->getLogger()->debug(sprintf(
-                    'Was previously looking at %s; now looking at %s.',
-                    $lastAssessmentInfo['assessmentSpecId'],
-                    $assessmentInfo['assessmentSpecId']
-                ));
+                $this->backfillUnmarked($lastAssessmentInfo, $assessmentInfo, $studentList, $outstream);
 
-                /* Find everyone who didn't get a feedback for $lastAssessmentInfo['assessmentSpecId'],
-                 * find their context/curriculum nodes,
-                 * and push them through the same combine() method
+                /* Reset student list for next assessment
                  */
-
-                /* Find all the ancestry info about the assessment: course, unit
-                 */
-                $context = $this->contextLookup->find((int)$lastAssessmentInfo['assessment_id']);
-
-                /* Feedback data
-                 */
-                $feedback = [
-                    'normalised' => '',
-                    'humanReadable' => '',
-                ];
-
-                /* Curriculum nodes
-                 */
-                $curriculumNodes = $this->findCurriculumNodes((int)$lastAssessmentInfo['assessmentSpecId']);
-
-                foreach ($studentList as $externalId => $data) {
-                    $this->getLogger()->debug(sprintf(
-                        'Backfilling unfeedbacked student %s %s %s',
-                        $externalId,
-                        $data['firstname'],
-                        $data['lastname']
-                    ));
-
-                    /* Manufacture a placeholder payload containing students' data for
-                     * those who didn't get feedback
-                     */
-                    $temp = $data;
-                    $temp['title'] = $lastAssessmentInfo['title'];
-
-                    /* Combine all that into a set of csv rows
-                     */
-                    $rows = $this->combine($temp, $curriculumNodes, $context, $feedback);
-
-                    /* Pump it to an fputcsv
-                     */
-                    $this->outputRows($rows, $outstream);
-                }
-
                 $studentList = null;
 
                 /* Artificial circuit breaker
@@ -493,6 +448,10 @@ HELP;
             $lastAssessmentInfo = $assessmentInfo;
         }
 
+        /* Anyone unmarked after the last iteration
+         */
+        $this->backfillUnmarked($lastAssessmentInfo, null, $studentList, $outstream);
+
         /* Gather some stats
          */
         $end = microtime(true);
@@ -514,6 +473,70 @@ HELP;
         }
 
         exit;
+    }
+
+
+    /**
+     * Everyone in $studentList left standing needs to be added with empty placeholder values.
+     *
+     * @param array $lastAssessmentInfo
+     * @param array|null $assessmentInfo
+     * @param array $studentList
+     * @param $outstream
+     * @return void
+     * @throws Exception
+     * @throws \RuntimeException
+     */
+    private function backfillUnmarked(array $lastAssessmentInfo, ?array $assessmentInfo, array $studentList, $outstream): void
+    {
+        $this->getLogger()->debug(sprintf(
+            'Was previously looking at %s; now looking at %s.',
+            $lastAssessmentInfo['assessmentSpecId'],
+            $assessmentInfo['assessmentSpecId'] ?? 'last iteration'
+        ));
+
+        /* Find everyone who didn't get a feedback for $lastAssessmentInfo['assessmentSpecId'],
+         * find their context/curriculum nodes,
+         * and push them through the same combine() method
+         */
+
+        /* Find all the ancestry info about the assessment: course, unit
+         */
+        $context = $this->contextLookup->find((int)$lastAssessmentInfo['assessment_id']);
+
+        /* Feedback data
+         */
+        $feedback = [
+            'normalised' => '',
+            'humanReadable' => '',
+        ];
+
+        /* Curriculum nodes
+         */
+        $curriculumNodes = $this->findCurriculumNodes((int)$lastAssessmentInfo['assessmentSpecId']);
+
+        foreach ($studentList as $externalId => $data) {
+            $this->getLogger()->debug(sprintf(
+                'Backfilling unfeedbacked student %s %s %s',
+                $externalId,
+                $data['firstname'],
+                $data['lastname']
+            ));
+
+            /* Manufacture a placeholder payload containing students' data for
+             * those who didn't get feedback
+             */
+            $temp = $data;
+            $temp['title'] = $lastAssessmentInfo['title'];
+
+            /* Combine all that into a set of csv rows
+             */
+            $rows = $this->combine($temp, $curriculumNodes, $context, $feedback);
+
+            /* Pump it to an fputcsv
+             */
+            $this->outputRows($rows, $outstream);
+        }
     }
 
 
