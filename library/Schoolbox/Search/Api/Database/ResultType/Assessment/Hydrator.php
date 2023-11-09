@@ -69,6 +69,7 @@ class Hydrator extends BaseHydrator
 
     /**
      * @inheritdoc
+     * @throws RouteNotFound
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
@@ -88,11 +89,12 @@ class Hydrator extends BaseHydrator
         //    Students
         //     - Should only see assessments in their own classes/groups
         //     - Should only see assessments that they have not been excluded from
-        //     - Should only see assessments that have reached there open date
+        //     - Should only see assessments that have reached their open date
         //    Staff
         //     - Should see assessments in their own classes
         //     - Should see assessments in units that they have permission to access
-        // The Visibility class is relied on to check the above conditions.
+        // The Visibility class is relied on to check (most of the) above conditions.  However, it was found that this
+        // check is insufficient, so more permission checks have been added below.
         $mutator = new AssessmentListMutator($viewer, new Visibility($this->access), Alaress_Date_Format::now(), true);
         $assessments = $assessments
             ->map([$mutator, 'map'])
@@ -123,6 +125,27 @@ class Hydrator extends BaseHydrator
                 $assessment = $assessments->getBy('id', $match->id);
 
                 if (!($assessment instanceof IAssessable)) {
+                    return null;
+                }
+
+                // This permissions check was added because the Visibility check above was found to be insufficient.
+                // From permissions summary above:
+                //    Students
+                //     - Should only see assessments that have reached their open date
+                if ($viewer->getRole()->isStudent() && $assessment->getOpenAt()?->isFuture()) {
+                    return null;
+                }
+
+                $route = 'learningAssessment.getSummary';
+                $params = [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                    'studentId' => $viewer->getId(),
+                    'student' => $viewer
+                ];
+
+                // This permissions check was added because the Visibility check above was found to be insufficient.
+                if (!$this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
                     return null;
                 }
 
@@ -190,9 +213,7 @@ class Hydrator extends BaseHydrator
                     $match,
                     $match->id,
                     $assessment->getTitle(),
-                    $this->buildBaseUrl()
-                         ->withPath("/learning/assessments/{$assessment->getId()}")
-                         ->__toString(),
+                    $this->routeGenerator->generate($route, $params),
                     $match->type,
                     $match->relevance,
                     $assessment->getUpdatedAt(),
