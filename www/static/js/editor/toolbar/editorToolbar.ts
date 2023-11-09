@@ -7,7 +7,6 @@ import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 
 /**
  * Display the toolbar options based on config
- *
  * @param { EditorConfig } config - the config to use when creating the editor
  * @returns { Array } - the toolbar display
  */

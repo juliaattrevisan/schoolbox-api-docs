@@ -2,7 +2,7 @@
  * To create a default CKEditor instances
  */
 
-import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
@@ -31,7 +31,6 @@ async function onCreated(sourceElement: HTMLElement, editor: Editor, config: Edi
 
 /**
  * set up any default config when it's not been defined
- *
  * @param { EditorConfig } config - the config to use when creating the editor
  */
 function addDefaultConfig(config: EditorConfig) {
@@ -52,7 +51,7 @@ function create(sourceElement: HTMLElement, config: EditorConfig) {
     addDefaultConfig(config);
     ClassicEditor.create(sourceElement, getConfig(config))
         .then((editor) => {
-            onCreated(sourceElement, editor, config);
+            void onCreated(sourceElement, editor, config);
         })
         .catch((error) => {
             console.error(error.stack);
@@ -98,28 +97,36 @@ function onDelete(event: CustomEvent) {
     const eventDetail = event.detail as EditorDeleteEventInfo;
     const sourceElement = eventDetail.editor.sourceElement as HTMLTextAreaElement;
 
-    const keyOfEditorToDelete = (
-        (sourceElement.id !== undefined) ? sourceElement.id :
-        ((sourceElement.name !== undefined) ? sourceElement.name : null)
-    );
+    let keyOfEditorToDelete = null;
+    if (sourceElement.id !== undefined) {
+        keyOfEditorToDelete = sourceElement.id;
+    } else if (sourceElement.name !== undefined) {
+        keyOfEditorToDelete = sourceElement.name;
+    }
 
     if (keyOfEditorToDelete !== null) {
         if (window.sbProps.editors[keyOfEditorToDelete] === undefined) {
-            throw new Error('Editor with key "' + keyOfEditorToDelete + '" does not exist in window.sbProps.editors.');
+            throw new Error(`Editor with key ${keyOfEditorToDelete} does not exist in window.sbProps.editors.`);
         }
 
-        window.sbProps.editors[keyOfEditorToDelete].destroy();
+        void window.sbProps.editors[keyOfEditorToDelete].destroy();
         delete window.sbProps.editors[keyOfEditorToDelete];
 
-        document.dispatchEvent(new CustomEvent("EDITOR__DELETED", {
-            detail: {
-                keyOfDeletedEditor: keyOfEditorToDelete,
-                containingFormId:'lesson-plan-template-form',
-                submitButtons: [document.getElementById('save-button')]
-            }
-        }));
+        document.dispatchEvent(
+            new CustomEvent("EDITOR__DELETED", {
+                detail: {
+                    keyOfDeletedEditor: keyOfEditorToDelete,
+                    containingFormId: "lesson-plan-template-form",
+                    submitButtons: [document.getElementById("save-button")],
+                },
+            })
+        );
     }
 }
 
-document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
-document.addEventListener(EditorEvent.EDITOR__DELETE, onDelete);
+document.addEventListener(EditorEvent.EDITOR__CREATE, (event) => {
+    onCreate(event as CustomEvent);
+});
+document.addEventListener(EditorEvent.EDITOR__DELETE, (event) => {
+    onDelete(event as CustomEvent);
+});

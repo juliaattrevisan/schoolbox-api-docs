@@ -3,12 +3,15 @@
  * dragged and dropped into the editor
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
 import { slideUp } from "@js/util/animateUtils";
 import { isHtmlIncluded } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { addResource } from "@js/editor/plugin/resource/resourceUtils";
+import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import type { FileLoader, FileRepository } from "@ckeditor/ckeditor5-upload/";
+import type { ClipboardInputEventData } from "@ckeditor/ckeditor5-clipboard/src/clipboardobserver";
 
 export default class ResourceEditing extends Plugin {
     totalUploadCount = 0; // the total number of files to upload
@@ -26,10 +29,10 @@ export default class ResourceEditing extends Plugin {
         if (config.toolbar === EditorToolbar.SIMPLE) {
             return;
         }
-        const editor = this.editor;
+        const { editor } = this;
         const fileRepository = editor.plugins.get("FileRepository");
-        const resourceUI = editor.plugins.get("ResourceUI");
-        editor.editing.view.document.on("clipboardInput", (event, data) => {
+        const resourceUI = editor.plugins.get("ResourceUI") as ResourceUI;
+        editor.editing.view.document.on("clipboardInput", (event, data: ClipboardInputEventData) => {
             /**
              * Skip if non empty HTML data is included.
              * https://github.com/ckeditor/ckeditor5-upload/issues/68
@@ -55,7 +58,7 @@ export default class ResourceEditing extends Plugin {
                 this.uploadedCount = 0;
                 this.editor.enableReadOnlyMode("auto-resource");
                 files.forEach((file) => {
-                    this.loadResource(fileRepository, resourceUI, file as File);
+                    void this.loadResource(fileRepository, resourceUI, file as File);
                 });
             });
         });
@@ -65,31 +68,34 @@ export default class ResourceEditing extends Plugin {
      * Add an element to display the upload progress of the resource.
      * Once the resource is uploaded the upload element display is closed.
      * If there's an error the display will change to an error state.
-     *
      * @param { FileRepository } fileRepository - the file repository
      * @param { ResourceUI } resourceUI - the resource UI plugin
      * @param { File } file - the file to upload
      */
-    async loadResource(fileRepository, resourceUI, file: File) {
-        const uploadElement = resourceUI.getUploadElement(file, this.onCloseClicked);
+    async loadResource(fileRepository: FileRepository, resourceUI: ResourceUI, file: File) {
+        const uploadElement = resourceUI.getUploadElement(file);
         resourceUI.checkUploadContainer();
-        const progressMeter = uploadElement.querySelector("[data-progress-meter]");
-        const loader = fileRepository.createLoader(file);
+        const progressMeter = uploadElement.querySelector("[data-progress-meter]") as HTMLDivElement;
+        const loader = fileRepository.createLoader(file) as FileLoader;
         try {
-            loader.on("change:uploadedPercent", (event, name, value) => (progressMeter.style.width = `${value}%`));
+            loader.on("change:uploadedPercent", (event, name, value: number) => {
+                progressMeter.style.width = `${value}%`;
+            });
             // www/static/js/editor/plugin/uploadAdapter/UploadAdapter.ts is the adapter that uploads files to the server
             const resource: Resource = await loader.upload();
             addResource(this.editor, resource);
-            this.removeUploadProgress(uploadElement);
+            await this.removeUploadProgress(uploadElement);
         } catch (error) {
             resourceUI.showUploadErrorElement(
                 uploadElement,
                 "Sorry, the file could not be uploaded as an unknown error has occurred."
             );
-            const remove = uploadElement.querySelector("[data-remove-upload]");
-            remove.addEventListener("click", () => this.removeUploadProgress(uploadElement));
+            const remove = uploadElement.querySelector("[data-remove-upload]") as HTMLDivElement;
+            remove.addEventListener("click", () => {
+                void this.removeUploadProgress(uploadElement);
+            });
         } finally {
-            this.uploadedCount++;
+            this.uploadedCount += 1;
             if (this.uploadedCount === this.totalUploadCount) {
                 this.editor.disableReadOnlyMode("auto-resource");
             }
@@ -100,12 +106,11 @@ export default class ResourceEditing extends Plugin {
     /**
      * To remove the upload progress element, removing the upload container if
      * there are no more uploads in progress
-     *
      * @param { HTMLDivElement } uploadElement - the element to remove
      */
-    async removeUploadProgress(uploadElement) {
+    async removeUploadProgress(uploadElement: HTMLDivElement) {
         await slideUp(uploadElement);
         uploadElement.remove();
-        this.editor.plugins.get("ResourceUI").checkUploadContainer();
+        (this.editor.plugins.get("ResourceUI") as ResourceUI).checkUploadContainer();
     }
 }

@@ -1,6 +1,5 @@
 /**
  * Returns the settings for the links
- *
  * @returns { object } - the links settings
  */
 export function getLinkSettings() {
@@ -35,7 +34,6 @@ export function getLinkSettings() {
  * This is required so the CKEditor 4 / CKeditor 5 'open in new tab' UI are kept consistent
  * As the rel attribute previously wasn't allowed in CKEditor 4, we can be sure that it won't exist in any existing data
  * We also check for 'noreferrer noopener' as twigs 'purify' method converts 'noopener noreferrer' to 'noreferrer noopener'
- *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - the sourceElement content as HTML with the rel attribute added to any links that have the target attribute set to _blank
  */

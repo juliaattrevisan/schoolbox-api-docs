@@ -2,18 +2,21 @@
  * Handles the insertion of a resource into the editor
  */
 
-import Command from "@ckeditor/ckeditor5-core/src/command";
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import { Command, type Editor } from "@ckeditor/ckeditor5-core";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
+import LinkUI from "@js/editor/plugin/link/LinkUI";
 
 export default class InsertResourceLinkCommand extends Command {
+    /**
+     * Whether the button is on or off
+     */
+    public declare isOn: boolean;
     messageBinding; // as .bind() returns a new function object, we need to store it in a variable
 
     /**
      * To open the Resource modal and insert the selected resource into the editor
-     *
      * @param { Editor } editor - the editor instance
      */
     constructor(editor: Editor) {
@@ -35,7 +38,7 @@ export default class InsertResourceLinkCommand extends Command {
      * we use the same method as the image command to determine
      */
     refresh() {
-        const linkCommand = this.editor.commands.get("link");
+        const linkCommand = this.editor.commands.get("link") as Command;
         this.isEnabled = linkCommand.isEnabled;
     }
 
@@ -44,8 +47,8 @@ export default class InsertResourceLinkCommand extends Command {
      */
     displayModal() {
         /**
-         * Ensure that selected files are not recieved by other event listeners made by other schoolboxResource functions on the page
-         * For example, this prevents file drops from recieving the file selected in the editor.
+         * Ensure that selected files are not received by other event listeners made by other schoolboxResource functions on the page
+         * For example, this prevents file drops from receiving the file selected in the editor.
          */
         $(window).unbind("message");
         /**
@@ -54,7 +57,7 @@ export default class InsertResourceLinkCommand extends Command {
         $.fn.schoolboxResource({
             allowedFilesystems: "link",
             allowedFiles: null,
-            fileBrowserCategoryId: this.editor.config.get("sbConfig").fileBrowserCategoryId,
+            fileBrowserCategoryId: (this.editor.config.get("sbConfig") as EditorConfig).fileBrowserCategoryId,
             onBeforeOpen: () => {
                 this.set("isOn", true);
                 this.messageBinding = this.onResourceReturned.bind(this);
@@ -78,11 +81,10 @@ export default class InsertResourceLinkCommand extends Command {
 
     /**
      * Update the link in the LinkUI to the selected resource
-     *
      * @param { string } value - the value to update the link to
      */
     updateLink(value: string) {
-        const linkUI = this.editor.plugins.get("LinkUI");
+        const linkUI = this.editor.plugins.get("LinkUI") as LinkUI;
         linkUI.formView.urlInputView.fieldView.focus();
         linkUI.formView.urlInputView.fieldView.value = value;
     }
@@ -90,7 +92,6 @@ export default class InsertResourceLinkCommand extends Command {
     /**
      * Get the resource information from the server and
      * then insert the link into the editor
-     *
      * @param { string } hash - the hash of the stored file
      */
     async getResourceInfo(hash: string) {
@@ -101,7 +102,7 @@ export default class InsertResourceLinkCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            const src = getSrc(resource, this.editor.config.get("sbConfig") as EditorConfig);
+            const src = getSrc(resource, this.editor.config.get("sbConfig") as EditorConfig) as string;
             this.updateLink(src);
         } catch (error) {
             console.error(error);
@@ -111,7 +112,6 @@ export default class InsertResourceLinkCommand extends Command {
 
     /**
      * Handle the returned resource from the resource modal
-     *
      * @param { MessageEvent } event - the event
      */
     onResourceReturned(event: MessageEvent) {

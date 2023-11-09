@@ -3,7 +3,7 @@
  * and add the toggleFullWidth command to the editor
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
 import ToggleFullWidthCommand from "./ToggleFullWidthCommand";
 
 export default class FullWidthEditing extends Plugin {

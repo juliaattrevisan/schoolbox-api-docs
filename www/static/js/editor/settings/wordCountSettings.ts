@@ -1,4 +1,4 @@
-import { ClassicEditor } from "@ckeditor/ckeditor5-build-classic";
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import { EditorEvent, EditorDeletedEventInfo } from "@js/editor/event/editorEvent";
 import { insertElementAfter } from "@js/util/domUtils";

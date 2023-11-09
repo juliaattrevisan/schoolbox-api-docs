@@ -2,6 +2,12 @@
  * This is primarily a copy of the original LinkUI plugin from CKEditor 5
  * modified to display a browse button that opens our resource modal to select
  * a resource to link to
+ *
+ * Changes:
+ *  - Update all imports to "@ckeditor/" equivalents
+ *  - Change LinkFormView import to our own plugin
+ *  - Add "insertResourceLink" command into _createFormView()
+ *  - Add resourceLinkCommand.isOn check into _hide()
  */
 
 /**
@@ -13,14 +19,28 @@
  * @module link/linkui
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import ClickObserver from "@ckeditor/ckeditor5-engine/src/view/observer/clickobserver";
-import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
-import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
-import clickOutsideHandler from "@ckeditor/ckeditor5-ui/src/bindings/clickoutsidehandler";
-import { isWidget } from "@ckeditor/ckeditor5-widget/src/utils";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import {
+    ClickObserver,
+    type ViewAttributeElement,
+    type ViewDocumentClickEvent,
+    type ViewElement,
+    type ViewPosition,
+} from "@ckeditor/ckeditor5-engine";
+import {
+    ButtonView,
+    ContextualBalloon,
+    clickOutsideHandler,
+    CssTransitionDisablerMixin,
+    type ViewWithCssTransitionDisabler,
+} from "@ckeditor/ckeditor5-ui";
+import type { PositionOptions } from "@ckeditor/ckeditor5-utils";
+import { isWidget } from "@ckeditor/ckeditor5-widget";
+
 import LinkFormView from "@js/editor/plugin/link/LinkFormView";
 import LinkActionsView from "@ckeditor/ckeditor5-link/src/ui/linkactionsview";
+import type LinkCommand from "@ckeditor/ckeditor5-link/src/linkcommand";
+import type UnlinkCommand from "@ckeditor/ckeditor5-link/src/unlinkcommand";
 import { addLinkProtocolIfApplicable, isLinkElement, LINK_KEYSTROKE } from "@ckeditor/ckeditor5-link/src/utils";
 
 import linkIcon from "@ckeditor/ckeditor5-link/theme/icons/link.svg";
@@ -32,52 +52,45 @@ const VISUAL_SELECTION_MARKER_NAME = "link-ui";
  *
  * It uses the
  * {@link module:ui/panel/balloon/contextualballoon~ContextualBalloon contextual balloon plugin}.
- *
- * @extends module:core/plugin~Plugin
  */
 export default class LinkUI extends Plugin {
     /**
+     * The actions view displayed inside of the balloon.
+     */
+    public actionsView: LinkActionsView | null = null;
+
+    /**
+     * The form view displayed inside the balloon.
+     */
+    public formView: (LinkFormView & ViewWithCssTransitionDisabler) | null = null;
+
+    /**
+     * The contextual balloon plugin instance.
+     */
+    private _balloon!: ContextualBalloon;
+
+    /**
      * @inheritDoc
      */
-    static get requires() {
-        return [ContextualBalloon];
+    public static get requires() {
+        return [ContextualBalloon] as const;
     }
 
     /**
      * @inheritDoc
      */
-    static get pluginName() {
-        return "LinkUI";
+    public static get pluginName() {
+        return "LinkUI" as const;
     }
 
     /**
      * @inheritDoc
      */
-    init() {
+    public init(): void {
         const editor = this.editor;
 
         editor.editing.view.addObserver(ClickObserver);
 
-        /**
-         * The actions view displayed inside of the balloon.
-         *
-         * @member {module:link/ui/linkactionsview~LinkActionsView}
-         */
-        this.actionsView = null;
-
-        /**
-         * The form view displayed inside the balloon.
-         *
-         * @member {module:link/ui/linkformview~LinkFormView}
-         */
-        this.formView = null;
-
-        /**
-         * The contextual balloon plugin instance.
-         *
-         * @private
-         * @member {module:ui/panel/balloon/contextualballoon~ContextualBalloon}
-         */
         this._balloon = editor.plugins.get(ContextualBalloon);
 
         // Create toolbar buttons.
@@ -105,7 +118,7 @@ export default class LinkUI extends Plugin {
     /**
      * @inheritDoc
      */
-    destroy() {
+    public override destroy(): void {
         super.destroy();
 
         // Destroy created UI components as they are not automatically destroyed (see ckeditor5#1341).
@@ -119,11 +132,9 @@ export default class LinkUI extends Plugin {
     }
 
     /**
-     * Creates...
-     *
-     * @private
+     * Creates views.
      */
-    _createViews() {
+    private _createViews() {
         this.actionsView = this._createActionsView();
         this.formView = this._createFormView();
 
@@ -133,15 +144,12 @@ export default class LinkUI extends Plugin {
 
     /**
      * Creates the {@link module:link/ui/linkactionsview~LinkActionsView} instance.
-     *
-     * @private
-     * @returns {module:link/ui/linkactionsview~LinkActionsView} The link actions view instance.
      */
-    _createActionsView() {
+    private _createActionsView(): LinkActionsView {
         const editor = this.editor;
         const actionsView = new LinkActionsView(editor.locale);
-        const linkCommand = editor.commands.get("link");
-        const unlinkCommand = editor.commands.get("unlink");
+        const linkCommand: LinkCommand = editor.commands.get("link")!;
+        const unlinkCommand: UnlinkCommand = editor.commands.get("unlink")!;
 
         actionsView.bind("href").to(linkCommand, "value");
         actionsView.editButtonView.bind("isEnabled").to(linkCommand);
@@ -175,29 +183,26 @@ export default class LinkUI extends Plugin {
 
     /**
      * Creates the {@link module:link/ui/linkformview~LinkFormView} instance.
-     *
-     * @private
-     * @returns {module:link/ui/linkformview~LinkFormView} The link form view instance.
      */
-    _createFormView() {
+    private _createFormView(): LinkFormView & ViewWithCssTransitionDisabler {
         const editor = this.editor;
-        const linkCommand = editor.commands.get("link");
+        const linkCommand: LinkCommand = editor.commands.get("link")!;
         const defaultProtocol = editor.config.get("link.defaultProtocol");
 
-        const formView = new LinkFormView(editor.locale, linkCommand);
+        const formView = new (CssTransitionDisablerMixin(LinkFormView))(editor.locale, linkCommand);
 
         formView.urlInputView.fieldView.bind("value").to(linkCommand, "value");
 
         // Form elements should be read-only when corresponding commands are disabled.
-        formView.urlInputView.bind("isReadOnly").to(linkCommand, "isEnabled", (value) => !value);
+        formView.urlInputView.bind("isEnabled").to(linkCommand, "isEnabled");
         formView.saveButtonView.bind("isEnabled").to(linkCommand);
 
-        // Open up the resource browser when clicking the "Browse" button.
+        // Open up the resource browser when clicking the "Browse" button
         formView.resourceButtonView.on("execute", () => editor.execute("insertResourceLink"));
 
         // Execute link command after clicking the "Save" button.
         this.listenTo(formView, "submit", () => {
-            const { value } = formView.urlInputView.fieldView.element;
+            const { value } = formView.urlInputView.fieldView.element!;
             const parsedUrl = addLinkProtocolIfApplicable(value, defaultProtocol);
             editor.execute("link", parsedUrl, formView.getDecoratorSwitchesState());
             this._closeFormView();
@@ -220,12 +225,10 @@ export default class LinkUI extends Plugin {
     /**
      * Creates a toolbar Link button. Clicking this button will show
      * a {@link #_balloon} attached to the selection.
-     *
-     * @private
      */
-    _createToolbarLinkButton() {
+    private _createToolbarLinkButton(): void {
         const editor = this.editor;
-        const linkCommand = editor.commands.get("link");
+        const linkCommand: LinkCommand = editor.commands.get("link")!;
         const t = editor.t;
 
         editor.ui.componentFactory.add("link", (locale) => {
@@ -252,16 +255,14 @@ export default class LinkUI extends Plugin {
     /**
      * Attaches actions that control whether the balloon panel containing the
      * {@link #formView} should be displayed.
-     *
-     * @private
      */
-    _enableBalloonActivators() {
+    private _enableBalloonActivators(): void {
         const editor = this.editor;
         const viewDocument = editor.editing.view.document;
 
         // Handle click on view document and show panel when selection is placed inside the link element.
         // Keep panel open until selection will be inside the same link element.
-        this.listenTo(viewDocument, "click", () => {
+        this.listenTo<ViewDocumentClickEvent>(viewDocument, "click", () => {
             const parentLink = this._getSelectedLinkElement();
 
             if (parentLink) {
@@ -275,7 +276,7 @@ export default class LinkUI extends Plugin {
             // Prevent focusing the search bar in FF, Chrome and Edge. See https://github.com/ckeditor/ckeditor5/issues/4811.
             cancel();
 
-            if (editor.commands.get("link").isEnabled) {
+            if (editor.commands.get("link")!.isEnabled) {
                 this._showUI(true);
             }
         });
@@ -284,16 +285,14 @@ export default class LinkUI extends Plugin {
     /**
      * Attaches actions that control whether the balloon panel containing the
      * {@link #formView} is visible or not.
-     *
-     * @private
      */
-    _enableUserBalloonInteractions() {
+    private _enableUserBalloonInteractions(): void {
         // Focus the form if the balloon is visible and the Tab key has been pressed.
         this.editor.keystrokes.set(
             "Tab",
             (data, cancel) => {
-                if (this._areActionsVisible && !this.actionsView.focusTracker.isFocused) {
-                    this.actionsView.focus();
+                if (this._areActionsVisible && !this.actionsView!.focusTracker.isFocused) {
+                    this.actionsView!.focus();
                     cancel();
                 }
             },
@@ -315,9 +314,9 @@ export default class LinkUI extends Plugin {
 
         // Close on click outside of balloon panel element.
         clickOutsideHandler({
-            emitter: this.formView,
+            emitter: this.formView!,
             activator: () => this._isUIInPanel,
-            contextElements: () => [this._balloon.view.element],
+            contextElements: () => [this._balloon.view.element!],
             callback: () => this._hideUI(),
         });
     }
@@ -325,9 +324,9 @@ export default class LinkUI extends Plugin {
     /**
      * Adds the {@link #actionsView} to the {@link #_balloon}.
      *
-     * @protected
+     * @internal
      */
-    _addActionsView() {
+    public _addActionsView(): void {
         if (!this.actionsView) {
             this._createViews();
         }
@@ -337,17 +336,15 @@ export default class LinkUI extends Plugin {
         }
 
         this._balloon.add({
-            view: this.actionsView,
+            view: this.actionsView!,
             position: this._getBalloonPositionData(),
         });
     }
 
     /**
      * Adds the {@link #formView} to the {@link #_balloon}.
-     *
-     * @protected
      */
-    _addFormView() {
+    private _addFormView(): void {
         if (!this.formView) {
             this._createViews();
         }
@@ -357,21 +354,21 @@ export default class LinkUI extends Plugin {
         }
 
         const editor = this.editor;
-        const linkCommand = editor.commands.get("link");
+        const linkCommand: LinkCommand = editor.commands.get("link")!;
 
-        this.formView.disableCssTransitions();
+        this.formView!.disableCssTransitions();
 
         this._balloon.add({
-            view: this.formView,
+            view: this.formView!,
             position: this._getBalloonPositionData(),
         });
 
         // Select input when form view is currently visible.
         if (this._balloon.visibleView === this.formView) {
-            this.formView.urlInputView.fieldView.select();
+            this.formView!.urlInputView.fieldView.select();
         }
 
-        this.formView.enableCssTransitions();
+        this.formView!.enableCssTransitions();
 
         // Make sure that each time the panel shows up, the URL field remains in sync with the value of
         // the command. If the user typed in the input, then canceled the balloon (`urlInputView.fieldView#value` stays
@@ -379,20 +376,18 @@ export default class LinkUI extends Plugin {
         // clicked the same link), they would see the old value instead of the actual value of the command.
         // https://github.com/ckeditor/ckeditor5-link/issues/78
         // https://github.com/ckeditor/ckeditor5-link/issues/123
-        this.formView.urlInputView.fieldView.element.value = linkCommand.value || "";
+        this.formView!.urlInputView.fieldView.element!.value = linkCommand.value || "";
     }
 
     /**
      * Closes the form view. Decides whether the balloon should be hidden completely or if the action view should be shown. This is
      * decided upon the link command value (which has a value if the document selection is in the link).
      *
-     * Additionally, if any {@link module:link/link~LinkConfig#decorators} are defined in the editor configuration, the state of
+     * Additionally, if any {@link module:link/linkconfig~LinkConfig#decorators} are defined in the editor configuration, the state of
      * switch buttons responsible for manual decorator handling is restored.
-     *
-     * @private
      */
-    _closeFormView() {
-        const linkCommand = this.editor.commands.get("link");
+    private _closeFormView(): void {
+        const linkCommand: LinkCommand = this.editor.commands.get("link")!;
 
         // Restore manual decorator states to represent the current model state. This case is important to reset the switch buttons
         // when the user cancels the editing form.
@@ -407,16 +402,14 @@ export default class LinkUI extends Plugin {
 
     /**
      * Removes the {@link #formView} from the {@link #_balloon}.
-     *
-     * @protected
      */
-    _removeFormView() {
+    private _removeFormView(): void {
         if (this._isFormInPanel) {
             // Blur the input element before removing it from DOM to prevent issues in some browsers.
             // See https://github.com/ckeditor/ckeditor5/issues/1501.
-            this.formView.saveButtonView.focus();
+            this.formView!.saveButtonView.focus();
 
-            this._balloon.remove(this.formView);
+            this._balloon.remove(this.formView!);
 
             // Because the form has an input which has focus, the focus must be brought back
             // to the editor. Otherwise, it would be lost.
@@ -429,10 +422,9 @@ export default class LinkUI extends Plugin {
     /**
      * Shows the correct UI type. It is either {@link #formView} or {@link #actionsView}.
      *
-     * @param {Boolean} forceVisible
-     * @private
+     * @internal
      */
-    _showUI(forceVisible = false) {
+    public _showUI(forceVisible: boolean = false): void {
         if (!this.formView) {
             this._createViews();
         }
@@ -477,10 +469,8 @@ export default class LinkUI extends Plugin {
      * Removes the {@link #formView} from the {@link #_balloon}.
      *
      * See {@link #_addFormView}, {@link #_addActionsView}.
-     *
-     * @protected
      */
-    _hideUI() {
+    private _hideUI(): void {
         if (!this._isUIInPanel) {
             return;
         }
@@ -506,20 +496,18 @@ export default class LinkUI extends Plugin {
         this._removeFormView();
 
         // Then remove the actions view because it's beneath the form.
-        this._balloon.remove(this.actionsView);
+        this._balloon.remove(this.actionsView!);
 
         this._hideFakeVisualSelection();
     }
 
     /**
-     * Makes the UI react to the {@link module:core/editor/editorui~EditorUI#event:update} event to
+     * Makes the UI react to the {@link module:ui/editorui/editorui~EditorUI#event:update} event to
      * reposition itself when the editor UI should be refreshed.
      *
      * See: {@link #_hideUI} to learn when the UI stops reacting to the `update` event.
-     *
-     * @protected
      */
-    _startUpdatingUI() {
+    private _startUpdatingUI(): void {
         const editor = this.editor;
         const viewDocument = editor.editing.view.document;
 
@@ -559,10 +547,10 @@ export default class LinkUI extends Plugin {
         };
 
         function getSelectionParent() {
-            return viewDocument.selection.focus
-                .getAncestors()
+            return viewDocument.selection
+                .focus!.getAncestors()
                 .reverse()
-                .find((node) => node.is("element"));
+                .find((node): node is ViewElement => node.is("element"));
         }
 
         this.listenTo(editor.ui, "update", update);
@@ -571,61 +559,41 @@ export default class LinkUI extends Plugin {
 
     /**
      * Returns `true` when {@link #formView} is in the {@link #_balloon}.
-     *
-     * @readonly
-     * @protected
-     * @type {Boolean}
      */
-    get _isFormInPanel() {
-        return this._balloon.hasView(this.formView);
+    private get _isFormInPanel(): boolean {
+        return !!this.formView && this._balloon.hasView(this.formView);
     }
 
     /**
      * Returns `true` when {@link #actionsView} is in the {@link #_balloon}.
-     *
-     * @readonly
-     * @protected
-     * @type {Boolean}
      */
-    get _areActionsInPanel() {
-        return this._balloon.hasView(this.actionsView);
+    private get _areActionsInPanel(): boolean {
+        return !!this.actionsView && this._balloon.hasView(this.actionsView);
     }
 
     /**
      * Returns `true` when {@link #actionsView} is in the {@link #_balloon} and it is
      * currently visible.
-     *
-     * @readonly
-     * @protected
-     * @type {Boolean}
      */
-    get _areActionsVisible() {
-        return this._balloon.visibleView === this.actionsView;
+    private get _areActionsVisible(): boolean {
+        return !!this.actionsView && this._balloon.visibleView === this.actionsView;
     }
 
     /**
      * Returns `true` when {@link #actionsView} or {@link #formView} is in the {@link #_balloon}.
-     *
-     * @readonly
-     * @protected
-     * @type {Boolean}
      */
-    get _isUIInPanel() {
+    private get _isUIInPanel(): boolean {
         return this._isFormInPanel || this._areActionsInPanel;
     }
 
     /**
      * Returns `true` when {@link #actionsView} or {@link #formView} is in the {@link #_balloon} and it is
      * currently visible.
-     *
-     * @readonly
-     * @protected
-     * @type {Boolean}
      */
-    get _isUIVisible() {
+    private get _isUIVisible(): boolean {
         const visibleView = this._balloon.visibleView;
 
-        return visibleView == this.formView || this._areActionsVisible;
+        return (!!this.formView && visibleView == this.formView) || this._areActionsVisible;
     }
 
     /**
@@ -634,20 +602,17 @@ export default class LinkUI extends Plugin {
      *
      * If the selection is collapsed and inside a link element, the panel will be attached to the
      * entire link element. Otherwise, it will be attached to the selection.
-     *
-     * @private
-     * @returns {module:utils/dom/position~Options}
      */
-    _getBalloonPositionData() {
+    private _getBalloonPositionData(): Partial<PositionOptions> {
         const view = this.editor.editing.view;
         const model = this.editor.model;
         const viewDocument = view.document;
-        let target = null;
+        let target: PositionOptions["target"];
 
         if (model.markers.has(VISUAL_SELECTION_MARKER_NAME)) {
             // There are cases when we highlight selection using a marker (#7705, #4721).
             const markerViewElements = Array.from(
-                this.editor.editing.mapper.markerNameToElements(VISUAL_SELECTION_MARKER_NAME)
+                this.editor.editing.mapper.markerNameToElements(VISUAL_SELECTION_MARKER_NAME)!
             );
             const newRange = view.createRange(
                 view.createPositionBefore(markerViewElements[0]),
@@ -665,9 +630,9 @@ export default class LinkUI extends Plugin {
 
                 return targetLink
                     ? // When selection is inside link element, then attach panel to this element.
-                      view.domConverter.mapViewToDom(targetLink)
+                      view.domConverter.mapViewToDom(targetLink)!
                     : // Otherwise attach panel to the selection.
-                      view.domConverter.viewRangeToDom(viewDocument.selection.getFirstRange());
+                      view.domConverter.viewRangeToDom(viewDocument.selection.getFirstRange()!);
             };
         }
 
@@ -682,22 +647,19 @@ export default class LinkUI extends Plugin {
      * **Note**: For a non–collapsed selection, the link element is returned when **fully**
      * selected and the **only** element within the selection boundaries, or when
      * a linked widget is selected.
-     *
-     * @private
-     * @returns {module:engine/view/attributeelement~AttributeElement|null}
      */
-    _getSelectedLinkElement() {
+    private _getSelectedLinkElement(): ViewAttributeElement | null {
         const view = this.editor.editing.view;
         const selection = view.document.selection;
         const selectedElement = selection.getSelectedElement();
 
         // The selection is collapsed or some widget is selected (especially inline widget).
         if (selection.isCollapsed || (selectedElement && isWidget(selectedElement))) {
-            return findLinkElementAncestor(selection.getFirstPosition());
+            return findLinkElementAncestor(selection.getFirstPosition()!);
         } else {
             // The range for fully selected link is usually anchored in adjacent text nodes.
             // Trim it to get closer to the actual link element.
-            const range = selection.getFirstRange().getTrimmed();
+            const range = selection.getFirstRange()!.getTrimmed();
             const startLink = findLinkElementAncestor(range.start);
             const endLink = findLinkElementAncestor(range.end);
 
@@ -718,14 +680,12 @@ export default class LinkUI extends Plugin {
      * Displays a fake visual selection when the contextual balloon is displayed.
      *
      * This adds a 'link-ui' marker into the document that is rendered as a highlight on selected text fragment.
-     *
-     * @private
      */
-    _showFakeVisualSelection() {
+    private _showFakeVisualSelection(): void {
         const model = this.editor.model;
 
         model.change((writer) => {
-            const range = model.document.selection.getFirstRange();
+            const range = model.document.selection.getFirstRange()!;
 
             if (model.markers.has(VISUAL_SELECTION_MARKER_NAME)) {
                 writer.updateMarker(VISUAL_SELECTION_MARKER_NAME, { range });
@@ -754,10 +714,8 @@ export default class LinkUI extends Plugin {
 
     /**
      * Hides the fake visual selection created in {@link #_showFakeVisualSelection}.
-     *
-     * @private
      */
-    _hideFakeVisualSelection() {
+    private _hideFakeVisualSelection(): void {
         const model = this.editor.model;
 
         if (model.markers.has(VISUAL_SELECTION_MARKER_NAME)) {
@@ -768,11 +726,14 @@ export default class LinkUI extends Plugin {
     }
 }
 
-// Returns a link element if there's one among the ancestors of the provided `Position`.
-//
-// @private
-// @param {module:engine/view/position~Position} View position to analyze.
-// @returns {module:engine/view/attributeelement~AttributeElement|null} Link element at the position or null.
-function findLinkElementAncestor(position) {
-    return position.getAncestors().find((ancestor) => isLinkElement(ancestor));
+/**
+ * Returns a link element if there's one among the ancestors of the provided `Position`.
+ *
+ * @param View position to analyze.
+ * @returns Link element at the position or null.
+ */
+function findLinkElementAncestor(position: ViewPosition): ViewAttributeElement | null {
+    return (
+        position.getAncestors().find((ancestor): ancestor is ViewAttributeElement => isLinkElement(ancestor)) || null
+    );
 }

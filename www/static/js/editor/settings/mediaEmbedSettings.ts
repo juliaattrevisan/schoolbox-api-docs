@@ -8,7 +8,6 @@ const API_KEY = "94aa8fc28ac1089a2dfb28";
 
 /**
  * Returns the settings for the mediaEmbed plugin.
- *
  * @returns { object } - the media embed settings
  */
 export function getMediaEmbedSettings() {

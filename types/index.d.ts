@@ -5,6 +5,7 @@
 
 import Vue from "vue";
 import dayjs from "dayjs";
+import type { Editor } from "@ckeditor/ckeditor5-core";
 
 declare global {
     interface Window {
@@ -19,8 +20,12 @@ declare global {
             lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };
             imageLightboxLicenseKey: string;
+            ckeditor5LicenseKey: string;
             imageSlideshows: { [key: string]: any };
             colourDefaults: { [key: string]: any };
+            MAX_BYTES_MYSQL_TEXT: number;
+            MAX_BYTES_MYSQL_MEDIUMTEXT: number;
+            editors: { [key: string]: Editor };
         };
         schoolboxUser: {
             id: number;

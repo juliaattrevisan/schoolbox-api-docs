@@ -5,21 +5,22 @@
  */
 
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
+import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { FileLoader } from "@ckeditor/ckeditor5-upload/src/filerepository";
 
 export default class UploadAdapter {
-    loader: unknown;
+    loader: FileLoader;
 
     xhr: XMLHttpRequest;
 
-    editor: object;
+    editor: Editor;
 
     /**
      * Create a new instance of MyUploadAdapter
-     *
-     * @param { unknown } loader - see https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-FileLoader.html
-     * @param { CKEditor } editor - the CKEditor instance
+     * @param { FileLoader } loader - see https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-FileLoader.html
+     * @param { Editor } editor - the CKEditor instance
      */
-    constructor(loader, editor) {
+    constructor(loader: FileLoader, editor: Editor) {
         this.loader = loader;
         this.editor = editor;
         this.xhr = new XMLHttpRequest();
@@ -36,7 +37,6 @@ export default class UploadAdapter {
     /**
      * Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded
      * properties which are used e.g. to display the upload progress bar in the editor user interface.
-     *
      * @param { ProgressEvent } event - to display load progress
      */
     onLoading(event: ProgressEvent) {
@@ -53,7 +53,6 @@ export default class UploadAdapter {
      * at least the "default" URL, pointing to the image on the server.
      * This URL will be used to display the image in the content. Learn more in the
      * UploadAdapter#upload documentation.
-     *
      * @param { Function } resolve - when the file uploads successfully
      * @param { Function } reject - when the file fails
      * @param { string } genericErrorText - message to display when failed if a message isn't passed through
@@ -76,7 +75,6 @@ export default class UploadAdapter {
 
     /**
      * Initializes XMLHttpRequest listeners.
-     *
      * @param { Function } resolve - when the file uploads successfully
      * @param { Function } reject - when the file fails
      * @param { File } file - the file being uploaded
@@ -93,12 +91,10 @@ export default class UploadAdapter {
 
     /**
      * Prepares the data and sends the request.
-     *
      * @todo - Important note: This is the right place to implement security mechanisms
      * like authentication and CSRF protection. For instance, you can use
      * XMLHttpRequest.setRequestHeader() to set the request headers containing
      * the CSRF token generated earlier by your application.
-     *
      * @param { File } file - the file to upload
      */
     sendRequest(file: File) {
@@ -109,7 +105,6 @@ export default class UploadAdapter {
 
     /**
      * Starts the upload process.
-     *
      * @returns { Promise } - new Promise request
      */
     upload() {

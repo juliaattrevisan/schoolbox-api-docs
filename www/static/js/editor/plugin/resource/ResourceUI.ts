@@ -3,16 +3,17 @@
  * and to trigger he insertResource command on selection
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import { ButtonView } from "@ckeditor/ckeditor5-ui";
 import { insertElementAfter } from "@js/util/domUtils";
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import InsertResourceCommand from "./InsertResourceCommand";
 
 export default class ResourceUI extends Plugin {
-    uploadContainer: HTMLDivElement; // the container for the upload progress bars
+    uploadContainer!: HTMLDivElement; // the container for the upload progress bars
 
     /**
      * Get the plugin name, so can access with editor.plugins.get("ResourceUI")
-     *
      * @returns { string } the plugin name
      */
     static get pluginName() {
@@ -44,7 +45,7 @@ export default class ResourceUI extends Plugin {
             });
             button.on("execute", () => this.editor.execute("insertResource"));
             // Disable the button when the command is disabled
-            const command = this.editor.commands.get("insertResource");
+            const command = this.editor.commands.get("insertResource") as InsertResourceCommand;
             button.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
             return button;
         });
@@ -56,15 +57,15 @@ export default class ResourceUI extends Plugin {
      */
     addUploadContainer() {
         const uploadContainerAttribute = "data-resource-upload-container";
-        const uploadContainer = (this.editor.sourceElement.parentElement as HTMLElement).querySelector(
-            `[${uploadContainerAttribute}]`
-        );
+        const uploadContainer = (
+            (this.editor as ClassicEditor).sourceElement?.parentElement as HTMLElement
+        ).querySelector(`[${uploadContainerAttribute}]`);
         if (uploadContainer === null) {
             this.uploadContainer = document.createElement("div");
             this.uploadContainer.setAttribute(uploadContainerAttribute, "");
             this.uploadContainer.classList.add("dropzone-wrap", "sb-ck-resource-upload-container");
             this.checkUploadContainer();
-            insertElementAfter(this.editor.sourceElement as HTMLElement, this.uploadContainer);
+            insertElementAfter((this.editor as ClassicEditor).sourceElement as HTMLElement, this.uploadContainer);
         } else {
             this.uploadContainer = uploadContainer as HTMLDivElement;
         }
@@ -80,7 +81,6 @@ export default class ResourceUI extends Plugin {
     /**
      * To display the progress of a resource being uploaded, based off the already
      * existing dropzone usages
-     *
      * @param { File } file - the file being uploaded
      * @returns { HTMLDivElement } the element to display the progress
      */
@@ -103,7 +103,6 @@ export default class ResourceUI extends Plugin {
 
     /**
      * To show the error state of a failed resource upload
-     *
      * @param { HTMLDivElement } element - the element to display the error
      * @param { string } error - the error message to display
      */

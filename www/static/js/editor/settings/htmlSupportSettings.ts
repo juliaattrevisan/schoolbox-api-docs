@@ -16,7 +16,6 @@
  *
  * So the below is a translation of this into the new format, to ensure legacy data is not lost.
  * Note that some of these would already be enabled in CKEditor5, but we're explicitly enabling them here to match exactly the previous settings.
- *
  * @returns { object } - the html support settings
  */
 export function getHTMLSupportSettings() {

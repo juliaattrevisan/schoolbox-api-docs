@@ -2,6 +2,11 @@
  * This is primarily a copy of the original LinkFormView plugin from CKEditor 5
  * modified to display a browse button that opens our resource modal to select
  * a resource to link to
+ *
+ * Changes:
+ *  - Update all imports to "@ckeditor/" equivalents
+ *  - Import insertElementAfter from @js/util/domUtils
+ *  - Add resourceButtonView
  */
 
 /**
@@ -10,21 +15,25 @@
  */
 
 /**
- * @module link/ui/linkformview
+ * @module link/ui/linkformviews
  */
 
-import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
-import FocusCycler from "@ckeditor/ckeditor5-ui/src/focuscycler";
-import LabeledFieldView from "@ckeditor/ckeditor5-ui/src/labeledfield/labeledfieldview";
-import SwitchButtonView from "@ckeditor/ckeditor5-ui/src/button/switchbuttonview";
-import View from "@ckeditor/ckeditor5-ui/src/view";
-import ViewCollection from "@ckeditor/ckeditor5-ui/src/viewcollection";
-import { createLabeledInputText } from "@ckeditor/ckeditor5-ui/src/labeledfield/utils";
-import injectCssTransitionDisabler from "@ckeditor/ckeditor5-ui/src/bindings/injectcsstransitiondisabler";
-import submitHandler from "@ckeditor/ckeditor5-ui/src/bindings/submithandler";
-import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
-import KeystrokeHandler from "@ckeditor/ckeditor5-utils/src/keystrokehandler";
-import { icons } from "@ckeditor/ckeditor5-core/src/index";
+import {
+    ButtonView,
+    FocusCycler,
+    LabeledFieldView,
+    SwitchButtonView,
+    View,
+    ViewCollection,
+    createLabeledInputText,
+    submitHandler,
+    type InputTextView,
+} from "@ckeditor/ckeditor5-ui";
+import { FocusTracker, KeystrokeHandler, type Collection, type Locale } from "@ckeditor/ckeditor5-utils";
+import { icons } from "@ckeditor/ckeditor5-core";
+
+import type LinkCommand from "@ckeditor/ckeditor5-link/src/linkcommand";
+import type ManualDecorator from "@ckeditor/ckeditor5-link/src/utils/manualdecorator";
 import { insertElementAfter } from "@js/util/domUtils";
 
 // See: #8833.
@@ -36,50 +45,76 @@ import "@ckeditor/ckeditor5-link/theme/linkform.css";
  * The link form view controller class.
  *
  * See {@link module:link/ui/linkformview~LinkFormView}.
- *
- * @extends module:ui/view~View
  */
 export default class LinkFormView extends View {
+    /**
+     * Tracks information about DOM focus in the form.
+     */
+    public readonly focusTracker = new FocusTracker();
+
+    /**
+     * An instance of the {@link module:utils/keystrokehandler~KeystrokeHandler}.
+     */
+    public readonly keystrokes = new KeystrokeHandler();
+
+    /**
+     * The URL input view.
+     */
+    public urlInputView: LabeledFieldView<InputTextView>;
+
+    /**
+     * The resource button that appears next to the url input that
+     * opens our resource modal to select a resource to link to
+     */
+    public resourceButtonView: ButtonView;
+
+    /**
+     * The Save button view.
+     */
+    public saveButtonView: ButtonView;
+
+    /**
+     * The Cancel button view.
+     */
+    public cancelButtonView: ButtonView;
+
+    /**
+     * A collection of {@link module:ui/button/switchbuttonview~SwitchButtonView},
+     * which corresponds to {@link module:link/linkcommand~LinkCommand#manualDecorators manual decorators}
+     * configured in the editor.
+     */
+    private readonly _manualDecoratorSwitches: ViewCollection;
+
+    /**
+     * A collection of child views in the form.
+     */
+    public readonly children: ViewCollection;
+
+    /**
+     * A collection of views that can be focused in the form.
+     */
+    private readonly _focusables = new ViewCollection();
+
+    /**
+     * Helps cycling over {@link #_focusables} in the form.
+     */
+    private readonly _focusCycler: FocusCycler;
+
     /**
      * Creates an instance of the {@link module:link/ui/linkformview~LinkFormView} class.
      *
      * Also see {@link #render}.
      *
-     * @param {module:utils/locale~Locale} [locale] The localization services instance.
-     * @param {module:link/linkcommand~LinkCommand} linkCommand Reference to {@link module:link/linkcommand~LinkCommand}.
-     * @param {String} [protocol] A value of a protocol to be displayed in the input's placeholder.
+     * @param locale The localization services instance.
+     * @param linkCommand Reference to {@link module:link/linkcommand~LinkCommand}.
      */
-    constructor(locale, linkCommand) {
+    constructor(locale: Locale, linkCommand: LinkCommand) {
         super(locale);
 
         const t = locale.t;
 
-        /**
-         * Tracks information about DOM focus in the form.
-         *
-         * @readonly
-         * @member {module:utils/focustracker~FocusTracker}
-         */
-        this.focusTracker = new FocusTracker();
-
-        /**
-         * An instance of the {@link module:utils/keystrokehandler~KeystrokeHandler}.
-         *
-         * @readonly
-         * @member {module:utils/keystrokehandler~KeystrokeHandler}
-         */
-        this.keystrokes = new KeystrokeHandler();
-
-        /**
-         * The URL input view.
-         *
-         * @member {module:ui/labeledfield/labeledfieldview~LabeledFieldView}
-         */
         this.urlInputView = this._createUrlInput();
 
-        /**
-         * Add a button next to the URL input view to browse for a resource
-         */
         this.resourceButtonView = new ButtonView(this.locale);
         this.resourceButtonView.set({
             label: "Browse",
@@ -88,56 +123,12 @@ export default class LinkFormView extends View {
             class: "ck-button-resource-link",
         });
 
-        /**
-         * The Save button view.
-         *
-         * @member {module:ui/button/buttonview~ButtonView}
-         */
         this.saveButtonView = this._createButton(t("Save"), icons.check, "ck-button-save");
         this.saveButtonView.type = "submit";
-
-        /**
-         * The Cancel button view.
-         *
-         * @member {module:ui/button/buttonview~ButtonView}
-         */
         this.cancelButtonView = this._createButton(t("Cancel"), icons.cancel, "ck-button-cancel", "cancel");
-
-        /**
-         * A collection of {@link module:ui/button/switchbuttonview~SwitchButtonView},
-         * which corresponds to {@link module:link/linkcommand~LinkCommand#manualDecorators manual decorators}
-         * configured in the editor.
-         *
-         * @private
-         * @readonly
-         * @type {module:ui/viewcollection~ViewCollection}
-         */
         this._manualDecoratorSwitches = this._createManualDecoratorSwitches(linkCommand);
-
-        /**
-         * A collection of child views in the form.
-         *
-         * @readonly
-         * @type {module:ui/viewcollection~ViewCollection}
-         */
         this.children = this._createFormChildren(linkCommand.manualDecorators);
 
-        /**
-         * A collection of views that can be focused in the form.
-         *
-         * @readonly
-         * @protected
-         * @member {module:ui/viewcollection~ViewCollection}
-         */
-        this._focusables = new ViewCollection();
-
-        /**
-         * Helps cycling over {@link #_focusables} in the form.
-         *
-         * @readonly
-         * @protected
-         * @member {module:ui/focuscycler~FocusCycler}
-         */
         this._focusCycler = new FocusCycler({
             focusables: this._focusables,
             focusTracker: this.focusTracker,
@@ -169,8 +160,6 @@ export default class LinkFormView extends View {
 
             children: this.children,
         });
-
-        injectCssTransitionDisabler(this);
     }
 
     /**
@@ -178,20 +167,22 @@ export default class LinkFormView extends View {
      * {@link module:link/linkcommand~LinkCommand#manualDecorators manual link decorators}
      * in the {@link module:link/ui/linkformview~LinkFormView}.
      *
-     * @returns {Object.<String,Boolean>} Key-value pairs, where the key is the name of the decorator and the value is
-     * its state.
+     * @returns Key-value pairs, where the key is the name of the decorator and the value is its state.
      */
-    getDecoratorSwitchesState() {
-        return Array.from(this._manualDecoratorSwitches).reduce((accumulator, switchButton) => {
-            accumulator[switchButton.name] = switchButton.isOn;
-            return accumulator;
-        }, {});
+    public getDecoratorSwitchesState(): Record<string, boolean> {
+        return Array.from(this._manualDecoratorSwitches as Iterable<SwitchButtonView & { name: string }>).reduce(
+            (accumulator, switchButton) => {
+                accumulator[switchButton.name] = switchButton.isOn;
+                return accumulator;
+            },
+            {} as Record<string, boolean>
+        );
     }
 
     /**
      * @inheritDoc
      */
-    render() {
+    public override render(): void {
         super.render();
 
         submitHandler({
@@ -200,6 +191,7 @@ export default class LinkFormView extends View {
 
         const childViews = [
             this.urlInputView,
+            this.resourceButtonView,
             ...this._manualDecoratorSwitches,
             this.saveButtonView,
             this.cancelButtonView,
@@ -210,11 +202,11 @@ export default class LinkFormView extends View {
             this._focusables.add(v);
 
             // Register the view in the focus tracker.
-            this.focusTracker.add(v.element);
+            this.focusTracker.add(v.element!);
         });
 
         // Start listening for the keystrokes coming from #element.
-        this.keystrokes.listenTo(this.element);
+        this.keystrokes.listenTo(this.element!);
 
         // add the resource button after the url input
         insertElementAfter(this.urlInputView.fieldView.element, this.resourceButtonView.element);
@@ -223,7 +215,7 @@ export default class LinkFormView extends View {
     /**
      * @inheritDoc
      */
-    destroy() {
+    public override destroy(): void {
         super.destroy();
 
         this.focusTracker.destroy();
@@ -233,18 +225,17 @@ export default class LinkFormView extends View {
     /**
      * Focuses the fist {@link #_focusables} in the form.
      */
-    focus() {
+    public focus(): void {
         this._focusCycler.focusFirst();
     }
 
     /**
      * Creates a labeled input view.
      *
-     * @private
-     * @returns {module:ui/labeledfield/labeledfieldview~LabeledFieldView} Labeled field view instance.
+     * @returns Labeled field view instance.
      */
-    _createUrlInput() {
-        const t = this.locale.t;
+    private _createUrlInput(): LabeledFieldView<InputTextView> {
+        const t = this.locale!.t;
         const labeledInput = new LabeledFieldView(this.locale, createLabeledInputText);
 
         labeledInput.label = t("Link URL");
@@ -255,14 +246,13 @@ export default class LinkFormView extends View {
     /**
      * Creates a button view.
      *
-     * @private
-     * @param {String} label The button label.
-     * @param {String} icon The button icon.
-     * @param {String} className The additional button CSS class name.
-     * @param {String} [eventName] An event name that the `ButtonView#execute` event will be delegated to.
-     * @returns {module:ui/button/buttonview~ButtonView} The button view instance.
+     * @param label The button label.
+     * @param icon The button icon.
+     * @param className The additional button CSS class name.
+     * @param eventName An event name that the `ButtonView#execute` event will be delegated to.
+     * @returns The button view instance.
      */
-    _createButton(label, icon, className, eventName) {
+    private _createButton(label: string, icon: string, className: string, eventName?: string): ButtonView {
         const button = new ButtonView(this.locale);
 
         button.set({
@@ -288,15 +278,14 @@ export default class LinkFormView extends View {
      * Populates {@link module:ui/viewcollection~ViewCollection} of {@link module:ui/button/switchbuttonview~SwitchButtonView}
      * made based on {@link module:link/linkcommand~LinkCommand#manualDecorators}.
      *
-     * @private
-     * @param {module:link/linkcommand~LinkCommand} linkCommand A reference to the link command.
-     * @returns {module:ui/viewcollection~ViewCollection} of switch buttons.
+     * @param linkCommand A reference to the link command.
+     * @returns ViewCollection of switch buttons.
      */
-    _createManualDecoratorSwitches(linkCommand) {
+    private _createManualDecoratorSwitches(linkCommand: LinkCommand): ViewCollection {
         const switches = this.createCollection();
 
         for (const manualDecorator of linkCommand.manualDecorators) {
-            const switchButton = new SwitchButtonView(this.locale);
+            const switchButton: SwitchButtonView & { name?: string } = new SwitchButtonView(this.locale);
 
             switchButton.set({
                 name: manualDecorator.id,
@@ -308,8 +297,8 @@ export default class LinkFormView extends View {
                 .bind("isOn")
                 .toMany([manualDecorator, linkCommand], "value", (decoratorValue, commandValue) => {
                     return commandValue === undefined && decoratorValue === undefined
-                        ? manualDecorator.defaultValue
-                        : decoratorValue;
+                        ? !!manualDecorator.defaultValue
+                        : !!decoratorValue;
                 });
 
             switchButton.on("execute", () => {
@@ -329,12 +318,11 @@ export default class LinkFormView extends View {
      * additional `View` wrapping all {@link #_manualDecoratorSwitches} switch buttons corresponding
      * to these decorators.
      *
-     * @private
-     * @param {module:utils/collection~Collection} manualDecorators A reference to
+     * @param manualDecorators A reference to
      * the collection of manual decorators stored in the link command.
-     * @returns {module:ui/viewcollection~ViewCollection} The children of link form view.
+     * @returns The children of link form view.
      */
-    _createFormChildren(manualDecorators) {
+    private _createFormChildren(manualDecorators: Collection<ManualDecorator>): ViewCollection {
         const children = this.createCollection();
 
         children.add(this.urlInputView);
@@ -368,13 +356,21 @@ export default class LinkFormView extends View {
 
 /**
  * Fired when the form view is submitted (when one of the children triggered the submit event),
- * for example with a click on {@link #saveButtonView}.
+ * for example with a click on {@link ~LinkFormView#saveButtonView}.
  *
- * @event submit
+ * @eventName ~LinkFormView#submit
  */
+export type SubmitEvent = {
+    name: "submit";
+    args: [];
+};
 
 /**
- * Fired when the form view is canceled, for example with a click on {@link #cancelButtonView}.
+ * Fired when the form view is canceled, for example with a click on {@link ~LinkFormView#cancelButtonView}.
  *
- * @event cancel
+ * @eventName ~LinkFormView#cancel
  */
+export type CancelEvent = {
+    name: "cancel";
+    args: [];
+};

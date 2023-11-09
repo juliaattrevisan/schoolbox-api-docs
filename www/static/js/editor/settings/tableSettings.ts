@@ -2,7 +2,6 @@ import { tableBorderColourSwatches, tableBackgroundColourSwatches } from "./colo
 
 /**
  * Returns the settings for the tables
- *
  * @returns { object } - the table settings
  */
 export function getTableSettings() {
@@ -26,7 +25,6 @@ export function getTableSettings() {
 
 /**
  * When a fixed width isn't set on a table, it should be 100% width by default
- *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - updated sourceElement content as HTML
  */
@@ -43,7 +41,6 @@ export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
 /**
  * CKEditor4 tables use the now deprecated align attribute,
  * so we need to add the float style to the table as an alternative
- *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } -
  */

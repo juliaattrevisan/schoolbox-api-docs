@@ -1,9 +1,11 @@
 /**
- * Custom tweaks to the ckeditor table plugin, primarily to bring some CKEditor5 bevaviour
+ * Custom tweaks to the ckeditor table plugin, primarily to bring some CKEditor5 behaviour
  * back inline with CKEditor4, which our users are used to.
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import type { DowncastInsertEvent, Element, ViewElement } from "@ckeditor/ckeditor5-engine";
+import type { InsertTableCommand, TableAlignmentCommand } from "@ckeditor/ckeditor5-table";
 
 export default class TableUpdates extends Plugin {
     isCK5Attribute = "data-is-ckeditor5-table";
@@ -35,7 +37,7 @@ export default class TableUpdates extends Plugin {
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_conversion_conversion-Conversion.html
      */
     defineConverters() {
-        const conversion = this.editor.conversion;
+        const { conversion } = this.editor;
         conversion.for("downcast").attributeToAttribute({
             model: {
                 name: "table",
@@ -68,12 +70,12 @@ export default class TableUpdates extends Plugin {
      */
     addCustomClass() {
         this.editor.conversion.for("downcast").add((dispatcher) => {
-            dispatcher.on(
+            dispatcher.on<DowncastInsertEvent>(
                 "insert:table",
                 (event, data, conversionApi) => {
                     const viewWriter = conversionApi.writer;
-                    const modelTable = data.item;
-                    const viewElement: ViewElement = conversionApi.mapper.toViewElement(modelTable);
+                    const modelTable = data.item as Element;
+                    const viewElement = conversionApi.mapper.toViewElement(modelTable) as ViewElement;
                     const viewTable = viewElement.is("element", "table")
                         ? viewElement
                         : Array.from(viewElement.getChildren()).find((viewChild) => viewChild.is("element", "table"));
@@ -88,10 +90,11 @@ export default class TableUpdates extends Plugin {
 
     /**
      * Get the currently selected table
+     * @returns { ModelElement } The currently selected table
      */
     getSelectedTable() {
-        const selection = this.editor.model.document.selection;
-        const table = selection.getFirstPosition().findAncestor("table");
+        const { selection } = this.editor.model.document;
+        const table = selection.getFirstPosition()?.findAncestor("table");
         return table;
     }
 
@@ -99,7 +102,7 @@ export default class TableUpdates extends Plugin {
      * Add the following properties as default to newly created tables, columns and rows
      */
     addDefaultProperties() {
-        const insertTableCommand = this.editor.commands.get("insertTable");
+        const insertTableCommand = this.editor.commands.get("insertTable") as InsertTableCommand;
         insertTableCommand.on("execute", () => {
             this.editor.execute("tableWidth", {
                 value: "100%",
@@ -179,7 +182,7 @@ export default class TableUpdates extends Plugin {
      * This is so an old table created in CKEditor4 can still be centre aligned if desired
      */
     markAlignedTables() {
-        const tableAlignmentCommand = this.editor.commands.get("tableAlignment");
+        const tableAlignmentCommand = this.editor.commands.get("tableAlignment") as TableAlignmentCommand;
         tableAlignmentCommand.on("execute", () => {
             this.editor.model.change((writer) => {
                 writer.setAttribute(this.isCK5Attribute, "true", this.getSelectedTable());

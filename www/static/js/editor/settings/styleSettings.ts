@@ -1,6 +1,5 @@
 /**
  * Returns the settings for the Styles dropdown
- *
  * @returns { object } - the style settings
  */
 export function getStyleSettings() {
@@ -18,11 +17,6 @@ export function getStyleSettings() {
                     element: "tt",
                     classes: [""],
                 },
-                /* {
-                    name: "Computer Code",
-                    element: "code",
-                    classes: [""],
-                }, */
                 {
                     name: "Highlighted Note",
                     element: "p",

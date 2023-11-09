@@ -8,24 +8,20 @@ import { getImagePlugins } from "@js/editor/plugin/imagePlugins";
 import { getTablePlugins } from "@js/editor/plugin/tablePlugins";
 import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getEmojiPlugins } from "@js/editor/plugin/emojiPlugins";
-import Heading from "@ckeditor/ckeditor5-heading/src/heading";
-import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph";
-import HeadingButtonsUI from "@ckeditor/ckeditor5-heading/src/headingbuttonsui";
-import ParagraphButtonUI from "@ckeditor/ckeditor5-paragraph/src/paragraphbuttonui";
-import Style from "@ckeditor/ckeditor5-style/src/style";
-import Subscript from "@ckeditor/ckeditor5-basic-styles/src/subscript";
-import Superscript from "@ckeditor/ckeditor5-basic-styles/src/superscript";
-import Font from "@ckeditor/ckeditor5-font/src/font";
-import RemoveFormat from "@ckeditor/ckeditor5-remove-format/src/removeformat";
-import SimpleUploadAdapter from "@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter";
-import MediaEmbed from "@ckeditor/ckeditor5-media-embed/src/mediaembed";
-import SpecialCharacters from "@ckeditor/ckeditor5-special-characters/src/specialcharacters";
-import SpecialCharactersEssentials from "@ckeditor/ckeditor5-special-characters/src/specialcharactersessentials";
-import HorizontalLine from "@ckeditor/ckeditor5-horizontal-line/src/horizontalline";
-import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
-import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
-import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
-import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
+import { Heading, HeadingButtonsUI } from "@ckeditor/ckeditor5-heading";
+import { Paragraph, ParagraphButtonUI } from "@ckeditor/ckeditor5-paragraph";
+import { Style } from "@ckeditor/ckeditor5-style";
+import { Subscript, Superscript } from "@ckeditor/ckeditor5-basic-styles";
+import { Font } from "@ckeditor/ckeditor5-font";
+import { RemoveFormat } from "@ckeditor/ckeditor5-remove-format";
+import { SimpleUploadAdapter } from "@ckeditor/ckeditor5-upload";
+import { MediaEmbed } from "@ckeditor/ckeditor5-media-embed";
+import { SpecialCharacters, SpecialCharactersEssentials } from "@ckeditor/ckeditor5-special-characters";
+import { HorizontalLine } from "@ckeditor/ckeditor5-horizontal-line";
+import { Alignment } from "@ckeditor/ckeditor5-alignment";
+import { FindAndReplace } from "@ckeditor/ckeditor5-find-and-replace";
+import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
+import { WordCount } from "@ckeditor/ckeditor5-word-count";
 import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
@@ -41,12 +37,10 @@ import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings"
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
-import Blank from "@js/editor/plugin/blank/Blank";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
 
 /**
  * Return the default configuration
- *
  * @param { EditorConfig } config - the default config
  * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
@@ -79,10 +73,10 @@ export function getConfig(config: EditorConfig) {
             WordCount,
             Eqneditor5,
             Resource,
-            Blank,
             UITweaks,
         ],
         extraPlugins: [UploadAdapterPlugin],
+        licenseKey: window.sbProps.ckeditor5LicenseKey,
         toolbar: getToolbar(config),
         ...getLinkSettings(),
         ...getFontSettings(),

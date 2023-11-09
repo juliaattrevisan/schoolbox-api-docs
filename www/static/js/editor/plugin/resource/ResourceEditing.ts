@@ -1,15 +1,14 @@
 /**
  * To extend imageBlock and imageInline to allow for additional data attributes
  * and add the insertResource command to the editor
- *
- * @todo - there's currently an issue with preserving extra attributes on the imageBlock element
- * as imageInline appears to work fine, all images are currently set to imageInline, so all imageBlock
- * related functionality is currently disabled
  */
 
-import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { Plugin } from "@ckeditor/ckeditor5-core";
+import type { ResizeImageCommand } from "@ckeditor/ckeditor5-image";
+import type { Element } from "@ckeditor/ckeditor5-engine";
 import InsertResourceCommand from "./InsertResourceCommand";
 import { ResourceType, getExtraAttributes } from "./resourceUtils";
+
 export default class ResourceEditing extends Plugin {
     /**
      * Runs on startup, defines the schema and converters
@@ -27,10 +26,7 @@ export default class ResourceEditing extends Plugin {
      * Otherwise the attributes will be stripped out when the editor is loaded
      */
     updateSchema() {
-        const schema = this.editor.model.schema;
-        // schema.extend("imageBlock", {
-        //     allowAttributes: [...getExtraAttributes()],
-        // });
+        const { schema } = this.editor.model;
         schema.extend("imageInline", {
             allowAttributes: [...getExtraAttributes()],
         });
@@ -41,30 +37,10 @@ export default class ResourceEditing extends Plugin {
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_conversion_conversion-Conversion.html
      */
     defineConverters() {
-        const conversion = this.editor.conversion;
+        const { conversion } = this.editor;
 
         const attributes = getExtraAttributes();
         attributes.forEach((attribute) => {
-            // conversion.for("downcast").attributeToAttribute({
-            //     model: {
-            //         name: "imageBlock",
-            //         key: attribute,
-            //     },
-            //     view: {
-            //         name: "img",
-            //         key: attribute,
-            //     },
-            // });
-            // conversion.for("upcast").attributeToAttribute({
-            //     view: {
-            //         name: "img",
-            //         key: attribute,
-            //     },
-            //     model: {
-            //         name: "imageBlock",
-            //         key: attribute,
-            //     },
-            // });
             conversion.for("downcast").attributeToAttribute({
                 model: {
                     name: "imageInline",
@@ -95,22 +71,22 @@ export default class ResourceEditing extends Plugin {
      * (If the image has been marked as full-width, these attributes will be ignored)
      */
     onImageResized() {
-        const editor = this.editor;
-        const model = editor.model;
+        const { editor } = this;
+        const { model } = editor;
         const imageUtils = editor.plugins.get("ImageUtils");
-        const resizeImageCommand = editor.commands.get("resizeImage");
+        const resizeImageCommand = editor.commands.get("resizeImage") as ResizeImageCommand;
         resizeImageCommand.on("execute", (eventInfo) => {
-            const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection);
+            const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection) as Element;
             if (
                 imageElement.hasAttribute("data-schoolboxresource-type") &&
                 imageElement.getAttribute("data-schoolboxresource-type") === ResourceType.VIDEO
             ) {
                 model.change((writer) => {
-                    const width = eventInfo.source.value?.width || 640;
+                    const width = (eventInfo.source as ResizeImageCommand).value?.width || "640px";
                     writer.setAttributes(
                         {
-                            "data-schoolboxresource-width": parseInt(width),
-                            "data-schoolboxresource-height": parseInt(width) * (9 / 16),
+                            "data-schoolboxresource-width": parseFloat(width),
+                            "data-schoolboxresource-height": parseFloat(width) * (9 / 16),
                         },
                         imageElement
                     );
