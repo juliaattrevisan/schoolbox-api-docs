@@ -92,7 +92,9 @@ class Quiz implements IAssessmentTypeTranslator
             ->setMaxAttempts($domainObject->getMaxAttempts())
             ->setMarkVisibility($domainObject->getMarkVisibility())
             ->setExternalId($domainObject->getExternalId())
-            ->setLearnosityReference($domainObject->getLearnosityReference());
+            ->setLearnosityReference($domainObject->getLearnosityReference())
+            ->setLearnosityJobReference($domainObject->getLearnosityJobReference())
+        ;
 
         // Translate mark scheme
         // TODO move this to the mark scheme translator
@@ -128,7 +130,9 @@ class Quiz implements IAssessmentTypeTranslator
             ->setCompletionMessage($dataModel->getCompletionMessage())
             ->setCreator($dataModel->getUser())
             ->setExternalId($dataModel->getExternalId())
-            ->setLearnosityReference($dataModel->getLearnosityReference());
+            ->setLearnosityReference($dataModel->getLearnosityReference())
+            ->setLearnosityJobReference($dataModel->getLearnosityJobReference())
+        ;
 
         // Copy mark type and grade group
         if (null !== $dataModel->getMarkType()) {

@@ -1364,6 +1364,7 @@ class MapperProxy
              * Otherwise it retains the old identifier lol
              */
             $subObject->setLearnosityReference($assessable->getLearnosityReference());
+            $subObject->setLearnosityJobReference($assessable->getLearnosityJobReference());
 
             QuizMapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof LtiAssessment\Model) {

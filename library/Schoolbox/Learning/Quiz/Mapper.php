@@ -298,6 +298,7 @@ class Mapper extends BaseMapper
              *  But Why?
              */
             $destination->setLearnosityReference($newLearnosityReference);
+            $destination->setLearnosityJobReference($learnosityJobReference);
             if ($destination->getId()) {
                 $this->database->prepareQuery(
                     "

@@ -56,6 +56,15 @@ class Model extends AbstractAssessment
 
 
     /**
+     * The Learnosity job reference identifier which associates an import of
+     * Learnosity data from one quiz to another.
+     *
+     * @var string|null
+     */
+    private ?string $learnosityJobReference = null;
+
+
+    /**
      * Decide whether to randomise all the items in a learnosity quiz
      *
      * @var int
@@ -128,6 +137,7 @@ class Model extends AbstractAssessment
         /** @var static $clone */
         $clone = parent::cloneForCopy();
         $clone->setLearnosityReference(null);
+        $clone->setLearnosityJobReference(null);
         return $clone;
     }
 
@@ -153,10 +163,11 @@ class Model extends AbstractAssessment
     public function overwrite(IAssessable $source): IAssessable
     {
         parent::overwrite($source);
-        $this->completionMessage   = $source->completionMessage;
-        $this->duration            = $source->duration;
-        $this->maxAttempts         = $source->maxAttempts;
-        $this->learnosityReference = null;
+        $this->completionMessage      = $source->completionMessage;
+        $this->duration               = $source->duration;
+        $this->maxAttempts            = $source->maxAttempts;
+        $this->learnosityReference    = null;
+        $this->learnosityJobReference = null;
         return $this;
     }
 
@@ -567,6 +578,26 @@ class Model extends AbstractAssessment
     public function setLearnosityReference(?string $learnosityReference): self
     {
         $this->learnosityReference = $learnosityReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityJobReference(): ?string
+    {
+        return $this->learnosityJobReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityJobReference
+     * @return Model
+     */
+    public function setLearnosityJobReference(?string $learnosityJobReference): self
+    {
+        $this->learnosityJobReference = $learnosityJobReference;
         return $this;
     }
 }
