@@ -4,6 +4,7 @@
  */
 
 import { useStore } from "./store/quizFeedbackStore";
+import { loadReport } from "./util/loadReport";
 
 interface Props {
     title: string; // the title of the quiz
@@ -23,7 +24,7 @@ const store = useStore();
 window.Vue.onMounted(async () => {
     store.init(props.statusPage);
     // await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
-    // loadReports(props.reportPayloads);
+    // loadReport(props.reportInitOptions);
 });
 </script>
 
