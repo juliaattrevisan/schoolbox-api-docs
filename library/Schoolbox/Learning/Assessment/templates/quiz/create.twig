@@ -2,6 +2,7 @@
 
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+<input type="hidden" name="learnosityReference" id="learnosity-reference" value="{{ assessment.learnosityReference }}" />
 
 
 {# TODO 'stage' is a temp hack until this fragment gets refactored to use *extend* instead of *include* #}
@@ -23,15 +24,6 @@
 
 
 <fieldset>
-    {# This is the Learnosity reference id. It's used to associate one of our Quizzes
-     # with a Learnosity quiz, kinda like a guid. We just specify one here, arbitrarily;
-     # if it doesn't exist in Learnosity, a Learnosity quiz will be created using the
-     # reference we provided. Otherwise, it'll load it from Learnosity
-     # TODO Make this a hidden input field when you're ready
-     #}
-    <label for="learnosity-reference">Learnosity Reference</label>
-    <input type="text" name="learnosityReference" id="learnosity-reference" value="{{ assessment.learnosityReference }}" maxlength="255" readonly />
-
     {# ----------------------------------------------------------- #}
     {# Title #}
     {# ----------------------------------------------------------- #}
@@ -217,7 +209,6 @@
     {{ visibility.dropdown(markVisibility, availableVisibilities) }}
 </fieldset>
 
-
 {# ----------------------------------------------------------- #}
 {# Participation #}
 {# ----------------------------------------------------------- #}
@@ -225,18 +216,15 @@
     {% include '@learningAssessment/fragments/participation.twig' %}
 {% endif %}
 
-
 {# ----------------------------------------------------------- #}
 {# Curriculum #}
 {# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Quiz'} %}
 
-
 {# ----------------------------------------------------------- #}
 {# Submit #}
 {# ----------------------------------------------------------- #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-
 
 {# ----------------------------------------------------------- #}
 {# Scripts #}
