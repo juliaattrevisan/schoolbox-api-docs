@@ -297,7 +297,7 @@ This was part of an auditing procedure and generates a csv
 Usage: extract.php --from=... --to=... [--max=...] > outfile.csv
         --from      Start date of extraction e.g. 2023-01-01
         --to        End date of extraction e.g. 2023-12-12
-        
+
         --max       Maximum number of assessments to process before arbitrarily exiting
                     (used for debugging faster)
 
@@ -450,8 +450,12 @@ HELP;
         }
 
         /* Anyone unmarked after the last iteration
+         * $studentList will be null if broken via max assess limit, and this
+         * won't be needed anyway
          */
-        $this->backfillUnmarked($lastAssessmentInfo, null, $studentList, $outstream);
+        if (isset($studentList)) {
+            $this->backfillUnmarked($lastAssessmentInfo, null, $studentList, $outstream);
+        }
 
         /* Gather some stats
          */
