@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Markbook\Export;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Markbook\AbstractCSV;

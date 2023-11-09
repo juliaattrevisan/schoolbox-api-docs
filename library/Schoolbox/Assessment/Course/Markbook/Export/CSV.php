@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Course\Markbook\Export;
 use Schoolbox\Assessment\Course\Markbook\CourseMarkbook;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Markbook\AbstractCSV;
 use Schoolbox\Learning\MarkScheme\Completion;
