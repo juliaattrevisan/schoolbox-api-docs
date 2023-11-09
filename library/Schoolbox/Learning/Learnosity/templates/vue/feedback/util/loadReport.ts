@@ -3,7 +3,7 @@
  */
 
 // import type { Item } from "@schoolboxLearnosity/js/types/Item";
-// import { useItemsStore } from "../store/hmItemsStore";
+import { useItemsStore } from "../store/qfItemsStore";
 // import { useStudentsStore } from "../store/hmStudentsStore";
 
 /**
@@ -25,16 +25,12 @@ function addTargetsToMarks(reportId: string) {
 }
 
 /**
- * store any passed through properties
+ * To load the reports data and pass it to the other stores
  * @param {object} initOptions - the report init options
  */
 export function loadReport(initOptions: object) {
-    // for (let i = 0; i < reportPayloads.length; i += 1) {
-    // const initOptions = JSON.parse(reportPayloads[i]);
-
     // To link the report to the student
     const reportId = initOptions.request.reports[0].id as string;
-
     /**
      * Every report gets its own callback; this is because the readyListeners()
      * don't have any idea which report they are in, which means we can't tell
@@ -44,7 +40,6 @@ export function loadReport(initOptions: object) {
     const reportCallback = {
         readyListener: () => {
             const attemptReport = reportsApp.getReport(reportId);
-
             // itemsApi only spawns if you used session-detail-by-item
             attemptReport.on("ready:itemsApi", (itemsApp) => {
                 // Load the items for the student
@@ -54,22 +49,14 @@ export function loadReport(initOptions: object) {
                     Object.values($items).forEach((item: Item) => {
                         items.push(item);
                     });
-                    // useStudentsStore().addItems(reportId, items);
+                    useItemsStore().addItems(items);
                     addTargetsToMarks(reportId);
-
-                    // // add the questions to the items, as they aren't included in the initial payload
-                    // if (i === 0) {
-                    //     useItemsStore().addQuestions(items);
-                    // }
                 });
-
                 // to notify the report has loaded
                 // useStudentsStore().reportLoaded(reportId);
             });
         },
     };
-
     // Initialise reports for each attempt
     const reportsApp = LearnosityReports.init(initOptions, reportCallback);
-    // }
 }
