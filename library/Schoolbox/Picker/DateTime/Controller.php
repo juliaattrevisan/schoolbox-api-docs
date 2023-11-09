@@ -100,10 +100,10 @@ class Controller extends Base
      * @param string $value   Default date to display
      * @param string|null $timetableHide    whether we should hide the timetable fields
      */
-    public function getPicker($type, $element, $id, $value, string|null $timetableHide = '')
+    public function getPicker($type, $element, $id, $value, string|null $hideTimetable = '')
     {
         $timetable = false;
-        if ('hideTimetable' !== $timetableHide) {
+        if ('hideTimetable' !== $hideTimetable) {
             $timetable = $this->getUserTimetable();
         }
 
@@ -316,7 +316,7 @@ class Controller extends Base
      */
     public function getTerms()
     {
-        return $this->termMapper->findAll([ 'order' => [ 'start' => 'desc' ] ]);
+        return $this->termMapper->findAll(['order' => ['start' => 'desc']]);
     }
 
     /**
