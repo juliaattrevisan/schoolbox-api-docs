@@ -3,9 +3,9 @@
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  */
 
-import { EditorEvent } from "@js/editor/event/editorEvent";
+import { EditorEvent, type EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * Initialise the composable
@@ -19,15 +19,15 @@ export function useEditor($currentValue: string, ckeditorSelector: string, edito
 
     /**
      * When a new editor is created
-     * @param { object } event - Javascript event object
+     * @param { CustomEvent } event - the event that triggered the creation of the editor
      */
-    function onEditorCreated(event: object) {
-        const editor = event.detail.editor as object;
+    function onEditorCreated(event: CustomEvent) {
+        const { editor } = event.detail as EditorCreatedEventInfo;
         if (currentValue.value !== null) {
             editor.setData(currentValue.value); // set the initial data
         }
         editor.model.document.on("change:data", () => {
-            currentValue.value = editor.getData() as string;
+            currentValue.value = editor.getData();
         });
     }
 
@@ -43,15 +43,13 @@ export function useEditor($currentValue: string, ckeditorSelector: string, edito
             }
             const ckeditorElement = document.getElementById(ckeditorSelector) as HTMLElement;
 
-            ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, onEditorCreated);
+            ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
+                onEditorCreated(event as CustomEvent);
+            });
 
             document.dispatchEvent(
                 new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: editorConfig,
-                    // detail: {
-                    //     targetElements: [`#${ckeditorSelector}`],
-                    //     hasTokens: true,
-                    // },
                 })
             );
         } catch (error) {

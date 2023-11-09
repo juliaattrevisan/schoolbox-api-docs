@@ -5,7 +5,7 @@ export enum EditorToolbar {
     DEFAULT = "default",
     COMMENT = "comment",
     SIMPLE = "simple",
-};
+}
 
 /**
  * The config object for the editor
@@ -22,4 +22,4 @@ export interface EditorConfig {
     addMaxCharCountDefaultEventListeners?: boolean; // Whether to add the default event listeners for dealing with events relating to max char count.
     showWordCount?: boolean; // whether or not to show the word count
     fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal
-};
+}

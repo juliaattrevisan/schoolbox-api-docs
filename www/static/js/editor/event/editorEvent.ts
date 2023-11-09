@@ -1,4 +1,4 @@
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 
 /**
  * The different events that can be dispatched by the editor
@@ -23,6 +23,14 @@ export enum EditorEvent {
 }
 
 // Types for information objects sent with events. /////////////////////////////////////////////////////////////////////
+
+/**
+ * When an EDITOR__CREATE event is dispatched, this is included
+ */
+export type EditorCreatedEventInfo = {
+    editor: ClassicEditor;
+    sourceElement: HTMLElement;
+};
 
 /**
  * When an EDITOR__DELETE event is dispatched, include this info:
