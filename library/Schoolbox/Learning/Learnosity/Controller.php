@@ -889,8 +889,6 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
-            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
             'itemResponses' => array_values(array_merge_recursive($scores, $comments)),
             'urls' => $urls
         ], sprintf(
