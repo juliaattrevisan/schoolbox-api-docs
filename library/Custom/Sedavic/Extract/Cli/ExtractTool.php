@@ -306,14 +306,15 @@ HELP;
             return;
         }
 
-        /* To figure out course names from their spec or impl
-         * Carefully abducted from Learnosity prototype
-         */
         $database = $this->getDatabaseInternal();
 
         /* Other dependencies
          */
         $this->externalClass = new \External_Class();
+
+        /* To figure out course names from their spec or impl
+         * Carefully abducted from Learnosity prototype
+         */
         $this->contextLookup = new ContextLookup($database);
 
         /* Basic user and assessment metadata
