@@ -34,9 +34,7 @@ class CSV extends AbstractCSV
     {
         $this->initExport($filename);
         // grab assessments, and remove lesson plans
-        $assessmentSpecs = $courseMarkbook->getCollapsedAssessments()->filter(static function (IAssessable $assessment) {
-            return AssessmentType::TYPE_LESSON_PLAN !== $assessment->getFamilyName();
-        });
+        $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
 
         // Column headings
         $this->writeHeader($assessmentSpecs);

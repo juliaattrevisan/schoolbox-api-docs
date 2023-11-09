@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
+use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -184,6 +185,19 @@ class Controller extends WebController\Base
 
         $queryArgs = $this->requestQuery->getArrayCopy();
         [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+
+        /**
+         * if no assessment type was selected, then use the following defaults...
+         */
+        if (!isset($filters[AssessmentTypeDefinition::class])) {
+            $filters[AssessmentTypeDefinition::class] = [
+                AssessmentTypeDefinition::KEY_PROJECT           => AssessmentTypeDefinition::KEY_PROJECT,
+                AssessmentTypeDefinition::KEY_QUIZ              => AssessmentTypeDefinition::KEY_QUIZ,
+                AssessmentTypeDefinition::KEY_DUE_WORK          => AssessmentTypeDefinition::KEY_DUE_WORK,
+                AssessmentTypeDefinition::KEY_TASK              => AssessmentTypeDefinition::KEY_TASK,
+                AssessmentTypeDefinition::KEY_LTI_ASSESSMENT    => AssessmentTypeDefinition::KEY_LTI_ASSESSMENT,
+            ];
+        }
 
         $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
