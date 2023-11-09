@@ -705,7 +705,7 @@ HELP;
         $tree = [];
 
         foreach ($leaves as &$leaf) {
-            if ($leaf['parentId'] === $parentId) {
+            if ((string)$leaf['parentId'] === $parentId) {
                 $children = $this->buildTree($leaves, (string)$leaf['id']);
 
                 if ($children) {
