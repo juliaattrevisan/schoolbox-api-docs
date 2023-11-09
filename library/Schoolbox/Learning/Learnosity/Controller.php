@@ -1636,25 +1636,47 @@ class Controller extends Base
         // failed: set and return status 4xx
         // complete: set and return status 200
 
-        // Ask Learnosity for the status of the job associated with this assessment
-        if (!$assessment instanceof Quiz) {
-            // error
-            return;
+        // Not a quiz, or no Learnosity job reference? error
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+        if (!$quiz->getLearnosityJobReference()) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        if (!$assessment->getLearnosityJobReference()) {
-            return;
+        // Already complete or failed: don't bother re-checking
+        $jobStatus = $quiz->getLearnosityJobStatus();
+        if ($jobStatus === Quiz::LEARNOSITY_JOB_STATUS_PROCESSING) {
+            // Check the API for this job's status
+            $learnosityJobResponse = $this->api->dataGetRequest(
+                '/jobs',
+                ["references" => [$quiz->getLearnosityJobReference()],],
+            );
+
+            // Possible statuses: queued, running, halted, completed
+            // https://reference.learnosity.com/data-api/endpoints/jobs_endpoints
+            $learnosityJobStatus = $learnosityJobResponse['data'][0]['status'] ?? null;
+            if ($learnosityJobStatus === Api::JOB_STATUS_COMPLETED) {
+                $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_COMPLETED;
+                $quiz->setLearnosityJobStatus($jobStatus);
+                $this->quizMapper->save($quiz);
+            } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
+                $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_FAILED;
+                $quiz->setLearnosityJobStatus($jobStatus);
+                $this->quizMapper->save($quiz);
+            }
         }
 
-        $jobStatus    = $assessment->getLearnosityJobStatus();
+
+        // What's in the response: just a "status" callback,
+        // possibly a API problem?
+        $jobStatus    = $quiz->getLearnosityJobStatus();
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
-            Quiz::LEARNOSITY_JOB_STATUS_FAILED    => 500,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
+            // including failure
             default => 400,
         };
         $this->response = $this
-            ->responseAsJson(['status' => $assessment->getLearnosityJobStatus()])
+            ->responseAsJson(['jobStatus' => $jobStatus])
             ->withStatus($responseCode);
     }
 
