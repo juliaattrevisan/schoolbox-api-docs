@@ -13,34 +13,72 @@ declare instance_registry_url_override
 declare instance_registry_api_token
 declare data_source
 declare extra_hostname
-declare aws_iam_key
-declare aws_iam_secret
+declare aws_account_id
+declare aws_role_name
+declare aws_start_url
+declare access_key_id
+declare secret_access_key
 
 function parse_args() {
   instance_registry_url_override=$1
   instance_registry_api_token=$2
   data_source=$3
   extra_hostname=$4
-  aws_iam_key=$5
-  aws_iam_secret=$6
+  aws_account_id=$5
+  aws_role_name=$6
+  aws_start_url=$7
 }
 
 function validate_args() {
-  if [[ $# -ne 6 ]]; then
-    error "Script requires 6 params, found $#"
+  if [[ $# -ne 7 ]]; then
+    error "Script requires 7 params, found $#"
     exit 1
   fi
   if [[ -z "$data_source" ]]; then
     echo "Please provide data_source" >&2
     exit 1
   fi
-  if [[ -z $aws_iam_key ]]; then
-    echo "Please provide IAM Access Key" >&2
+  if [[ -z $aws_account_id ]]; then
+    echo "Please provide aws_account_id" >&2
     exit 1
   fi
-  if [[ -z $aws_iam_secret ]]; then
-    echo "Please provide IAM Secret Key" >&2
+  if [[ -z $aws_role_name ]]; then
+    echo "Please provide aws_role_name" >&2
     exit 1
+  fi
+  if [[ -z $aws_start_url ]]; then
+    echo "Please provide aws_start_url" >&2
+    exit 1
+  fi
+}
+
+function setup_aws_cli() {
+  if type aws 2>/dev/null >&2; then
+    echo "AWS CLI already installed"
+    return
+  fi
+  echo "Installing AWS CLI"
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip -q awscliv2.zip
+  ./aws/install
+  rm -rf awscliv2.zip aws
+}
+
+function setup_aws_sso() {
+  echo "Setting up AWS SSO"
+  mkdir -p /root/.aws
+  echo "[default]
+sso_session = vagrant
+sso_account_id = $aws_account_id
+sso_role_name = $aws_role_name
+region = ap-southeast-2
+
+[sso-session vagrant]
+sso_region = ap-southeast-2
+sso_start_url = $aws_start_url" > /root/.aws/config
+
+  if ! aws configure list > /dev/null; then
+    aws sso login --no-browser
   fi
 }
 
@@ -108,7 +146,7 @@ function deploy_nginx_ssl_cert() {
   if [[ -z $extra_hostname ]]; then
     # Download vagrant cert
     s3Referer="TODO-invalid"
-    if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
+    if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
       echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'"
       exit 1
     fi
@@ -120,8 +158,6 @@ function deploy_nginx_ssl_cert() {
     filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
 
     if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "https://s3-ap-southeast-2.amazonaws.com/schoolbox-cloud-tls" \
-        --iam-access-key "$aws_iam_key" \
-        --iam-secret-key "$aws_iam_secret" \
         --file-name "certs/$filename" \
         --cache-dir "$cache_dir"; then
       echo "Unable to download wildcard certificate" >&2
@@ -136,6 +172,8 @@ function deploy_nginx_ssl_cert() {
 function main() {
   parse_args "$@"
   validate_args "$@"
+  setup_aws_cli
+  setup_aws_sso
   create_cache_dir
   create_mount_dir
   check_vagrant_box_version

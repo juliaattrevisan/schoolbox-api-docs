@@ -15,11 +15,9 @@ enable_xdebug="true";
 force_upgrade=0
 instance_registry_url="https://manage.schoolbox.cloud"
 declare phpversion_supported                                # Must be specified via script arg
-declare aws_iam_key
-declare aws_iam_secret
 
-if [[ $# -ne 14 ]]; then
-  error "Script requires 14 params, found $#"
+if [[ $# -ne 12 ]]; then
+  error "Script requires 12 params, found $#"
   exit 1
 fi
 
@@ -49,8 +47,6 @@ if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]];
   error " Invalid 'taskd_build_from_local' value. Expected ['0','1']. Found: $taskd_build_from_local";
   exit 1
 fi
-aws_iam_key=${13}
-aws_iam_secret=${14}
 
 # Does this environment use the systemd-wrapped taskd service?
 declare taskd_systemd_service_installed
@@ -79,11 +75,11 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
 
 # Download some files from S3
-if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
   exit 1;
 fi
-if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
   exit 1;
 fi
@@ -197,8 +193,6 @@ fi
 if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
---iam-access-key "$aws_iam_key" \
---iam-secret-key "$aws_iam_secret" \
 --skip-bucket-copy \
 --sql-host 'localhost' \
 --sql-schema 'schoolbox' \
@@ -257,8 +251,6 @@ declare -A env_vars=(
   [FACTER_primary_php_majver]="$phpversion_supported"
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
   [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
-  [FACTER_iam_access_key]="$aws_iam_key"
-  [FACTER_iam_secret_key]="$aws_iam_secret"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
@@ -280,8 +272,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-ins
 FACTER_vagrant_extra_hostname="$extra_hostname" \
     FACTER_primary_php_majver="$phpversion_supported" \
     FACTER_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
-    FACTER_iam_access_key="$aws_iam_key" \
-    FACTER_iam_secret_key="$aws_iam_secret" \
     "$SITE_ROOT"/puppet-apply.sh
 
 

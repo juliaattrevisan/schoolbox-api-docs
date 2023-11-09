@@ -26,8 +26,6 @@ readonly ARG_DATA_SOURCE='data-source'
 readonly ARG_FILE_NAME='file-name'
 readonly ARG_CACHE_DIR='cache-dir'
 readonly ARG_S3_REFERER='s3-referer'
-readonly ARG_IAM_ACCESS_KEY='iam-access-key'
-readonly ARG_IAM_SECRET_KEY='iam-secret-key'
 readonly ARG_HELP_SHORT='h'
 readonly ARG_HELP='help'
 readonly CACHE_DIR_DEFAULT="/tmp"
@@ -38,8 +36,6 @@ declare file_name_short;                        # The name we use on local disk,
 declare file_basename                           # Prefix and version stripped,   eg 'sales.tar.gz'
 declare cache_dir="$CACHE_DIR_DEFAULT"
 declare s3_referer;
-declare iam_access_key
-declare iam_secret_key
 # Where to fetch files from:
 # eg "https://s3-ap-southeast-2.amazonaws.com/schoolbox-data-temp"  - S3, use IAM credentials
 # eg "https://gw-mel.alaress.com.au/sandbox-data"                   - not S3, no auth
@@ -72,8 +68,6 @@ function print_help(){
   echo "  --$ARG_DATA_SOURCE <data-source>       Required. Where to download file from. Either S3 or Camberwell office caching proxy."
   echo "  --$ARG_CACHE_DIR <cache-dir>           Optional. Defaults to '$CACHE_DIR_DEFAULT'. Where to download file to."
   echo "  --$ARG_S3_REFERER <s3-referer>         Optional. Authentication token."
-  echo "  --$ARG_IAM_ACCESS_KEY <iam-access-key> Required to download from S3 data sources"
-  echo "  --$ARG_IAM_SECRET_KEY <iam-secret-key> Required to download from S3 data sources"
 }
 
 
@@ -90,12 +84,6 @@ function parse_args(){
         ;;
         --"$ARG_S3_REFERER")
         s3_referer="$2"; shift; shift;
-        ;;
-        --"$ARG_IAM_ACCESS_KEY")
-        iam_access_key="$2"; shift; shift;
-        ;;
-        --"$ARG_IAM_SECRET_KEY")
-        iam_secret_key="$2"; shift; shift;
         ;;
         --"$ARG_FILE_NAME")
         file_name="$2"; shift; shift;
@@ -138,19 +126,6 @@ function validate_args(){
     error "Please provide a data source to download from: e.g. --$ARG_DATA_SOURCE 'https://s3-ap-southeast-2.amazonaws.com/schoolbox-data'";
     errors='1'
   fi
-
-  # Is data source S3 or generic HTTP?
-  if is_s3_data_source; then
-    if [[ -z "$iam_access_key" ]]; then
-      error "Please provide an IAM Access Key to authenticate to AWS with using: e.g. --$ARG_IAM_ACCESS_KEY 'xxx'";
-      errors='1'
-    fi
-    if [[ -z "$iam_secret_key" ]]; then
-      error "Please provide an IAM Secret Key to authenticate to AWS with using: e.g. --$ARG_IAM_SECRET_KEY 'xxx'";
-      errors='1'
-    fi
-  fi
-
   if [[ -z "$file_name" ]]; then
     error "Please provide a file to download: e.g. --$ARG_FILE_NAME 'sales.tar.gz'";
     errors='1'
@@ -186,31 +161,13 @@ function check_cache_file_hash(){
 
 # See https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html
 function check_cache_s3(){
-  resource="/$s3_bucket/$file_name_short"
-  dateValue="$(date -u +'%a, %d %b %Y %H:%M:%S GMT')"
-  contentType="application/x-compressed-tar"
-  stringToSign="HEAD\n\n${contentType}\n\nx-amz-date:${dateValue}\n${resource}"
-  signature=$(/bin/echo -en "$stringToSign" | openssl sha1 -hmac "${iam_secret_key}" -binary | base64)
-
-  local curl_head;
-  if ! curl_head=$(curl --head --silent  --show-error -H "Host: ${s3_bucket}.s3.amazonaws.com" \
-    -H "x-amz-date: ${dateValue}" \
-    -H "Content-Type: ${contentType}" \
-    -H "Authorization: AWS ${iam_access_key}:${signature}" \
-    "https://$s3_bucket.s3.amazonaws.com/$file_name_short"); then
-    error "Unable to fetch curl head for $data_source/$file_name"
-    exit 1;
-  fi
-
-  local http_response_code;
-  http_response_code=$(echo "$curl_head" | grep -E 'HTTP/(1.0|1.1|2)' | cut -d' ' -f2);
-  if [ "$http_response_code" != "200" ]; then
-    error "Curl header HTTP response code error: $http_response_code";
+  if ! head=$(aws s3api head-object --bucket "$s3_bucket" --key "$file_name_short"); then
+    error "Unable to fetch aws s3api head-object for $s3_bucket/$file_name_short"
     exit 1;
   fi
 
   local etag;
-  etag=$(echo "$curl_head" | grep -E '^ETag: "(\w+)"' | cut -d'"' -f2)
+  etag=$(echo "$head" | jq -r '.ETag')
   if [ -z "$etag" ]; then
     error "Unable to parse etag from curl head"
     exit 1;
@@ -256,18 +213,8 @@ function check_cache(){
 
 # See https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
 function download_file_s3(){
-  resource="/$s3_bucket/$file_name_short"
-  dateValue="$(date -u +'%a, %d %b %Y %H:%M:%S GMT')"
-  contentType="application/x-compressed-tar"
-  stringToSign="GET\n\n${contentType}\n\nx-amz-date:${dateValue}\n${resource}"
-  signature=$(/bin/echo -en "$stringToSign" | openssl sha1 -hmac "${iam_secret_key}" -binary | base64)
 
-  if ! curl --silent --show-error -H "Host: ${s3_bucket}.s3.amazonaws.com" \
-    -H "x-amz-date: ${dateValue}" \
-    -H "Content-Type: ${contentType}" \
-    -H "Authorization: AWS ${iam_access_key}:${signature}" \
-    "https://$s3_bucket.s3.amazonaws.com/$file_name_short" \
-    -o "$cache_dir/$file_basename"; then
+  if ! aws s3 cp "s3://$s3_bucket/$file_name_short" "$cache_dir/$file_basename"; then
     error "Unable to download file: $data_source/$file_name"
     exit 1;
   fi
