@@ -20,13 +20,35 @@ import { useStore } from "./quizFeedbackStore";
 import { useItemsStore } from "./qfItemsStore";
 
 export const useStudentStore = defineStore("qfStudent", () => {
-    const student = window.Vue.ref<Student>();
+    const student = window.Vue.ref<Student>({
+        id: 0,
+        firstname: "",
+        lastname: "",
+        name: "",
+        elementId: "",
+        hasReport: false,
+        isReportLoaded: false,
+        isExpanded: false,
+        isMarked: false,
+        items: [],
+        attemptComment: {
+            learnosityReference: "",
+            studentId: 0,
+        },
+        urls: {
+            studentId: 0,
+            score: "",
+            comment: "",
+            attemptComment: "",
+            teacherFeedback: "",
+        },
+    });
     const isExpanded = window.Vue.ref<boolean>(true); // if all students are expanded
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
     const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]); // all attempt comments from the backend
     const urls = window.Vue.ref<StudentUrls>(); // the urls for each student to save score, comment and attempt comment
     const showMarkedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
-    const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
+    // const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
     const store = useStore();
 
     /**
@@ -95,7 +117,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             setInitialQuestionIsMarked(item);
             item.isMarked = getItemIsMarked(item);
         });
-        student.value.isMarked = getStudentIsMarked(student);
+        student.value.isMarked = getStudentIsMarked(student.value);
         student.value.attemptComment = getAttemptResponse(attemptComments.value, student.value.id);
         student.value.urls = getUrls(urls.value, student.value.id);
     }
@@ -121,7 +143,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
      */
     function updateItemsIsMarked() {
         useItemsStore().items.forEach((item) => {
-            const studentItem = student.value.items.find(($item) => $item.reference === item.reference);
+            const studentItem = student.value.items.find(($item) => $item.reference === item.reference) as StudentItem;
             item.isMarked = studentItem.isMarked;
         });
     }
@@ -143,7 +165,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
      */
     function updateIsMarked($student: Student, item: StudentItem) {
         item.isMarked = getItemIsMarked(item);
-        student.value.isMarked = getStudentIsMarked(student);
+        student.value.isMarked = getStudentIsMarked(student.value);
         updateItemsIsMarked();
     }
 
@@ -197,7 +219,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
         student,
         isExpanded,
         showMarkedAttempts,
-        allStudentsMarked,
+        // allStudentsMarked,
         toggleStudent,
         reportLoaded,
         updateItemResponseScore,
