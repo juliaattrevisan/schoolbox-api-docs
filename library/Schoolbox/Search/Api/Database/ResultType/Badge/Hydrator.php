@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
@@ -137,10 +138,10 @@ class Hydrator extends BaseHydrator
     {
         $links = [];
 
-        $canCreateBadgesRule = new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF);
-        $canCreateBadges = $canCreateBadgesRule->authorize([], $this->authorizer->getUser());
+        $params = ['badgeId' => $badge->getId(), 'badge' => $badge];
 
-        if ($canCreateBadges) {
+        $awardRoute = 'learningBadgeAward.awardAsAchievement';
+        if ($this->authorizer->isPathAuthorizedForUser($awardRoute, $params, $viewer)) {
             $links[] = [
                 'title' => 'Award Achievement',
                 'icon' => 'icon-badge',
@@ -153,7 +154,8 @@ class Hydrator extends BaseHydrator
             ];                                      // The modal prompts the user to supply the students to whom the achievement should be awarded.
         }
 
-        if ($canCreateBadges) {
+        $goalRoute = 'learningBadgeAward.setAsGoal';
+        if ($this->authorizer->isPathAuthorizedForUser($goalRoute, $params, $viewer)) {
             $links[] = [
                 'title' => 'Set Goal',
                 'icon' => 'icon-goal',
@@ -167,7 +169,6 @@ class Hydrator extends BaseHydrator
         }
 
         $route = 'learningBadge.getUpdateForm';
-        $params = ['badgeId' => $badge->getId(), 'badge' => $badge];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
             $links[] = [
                 'title' => 'Modify',
