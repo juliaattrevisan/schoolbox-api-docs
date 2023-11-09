@@ -90,8 +90,7 @@ class CSV extends AbstractCSV
     private function getSortedAssessments(Markbook $markbook)
     {
         $sortedAssessments = new GenericCollection(IAssessable::class);
-        $assessments = $markbook->getAssessments();
-        foreach ($assessments as $assessment) {
+        foreach ($markbook->getAssessments() as $assessment) {
             $sortedAssessments[$assessment->getId()] = $assessment;
         }
         return $sortedAssessments;
