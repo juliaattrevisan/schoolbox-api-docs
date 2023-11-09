@@ -575,7 +575,7 @@ class Controller extends Base
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
         $payload = [
-            'user_id' => (string)$attempt->getUser()->getId(),
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
             'reports' => [
                 [
                     /* DOM element id, where this goes in
