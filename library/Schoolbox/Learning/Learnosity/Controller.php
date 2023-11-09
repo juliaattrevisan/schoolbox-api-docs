@@ -829,8 +829,10 @@ class Controller extends Base
             $learnosityReference = $response['response_id'];
 
             $scores[$learnosityReference] = [
+                'learnosityReference' => $learnosityReference,
                 'score' => $response['score'],
-                'max' => $response['max_score']
+                'maxScore' => $response['max_score'],
+                'itemReference' => $response['item_reference']
             ];
         }
 
@@ -855,6 +857,7 @@ class Controller extends Base
             'attempt' => $attempt,
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
             'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
+            'itemResponses' => array_values(array_merge_recursive($scores, $comments))
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),

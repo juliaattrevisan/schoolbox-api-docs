@@ -19,6 +19,9 @@
 <div id="quiz-feedback-container">
     <quiz-feedback
         :title="'{{ assessment.title }}'"
+        :item-responses="{{ itemResponses|json_encode }}"
+        :attempt="{{ attempt|json_encode }}"
+        :report-init-options="{{ reportInitOptions }}"
         status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
     />
 </div>
