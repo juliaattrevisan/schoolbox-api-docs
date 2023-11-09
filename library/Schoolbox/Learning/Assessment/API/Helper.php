@@ -573,7 +573,6 @@ class Helper
                 LEFT JOIN `user` `reviewer`    on `prr`.`marker_id` = `reviewer`.`id`
             where
               `prr`.`deleted_at` is null
-              and `prr`.`norm_mark` is not null
               and `pr`.`assessment_id` in ({$bindings->getPlaceholder()})
             PROJECT,
         ];
