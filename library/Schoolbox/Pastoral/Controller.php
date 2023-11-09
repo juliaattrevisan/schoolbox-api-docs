@@ -52,7 +52,6 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;

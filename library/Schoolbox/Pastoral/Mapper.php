@@ -31,7 +31,6 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\RecordAction\Mapper as PastoralRecordActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Resource\Search\Results;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
