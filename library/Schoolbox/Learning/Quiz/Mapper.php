@@ -86,6 +86,7 @@ class Mapper extends BaseMapper
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('external_id', self::TYPE_STRING);
         $this->uses('learnosity_reference', self::TYPE_STRING);
+        $this->uses('learnosity_job_reference', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
@@ -288,6 +289,7 @@ class Mapper extends BaseMapper
                     ]
                 ]
             ]);
+            $learnosityJobReference = $response['data']['job_reference'] ?? null;
 
             // Assign and save Learnosity reference
             /* FIXME projects need some special treatment of some kind,
@@ -300,10 +302,11 @@ class Mapper extends BaseMapper
                 $this->database->prepareQuery(
                     "
                         UPDATE {$this->database->getQuoter()->quoteIdentifier($this->table)}
-                        SET learnosity_reference = ?
+                        SET learnosity_reference = ?,
+                            learnosity_job_reference = ?
                         WHERE assessment_id = ?
                     ",
-                    [$newLearnosityReference, $destination->getId()],
+                    [$newLearnosityReference, $learnosityJobReference, $destination->getId()],
                 )->execute();
             }
 
@@ -314,7 +317,7 @@ class Mapper extends BaseMapper
              */
 
             // Return whatever the job ID from Learnosity was
-            return $response['data']['job_reference'] ?? null;
+            return $learnosityJobReference;
         }
 
 

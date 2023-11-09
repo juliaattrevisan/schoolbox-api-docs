@@ -193,6 +193,15 @@ class Model implements ISoftDeletable, IAssessableDataModel
 
 
     /**
+     * The Learnosity job reference identifier which associates an import of
+     * Learnosity data from one quiz to another.
+     *
+     * @var string|null
+     */
+    private ?string $learnosityJobReference = null;
+
+
+    /**
      * Indexed by section.id
      * @var QuizSection[]|GenericCollection<QuizSection>
      */
@@ -795,6 +804,26 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function setLearnosityReference(?string $learnosityReference): self
     {
         $this->learnosityReference = $learnosityReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityJobReference(): ?string
+    {
+        return $this->learnosityJobReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityJobReference
+     * @return $this
+     */
+    public function setLearnosityJobReference(?string $learnosityJobReference): self
+    {
+        $this->learnosityJobReference = $learnosityJobReference;
         return $this;
     }
 
