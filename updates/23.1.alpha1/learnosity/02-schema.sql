@@ -4,6 +4,9 @@ ALTER TABLE `assess`
 ALTER TABLE `assess`
     ADD COLUMN `learnosity_job_reference` VARCHAR(255) NULL AFTER `learnosity_reference`;
 
+ALTER TABLE `assess`
+    ADD COLUMN `learnosity_job_status` ENUM('pending', 'processing', 'completed', 'failed') NULL AFTER `learnosity_job_reference`;
+
 ALTER TABLE `assess_attempt`
     ADD COLUMN `learnosity_reference` VARCHAR(255) NULL AFTER `max_mark`;
 
