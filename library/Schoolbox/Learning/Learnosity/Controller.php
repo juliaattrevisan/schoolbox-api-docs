@@ -793,6 +793,17 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
+
+        /* The student who did the attempt
+        */
+        $studentData = [
+            'id' => $attempt->getUser()->getId(),
+            'name' => $attempt->getUser()->getFullName(),
+            'firstname' => $attempt->getUser()->getFirstname(),
+            'lastname' => $attempt->getUser()->getLastname(),
+            'elementId' => 'schoolbox-student'
+        ];
+
         /* This is what the student did
          */
         $reportPayload = [
@@ -872,6 +883,8 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
+            'student' => $studentData,
+            'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $reportPayload),

@@ -14,6 +14,7 @@ import QfStudent from "./student/qf-student.vue";
 
 interface Props {
     title: string; // the title of the quiz
+    student: object; // Student[] the student who has attempted the quiz
     itemResponses: object[]; // StudentItemQuestionResponse[] all the item responses for the quiz, which can include multiple questions within the same item
     attempt: object; // StudentAttemptComment[] all the overall attempt comments for the quiz
     urls: object; // StudentUrls[] the urls to use for the students to update their scores and comments

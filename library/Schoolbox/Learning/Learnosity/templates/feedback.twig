@@ -1,12 +1,16 @@
 {##
  # Give feedback for an attempt
  #
+ # @param object student                   The student's data
+ # @param string|array $reportInitOptions  Learnosity API initialisation object
  # @param IAssessable $assessment          Our schoolbgox quiz instance
  # @param array $breadcrumbs               A context trail at the top of the screeen
  # @param string|array $initOptions        Learnosity API initialisation object
  # @param Attempt\Model $attempt           The student's attempt from our local db
  # @param array $scores                    A list of score tuples obtained per question in this attempt
  # @param array $comments                  A list of comment tuples that contain per-question comments
+ # @param string $itemResponses     A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
+ # @param array $urls                      A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -19,6 +23,7 @@
 <div id="quiz-feedback-container">
     <quiz-feedback
         :title="'{{ assessment.title }}'"
+        :student="{{ student|json_encode }}"
         :item-responses="{{ itemResponses|json_encode }}"
         :attempt="{{ attempt|json_encode }}"
         :report-init-options="{{ reportInitOptions }}"
