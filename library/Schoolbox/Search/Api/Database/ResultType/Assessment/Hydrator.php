@@ -89,7 +89,7 @@ class Hydrator extends BaseHydrator
         //    Students
         //     - Should only see assessments in their own classes/groups
         //     - Should only see assessments that they have not been excluded from
-        //     - Should only see assessments that have reached their open date
+        //     - Should only see assessments that have been published
         //    Staff
         //     - Should see assessments in their own classes
         //     - Should see assessments in units that they have permission to access
@@ -131,8 +131,8 @@ class Hydrator extends BaseHydrator
                 // This permissions check was added because the Visibility check above was found to be insufficient.
                 // From permissions summary above:
                 //    Students
-                //     - Should only see assessments that have reached their open date
-                if ($viewer->getRole()->isStudent() && $assessment->getOpenAt()?->isFutureDate()) {
+                //     - Should only see assessments that have been published
+                if ($viewer->getRole()->isStudent() && $assessment->getPublishAt()?->isFuture()) {
                     return null;
                 }
 
