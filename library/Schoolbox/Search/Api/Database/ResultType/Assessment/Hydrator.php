@@ -132,7 +132,7 @@ class Hydrator extends BaseHydrator
                 // From permissions summary above:
                 //    Students
                 //     - Should only see assessments that have reached their open date
-                if ($viewer->getRole()->isStudent() && $assessment->getOpenAt()?->isFuture()) {
+                if ($viewer->getRole()->isStudent() && $assessment->getOpenAt()?->isFutureDate()) {
                     return null;
                 }
 
