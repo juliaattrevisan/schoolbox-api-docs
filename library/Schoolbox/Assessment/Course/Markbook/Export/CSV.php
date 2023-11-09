@@ -33,7 +33,6 @@ class CSV extends AbstractCSV
     public function export(CourseMarkbook $courseMarkbook, string $filename, bool $showDrafts): void
     {
         $this->initExport($filename);
-        // grab assessments, and remove lesson plans
         $assessmentSpecs = $courseMarkbook->getCollapsedAssessments();
 
         // Column headings
