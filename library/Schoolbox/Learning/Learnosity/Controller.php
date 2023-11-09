@@ -1137,21 +1137,6 @@ class Controller extends Base
         ));
     }
 
-
-    /**
-     * Takes an array of data, removes associations, json_encodes then
-     * bse64_encodes for html safety prior to giving to twig
-     *
-     * @param array $data
-     * @return string
-     * @throws \JsonException
-     */
-    private function encodeJs(array $data): string
-    {
-        return base64_encode(json_encode(array_values($data), JSON_THROW_ON_ERROR));
-    }
-
-
     /**
      * Persists a new score back to Learnosity for it to re-tally
      *
