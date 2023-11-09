@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
+use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
@@ -301,6 +302,18 @@ class Controller extends Base
 
         [$filters] = $this->convertRequestToFilters($filtersArray, false);
 
+        /**
+         * if no assessment type was selected, then use the following defaults...
+         */
+        if (!isset($filters[AssessmentTypeDefinition::class])) {
+            $filters[AssessmentTypeDefinition::class] = [
+                AssessmentTypeDefinition::KEY_PROJECT           => AssessmentTypeDefinition::KEY_PROJECT,
+                AssessmentTypeDefinition::KEY_QUIZ              => AssessmentTypeDefinition::KEY_QUIZ,
+                AssessmentTypeDefinition::KEY_DUE_WORK          => AssessmentTypeDefinition::KEY_DUE_WORK,
+                AssessmentTypeDefinition::KEY_TASK              => AssessmentTypeDefinition::KEY_TASK,
+                AssessmentTypeDefinition::KEY_LTI_ASSESSMENT    => AssessmentTypeDefinition::KEY_LTI_ASSESSMENT,
+            ];
+        }
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
         $showDrafts    = (bool)($filtersArray['showDrafts'] ?? false);
