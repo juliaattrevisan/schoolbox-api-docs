@@ -1447,11 +1447,6 @@ span.lrn-author-name-wrapper {
     font-family: "schoolbox";
 }
 
-/* hide back to home button */
-a.button {
-    display: none;
-}
-
 /* questions and features button styles */
 .lrn .lrn-author-ui .lrn-author-btn-outline {
     background-color: var(--content-ui-background);
