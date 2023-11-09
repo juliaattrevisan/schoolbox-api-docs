@@ -147,10 +147,7 @@ class Controller extends Base
         if ($this->samlBlacklist()) {
             $data['requestFromInternalIp'] = true;
             $internalSsoUrl                = new Uri($this->getConfigLoader()->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL));
-            $internalSsoUrlParams          = [
-                'instance_id' => INSTANCE_ID,
-                'redirect'    => $data['page'],
-                ];
+            $internalSsoUrlParams          = ['instance_id' => INSTANCE_ID];
             if ($data['page']) {
                 $internalSsoUrlParams['redirect'] = $data['page'];
             }
