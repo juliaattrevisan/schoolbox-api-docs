@@ -47,6 +47,15 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Possible statuses for Learnosity jobs.
+     */
+    public const LEARNOSITY_JOB_STATUS_PENDING = 'pending';
+    public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';
+    public const LEARNOSITY_JOB_STATUS_COMPLETED = 'completed';
+    public const LEARNOSITY_JOB_STATUS_FAILED = 'failed';
+
+
+    /**
      * Learnosity reference identifier, to associate our quiz
      * with a Learnosity quiz.
      *
@@ -62,6 +71,13 @@ class Model extends AbstractAssessment
      * @var string|null
      */
     private ?string $learnosityJobReference = null;
+
+
+    /**
+     * The status of the Learnosity job: if set, this is one of the
+     * `self::LEARNOSITY_JOB_STATUS_*` constants.
+     */
+    private ?string $learnosityJobStatus = null;
 
 
     /**
@@ -598,6 +614,26 @@ class Model extends AbstractAssessment
     public function setLearnosityJobReference(?string $learnosityJobReference): self
     {
         $this->learnosityJobReference = $learnosityJobReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityJobStatus(): ?string
+    {
+        return $this->learnosityJobStatus;
+    }
+
+
+    /**
+     * @param string|null $learnosityJobStatus
+     * @return $this
+     */
+    public function setLearnosityJobStatus(?string $learnosityJobStatus): self
+    {
+        $this->learnosityJobStatus = $learnosityJobStatus;
         return $this;
     }
 }
