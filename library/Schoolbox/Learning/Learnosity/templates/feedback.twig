@@ -22,6 +22,7 @@
         :item-responses="{{ itemResponses|json_encode }}"
         :attempt="{{ attempt|json_encode }}"
         :report-init-options="{{ reportInitOptions }}"
+        :urls="{{ urls|json_encode }}"
         status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
     />
 </div>

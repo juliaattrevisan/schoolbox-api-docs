@@ -296,10 +296,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([$assessment->getTitle(),
-                                           $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
-                                          ])
-                                    ->add(['Modify Content', null]);
+            ->add([
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ])
+            ->add(['Modify Content', null]);
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
@@ -663,17 +664,19 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add(
-                                        [$assessment->getTitle(),
-                                         $this->routeGenerator->generate(
-                                             'learningAssessment.getSummary',
-                                             ['assessmentId' => $assessment->getId(),
-                                              'studentId' => $this->getUser()->getId()
-                                             ]
-                                         )
-                                        ]
-                                    )
-                                    ->add(['Result Summary']);
+            ->add(
+                [
+                    $assessment->getTitle(),
+                    $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId' => $this->getUser()->getId()
+                        ]
+                    )
+                ]
+            )
+            ->add(['Result Summary']);
 
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'assessment' => $assessment,
@@ -843,12 +846,30 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-            [$assessment->getTitle(),
+            [
+                $assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
 
             ]
         )
             ->add(['Feedback']);
+
+        /* Pregenerate all the urls for the user, because you can't manufacture them
+        * in javascript without risking desync with backend
+        */
+        $args = [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $attempt->getUser()->getId(),
+            'learnositySessionReference' => $attempt->getLearnosityReference()
+        ];
+
+        $urls = [
+            'studentId' => $attempt->getUser()->getId(),
+            'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+            'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+            'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+            'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+        ];
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'assessment' => $assessment,
@@ -857,7 +878,8 @@ class Controller extends Base
             'attempt' => $attempt,
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
             'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
-            'itemResponses' => array_values(array_merge_recursive($scores, $comments))
+            'itemResponses' => array_values(array_merge_recursive($scores, $comments)),
+            'urls' => $urls
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
@@ -1290,11 +1312,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([
-                                            $assessment->getTitle(),
-                                            $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
-                                          ])
-                                    ->add(['Horizontal Marking']);
+            ->add([
+                $assessment->getTitle(),
+                $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+            ])
+            ->add(['Horizontal Marking']);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'assessment' => $assessment,
