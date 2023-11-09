@@ -163,12 +163,11 @@ class ListController extends Web\Controller\Base
         /* Send as a downloadable file
          */
         $this->response = $this->responseFromContent($contents)
-                               ->withHeader('Pragma', 'no-cache')
-                               ->withHeader('Cache-Control', 'private, max-age=1, no-transform')
-                               ->withHeader('Content-Type', 'application/seb')
-                               ->withHeader('Content-Length', strlen($contents))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"")
-        ;
+            ->withHeader('Pragma', 'no-cache')
+            ->withHeader('Cache-Control', 'private, max-age=1, no-transform')
+            ->withHeader('Content-Type', 'application/seb')
+            ->withHeader('Content-Length', strlen($contents))
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"");
     }
 
 
@@ -245,7 +244,7 @@ class ListController extends Web\Controller\Base
             $user = $this->getUser();
         }
 
-        $assessments = $this->getAssessmentMapper()->findAllByContext($context, ['hydrateParticipants' => true ]);
+        $assessments = $this->getAssessmentMapper()->findAllByContext($context, ['hydrateParticipants' => true]);
 
         if ($readOnly) {
             $hasContextWrite = false;
@@ -581,18 +580,6 @@ class ListController extends Web\Controller\Base
             ['Learning', $this->routeGenerator->generate('learning.getClasses')],
             [$context->getFolder()->getTitle(), "/homepage/{$context->getFolder()->getId()}"],
         ];
-        // This needs to be here for creating a quiz in a project or from Course Builder component
-        $data['importAttachzone'] = (new Zone('importXml'))
-            ->setFileVar('importXml[]')
-            ->setThumbnailSize(64)
-            ->setModalTitle('Select XML')
-            ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload XML')
-            ->setMimeFilter('text/xml,application/xml')
-            ->setReadOnly(false)
-            ->setMulti(false)
-            ->useImportExpiryDate()
-            ->getTwigContext();
         if ($context instanceof Project) {
             $data['breadcrumbs'][] = [
                 $context->getTitle(),
@@ -739,13 +726,13 @@ class ListController extends Web\Controller\Base
     private function savePlanData(IAssessable $assessment, array $postPlans = [])
     {
         $assessmentId = $assessment->getId();
-        $dateFields = [ 'publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at' ];
+        $dateFields = ['publish_date',  'open_date', 'due_date', 'close_date', 'created_at', 'updated_at'];
 
         $planMap = $this->participantDataSource->getPlanMapper();
 
         // preload the plans list
-        $plans = $planMap->findByColumnList([ 'assessment_id' => $assessmentId ])
-                         ->indexBy('id');
+        $plans = $planMap->findByColumnList(['assessment_id' => $assessmentId])
+            ->indexBy('id');
 
         // obtain this reference for later
         $dynaPlan = $plans->filterBy('isDynamic', true)->first();
@@ -841,7 +828,7 @@ class ListController extends Web\Controller\Base
     protected function redirect($url)
     {
         if ($this->isXhrRequest()) {
-            $this->response = $this->responseAsJson([Redirect::RETURN_URL => $url ]);
+            $this->response = $this->responseAsJson([Redirect::RETURN_URL => $url]);
         } else {
             $this->response = $this->redirectAfterPost($url);
         }
@@ -1075,8 +1062,8 @@ class ListController extends Web\Controller\Base
             'assessment'  => $assessment,
             'returnUrl'   => $returnUrl->__toString(),
             'breadcrumbs' => $this->getBakery()
-                                  ->produceFromAssessment($assessment, $this->getUser())
-                                  ->add([$assessment->getTitle(), $statusUrl])
+                ->produceFromAssessment($assessment, $this->getUser())
+                ->add([$assessment->getTitle(), $statusUrl])
         ];
 
         // Launches:
@@ -1216,8 +1203,8 @@ class ListController extends Web\Controller\Base
             'assessment'  => $assessment,
             'returnUrl'   => $returnUrl->__toString(),
             'breadcrumbs' => $this->getBakery()
-                                  ->produceFromAssessment($assessment, $this->getUser())
-                                  ->add([$assessment->getTitle(), $summaryUrl])
+                ->produceFromAssessment($assessment, $this->getUser())
+                ->add([$assessment->getTitle(), $summaryUrl])
         ];
 
         // Launches:
