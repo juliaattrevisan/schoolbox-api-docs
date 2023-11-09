@@ -83,7 +83,6 @@ class CSV extends AbstractCSV
 
     /**
      * Get assessments sorted as displayed in markbook, indexed by assessment.id
-     * whilst removing lessonplans (we don't show lesson plans in markbooks, or markbook exports)
      *
      * @param Markbook $markbook
      * @return GenericCollection|IAssessable[]
