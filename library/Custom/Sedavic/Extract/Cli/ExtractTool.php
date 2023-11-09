@@ -372,7 +372,7 @@ HELP;
 
         /* Artificial circuit breaker
          */
-        $nAssessments = 9;
+        $nAssessments = 0;
         $maxAssessments = (int)$this->getOpt(self::OPT_LONG_MAX_ASSESSMENTS);
 
         while ($assessmentInfo = $this->assessmentInfoStatement->fetch(\PDO::FETCH_ASSOC)) {
