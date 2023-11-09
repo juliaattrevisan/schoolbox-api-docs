@@ -87,6 +87,19 @@ class Mapper extends BaseMapper
         $this->uses('external_id', self::TYPE_STRING);
         $this->uses('learnosity_reference', self::TYPE_STRING);
         $this->uses('learnosity_job_reference', self::TYPE_STRING);
+        $this->uses(
+            'learnosity_job_status',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [
+                null,
+                Model::LEARNOSITY_JOB_STATUS_PENDING,
+                Model::LEARNOSITY_JOB_STATUS_PROCESSING,
+                Model::LEARNOSITY_JOB_STATUS_COMPLETED,
+                Model::LEARNOSITY_JOB_STATUS_FAILED,
+            ],
+        );
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
