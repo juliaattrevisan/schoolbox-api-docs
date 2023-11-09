@@ -10,14 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Authorizer\Rule;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
-use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
