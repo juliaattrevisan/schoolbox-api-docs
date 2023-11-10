@@ -3,12 +3,11 @@
  * Display a single student's responses
  */
 
-import { gsap } from "gsap";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useStudentStore } from "../store/qfStudentStore";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
-// import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";s
+import QfStudentAttemptComment from "./qf-student-attempt-comment.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -55,10 +54,7 @@ window.Vue.watch(
                                     :item="item"
                                     :container="(responseContentEl as HTMLDivElement)"
                                 />
-                                <!-- <hm-students-student-attempt-comment
-                                v-if="itemsStore.isAttemptComment"
-                                :student="props.student"
-                            /> -->
+                                <!-- <qf-student-attempt-comment :student="props.student" /> -->
                             </div>
                         </template>
                     </div>
