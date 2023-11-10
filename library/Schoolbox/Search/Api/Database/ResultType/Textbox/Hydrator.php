@@ -152,7 +152,7 @@ class Hydrator extends BaseHydrator
                 }
             }
 
-            if ($componentConfig === null) {
+            if ($componentInstanceId === null) {
                 // This textbox is not used on any page.
 
                 // Textboxes not currently used in any component should be shown
