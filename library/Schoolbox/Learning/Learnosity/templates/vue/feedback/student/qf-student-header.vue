@@ -42,14 +42,6 @@ const props = defineProps<Props>();
             <template v-if="props.student.isReportLoaded">
                 <qf-student-header-attempt-mark :student="props.student" />
             </template>
-            <!-- <template v-if="props.student.isReportLoaded">
-                <hm-students-student-item-mark
-                    v-for="item in props.student.items"
-                    :key="item.reference"
-                    :item="item"
-                    :container="(container as HTMLDivElement)"
-                />
-            </template> -->
         </div>
     </div>
 </template>

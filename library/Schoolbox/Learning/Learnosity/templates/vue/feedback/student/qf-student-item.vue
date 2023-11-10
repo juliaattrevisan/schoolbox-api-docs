@@ -5,6 +5,7 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import QfStudentItemMark from "./qf-student-item-mark.vue";
 import QfStudentItemQuestion from "./qf-student-item-question.vue";
 import QfStudentItemComment from "./qf-student-item-comment.vue";
 
@@ -19,6 +20,7 @@ const hasQuestionsWithNoScore = props.item.questions.some((question) => question
 
 <template>
     <div class="l-flex-col l-gap-m l-pad-l--top item">
+        <qf-student-item-mark :item="item" :container="(container as HTMLDivElement)" />
         <div v-if="hasQuestionsWithNoScore">
             <div class="alert-box f-no-margins">
                 Any questions within a card that don't have a score are considered marked when a comment is added to the
