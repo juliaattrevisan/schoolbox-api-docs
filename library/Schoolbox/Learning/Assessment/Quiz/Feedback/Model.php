@@ -25,14 +25,6 @@ class Model extends AbstractFeedback
      */
     public function getNormalisedMark()
     {
-        $marksAvailable = $this->getResponse()->getMarksAvailable();
-
-        /* No marks because no questions with mark values
-         */
-        if ($marksAvailable == 0) {
-            return null;
-        }
-
         return $this->getResponse()->getNormalisedMark();
     }
 
