@@ -882,6 +882,14 @@ class Controller extends Base
             'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
         ];
 
+        /* Retrieve the comment for this attempt
+        */
+        $attemptComment = [
+            'learnosityReference' => $attempt->getLearnosityReference(),
+            'studentId' => $attempt->getUser()->getId(),
+            'comment' => $attempt->getComment()
+        ];
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'student' => $studentData,
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
@@ -890,6 +898,7 @@ class Controller extends Base
             'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
             'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
+            'attemptComment' => $attemptComment,
             'urls' => $urls
         ], sprintf(
             'Feedback for %s in %s',

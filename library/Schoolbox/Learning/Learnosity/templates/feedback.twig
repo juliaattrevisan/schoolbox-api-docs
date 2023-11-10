@@ -9,6 +9,7 @@
  # @param IAssessable $assessment          Our schoolbox quiz instance
  # @param Attempt\Model $attempt           The student's attempt from our local db
  # @param string $itemResponses            A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
+ # @param string $attemptComment           The overall comment for the attempt
  # @param object $urls                     A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -25,6 +26,7 @@
         :item-responses="{{ itemResponses|json_encode }}"
         :attempt="{{ attempt|json_encode }}"
         :report-init-options="{{ reportInitOptions }}"
+        :attempt-comment="{{ attemptComment|json_encode }}"
         :urls="{{ urls|json_encode }}"
         status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
     />

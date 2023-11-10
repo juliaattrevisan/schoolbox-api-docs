@@ -54,7 +54,7 @@ window.Vue.watch(
                                     :item="item"
                                     :container="(responseContentEl as HTMLDivElement)"
                                 />
-                                <!-- <qf-student-attempt-comment :student="props.student" /> -->
+                                <qf-student-attempt-comment :student="props.student" />
                             </div>
                         </template>
                     </div>

@@ -91,7 +91,7 @@ window.Vue.onUnmounted(async () => {
     <div>
         <div class="l-flex-col l-gap-m">
             <div>
-                <label>Comment</label>
+                <label>Overall Comment</label>
                 <p class="meta">
                     Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
                     details on creation.

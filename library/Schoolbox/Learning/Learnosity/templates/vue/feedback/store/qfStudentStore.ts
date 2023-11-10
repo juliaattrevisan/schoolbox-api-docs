@@ -9,12 +9,7 @@ import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentI
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
 import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
-import {
-    getItemQuestions,
-    getAttemptResponse,
-    getItemIsMarked,
-    getStudentIsMarked,
-} from "@schoolboxLearnosity/js/util/markingUtils";
+import { getItemQuestions, getItemIsMarked, getStudentIsMarked } from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./quizFeedbackStore";
 
 export const useStudentStore = defineStore("qfStudent", () => {
@@ -43,7 +38,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
     });
     const isExpanded = window.Vue.ref<boolean>(true); // if all students are expanded
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
-    const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]); // all attempt comments from the backend
     const showMarkedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
     const store = useStore();
 
@@ -114,7 +108,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
             item.isMarked = getItemIsMarked(item);
         });
         student.value.isMarked = getStudentIsMarked(student.value);
-        student.value.attemptComment = getAttemptResponse(attemptComments.value, student.value.id);
     }
 
     /**
