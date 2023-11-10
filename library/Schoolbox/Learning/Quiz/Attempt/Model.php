@@ -280,19 +280,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|float $mark
+     * @param null|string $mark
      * @return static
      */
-    public function setMark(?float $mark): self
+    public function setMark(?string $mark): self
     {
         $this->mark = $mark;
         return $this;
     }
 
     /**
-     * @return null|float
+     * @return null|string
      */
-    public function getMark(): ?float
+    public function getMark(): ?string
     {
         return $this->mark;
     }

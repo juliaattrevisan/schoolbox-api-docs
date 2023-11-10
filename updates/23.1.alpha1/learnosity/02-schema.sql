@@ -52,6 +52,12 @@ ALTER TABLE `assess`
     ADD COLUMN `mark_type_id` INT(11) NOT NULL DEFAULT 3 AFTER `weight`,
     ADD COLUMN `grade_group_id` INT(11) NULL AFTER `mark_type_id`;
 
+-- assess_attempt.mark is now the human readable mark, I guess?
+-- We never really had to store the values that *inform* the norm- and human-readable
+-- marks before Learnosity...this is kind of synonymous with submission_return's usage
+ALTER TABLE `assess_attempt`
+    CHANGE COLUMN `mark` `mark` VARCHAR(255) NULL DEFAULT NULL ;
+
 -- Reset duration to 0 for Unlimited, rather than -1
 ALTER TABLE `assess`
     ADD COLUMN `_duration` INT NOT NULL DEFAULT 0 AFTER `duration`;
