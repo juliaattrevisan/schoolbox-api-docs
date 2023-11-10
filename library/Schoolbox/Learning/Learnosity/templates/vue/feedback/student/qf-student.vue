@@ -8,7 +8,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useItemsStore } from "../store/qfItemsStore";
 import { useStudentStore } from "../store/qfStudentStore";
 import QfStudentHeader from "./qf-student-header.vue";
-// import HmStudentsStudentItem from "./hm-students-student-item.vue";
+import QfStudentItem from "./qf-student-item.vue";
 // import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";
 
 interface Props {
@@ -46,22 +46,21 @@ window.Vue.watch(
                     <div ref="responseInnerContainerEl" class="response__inner-container">
                         <div ref="responseContentEl" class="response__content">
                             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
-                            <!-- <div :id="props.student.elementId"></div> -->
-                            <div id="schoolbox-student"></div>
+                            <div :id="props.student.elementId"></div>
                         </div>
-                        <!-- <template v-if="props.student.isReportLoaded">
-                            <hm-students-student-item
+                        <template v-if="props.student.isReportLoaded">
+                            <qf-student-item
                                 v-for="item in props.student.items"
                                 :key="item.reference"
                                 :student="props.student"
                                 :item="item"
                                 :container="(responseContentEl as HTMLDivElement)"
                             />
-                            <hm-students-student-attempt-comment
+                            <!-- <hm-students-student-attempt-comment
                                 v-if="itemsStore.isAttemptComment"
                                 :student="props.student"
-                            />
-                        </template> -->
+                            /> -->
+                        </template>
                     </div>
                 </div>
             </div>
