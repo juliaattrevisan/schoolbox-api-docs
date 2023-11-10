@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -274,7 +275,7 @@ class Controller extends Base
              * Misconfiguring this leads to Error 10000 which has no definition
              */
             'user' => [
-                'id' => (string)$this->getUser()->getId(),
+                'id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
                 /* These fields are superfluous and are presumably used for auditing
                  * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */
@@ -445,7 +446,7 @@ class Controller extends Base
             'type' => 'submit_practice',
             /* A uniquely-identifying string for us, I think
              */
-            'user_id' => (string)$this->getUser()->getId(),
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
         ];
 
         /* Prompts And Feedback mode settings
@@ -619,7 +620,7 @@ class Controller extends Base
     ): void {
         if (null !== $attempt->getReviewed()) {
             $payload = [
-                'user_id' => (string)$attempt->getUser()->getId(),
+                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                 'reports' => [
                     [
                         /* DOM element id, where this goes in
@@ -644,7 +645,7 @@ class Controller extends Base
             $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
         } else {
             $payload = [
-                'user_id' => (string)$attempt->getUser()->getId(),
+                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                 'reports' => [
                     [
                         /* DOM element id, where this goes in
@@ -694,7 +695,7 @@ class Controller extends Base
         /* This is what the student did
          */
         $reportPayload = [
-            'user_id' => (string)$attempt->getUser()->getId(),
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
             'reports' => [
                 [
                     /* DOM element id, where this goes in
@@ -926,7 +927,7 @@ class Controller extends Base
                 'sessions' => [
                     [
                         'session_id' => $attempt->getLearnosityReference(),
-                        'user_id' => (string)$attempt->getUser()->getId(),
+                        'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                         'responses' => $responseData
                     ]
                 ]
@@ -1034,7 +1035,7 @@ class Controller extends Base
                  * ($learnosityReference) currently determined.
                  */
                 $reportPayloads[] = $this->api->initOptions('reports', [
-                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                     'reports' => [
                         [
                             /* DOM element id, where this goes in
@@ -1182,6 +1183,7 @@ class Controller extends Base
         ));
     }
 
+
     /**
      * Persists a new score back to Learnosity for it to re-tally
      *
@@ -1252,7 +1254,7 @@ class Controller extends Base
             'sessions' => [
                 [
                     'session_id' => $attempt->getLearnosityReference(),
-                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                     'responses' => [
                         $updatedResponse
                     ]
@@ -1386,7 +1388,7 @@ class Controller extends Base
                 ]
             ],
             'user' => [
-                'id' => (string)$this->getUser()->getId(),
+                'id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
                 /* These fields are superfluous and are presumably used for auditing
                  * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */
