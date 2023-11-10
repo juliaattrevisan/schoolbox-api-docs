@@ -4,9 +4,8 @@
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import { useItemsStore } from "../store/qfItemsStore";
 // import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
-// import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
+import QfStudentHeaderAttemptMark from "./qf-student-header-attempt-mark.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -40,6 +39,9 @@ const props = defineProps<Props>();
             </h2>
         </div>
         <div>
+            <template v-if="props.student.isReportLoaded">
+                <qf-student-header-attempt-mark :student="props.student" />
+            </template>
             <!-- <template v-if="props.student.isReportLoaded">
                 <hm-students-student-item-mark
                     v-for="item in props.student.items"
@@ -47,7 +49,6 @@ const props = defineProps<Props>();
                     :item="item"
                     :container="(container as HTMLDivElement)"
                 />
-                <hm-students-student-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
             </template> -->
         </div>
     </div>
