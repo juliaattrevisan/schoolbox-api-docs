@@ -465,7 +465,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $assessment
             );
         } catch (DomainException $e) {
-            $this->sendError('Could not save assessment. ', [ $e->getMessage() ]);
+            $this->sendError('Could not save assessment. ', [$e->getMessage()]);
 
             /* Return Early to let mage deal with error messages
              */
@@ -596,6 +596,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model && $assessment->getLearnosityReference()) {
             $api = new Api(
                 (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
+                $this->getConfigLoader()->get('learnosity_version'),
                 $this->getConfigLoader()->get('learnosity_consumer_key'),
                 $this->getConfigLoader()->get('learnosity_consumer_secret'),
                 new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')

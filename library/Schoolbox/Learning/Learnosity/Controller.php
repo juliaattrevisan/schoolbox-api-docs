@@ -155,6 +155,7 @@ class Controller extends Base
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
         protected BreadcrumbFactory $bakery,
+        private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -171,6 +172,7 @@ class Controller extends Base
          */
         $this->api = new Api(
             $urlFactory->buildFullyQualified()->getHost(),
+            $this->learnosityVersion,
             $this->learnosityConsumerKey,
             $this->learnosityConsumerSecret,
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')

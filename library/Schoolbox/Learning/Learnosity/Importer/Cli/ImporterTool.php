@@ -186,12 +186,12 @@ Each question type and contents is mapped to their closest Learnosity synonyms.
 You can specify a particular assessment to import; otherwise it imports everything
 that is:
  * alive (ie. everything that is not soft-deleted)
- * not already in learnosity (ie. assess.learnosity_reference is null) 
+ * not already in learnosity (ie. assess.learnosity_reference is null)
 
 Use --blueprint option in either mode to show the array struct we intended to send to Learnosity
 dumped to the cli. This is useful for manual inspection before committing to a --perform
 
-As usual, verbose mode tells you all the debugging-level info about what the algorithm does.  
+As usual, verbose mode tells you all the debugging-level info about what the algorithm does.
 
 Usage: import.php [--assessment <assessmentId>] [--perform] [-vvv]
 Example: import.php --assessment=123456 --perform
@@ -225,6 +225,7 @@ HELP;
 
         $api = new Api(
             $serverName,
+            $this->getConfig()->get('learnosity_version'),
             $this->getConfig()->get('learnosity_consumer_key'),
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger()

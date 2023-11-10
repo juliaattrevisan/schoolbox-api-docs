@@ -83,7 +83,7 @@ class Overwriter
         /* Remove this quiz from Learnosity entirely,
          * and orphan it intentionally into an archived state
          */
-         $this->deleteQuizConstituents($updatedDestination);
+        $this->deleteQuizConstituents($updatedDestination);
 
         /* Cloning a quiz means we need the new Learnosity Reference identifier
          * that can only really be obtained after sending it to Learnosity; we
@@ -146,6 +146,7 @@ class Overwriter
          */
         $api = new Api(
             (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified()->getHost(),
+            $this->quizMapper->getConfigLoader()->get('learnosity_version'),
             $this->quizMapper->getConfigLoader()->get('learnosity_consumer_key'),
             $this->quizMapper->getConfigLoader()->get('learnosity_consumer_secret'),
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
@@ -158,7 +159,7 @@ class Overwriter
          */
         // (new Helper($api))->archive($assessment->getLearnosityReference());
 
-//        $this->quizMapper->deleteQuizConstituents($assessment->getId());
+        //        $this->quizMapper->deleteQuizConstituents($assessment->getId());
     }
 
     /**

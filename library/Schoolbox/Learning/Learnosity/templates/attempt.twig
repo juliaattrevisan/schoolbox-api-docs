@@ -11,7 +11,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<script src="https://items-au.learnosity.com/?v2023.2.LTS"></script>
+<script src="https://items-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 <div class="row">
     <div id='quiz-container' class="small-12 island">

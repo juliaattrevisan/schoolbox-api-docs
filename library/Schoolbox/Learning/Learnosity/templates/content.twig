@@ -10,7 +10,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<script src="https://authorapi-au.learnosity.com/?v2023.3.LTS"></script>
+<script src="https://authorapi-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
 <div class="actions-small-1 row">

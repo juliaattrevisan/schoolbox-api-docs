@@ -158,9 +158,8 @@ class Mapper extends BaseMapper
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
             $quiz = $this->hydrate($row)
-                         ->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'))
-                         ->setUser($this->hydrateJoin($row, 'user', 'u'))
-            ;
+                ->setAssessmentModel($this->hydrateJoin($row, 'am', 'am'))
+                ->setUser($this->hydrateJoin($row, 'user', 'u'));
             $collection[$quiz->getId()] = $quiz;
         }
 
@@ -233,11 +232,13 @@ class Mapper extends BaseMapper
      */
     public function copyQuizConstituents(IAssessable $source, IAssessable $destination): bool
     {
+        $learnosityVersion = $this->getConfigLoader()->get('learnosity_version');
         $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
         $learnosityConsumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
 
         $api = new Api(
             (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
+            $learnosityVersion,
             $learnosityConsumerKey,
             $learnosityConsumerSecret,
             new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
@@ -299,42 +300,42 @@ class Mapper extends BaseMapper
         }
 
 
-//        $sectionMapper = $this->getJoinMapper('sections');
-//        $questionMapper = QuizQuestionMapper::getInstance();
-//        $solutionMapper = QuizSolutionMapper::getInstance();
-//
-//        /** @var Model $sourceQuiz */
-//        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
-//        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
-//
-//        foreach ($sourceQuiz->getSections() as $section) {
-//            $questions = $questionMapper->findByColumn('section_id', $section->getId());
-//            $section->setQuestions($questions);
-//        }
-//
-//        /** @var Model $destinationQuiz */
-//        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
-//
-//        // Ensure that we don't clobber destination Sections
-//        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
-//        if ($destinationQuiz->getSections()->count()) {
-//            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
-//        }
-//
-//        // Clone and Save Sections, Questions + Solutions
-//        foreach ($sourceQuiz->getSections() as $section) {
-//            $clonedSection = clone $section;
-//            $clonedSection->setQuiz($destinationQuiz);
-//            $destinationQuiz->getSections()->add($clonedSection);
-//            $sectionMapper->save($clonedSection);
-//
-//            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
-//                $questionMapper->save($clonedQuestion);
-//                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
-//                    $solutionMapper->save($clonedQuestion->getSolution());
-//                }
-//            }
-//        }
+        //        $sectionMapper = $this->getJoinMapper('sections');
+        //        $questionMapper = QuizQuestionMapper::getInstance();
+        //        $solutionMapper = QuizSolutionMapper::getInstance();
+        //
+        //        /** @var Model $sourceQuiz */
+        //        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
+        //        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
+        //
+        //        foreach ($sourceQuiz->getSections() as $section) {
+        //            $questions = $questionMapper->findByColumn('section_id', $section->getId());
+        //            $section->setQuestions($questions);
+        //        }
+        //
+        //        /** @var Model $destinationQuiz */
+        //        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
+        //
+        //        // Ensure that we don't clobber destination Sections
+        //        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
+        //        if ($destinationQuiz->getSections()->count()) {
+        //            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
+        //        }
+        //
+        //        // Clone and Save Sections, Questions + Solutions
+        //        foreach ($sourceQuiz->getSections() as $section) {
+        //            $clonedSection = clone $section;
+        //            $clonedSection->setQuiz($destinationQuiz);
+        //            $destinationQuiz->getSections()->add($clonedSection);
+        //            $sectionMapper->save($clonedSection);
+        //
+        //            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
+        //                $questionMapper->save($clonedQuestion);
+        //                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
+        //                    $solutionMapper->save($clonedQuestion->getSolution());
+        //                }
+        //            }
+        //        }
 
         return true;
     }
