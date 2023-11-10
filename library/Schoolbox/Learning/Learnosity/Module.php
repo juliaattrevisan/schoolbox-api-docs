@@ -297,6 +297,12 @@ class Module extends BaseModule
      */
     protected function preloadAttemptForReview(array $params): array
     {
+        /* Not in learnosity? No trabajo
+         */
+        if ('' === trim((string)$params['learnositySessionReference'])) {
+            throw new NotFound();
+        }
+
         $participantPreload = $this->preloadAssessmentAndStudent($params);
 
         try {
