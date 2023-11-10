@@ -1054,10 +1054,10 @@ class Controller extends Base\Base
         foreach ($courseImpls as $courseImpl) {
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $implAssessment) {
-                    $this->lessonPlanActivitiesReplicator->replicate(
-                        $implAssessment->getSpecificationAssessment(),
-                        $implAssessment,
-                    );
+                    $specAssessment = $implAssessment->getSpecificationAssessment();
+                    if ($specAssessment) {
+                        $this->lessonPlanActivitiesReplicator->replicate($specAssessment, $implAssessment);
+                    }
                 }
             }
         }
