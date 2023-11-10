@@ -120,18 +120,6 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @param GradeGroup|null $gradeGroup
-     * @return static
-     */
-    public function setGradeGroup(GradeGroup $gradeGroup = null)
-    {
-        if (!is_null($gradeGroup)) {
-            throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
-        }
-        return $this;
-    }
-
-    /**
      * Overwrite fields from `$source` into this object.
      *
      * This implementation overwrites the additional fields over and above the

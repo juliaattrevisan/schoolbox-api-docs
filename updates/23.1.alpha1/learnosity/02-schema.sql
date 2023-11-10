@@ -46,6 +46,11 @@ ALTER TABLE `assess`
 ALTER TABLE `assess`
     ADD COLUMN `prompts_mode` TINYINT(1) NOT NULL DEFAULT 0 AFTER `shuffle_items`;
 
+-- Add Mark Type and Grade Group
+ALTER TABLE `assess`
+    ADD COLUMN `mark_type_id` INT(11) NOT NULL AFTER `weight`,
+    ADD COLUMN `grade_group_id` INT(11) NULL AFTER `mark_type_id`;
+
 -- Reset duration to 0 for Unlimited, rather than -1
 ALTER TABLE `assess`
     ADD COLUMN `_duration` INT NOT NULL DEFAULT 0 AFTER `duration`;

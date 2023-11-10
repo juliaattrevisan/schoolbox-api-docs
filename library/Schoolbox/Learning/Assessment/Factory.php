@@ -20,7 +20,6 @@ use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as Du
 use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Decorator\Decorator as LtiDecorator;
 use Schoolbox\Learning\Assessment\Lti\Decorator\LtiTrait;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
@@ -414,7 +413,9 @@ class Factory
                 $this->getShuffleItems(),
                 $this->getPromptsMode(),
                 $this->getMaxAttempts(),
-                $this->getCompletionMessage()
+                $this->getCompletionMessage(),
+                $this->getMarkType(),
+                $this->getGradingScheme(),
             );
         } elseif ($assessment instanceof LtiAssessment) {
             $decorator = new LtiDecorator(

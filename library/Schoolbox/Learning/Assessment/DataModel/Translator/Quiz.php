@@ -8,7 +8,11 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Model as QuizModel;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -89,6 +93,18 @@ class Quiz implements IAssessmentTypeTranslator
             ->setMarkVisibility($domainObject->getMarkVisibility())
             ->setExternalId($domainObject->getExternalId())
             ->setLearnosityReference($domainObject->getLearnosityReference());
+
+        // Translate mark scheme
+        // TODO move this to the mark scheme translator
+        $markScheme = $domainObject->getMarkScheme();
+        if ($markScheme instanceof Percentage) {
+            $dataModel->setMarkType((new MarkType())->setId(MarkType::TYPE_PERCENT));
+        } elseif ($markScheme instanceof LetterGrade) {
+            $dataModel->setMarkType((new MarkType())->setId(MarkType::TYPE_LETTER));
+            $dataModel->setGradeGroup($markScheme->getGradeGroup());
+        } elseif ($markScheme instanceof TotalMarkFractional) {
+            $dataModel->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL));
+        }
     }
 
 
@@ -113,5 +129,16 @@ class Quiz implements IAssessmentTypeTranslator
             ->setCreator($dataModel->getUser())
             ->setExternalId($dataModel->getExternalId())
             ->setLearnosityReference($dataModel->getLearnosityReference());
+
+        // Copy mark type and grade group
+        if (null !== $dataModel->getMarkType()) {
+            $domainObject->setMarkType($dataModel->getMarkType());
+        }
+        if ($dataModel->getGradeGroup() instanceof GradeGroup) {
+            $domainObject->setGradeGroup($dataModel->getGradeGroup());
+        }
+        if (null !== $dataModel->getMarkVisibility()) {
+            $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
+        }
     }
 }

@@ -14,6 +14,8 @@ use PDO;
 use PDOStatement;
 use Ramsey\Uuid\Uuid;
 use Schoolbox;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
@@ -77,6 +79,8 @@ class Mapper extends BaseMapper
         $this->uses('prompts_mode', self::TYPE_INTEGER);
         $this->uses('max_attempts', self::TYPE_INTEGER);
         $this->uses('weight', self::TYPE_INTEGER);
+        $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
+        $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
         $this->uses('availability', self::TYPE_STRING);
         $this->uses('anonymous_result', self::TYPE_BOOLEAN);
         $this->uses('mark_visibility', self::TYPE_INTEGER);
