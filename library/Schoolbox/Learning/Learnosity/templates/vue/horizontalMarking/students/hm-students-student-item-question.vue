@@ -157,7 +157,7 @@ window.Vue.onBeforeUnmount(async () => {
     }
 }
 .question {
-    border-bottom: 4px solid var(--body-background);
+    border-bottom: 2px solid var(--body-background);
 }
 /* as it's readonly, but we still want to make it fully readable  */
 input[readonly] {

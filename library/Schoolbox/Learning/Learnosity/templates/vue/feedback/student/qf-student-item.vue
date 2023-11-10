@@ -18,30 +18,32 @@ const hasQuestionsWithNoScore = props.item.questions.some((question) => question
 </script>
 
 <template>
-    <transition>
-        <div class="l-flex-col l-gap-m">
-            <div v-if="hasQuestionsWithNoScore">
-                <div class="alert-box f-no-margins">
-                    Any questions within a card that don't have a score are considered marked when a comment is added to
-                    the card.
-                </div>
+    <div class="l-flex-col l-gap-m l-pad-l--top item">
+        <div v-if="hasQuestionsWithNoScore">
+            <div class="alert-box f-no-margins">
+                Any questions within a card that don't have a score are considered marked when a comment is added to the
+                card.
             </div>
-            <div class="item-questions l-flex-col l-gap-m">
-                <qf-student-item-question
-                    v-for="question in props.item.questions"
-                    :key="question.response_id"
-                    :student="props.student"
-                    :item="props.item"
-                    :question="question"
-                    :container="props.container"
-                />
-            </div>
-            <qf-student-item-comment :student="props.student" :item="props.item" />
         </div>
-    </transition>
+        <div class="item-questions l-flex-col l-gap-l">
+            <qf-student-item-question
+                v-for="question in props.item.questions"
+                :key="question.response_id"
+                :student="props.student"
+                :item="props.item"
+                :question="question"
+                :container="props.container"
+            />
+        </div>
+        <qf-student-item-comment :student="props.student" :item="props.item" />
+    </div>
 </template>
 
 <style lang="scss">
+.item {
+    border-top: 4px solid var(--body-background);
+}
+
 .item-questions {
     .lrn_widget {
         margin: 0;

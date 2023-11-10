@@ -16,7 +16,6 @@ import {
     getStudentIsMarked,
 } from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./quizFeedbackStore";
-import { useItemsStore } from "./qfItemsStore";
 
 export const useStudentStore = defineStore("qfStudent", () => {
     const student = window.Vue.ref<Student>({
@@ -46,7 +45,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
     const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]); // all attempt comments from the backend
     const showMarkedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
-    // const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
     const store = useStore();
 
     /**
@@ -125,24 +123,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
      */
     function toggleStudent($student: Student) {
         student.value.isExpanded = !$student.isExpanded;
-        // if all students are now expanded, set the overall toggle to true
-        // if (students.value.every(($student) => $student.isExpanded)) {
-        //     isExpanded.value = true;
-        // }
-        // // if all students are now collapsed, set the overall toggle to false
-        // else if (students.value.every(($student) => !$student.isExpanded)) {
-        //     isExpanded.value = false;
-        // }
-    }
-
-    /**
-     * For each item within the store, check if all students have been marked for that item
-     */
-    function updateItemsIsMarked() {
-        useItemsStore().items.forEach((item) => {
-            const studentItem = student.value.items.find(($item) => $item.reference === item.reference) as StudentItem;
-            item.isMarked = studentItem.isMarked;
-        });
     }
 
     /**
@@ -150,9 +130,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
      */
     function reportLoaded() {
         student.value.isReportLoaded = true;
-        // check if all student reports are loaded and if so, the central store can be considered loaded
         store.isLoaded = true;
-        updateItemsIsMarked();
     }
 
     /**
@@ -163,7 +141,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
     function updateIsMarked($student: Student, item: StudentItem) {
         item.isMarked = getItemIsMarked(item);
         student.value.isMarked = getStudentIsMarked(student.value);
-        updateItemsIsMarked();
     }
 
     /**
@@ -216,7 +193,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
         student,
         isExpanded,
         showMarkedAttempts,
-        // allStudentsMarked,
         toggleStudent,
         reportLoaded,
         updateItemResponseScore,

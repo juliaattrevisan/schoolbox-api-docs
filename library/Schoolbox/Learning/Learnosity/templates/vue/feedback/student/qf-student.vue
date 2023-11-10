@@ -5,11 +5,10 @@
 
 import { gsap } from "gsap";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import { useItemsStore } from "../store/qfItemsStore";
 import { useStudentStore } from "../store/qfStudentStore";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
-// import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";
+// import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";s
 
 interface Props {
     student: Student; // the student to display
@@ -21,7 +20,6 @@ const studentInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // 
 const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the response container
 const responseInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // the response container
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
-const itemsStore = useItemsStore();
 const studentStore = useStudentStore();
 
 /**
@@ -49,17 +47,19 @@ window.Vue.watch(
                             <div :id="props.student.elementId"></div>
                         </div>
                         <template v-if="props.student.isReportLoaded">
-                            <qf-student-item
-                                v-for="item in props.student.items"
-                                :key="item.reference"
-                                :student="props.student"
-                                :item="item"
-                                :container="(responseContentEl as HTMLDivElement)"
-                            />
-                            <!-- <hm-students-student-attempt-comment
+                            <div class="l-flex-col l-gap-l">
+                                <qf-student-item
+                                    v-for="item in props.student.items"
+                                    :key="item.reference"
+                                    :student="props.student"
+                                    :item="item"
+                                    :container="(responseContentEl as HTMLDivElement)"
+                                />
+                                <!-- <hm-students-student-attempt-comment
                                 v-if="itemsStore.isAttemptComment"
                                 :student="props.student"
                             /> -->
+                            </div>
                         </template>
                     </div>
                 </div>

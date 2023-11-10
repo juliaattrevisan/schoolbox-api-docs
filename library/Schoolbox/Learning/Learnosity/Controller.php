@@ -852,7 +852,7 @@ class Controller extends Base
 
         /* Find all the comments for this attempt
          */
-        $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
 
         /* Breadcrumbs
          */
@@ -889,7 +889,7 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
-            'itemResponses' => array_values(array_merge_recursive($scores, $comments)),
+            'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
             'urls' => $urls
         ], sprintf(
             'Feedback for %s in %s',

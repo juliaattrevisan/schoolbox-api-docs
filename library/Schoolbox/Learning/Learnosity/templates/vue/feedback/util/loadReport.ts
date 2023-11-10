@@ -3,7 +3,6 @@
  */
 
 import type { Item } from "@schoolboxLearnosity/js/types/Item";
-import { useItemsStore } from "../store/qfItemsStore";
 import { useStudentStore } from "../store/qfStudentStore";
 
 /**
@@ -49,7 +48,6 @@ export function loadReport(initOptions: object) {
                     Object.values($items).forEach((item: Item) => {
                         items.push(item);
                     });
-                    useItemsStore().addItems(items);
                     useStudentStore().addItems(items);
                     addTargetsToMarks(reportId);
                 });
