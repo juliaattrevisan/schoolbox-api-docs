@@ -23,6 +23,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
+use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
@@ -46,6 +48,18 @@ class Controller extends Base
      *
      */
     private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT = 300;
+
+
+    /**
+     * Saves intermittently every 300 seconds by default
+     */
+    private const LEARNOSITY_SAVE_INTERVAL = 300;
+
+
+    /**
+     * Alert students 60 seconds before it kicks you out
+     */
+    private const LEARNOSITY_WARNING_TIME = 60;
 
 
     /**
@@ -261,7 +275,7 @@ class Controller extends Base
              * Misconfiguring this leads to Error 10000 which has no definition
              */
             'user' => [
-                'id' => (string)$this->getUser()->getId(),
+                'id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
                 /* These fields are superfluous and are presumably used for auditing
                  * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */
@@ -360,9 +374,7 @@ class Controller extends Base
                 ],
                 "navigation" => [
                     "auto_save" => [
-                        /* TODO Decide on this value and const it
-                         */
-                        "save_interval_duration" => 300
+                        "save_interval_duration" => self::LEARNOSITY_SAVE_INTERVAL
                     ],
                     "show_intro" => false,
                     "show_outro" => false
@@ -410,7 +422,7 @@ class Controller extends Base
                 'time' => [
                     'max_time' => $quiz->getDuration(),
                     'limit_type' => 'hard',
-                    'warning_time' => 60
+                    'warning_time' => self::LEARNOSITY_WARNING_TIME
                 ],
                 /* This is our Quiz title, I guess
                  */
@@ -434,7 +446,7 @@ class Controller extends Base
             'type' => 'submit_practice',
             /* A uniquely-identifying string for us, I think
              */
-            'user_id' => (string)$this->getUser()->getId(),
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
         ];
 
         /* Prompts And Feedback mode settings
@@ -480,9 +492,6 @@ class Controller extends Base
             ]),
             'learnositySessionReference' => $attempt->getLearnosityReference(),
         ], "Attempt {$assessment->getTitle()}");
-
-        /* TODO Record the automated result somewhere (idk where)
-         */
     }
 
 
@@ -494,11 +503,12 @@ class Controller extends Base
      * learnosityReference should not be easily guessed
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
      * @throws Deleted
      * @throws NotFound
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
@@ -514,8 +524,13 @@ class Controller extends Base
             ]
         ]);
 
-        $mark = $result['data'][0]['score'];
-        $maxMark = $result['data'][0]['max_score'];
+        /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+         */
+        $sanitisedScore = (new SanitiseScores())->sanitise($result['data'][0]['score'], $result['data'][0]['max_score']);
+
+        $mark = $sanitisedScore['score'];
+        $maxMark = $sanitisedScore['max_score'];
 
         /* Record it locally for our own usages
          */
@@ -560,7 +575,7 @@ class Controller extends Base
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
         $payload = [
-            'user_id' => (string)$attempt->getUser()->getId(),
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
             'reports' => [
                 [
                     /* DOM element id, where this goes in
@@ -605,7 +620,7 @@ class Controller extends Base
     ): void {
         if (null !== $attempt->getReviewed()) {
             $payload = [
-                'user_id' => (string)$attempt->getUser()->getId(),
+                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                 'reports' => [
                     [
                         /* DOM element id, where this goes in
@@ -630,7 +645,7 @@ class Controller extends Base
             $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
         } else {
             $payload = [
-                'user_id' => (string)$attempt->getUser()->getId(),
+                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                 'reports' => [
                     [
                         /* DOM element id, where this goes in
@@ -680,7 +695,7 @@ class Controller extends Base
         /* This is what the student did
          */
         $reportPayload = [
-            'user_id' => (string)$attempt->getUser()->getId(),
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
             'reports' => [
                 [
                     /* DOM element id, where this goes in
@@ -743,11 +758,12 @@ class Controller extends Base
      * Tell Learnosity about what our teachers marked each question
      *
      * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
      * @throws RouteNotFound
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
@@ -777,13 +793,21 @@ class Controller extends Base
          * ]
          */
 
-        /* FIXME Instead of asking learnosity how it tallied everything, we can
-         *  just...do it ourselves, I guess, and sort-of delete this problem
-         *  We knew the max_mark from the attempt table, so it could potentially
-         *  desync from what Learnosity knows.
+        /* Instead of asking learnosity how it tallied everything, we can
+         * just...do it ourselves, I guess, and sort-of delete this problem
+         * We knew the max_mark from the attempt table, so it could potentially
+         * desync from what Learnosity knows.
+         *
+         * FIXME Add Polling Mechanism
+         *  This would otherwise have been processed by the polling thing
+         *
+         * Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
          */
-        $mark = array_sum(array_values($postData['scores']));
-        $maxMark = $attempt->getMaxMark();
+        $sanitisedScore = (new SanitiseScores())->sanitise(array_sum(array_values($postData['scores'])), $attempt->getMaxMark());
+
+        $mark = $sanitisedScore['score'];
+        $maxMark = $sanitisedScore['max_score'];
 
         /* Save the comment and new normalised mark
          */
@@ -848,7 +872,36 @@ class Controller extends Base
             $responseId = $response['response_id'];
 
             $updatedResponse = $response;
-            $updatedResponse['score'] = $postData['scores'][$responseId];
+
+            /* If $updatedResponse['max_score'] is null...I guess this is unscored/practice
+             * Learnosity fails with http 400 if you try to score an unscorable question
+             */
+            if (null === $updatedResponse['max_score']) {
+                continue;
+            }
+
+            /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
+             * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+             */
+            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$responseId], $updatedResponse['max_score']);
+
+            $mark = $sanitisedScore['score'];
+            $maxMark = $sanitisedScore['max_score'];
+
+            /* If the new score is also null, skip it
+             *
+             * This would happen if frontend validation failed and allowed users
+             * to pass a value that equated to null, such as the string "cat"
+             * Consult unit tests for other reasons
+             */
+            if (null === $maxMark) {
+                continue;
+            }
+
+            /* Get ready to send it back to Learnosity land
+             */
+            $updatedResponse['score'] = $mark;
+            $updatedResponse['max_score'] = $maxMark;
 
             /* "When setting a non-zero score, the response must also be attempted."
              *    -- https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#updateResponseScores
@@ -856,14 +909,6 @@ class Controller extends Base
              * This includes responses that cannot be automagically calculated
              */
             $updatedResponse['attempted'] = true;
-
-            /* If there's no max score, but the teacher gave a score, I guess
-             * we just assume that to be the max score too...basically bonus
-             * marks in this scenario
-             */
-            if (null === $updatedResponse['max_score']) {
-                $updatedResponse['max_score'] = $updatedResponse['score'];
-            }
 
             $responseData[] = $updatedResponse;
         }
@@ -877,15 +922,17 @@ class Controller extends Base
          * Instead, redirect people to a whole other screen afterwards to
          * artificially force this behaviour
          */
-        $this->api->dataUpdateRequest('/sessions/responses/scores', [
-            'sessions' => [
-                [
-                    'session_id' => $attempt->getLearnosityReference(),
-                    'user_id' => (string)$attempt->getUser()->getId(),
-                    'responses' => $responseData
+        if (\count($responseData)) {
+            $this->api->dataUpdateRequest('/sessions/responses/scores', [
+                'sessions' => [
+                    [
+                        'session_id' => $attempt->getLearnosityReference(),
+                        'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
+                        'responses' => $responseData
+                    ]
                 ]
-            ]
-        ]);
+            ]);
+        }
 
         /* Get the new result back from learnosity
          *
@@ -901,11 +948,11 @@ class Controller extends Base
             ]);
          */
 
-        /* TODO Redirect back to the index screen for now
-         *  but probably need a returnUrl
+        /* Redirect back to summary screen
          */
-        $redirect = $this->router->getGenerator()->generate('learningAssessment.getStatus', [
+        $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
             'assessmentId' => $assessment->getId(),
+            'studentId' => $attempt->getUser()->getId(),
         ]);
 
         $this->response = $this->redirectFound($redirect);
@@ -936,7 +983,7 @@ class Controller extends Base
         /* Get a list of attempts sorted by finish date
          * This gives us the most recent attempt for a quiz, if a student did multiple attempts
          *
-         * TODO What was supposed to happen for multiple attempts in a horizontal marking context?
+         * Horizontal marking always users the most recent attempt.
          */
         $pb = $this->attemptMapper->getPredicateBuilder()
             ->equals('assess_id', $quiz->getId())
@@ -989,7 +1036,7 @@ class Controller extends Base
                  * ($learnosityReference) currently determined.
                  */
                 $reportPayloads[] = $this->api->initOptions('reports', [
-                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                     'reports' => [
                         [
                             /* DOM element id, where this goes in
@@ -1063,8 +1110,8 @@ class Controller extends Base
              * (because $items is in some non-sequenced order)
              */
             foreach ($itemReferences as &$itemReference) {
-                /* FIXME Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                 *  we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                 * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
                  */
                 if (!is_array($itemReference)) {
                     $itemReference = [
@@ -1137,6 +1184,7 @@ class Controller extends Base
         ));
     }
 
+
     /**
      * Persists a new score back to Learnosity for it to re-tally
      *
@@ -1146,6 +1194,7 @@ class Controller extends Base
      * @return void
      * @throws ValidationException
      * @throws \DomainException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function postFeedbackScore(
@@ -1206,7 +1255,7 @@ class Controller extends Base
             'sessions' => [
                 [
                     'session_id' => $attempt->getLearnosityReference(),
-                    'user_id' => (string)$attempt->getUser()->getId(),
+                    'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                     'responses' => [
                         $updatedResponse
                     ]
@@ -1340,7 +1389,7 @@ class Controller extends Base
                 ]
             ],
             'user' => [
-                'id' => (string)$this->getUser()->getId(),
+                'id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $this->getUser()->getId()),
                 /* These fields are superfluous and are presumably used for auditing
                  * (we don't have a screen for this, it's in Learnosity somewhere else)
                  */

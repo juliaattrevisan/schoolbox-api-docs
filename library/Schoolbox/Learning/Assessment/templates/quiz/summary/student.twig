@@ -146,13 +146,15 @@
                     </td>
                     <td class="actions-small-2">
                         <nav>
-                            {% if not finished and canAttempt %}
-                                <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
-                            {% else %}
-                                {% if canStudentReview %}
-                                    <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
-                                {% elseif canReview %}
-                                    <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                            {% if attempt.learnosityReference %}
+                                {% if not finished and canAttempt %}
+                                    <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                                {% else %}
+                                    {% if canReview %}
+                                        <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                                    {% elseif canStudentReview %}
+                                        <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
+                                    {% endif %}
                                 {% endif %}
                             {% endif %}
 

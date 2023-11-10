@@ -12,7 +12,7 @@
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
 <div class="row">
-    <div class="small-12 island">
+    <div id="student-review-container" class="small-12 island">
         <h1>{{ assessment.title }}</h1>
 
         <h2 class="subheader">Student Review</h2>
@@ -20,11 +20,13 @@
             <div id="schoolbox-student"></div>
         </section>
 
-        {% if attempt.reviewed %}
+        {% if attempt.reviewed and attempt.comment|length %}
+        <div id="overall-comment-container" style="display:none">
             <h2 class="subheader">Overall comments from {{ attempt.reviewer.fullname }}</h2>
             <section class="content">
                 <article>{{ attempt.comment|purify }}</article>
             </section>
+        </div>
         {% endif %}
 
         {% if returnUrl %}
@@ -70,7 +72,25 @@
                             '');
                         });
                     });
+
+                    /* Show container when ready
+                     */
+                    document.getElementById('overall-comment-container').style.display = '';
                 });
+            },
+            /* Log errors to console and to screen for users
+             */
+            errorListener: function(error) {
+                let errorElement = document.createElement('div');
+                errorElement.classList.add('alert-box', 'warning');
+                errorElement.innerHTML = '<p>There was a problem loading this attempt.</p>';
+                errorElement.innerHTML += '<p>' + error.code + ' ' + error.msg + '</p>';
+
+                document.getElementById('schoolbox-student').replaceWith(errorElement);
+                document.getElementById('student-review-container').classList.remove('island');
+                document.getElementById('student-review-container').classList.add('columns');
+
+                console.log(error);
             }
         }
 

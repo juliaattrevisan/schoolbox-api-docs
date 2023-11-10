@@ -582,7 +582,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         /* Delete corresponding Learnosity items
          */
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model && $assessment->getLearnosityReference()) {
             $api = new Api(
                 (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
                 $this->getConfigLoader()->get('learnosity_consumer_key'),

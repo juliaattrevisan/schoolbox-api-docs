@@ -10,7 +10,7 @@
 <script src="https://items-au.learnosity.com/?v2023.2.LTS"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 <div class="row">
-    <div class="small-12 island">
+    <div id='quiz-container' class="small-12 island">
         <section class="content">
             <div id="learnosity_assess"></div>
         </section>
@@ -56,6 +56,20 @@
                     itemsApp.items().goto(parseInt(window.location.hash.replace(/^#/, "")));
                 }
             };
+        },
+        /* Log errors to console and to screen for users
+         */
+        errorListener: function(error) {
+            let errorElement = document.createElement('div');
+            errorElement.classList.add('alert-box', 'warning');
+            errorElement.innerHTML = '<p>There was a problem loading this quiz.</p>';
+            errorElement.innerHTML += '<p>' + error.code + ' ' + error.msg + '</p>';
+
+            document.getElementById('learnosity_assess').replaceWith(errorElement);
+            document.getElementById('quiz-container').classList.remove('island');
+            document.getElementById('quiz-container').classList.add('columns');
+
+            console.log(error);
         }
     };
 

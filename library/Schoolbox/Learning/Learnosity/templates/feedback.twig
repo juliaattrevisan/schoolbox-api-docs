@@ -24,7 +24,7 @@
             <section class="content">
                 <div id="schoolbox-student"></div>
             </section>
-            <section class="content">
+            <section class="content" id="attempt-comment-container" style="display:none">
                 <label>Overall Comment</label>
                 <textarea id="attempt-comment" name="attempt-comment">{{ attempt.comment }}</textarea>
                 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
@@ -126,7 +126,18 @@
                         targetElements: attemptEditorFields
                     }
                 }));
+
+                /* Show the Overall Comment inputs
+                 */
+                document.getElementById('attempt-comment-container').style.display = '';
             });
+        },
+        /* Log errors to console and to screen for users
+         */
+        errorListener: function(error) {
+            console.log(error);
+
+            document.getElementById('attempt-comment-container').remove();
         }
     }
 

@@ -118,8 +118,8 @@ class BlueprintBuilder
                 'payload' => [
                     'meta' => [
                         'user' => [
-                            /* FIXME replace with actual author somehow, or just assume a system user
-                             *  I'm not really sure this is ever shown to an end user
+                            /* Just assume a system user
+                             *  This is only ever used in learnosity land in some secret place
                              */
                             'id' => $defaultAuthor
                         ]
@@ -244,8 +244,6 @@ class BlueprintBuilder
              * pile them up here
              */
             foreach ($section['_questions'] as $question) {
-                /* FIXME temporary shim while constructing Strategies
-                 */
                 try {
                     $questionStruct = $this->payloadFactory->produce(
                         PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
@@ -473,8 +471,6 @@ class BlueprintBuilder
              * pile them up here
              */
             foreach ($section['_questions'] as $question) {
-                /* FIXME temporary shim while constructing Strategies
-                 */
                 try {
                     $questionStruct = $this->payloadFactory->produce(
                         PayloadFactory::LEARNOSITY_PAYLOAD_QUESTION,
