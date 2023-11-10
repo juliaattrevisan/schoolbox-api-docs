@@ -33,8 +33,8 @@ class Api
      *
      * https://help.learnosity.com/hc/en-us/articles/360000754798-What-Regions-and-Endpoints-Should-I-Use-#us-west-oregon
      */
-    private const DATA_API_HOST_READ = 'https://data-au.learnosity.com/v2023.2.LTS/';
-    private const DATA_API_HOST_WRITE = 'https://data-or.learnosity.com/v2023.2.LTS/';
+    private const DATA_API_HOST_READ = 'https://data-au.learnosity.com/v2023.3.LTS/';
+    private const DATA_API_HOST_WRITE = 'https://data-or.learnosity.com/v2023.3.LTS/';
 
 
     /**
