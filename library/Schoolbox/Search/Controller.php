@@ -119,6 +119,8 @@ class Controller extends Base
         // The hard-coded filters list returned by this function originated in https://schoolbox.atlassian.net/browse/SA-7782.
 
         $rosettaStone = self::$rosettaStone;
+        $loggedInUserRole = $this->getUser()->getRole();
+
 
         // NOTE: The values for the 'value' key must match those in ResultTypes.ts.
         $filters = [
@@ -154,7 +156,9 @@ class Controller extends Base
             ];
         }
 
-        if ($configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)) {
+        if ($configLoader->get(ConfigMapper::NAME_BADGES_ENABLED) &&
+            ($loggedInUserRole->isStudent() || $loggedInUserRole->isStaff())
+        ) {
             $filters[] = ["title" => "Badges", "value" => "badge"];
         }
 
@@ -193,7 +197,6 @@ class Controller extends Base
             ["title" => "Guest", "value" => "user.guest"]
         ];
 
-        $loggedInUserRole = $this->getUser()->getRole();
 
         if (
             $loggedInUserRole->isStaff() || (

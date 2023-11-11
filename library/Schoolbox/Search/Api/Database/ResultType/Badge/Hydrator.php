@@ -77,6 +77,11 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
+                // Don't allow students to search for badges they cannot set as a goal
+                if ($viewer->getRole()->isStudent() && !$badge->getAllowAsGoal()) {
+                    return null;
+                }
+
                 $badgeBodyTextOnly = $this->htmlToText($badge->getBody());
 
                 // Because the badge body contains HTML, this match might have come about only because the
