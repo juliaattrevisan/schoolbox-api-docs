@@ -153,7 +153,7 @@ class Controller extends Base
             }
             $data['internalSsoUrl'] = $internalSsoUrl
                 ->appendQueryParameters($internalSsoUrlParams)
-                ->withPath('/api/users/jwt');
+                ->withPath('/instances/login');
         }
 
         $this->response = $this->responseFromTemplateUnthemed('@login/login.twig', $data);
