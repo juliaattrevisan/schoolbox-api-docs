@@ -3,6 +3,8 @@
 namespace Schoolbox\Resource\Storage\Virus;
 
 use Schoolbox\File\Exception as FileException;
+use League\Flysystem\Filesystem;
+
 
 /**
  * @copyright Copyright 2023, Schoolbox Pty Ltd
@@ -11,19 +13,32 @@ use Schoolbox\File\Exception as FileException;
 
 class Scanner
 {
+    /**
+     * We use clamdscan to pass file to already running daemon of clamd
+     */
+    private const CLAMSCAN_COMMAND = 'clamdscan';
 
     /**
-     * TODO: Possible alerts (alert-encrypted, alert-macros)
-     * TODO: DOS protection (max-scantime=2min, max-filesize=25MB)
+     * We utilise 'fdpass' so that file descriptor is passed to avoid issues with permissions in clamd
+     * If the file is a virus, we use the 'move' parameter to specific quarantine location
      */
-    private const CLAMSCAN_COMMAND = 'clamdscan --fdpass --move=%s %s';
+    private const  CLAMSCAN_ARGS = '--fdpass --move=%s %s';
 
+    /**
+     * This is the quarantine location, it sits under the system temp directory and will be automatically created
+     */
     private const VIRUS_QUARANTINE = '/quarantine/';
 
     private string $quarantine;
-    public function __construct()
+    public function __construct(private Filesystem $tempFileSystem)
     {
-        $this->quarantine = sys_get_temp_dir();
+
+
+        if(!$this->tempFileSystem->directoryExists(self::VIRUS_QUARANTINE)) {
+            $this->tempFileSystem->createDirectory(self::VIRUS_QUARANTINE);
+        }
+
+        $this->quarantine = sys_get_temp_dir() . self::VIRUS_QUARANTINE;
     }
 
     /**
@@ -39,8 +54,12 @@ class Scanner
         $output = '';
         $resultCode = 0;
 
-        exec(sprintf(self::CLAMSCAN_COMMAND, $this->quarantine, $filelocation), $output, $resultCode);
+        exec(sprintf(self::CLAMSCAN_COMMAND.' '.self::CLAMSCAN_ARGS, $this->quarantine, $filelocation), $output, $resultCode);
 
+        if ($resultCode === 127) {
+            // Virus scanner not available, just continue without it
+            return;
+        }
         if ($resultCode > 0) {
             throw new FileException('A virus has been detected and this file has been quarantined');
         }

@@ -85,6 +85,7 @@ class Receiver implements IReceiver
         bool $public = true,
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
+
     ): Model {
         $storage = $this->storageMapper->createModel();
 
@@ -128,7 +129,8 @@ class Receiver implements IReceiver
         $storage->setPublic($public);
 
         // Run the virus scanner
-        $scanner = new Virus\Scanner();
+
+        $scanner = new Virus\Scanner($this->tempFilesystem);
         $scanner->scan($tempLocation);
 
         $helper    = new Sanitizer\Helper($this->sanitizer);
