@@ -29,7 +29,7 @@
                 "@ckeditor/ckeditor5-mention": "~40.0.0",
                 "@ckeditor/ckeditor5-paragraph": "~40.0.0",
                 "@ckeditor/ckeditor5-paste-from-office": "~40.0.0",
-                "@ckeditor/ckeditor5-paste-from-office-enhanced": "^40.0.0",
+                "@ckeditor/ckeditor5-paste-from-office-enhanced": "~40.0.0",
                 "@ckeditor/ckeditor5-remove-format": "~40.0.0",
                 "@ckeditor/ckeditor5-source-editing": "~40.0.0",
                 "@ckeditor/ckeditor5-special-characters": "~40.0.0",
@@ -59,7 +59,7 @@
                 "@phudak/ckeditor5-emoji": "~1.1.1",
                 "@vueuse/components": "^10.3.0",
                 "@vueuse/core": "^10.2.1",
-                "axios": "~1.4.0",
+                "axios": "~1.6.0",
                 "canvas-confetti": "~1.6.0",
                 "clipboard": "~2.0.11",
                 "datatables.net": "~1.13.4",
@@ -10333,9 +10333,9 @@
             }
         },
         "node_modules/axios": {
-            "version": "1.4.0",
-            "resolved": "https://registry.npmjs.org/axios/-/axios-1.4.0.tgz",
-            "integrity": "sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==",
+            "version": "1.6.0",
+            "resolved": "https://registry.npmjs.org/axios/-/axios-1.6.0.tgz",
+            "integrity": "sha512-EZ1DYihju9pwVB+jg67ogm+Tmqc6JmhamRN6I4Zt8DfZu5lbcQGw3ozH9lFejSJgs/ibaef3A9PMXPLeefFGJg==",
             "dependencies": {
                 "follow-redirects": "^1.15.0",
                 "form-data": "^4.0.0",
@@ -36868,9 +36868,9 @@
             "dev": true
         },
         "axios": {
-            "version": "1.4.0",
-            "resolved": "https://registry.npmjs.org/axios/-/axios-1.4.0.tgz",
-            "integrity": "sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==",
+            "version": "1.6.0",
+            "resolved": "https://registry.npmjs.org/axios/-/axios-1.6.0.tgz",
+            "integrity": "sha512-EZ1DYihju9pwVB+jg67ogm+Tmqc6JmhamRN6I4Zt8DfZu5lbcQGw3ozH9lFejSJgs/ibaef3A9PMXPLeefFGJg==",
             "requires": {
                 "follow-redirects": "^1.15.0",
                 "form-data": "^4.0.0",
