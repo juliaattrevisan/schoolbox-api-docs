@@ -19,7 +19,7 @@ const hasQuestionsWithNoScore = props.item.questions.some((question) => question
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m l-pad-l--top item">
+    <div class="c-island l-flex-col l-gap-m l-pad-m">
         <qf-student-item-mark :item="item" :container="(container as HTMLDivElement)" />
         <div v-if="hasQuestionsWithNoScore">
             <div class="alert-box f-no-margins">
@@ -42,10 +42,6 @@ const hasQuestionsWithNoScore = props.item.questions.some((question) => question
 </template>
 
 <style lang="scss">
-.item {
-    border-top: 4px solid var(--body-background);
-}
-
 .item-questions {
     .lrn_widget {
         margin: 0;

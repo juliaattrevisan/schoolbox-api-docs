@@ -37,7 +37,7 @@ window.Vue.watch(
 <template>
     <div ref="studentEl" class="student l-grid">
         <div ref="studentInnerContainerEl" class="student__inner-container">
-            <div ref="studentEl" class="c-island l-flex-col l-gap-m l-pad-m">
+            <div ref="studentEl" class="l-flex-col l-gap-m">
                 <qf-student-header :student="props.student" :container="(responseContentEl as HTMLDivElement)" />
                 <div ref="responseEl" class="response l-grid">
                     <div ref="responseInnerContainerEl" class="response__inner-container">

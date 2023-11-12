@@ -89,7 +89,7 @@ window.Vue.onUnmounted(async () => {
 
 <template>
     <div>
-        <div class="l-flex-col l-gap-m">
+        <div class="c-island l-flex-col l-gap-m l-pad-m">
             <div>
                 <label>Overall Comment</label>
                 <p class="meta">
