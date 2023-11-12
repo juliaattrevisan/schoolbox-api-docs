@@ -19,17 +19,19 @@
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
-<div id="quiz-feedback-container">
-    <quiz-feedback
-        :title="'{{ assessment.title }}'"
-        :student="{{ student|json_encode }}"
-        :item-responses="{{ itemResponses|json_encode }}"
-        :attempt="{{ attempt|json_encode }}"
-        :report-init-options="{{ reportInitOptions }}"
-        :attempt-comment="{{ attemptComment|json_encode }}"
-        :urls="{{ urls|json_encode }}"
-        status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
-    />
+<div class="l-flex-col l-gap-l f-no-margins">
+    <h1>Feedback for {{ assessment.title }}</h1>
+    <div id="quiz-feedback-container">
+        <quiz-feedback
+            :student="{{ student|json_encode }}"
+            :item-responses="{{ itemResponses|json_encode }}"
+            :attempt="{{ attempt|json_encode }}"
+            :report-init-options="{{ reportInitOptions }}"
+            :attempt-comment="{{ attemptComment|json_encode }}"
+            :urls="{{ urls|json_encode }}"
+            status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
+        />
+    </div>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/quizFeedback.js?v={{ config.site_version }}"></script>
 <script>

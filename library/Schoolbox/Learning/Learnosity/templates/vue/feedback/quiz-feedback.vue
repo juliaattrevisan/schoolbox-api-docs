@@ -13,7 +13,6 @@ import { loadReport } from "./util/loadReport";
 import QfStudent from "./student/qf-student.vue";
 
 interface Props {
-    title: string; // the title of the quiz
     student: Student; // the student who has attempted the quiz
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
     attemptComment: StudentAttemptComment; // StudentAttemptComment all the overall attempt comments for the quiz
@@ -37,12 +36,8 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-l f-no-margins">
-        <!-- Title. But add the metadata etc. when you get up to that bit -->
-        <h1>Feedback for {{ props.title }}</h1>
-        <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
-        <qf-student :student="useStudentStore().student" />
-    </div>
+    <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
+    <qf-student :student="useStudentStore().student" />
 </template>
 
 <style>
