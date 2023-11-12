@@ -1403,7 +1403,10 @@ class Mapper extends BaseMapper
                 return $link->getAssessmentModel()->getId();
             });
 
-            foreach ($this->hydrateSelectRecursive($statement, false) as $subAssessment) {
+            // As of SA-16450 it should be safe to hydrate project contexts for
+            // lesson plan linked assessments, because lesson plans may no
+            // longer be linked to projects.
+            foreach ($this->hydrateSelectRecursive($statement) as $subAssessment) {
                 foreach ($links->offsetGet($subAssessment->getId()) as $lessonPlan) {
                     $lessonPlans[$lessonPlan->getLessonPlan()->getId()]->getLinkedAssessments()[$subAssessment->getId()] = $subAssessment;
                 }
