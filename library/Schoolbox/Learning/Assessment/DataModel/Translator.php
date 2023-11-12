@@ -473,6 +473,14 @@ class Translator
             // Fetch project from cache, building it if required
             $projectDomainModel = $this->getCachedDomainObject($context, $this->getSubTranslatorData($context));
             if ($projectDomainModel instanceof AssessmentContext) {
+                // Also copy project's context from data to domain.
+                // The project's context should always be the same object in
+                // data and domain: the only case where they aren't is for
+                // projects themselves, and projects can't exist in projects.
+                $projectContext = $context->getAssessmentModel()->getAssessmentContext();
+                if ($projectContext instanceof AssessmentContext) {
+                    $projectDomainModel->setContext($projectContext);
+                }
                 $domainObject->setContext($projectDomainModel);
             }
         }
