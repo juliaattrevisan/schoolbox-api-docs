@@ -46,15 +46,23 @@ window.Vue.watch(
                             <div :id="props.student.elementId"></div>
                         </div>
                         <template v-if="props.student.isReportLoaded">
-                            <div class="l-flex-col l-gap-l">
-                                <qf-student-item
-                                    v-for="item in props.student.items"
-                                    :key="item.reference"
-                                    :student="props.student"
-                                    :item="item"
-                                    :container="(responseContentEl as HTMLDivElement)"
-                                />
-                                <qf-student-attempt-comment :student="props.student" />
+                            <div class="l-flex-col l-gap-m">
+                                <div class="l-flex-col l-gap-s">
+                                    <h2 class="subheader">Cards</h2>
+                                    <div class="l-flex-col l-gap-l">
+                                        <qf-student-item
+                                            v-for="item in props.student.items"
+                                            :key="item.reference"
+                                            :student="props.student"
+                                            :item="item"
+                                            :container="(responseContentEl as HTMLDivElement)"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="l-flex-col l-gap-s">
+                                    <h2 class="subheader">Overall Comment</h2>
+                                    <qf-student-attempt-comment :student="props.student" />
+                                </div>
                             </div>
                         </template>
                     </div>
