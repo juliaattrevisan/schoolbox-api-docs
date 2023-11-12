@@ -141,6 +141,7 @@ class Controller extends Base
      *
      * @param Factory $urlFactory
      * @param BreadcrumbFactory $bakery
+     * @param string $learnosityVersion
      * @param string $learnosityConsumerKey
      * @param string $learnosityConsumerSecret
      * @param ErrorMapper $errorMapper

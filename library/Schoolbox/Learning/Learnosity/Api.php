@@ -75,6 +75,7 @@ class Api
      * Constructor.
      *
      * @param string      $serverName
+     * @param string      $learnosityVersion
      * @param string      $consumerKey
      * @param string      $consumerSecret
      * @param Logger|null $logger
