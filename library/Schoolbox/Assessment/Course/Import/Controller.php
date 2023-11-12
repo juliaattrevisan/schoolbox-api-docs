@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -1051,17 +1052,42 @@ class Controller extends Base\Base
         // After all assessments are imported: link/unlink lesson plans.
         // This must be done after creating all impl assessments: only then is
         // it known which linked assessments actually exist.
-        if ('import' === $action) {
-            foreach ($courseImpls as $courseImpl) {
-                foreach ($courseImpl->getUnits() as $unitImpl) {
-                    foreach ($unitImpl->getAssessables() as $implAssessment) {
-                        $specAssessment = $implAssessment->getSpecificationAssessment();
-                        if ($specAssessment) {
+        foreach ($courseImpls as $courseImpl) {
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                foreach ($unitImpl->getAssessables() as $implAssessment) {
+                    $specAssessment = $implAssessment->getSpecificationAssessment();
+                    if ($specAssessment) {
+                        // Replicate only if this assessment didn't already
+                        // exist in the unit.
+                        if (!$this->isAssessmentAlreadyInUnit($implAssessment, $unitImplData)) {
                             $this->lessonPlanActivitiesReplicator->replicate($specAssessment, $implAssessment);
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Did this assessment already exist in the unit implementation?
+     *
+     * * if the implementation assessment ID was passed in POST data, then it
+     *   already existed
+     * * otherwise, it did not exist
+     *
+     * @param IAssessable $implAssessment
+     * @param array       $unitImplData
+     * @return bool
+     */
+    private function isAssessmentAlreadyInUnit(IAssessable $implAssessment, array $unitImplData): bool
+    {
+        foreach ($unitImplData as $unitImplDatum) {
+            foreach (array_keys($unitImplDatum['a'] ?? []) as $assessmentId) {
+                if ($implAssessment->getId() === (int)$assessmentId) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
