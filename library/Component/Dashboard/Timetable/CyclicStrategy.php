@@ -103,10 +103,9 @@ class Component_Dashboard_Timetable_CyclicStrategy implements Component_Dashboar
      */
     public function execute(): bool
     {
-        /* I think $_SESSION['timetable'] is the Hide Timetable config option
-         * but urgh hideous superglobal dependency here
+        /* is the user is hiding the timetable, or we aren't connected to an external db then don't show the timetable
          */
-        if (!(!empty($_SESSION['timetable']) && $this->configLoader->get('external_enable'))) {
+        if ($this->user->getHideTimetable() && $this->configLoader->get('external_enable')) {
             return false;
         }
 
