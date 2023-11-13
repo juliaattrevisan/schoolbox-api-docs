@@ -215,20 +215,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 tb2.updated_at AS textboxUpdatedAt,
                 tb2.created_by AS textboxCreatedBy
                 FROM textBox tb2
+                LEFT JOIN component_config_instance cci2 ON (
+                    cci2.component_config_definition_id = (
+                        SELECT id
+                        FROM component_config_definition ccd2
+                        WHERE ccd2.key = "' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"
+                    ) AND
+                    cci2.value = CAST(tb2.textBoxID AS NCHAR)
+                )
                 WHERE tb2.deleted_at IS NULL
                 AND (
                    tb2.heading LIKE :textboxKeywordLike OR
                    tb2.body LIKE :textboxKeywordLike
                 )
-                AND tb2.textBoxID NOT IN (
-                    SELECT CAST(cci2.value AS INT)
-                    FROM component_config_instance cci2
-                    JOIN component_config_definition ccd2 ON (
-                        ccd2.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
-                        ccd2.id=cci2.component_config_definition_id
-                    )
-                    WHERE cci2.value = CAST(tb2.textBoxID AS NCHAR)
-                )
+                AND cci2.id IS NULL
             ) AS dummy';
     }
 }
