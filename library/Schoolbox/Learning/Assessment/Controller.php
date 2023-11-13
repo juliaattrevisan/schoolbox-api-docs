@@ -377,7 +377,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
 
-        $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+        $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
+        /* Quizzes have two parts to change
+         */
+        if ($assessment instanceof Quiz\Model) {
+            $breadcrumbs->add([
+                'Modify Settings',
+                null
+            ]);
+        }
+
+        $data['breadcrumbs'] = $breadcrumbs;
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
 

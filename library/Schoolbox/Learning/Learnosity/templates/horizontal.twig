@@ -1,32 +1,37 @@
 {##
  # Give feedback for each attempt, one question at a time
  #
- # @param string $reportPayloads    Learnosity API initialisation objects (one for each person's attempt, json encoded)
- # @param array $itemReferences     A set of (item reference, item title) tuples for rendering the table of contents
- # @param array $students           A set of (user data, dom element id) tuples used to render Learnosity app anchor divs
- # @param string $itemResponses     A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
- # @param string $attemptComments  A base64_encoded set of (student id, item reference, attempt comment) tuples that contain overall comments for a person's attempt
- # @param array $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
- # @param IAssessable $assessment   Our schoolbgox quiz instance
+ # @param IAssessable $assessment          Our schoolbgox quiz instance
+ # @param array $breadcrumbs               A context trail at the top of the screeen
+ # @param string $reportPayloads           Learnosity API initialisation objects (one for each person's attempt, json encoded)
+ # @param array $itemReferences            A set of (item reference, item title) tuples for rendering the table of contents
+ # @param array $students                  A set of (user data, dom element id) tuples used to render Learnosity app anchor divs
+ # @param string $itemResponses            A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
+ # @param string $attemptComments          A base64_encoded set of (student id, item reference, attempt comment) tuples that contain overall comments for a person's attempt
+ # @param array $urls                      A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
-<div id="horizontal-marking-container">
-    <horizontal-marking
-        :title="'{{ assessment.title }}'"
-        :items="{{ itemReferences|json_encode }}"
-        :students="{{ students|json_encode }}"
-        :item-responses="{{ itemResponses|json_encode }}"
-        :attempt-comments="{{ attemptComments|json_encode }}"
-        :urls="{{ urls|json_encode }}"
-        :report-payloads="{{ reportPayloads }}"
-        status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
-    />
+<div class="row">
+    <div class="small-12 columns">
+        <div id="horizontal-marking-container">
+            <horizontal-marking
+                    :title="'{{ assessment.title }}'"
+                    :items="{{ itemReferences|json_encode }}"
+                    :students="{{ students|json_encode }}"
+                    :item-responses="{{ itemResponses|json_encode }}"
+                    :attempt-comments="{{ attemptComments|json_encode }}"
+                    :urls="{{ urls|json_encode }}"
+                    :report-payloads="{{ reportPayloads }}"
+                    status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
+            />
+        </div>
+    </div>
 </div>
+
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
-<script>
-// to use the new spacing styles
-document.getElementById("container").classList.add("c-container");
-</script>

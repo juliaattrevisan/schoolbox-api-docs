@@ -18,6 +18,7 @@ use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
@@ -137,7 +138,9 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     *
      * @param Factory $urlFactory
+     * @param BreadcrumbFactory $bakery
      * @param string $learnosityConsumerKey
      * @param string $learnosityConsumerSecret
      * @param ErrorMapper $errorMapper
@@ -151,6 +154,7 @@ class Controller extends Base
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
+        protected BreadcrumbFactory $bakery,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -180,6 +184,7 @@ class Controller extends Base
      * @param IAssessable $assessment
      * @return void
      * @throws Error
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \DomainException Thrown when site_school_code is empty string
      * @throws \JsonException
@@ -285,8 +290,17 @@ class Controller extends Base
             ]
         ];
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                    ->add([$assessment->getTitle(),
+                                           $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+                                          ])
+                                    ->add(['Modify Content', null]);
+
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
+            'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('author', $payload),
             'tags' => json_encode($tags, JSON_THROW_ON_ERROR),
             'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
@@ -473,9 +487,18 @@ class Controller extends Base
             );
         }
 
+        /* Breadcrumbs
+         * Legacy quiz never had breadcrumbs for attempt screen; I can only presume
+         * we meant to minimise the ways students could get out of a quiz. Given that
+         * we have a whole slew of buttons at the top, I don't see how omitting the
+         * breadcrumbs reduces that risk.
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
         $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
-            'initOptions' => $this->api->initOptions('items', $payload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('items', $payload),
             'attemptId' => $attempt->getId(),
             /* Save results locally
              */
@@ -592,9 +615,25 @@ class Controller extends Base
             ],
         ];
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                    ->add(
+                                        [$assessment->getTitle(),
+                                         $this->routeGenerator->generate(
+                                             'learningAssessment.getSummary',
+                                             ['assessmentId' => $assessment->getId(),
+                                              'studentId' => $this->getUser()->getId()
+                                             ]
+                                         )
+                                        ]
+                                    )
+                                    ->add(['Result Summary']);
+
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
@@ -666,9 +705,22 @@ class Controller extends Base
             $comments = [];
         }
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
+            [
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ]
+        );
+        $breadcrumbs->add([
+            'Review', null
+        ]);
+
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
             'comments' => $comments ? base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)) : null,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
@@ -683,6 +735,7 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @throws Error
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \JsonException
      * @throws \RuntimeException
@@ -740,9 +793,20 @@ class Controller extends Base
          */
         $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
+            [$assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+
+            ]
+        )
+            ->add(['Feedback']);
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
-            'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
             'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
@@ -1170,8 +1234,18 @@ class Controller extends Base
         $attemptComments = array_values($attemptComments);
         $urls = array_values($urls);
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                    ->add([
+                                            $assessment->getTitle(),
+                                            $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+                                          ])
+                                    ->add(['Horizontal Marking']);
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
             'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
             'itemReferences' => $itemReferences,
             'students' => $students,
