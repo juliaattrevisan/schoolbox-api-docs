@@ -1,12 +1,16 @@
 {##
  # Do an attempt
  #
- # @param string|array $initOptions    Learnosity API initialisation object
  # @param IAssessable $assessment      Our schoolbgox quiz instance
+ # @param array $breadcrumbs           A context trail at the top of the screeen
+ # @param string|array $initOptions    Learnosity API initialisation object
  # @param int $attemptId               In int corresponding a row in assess_attempt
  # @param string $completionUrl        A url to the endpoint that records an attempt as "finished"
  # @param string $learnosityReference  A Learnosity UUID corresponding uniquely to this attempt
  #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
 <script src="https://items-au.learnosity.com/?v2023.2.LTS"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 <div class="row">

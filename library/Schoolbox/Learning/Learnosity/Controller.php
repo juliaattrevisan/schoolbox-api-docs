@@ -487,9 +487,18 @@ class Controller extends Base
             );
         }
 
+        /* Breadcrumbs
+         * Legacy quiz never had breadcrumbs for attempt screen; I can only presume
+         * we meant to minimise the ways students could get out of a quiz. Given that
+         * we have a whole slew of buttons at the top, I don't see how omitting the
+         * breadcrumbs reduces that risk.
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
         $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
-            'initOptions' => $this->api->initOptions('items', $payload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('items', $payload),
             'attemptId' => $attempt->getId(),
             /* Save results locally
              */
