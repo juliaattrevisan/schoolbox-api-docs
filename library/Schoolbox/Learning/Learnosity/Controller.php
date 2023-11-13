@@ -540,11 +540,37 @@ class Controller extends Base
             'user_id'              => $student->getId()
         ]);
 
+        /* Fabricate an IResponse instance for existing mark scheme
+         *
+         * Note that $existingResponse might well be null for broken data somehow,
+         * but we have no means to recover from that...and it shouldn't really
+         * occur naturally
+         */
+        $existingResponse = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+
+        /* TODO What kind of error should we present to users? It's asynchronous
+         */
+        if (null === $existingResponse) {
+            return;
+        }
+
         /* Update normalised and human-readable marks
          */
         $normalisedMark = $existingAttempt->calculateNormalisedMark($mark, $maxMark);
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
 
+        /* Update the domain object synonymously which will desync from $existingAttempt
+         * so we need to sync them manually...
+         *
+         * This is required for getMarkScheme() to calculate human-readable mark
+         */
+        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\Model $existingResponse */
+        $existingResponse->setNormalisedMark($normalisedMark);
+        $existingResponse->setMarksAvailable($maxMark);
+
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $existingResponse);
+
+        /* Update the columns with newly-derived values
+         */
         $existingAttempt
             ->setMark($humanReadableMark)
             ->setNormalisedMark($normalisedMark)
