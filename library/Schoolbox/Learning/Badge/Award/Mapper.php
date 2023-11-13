@@ -17,7 +17,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge;
 use Schoolbox\Learning\Badge\Award;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Search\Results;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;

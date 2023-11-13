@@ -52,7 +52,6 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
@@ -1436,15 +1435,11 @@ class Controller extends Base
      */
     private function assertSyncability(): void
     {
-        $message = 'Your user account does not have an external ID, and thus cannot create or modify pastoral records.';
-        if (!$this->getUser()->isSuperuser()) {
-            $message .= ' Please contact your Schoolbox administrator.';
-        }
         if (
             ($this->getUser()->getExternalId() ?? '') === '' &&
             $this->config->get(ConfigMapper::NAME_EXTERNAL_PASTORAL)
         ) {
-            throw $this->errorMapper->generateException(null, null, $message);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NO_EXTERNAL_ID);
         }
     }
 }
