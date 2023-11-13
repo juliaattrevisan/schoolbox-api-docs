@@ -128,6 +128,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
         $this->setBlock($templateHandle, 'class_pastoral_report_link', 'class_pastoral_report_link_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
+        $this->setBlock($templateHandle, 'unit_planner', 'unit_planner_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
         $this->setBlock($templateHandle, 'qrcode_link', 'qrcode_link_block');
 
@@ -334,6 +335,20 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
             $this->parse('course_link_block', 'course_link');
             $hasClassActions = true;
+        }
+
+        // Unit planner link should show for both Unit and Course pages.
+        if ($isCoursePage || $isUnitPage) {
+            $unitPlannerLink = null;
+            if ($isUnitPage) {
+                $unitPlannerLink = $this->getRouteGenerator()->generate('coursePlan.getPlan', ['id' => $this->getContext()->getUnitSpecification()->getCourse()->getId()]);
+            } elseif ($isCoursePage) {
+                $unitPlannerLink = $this->getRouteGenerator()->generate('coursePlan.getPlan', ['id' => $this->getContext()->getCourseSpecification()->getId()]);
+            }
+            $this->setVar('UNIT_PLANNER_LINK', $unitPlannerLink);
+            $this->parse('unit_planner_block', 'unit_planner');
+        } else {
+            $this->setVar('unit_planner_block');
         }
 
         return $hasClassActions;
