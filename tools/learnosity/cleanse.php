@@ -118,6 +118,7 @@ HELP;
          */
         $api = new Api(
             $serverName,
+            $this->getConfig()->get('learnosity_version'),
             $this->getConfig()->get('learnosity_consumer_key'),
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger()

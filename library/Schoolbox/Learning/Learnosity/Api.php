@@ -32,9 +32,11 @@ class Api
      * match the consumer’s region, not the end user’s region."
      *
      * https://help.learnosity.com/hc/en-us/articles/360000754798-What-Regions-and-Endpoints-Should-I-Use-#us-west-oregon
+     *
+     * Learnosity API Endpoints - Version must be specified
      */
-    private const DATA_API_HOST_READ = 'https://data-au.learnosity.com/v2023.2.LTS/';
-    private const DATA_API_HOST_WRITE = 'https://data-or.learnosity.com/v2023.2.LTS/';
+    private const DATA_API_HOST_READ = 'https://data-au.learnosity.com/v%s/';
+    private const DATA_API_HOST_WRITE = 'https://data-or.learnosity.com/v%s/';
 
 
     /**
@@ -63,11 +65,17 @@ class Api
     private const JITTER_LOWER = 0;
     private const JITTER_UPPER = 3;
 
+    /**
+     * Endpoints for Learnosity API
+     */
+    private string $dataAPIWriteHost;
+    private string $dataAPIReadHost;
 
     /**
      * Constructor.
      *
      * @param string      $serverName
+     * @param string      $learnosityVersion
      * @param string      $consumerKey
      * @param string      $consumerSecret
      * @param Logger|null $logger
@@ -75,6 +83,7 @@ class Api
      */
     public function __construct(
         private string $serverName,
+        private string $learnosityVersion,
         #[\SensitiveParameter] private string $consumerKey,
         #[\SensitiveParameter] private string $consumerSecret,
         private ?LoggerInterface $logger = null
@@ -84,6 +93,9 @@ class Api
         if ('' === $consumerKey || '' === $consumerSecret) {
             throw new \DomainException('Learnosity is not configured; please check settings');
         }
+
+        $this->dataAPIWriteHost = sprintf(self::DATA_API_HOST_WRITE, $this->learnosityVersion);
+        $this->dataAPIReadHost = sprintf(self::DATA_API_HOST_READ, $this->learnosityVersion);
     }
 
 
@@ -142,7 +154,7 @@ class Api
      */
     public function dataGetRequest(string $endpoint, array $payload): mixed
     {
-        return $this->dataRequest(self::DATA_API_HOST_READ, $endpoint, $payload, 'get');
+        return $this->dataRequest($this->dataAPIReadHost, $endpoint, $payload, 'get');
     }
 
 
@@ -158,7 +170,7 @@ class Api
      */
     public function dataSetRequest(string $endpoint, array $payload): mixed
     {
-        return $this->dataRequest(self::DATA_API_HOST_WRITE, $endpoint, $payload, 'set');
+        return $this->dataRequest($this->dataAPIWriteHost, $endpoint, $payload, 'set');
     }
 
 
@@ -174,7 +186,7 @@ class Api
      */
     public function dataUpdateRequest(string $endpoint, array $payload): mixed
     {
-        return $this->dataRequest(self::DATA_API_HOST_WRITE, $endpoint, $payload, 'update');
+        return $this->dataRequest($this->dataAPIWriteHost, $endpoint, $payload, 'update');
     }
 
 

@@ -342,6 +342,7 @@ class Module extends BaseModule
         return new Controller(
             new \Schoolbox\Url\Factory($this->getConfig()),
             $bakery,
+            (string)$this->getConfig()->get('learnosity_version'),
             (string)$this->getConfig()->get('learnosity_consumer_key'),
             (string)$this->getConfig()->get('learnosity_consumer_secret'),
             $this->getMapperFactory()->get(ErrorMapper::class),
