@@ -129,18 +129,21 @@ class Payload
          *  "Router $router" to "string $route" instead, and have the aura pages generate
          *  the $route and pass it instead of doing it internally
          */
-        $assessmentUrl = $this->routeGenerator->generate('learningAssessment.getAssessment', [
+        $assessmentUrl = $domain . $this->routeGenerator->generate('learningAssessment.getAssessment', [
                 'assessmentId' => $assessment->getId()
             ]);
-        $startUrl = $this->routeGenerator->generate('learningAssessment.getSummaryViaSeb', [
+        $startUrl = $domain . $this->routeGenerator->generate('learningAssessment.getSummaryViaSeb', [
             'assessmentId' => $assessment->getId(),
             'studentId' => $user->getId()
         ]);
-        $quizStartUrl = $this->routeGenerator->generate(
+
+        // Allow access to quiz start URL, and in addition any URLs underneath
+        // (learnosity.getCompleteAttempt is underneath)
+        $quizStartUrl = $domain . $this->routeGenerator->generate(
             'learnosity.getAttempt',
             [
                 'assessmentId' => $assessment->getId(),
-                'studentId' => $user->getId()
+                'studentId'    => $user->getId(),
             ]
         );
 
@@ -155,9 +158,9 @@ class Payload
          */
         $whitelistUrls = [
             "{$domain}/login*",
-            "{$domain}/{$assessmentUrl}*",
-            "{$domain}/{$startUrl}*",
-            "{$domain}/{$quizStartUrl}",
+            "{$assessmentUrl}*",
+            "{$startUrl}*",
+            "{$quizStartUrl}*",
             "{$domain}/storage/fetch.php*",
             "{$domain}/storage/image.php*",
             "{$domain}/cms/sendVideo.php*"
