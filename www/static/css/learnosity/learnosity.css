@@ -50,12 +50,6 @@
     background-color: transparent;
 }
 
-/* change the accessibility modal button colour */
-.lrn-assess .lrn-dialogs-close-btn:after,
-.lrn-assess .lrn-dialogs-close-btn:before {
-    background-color: var(--content-ui-foreground);
-}
-
 /* general button, like previous question or resume quiz */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
 .lrn.lrn-assess .dialogs .lrn_btn {
