@@ -1,18 +1,22 @@
 {##
  # Give feedback for an attempt
  #
- # @param string|array $reportInitOptions  Learnosity API initialisation object
  # @param IAssessable $assessment          Our schoolbgox quiz instance
+ # @param array $breadcrumbs               A context trail at the top of the screeen
+ # @param string|array $initOptions        Learnosity API initialisation object
  # @param Attempt\Model $attempt           The student's attempt from our local db
  # @param array $scores                    A list of score tuples obtained per question in this attempt
  # @param array $comments                  A list of comment tuples that contain per-question comments
  #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Feedback for {{ assessment.title }}</h1>
+        <h1>Feedback for {{ attempt.user.fullname }}</h1>
         {# Send synchronously
          # Learnosity does this weird caching behaviour where it remembers old
          # scores for a short time, forcing you to refresh manually, which isn't nice
@@ -142,7 +146,7 @@
     }
 
     let reportsApp = LearnosityReports.init(
-        {{ reportInitOptions | raw }}, reportCallback
+        {{ initOptions | raw }}, reportCallback
     );
 </script>
 {% endautoescape %}

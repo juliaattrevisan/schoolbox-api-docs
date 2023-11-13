@@ -719,6 +719,7 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @throws Error
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \JsonException
      * @throws \RuntimeException
@@ -776,9 +777,14 @@ class Controller extends Base
          */
         $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
-            'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
             'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
             'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
