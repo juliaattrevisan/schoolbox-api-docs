@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Hydrator;
 
-use Alaress\Html\ToText;
 use Alaress\Image\Transformation\Storage;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Resource\Storage\IStorage;
@@ -83,18 +82,17 @@ abstract class BaseHydrator implements IHydrator
     }
 
     /**
-     * Convert HTML to text, being careful not to introduce any artifacts that could prevent the search from working.
+     * Convert HTML to text, being careful not to introduce any artifacts that could prevent the search result text
+     * from making sense in the context of the search keyword used.
      * @param string $html - A full or partial HTML document.
      * @returns string - A text-only representation of the supplied HTML.
      */
     public function htmlToText(string $html): string
     {
-        // Set line width to zero (unrestricted) to avoid introducing newlines into the text-only string.
-        // Extra newlines prevent the search from working if the keyword spans multiple lines.
-        // Note this method was chosen over Scrub::html2text() because that method results in table cell content in
-        // neighboring cells being concatenated into a single string, while ToText separates cell content with a space.
-        // (e.g. '<td>Key</td><td>word</td>' becomes 'Keyword' when Scrub::html2text() is used).
-        return (new ToText($html, ['width' => 0, 'do_links' => 'none']))->getText();
+        // Simplicity is better here.  Previously more elaborate methods of converting HTML to text were used here,
+        // but the result was more complexity and more problematic edge-cases, with little benefit.
+        // See https://github.com/alaress/schoolbox/pull/29275
+        return strip_tags($html);
     }
 
     /**
