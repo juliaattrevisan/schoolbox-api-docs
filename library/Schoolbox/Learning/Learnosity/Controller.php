@@ -621,10 +621,11 @@ class Controller extends Base
                                     ->add(
                                         [$assessment->getTitle(),
                                          $this->routeGenerator->generate('learningAssessment.getSummary',
-                                                                         ['assessmentId' => $assessment->getId(),
-                                                                          'studentId' => $this->getUser()->getId()
-                                                                         ])
-                                        ])
+                                             ['assessmentId' => $assessment->getId(),
+                                              'studentId' => $this->getUser()->getId()
+                                             ])
+                                        ]
+                                    )
                                     ->add(['Result Summary']);
 
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
@@ -705,9 +706,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-            [$assessment->getTitle(),
-             $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
-            ]);
+            [
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ]
+        );
         $breadcrumbs->add([
             'Review', null
         ]);
@@ -794,7 +797,8 @@ class Controller extends Base
             [$assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
 
-            ])
+            ]
+        )
             ->add(['Feedback']);
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
