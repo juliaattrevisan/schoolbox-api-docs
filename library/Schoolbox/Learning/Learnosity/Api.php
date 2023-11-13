@@ -94,8 +94,8 @@ class Api
             throw new \DomainException('Learnosity is not configured; please check settings');
         }
 
-        $this->dataAPIWriteHost = sprintf(self::DATA_API_HOST_WRITE, $learnosityVersion);
-        $this->dataAPIReadHost = sprintf(self::DATA_API_HOST_READ, $learnosityVersion);
+        $this->dataAPIWriteHost = sprintf(self::DATA_API_HOST_WRITE, $this->learnosityVersion);
+        $this->dataAPIReadHost = sprintf(self::DATA_API_HOST_READ, $this->learnosityVersion);
     }
 
 
