@@ -7,13 +7,11 @@ import debounce from "lodash/debounce";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
     student: Student; // the student to display
 }
 const props = defineProps<Props>();
-const studentStore = useStudentStore();
 const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, {
     targetElements: [`#${editorId}`],
