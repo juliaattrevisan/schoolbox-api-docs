@@ -7,6 +7,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
 import QfStudentShowMarked from "./qf-student-show-marked.vue";
+import QfStudentAllMarked from "./qf-student-all-marked.vue";
 import QfStudentAttemptComment from "./qf-student-attempt-comment.vue";
 
 interface Props {
@@ -36,6 +37,7 @@ const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the el
                         :item="item"
                         :container="(responseContentEl as HTMLDivElement)"
                     />
+                    <qf-student-all-marked />
                 </div>
             </div>
             <div class="l-flex-col l-gap-s">
