@@ -858,12 +858,14 @@ td.lrn-report-area {
     border: none;
     border-radius: 0px;
     color: var(--content-ui-foreground);
+    font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-active,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:not(:checked) ~ .lrn-author-toggle-right,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:checked ~ .lrn-author-toggle-left {
     background-color: var(--content-ui-selected);
     color: var(--content-ui-foreground);
+    font-size: 1rem;
 }
 
 /* author primary and secondary and disabled button styles */
@@ -873,7 +875,7 @@ td.lrn-report-area {
     border-radius: 0px !important;
     border: none;
     color: var(--content-ui-foreground);
-    font-size: 1rem;
+    font-size: 1rem !important;
 }
 .lrn .lrn-author-ui .lrn-btn-primary:hover,
 .lrn .lrn-author-ui .lrn-btn-sec:hover,
@@ -881,6 +883,7 @@ td.lrn-report-area {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
     text-decoration: none !important;
+    font-size: 1rem !important;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.lrn-author-disabled {
     background-color: var(--content-ui-background);
@@ -890,11 +893,13 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
     color: var(--content-ui-foreground);
     cursor: default;
     opacity: 0.5;
+    font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
     background: var(--content-ui-background);
     border: none;
     color: var(--content-ui-foreground);
+    font-size: 1rem;
 }
 
 /* Save button styles */
@@ -1377,12 +1382,12 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 150px;
-    top: 55px;
+    top: 75px;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 0px;
-    top: 55px;
+    top: 75px;
 }
 span.lrn-author-name-wrapper {
     border: 1px solid var(--form-border-color);
@@ -1663,6 +1668,7 @@ span.lrn-list-view-empty-label {
     font-size: 1rem;
     font-style: italic;
     margin-bottom: 1rem;
+    margin-top: 3rem !important;
     padding: 1rem;
     padding: 2rem;
     text-align: center;
@@ -1778,4 +1784,18 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
 /* Added space to the right of questions in the item authoring */
 .lrn-widget-drag-wrapper {
     padding-right: 50px;
+}
+
+/* update Add items button styles */
+.lrn .lrn-author-ui .lrn-btn-primary[disabled],
+.lrn .lrn-author-ui .lrn-btn-primary[disabled]:hover,
+.lrn .lrn-author-ui .lrn-btn-primary[disabled]:focus {
+    background-color: var(--content-ui-background);
+    border-color: transparent;
+    border-radius: 0px;
+    box-shadow: none;
+    color: var(--content-ui-foreground);
+    cursor: default;
+    opacity: 0.5;
+    font-size: 1rem;
 }
