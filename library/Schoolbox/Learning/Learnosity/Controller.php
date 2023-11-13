@@ -292,11 +292,11 @@ class Controller extends Base
 
         /* Breadcrumbs
          */
-        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
-        $breadcrumbs->add([
-            'Modify Content',
-            null
-        ]);
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                    ->add([$assessment->getTitle(),
+                                           $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+                                          ])
+                                    ->add(['Modify Content', null]);
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
@@ -617,7 +617,15 @@ class Controller extends Base
 
         /* Breadcrumbs
          */
-        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                    ->add(
+                                        [$assessment->getTitle(),
+                                         $this->routeGenerator->generate('learningAssessment.getSummary',
+                                                                         ['assessmentId' => $assessment->getId(),
+                                                                          'studentId' => $this->getUser()->getId()
+                                                                         ])
+                                        ])
+                                    ->add(['Result Summary']);
 
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'assessment' => $assessment,
@@ -696,7 +704,10 @@ class Controller extends Base
 
         /* Breadcrumbs
          */
-        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
+            [$assessment->getTitle(),
+             $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ]);
         $breadcrumbs->add([
             'Review', null
         ]);
@@ -779,7 +790,12 @@ class Controller extends Base
 
         /* Breadcrumbs
          */
-        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
+            [$assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+
+            ])
+            ->add(['Feedback']);
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'assessment' => $assessment,
@@ -1214,7 +1230,12 @@ class Controller extends Base
 
         /* Breadcrumbs
          */
-        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                    ->add([
+                                            $assessment->getTitle(),
+                                            $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+                                          ])
+                                    ->add(['Horizontal Marking']);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'assessment' => $assessment,

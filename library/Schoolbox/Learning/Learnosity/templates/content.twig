@@ -15,7 +15,7 @@
 
 <div class="actions-small-1 row">
     <div class="small-12 columns">
-        <h1>Questions in {{ assessment.title }}</h1>
+        <h1>Modify {{ assessment.title }}</h1>
     </div>
 
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}

@@ -17,9 +17,11 @@
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
 
+        {%  if assessment.completionMessage %}
         <section class="content">
             {{ assessment.completionMessage | purify }}
         </section>
+        {%  endif %}
 
         <h2 class="subheader">Result Summary</h2>
         <section class="content">
