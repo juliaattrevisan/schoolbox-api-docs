@@ -313,6 +313,7 @@ Usage:
                 <a href="{{ assessmentCalendarUrl~'?course='~courseSpec.id }}" class="icon-calendar">{{ locale.assessment|capitalize }} Calendar</a>
             </li>
         {% endif %}
+        <li><a href="{{ routeLookup('coursePlan.getPlan', {id: courseSpec.id}) }}" class="icon-project">Unit Planner</a></li>
     </ul>
     {% endif %}
 </div>
