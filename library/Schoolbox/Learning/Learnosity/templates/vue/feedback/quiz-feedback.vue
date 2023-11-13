@@ -11,6 +11,7 @@ import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
 import { loadReport } from "./util/loadReport";
 import QfStudent from "./student/qf-student.vue";
+import QfFinaliseReview from "./qf-finalise-review.vue";
 
 interface Props {
     student: Student; // the student who has attempted the quiz
@@ -22,6 +23,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const store = useStore();
+const studentStore = useStudentStore();
 
 /**
  * Initialise the stores, adding the students first, then the reports as
@@ -37,7 +39,10 @@ window.Vue.onMounted(async () => {
 
 <template>
     <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
-    <qf-student :student="useStudentStore().student" />
+    <div class="l-flex-col l-gap-m">
+        <qf-student :student="studentStore.student" />
+        <qf-finalise-review v-if="studentStore.student.isReportLoaded" />
+    </div>
 </template>
 
 <style>
