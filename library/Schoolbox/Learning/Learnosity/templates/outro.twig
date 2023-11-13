@@ -1,3 +1,14 @@
+{##
+ # Complete an attempt
+ #
+ # @param IAssessable $assessment      Our schoolbgox quiz instance
+ # @param array $breadcrumbs           A context trail at the top of the screeen
+ # @param string|array $initOptions    Learnosity API initialisation object
+ # @param Attempt/Model $attempt       An attempt instance
+#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
 <script src="https://reports-au.learnosity.com/?v2023.2.LTS"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
@@ -23,8 +34,11 @@
             <div id="schoolbox-result-1"></div>
         </section>
 
+        {# This is exactly how it used to be
+         # Not sure if we wanted to represent it differently this time around
+         #}
         {% if returnUrl %}
-            <a href="{{ returnUrl }}" class="button">Back to homepage</a>
+            <a href="{{ returnUrl }}" class="submit button">Return</a>
         {% endif %}
     </div>
 </div>

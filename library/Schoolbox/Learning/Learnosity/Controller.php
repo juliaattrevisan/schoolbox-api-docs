@@ -615,9 +615,14 @@ class Controller extends Base
             ],
         ];
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
