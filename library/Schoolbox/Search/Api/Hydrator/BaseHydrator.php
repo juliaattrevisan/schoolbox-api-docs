@@ -91,8 +91,8 @@ abstract class BaseHydrator implements IHydrator
     {
         // Replace any image 'alt' text that looks like a filename with a blank string.
         // We do this to avoid filenames placed in image 'alt' text ending up in the search result context text.
-        // Test regex here: https://www.phpliveregex.com/p/KkK#tab-preg-replace
-        $html = preg_replace('/ (alt|ALT)=("|\')\S*\.\S*?("|\')/', '', $html);
+        // Test regex here: https://www.phpliveregex.com/p/KkN#tab-preg-replace
+        $html = preg_replace('/ (alt|ALT)=("|\')\S+\.\S{3,6}("|\')/', '', $html);
 
         // Set line width to zero (unrestricted) to avoid introducing newlines into the text-only string.
         // Extra newlines prevent the search from working if the keyword spans multiple lines.
