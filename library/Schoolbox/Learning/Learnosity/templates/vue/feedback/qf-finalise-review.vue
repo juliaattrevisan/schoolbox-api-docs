@@ -38,7 +38,7 @@ window.Vue.watch(
 /**
  * Send through the data to mark the submission as requiring resubmission
  * and add the comment
- * @returns { FormData } - the data to send through
+ * @returns {FormData} - the data to send through
  */
 function getFormData() {
     const formData = new FormData();

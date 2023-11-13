@@ -1702,3 +1702,11 @@ span.lrn-list-view-empty-label {
     content: "\e645";
     font-family: "schoolbox";
 }
+
+/* shown in horizontal and vertical marking, remove the margins from the item mark */
+h3.lrn-report-item-title {
+    margin: 0;
+}
+.learnosity-report .lrn-circle {
+    margin: 0;
+}

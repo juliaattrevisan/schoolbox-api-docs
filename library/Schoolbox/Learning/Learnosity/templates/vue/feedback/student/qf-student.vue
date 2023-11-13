@@ -36,7 +36,7 @@ function onAttemptCommentUpdated(comment: string) {
         </div>
         <div v-if="props.student.isReportLoaded" class="l-flex-col l-gap-m">
             <div class="l-flex-col l-gap-s">
-                <h2 class="subheader">Cards</h2>
+                <h2 class="subheader f-no-margins">Cards</h2>
                 <qf-student-show-marked />
                 <div class="l-flex-col l-gap-l">
                     <qf-student-item
@@ -50,7 +50,7 @@ function onAttemptCommentUpdated(comment: string) {
                 </div>
             </div>
             <div class="l-flex-col l-gap-s">
-                <h2 class="subheader">Overall Comment</h2>
+                <h2 class="subheader f-no-margins">Overall Comment</h2>
                 <student-attempt-comment :student="props.student" @update-comment="onAttemptCommentUpdated" />
             </div>
         </div>

@@ -126,11 +126,11 @@ window.Vue.onBeforeUnmount(async () => {
 <template>
     <div class="l-flex-col l-gap-m l-pad-m--bottom question">
         <div ref="responsesEl"></div>
-        <div v-if="props.question.metadata.sample_answer">
+        <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
             <label>Sample answer</label>
             <input type="text" :value="question.metadata.sample_answer" readonly />
         </div>
-        <div v-if="props.question.response.maxScore">
+        <div v-if="props.question.response.maxScore" class="f-no-margins">
             <label>Score (max score: {{ props.question.response.maxScore }})</label>
             <input
                 :id="`customise-score-${props.question.response.learnosityReference}`"
