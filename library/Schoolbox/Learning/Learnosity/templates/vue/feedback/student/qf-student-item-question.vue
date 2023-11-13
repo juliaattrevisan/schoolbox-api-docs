@@ -56,7 +56,7 @@ async function saveScore() {
     if (score.value.toString() === props.question.response.score?.toString()) {
         return;
     }
-    if (Number.isNaN(parseInt(score.value, 10))) {
+    if (Number.isNaN(parseFloat(score.value))) {
         score.value = "";
         return;
     }
@@ -68,7 +68,7 @@ async function saveScore() {
         method: "POST",
         body: formData,
     });
-    studentStore.updateItemResponseScore(props.student, props.item, props.question, parseInt(score.value, 10));
+    studentStore.updateItemResponseScore(props.student, props.item, props.question, parseFloat(score.value));
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
