@@ -694,9 +694,17 @@ class Controller extends Base
             $comments = [];
         }
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+        $breadcrumbs->add([
+            'Review', null
+        ]);
+
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
-            'initOptions' => $this->api->initOptions('reports', $payload),
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
+            'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
             'comments' => $comments ? base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)) : null,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
