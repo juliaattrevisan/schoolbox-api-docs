@@ -188,7 +188,7 @@
 
     {# Letter Grade enables Grading Scheme
      # Total Mark enables Maximum Available Marks
-    #}
+     #}
     {% include '@learningAssessment/fragments/markType.twig' with {
         context: '',
         assessment: assessment,
@@ -197,7 +197,7 @@
         selectedMarkType: assessment.markType.id ?? null,
         selectedGradeGroup: assessment.gradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
-        renderMaxMark: true,
+        renderMaxMark: false,
         markTypeLabel: 'Mark Type',
         courseManagedReadonly: courseManaged.isReadonly
     } %}
