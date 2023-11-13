@@ -161,12 +161,16 @@ class Controller extends Base
                     ];
                     $translatedResults[$folderResultKey]['_subResults']['data'][] = $translatedResult;
 
-                    // Use the cursor object to build a pointer to the next
-                    // result within this page
-                    $cursor ??= new Cursor\Cursor($this->source, $keyword, $filter, $limit);
-                    $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
-                        new Collection([$result])
-                    );
+                    if ($nextCursor === null) {
+                        $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = null;
+                    } else {
+                        // Use the cursor object to build a pointer to the next
+                        // result within this page
+                        $cursor ??= new Cursor\Cursor($this->source, $keyword, $filter, $limit);
+                        $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
+                            new Collection([$result])
+                        );
+                    }
                 } else {
                     $translatedResults[$resultKey] = $translatedResult;
                 }
