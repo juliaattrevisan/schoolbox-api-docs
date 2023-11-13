@@ -6,9 +6,9 @@
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
 import QfStudentItemQuestion from "./qf-student-item-question.vue";
-import QfStudentItemComment from "./qf-student-item-comment.vue";
 import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
@@ -64,7 +64,7 @@ function onCommentUpdated(comment: string) {
                 :container="props.container"
             />
         </div>
-        <qf-student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
+        <student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
     </div>
 </template>
 
