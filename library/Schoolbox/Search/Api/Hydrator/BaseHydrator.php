@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Hydrator;
 
-use Alaress\Html\ToText;
 use Alaress\Image\Transformation\Storage;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Resource\Storage\IStorage;
