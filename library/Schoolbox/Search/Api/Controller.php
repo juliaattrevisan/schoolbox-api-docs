@@ -118,7 +118,7 @@ class Controller extends Base
                         // Finagle a raw result for the folder, and hydrate that
                         // into a full result.
                         $rawFolderResult = new RawResult(
-                            $folderResultId,
+                            (string)$folderResultId,
                             $result->folder->getTitle(),
                             $folderResultType,
                             $result->relevance,

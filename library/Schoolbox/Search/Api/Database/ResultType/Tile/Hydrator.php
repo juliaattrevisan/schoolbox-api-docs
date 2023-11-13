@@ -126,7 +126,7 @@ class Hydrator extends BaseHydrator
                     null,
                     $tile->getBackgroundImage() ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString() : null,
                     'tiles',
-                    '',
+                    $tile->getLink(), // Include the link to explain why the result is appearing if only the link matched.
                     null,
                     ($tileFolder === null) ? [] : [$tileFolder],
                     [],

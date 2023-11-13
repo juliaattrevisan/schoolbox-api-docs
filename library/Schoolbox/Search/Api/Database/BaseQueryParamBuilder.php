@@ -111,10 +111,14 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         // Apply cursor
         if ($cursor) {
             $cursorSearchParts = [
-                "($relevancePart < :cursorRelevance)",
-                "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)",
-                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)",
-                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND $idPart > :cursorId)",
+                // IMPORTANT:
+                //  * The direction of the comparisons here (> or <) must match the directions used in the ORDER BY clause below, in the following way:
+                //     * ORDER BY ASC  below implies < here.
+                //     * ORDER BY DESC below implies > here.
+                "($relevancePart < :cursorRelevance)", // < because ORDER BY relevance DESC.
+                "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)", // > because ORDER BY title ASC.
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)", // > because ORDER BY type ASC.
+                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND $idPart < :cursorId)", // < because ORDER BY id DESC.
             ];
 
             $whereParts[]              = '(' . implode(' OR ', $cursorSearchParts) . ')';
@@ -137,7 +141,11 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             ((count($havingParts) > 0) ? "\nHAVING " . implode(' AND ', $havingParts) : '')
         );
 
-        // Build order parts
+        // Build order parts.
+        // IMPORTANT:
+        //  * Order here must match order in library/Schoolbox/Search/Api/Database/AggregateSource->search().
+        //  * The order of `id` is DESC because all other things being equal, we want more recently created rows to
+        //    appear before less recently created rows.
         $orderParts = [];
         if ($this->isOrderedByRelevance()) {
             $orderParts[] = "$relevancePart DESC";

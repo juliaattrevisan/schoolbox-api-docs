@@ -11,7 +11,10 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
+use Component_Config_Componentname;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
+use Component_Definition;
 
 /**
  * Query parameter builder for textbox searches.
@@ -38,23 +41,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword): array
     {
-        $whereParts         = [
-            'tb.deleted_at IS NULL',
-            'fo.deleted_at IS NULL',
-        ];
-        $keywordSearchParts = [
-            'tb.heading LIKE :textboxKeywordLike',
-            'tb.body LIKE :textboxKeywordLike',
-        ];
-        $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
-        $params             = [
-            'textboxNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'textboxKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
-        ];
-
         return [
-            'where'  => $whereParts,
-            'params' => $params,
+            'where'  => [], // All the where conditions are specified in buildFromStatement().
+            'params' => [
+                'textboxNow'         => Alaress_Date_Format::now()->getDatabase(),
+                'textboxKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            ]
         ];
     }
 
@@ -65,12 +57,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildRelevanceExpression(): string
     {
-        return $this->buildLinearDecayExpression(
-            ':textboxNow',
-            'tb.updated_at',
-            7,
-            56,
-        );
+        return '`relevance`';
     }
 
     /**
@@ -90,7 +77,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleExpression(): string
     {
-        return 'tb.heading';
+        return '`title`';
     }
 
     /**
@@ -116,7 +103,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(): string
     {
-        return 'tb.textBoxID';
+        return '`textboxInstanceId`';
     }
 
     /**
@@ -126,7 +113,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildDateExpression(): string
     {
-        return 'tb.updated_at';
+        return '`textboxUpdatedAt`';
     }
 
     /**
@@ -136,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(): ?string
     {
-        return 'tb.created_by';
+        return '`textboxCreatedBy`';
     }
 
     /**
@@ -146,7 +133,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(): string
     {
-        return 'tb.categoryID';
+        return '`folderId`';
     }
 
     /**
@@ -156,9 +143,92 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildFromStatement(): string
     {
+        $linearDecayExpression1 = $this->buildLinearDecayExpression(
+            ':textboxNow',
+            'tb.updated_at',
+            7,
+            56
+        );
+        $linearDecayExpression2 = $this->buildLinearDecayExpression(
+            ':textboxNow',
+            'tb2.updated_at',
+            7,
+            56
+        );
+
+        // Notes on 1st UNIONED subquery:
+        //  * this subquery gets all textbox instances matching the keyword
+        //  * a textbox instance is a textbox in a particular component in a particular homepage
+        //  * we are not interested in textbox components in modules other than homepages
+        //  * a textbox instance's title is the component name if set, otherwise the textbox heading
+        //  * results that match on textbox heading when textbox heading has been overridden by component name will be
+        //    eliminated in the Hydrator.
+        //
+        // Notes on 2nd UNIONED subquery:
+        //  * gets all textboxes that are not used in any component on any page (not just homepages)
+        //    (since we are only interested in homepages, we don't want to find textboxes that are used on other types of pages)
+        //
+        // Each textbox instance (found in either subquery) will be uniquely identified by the following compound ID:
+        //  * "$textboxId-$componentInstanceId-$folderId"
+        //  * Example with integer IDs: "1-4081-80"
+        //  * Example with integer IDs and not used in any component "94--"
         return '
-            FROM textBox tb
-            INNER JOIN folder fo ON tb.categoryID = fo.id
-        ';
+            FROM (
+                SELECT
+                CONCAT(tb.textBoxID, "-", cci.component_instance_id, "-", fo.id) AS textboxInstanceId,
+                tb.heading AS title,
+                ' . $linearDecayExpression1 . ' AS relevance,
+                fo.id AS folderId,
+                tb.updated_at AS textboxUpdatedAt,
+                tb.created_by AS textboxCreatedBy
+                FROM component_instance ci
+                JOIN component_config_instance cci ON cci.component_instance_id=ci.id
+                JOIN component_config_definition ccd ON (
+                    ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
+                    ccd.id=cci.component_config_definition_id
+                )
+                JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
+                JOIN folder fo ON fo.id=ci.identifier
+                WHERE ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
+                AND tb.deleted_at IS NULL
+                AND fo.deleted_at IS NULL
+                AND (
+                    tb.heading LIKE :textboxKeywordLike OR
+                    tb.body LIKE :textboxKeywordLike OR
+                    EXISTS(
+                        SELECT *
+                        FROM component_config_instance cci2
+                        JOIN component_config_definition ccd2 ON (
+                            ccd2.key = "' . Component_Config_Componentname::KEY . '" AND
+                            ccd2.id=cci2.component_config_definition_id
+                        )
+                        WHERE cci2.component_instance_id=ci.id
+                        AND cci2.value LIKE :textboxKeywordLike
+                    )
+                )
+                UNION
+                SELECT
+                CONCAT(tb2.textBoxID, "--") AS textboxInstanceId,
+                tb2.heading AS title,
+                ' . $linearDecayExpression2 . ' AS relevance,
+                NULL AS folderId,
+                tb2.updated_at AS textboxUpdatedAt,
+                tb2.created_by AS textboxCreatedBy
+                FROM textBox tb2
+                LEFT JOIN component_config_instance cci2 ON (
+                    cci2.component_config_definition_id = (
+                        SELECT id
+                        FROM component_config_definition ccd2
+                        WHERE ccd2.key = "' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"
+                    ) AND
+                    cci2.value = CAST(tb2.textBoxID AS NCHAR)
+                )
+                WHERE tb2.deleted_at IS NULL
+                AND (
+                   tb2.heading LIKE :textboxKeywordLike OR
+                   tb2.body LIKE :textboxKeywordLike
+                )
+                AND cci2.id IS NULL
+            ) AS dummy';
     }
 }

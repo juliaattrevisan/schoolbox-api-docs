@@ -27,7 +27,9 @@ class FullResult
      *
      * @param RawResult                $rawResult   The raw result from which this full result was derived.
      *                                              Required so that a cursor may be built to this raw result.
-     * @param int                      $id          The ID of the search result subject.
+     * @param string $id                            The ID of the search result subject.
+     *                                              (string not int because we need to accommodate compound IDs).
+     *                                              (See /Search/Api/Database/ResultType/Textbox/QueryParamBuilder.php).
      * @param string                   $title       The title of the search result.
      * @param string                   $url         A link to the search result.
      * @param string                   $type        The type of search result.
@@ -53,7 +55,7 @@ class FullResult
      */
     public function __construct(
         public RawResult $rawResult,
-        public int $id,
+        public string $id,
         public string $title,
         public string $url,
         public string $type,
