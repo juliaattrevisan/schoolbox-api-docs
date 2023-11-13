@@ -3,6 +3,7 @@
  * Contains a students response to an item, (only one item is shown at a time)
  */
 
+import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import QfStudentItemMark from "./qf-student-item-mark.vue";
@@ -15,11 +16,28 @@ interface Props {
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
+const itemEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the item into
 const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
+
+/**
+ * Hide the item if it's already been marked and the user has chosen to only show unmarked items
+ */
+window.Vue.watch(
+    () => props.student.showMarked,
+    async (showMarked) => {
+        if (showMarked && props.item.isMarked) {
+            // reveal all
+            await slideDown(itemEl.value as HTMLElement);
+        } else if (!showMarked && props.item.isMarked) {
+            // hide those that are marked
+            await slideUp(itemEl.value as HTMLElement);
+        }
+    }
+);
 </script>
 
 <template>
-    <div class="c-island l-flex-col l-gap-m l-pad-m">
+    <div ref="itemEl" class="c-island l-flex-col l-gap-m l-pad-m">
         <qf-student-item-mark :item="item" :container="(container as HTMLDivElement)" />
         <div v-if="hasQuestionsWithNoScore">
             <div class="alert-box f-no-margins">
