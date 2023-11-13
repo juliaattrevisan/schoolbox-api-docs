@@ -9,6 +9,7 @@ import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
 import QfStudentItemQuestion from "./qf-student-item-question.vue";
 import QfStudentItemComment from "./qf-student-item-comment.vue";
+import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
     student: Student; // the student to display
@@ -34,6 +35,14 @@ window.Vue.watch(
         }
     }
 );
+
+/**
+ * To notify of a change in the comment
+ * @param {string} comment - the comment to save
+ */
+function onCommentUpdated(comment: string) {
+    useStudentStore().updateItemComment(props.student, props.item, props.item.questions[0], comment);
+}
 </script>
 
 <template>
@@ -55,7 +64,7 @@ window.Vue.watch(
                 :container="props.container"
             />
         </div>
-        <qf-student-item-comment :student="props.student" :item="props.item" />
+        <qf-student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
     </div>
 </template>
 
