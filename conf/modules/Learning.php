@@ -123,6 +123,6 @@ class Learning extends ModuleLoader
 
         /* Learnosity
          */
-        $this->loadModule($di, LearnosityModule::class, "/{$namespace}/learnosity");
+        $this->loadModule($di, LearnosityModule::class, "/{$namespace}/quiz");
     }
 }
