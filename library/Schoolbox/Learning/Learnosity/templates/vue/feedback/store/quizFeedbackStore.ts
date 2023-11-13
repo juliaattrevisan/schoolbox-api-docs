@@ -26,6 +26,7 @@ export const useStore = defineStore("quizFeedback", () => {
         isLoaded,
         init,
         isFinaliseReviewModalOpen,
+        postFeedback,
         statusPage,
     };
 });
