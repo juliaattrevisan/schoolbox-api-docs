@@ -3,12 +3,13 @@
  * Display a single student's responses
  */
 
+import StudentAttemptComment from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
 import QfStudentShowMarked from "./qf-student-show-marked.vue";
 import QfStudentAllMarked from "./qf-student-all-marked.vue";
-import QfStudentAttemptComment from "./qf-student-attempt-comment.vue";
+import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
     student: Student; // the student to display
@@ -16,6 +17,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+
+/**
+ * To notify of a change in the comment
+ * @param {string} comment - the comment to save
+ */
+function onAttemptCommentUpdated(comment: string) {
+    useStudentStore().updateAttemptComment(props.student, comment);
+}
 </script>
 
 <template>
@@ -42,7 +51,7 @@ const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the el
             </div>
             <div class="l-flex-col l-gap-s">
                 <h2 class="subheader">Overall Comment</h2>
-                <qf-student-attempt-comment :student="props.student" />
+                <student-attempt-comment :student="props.student" @update-comment="onAttemptCommentUpdated" />
             </div>
         </div>
     </div>

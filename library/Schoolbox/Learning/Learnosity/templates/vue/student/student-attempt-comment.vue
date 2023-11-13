@@ -22,6 +22,10 @@ const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, 
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
+const emit = defineEmits<{
+    updateComment: [comment: string];
+}>();
+
 /**
  * To notify of the current save status
  * @returns {string} - the text to display
@@ -58,7 +62,7 @@ async function saveComment() {
         method: "POST",
         body: formData,
     });
-    studentStore.updateAttemptComment(props.student, comment.value);
+    emit("updateComment", comment.value);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
