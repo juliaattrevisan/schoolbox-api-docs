@@ -1212,8 +1212,13 @@ class Controller extends Base
         $attemptComments = array_values($attemptComments);
         $urls = array_values($urls);
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
             'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
             'itemReferences' => $itemReferences,
             'students' => $students,
