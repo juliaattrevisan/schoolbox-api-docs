@@ -123,7 +123,7 @@ class Model implements ISoftDeletable, Serializable
      */
     public function setHeading($heading)
     {
-        $this->heading = trim($heading);
+        $this->heading = $heading;
         return $this;
     }
 
