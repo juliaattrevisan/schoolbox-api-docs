@@ -6,7 +6,7 @@
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
-import QfStudentItemMark from "./qf-student-item-mark.vue";
+import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
 import QfStudentItemQuestion from "./qf-student-item-question.vue";
 import QfStudentItemComment from "./qf-student-item-comment.vue";
 
@@ -38,7 +38,7 @@ window.Vue.watch(
 
 <template>
     <div ref="itemEl" class="c-island l-flex-col l-gap-m l-pad-m">
-        <qf-student-item-mark :item="item" :container="(container as HTMLDivElement)" />
+        <student-item-mark :item="item" :container="(container as HTMLDivElement)" />
         <div v-if="hasQuestionsWithNoScore">
             <div class="alert-box f-no-margins">
                 Any questions within a card that don't have a score are considered marked when a comment is added to the

@@ -4,8 +4,7 @@
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-// import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
-import QfStudentHeaderAttemptMark from "./qf-student-header-attempt-mark.vue";
+import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-header-attempt-mark.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -31,9 +30,7 @@ const props = defineProps<Props>();
             </h2>
         </div>
         <div>
-            <template v-if="props.student.isReportLoaded">
-                <qf-student-header-attempt-mark :student="props.student" />
-            </template>
+            <student-header-attempt-mark v-if="props.student.isReportLoaded" :student="props.student" />
         </div>
     </div>
 </template>
