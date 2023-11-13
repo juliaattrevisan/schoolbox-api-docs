@@ -406,7 +406,6 @@ class Controller extends Base
                     ],
                     'top-right' => [
                         ['type' => 'itemcount_element'],
-                        ['type' => 'pause_button'],
                         ['type' => 'reading_timer_element'],
                         ['type' => 'timer_element'],
                     ],
@@ -439,7 +438,19 @@ class Controller extends Base
                 'time' => [
                     'max_time' => $quiz->getDuration(),
                     'limit_type' => 'hard',
-                    'warning_time' => self::LEARNOSITY_WARNING_TIME
+                    'warning_time' => self::LEARNOSITY_WARNING_TIME,
+                    "start_time" => [
+                        /* The "soft" start time type tells Learnosity to store the start time on their servers
+                         * and use that to calculate the time, this prevents a user from reloading the
+                         * page and causing their timer to be inaccurate or reset
+                         */
+                        'type' => 'soft',
+                        /* Note: Whilst looking into this, I also experimented with the "hard" type which requires a "value" prop.
+                        * Learnosity wants this value given in UTC with an unusual format, which can be achieved with "Ymd-His"
+                        * The Learnosity docs do not include seconds as a valid attribute, however, I found that this both works and is
+                        * requried to ensure that the start time is not off by a few seconds when starting the quiz
+                        */
+                    ]
                 ],
                 /* This is our Quiz title, I guess
                  */
