@@ -5,7 +5,8 @@
  # @param array $breadcrumbs           A context trail at the top of the screeen
  # @param string|array $initOptions    Learnosity API initialisation object
  # @param Attempt/Model $attempt       An attempt instance
-#}
+ # @param string $returnUrl            A redirect back to a place from whence you came.
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
