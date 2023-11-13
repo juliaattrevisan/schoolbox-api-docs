@@ -14,10 +14,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const studentEl = window.Vue.ref<HTMLDivElement | null>(null); // the entire student container
-const studentInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // the entire student container
-const responseEl = window.Vue.ref<HTMLDivElement | null>(null); // the response container
-const responseInnerContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // the response container
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const studentStore = useStudentStore();
 
@@ -35,57 +31,38 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="studentEl" class="student l-grid">
-        <div ref="studentInnerContainerEl" class="student__inner-container">
-            <div ref="studentEl" class="l-flex-col l-gap-m">
-                <qf-student-header :student="props.student" :container="(responseContentEl as HTMLDivElement)" />
-                <div ref="responseEl" class="response l-grid">
-                    <div ref="responseInnerContainerEl" class="response__inner-container">
-                        <div ref="responseContentEl" class="response__content">
-                            <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
-                            <div :id="props.student.elementId"></div>
-                        </div>
-                        <template v-if="props.student.isReportLoaded">
-                            <div class="l-flex-col l-gap-m">
-                                <div class="l-flex-col l-gap-s">
-                                    <h2 class="subheader">Cards</h2>
-                                    <div class="l-flex-col l-gap-l">
-                                        <qf-student-item
-                                            v-for="item in props.student.items"
-                                            :key="item.reference"
-                                            :student="props.student"
-                                            :item="item"
-                                            :container="(responseContentEl as HTMLDivElement)"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="l-flex-col l-gap-s">
-                                    <h2 class="subheader">Overall Comment</h2>
-                                    <qf-student-attempt-comment :student="props.student" />
-                                </div>
-                            </div>
-                        </template>
+    <div class="l-flex-col l-gap-m">
+        <qf-student-header :student="props.student" :container="(responseContentEl as HTMLDivElement)" />
+        <div ref="responseContentEl" class="response-content">
+            <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
+            <div :id="props.student.elementId"></div>
+        </div>
+        <template v-if="props.student.isReportLoaded">
+            <div class="l-flex-col l-gap-m">
+                <div class="l-flex-col l-gap-s">
+                    <h2 class="subheader">Cards</h2>
+                    <div class="l-flex-col l-gap-l">
+                        <qf-student-item
+                            v-for="item in props.student.items"
+                            :key="item.reference"
+                            :student="props.student"
+                            :item="item"
+                            :container="(responseContentEl as HTMLDivElement)"
+                        />
                     </div>
                 </div>
+                <div class="l-flex-col l-gap-s">
+                    <h2 class="subheader">Overall Comment</h2>
+                    <qf-student-attempt-comment :student="props.student" />
+                </div>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.student {
-    &__inner-container {
-        overflow: hidden;
-    }
-}
-
-.response {
-    &__inner-container {
-        overflow: hidden;
-    }
-    &__content {
-        // this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items
-        display: none;
-    }
+.response-content {
+    // this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items
+    display: none;
 }
 </style>
