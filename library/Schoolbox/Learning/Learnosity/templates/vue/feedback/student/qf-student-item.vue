@@ -6,9 +6,10 @@
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
-import QfStudentItemQuestion from "./qf-student-item-question.vue";
+import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
 import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 const props = defineProps<Props>();
 const itemEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the item into
 const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
+const studentStore = useStudentStore();
 
 /**
  * Hide the item if it's already been marked and the user has chosen to only show unmarked items
@@ -37,11 +39,20 @@ window.Vue.watch(
 );
 
 /**
+ * To notify of a change in the score
+ * @param {StudentItemQuestion} question - the question to update
+ * @param {number} score - the score to save
+ */
+function onScoreUpdated(question: StudentItemQuestion, score: number) {
+    studentStore.updateItemResponseScore(props.student, props.item, question, score);
+}
+
+/**
  * To notify of a change in the comment
  * @param {string} comment - the comment to save
  */
 function onCommentUpdated(comment: string) {
-    useStudentStore().updateItemComment(props.student, props.item, props.item.questions[0], comment);
+    studentStore.updateItemComment(props.student, props.item, props.item.questions[0], comment);
 }
 </script>
 
@@ -55,13 +66,14 @@ function onCommentUpdated(comment: string) {
             </div>
         </div>
         <div class="item-questions l-flex-col l-gap-l">
-            <qf-student-item-question
+            <student-item-question-display
                 v-for="question in props.item.questions"
                 :key="question.response_id"
                 :student="props.student"
                 :item="props.item"
                 :question="question"
                 :container="props.container"
+                @update-score="onScoreUpdated"
             />
         </div>
         <student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />

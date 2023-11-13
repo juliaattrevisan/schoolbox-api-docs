@@ -8,7 +8,6 @@ import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
-import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
     student: Student; // the student to display
@@ -17,12 +16,15 @@ interface Props {
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
-const studentStore = useStudentStore();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
 const score = window.Vue.ref<string>(props.question.response.score?.toString() ?? "");
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
+
+const emit = defineEmits<{
+    updateScore: [question: StudentItemQuestion, score: number];
+}>();
 
 /**
  * To notify of the current save status
@@ -68,7 +70,8 @@ async function saveScore() {
         method: "POST",
         body: formData,
     });
-    studentStore.updateItemResponseScore(props.student, props.item, props.question, parseFloat(score.value));
+    // studentStore.updateItemResponseScore(props.student, props.item, props.question, parseFloat(score.value));
+    emit("updateScore", props.question, parseFloat(score.value));
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
