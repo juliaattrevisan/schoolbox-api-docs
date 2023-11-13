@@ -21,7 +21,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
         elementId: "",
         hasReport: false,
         isReportLoaded: false,
-        isExpanded: false,
         isMarked: false,
         items: [],
         attemptComment: {
@@ -36,7 +35,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
             teacherFeedback: "",
         },
     });
-    const isExpanded = window.Vue.ref<boolean>(true); // if all students are expanded
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
     const showMarkedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
     const store = useStore();
@@ -57,11 +55,11 @@ export const useStudentStore = defineStore("qfStudent", () => {
         student.value = {
             ...$student,
             isReportLoaded: false,
-            isExpanded: false,
             hasReport: false,
             items: [],
             attemptComment: $attemptComment,
             urls: $urls,
+            showMarked: true,
         };
         itemResponses.value = $itemResponses;
     }
@@ -108,14 +106,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
             item.isMarked = getItemIsMarked(item);
         });
         student.value.isMarked = getStudentIsMarked(student.value);
-    }
-
-    /**
-     * To show/hide a student
-     * @param {Student} $student - the student to change
-     */
-    function toggleStudent($student: Student) {
-        student.value.isExpanded = !$student.isExpanded;
     }
 
     /**
@@ -184,9 +174,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
         init,
         addItems,
         student,
-        isExpanded,
         showMarkedAttempts,
-        toggleStudent,
         reportLoaded,
         updateItemResponseScore,
         updateItemComment,

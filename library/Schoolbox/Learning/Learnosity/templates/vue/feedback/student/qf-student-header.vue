@@ -17,14 +17,6 @@ const props = defineProps<Props>();
 <template>
     <div class="c-island l-flex-row l-flex--justify-space l-gap-m l-pad-m f-no-margins">
         <div class="l-flex-row l-flex--align-center l-gap-m">
-            <!-- <button
-                v-if="props.student.isReportLoaded"
-                :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
-                    props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
-                }`"
-                :disabled="!props.student.isReportLoaded"
-                @click.prevent="onToggleSelected"
-            ></button> -->
             <span v-if="!props.student.isReportLoaded" class="loader"></span>
             <div class="c-img c-img--round c-img--s">
                 <div class="c-img__wrapper">
@@ -47,15 +39,8 @@ const props = defineProps<Props>();
 </template>
 
 <style scoped>
-.toggle-button {
-    background: none;
-    color: var(--content-ui-foreground);
-    height: 2.5rem;
-    width: 2.5rem;
-}
-
 .loader {
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 2rem;
+    width: 2rem;
 }
 </style>

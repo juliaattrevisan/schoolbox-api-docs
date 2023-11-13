@@ -4,9 +4,9 @@
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import { useStudentStore } from "../store/qfStudentStore";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
+import QfStudentShowMarked from "./qf-student-show-marked.vue";
 import QfStudentAttemptComment from "./qf-student-attempt-comment.vue";
 
 interface Props {
@@ -15,19 +15,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
-const studentStore = useStudentStore();
-
-/**
- * Display the student now the linked report has been loaded
- */
-window.Vue.watch(
-    () => props.student.isReportLoaded,
-    async () => {
-        studentStore.toggleStudent(props.student);
-        // expand the student if it is marked
-        await window.Vue.nextTick();
-    }
-);
 </script>
 
 <template>
@@ -37,26 +24,25 @@ window.Vue.watch(
             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
             <div :id="props.student.elementId"></div>
         </div>
-        <template v-if="props.student.isReportLoaded">
-            <div class="l-flex-col l-gap-m">
-                <div class="l-flex-col l-gap-s">
-                    <h2 class="subheader">Cards</h2>
-                    <div class="l-flex-col l-gap-l">
-                        <qf-student-item
-                            v-for="item in props.student.items"
-                            :key="item.reference"
-                            :student="props.student"
-                            :item="item"
-                            :container="(responseContentEl as HTMLDivElement)"
-                        />
-                    </div>
-                </div>
-                <div class="l-flex-col l-gap-s">
-                    <h2 class="subheader">Overall Comment</h2>
-                    <qf-student-attempt-comment :student="props.student" />
+        <div v-if="props.student.isReportLoaded" class="l-flex-col l-gap-m">
+            <div class="l-flex-col l-gap-s">
+                <h2 class="subheader">Cards</h2>
+                <qf-student-show-marked />
+                <div class="l-flex-col l-gap-l">
+                    <qf-student-item
+                        v-for="item in props.student.items"
+                        :key="item.reference"
+                        :student="props.student"
+                        :item="item"
+                        :container="(responseContentEl as HTMLDivElement)"
+                    />
                 </div>
             </div>
-        </template>
+            <div class="l-flex-col l-gap-s">
+                <h2 class="subheader">Overall Comment</h2>
+                <qf-student-attempt-comment :student="props.student" />
+            </div>
+        </div>
     </div>
 </template>
 

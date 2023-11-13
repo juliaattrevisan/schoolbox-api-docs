@@ -14,9 +14,10 @@ export type Student = {
     elementId: string;
     hasReport: boolean;
     isReportLoaded: boolean;
-    isExpanded: boolean;
+    isExpanded?: boolean;
     items: StudentItem[];
     attemptComment: StudentAttemptComment;
     urls: StudentUrls;
     isMarked?: boolean;
+    showMarked?: boolean;
 };
