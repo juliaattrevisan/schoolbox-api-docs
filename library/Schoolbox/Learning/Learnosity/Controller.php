@@ -18,6 +18,7 @@ use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
@@ -137,7 +138,9 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     *
      * @param Factory $urlFactory
+     * @param BreadcrumbFactory $bakery
      * @param string $learnosityConsumerKey
      * @param string $learnosityConsumerSecret
      * @param ErrorMapper $errorMapper
@@ -151,6 +154,7 @@ class Controller extends Base
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
+        protected BreadcrumbFactory $bakery,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -180,6 +184,7 @@ class Controller extends Base
      * @param IAssessable $assessment
      * @return void
      * @throws Error
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \DomainException Thrown when site_school_code is empty string
      * @throws \JsonException
@@ -285,8 +290,17 @@ class Controller extends Base
             ]
         ];
 
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+        $breadcrumbs->add([
+            'Modify Content',
+            null
+        ]);
+
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
+            'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('author', $payload),
             'tags' => json_encode($tags, JSON_THROW_ON_ERROR),
             'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),

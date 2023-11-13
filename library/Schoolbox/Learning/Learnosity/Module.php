@@ -16,6 +16,7 @@ use LogicException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Alaress\Authorizer\Rule;
@@ -330,8 +331,17 @@ class Module extends BaseModule
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->injector->get('assessmentDataSource');
 
+        /* Breadcrumb generator
+         */
+        $bakery = new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $this->getMapperFactory()->get(Access::class),
+        );
+
         return new Controller(
             new \Schoolbox\Url\Factory($this->getConfig()),
+            $bakery,
             (string)$this->getConfig()->get('learnosity_consumer_key'),
             (string)$this->getConfig()->get('learnosity_consumer_secret'),
             $this->getMapperFactory()->get(ErrorMapper::class),
