@@ -41,9 +41,6 @@ echo "... setting up instance data"
 mariadb schoolbox < "$initialdir"/data/schoolbox.sql
 
 echo "... updating instance data"
-# Set default passwords for users
-mariadb schoolbox -e "UPDATE user SET password = '\$2y\$10\$OaQRb8va2opSxke38QutwOHOKaa3KuZdvIXMgO22IFkI.LTZtCzDK' WHERE username like 'alaress'"
-mariadb schoolbox -e "UPDATE user SET password = '\$2y\$10\$GJATSdYOiiDPaSR6.4uN4.z6k8ehM20bv2oPJmBnCrKgiOTJ1VST2' WHERE username not like 'alaress'"
 mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled');"
 echo "MariaDB setup complete"
 
@@ -124,6 +121,11 @@ php assessment/projectResultCacheReload.php --perform
 
 # Force the persistent instance again
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"
+
+# Set default passwords for users
+echo "setting default passwords for users"
+mariadb schoolbox -e "UPDATE user SET password = '\$2y\$10\$OaQRb8va2opSxke38QutwOHOKaa3KuZdvIXMgO22IFkI.LTZtCzDK' WHERE username like 'alaress'"
+mariadb schoolbox -e "UPDATE user SET password = '\$2y\$10\$GJATSdYOiiDPaSR6.4uN4.z6k8ehM20bv2oPJmBnCrKgiOTJ1VST2' WHERE username not like 'alaress'"
 
 ## Finish where we started.
 cd "$initialdir"
