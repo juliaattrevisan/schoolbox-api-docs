@@ -150,7 +150,7 @@ class Payload
             "{$domain}/login*",
             "{$assessmentUrl}*",
             "{$startUrl}*",
-            "{$domain}/assess/*",
+            "{$domain}/learning/learnosity/*",
             "{$domain}/storage/fetch.php*",
             "{$domain}/storage/image.php*",
             "{$domain}/cms/sendVideo.php*"
