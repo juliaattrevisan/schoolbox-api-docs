@@ -239,7 +239,7 @@ class Controller extends Base
      * @param string                  $keyword
      * @param SearchFilter\DataObject $filter
      * @param int                     $limit
-     * @return array{results: array<FullResult>, nextCursor: string}
+     * @return array{results: array<FullResult>, nextCursor: string|null}
      */
     private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit): array
     {
