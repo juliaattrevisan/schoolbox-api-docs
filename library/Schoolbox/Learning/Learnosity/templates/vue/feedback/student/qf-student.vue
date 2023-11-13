@@ -34,7 +34,7 @@ function onAttemptCommentUpdated(comment: string) {
             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
             <div :id="props.student.elementId"></div>
         </div>
-        <div v-if="props.student.isReportLoaded" class="l-flex-col l-gap-m">
+        <template v-if="props.student.isReportLoaded">
             <div class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Cards</h2>
                 <qf-student-show-marked />
@@ -53,7 +53,7 @@ function onAttemptCommentUpdated(comment: string) {
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
                 <student-attempt-comment :student="props.student" @update-comment="onAttemptCommentUpdated" />
             </div>
-        </div>
+        </template>
     </div>
 </template>
 
