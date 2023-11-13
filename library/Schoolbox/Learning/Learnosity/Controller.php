@@ -577,9 +577,41 @@ class Controller extends Base
             'user_id'              => $student->getId()
         ]);
 
-        $existingAttempt->setMark($mark)
-            ->setMaxMark($maxMark)
-            ->refreshNormalisedMark();
+        /* Fabricate an IResponse instance for existing mark scheme
+         *
+         * Note that $existingResponse might well be null for broken data somehow,
+         * but we have no means to recover from that...and it shouldn't really
+         * occur naturally
+         */
+        $existingResponse = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+
+        /* TODO What kind of error should we present to users? It's asynchronous
+         */
+        if (null === $existingResponse) {
+            return;
+        }
+
+        /* Update normalised and human-readable marks
+         */
+        $normalisedMark = $existingAttempt->calculateNormalisedMark($mark, $maxMark);
+
+        /* Update the domain object synonymously which will desync from $existingAttempt
+         * so we need to sync them manually...
+         *
+         * This is required for getMarkScheme() to calculate human-readable mark
+         */
+        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\Model $existingResponse */
+        $existingResponse->setNormalisedMark($normalisedMark);
+        $existingResponse->setMarksAvailable($maxMark);
+
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $existingResponse);
+
+        /* Update the columns with newly-derived values
+         */
+        $existingAttempt
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
+            ->setMaxMark($maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording
@@ -887,14 +919,19 @@ class Controller extends Base
         $mark = $sanitisedScore['score'];
         $maxMark = $sanitisedScore['max_score'];
 
+        /* Update normalised and human-readable marks
+         */
+        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+
         /* Save the comment and new normalised mark
          */
         $attempt->setComment(trim($postData['attempt-comment']))
-            ->setMark($mark)
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
             ->setMaxMark($maxMark)
             ->setReviewer($this->getUser())
-            ->setReviewed(\Alaress_Date_Format::now())
-            ->refreshNormalisedMark();
+            ->setReviewed(\Alaress_Date_Format::now());
 
         $this->attemptMapper->save($attempt);
 

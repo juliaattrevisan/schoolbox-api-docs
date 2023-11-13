@@ -250,7 +250,7 @@
                                     {% set publishedMark      = marks.published ?? null %}
                                     {% set draftMark          = marks.draft ?? null %}
 
-                                     <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ decorator.label(participant, true) }}</a>
+                                     <a class="{{ urgency.marks(participant.normalisedMark(true)) }}" href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ decorator.label(participant, true) }}</a>
                                     {% if marks.draft is defined %}
                                         <a href="{{ participationRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ decorator.label(participant, false) }}</a>
                                     {% endif %}

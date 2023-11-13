@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\Quiz\Decorator;
 
 use Assess_Main;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 
@@ -30,7 +31,9 @@ class Decorator implements DecoratorInterface
         protected int $shuffleItems,
         protected int $promptsMode,
         protected int $maxAttempts,
-        protected string $completionMessage
+        protected string $completionMessage,
+        protected int $markType,
+        protected int $gradingScheme,
     ) {
     }
 
@@ -58,6 +61,19 @@ class Decorator implements DecoratorInterface
         $assessment->setMaxAttempts($this->getMaxAttempts());
         $assessment->setCompletionMessage($this->getCompletionMessage());
         $assessment->setLearnosityReference($this->getLearnosityReference());
+
+        /* TODO: Maybe replace these old classes?
+         */
+        $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
+        $markType->setId($this->getMarkType());
+        $assessment->setMarkType($markType);
+
+        $gradingGroup = (new GradeGroup())->setId($this->getGradingScheme());
+        $assessment->setGradeGroup($gradingGroup);
+
+        $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
+        $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
+        $assessment->setMarkScheme($markScheme);
     }
 
 
@@ -77,5 +93,45 @@ class Decorator implements DecoratorInterface
         }
 
         return (3600 * $hours) + (60 * $minutes);
+    }
+
+
+    /**
+     * @return int
+     */
+    protected function getMarkType()
+    {
+        return $this->markType;
+    }
+
+
+    /**
+     * @param int $markType
+     * @return $this
+     */
+    protected function setMarkType($markType)
+    {
+        $this->markType = $markType;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    protected function getGradingScheme()
+    {
+        return $this->gradingScheme;
+    }
+
+
+    /**
+     * @param int $gradingScheme
+     * @return $this
+     */
+    protected function setGradingScheme($gradingScheme)
+    {
+        $this->gradingScheme = $gradingScheme;
+        return $this;
     }
 }

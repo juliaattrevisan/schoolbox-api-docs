@@ -133,7 +133,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             if (isset($markSets[$response->getId()])) {
                 $markSet = $markSets[$response->getId()];
                 $response
-                    ->setMarksGiven(floatval($markSet['mark']))
+                    ->setHumanReadableMark($markSet['mark'])
+                    ->setNormalisedMark($markSet['norm_mark'])
                     ->setMarksAvailable(floatval($markSet['max_mark']))
                     ->setFirstSectionId(intval($markSet['first_section']))
                 ;

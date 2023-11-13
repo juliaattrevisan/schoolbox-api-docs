@@ -200,8 +200,6 @@ class FactoryTest extends TestCase
     public function providerQuizMarkTypeInvalid(): array
     {
         return [
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))],
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE))],
@@ -499,7 +497,12 @@ class FactoryTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
 
         return $quiz;
     }

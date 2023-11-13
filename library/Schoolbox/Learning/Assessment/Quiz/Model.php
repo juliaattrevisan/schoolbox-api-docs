@@ -16,7 +16,6 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -120,18 +119,6 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @param GradeGroup|null $gradeGroup
-     * @return static
-     */
-    public function setGradeGroup(GradeGroup $gradeGroup = null)
-    {
-        if (!is_null($gradeGroup)) {
-            throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
-        }
-        return $this;
-    }
-
-    /**
      * Overwrite fields from `$source` into this object.
      *
      * This implementation overwrites the additional fields over and above the
@@ -185,11 +172,19 @@ class Model extends AbstractAssessment
         if (null === $authoritativeAttempt) {
             return null;
         }
-        $marksAvailable = $authoritativeAttempt->getMarksAvailable();
-        if (0.0 === (float)$marksAvailable) {
-            return null;
-        }
-        return IMarkScheme::NORMALISED_MARK_MAX * $authoritativeAttempt->getMarksGiven() / $marksAvailable;
+
+        return $authoritativeAttempt->getNormalisedMark();
+    }
+
+    /**
+     * Quiz does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @inheritdoc
+     */
+    public function getHumanReadableMark(Participant $participant, $publishedOnly)
+    {
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getHumanReadableMark() : null;
     }
 
 

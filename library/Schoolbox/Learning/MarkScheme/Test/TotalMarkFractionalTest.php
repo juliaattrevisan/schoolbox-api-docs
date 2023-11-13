@@ -19,7 +19,6 @@ use Schoolbox\User;
 
 class TotalMarkFractionalTest extends TestCase
 {
-
     /**
      * An attempt is now required when retrieving a human-readable mark.
      *
@@ -609,7 +608,12 @@ class TotalMarkFractionalTest extends TestCase
         }
 
         $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
+        /* Presume Total Mark Fractional mark scheme for historical data,
+         * causing human readable mark to be cached in the format "$numerator / $denominator"
+         */
+        $attempt->setHumanReadableMark("{$marksGiven} / {$marksAvailable}")
+            ->setNormalisedMark(100 * $marksGiven / $marksAvailable);
 
         return $quiz;
     }

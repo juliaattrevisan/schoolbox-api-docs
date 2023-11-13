@@ -71,7 +71,9 @@ class Factory
      * @var string[]
      */
     private static $markTypesQuiz = [
-        MarkType::TYPE_TOTAL => TotalMarkFractional::TITLE,
+        MarkType::TYPE_TOTAL   => TotalMarkFractional::TITLE,
+        MarkType::TYPE_PERCENT => Percentage::TITLE,
+        MarkType::TYPE_LETTER  => LetterGrade::TITLE
     ];
 
 
@@ -179,14 +181,17 @@ class Factory
 
     /**
      * @param Quiz $quiz
-     * @return TotalMarkFractional
      * @throws DomainException
      */
-    protected function spawnForQuiz(Quiz $quiz): ?TotalMarkFractional
+    protected function spawnForQuiz(Quiz $quiz)
     {
         switch ($quiz->getMarkType()->getId()) {
             case MarkType::TYPE_TOTAL:
                 return new TotalMarkFractional();
+            case MarkType::TYPE_PERCENT:
+                return new Percentage();
+            case MarkType::TYPE_LETTER:
+                return new LetterGrade($quiz->getGradeGroup());
             default:
                 throw new DomainException('Invalid MarkType for Quiz: ' . $quiz->getMarkType()->getName());
         }

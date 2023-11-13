@@ -68,9 +68,9 @@ class Model implements ISoftDeletable
     private $answers;
 
     /**
-     * @var null|float
+     * @var null|string
      */
-    private ?float $mark = null;
+    private ?string $mark = null;
 
     /**
      * @var null|float
@@ -280,19 +280,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|float $mark
+     * @param null|string $mark
      * @return static
      */
-    public function setMark(?float $mark): self
+    public function setMark(?string $mark): self
     {
         $this->mark = $mark;
         return $this;
     }
 
     /**
-     * @return null|float
+     * @return null|string
      */
-    public function getMark(): ?float
+    public function getMark(): ?string
     {
         return $this->mark;
     }
@@ -339,19 +339,19 @@ class Model implements ISoftDeletable
      * and $this->>getMaxMark(), saving you manually calculating
      * this percentage everywhere else
      *
-     * @return self
+     * @param float $numerator
+     * @param float $denominator
+     * @return float|null
      */
-    public function refreshNormalisedMark(): self
+    public function calculateNormalisedMark(float $numerator, float $denominator): ?float
     {
         /* No marks available
          */
-        if ((float)0 === (float)$this->getMaxMark()) {
-            $this->setNormalisedMark(null);
-        } else {
-            $this->setNormalisedMark(100 * $this->getMark() / $this->getMaxMark());
+        if (0.0 === $denominator) {
+            return null;
         }
 
-        return $this;
+        return 100 * $numerator / $denominator;
     }
 
 

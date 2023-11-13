@@ -13,6 +13,8 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -130,6 +132,21 @@ class Model implements ISoftDeletable, IAssessableDataModel
     * @var float
     */
     protected $weight = 0;
+
+    /**
+     * The mark type this project uses.
+     *
+     * @var MarkType
+     */
+    protected $markType;
+
+
+    /**
+     * The grade group this project uses (only if $this->markType is letter grade)
+     *
+     * @var GradeGroup
+     */
+    protected $gradeGroup;
 
     /**
     * @var string
@@ -683,6 +700,43 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
+    }
+
+    /**
+     * @return MarkType
+     */
+    public function getMarkType()
+    {
+        return $this->markType;
+    }
+
+    /**
+     * @param MarkType $markType
+     * @return static
+     */
+    public function setMarkType(MarkType $markType)
+    {
+        $this->markType = $markType;
+        return $this;
+    }
+
+
+    /**
+     * @return GradeGroup
+     */
+    public function getGradeGroup()
+    {
+        return $this->gradeGroup;
+    }
+
+    /**
+     * @param GradeGroup $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup = null)
+    {
+        $this->gradeGroup = $gradeGroup;
         return $this;
     }
 

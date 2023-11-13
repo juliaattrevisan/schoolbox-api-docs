@@ -487,6 +487,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
                 {$this->getJoinColumnString('quiz', 'q')},
+                {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
@@ -514,6 +515,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('quiz.mark_type_id', 'q', 'qmt')}
             LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
@@ -800,7 +802,10 @@ class Mapper extends BaseMapper
             }
             // Quiz?
             if ($row['q.assess_id']) {
-                $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
+                $model->setQuiz(
+                    $this->hydrateJoin($row, 'quiz', 'q')
+                        ->setMarkType($this->hydrateJoin($row, 'quiz.mark_type_id', 'qmt'))
+                );
             } else {
                 $model->setQuiz(null);
             }
@@ -1283,7 +1288,7 @@ class Mapper extends BaseMapper
         $gradeGroupMapper = $this->getJoinMapper('duework.grade_group');
         foreach ($modelList as $model) {
             $submodel = $model->getSubObject();
-            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model) {
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model || $submodel instanceof Quiz\Model) {
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())

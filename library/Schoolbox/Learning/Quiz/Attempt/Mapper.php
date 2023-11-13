@@ -32,6 +32,7 @@ use Schoolbox\UserMapper;
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)
+ * @method Model findOneByColumnList($columnList, array $options = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
@@ -66,7 +67,7 @@ class Mapper extends BaseMapper
         $this->joins('reviewer_id', UserMapper::class, 'id', null, null, 'reviewer', 'reviewer');
         $this->uses('reviewed_at', self::TYPE_DATETIME, null, 'reviewed');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
-        $this->uses('mark', self::TYPE_DECIMAL);
+        $this->uses('mark', self::TYPE_STRING);
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('norm_mark', self::TYPE_DECIMAL, null, 'normalisedMark');
         $this->uses('comment', self::TYPE_STRING);
@@ -317,7 +318,8 @@ class Mapper extends BaseMapper
         $query = "
             SELECT
                 aa.attempt_id,
-                aa.mark  AS mark,
+                aa.mark AS mark,
+                aa.norm_mark AS norm_mark,
                 aa.max_mark AS max_mark,
                 (
                     SELECT `as`.section_id

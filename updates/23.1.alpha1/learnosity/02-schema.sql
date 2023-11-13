@@ -46,6 +46,37 @@ ALTER TABLE `assess`
 ALTER TABLE `assess`
     ADD COLUMN `prompts_mode` TINYINT(1) NOT NULL DEFAULT 0 AFTER `shuffle_items`;
 
+-- Add Mark Type and Grade Group
+-- Defaults to Total Mark Fractional
+ALTER TABLE `assess`
+    ADD COLUMN `mark_type_id` INT(11) NOT NULL DEFAULT 3 AFTER `weight`,
+    ADD COLUMN `grade_group_id` INT(11) NULL AFTER `mark_type_id`;
+
+-- assess_attempt.mark is now the human readable mark, I guess?
+-- We never really had to store the values that *inform* the norm- and human-readable
+-- marks before Learnosity...this is kind of synonymous with submission_return's usage
+
+-- make a backup, clone the values, then alter the original
+ALTER TABLE `assess_attempt`
+    ADD COLUMN `_mark` DECIMAL(15,2) NULL DEFAULT NULL AFTER `deleted_at`;
+
+UPDATE assess_attempt
+    SET _mark = mark;
+
+-- represent norm_mark for old attempts
+UPDATE assess_attempt
+SET norm_mark = FORMAT(100 * mark / max_mark, 11);
+
+-- change data type
+ALTER TABLE `assess_attempt`
+    CHANGE COLUMN `mark` `mark` VARCHAR(255) NULL DEFAULT NULL ;
+
+-- represent total mark for historical marks
+-- use this trim tactic to remove trailing zeroes (wild!)
+-- https://stackoverflow.com/questions/7968531/remove-trailing-zeros-in-decimal-value-with-changing-length
+UPDATE assess_attempt
+SET mark = CONCAT(trim(mark)+0, " / ", trim(max_mark)+0);
+
 -- Reset duration to 0 for Unlimited, rather than -1
 ALTER TABLE `assess`
     ADD COLUMN `_duration` INT NOT NULL DEFAULT 0 AFTER `duration`;
@@ -56,3 +87,4 @@ UPDATE `assess`
 UPDATE `assess`
 SET duration = 0
 WHERE duration = -1;
+
