@@ -34,3 +34,25 @@
     </div>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
+<<<<<<< HEAD
+=======
+<script>
+// to use the new spacing styles
+document.getElementById("container").classList.add("c-container");
+</script>
+
+<script>
+    $(function() {
+        let learnosityReferences = {{ sessions|raw }};
+
+        $('#finalise').on('click', function() {
+            $.post('{{ routeLookup('learnosity.postHoriziontalMarking', {assessment: assessment}) }}', {
+                'learnosityReferences': learnosityReferences
+            }, function (response) {
+                console.log(response);
+            });
+        });
+    });
+</script>
+<a id="finalise">Finalise</a>
+>>>>>>> b11138d63a7 (Add finalisation for horizontal marking [SA-16502])

@@ -1296,8 +1296,10 @@ class Controller extends Base
 
         /* Obtain their scores from Learnosity
          */
+        $learnositySessions = array_values(array_filter($sessions));
+
         $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => array_values(array_filter($sessions))
+            'session_id' => $learnositySessions
         ])['data'];
 
         /* Reforge it into a generic set of tuples
@@ -1346,11 +1348,38 @@ class Controller extends Base
             'students' => $students,
             'itemResponses' => $itemResponses,
             'attemptComments' => $attemptComments,
-            'urls' => $urls
+            'urls' => $urls,
+            /* This list of learnosity references is used for the finalisation step
+             */
+            'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR)
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
+    }
+
+
+    /**
+     * Finalise the list of attempts whose learnosity_references match those
+     * sent in the POST array
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postHorizontalMarking(IAssessable $assessment): void
+    {
+        $refs = $this->requestPost->get('learnosityReferences');
+        $attempts = $this->attemptMapper->findByColumn('learnosity_reference', $refs);
+
+        foreach ($attempts as $attempt) {
+            $attempt->setReviewer($this->getUser())
+                ->setReviewed(\Alaress_Date_Format::now());
+
+            $this->attemptMapper->save($attempt);
+        }
     }
 
 
