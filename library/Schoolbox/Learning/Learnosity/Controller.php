@@ -401,7 +401,6 @@ class Controller extends Base
                         ['type' => 'save_button'],
                         ['type' => 'reviewscreen_button'],
                         ['type' => 'resource_button'],
-                        ['type' => 'accessibility_button'],
                         ['type' => 'flagitem_button'],
                         ['type' => 'masking_button'],
                         ['type' => 'verticaltoc_element'],
