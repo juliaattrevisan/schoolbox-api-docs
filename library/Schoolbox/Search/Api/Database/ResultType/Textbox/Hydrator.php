@@ -38,6 +38,11 @@ class Hydrator extends BaseHydrator
     public const BASE_TYPE = 'textbox';
 
     /**
+     * Title to display if neither the textbox nor the textbox component has a non-blank title.
+     */
+    public const TITLE_FOR_UNTITLED_TEXTBOX = 'Untitled textbox';
+
+    /**
      * Constructor
      *
      * @param TextboxMapper $textboxMapper Used to fetch textboxes for hydration.
@@ -137,7 +142,7 @@ class Hydrator extends BaseHydrator
             $textboxHeading = (
                 ($textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
                 ? ''
-                : $componentName ?? $textbox->getHeading()
+                : $componentName ?? trim($textbox->getHeading())
             );
 
             // Because the textbox body contains HTML, this match might have come about only because the
@@ -168,7 +173,7 @@ class Hydrator extends BaseHydrator
                     //  * $componentIsCollapsed does not apply,
                     //  * $showTitleToReadOnlyUsers will have default value, true.
                     // Conclusion: No reason not to display heading.
-                    $textboxHeading,
+                    ($textboxHeading === '' ? self::TITLE_FOR_UNTITLED_TEXTBOX : $textboxHeading),
                     $this->buildBaseUrl()
                          ->withPath("/textbox/folder/{$textboxRootFolder->getId()}")
                          ->withFragment("textbox-" . $textbox->getId())
@@ -209,8 +214,8 @@ class Hydrator extends BaseHydrator
                 $match->id,
                 (
                     // Hide title if it should be hidden.
-                    ($textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
-                    ? 'Untitled Textbox'
+                    ($textboxHeading === '' || $textboxAccess === UserAccess::ACCESS_READ && !$showTitleToReadOnlyUsers)
+                    ? self::TITLE_FOR_UNTITLED_TEXTBOX
                     : $textboxHeading
                 ),
                 $this->buildBaseUrl()
