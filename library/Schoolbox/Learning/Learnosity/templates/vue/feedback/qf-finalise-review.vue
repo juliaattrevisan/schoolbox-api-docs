@@ -6,6 +6,7 @@
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
+import { getItemScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 const store = useStore();
 const studentStore = useStudentStore();
@@ -40,14 +41,7 @@ function getFormData() {
     formData.append(`scores[41654654]`, "1"); //
     // run through all the items and add the total score and comment for each item
     studentStore.student.items.forEach((item) => {
-        // get the total score for the item, looping through all the questions and adding the score if available
-        const totalScore = item.questions.reduce((total, question) => {
-            if (question.response.score) {
-                return total + question.response.score;
-            }
-            return total;
-        }, 0);
-        formData.append(`scores[${item.reference}]`, totalScore.toString());
+        formData.append(`scores[${item.reference}]`, getItemScore(item).toString());
         formData.append(`comment[${item.reference}]`, item.questions[0].response.comment ?? "");
     });
     formData.append(`attempt-comment`, studentStore.student.attemptComment.comment ?? ""); //

@@ -5,6 +5,7 @@
 
 import { gsap } from "gsap";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
+import { getItemScore, getItemMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 
 interface Props {
@@ -27,12 +28,7 @@ const noScore = window.Vue.computed(() => {
  * @returns {number} - the total score
  */
 const totalScore = window.Vue.computed(() => {
-    return props.item.questions.reduce((total, question) => {
-        if (question.response.score) {
-            return total + question.response.score;
-        }
-        return total;
-    }, 0);
+    return getItemScore(props.item);
 });
 
 /**
@@ -40,12 +36,7 @@ const totalScore = window.Vue.computed(() => {
  * @returns {number} - the max score
  */
 const maxScore = window.Vue.computed(() => {
-    return props.item.questions.reduce((total, question) => {
-        if (question.response.maxScore) {
-            return total + question.response.maxScore;
-        }
-        return total;
-    }, 0);
+    return getItemMaxScore(props.item);
 });
 
 /**
