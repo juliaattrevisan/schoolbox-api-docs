@@ -620,10 +620,12 @@ class Controller extends Base
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
                                     ->add(
                                         [$assessment->getTitle(),
-                                         $this->routeGenerator->generate('learningAssessment.getSummary',
+                                         $this->routeGenerator->generate(
+                                             'learningAssessment.getSummary',
                                              ['assessmentId' => $assessment->getId(),
                                               'studentId' => $this->getUser()->getId()
-                                             ])
+                                             ]
+                                         )
                                         ]
                                     )
                                     ->add(['Result Summary']);
