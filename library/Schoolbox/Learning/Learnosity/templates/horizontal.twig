@@ -28,14 +28,13 @@
                 :attempt-comments="{{ attemptComments|json_encode }}"
                 :urls="{{ urls|json_encode }}"
                 :report-payloads="{{ reportPayloads }}"
+                post-feedback="{{ routeLookup('learnosity.postHoriziontalMarking', {assessment: assessment}) }}"
                 status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
             />
         </div>
     </div>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
-<<<<<<< HEAD
-=======
 <script>
 // to use the new spacing styles
 document.getElementById("container").classList.add("c-container");
@@ -55,4 +54,3 @@ document.getElementById("container").classList.add("c-container");
     });
 </script>
 <a id="finalise">Finalise</a>
->>>>>>> b11138d63a7 (Add finalisation for horizontal marking [SA-16502])

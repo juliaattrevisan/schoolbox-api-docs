@@ -26,6 +26,7 @@ interface Props {
     attemptComments: StudentAttemptComment[]; // all the overall attempt comments for the quiz
     urls: StudentUrls[]; // the urls to use for the students to update their scores and comments
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
+    postFeedback: string; // the URL to post the feedback to
     statusPage: string; // the status page to link to once user has finished marking
 }
 const props = defineProps<Props>();
@@ -45,7 +46,7 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.statusPage);
+    store.init(props.postFeedback, props.statusPage);
     itemsStore.init(props.items);
     useStudentsStore().init(props.students, props.itemResponses, props.attemptComments, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
