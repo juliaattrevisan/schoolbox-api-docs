@@ -36,8 +36,7 @@ window.Vue.watch(
 );
 
 /**
- * Send through the data to mark the submission as requiring resubmission
- * and add the comment
+ * To mark the attempt as reviewed
  * @returns {FormData} - the data to send through
  */
 function getFormData() {
@@ -52,7 +51,7 @@ function getFormData() {
 }
 
 /**
- * Navigate to appropriate URL
+ * Submit the feedback then redirect to the status page
  */
 async function submitFeedback() {
     isFinalising.value = true;
@@ -81,7 +80,7 @@ function onSelected() {
 }
 
 /**
- * Navigate to appropriate URL
+ * Submit the feedback
  */
 function onConfirmSelected() {
     void submitFeedback();

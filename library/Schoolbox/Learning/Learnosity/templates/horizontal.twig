@@ -39,18 +39,3 @@
 // to use the new spacing styles
 document.getElementById("container").classList.add("c-container");
 </script>
-
-<script>
-    $(function() {
-        let learnosityReferences = {{ sessions|raw }};
-
-        $('#finalise').on('click', function() {
-            $.post('{{ routeLookup('learnosity.postHoriziontalMarking', {assessment: assessment}) }}', {
-                'learnosityReferences': learnosityReferences
-            }, function (response) {
-                console.log(response);
-            });
-        });
-    });
-</script>
-<a id="finalise">Finalise</a>
