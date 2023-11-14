@@ -9,3 +9,15 @@ ALTER TABLE textBox ADD COLUMN deleted_by int(4) unsigned DEFAULT NULL AFTER del
 ALTER TABLE textBox ADD CONSTRAINT fk_textBox_created_by FOREIGN KEY (created_by) REFERENCES user (id);
 ALTER TABLE textBox ADD CONSTRAINT fk_textBox_updated_by FOREIGN KEY (updated_by) REFERENCES user (id);
 ALTER TABLE textBox ADD CONSTRAINT fk_textBox_deleted_by FOREIGN KEY (deleted_by) REFERENCES user (id);
+
+
+### seed textbox table with historic data if it exists
+update textBox tb
+    inner join cmsLog cmsLogCreate on (tb.textBoxID = cmsLogCreate.objectId and cmsLogCreate.object = 'content' and cmsLogCreate.action = 'create')
+    inner join cmsLog cmsLogModify on (tb.textBoxID = cmsLogModify.objectId and cmsLogModify.object = 'content' and cmsLogModify.action = 'modify')
+set tb.created_at = cmsLogCreate.time,
+    tb.created_by = cmsLogCreate.user,
+    tb.updated_at = cmsLogModify.time,
+    tb.updated_by = cmsLogModify.user
+
+WHERE tb.textBoxID > 0;
