@@ -92,6 +92,7 @@ class Mapper extends AbstractUnitMapper
     public function hydrateSelect(PDOStatement $statement)
     {
         $modelList = $this->createCollection();
+        // record of folder ids to hydrate curriculum codes from
         $folderIds = [];
 
         /** @var FolderMapper $folderMapper */
@@ -132,8 +133,10 @@ class Mapper extends AbstractUnitMapper
 
         foreach ($modelList as $model) {
             if (isset($folderCurricNodes[$model->getFolder()->getId()])) {
+                // if joined folder has codes, then inject them back onto the folder
                 $model->getFolder()->setCurriculumNodes($folderCurricNodes[$model->getFolder()->getId()]);
             } else {
+                // folder has no curric codes, set to empty collection
                 $model->getFolder()->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
         }
