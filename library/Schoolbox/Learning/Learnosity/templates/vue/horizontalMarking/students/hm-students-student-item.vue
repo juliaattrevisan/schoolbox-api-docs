@@ -6,6 +6,7 @@
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
+import StudentNoScoreNote from "@schoolboxLearnosity/vue/student/student-no-score-note.vue";
 import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
 import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import { useItemsStore } from "../store/hmItemsStore";
@@ -19,10 +20,10 @@ interface Props {
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
-const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
 
 /**
  * To display the item when it's the active item
+ * @returns {boolean} - whether the item is active
  */
 const isActive = window.Vue.computed(() => {
     if (itemsStore.isAttemptComment) {
@@ -52,12 +53,7 @@ function onCommentUpdated(comment: string) {
 <template>
     <transition>
         <div v-if="isActive" class="l-flex-col l-gap-m">
-            <div v-if="hasQuestionsWithNoScore">
-                <div class="alert-box f-no-margins">
-                    Any questions within a card that don't have a score are considered marked when a comment is added to
-                    the card.
-                </div>
-            </div>
+            <student-no-score-note :item="props.item" />
             <div class="item-questions l-flex-col l-gap-m">
                 <student-item-question-display
                     v-for="question in props.item.questions"
@@ -83,7 +79,7 @@ function onCommentUpdated(comment: string) {
 }
 
 .v-enter-active {
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease-out;
 }
 .v-enter-from {
     opacity: 0;

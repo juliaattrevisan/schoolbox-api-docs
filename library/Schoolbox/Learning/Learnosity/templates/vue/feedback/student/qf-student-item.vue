@@ -8,6 +8,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
+import StudentNoScoreNote from "@schoolboxLearnosity/vue/student/student-no-score-note.vue";
 import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
 import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import { useStudentStore } from "../store/qfStudentStore";
@@ -20,7 +21,6 @@ interface Props {
 const props = defineProps<Props>();
 const studentStore = useStudentStore();
 const itemEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the item into
-const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
 
 /**
  * Hide the item if it's already been marked and the user has chosen to only show unmarked items
@@ -59,12 +59,7 @@ function onCommentUpdated(comment: string) {
 <template>
     <div ref="itemEl" class="c-island l-flex-col l-gap-m l-pad-m">
         <student-item-mark :item="item" :container="(container as HTMLDivElement)" />
-        <div v-if="hasQuestionsWithNoScore">
-            <div class="alert-box f-no-margins">
-                Any questions within a card that don't have a score are considered marked when a comment is added to the
-                card.
-            </div>
-        </div>
+        <student-no-score-note :item="props.item" />
         <div class="item-questions l-flex-col l-gap-l">
             <student-item-question-display
                 v-for="question in props.item.questions"
