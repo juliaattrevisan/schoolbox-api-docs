@@ -146,7 +146,7 @@ class Controller extends Base
     private function persistTextbox(Model $model): Model
     {
         $data = $this->request->getParsedBody();
-        return $model->setHeading($data['heading'])
+        return $model->setHeading(trim($data['heading']))
                      ->setBody($data['body'])
                      ->setUpdatedAt(\Alaress_Date_Format::now())
                      ->setUpdatedBy($this->getUser()->getId())
