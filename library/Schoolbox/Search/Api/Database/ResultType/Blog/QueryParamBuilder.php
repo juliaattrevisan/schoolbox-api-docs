@@ -29,7 +29,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @see \Calendar::getDayEvents
      * @inheritDoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'b.deleted_at IS NULL',
@@ -53,7 +53,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
             ':blogNow',
@@ -74,7 +74,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'b.heading';
     }
@@ -90,7 +90,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -98,7 +98,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'b.id';
     }
@@ -106,7 +106,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'b.created_at';
     }
@@ -114,7 +114,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         return 'b.owner_id';
     }
@@ -122,7 +122,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM blog b
@@ -133,7 +133,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string|null
      */
-    protected function buildFolderExpression(): ?string
+    protected function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return 'f.id';
     }

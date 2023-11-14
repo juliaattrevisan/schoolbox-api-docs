@@ -39,7 +39,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @param string $keyword
      * @return array
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         return [
             'where'  => [], // All the where conditions are specified in buildFromStatement().
@@ -55,7 +55,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return '`relevance`';
     }
@@ -75,7 +75,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return '`title`';
     }
@@ -91,7 +91,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -101,7 +101,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return '`textboxInstanceId`';
     }
@@ -111,7 +111,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return '`textboxUpdatedAt`';
     }
@@ -121,7 +121,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string|null
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return '`textboxCreatedBy`';
     }
@@ -131,7 +131,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    public function buildFolderExpression(): string
+    public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
         return '`folderId`';
     }
@@ -141,7 +141,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         $linearDecayExpression1 = $this->buildLinearDecayExpression(
             ':textboxNow',

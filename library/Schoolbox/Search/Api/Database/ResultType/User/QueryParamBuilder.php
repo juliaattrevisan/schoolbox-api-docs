@@ -43,7 +43,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * users whose title + (first name or preferred name) + last name is like
      *   `$keyword` are fetched
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         // Don't show deleted users
         $whereParts = ['u.deleted_at IS NULL'];
@@ -81,7 +81,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The relevance of users is always maximum, so return a static value.
      * @return string
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return '1';
     }
@@ -101,7 +101,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * present, otherwise fall back to first name).
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return "CONCAT_WS(' ', u.chosen_name, u.lastname)";
     }
@@ -118,7 +118,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The type of a user result will be "user.$roleType".
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return "CONCAT('" . Hydrator::BASE_TYPE . ".', r.group_type)";
     }
@@ -127,7 +127,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The ID of a user result will simply be the user's ID.
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'u.id';
     }
@@ -136,7 +136,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The date of a user result will be their last updated date.
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'u.updated_at';
     }
@@ -145,7 +145,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Users have no recorded creator: thus, this will always be null.
      * @return string|null
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -154,7 +154,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Users do not have folders, thus this returns `null`.
      * @return string|null
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -164,7 +164,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * tables.
      * @return string
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return "
             FROM `user` u

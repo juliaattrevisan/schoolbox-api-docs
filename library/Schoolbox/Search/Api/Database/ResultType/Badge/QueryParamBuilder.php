@@ -36,7 +36,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @param string $keyword
      * @return array
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'b.deleted_at IS NULL'
@@ -62,7 +62,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
             ':badgeNow',
@@ -87,7 +87,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'b.name';
     }
@@ -103,7 +103,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -113,7 +113,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'b.id';
     }
@@ -123,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'b.updated_at';
     }
@@ -133,7 +133,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string|null
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return 'b.created_by';
     }
@@ -143,7 +143,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string|null
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -153,7 +153,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM badge b

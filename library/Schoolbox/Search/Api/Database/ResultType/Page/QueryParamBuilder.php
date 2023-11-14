@@ -37,7 +37,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * pages whose name matches `$keyword` are fetched
      * * pages with a class code which matches `$keyword` are fetched
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'f.deleted_at IS NULL',
@@ -54,7 +54,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The relevance of pages is always maximum, so return a static value.
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return '1';
     }
@@ -73,7 +73,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The title of a page result is always just its name.
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return "f.name";
     }
@@ -97,7 +97,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * homepage: pages with no class code, but a homepage
      * * folder: pages without a homepage
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         // NVL2: if param 1 is not null returns param 2, otherwise param 3 (https://mariadb.com/kb/en/nvl2/)
         return "CONCAT(
@@ -125,7 +125,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The ID of a page result will simply be the page's ID.
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'f.id';
     }
@@ -135,7 +135,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'f.updated_at';
     }
@@ -144,7 +144,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Pages have no recorded creator: thus, this will be null.
      * @return string|null
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return 'f.created_by';
     }
@@ -157,7 +157,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string|null
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -166,7 +166,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Page results need to be fetched from the folder table: possibly joining
      * onto other tables to populate the result type and folder codes.
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return "
             FROM folder f

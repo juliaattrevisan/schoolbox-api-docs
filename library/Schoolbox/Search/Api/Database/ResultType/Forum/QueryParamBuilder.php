@@ -36,7 +36,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @param string $keyword
      * @return array
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'fp.deleted="false"', // The type of forumPost.deleted is enum('true', 'false').
@@ -64,7 +64,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
             ':postNow',
@@ -91,7 +91,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'ft.title';
     }
@@ -107,7 +107,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -117,7 +117,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return $this->getSubqueryForMostRelevantPostInThread('postID');
     }
@@ -127,7 +127,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return $this->getSubqueryForMostRelevantPostInThread('modified');
     }
@@ -137,7 +137,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         return $this->getSubqueryForMostRelevantPostInThread('userID');
     }
@@ -147,7 +147,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string|null
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -166,7 +166,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM forumThread ft

@@ -9,13 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
@@ -31,7 +31,7 @@ class Controller extends Base
     /**
      * Maximum number of search results to return per call.
      */
-    private const MAX_RESULT_LIMIT = 20;
+    private const MAX_RESULT_LIMIT = 5;
 
     /**
      * Minimum number of characters required to complete a search
@@ -48,6 +48,7 @@ class Controller extends Base
      * @param UserMapper        $userMapper           Finds the user model corresponding to the creator in the filter.
      * @param Folder\Mapper     $folderMapper         Fully hydrates the folder in a raw result, so that its type may be
      *                                                determined.
+     * @param IConnector        $connector
      */
     public function __construct(
         private ISource $source,
@@ -55,6 +56,7 @@ class Controller extends Base
         private FullResultToArray $fullResultTranslator,
         private UserMapper $userMapper,
         private Folder\Mapper $folderMapper,
+        private IConnector $connector,
     ) {
     }
 
@@ -123,7 +125,7 @@ class Controller extends Base
                     if (!isset($translatedResults[$folderResultKey])) {
                         // Finagle a raw result for the folder, and hydrate that
                         // into a full result.
-                        $rawFolderResult = new RawResult(
+                        $rawFolderResult = new Cursor\RawResult(
                             (string)$folderResultId,
                             $result->folder->getTitle(),
                             $folderResultType,
@@ -183,7 +185,8 @@ class Controller extends Base
                 }
             }
 
-            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeyMultiQueryVersion($keyword, $filter, $translatedResults);
+//            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeyMultiQueryVersion($keyword, $filter, $translatedResults);
+            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeySingleQueryVersion($keyword, $filter, $translatedResults);
             foreach ($translatedResults as $resultKey => $translatedResult) {
                 if (!$moreResultsExistByResultKey[$resultKey]) {
                     $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = null;
@@ -287,6 +290,60 @@ class Controller extends Base
         }
 
         return $moreResultsExistByResultKey;
+    }
+
+    /**
+     * @param string     $keyword
+     * @param DataObject $filter
+     * @param array      $translatedResults
+     * @return array
+     */
+    private function getMoreResultsExistByResultKeySingleQueryVersion(string $keyword, DataObject $filter, array $translatedResults): array
+    {
+        $subqueries = [];
+        $params = [];
+
+        $n = 0;
+
+        foreach ($translatedResults as $resultKey => $translatedResult) {
+            if (!array_key_exists('_subResults', $translatedResult)) {
+                // This translated result does not have sub-results, so we are not interested.
+                continue;
+            }
+
+            // String $resultKey key will contain three tokens.  Examples: 'page.homepage.80', 'page.course.100'.
+            $tokens = explode('.', $resultKey);
+            $folderId = $tokens[count($tokens) - 1];
+
+            try {
+                $filter->folder = $this->folderMapper->findById($folderId);
+            } catch (MapperException $e) {
+                // Folder deleted or not found.  Skip.
+                continue;
+            }
+
+            $cursorCode = $translatedResult['_subResults']['metadata']['cursor']['next'];
+            $codec = new Cursor\Codec();
+            $cursor = $codec->decode($cursorCode);
+
+            [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, (string)$n++);
+
+            $subquery .= " AS `$resultKey`";
+
+            $subqueries[] = $subquery;
+
+            $params = array_merge($params, $subqueryParams);
+        }
+
+        $queryString = 'SELECT ' . implode(",\n", $subqueries);
+
+        $rows = $this->connector->executeQuery($queryString, $params)->fetchAll();
+
+        if (count($rows) !== 1) {
+            throw new \LogicException('Expected one row from query.');
+        }
+
+        return $rows[0];
     }
 
     /**

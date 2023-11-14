@@ -194,6 +194,7 @@ class Module extends BaseModule
             ),
             $mapperFactory->get(UserMapper::class),
             $mapperFactory->get(FolderMapper::class),
+            $database,
         );
     }
 }

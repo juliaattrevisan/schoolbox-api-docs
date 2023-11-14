@@ -34,9 +34,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * tiles whose title_text or link contain `$keyword` are fetched
      *
      * @param string $keyword
+     * @param string $paramKeySuffix
      * @return array
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts         = [
             't.deleted_at IS NULL',
@@ -44,13 +45,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             // Tiles without a title should not appear in search results (AC for SA-8841).
-            'TRIM(t.title_text)<>"" AND t.title_text LIKE :tileKeywordLike',
-            'TRIM(t.title_text)<>"" AND t.link LIKE :tileKeywordLike',
+            "TRIM(t.title_text)<>'' AND t.title_text LIKE :tileKeywordLike$paramKeySuffix",
+            "TRIM(t.title_text)<>'' AND t.link LIKE :tileKeywordLike$paramKeySuffix",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
-            'tileNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'tileKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "tileNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "tileKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -61,13 +62,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The relevance of a tile is its modified_at time.
+     * @param string $paramKeySuffix
      *
      * @return string
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':tileNow',
+            ":tileNow$paramKeySuffix",
             't.modified_at',
             7,
             56,
@@ -79,7 +81,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return bool
      */
-    protected function isOrderedByRelevance(): bool
+    protected function isOrderedByRelevance(string $paramKeySuffix = ''): bool
     {
         return true;
     }
@@ -89,7 +91,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 't.title_text';
     }
@@ -105,7 +107,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -115,7 +117,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 't.id';
     }
@@ -125,7 +127,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 't.modified_at';
     }
@@ -135,7 +137,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string|null
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -145,7 +147,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    public function buildFolderExpression(): string
+    public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
         return 'tlf.folder_id';
     }
@@ -155,7 +157,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM tile t

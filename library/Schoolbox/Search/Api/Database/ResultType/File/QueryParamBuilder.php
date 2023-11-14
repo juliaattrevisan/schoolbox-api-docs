@@ -37,7 +37,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @param string $keyword
      * @return array
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts         = [
             'f.deleted_at IS NULL',
@@ -65,7 +65,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
             ':fileNow',
@@ -90,7 +90,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'f.realname';
     }
@@ -113,7 +113,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         // Depends on the mime's file type:
         // derived from a similar list in
@@ -153,7 +153,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'f.id';
     }
@@ -163,7 +163,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'f.modified';
     }
@@ -173,7 +173,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         return 'f.owner';
     }
@@ -183,7 +183,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    public function buildFolderExpression(): string
+    public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
         return 'f.category';
     }
@@ -194,7 +194,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM file f

@@ -45,7 +45,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *   fetched
      */
 
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'n.deleted_at IS NULL',
@@ -82,7 +82,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * linearly decays until reaching a minimum of 0 at 8 weeks after
      *   publishing
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
             ':newsNow',
@@ -104,7 +104,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The title of a news result is simply the article's title.
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'n.title';
     }
@@ -120,7 +120,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -129,7 +129,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The ID of a news result is simply the article's ID.
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'n.id';
     }
@@ -137,7 +137,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The date of a news result is the article's publish date.
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'n.publish_at';
     }
@@ -146,7 +146,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The creator of a news result is the article's author.
      * @return string
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         return 'n.author_id';
     }
@@ -159,7 +159,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string|null
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -168,7 +168,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * News results are simply fetched from the `comms_news_article` table:
      * currently, no joins are required.
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return 'FROM comms_news_article n';
     }

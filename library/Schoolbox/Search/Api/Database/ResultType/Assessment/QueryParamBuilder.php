@@ -38,7 +38,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @param string $keyword
      * @return array
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             // If any higher-level row the assessment is linked to is deleted, treat the assessment as deleted.
@@ -96,7 +96,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
             ':assessmentNow',
@@ -113,7 +113,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'COALESCE(assessment.due_date, assessment.updated_at)';
     }
@@ -133,7 +133,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         // Note on redundancy of assessment titles:
         // assess.title, submission_box.title, and lti_assessment.lti_assessment_title should always match assessment.title for linked rows.
@@ -146,7 +146,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *
      * @return string
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         // All second-level db tables have a creator field except lti_assessment.
         return "
@@ -172,7 +172,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return "
             CONCAT(
@@ -192,7 +192,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'assessment.id';
     }
@@ -200,7 +200,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    public function buildFolderExpression(): string
+    public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
         return 'mv_assessment_relation.folder_id';
     }
@@ -208,7 +208,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @return string
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM mv_assessment_relation
