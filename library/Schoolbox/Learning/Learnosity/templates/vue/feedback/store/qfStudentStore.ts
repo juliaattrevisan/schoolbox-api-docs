@@ -97,6 +97,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             studentItems.push({
                 reference: item.reference,
                 questions: getItemQuestions(itemResponses.value, item.questions),
+                title: item.title,
             });
         });
         student.value.items = studentItems;

@@ -41,7 +41,7 @@ export function loadReport(initOptions: object) {
             const attemptReport = reportsApp.getReport(reportId);
             // itemsApi only spawns if you used session-detail-by-item
             attemptReport.on("ready:itemsApi", (itemsApp) => {
-                // Load the items for the student
+\                // Load the items for the student
                 itemsApp.getItems(($items: object) => {
                     const items: Item[] = [];
                     // grab each item object and push it into the items array
