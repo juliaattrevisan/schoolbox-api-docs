@@ -92,7 +92,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 
                 /* Parse out the image if one was assigned
                  */
-                if (strlen($currentItem->getImagehash())) {
+                if ('' !== trim((string)$currentItem->getImagehash())) {
                     $this->setVar(array(
                         'LIST_ITEM_IMAGEHASH' => $currentItem->getImagehash(),
                     ));
@@ -116,7 +116,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
                         ->attachFiles([$currentItem->getImageHash()])
                         ->setReadOnly(false)
                         ->setMulti(false);
-                    if (strlen($currentItem->getImagehash())) {
+                    if ('' !== trim((string)$currentItem->getImagehash())) {
                         $zone->attachFiles([$currentItem->getImageHash()]);
                     }
                     $zone->renderIntoSitePage($this->getSitePage(), 'IMAGEHASH_MODIFY_ATTACH_ZONE');
