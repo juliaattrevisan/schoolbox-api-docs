@@ -8,3 +8,16 @@ ALTER TABLE folder ADD COLUMN deleted_by int(4) unsigned DEFAULT NULL AFTER dele
 ALTER TABLE folder ADD CONSTRAINT fk_folder_created_by FOREIGN KEY (created_by) REFERENCES user (id);
 ALTER TABLE folder ADD CONSTRAINT fk_folder_updated_by FOREIGN KEY (updated_by) REFERENCES user (id);
 ALTER TABLE folder ADD CONSTRAINT fk_folder_deleted_by FOREIGN KEY (deleted_by) REFERENCES user (id);
+
+### seed folder table with historic data if it exists
+update folder fd
+    left join cmsLog cmsLogCreate on (fd.id = cmsLogCreate.objectId and cmsLogCreate.object = 'folder' and cmsLogCreate.action = 'create')
+    left join cmsLog cmsLogModify on (fd.id = cmsLogModify.objectId and cmsLogModify.object = 'folder' and cmsLogModify.action = 'modify')
+    left join cmsLog cmsLogDelete on (fd.id = cmsLogDelete.objectId and cmsLogDelete.object = 'folder' and cmsLogDelete.action = 'delete')
+set fd.created_at = COALESCE(cmsLogCreate.time, fd.created_at),
+    fd.created_by = cmsLogCreate.user,
+    fd.updated_at = COALESCE(cmsLogModify.time, fd.deleted_at, cmsLogCreate.time, fd.updated_at),
+    fd.updated_by = coalesce(cmsLogModify.user, cmsLogCreate.user),
+    fd.deleted_by = cmsLogDelete.user
+
+WHERE fd.id > 0;
