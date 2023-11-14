@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Schoolbox\Resource\Storage\Virus;
 
 use Schoolbox\File\Exception as FileException;
 use League\Flysystem\Filesystem;
-
 
 /**
  * @copyright Copyright 2023, Schoolbox Pty Ltd
@@ -34,7 +35,7 @@ class Scanner
     {
 
 
-        if(!$this->tempFileSystem->directoryExists(self::VIRUS_QUARANTINE)) {
+        if (!$this->tempFileSystem->directoryExists(self::VIRUS_QUARANTINE)) {
             $this->tempFileSystem->createDirectory(self::VIRUS_QUARANTINE);
         }
 
@@ -49,12 +50,12 @@ class Scanner
      * @return void
      * @throws FileException
      */
-    public function scan($filelocation): void
+    public function scan(Path $filelocation): void
     {
         $output = '';
         $resultCode = 0;
 
-        exec(sprintf(self::CLAMSCAN_COMMAND.' '.self::CLAMSCAN_ARGS, $this->quarantine, $filelocation), $output, $resultCode);
+        exec(sprintf(self::CLAMSCAN_COMMAND . ' ' . self::CLAMSCAN_ARGS, $this->quarantine, $filelocation), $output, $resultCode);
 
         if ($resultCode === 127) {
             // Virus scanner not available, just continue without it
