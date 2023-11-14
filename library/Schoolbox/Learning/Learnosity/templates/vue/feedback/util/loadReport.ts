@@ -6,7 +6,7 @@ import type { Item } from "@schoolboxLearnosity/js/types/Item";
 import { useStudentStore } from "../store/qfStudentStore";
 
 /**
- * To move the marks (which are in the title div) out of the response container into <hm-students-student-mark>
+ * To move the marks (which are in the title div) out of the response container
  * we need to add an attribute to each title div so it can be properly targeted, as they all just have the same class name
  * @param {string} reportId - the report id
  */
@@ -41,7 +41,7 @@ export function loadReport(initOptions: object) {
             const attemptReport = reportsApp.getReport(reportId);
             // itemsApi only spawns if you used session-detail-by-item
             attemptReport.on("ready:itemsApi", (itemsApp) => {
-\                // Load the items for the student
+                // Load the items for the student
                 itemsApp.getItems(($items: object) => {
                     const items: Item[] = [];
                     // grab each item object and push it into the items array

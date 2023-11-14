@@ -13,7 +13,7 @@ interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item that's displayed
     question: StudentItemQuestion; // the question that's displayed
-    container: HTMLDivElement; // the parent container, to look for the relevant item
+    container: HTMLElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into

@@ -59,8 +59,9 @@ function onToggleSelected() {
                 v-for="item in props.student.items"
                 :key="item.reference"
                 :item="item"
-                :is-shown="item.reference === itemsStore.activeItem.reference"
                 :container="(container as HTMLElement)"
+                :is-shown="item.reference === itemsStore.activeItem.reference"
+                :show-title="false"
             />
             <student-header-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
         </div>

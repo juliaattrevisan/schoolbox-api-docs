@@ -4,7 +4,8 @@
 
 /* use our font everywhere */
 .lrn,
-.lrn-assess {
+.lrn-assess,
+h3.lrn-report-item-title {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
         Arial, sans-serif;
 }
@@ -1705,6 +1706,7 @@ span.lrn-list-view-empty-label {
 
 /* shown in horizontal and vertical marking, remove the margins from the item mark */
 h3.lrn-report-item-title {
+    font-size: 1.25rem;
     margin: 0;
 }
 .learnosity-report .lrn-circle {

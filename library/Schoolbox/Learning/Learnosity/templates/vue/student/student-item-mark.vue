@@ -12,6 +12,7 @@ interface Props {
     item: StudentItem; // the item to display
     container: HTMLElement; // the parent container, to look for the relevant item
     isShown: boolean; // whether to display the item or not
+    showTitle: boolean; // whether to show the item title or not
 }
 const props = defineProps<Props>();
 const markEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the report into
@@ -148,7 +149,9 @@ function updateScoreDisplay() {
 window.Vue.onMounted(() => {
     const mark = props.container.querySelector(`[data-reference-title="${props.item.reference}"]`) as HTMLDivElement;
     if (mark) {
-        (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
+        if (!props.showTitle) {
+            (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
+        }
         markEl.value?.appendChild(mark);
         updateScoreDisplay();
     }
