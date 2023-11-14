@@ -36,7 +36,7 @@ function onAttemptCommentUpdated(comment: string) {
         </div>
         <template v-if="props.student.isReportLoaded">
             <div class="l-flex-col l-gap-s">
-                <h2 class="subheader f-no-margins">Cards</h2>
+                <h2 class="subheader f-no-margins">Items</h2>
                 <qf-student-show-marked />
                 <div class="l-flex-col l-gap-l">
                     <qf-student-item

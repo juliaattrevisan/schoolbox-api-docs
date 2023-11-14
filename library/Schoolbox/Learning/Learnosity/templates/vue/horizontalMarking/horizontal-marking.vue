@@ -55,7 +55,7 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-l f-no-margins">
+    <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
         <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">

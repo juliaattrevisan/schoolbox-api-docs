@@ -99,8 +99,8 @@ function onCancelSelected() {
         {{ buttonText }}
     </button>
     <reveal-modal ref="modalEl" :close-on-background-click="false" @closed="onCancelSelected">
-        <h2>Unmarked cards</h2>
-        <p>There are currently cards that have not yet been marked. Are you sure you wish to finalise the review?</p>
+        <h2>Unmarked items</h2>
+        <p>There are currently items that have not yet been marked. Are you sure you wish to finalise the review?</p>
         <ul class="flex-list">
             <li>
                 <button class="button icon-approve submit" @click.prevent="onConfirmSelected">

@@ -22,7 +22,7 @@ const { currentLabel, isOpen, onButtonSelected, close } = usePopOut(
 
 const buttonText = window.Vue.computed(() => {
     if (!store.isLoaded) {
-        return "Loading cards...";
+        return "Loading items...";
     }
     return itemsStore.activeItem.title;
 });
