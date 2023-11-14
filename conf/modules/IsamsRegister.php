@@ -15,6 +15,9 @@ use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\Endpoint\Factory;
 
+/**
+ * Module configuration for the iSams register.
+ */
 class IsamsRegister implements ModuleConfigInterface
 {
     /**
