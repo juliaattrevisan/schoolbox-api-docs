@@ -1316,7 +1316,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 /* replace icons with sb icons */
 .lrn-i-preview::before {
     color: var(--content-ui-foreground);
-    content: "\e62f";
+    content: "\e901";
     font-family: "schoolbox";
 }
 .lrn .lrn-author-ui .lrn-list-view-item .lrn-btn-default {
@@ -1822,10 +1822,10 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
     font-style: italic;
     margin-bottom: 1rem !important;
     margin-top: 3rem !important;
+    min-height: unset !important;
     padding: 2rem !important;
     text-align: center;
     width: 100%;
-    min-height: unset !important;
 }
 .lrn-empty-activity-wrapper > span {
     display: none;
