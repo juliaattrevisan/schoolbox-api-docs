@@ -20,6 +20,10 @@ const { currentLabel, isOpen, onButtonSelected, close } = usePopOut(
     true
 );
 
+/**
+ * The text to display on the button
+ * @returns {string} The text to display on the button
+ */
 const buttonText = window.Vue.computed(() => {
     if (!store.isLoaded) {
         return "Loading items...";
