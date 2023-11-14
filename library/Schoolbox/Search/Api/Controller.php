@@ -78,7 +78,10 @@ class Controller extends Base
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
-                $keyword, $filter, $limit, $this->requestQuery->get('cursor')
+                $keyword,
+                $filter,
+                $limit,
+                $this->requestQuery->get('cursor')
             );
 
             $translatedResults = [];
@@ -225,7 +228,10 @@ class Controller extends Base
 
         if (mb_strlen($keyword) >= 2) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
-                $keyword, $filter, $limit, $this->requestQuery->get('cursor')
+                $keyword,
+                $filter,
+                $limit,
+                $this->requestQuery->get('cursor')
             );
 
             // Finally output the response
