@@ -1853,3 +1853,10 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 .lrn button.lrn-mask:focus {
     outline: unset !important;
 }
+
+/* Set z-index to fix dropdown and side panels open behind the quiz modal */
+.lrn-assess.test-ready,
+.lrn-assess.test-init,
+.lrn.lrn-assess .app-panel.review-screen {
+    z-index: 0 !important;
+}
