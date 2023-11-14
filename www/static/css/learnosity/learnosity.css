@@ -1799,3 +1799,8 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
     opacity: 0.5;
     font-size: 1rem;
 }
+
+/* Add more padding to the bottom of the Learnosity container */
+#container {
+    padding: 1rem 1rem 3rem 1rem;
+}
