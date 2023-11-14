@@ -19,6 +19,7 @@ use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
+use Schoolbox\Search\Api\SearchFilter\DataObject;
 use Schoolbox\Search\Api\Source\ISource;
 use Schoolbox\UserMapper;
 
@@ -76,7 +77,9 @@ class Controller extends Base
         $cursor = null;
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
-            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
+                $keyword, $filter, $limit, $this->requestQuery->get('cursor')
+            );
 
             $translatedResults = [];
             foreach ($results as $result) {
@@ -113,7 +116,7 @@ class Controller extends Base
                     } else {
                         $folderResultType .= 'other';
                     }
-                    $folderResultKey  = $folderResultType . '.' . $folderResultId;
+                    $folderResultKey = $folderResultType . '.' . $folderResultId;
                     if (!isset($translatedResults[$folderResultKey])) {
                         // Finagle a raw result for the folder, and hydrate that
                         // into a full result.
@@ -176,6 +179,14 @@ class Controller extends Base
                     $translatedResults[$resultKey] = $translatedResult;
                 }
             }
+
+            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeyMultiQueryVersion($keyword, $filter, $translatedResults);
+            foreach ($translatedResults as $resultKey => $translatedResult) {
+                if (!$moreResultsExistByResultKey[$resultKey]) {
+                    $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = null;
+                }
+            }
+
             $translatedResults = array_values($translatedResults);
 
             // Finally output the response
@@ -213,7 +224,9 @@ class Controller extends Base
         $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
 
         if (mb_strlen($keyword) >= 2) {
-            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
+                $keyword, $filter, $limit, $this->requestQuery->get('cursor')
+            );
 
             // Finally output the response
             $this->response = $this->responseAsJson(
@@ -234,14 +247,52 @@ class Controller extends Base
     }
 
     /**
+     * @param string     $keyword
+     * @param DataObject $filter
+     * @param array      $translatedResults
+     * @return array
+     */
+    private function getMoreResultsExistByResultKeyMultiQueryVersion(string $keyword, DataObject $filter, array $translatedResults): array
+    {
+        $moreResultsExistByResultKey = [];
+
+        foreach ($translatedResults as $resultKey => $translatedResult) {
+            if (!array_key_exists('_subResults', $translatedResult)) {
+                // This translated result does not have sub-results, so we are not interested.
+                continue;
+            }
+
+            // String $resultKey key will contain three tokens.  Examples: 'page.homepage.80', 'page.course.100'.
+            $tokens = explode('.', $resultKey);
+            $folderId = $tokens[count($tokens) - 1];
+
+            try {
+                $filter->folder = $this->folderMapper->findById($folderId);
+            } catch (MapperException $e) {
+                // Folder deleted or not found.  Just say no more results exist.
+                $moreResultsExistByResultKey[$resultKey] = false;
+                continue;
+            }
+
+            $cursorCode = $translatedResult['_subResults']['metadata']['cursor']['next'];
+            $resultSet = $this->populateResultSet($keyword, $filter, 1, $cursorCode);
+
+            $moreResultsExistByResultKey[$resultKey] = count($resultSet['results']) !== 0;
+        }
+
+        return $moreResultsExistByResultKey;
+    }
+
+    /**
      * Build a result set from the keyword, filter and limit.
      *
      * @param string                  $keyword
      * @param SearchFilter\DataObject $filter
      * @param int                     $limit
+     * $param string|null             $cursorCode
      * @return array{results: array<FullResult>, nextCursor: string|null}
      */
-    private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit): array
+    private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit, ?string $cursorCode): array
     {
         $cursor = new Cursor\Cursor(
             $this->source,
@@ -257,7 +308,7 @@ class Controller extends Base
         // even if the hydrator filters out results.
         $i             = 0;
         $fullResults   = [];
-        $nextCursor    = $this->requestQuery->get('cursor');
+        $nextCursor    = $cursorCode;
         while (count($fullResults) < $limit && $i++ < 100) {
             // Get next set of raw results, and the cursor for the next
             // iteration.
