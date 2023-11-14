@@ -48,7 +48,7 @@ function handleUnlinkClick() {
         <p class="meta">
             {{ getActivityMeta(activity) }}
         </p>
-        <p class="meta">Due {{ activity.dueAtFormatted }}</p>
+        <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
     </div>
     <nav v-if="isInstructor">
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
