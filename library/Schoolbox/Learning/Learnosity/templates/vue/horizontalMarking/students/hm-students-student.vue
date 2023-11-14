@@ -5,11 +5,11 @@
 
 import { gsap } from "gsap";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import StudentAttemptComment from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentHeader from "./hm-students-student-header.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
-import HmStudentsStudentAttemptComment from "./hm-students-student-attempt-comment.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -93,6 +93,14 @@ window.Vue.watch(
         });
     }
 );
+
+/**
+ * To notify of a change in the comment
+ * @param {string} comment - the comment to save
+ */
+function onAttemptCommentUpdated(comment: string) {
+    studentsStore.updateAttemptComment(props.student, comment);
+}
 </script>
 
 <template>
@@ -118,9 +126,10 @@ window.Vue.watch(
                                 :item="item"
                                 :container="(responseContentEl as HTMLDivElement)"
                             />
-                            <hm-students-student-attempt-comment
+                            <student-attempt-comment
                                 v-if="itemsStore.isAttemptComment"
                                 :student="props.student"
+                                @update-comment="onAttemptCommentUpdated"
                             />
                         </template>
                     </div>
