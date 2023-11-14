@@ -1667,10 +1667,9 @@ span.lrn-list-view-empty-label {
     color: #999;
     font-size: 1rem;
     font-style: italic;
-    margin-bottom: 1rem;
+    margin-bottom: 1rem !important;
     margin-top: 3rem !important;
-    padding: 1rem;
-    padding: 2rem;
+    padding: 2rem !important;
     text-align: center;
     width: 100%;
 }
@@ -1813,4 +1812,25 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
     content: "\e600";
     font-family: "schoolbox";
     margin-right: 9px;
+}
+
+/* Updated empty state preview - when there are no items */
+.lrn-empty-activity-wrapper {
+    background-color: #ddd;
+    color: #999;
+    font-size: 1rem !important;
+    font-style: italic;
+    margin-bottom: 1rem !important;
+    margin-top: 3rem !important;
+    padding: 2rem !important;
+    text-align: center;
+    width: 100%;
+    min-height: unset !important;
+}
+.lrn-empty-activity-wrapper > span {
+    display: none;
+}
+.lrn-empty-activity-wrapper::after {
+    content: "\A No items to preview. Select Edit to proceed.";
+    white-space: pre;
 }
