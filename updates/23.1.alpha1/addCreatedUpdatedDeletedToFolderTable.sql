@@ -16,8 +16,8 @@ update folder fd
     left join cmsLog cmsLogDelete on (fd.id = cmsLogDelete.objectId and cmsLogDelete.object = 'folder' and cmsLogDelete.action = 'delete')
 set fd.created_at = COALESCE(cmsLogCreate.time, fd.created_at),
     fd.created_by = cmsLogCreate.user,
-    fd.updated_at = COALESCE(cmsLogModify.time, fd.updated_at),
-    fd.updated_by = cmsLogModify.user,
+    fd.updated_at = COALESCE(cmsLogModify.time, cmsLogCreate.time, fd.updated_at),
+    fd.updated_by = coalesce(cmsLogModify.user, cmsLogCreate.user),
     fd.deleted_by = cmsLogDelete.user
 
 WHERE fd.id > 0;
