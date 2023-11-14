@@ -11,9 +11,9 @@ const studentsStore = useStudentsStore();
 </script>
 
 <template>
-    <div class="checklist">
+    <div class="checklist f-no-margins">
         <ul class="option-list l-mar--0">
-            <li>
+            <li class="f-no-margins">
                 <input
                     id="show-marked-attempts"
                     v-model="studentsStore.showMarkedAttempts"

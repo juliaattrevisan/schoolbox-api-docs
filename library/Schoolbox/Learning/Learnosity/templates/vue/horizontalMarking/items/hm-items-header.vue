@@ -8,7 +8,7 @@ import HmItemsHeaderSelect from "./hm-items-header-select.vue";
 
 <template>
     <div class="l-flex-col l-gap-s">
-        <h2 class="subheader">Cards</h2>
+        <h2 class="subheader f-no-margins">Cards</h2>
         <hm-items-header-select />
     </div>
 </template>

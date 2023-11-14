@@ -106,7 +106,7 @@ function onAttemptCommentUpdated(comment: string) {
 <template>
     <div ref="studentEl" class="student l-grid">
         <div ref="studentInnerContainerEl" class="student__inner-container">
-            <div ref="studentEl" class="c-island l-flex-col l-gap-m l-pad-m">
+            <div ref="studentEl" class="c-island l-flex-col l-gap-m">
                 <hm-students-student-header
                     :student="props.student"
                     :container="(responseContentEl as HTMLDivElement)"

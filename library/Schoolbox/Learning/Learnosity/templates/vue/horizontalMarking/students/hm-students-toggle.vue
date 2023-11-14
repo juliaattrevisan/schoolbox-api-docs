@@ -24,7 +24,7 @@ function onSelected() {
 <template>
     <button
         :disabled="!store.isLoaded"
-        :class="`button ${studentsStore.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+        :class="`button f-no-margins ${studentsStore.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
         @click.prevent="onSelected"
     >
         {{ buttonText }}

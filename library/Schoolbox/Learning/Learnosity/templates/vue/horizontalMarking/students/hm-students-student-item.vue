@@ -52,7 +52,7 @@ function onCommentUpdated(comment: string) {
 
 <template>
     <transition>
-        <div v-if="isActive" class="l-flex-col l-gap-m">
+        <div v-if="isActive" class="l-flex-col l-gap-m l-pad-m">
             <student-no-score-note :item="props.item" />
             <div class="item-questions l-flex-col l-gap-m">
                 <student-item-question-display

@@ -90,20 +90,18 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div>
-        <div class="c-island l-flex-col l-gap-m l-pad-m">
-            <div>
-                <label>Comment</label>
-                <p class="meta">
-                    Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
-                    details on creation.
-                </p>
-                <textarea :id="editorId"></textarea>
-                <div class="save-container l-grid">
-                    <div class="save-container__inner-container">
-                        <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
-                            <em>{{ saveText }}</em>
-                        </div>
+    <div class="c-island l-flex-col l-gap-m l-pad-m">
+        <div>
+            <label>Comment</label>
+            <p class="meta">
+                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                details on creation.
+            </p>
+            <textarea :id="editorId"></textarea>
+            <div class="save-container l-grid">
+                <div class="save-container__inner-container">
+                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                        <em>{{ saveText }}</em>
                     </div>
                 </div>
             </div>
