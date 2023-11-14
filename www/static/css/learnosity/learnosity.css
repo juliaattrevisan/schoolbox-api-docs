@@ -1839,3 +1839,8 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 .action-list {
     background-color: #fff;
 }
+
+/* Change the style for disabled buttons to make it clear to the user the button is disabled */
+.lrn .lrn-author-ui .lrn-pagination-btn[aria-disabled="true"] > span {
+    opacity: 0.5;
+}
