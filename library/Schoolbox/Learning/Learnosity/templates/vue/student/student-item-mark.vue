@@ -11,9 +11,18 @@ import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 interface Props {
     item: StudentItem; // the item to display
     container: HTMLDivElement; // the parent container, to look for the relevant item
+    isShown: boolean; // whether to display the item or not
 }
 const props = defineProps<Props>();
 const markEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+
+/**
+ * To display the current item
+ * @returns {string} - the display style
+ */
+const display = window.Vue.computed(() => {
+    return props.isShown ? "block" : "none";
+});
 
 /**
  * If the item only contains questions that don't have a maxScore, we don't want to show any score
@@ -162,3 +171,9 @@ window.Vue.watch(
     <!-- these classes are so the correct learnosity styles can be applied -->
     <div ref="markEl" class="lrn learnosity-report session-detail-by-item mark"></div>
 </template>
+
+<style scoped>
+.mark {
+    display: v-bind(display);
+}
+</style>

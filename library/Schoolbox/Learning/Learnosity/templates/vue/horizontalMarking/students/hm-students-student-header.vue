@@ -4,8 +4,8 @@
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
 import { useItemsStore } from "../store/hmItemsStore";
-import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
 import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
 
 interface Props {
@@ -30,7 +30,7 @@ function onToggleSelected() {
 
 <template>
     <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
-        <div class="l-flex-row l-flex--align-center l-gap-m">
+        <div class="l-flex-row l-flex--align-center l-gap-m f-no-margins">
             <button
                 v-if="props.student.isReportLoaded"
                 :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
@@ -54,16 +54,15 @@ function onToggleSelected() {
                 }}</a>
             </h2>
         </div>
-        <div>
-            <template v-if="props.student.isReportLoaded">
-                <hm-students-student-item-mark
-                    v-for="item in props.student.items"
-                    :key="item.reference"
-                    :item="item"
-                    :container="(container as HTMLDivElement)"
-                />
-                <hm-students-student-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
-            </template>
+        <div v-if="props.student.isReportLoaded">
+            <student-item-mark
+                v-for="item in props.student.items"
+                :key="item.reference"
+                :item="item"
+                :is-shown="item.reference === itemsStore.activeItem.reference"
+                :container="(container as HTMLDivElement)"
+            />
+            <hm-students-student-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
         </div>
     </div>
 </template>
