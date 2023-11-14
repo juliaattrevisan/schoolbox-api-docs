@@ -111,7 +111,7 @@ function onItemSelected(reference: string) {
     max-height: 250px;
     overflow-y: scroll;
     position: absolute;
-    z-index: 10;
+    z-index: 20;
     &__button {
         background: var(--foreground-colour);
         display: inline-flex;
