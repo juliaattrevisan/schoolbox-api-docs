@@ -1844,3 +1844,12 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 .lrn .lrn-author-ui .lrn-pagination-btn[aria-disabled="true"] > span {
     opacity: 0.5;
 }
+
+/* fixed overlap of the masking  */
+.lrn .lrn-mask {
+    height: 90% !important;
+}
+.lrn button.lrn-mask:hover,
+.lrn button.lrn-mask:focus {
+    outline: unset !important;
+}
