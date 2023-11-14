@@ -37,7 +37,7 @@ class Controller extends Base
             'short_name'                  => $this->getConfigLoader()->get('title'),
             'theme_color'                 => $this->getConfigLoader()->get('skin_colour_navigation_background'),
             'background_color'            => $this->getConfigLoader()->get('skin_colour_navigation_background'),
-            'display'                     => 'minimal-ui',
+            'display'                     => 'standalone',
             'Scope'                       => '/',
             'start_url'                   => '/',
             'icons'                       => [
