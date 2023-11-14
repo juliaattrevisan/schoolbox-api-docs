@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The student header, containing the toggle, student photo, name and mark for each item
+ * The student header, containing the student photo, name and overall attempt mark
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
@@ -8,7 +8,6 @@ import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-h
 
 interface Props {
     student: Student; // the student to display
-    container: HTMLDivElement | null; // the element that the report is rendered into
 }
 const props = defineProps<Props>();
 </script>

@@ -42,27 +42,16 @@ window.Vue.onMounted(() => {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .content-container:not(.expanded) {
     max-height: v-bind(maxContentHeightStyle);
-    position: relative;
     overflow: hidden;
 }
 .show-more-container {
     bottom: 0;
     position: absolute;
-    z-index: 1;
     width: 100%;
     background: white;
-    &:before {
-        content: "";
-        position: absolute;
-        top: -20px;
-        left: 0;
-        height: 20px;
-        background: linear-gradient(rgba(255, 255, 255, 0), white);
-        width: 100%;
-    }
 }
 .show-more-container button {
     margin: 5px;

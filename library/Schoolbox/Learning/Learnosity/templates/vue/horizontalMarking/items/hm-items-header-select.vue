@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To move between the items (called cards in sbx)
+ * To move between the items
  */
 
 import type { Ref } from "vue";

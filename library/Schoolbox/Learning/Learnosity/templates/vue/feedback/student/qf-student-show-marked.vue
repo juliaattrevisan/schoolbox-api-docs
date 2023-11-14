@@ -19,7 +19,7 @@ const studentStore = useStudentStore();
                     v-model="studentStore.student.showMarked"
                     type="checkbox"
                     :disabled="!store.isLoaded"
-                /><label for="show-marked-attempts">Show marked attempts</label>
+                /><label for="show-marked-attempts">Show marked items</label>
             </li>
         </ul>
     </div>

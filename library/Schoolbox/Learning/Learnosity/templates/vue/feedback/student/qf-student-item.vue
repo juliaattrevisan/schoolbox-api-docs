@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Contains a students response to an item, (only one item is shown at a time)
+ * Contains a students response to an item
  */
 
 import { slideUp, slideDown } from "@js/util/animateUtils";

@@ -29,7 +29,7 @@ function onAttemptCommentUpdated(comment: string) {
 
 <template>
     <div class="l-flex-col l-gap-m">
-        <qf-student-header :student="props.student" :container="(responseContentEl as HTMLDivElement)" />
+        <qf-student-header :student="props.student" />
         <div ref="responseContentEl" class="response-content">
             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
             <div :id="props.student.elementId"></div>

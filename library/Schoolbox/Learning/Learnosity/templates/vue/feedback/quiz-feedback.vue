@@ -39,7 +39,6 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
     <div class="l-flex-col l-gap-m">
         <qf-student :student="studentStore.student" />
         <qf-finalise-review v-if="studentStore.student.isReportLoaded" />
