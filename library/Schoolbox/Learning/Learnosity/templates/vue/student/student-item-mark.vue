@@ -10,11 +10,11 @@ import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 
 interface Props {
     item: StudentItem; // the item to display
-    container: HTMLDivElement; // the parent container, to look for the relevant item
+    container: HTMLElement; // the parent container, to look for the relevant item
     isShown: boolean; // whether to display the item or not
 }
 const props = defineProps<Props>();
-const markEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+const markEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the report into
 
 /**
  * To display the current item

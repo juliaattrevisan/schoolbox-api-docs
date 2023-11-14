@@ -15,7 +15,7 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item that's displayed
-    container: HTMLDivElement; // the parent container, to look for the relevant item
+    container: HTMLElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();

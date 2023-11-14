@@ -10,7 +10,7 @@ import { useItemsStore } from "../store/hmItemsStore";
 
 interface Props {
     student: Student; // the student to display
-    container: HTMLDivElement | null; // the element that the report is rendered into
+    container: HTMLElement | null; // the element that the report is rendered into
 }
 const props = defineProps<Props>();
 
@@ -60,7 +60,7 @@ function onToggleSelected() {
                 :key="item.reference"
                 :item="item"
                 :is-shown="item.reference === itemsStore.activeItem.reference"
-                :container="(container as HTMLDivElement)"
+                :container="(container as HTMLElement)"
             />
             <student-header-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
         </div>

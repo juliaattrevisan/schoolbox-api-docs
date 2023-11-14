@@ -57,9 +57,9 @@ function onAttemptCommentUpdated(comment: string) {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .response-content {
-    // this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items
+    /* this contains the html from Learnosity, which has the response DOM elements that are extracted as we move through the items */
     display: none;
 }
 </style>
