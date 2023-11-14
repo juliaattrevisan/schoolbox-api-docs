@@ -5,8 +5,8 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
+import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-header-attempt-mark.vue";
 import { useItemsStore } from "../store/hmItemsStore";
-import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -62,7 +62,7 @@ function onToggleSelected() {
                 :is-shown="item.reference === itemsStore.activeItem.reference"
                 :container="(container as HTMLDivElement)"
             />
-            <hm-students-student-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
+            <student-header-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
         </div>
     </div>
 </template>
