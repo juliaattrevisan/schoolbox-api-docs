@@ -7,9 +7,9 @@ import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
-import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
 import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
+import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
@@ -18,9 +18,9 @@ interface Props {
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
+const studentStore = useStudentStore();
 const itemEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the item into
 const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
-const studentStore = useStudentStore();
 
 /**
  * Hide the item if it's already been marked and the user has chosen to only show unmarked items

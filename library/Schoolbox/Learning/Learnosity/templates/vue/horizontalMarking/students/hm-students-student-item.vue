@@ -7,9 +7,9 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
+import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
-import hmStudentsStudentItemComment from "./hm-students-student-item-comment.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -39,6 +39,14 @@ const isActive = window.Vue.computed(() => {
 function onScoreUpdated(question: StudentItemQuestion, score: number) {
     studentsStore.updateItemResponseScore(props.student, props.item, question, score);
 }
+
+/**
+ * To notify of a change in the comment
+ * @param {string} comment - the comment to save
+ */
+function onCommentUpdated(comment: string) {
+    studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment);
+}
 </script>
 
 <template>
@@ -61,7 +69,7 @@ function onScoreUpdated(question: StudentItemQuestion, score: number) {
                     @update-score="onScoreUpdated"
                 />
             </div>
-            <hm-students-student-item-comment :student="props.student" :item="props.item" />
+            <student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
         </div>
     </transition>
 </template>
