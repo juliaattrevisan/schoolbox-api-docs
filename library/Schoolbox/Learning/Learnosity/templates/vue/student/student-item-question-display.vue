@@ -70,7 +70,6 @@ async function saveScore() {
         method: "POST",
         body: formData,
     });
-    // studentStore.updateItemResponseScore(props.student, props.item, props.question, parseFloat(score.value));
     emit("updateScore", props.question, parseFloat(score.value));
     isSavedDelay.value = true;
     isSaving.value = false;

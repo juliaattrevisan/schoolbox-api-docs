@@ -5,8 +5,10 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
+import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
 import { useItemsStore } from "../store/hmItemsStore";
-import hmStudentsStudentItemQuestion from "./hm-students-student-item-question.vue";
+import { useStudentsStore } from "../store/hmStudentsStore";
 import hmStudentsStudentItemComment from "./hm-students-student-item-comment.vue";
 
 interface Props {
@@ -16,6 +18,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
+const studentsStore = useStudentsStore();
 const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
 
 /**
@@ -27,6 +30,15 @@ const isActive = window.Vue.computed(() => {
     }
     return props.item.reference === itemsStore.activeItem?.reference;
 });
+
+/**
+ * To notify of a change in the score
+ * @param {StudentItemQuestion} question - the question to update
+ * @param {number} score - the score to save
+ */
+function onScoreUpdated(question: StudentItemQuestion, score: number) {
+    studentsStore.updateItemResponseScore(props.student, props.item, question, score);
+}
 </script>
 
 <template>
@@ -39,13 +51,14 @@ const isActive = window.Vue.computed(() => {
                 </div>
             </div>
             <div class="item-questions l-flex-col l-gap-m">
-                <hm-students-student-item-question
+                <student-item-question-display
                     v-for="question in props.item.questions"
                     :key="question.response_id"
                     :student="props.student"
                     :item="props.item"
                     :question="question"
                     :container="props.container"
+                    @update-score="onScoreUpdated"
                 />
             </div>
             <hm-students-student-item-comment :student="props.student" :item="props.item" />
