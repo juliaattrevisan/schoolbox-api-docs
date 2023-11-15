@@ -944,7 +944,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border-radius: 0px !important;
     border: none;
     color: var(--content-ui-foreground);
-    font-size: 12px;
+    font-size: 1rem;
+    line-height: inherit;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
@@ -1870,7 +1871,7 @@ td.lrn-report-area::first-letter {
 /* change toggle line height to make it consistent with other buttons */
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part,
 .lrn .lrn-author-ui .lrn-author-activity-button {
-    line-height: unset !important;
+    line-height: inherit !important;
 }
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
     padding: 0.5rem;
@@ -1889,4 +1890,10 @@ td.lrn-report-area::first-letter {
 }
 .lrn .lrn-author-ui .lrn-author-activity-button {
     padding: 0.5rem 1.3rem;
+}
+
+/* Made edit/preview button font sizes consistent */
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control {
+    font-size: 1rem;
+    padding: 0.5rem;
 }
