@@ -1860,3 +1860,8 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 .lrn.lrn-assess .app-panel.review-screen {
     z-index: 0 !important;
 }
+
+/* Change result page table sentence to capitalise first letter */
+td.lrn-report-area::first-letter {
+    text-transform: capitalize !important;
+}
