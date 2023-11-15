@@ -13,6 +13,7 @@ use Alaress\Database\Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\InvalidArgumentException;
+use Proxy\Server;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 
@@ -25,7 +26,7 @@ abstract class PopulatorTool extends App
 
 
     /**
-     * This endpoint gets us learnosity credentials specially
+     * This endpoint gets us credentials
      */
     protected string $credentialsEndpoint = '';
 
@@ -68,9 +69,11 @@ abstract class PopulatorTool extends App
         }
 
         $this->getLogger()->info(sprintf(
-            'Fetching %s credentials from Instance Registry',
+            'Populate %s credentials via Instance Registry',
             $this->name
         ));
+
+        $this->getLogger()->info('');
 
         /* We need this to determine which environment we are in
          */
@@ -113,7 +116,7 @@ abstract class PopulatorTool extends App
      */
     private function fetchCredentials(string $irUrl, string $irApiKey, string $puppetCert, string $environment): array
     {
-        $client = new Client(['curl' => \Proxy\Server::getInstance()->buildCurlOptions()]);
+        $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
 
         /* This endpoint is listed here: https://manage.schoolbox.cloud/api/docs
          */
@@ -125,8 +128,8 @@ abstract class PopulatorTool extends App
 
         $response = $client->get($endpoint, [
             'headers' => [
-                "Authorization" => "Bearer {$irApiKey}",
-                "Content-Type"  => "application/json",
+                'Authorization' => "Bearer {$irApiKey}",
+                'Content-Type'  => 'application/json',
             ],
         ]);
 
@@ -179,7 +182,7 @@ abstract class PopulatorTool extends App
      */
     private function updateConfig(array $configTuples): void
     {
-        $this->getLogger()->info("Updating instance's DB with fetched credentials...");
+        $this->getLogger()->info("Updating instance's config table with fetched credentials...");
 
         $statement = $this->getDatabaseInternal()->prepareQuery(self::QUERY_UPDATE_CONFIG);
 
