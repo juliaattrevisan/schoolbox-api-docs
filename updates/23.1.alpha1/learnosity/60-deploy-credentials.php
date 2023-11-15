@@ -31,6 +31,11 @@ $app = new class extends CliTool\App
     ];
 
 
+    /* Prepared statements
+     */
+    private const QUERY_UPDATE_CONFIG = 'UPDATE config SET value = :value WHERE name = :name';
+
+
     /** @inheritDoc */
     public function run(): void
     {
@@ -43,13 +48,13 @@ $app = new class extends CliTool\App
          */
         $siteType = self::ENVIRONMENT_MAP[$siteType];
 
-        /* Obtain learnosity credentials from instance registry
+        /* Obtain learnosity credentials from instance registry in a set of key-value tuples
          */
-        [$learnosityConsumerKey, $learnosityConsumerSecret] = $this->fetchCredentials($irUrl, $irApiKey, $siteType);
+        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, $siteType);
 
         /* Shank them into our config table
          */
-        $this->updateConfig($learnosityConsumerKey, $learnosityConsumerSecret);
+        $this->updateConfig($configTuples);
 
         /* We did it! Exit cleanly with 0
          */
@@ -140,13 +145,14 @@ $app = new class extends CliTool\App
         /* access-key-id and secret-access-key are in a json-encoded
          * tuple from that special endpoint
          */
-        $content = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+        $content = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 
-        /* Re-map that again into something easily understood
+        /* Re-map that again into something easily understood,
+         * trimming values in case someone copypasted whitespaces/control chars for some reason
          */
         return [
-            'learnosity_consumer_key' => $content['access-key-id'],
-            'learnosity_consumer_secret' => $content['secret-access-key']
+            'learnosity_consumer_key' => trim((string)$content['access-key-id']),
+            'learnosity_consumer_secret' => trim((string)$content['secret-access-key'])
         ];
     }
 
@@ -154,25 +160,26 @@ $app = new class extends CliTool\App
     /**
      * Updates TurnItIn config
      *
-     * @param string|null $learnosityConsumerKey
-     * @param string|null $learnosityConsumerSecret
+     * @param array $configTuples
      * @return void
      */
-    private function updateConfig(?string $learnosityConsumerKey, ?string $learnosityConsumerSecret): void
+    private function updateConfig(array $configTuples): void
     {
         $this->getLogger()->info("Updating instance's DB with Learnosity credentials...");
 
-        $irConfig = [
-            'learnosity_consumer_key' => $learnosityConsumerKey,
-            'learnosity_consumer_secret'  => $learnosityConsumerSecret
-        ];
+        $statement = $this->getDatabaseInternal()->prepareQuery(self::QUERY_UPDATE_CONFIG);
 
-        foreach ($irConfig as $configName => $configValue) {
-            $this->getDatabaseInternal()->executeQuery("UPDATE config SET value = :value WHERE name = :name", [
-                "value" => $configValue,
-                "name"  => $configName,
+        foreach ($configTuples as $configName => $configValue) {
+            $statement->execute([
+                'value' => $configValue,
+                'name'  => $configName,
             ]);
-            $this->getLogger()->notice("Updated '$configName' to '$configValue'");
+
+            $this->getLogger()->debug(sprintf(
+                'Updated %s to %s',
+                $configName,
+                $configValue
+            ));
         }
     }
 
