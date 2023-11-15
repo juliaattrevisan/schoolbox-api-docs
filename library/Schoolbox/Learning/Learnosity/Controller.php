@@ -1357,7 +1357,32 @@ class Controller extends Base
         $refs = $this->requestPost->get('learnosityReferences');
         $attempts = $this->attemptMapper->findByColumn('learnosity_reference', $refs);
 
+        // Get results from Learnosity, for writing to Schoolbox attempt
+        $results = $this->api->dataGetRequest(
+            '/sessions/scores',
+            ['session_id' => $refs],
+        );
+        $groupedResults = [];
+        foreach ($results['data'] as $result) {
+            $groupedResults[$result['session_id']] = $result;
+        }
+
         foreach ($attempts as $attempt) {
+            // Assign marks to attempt based on results from Learnosity
+            $existingResponse = $this->extractExistingResponse($assessment, $attempt->getUser(), $attempt);
+            if ($existingResponse) {
+                $result = $groupedResults[$attempt->getLearnosityReference()] ?? null;
+                if ($result) {
+                    $this->assignMarksToAttempt(
+                        $attempt,
+                        $existingResponse,
+                        $assessment,
+                        $result['score'],
+                        $result['max_score'],
+                    );
+                }
+            }
+
             $attempt->setReviewer($this->getUser())
                 ->setReviewed(\Alaress_Date_Format::now());
 
