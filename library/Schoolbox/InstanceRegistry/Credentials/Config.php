@@ -56,6 +56,10 @@ class Config
             // We can't use the Instance::SITE_TYPE_DEVELOPMENT const for two reasons:
             // 1. Need this to reflect the value that was accurate when this version was current
             // 2. vagrant provisioning sets the site_type to current value before executing upgrades.
+
+            /* Note that in CI, INSTANCE_ID will always be 'ci' and trigger phpstannis
+             */
+            /** @phpstan-ignore-next-line  */
             if (INSTANCE_ID === 'vagrantx' || in_array($siteType, ['dev', 'vagrant'], true)) {
                 $this->logger->debug("No Instance Registry API_KEY and instance is development. That's fine. Exiting.");
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
