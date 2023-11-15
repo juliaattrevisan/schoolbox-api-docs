@@ -1158,15 +1158,20 @@ button.lrn-btn-save-dropdown {
 .lrn .lrn-author-ui .lrn-btn-save:hover:enabled .lrn-i-save:before {
     transform: none;
 }
+.lrn .lrn-author-ui .lrn-author-save-button-group {
+    width: 100%;
+}
+.lrn-author-save-button-group > .lrn-btn-save {
+    min-height: 2.5rem !important;
+    padding: 0.5rem !important;
+    width: 100% !important;
+}
 .lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary,
 .lrn .lrn-author-ui .lrn-btn-success[disabled],
 .lrn .lrn-author-ui .lrn-btn-success[disabled]:hover,
 .lrn .lrn-author-ui .lrn-btn-success[disabled]:focus {
     background-color: var(--content-ui-submit-background);
     color: var(--content-ui-submit-foreground);
-    min-height: 2.5rem !important;
-    padding: 0.5rem !important;
-    width: 100%;
 }
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
@@ -1299,6 +1304,9 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn.lrn-author .lrn-author-item-nav-right {
     display: flex;
     width: 100%;
+}
+.lrn.lrn-author .lrn-author-item-nav-left:empty {
+    display: none;
 }
 /* replace icons with sb icons */
 .lrn-i-preview::before {
