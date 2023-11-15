@@ -51,6 +51,12 @@ class AggregateSource implements ISource
     {
         [$queryString, $params] = $this->getQueryStringAndParams($keyword, $filter, $cursor, $limit, 'select');
 
+        if ($queryString === '') {
+            // This can happen if a filter has been specified that guarantees the query will return no results.
+            // E.g. Specifying a folder and restricting to users.  Users are not connected to folders, so no result possible.
+            return [];
+        }
+
         $rawMatches = [];
         foreach ($this->connector->executeQuery($queryString, $params) as $row) {
             $rawMatches[] = new RawResult(
