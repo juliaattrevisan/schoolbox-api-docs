@@ -21,6 +21,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -583,7 +584,7 @@ class Controller extends Base
          * but we have no means to recover from that...and it shouldn't really
          * occur naturally
          */
-        $existingResponse = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
 
         /* TODO What kind of error should we present to users? It's asynchronous
          */
@@ -963,10 +964,19 @@ class Controller extends Base
         $mark = $sanitisedScore['score'];
         $maxMark = $sanitisedScore['max_score'];
 
+        // As with posting a feedback:
+        // need the existing response to determine a human-readable mark.
+        $existingResponse = $this->extractExistingResponse($assessment, $student, $attempt);
+
         /* Update normalised and human-readable marks
          */
         $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+
+        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\Model $existingResponse */
+        $existingResponse->setNormalisedMark($normalisedMark);
+        $existingResponse->setMarksAvailable($maxMark);
+
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $existingResponse);
 
         /* Save the comment and new normalised mark
          */
@@ -1760,5 +1770,19 @@ class Controller extends Base
              */
             (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
         }
+    }
+
+    /**
+     * Extract the response object which matches `$existingAttempt` out of the
+     * student's participation record.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $existingAttempt
+     * @return IResponse|null
+     */
+    private function extractExistingResponse(IAssessable $assessment, User $student, Model $existingAttempt): ?IResponse
+    {
+        return $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
     }
 }
