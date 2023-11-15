@@ -46,11 +46,11 @@ class Scanner
      * Will scan a file for virus and throw and exception if one is found
      * The file will also be moved to the quarantine directory
      *
-     * @param $filelocation Path to temporary file on disk to be scanned
+     * @param string $filelocation Path to temporary file on disk to be scanned
      * @return void
      * @throws FileException
      */
-    public function scan(Path $filelocation): void
+    public function scan(string $filelocation): void
     {
         $output = '';
         $resultCode = 0;
