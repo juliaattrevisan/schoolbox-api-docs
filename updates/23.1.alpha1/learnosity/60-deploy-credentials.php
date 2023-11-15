@@ -45,11 +45,11 @@ $app = new class extends CliTool\App
 
         /* Obtain learnosity credentials from instance registry
          */
-        [$learnosityConsumerKey, $learnosityConsumerSecret] = $this->fetchLearnosityCredentials($irUrl, $irApiKey, $siteType);
+        [$learnosityConsumerKey, $learnosityConsumerSecret] = $this->fetchCredentials($irUrl, $irApiKey, $siteType);
 
         /* Shank them into our config table
          */
-        $this->updateLearnosityConfig($learnosityConsumerKey, $learnosityConsumerSecret);
+        $this->updateConfig($learnosityConsumerKey, $learnosityConsumerSecret);
 
         /* We did it! Exit cleanly with 0
          */
@@ -110,17 +110,9 @@ $app = new class extends CliTool\App
      * @param string $siteType
      * @return array
      */
-    private function fetchLearnosityCredentials(string $irUrl, string $irApiKey, string $siteType): array
+    private function fetchCredentials(string $irUrl, string $irApiKey, string $siteType): array
     {
-        $this->getLogger()->info("Fetching Learnosity credentials from IR API...");
-
-        $client   = new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
-        $options  = [
-            'headers' => [
-                "Authorization" => "Bearer $irApiKey",
-                "Content-Type"  => "application/json",
-            ],
-        ];
+        $client = new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
 
         /* This endpoint is listed here: https://manage.schoolbox.cloud/api/docs
          */
@@ -131,7 +123,14 @@ $app = new class extends CliTool\App
 
         /* Get the credentials from this special endpoint
          */
-        $response = $client->get($endpoint, $options);
+        $this->getLogger()->info("Fetching Learnosity credentials from IR API...");
+
+        $response = $client->get($endpoint, [
+            'headers' => [
+                "Authorization" => "Bearer $irApiKey",
+                "Content-Type"  => "application/json",
+            ],
+        ]);
 
         if (200 !== $response->getStatusCode()) {
             $this->getLogger()->error("Unable to fetch instance data from IR: ({$response->getStatusCode()})'{$response->getReasonPhrase()}'");
@@ -159,13 +158,15 @@ $app = new class extends CliTool\App
      * @param string|null $learnosityConsumerSecret
      * @return void
      */
-    private function updateLearnosityConfig(?string $learnosityConsumerKey, ?string $learnosityConsumerSecret): void
+    private function updateConfig(?string $learnosityConsumerKey, ?string $learnosityConsumerSecret): void
     {
         $this->getLogger()->info("Updating instance's DB with Learnosity credentials...");
+
         $irConfig = [
-            "learnosity_consumer_key" => $learnosityConsumerKey,
-            "learnosity_consumer_secret"  => $learnosityConsumerSecret
+            'learnosity_consumer_key' => $learnosityConsumerKey,
+            'learnosity_consumer_secret'  => $learnosityConsumerSecret
         ];
+
         foreach ($irConfig as $configName => $configValue) {
             $this->getDatabaseInternal()->executeQuery("UPDATE config SET value = :value WHERE name = :name", [
                 "value" => $configValue,
