@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  * Fetches Learnosity credentials from IR
  * Populates instance's database
  */
-$app = new \Schoolbox\InstanceRegistry\Credentials\PopulatorTool();
+$app = new \Schoolbox\Learning\Learnosity\Credentials\PopulatorTool();
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app))->runApp();

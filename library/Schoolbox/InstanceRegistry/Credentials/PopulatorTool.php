@@ -9,23 +9,25 @@ declare(strict_types=1);
 
 namespace Schoolbox\InstanceRegistry\Credentials;
 
+use Alaress\Database\Exception;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 
-class PopulatorTool extends App
+abstract class PopulatorTool extends App
 {
     /**
      * To save us all this renaming
      */
-    protected string $name = 'Learnosity';
+    protected string $name = '';
 
 
     /**
      * This endpoint gets us learnosity credentials specially
      */
-    protected string $credentialsEndpoint = '%s/api/secret/learnosity/%s';
+    protected string $credentialsEndpoint = '';
 
 
     /**
@@ -53,6 +55,18 @@ class PopulatorTool extends App
     /** @inheritDoc */
     public function run(): void
     {
+        /* Basic subclass configuration housekeeping
+         */
+        if ('' === $this->name) {
+            $this->getLogger()->info('Please configure the name of this credentials populator.');
+            exit;
+        }
+
+        if ('' === $this->credentialsEndpoint) {
+            $this->getLogger()->info('Please configure endpoint for obtaining credentials.');
+            exit;
+        }
+
         $this->getLogger()->info(sprintf(
             'Fetching %s credentials from Instance Registry',
             $this->name
@@ -83,23 +97,6 @@ class PopulatorTool extends App
 
 
     /**
-     * Configure the url we use to botain credentials
-     *
-     * @param string $irUrl
-     * @param string $puppetCert
-     * @param string $environment
-     * @return string
-     */
-    protected function generateEndpoint(string $irUrl, string $puppetCert, string $environment): string
-    {
-        return sprintf($this->credentialsEndpoint,
-            $irUrl,
-            $environment
-        );
-    }
-
-
-    /**
      * Fetch credentials for this instance from the IR's API
      *
      * Uses Template design pattern so you can subclass this...maybe
@@ -116,7 +113,7 @@ class PopulatorTool extends App
      */
     private function fetchCredentials(string $irUrl, string $irApiKey, string $puppetCert, string $environment): array
     {
-        $client = new \GuzzleHttp\Client(['curl' => \Proxy\Server::getInstance()->buildCurlOptions()]);
+        $client = new Client(['curl' => \Proxy\Server::getInstance()->buildCurlOptions()]);
 
         /* This endpoint is listed here: https://manage.schoolbox.cloud/api/docs
          */
@@ -156,16 +153,21 @@ class PopulatorTool extends App
 
 
     /**
+     * Configure the url we use to botain credentials
+     *
+     * @param string $irUrl
+     * @param string $puppetCert
+     * @param string $environment
+     * @return string
+     */
+    abstract protected function generateEndpoint(string $irUrl, string $puppetCert, string $environment): string;
+
+
+    /**
      * Re-map that again into something easily understood,
      * trimming values in case someone copypasted whitespaces/control chars for some reason
      */
-    protected function buildPayload(array $content): array
-    {
-        return [
-            'learnosity_consumer_key' => trim((string)$content['access-key-id']),
-            'learnosity_consumer_secret' => trim((string)$content['secret-access-key'])
-        ];
-    }
+    abstract protected function buildPayload(array $content): array;
 
 
     /**
@@ -173,6 +175,7 @@ class PopulatorTool extends App
      *
      * @param array $configTuples
      * @return void
+     * @throws Exception
      */
     private function updateConfig(array $configTuples): void
     {
