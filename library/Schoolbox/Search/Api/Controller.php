@@ -220,6 +220,7 @@ class Controller extends Base
     /**
      * Search for all results which match a keyword within a folder.
      *
+     * @param Folder\Model $folder
      * @return void
      * @throws NotFound
      * @api GET /api/search/folder/{folderId}
@@ -323,7 +324,7 @@ class Controller extends Base
      * @param string                  $keyword
      * @param SearchFilter\DataObject $filter
      * @param int                     $limit
-     * $param string|null             $cursorCode
+     * @param string|null             $cursorCode
      * @return array{results: array<FullResult>, nextCursor: string|null}
      */
     private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit, ?string $cursorCode): array
