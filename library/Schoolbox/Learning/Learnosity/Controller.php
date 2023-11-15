@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
@@ -583,35 +584,14 @@ class Controller extends Base
          * but we have no means to recover from that...and it shouldn't really
          * occur naturally
          */
-        $existingResponse = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
 
         /* TODO What kind of error should we present to users? It's asynchronous
          */
         if (null === $existingResponse) {
             return;
         }
-
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $existingAttempt->calculateNormalisedMark($mark, $maxMark);
-
-        /* Update the domain object synonymously which will desync from $existingAttempt
-         * so we need to sync them manually...
-         *
-         * This is required for getMarkScheme() to calculate human-readable mark
-         */
-        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\Model $existingResponse */
-        $existingResponse->setNormalisedMark($normalisedMark);
-        $existingResponse->setMarksAvailable($maxMark);
-
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $existingResponse);
-
-        /* Update the columns with newly-derived values
-         */
-        $existingAttempt
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark);
+        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording
@@ -963,17 +943,20 @@ class Controller extends Base
         $mark = $sanitisedScore['score'];
         $maxMark = $sanitisedScore['max_score'];
 
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+        // As with posting a feedback:
+        // need the existing response to determine a human-readable mark.
+        $existingResponse = $this->extractExistingResponse($assessment, $student, $attempt);
+
+        // TODO as with posting a feedback:
+        //      what kind of error should we present to users? It's asynchronous
+        if (!$existingResponse) {
+            return;
+        }
+        $this->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* Save the comment and new normalised mark
          */
         $attempt->setComment(trim($postData['attempt-comment']))
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark)
             ->setReviewer($this->getUser())
             ->setReviewed(\Alaress_Date_Format::now());
 
@@ -985,7 +968,7 @@ class Controller extends Base
          *
          * TODO make this algorithm cheaper
          */
-        foreach ($postData['comments'] as $learnosityReference => $comment) {
+        foreach ($postData['comment'] as $learnosityReference => $comment) {
             try {
                 $feedback = $this->feedbackMapper->findOneByColumnList([
                     'attempt_id' => $attempt->getId(),
@@ -1028,7 +1011,7 @@ class Controller extends Base
         $responseData = [];
 
         foreach ($responses as $response) {
-            $responseId = $response['response_id'];
+            $itemReference = $response['item_reference'];
 
             $updatedResponse = $response;
 
@@ -1042,7 +1025,7 @@ class Controller extends Base
             /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
              * ($mark must never exceed $maxMark) and/or otherwise sanitise data
              */
-            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$responseId], $updatedResponse['max_score']);
+            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$itemReference], $updatedResponse['max_score']);
 
             $mark = $sanitisedScore['score'];
             $maxMark = $sanitisedScore['max_score'];
@@ -1374,7 +1357,32 @@ class Controller extends Base
         $refs = $this->requestPost->get('learnosityReferences');
         $attempts = $this->attemptMapper->findByColumn('learnosity_reference', $refs);
 
+        // Get results from Learnosity, for writing to Schoolbox attempt
+        $results = $this->api->dataGetRequest(
+            '/sessions/scores',
+            ['session_id' => $refs],
+        );
+        $groupedResults = [];
+        foreach ($results['data'] as $result) {
+            $groupedResults[$result['session_id']] = $result;
+        }
+
         foreach ($attempts as $attempt) {
+            // Assign marks to attempt based on results from Learnosity
+            $existingResponse = $this->extractExistingResponse($assessment, $attempt->getUser(), $attempt);
+            if ($existingResponse) {
+                $result = $groupedResults[$attempt->getLearnosityReference()] ?? null;
+                if ($result) {
+                    $this->assignMarksToAttempt(
+                        $attempt,
+                        $existingResponse,
+                        $assessment,
+                        $result['score'],
+                        $result['max_score'],
+                    );
+                }
+            }
+
             $attempt->setReviewer($this->getUser())
                 ->setReviewed(\Alaress_Date_Format::now());
 
@@ -1760,5 +1768,64 @@ class Controller extends Base
              */
             (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
         }
+    }
+
+    /**
+     * Extract the response object which matches `$existingAttempt` out of the
+     * student's participation record.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $existingAttempt
+     * @return QuizResponse|null
+     */
+    private function extractExistingResponse(
+        IAssessable $assessment,
+        User $student,
+        Model $existingAttempt,
+    ): ?QuizResponse {
+        $response = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+        return $response instanceof QuizResponse ? $response : null;
+    }
+
+    /**
+     * Assign normalised and human-readable marks to `$attempt`.
+     *
+     * @param Model        $attempt
+     * @param QuizResponse $responseDomainObject The domain-level object corresponding to `$attempt`: required for
+     *                                           deriving a human-readable mark.
+     * @param IAssessable  $assessment           The assessment to which `$attempt` belongs: required for deriving a
+     *                                           human-readable mark.
+     * @param float        $mark
+     * @param float        $maxMark
+     * @return void
+     */
+    private function assignMarksToAttempt(
+        Model $attempt,
+        QuizResponse $responseDomainObject,
+        IAssessable $assessment,
+        float $mark,
+        float $maxMark
+    ): void {
+        /* Update normalised and human-readable marks
+         */
+        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
+
+        /* Update the domain object synonymously which will desync from $attempt
+         * so we need to sync them manually...
+         *
+         * This is required for getMarkScheme() to calculate human-readable mark
+         */
+        $responseDomainObject->setNormalisedMark($normalisedMark);
+        $responseDomainObject->setMarksAvailable($maxMark);
+
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
+
+        /* Update the columns with newly-derived values
+         */
+        $attempt
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
+            ->setMaxMark($maxMark);
     }
 }
