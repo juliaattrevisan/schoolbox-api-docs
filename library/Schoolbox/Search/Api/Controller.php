@@ -260,6 +260,30 @@ class Controller extends Base
     }
 
     /**
+     * Return an array like the following:
+     *    [
+     *       'page.unit.14'    => 1, // More results exist for this result key.
+     *       'page.course.120' => 0, // No more results exist for this result key.
+     *       ...
+     *    ]
+     *
+     * Method:
+     *    The array above is obtained by running a query like the following.
+     *    The purpose of doing this in single query instead of many queries is to reduce the load on the server, and
+     *    reduce search query reduce response times.
+     *    SELECT
+     *       IF(
+     *          EXISTS([search within folder 1 beyond cursor]),
+     *          1,
+     *          0
+     *       ) AS `page.unit.14`,
+     *       IF(
+     *          EXISTS([search within folder 2 beyond cursor]),
+     *          1,
+     *          0
+     *       ) AS `page.course.120`,
+     *       ...
+     *    );
      * @param string     $keyword
      * @param DataObject $filter
      * @param array      $translatedResults
