@@ -23,7 +23,7 @@ $app = new class extends CliTool\App
     /**
      * This endpoint gets us learnosity credentials specially
      */
-    private const SECRET_ENDPOINT = '%s/api/secret/learnosity/%s';
+    private string $credentialsEndpoint = '%s/api/secret/learnosity/%s';
 
 
     /**
@@ -63,12 +63,12 @@ $app = new class extends CliTool\App
         /* Obtain instance registry configuration vars,
          * cold exiting upon any failures
          */
-        [$irUrl, $irApiKey] = $this->getIrConfig($siteType);
+        [$irUrl, $irApiKey, $puppetCert] = (new \Schoolbox\InstanceRegistry\Config($this->getLogger()))->fetch($siteType);
 
         /* Obtain learnosity credentials from instance registry in a set of key-value tuples,
          * remapping siteType into something Instance Registry understands
          */
-        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, self::ENVIRONMENT_MAP[$siteType]);
+        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, $puppetCert, self::ENVIRONMENT_MAP[$siteType]);
 
         /* Shank them into our config table
          */
@@ -81,65 +81,40 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Return credentials to hit IR APIs, or exits if not found
+     * Configure the url we use to botain credentials
      *
-     * @param string $siteType
-     * @return array
+     * @param string $irUrl
+     * @param string $puppetCert
+     * @param string $environment
+     * @return string
      */
-    private function getIrConfig(string $siteType): array
+    protected function generateEndpoint(string $irUrl, string $puppetCert, string $environment): string
     {
-        $this->getLogger()->info('Fetching Instance Registry API credentials from disk...');
-
-        $irUrl = exec("/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null");
-        if (empty($irUrl)) {
-            $this->getLogger()->error("IR URL appears invalid: '$irUrl'");
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-        }
-
-        $puppetCert = exec("/usr/local/bin/schoolbox-instance-registry --puppet-cert 2>/dev/null");
-        if (empty($puppetCert)) {
-            $this->getLogger()->error("Host puppet cert appears invalid: '$puppetCert'");
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-        }
-
-        /* The Instance Registry API Key is obtained via password manager
-         * It's *not* the one in your profile panel in Instance Registry
-         */
-        $irApiKey = exec("/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null");
-
-        if (empty($irApiKey)) {
-            // We can't use the Instance::SITE_TYPE_DEVELOPMENT const for two reasons:
-            // 1. Need this to reflect the value that was accurate when this version was current
-            // 2. vagrant provisioning sets the site_type to current value before executing upgrades.
-            if (INSTANCE_ID === 'vagrantx' || in_array($siteType, ['dev', 'vagrant'], true)) {
-                $this->getLogger()->debug("No Instance Registry API_KEY and instance is development. That's fine. Exiting.");
-                exit(CliKernelAbstract::EXIT_STATUS_OK);
-            }
-            $this->getLogger()->error("No Instance Registry API_KEY and instance ($siteType) is not development.");
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-        }
-        return [$irUrl, $irApiKey, $siteType];
+        return sprintf($this->credentialsEndpoint,
+            $irUrl,
+            $environment
+        );
     }
 
 
     /**
      * Fetch credentials for this instance from the IR's API
      *
+     * Uses Template design pattern so you can subclass this...maybe
+     *
      * @param string $irUrl
      * @param string $irApiKey
+     * @param string $puppetCert
      * @param string $environment
      * @return array
      */
-    private function fetchCredentials(string $irUrl, string $irApiKey, string $environment): array
+    private function fetchCredentials(string $irUrl, string $irApiKey, string $puppetCert, string $environment): array
     {
         $client = new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
 
         /* This endpoint is listed here: https://manage.schoolbox.cloud/api/docs
          */
-        $endpoint = sprintf(self::SECRET_ENDPOINT,
-            $irUrl,
-            $environment
-        );
+        $endpoint = $this->generateEndpoint($irUrl, $puppetCert, $environment);
 
         /* Get the credentials from this special endpoint
          */
