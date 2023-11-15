@@ -169,11 +169,11 @@ class Hydrator extends BaseHydrator
 
         if ($filter->fromDate) {
             $whereParts[]             = "$datePart >= :filterFromDate";
-            $params['filterFromDate'] = $filter->fromDate->getDatabaseDate();
+            $params['filterFromDate'] = $filter->fromDate->getDatabaseDate(); // IMPORTANT: There must be no time component on this date.
         }
         if ($filter->toDate) {
             $whereParts[]           = "$datePart <= :filterToDate";
-            $params['filterToDate'] = $filter->toDate->getDatabaseDate();
+            $params['filterToDate'] = $filter->toDate->getDatabaseDate(); // IMPORTANT: There must be no time component on this date.
         }
         if ($filter->creator) {
             $whereParts[]            = "$creatorPart = :filterCreator";
