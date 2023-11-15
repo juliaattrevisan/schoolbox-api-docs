@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use LogicException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -188,7 +189,11 @@ class Controller extends Base
 //            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeyMultiQueryVersion($keyword, $filter, $translatedResults);
             $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeySingleQueryVersion($keyword, $filter, $translatedResults);
             foreach ($translatedResults as $resultKey => $translatedResult) {
-                if (!$moreResultsExistByResultKey[$resultKey]) {
+                if (
+                    // The array key will only exist for resultKeys corresponding to results having subresults.
+                    array_key_exists($resultKey, $moreResultsExistByResultKey) &&
+                    !$moreResultsExistByResultKey[$resultKey]
+                ) {
                     $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = null;
                 }
             }
@@ -300,9 +305,12 @@ class Controller extends Base
      */
     private function getMoreResultsExistByResultKeySingleQueryVersion(string $keyword, DataObject $filter, array $translatedResults): array
     {
+        if (count($translatedResults) === 0) {
+            return [];
+        }
+
         $subqueries = [];
         $params = [];
-
         $n = 0;
 
         foreach ($translatedResults as $resultKey => $translatedResult) {
@@ -328,11 +336,16 @@ class Controller extends Base
 
             [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, (string)$n++);
 
-            $subquery .= " AS `$resultKey`";
+            // TODO: Why is $subquery sometimes blank here?  Explain or fix.
+            if ($subquery !== '') {
+                $subqueries[] = $subquery . " AS `$resultKey`";
 
-            $subqueries[] = $subquery;
+                $params = array_merge($params, $subqueryParams);
+            }
+        }
 
-            $params = array_merge($params, $subqueryParams);
+        if (count($subqueries) === 0) {
+            return [];
         }
 
         $queryString = 'SELECT ' . implode(",\n", $subqueries);
@@ -340,7 +353,7 @@ class Controller extends Base
         $rows = $this->connector->executeQuery($queryString, $params)->fetchAll();
 
         if (count($rows) !== 1) {
-            throw new \LogicException('Expected one row from query.');
+            throw new LogicException('Expected one row from query.');
         }
 
         return $rows[0];

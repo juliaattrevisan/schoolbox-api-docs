@@ -36,13 +36,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'f.deleted_at IS NULL',
         ];
         $params = [
-            'blogNow' => Alaress_Date_Format::now()->getDatabase(),
+            "blogNow$paramKeySuffix" => Alaress_Date_Format::now()->getDatabase(),
+            "blogKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%'
         ];
         $keywordSearchParts = [
-            'b.heading LIKE :blogKeywordLike',
-            'b.body LIKE :blogKeywordLike',
+            "b.heading LIKE :blogKeywordLike$paramKeySuffix",
+            "b.body LIKE :blogKeywordLike$paramKeySuffix",
         ];
-        $params['blogKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
+
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
             'where'  => $whereParts,
@@ -56,7 +57,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':blogNow',
+            ":blogNow$paramKeySuffix",
             'b.created_at',
             7,
             56,
@@ -80,7 +81,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -131,7 +132,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string|null
+     * @inheritdoc
      */
     protected function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {

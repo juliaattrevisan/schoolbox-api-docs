@@ -34,8 +34,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *   will be determined in the hydrator)
      * * files whose name, description or comment contain `$keyword` are fetched
      *
-     * @param string $keyword
-     * @return array
+     * @inheritdoc
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
@@ -44,14 +43,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
-            'f.realname LIKE :fileKeywordLike',
-            'f.description LIKE :fileKeywordLike',
-            'f.comment LIKE :fileKeywordLike',
+            "f.realname LIKE :fileKeywordLike$paramKeySuffix",
+            "f.description LIKE :fileKeywordLike$paramKeySuffix",
+            "f.comment LIKE :fileKeywordLike$paramKeySuffix",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
-            'fileNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'fileKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "fileNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "fileKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -63,12 +62,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The relevance of a file is its modified time.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':fileNow',
+            ":fileNow$paramKeySuffix",
             'f.modified',
             7,
             56,
@@ -78,7 +77,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Files are ordered by relevance, as they have a modified time.
      *
-     * @return bool
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -88,7 +87,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's title is its real name.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
@@ -96,7 +95,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -111,7 +110,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * document
      * * other
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
@@ -151,7 +150,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's ID is simply in its `id` column.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
@@ -161,7 +160,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's date is its modified date.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
@@ -171,7 +170,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's creator is its `owner` column.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
@@ -181,7 +180,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The file's folder is its `category` column.
      *
-     * @return string
+     * @inheritdoc
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
@@ -192,7 +191,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Files are fetched from the `file` table: mimetypes will be derived from
      * `allowedFileTypes`.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildFromStatement(string $paramKeySuffix = ''): string
     {

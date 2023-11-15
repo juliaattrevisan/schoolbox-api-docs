@@ -33,9 +33,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * hidden tiles _are_ fetched (as whether the viewer can view the tile will be determined in the hydrator)
      * * tiles whose title_text or link contain `$keyword` are fetched
      *
-     * @param string $keyword
-     * @param string $paramKeySuffix
-     * @return array
+     * @inheritdoc
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
@@ -62,9 +60,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The relevance of a tile is its modified_at time.
-     * @param string $paramKeySuffix
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
@@ -79,7 +76,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Tiles are ordered by relevance, as they have a modified time.
      *
-     * @return bool
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(string $paramKeySuffix = ''): bool
     {
@@ -89,7 +86,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The title of a tile is tile.title_text.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
@@ -97,7 +94,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -105,7 +102,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
@@ -115,7 +112,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's ID is simply in its `id` column.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
@@ -125,7 +122,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's date is its modified date.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
@@ -135,7 +132,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Tiles do not have a creator.
      *
-     * @return string|null
+     * @inheritdoc
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
@@ -145,7 +142,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's folder is its tile_layout_for_folder.folder_id column.
      *
-     * @return string
+     * @inheritdoc
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
@@ -155,7 +152,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Tiles are fetched from the `tile` table.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildFromStatement(string $paramKeySuffix = ''): string
     {

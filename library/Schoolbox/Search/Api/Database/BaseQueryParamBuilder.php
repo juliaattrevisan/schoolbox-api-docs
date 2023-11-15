@@ -122,7 +122,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart = :cursorType$paramKeySuffix AND $idPart < :cursorId$paramKeySuffix)", // < because ORDER BY id DESC.
             ];
 
-            $whereParts[]              = '(' . implode(' OR ', $cursorSearchParts) . ')';
+            $whereParts[] = '(' . implode(' OR ', $cursorSearchParts) . ')';
             $params["cursorRelevance$paramKeySuffix"] = $cursor->relevance;
             $params["cursorType$paramKeySuffix"]      = $cursor->type;
             $params["cursorTitle$paramKeySuffix"]     = $cursor->title;
@@ -130,7 +130,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
 
         // Build query and params
-        $from = $this->buildFromStatement();
+        $from = $this->buildFromStatement($paramKeySuffix);
         $query = (
             "SELECT DISTINCT
                 $idPart        AS id,
@@ -158,6 +158,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $query .= " LIMIT :limit$paramKeySuffix";
 
         $params["limit$paramKeySuffix"] = $limit;
+
         return new QueryParams($query, $params);
     }
 
@@ -281,6 +282,9 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      */
     abstract protected function buildTitleExpression(string $paramKeySuffix = ''): string;
 
+    /**
+     * @return string
+     */
     abstract protected function getType(): string;
 
     /**

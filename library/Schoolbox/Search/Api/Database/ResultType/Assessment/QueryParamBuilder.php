@@ -35,8 +35,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * hidden assessments _are_ fetched (as whether the viewer can view the assessment will be determined in the hydrator)
      * * assessments whose url or comment or description contain `$keyword` are fetched
      *
-     * @param string $keyword
-     * @return array
+     * @inheritdoc
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
@@ -61,26 +60,29 @@ class QueryParamBuilder extends BaseQueryParamBuilder
              *    @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
              *  - lesson_plan_field.visibility is checked in the Hydrator.
              */
-            'assessment.title LIKE :assessmentKeywordLike',
-            'assessment.description LIKE :assessmentKeywordLike',
-            'task.link LIKE :assessmentKeywordLike',
-            'assess.title LIKE :assessmentKeywordLike',
-            'assess.description LIKE :assessmentKeywordLike',
-            'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',
-            'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike',
-            'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',
-            'EXISTS(
+            "assessment.title LIKE :assessmentKeywordLike$paramKeySuffix",
+            "assessment.description LIKE :assessmentKeywordLike$paramKeySuffix",
+            "task.link LIKE :assessmentKeywordLike$paramKeySuffix",
+            "assess.title LIKE :assessmentKeywordLike$paramKeySuffix",
+            "assess.description LIKE :assessmentKeywordLike$paramKeySuffix",
+            "lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike$paramKeySuffix",
+            "lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike$paramKeySuffix",
+            "lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike$paramKeySuffix",
+            "EXISTS(
                  SELECT *
                  FROM lesson_plan_field
                  WHERE lesson_plan_field.lesson_plan_id = lesson_plan.id
                  AND lesson_plan_field.deleted_at IS NULL
-                 AND (title LIKE :assessmentKeywordLike OR body LIKE :assessmentKeywordLike)
-             )'
+                 AND (
+                    title LIKE :assessmentKeywordLike$paramKeySuffix OR
+                    body LIKE :assessmentKeywordLike$paramKeySuffix
+                 )
+             )"
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params       = [
-            'assessmentNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'assessmentKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "assessmentNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "assessmentKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -94,12 +96,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Items due today should appear closer to the top than items due 6 months from now.
      * Note 'specification' assessments don't have a due_date, so we fall back to updated_at.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':assessmentNow',
+            ":assessmentNow$paramKeySuffix",
             'COALESCE(assessment.due_date, assessment.updated_at)',
             7,
             56,
@@ -111,7 +113,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Items due within the specified date range should appear regardless of created_at or updated_at.
      * Note 'specification' assessments don't have a due_date, so we fall back to updated_at.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
@@ -121,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Links are ordered by relevance, as they have a modified time.
      *
-     * @return bool
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -131,7 +133,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The title for an assessment depends on its type.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
@@ -144,7 +146,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Assessments have creators (except lti_assessments), but they are set on the tables below assessment.
      * The creator probably should be specified in the `assessment` table, but moving all those fields up one level might be a bit hard.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
@@ -162,7 +164,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -170,7 +172,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
@@ -190,7 +192,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
@@ -198,7 +200,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
@@ -206,7 +208,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function buildFromStatement(string $paramKeySuffix = ''): string
     {

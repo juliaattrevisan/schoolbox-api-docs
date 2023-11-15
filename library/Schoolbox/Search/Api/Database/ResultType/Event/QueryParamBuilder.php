@@ -36,15 +36,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'f.deleted_at IS NULL',
         ];
         $params = [
-            'eventNow' => Alaress_Date_Format::now()->getDatabase(),
+            "eventNow$paramKeySuffix" => Alaress_Date_Format::now()->getDatabase(),
         ];
-
         $keywordSearchParts = [
-            'e.title LIKE :eventKeywordLike',
-            'e.detail LIKE :eventKeywordLike',
-            'e.location LIKE :eventKeywordLike',
+            "e.title LIKE :eventKeywordLike$paramKeySuffix",
+            "e.detail LIKE :eventKeywordLike$paramKeySuffix",
+            "e.location LIKE :eventKeywordLike$paramKeySuffix",
         ];
-        $params['eventKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
+        $params["eventKeywordLike$paramKeySuffix"] = '%' . $this->quoter->escapeForLike($keyword) . '%';
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
             'where'  => $whereParts,
@@ -58,7 +57,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':eventNow',
+            ":eventNow$paramKeySuffix",
             'e.start_datetime',
             7,
             56,
@@ -82,7 +81,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -129,12 +128,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         return '
             FROM event e
             LEFT JOIN event_folder evf ON e.id = evf.event_id
-            LEFT JOIN folder       f   ON evf.folder_id = f.id
+            LEFT JOIN folder f ON evf.folder_id = f.id
         ';
     }
 
     /**
-     * @return string|null
+     * @inheritdoc
      */
     protected function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {

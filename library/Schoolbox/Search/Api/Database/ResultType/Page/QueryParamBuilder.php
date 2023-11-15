@@ -36,14 +36,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * deleted pages are never fetched
      * * pages whose name matches `$keyword` are fetched
      * * pages with a class code which matches `$keyword` are fetched
+     *
+     * @inheritdoc
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'f.deleted_at IS NULL',
-            '(f.name LIKE :pageKeywordLike OR fc.code LIKE :pageKeywordLike)',
+            "(f.name LIKE :pageKeywordLike$paramKeySuffix OR fc.code LIKE :pageKeywordLike$paramKeySuffix)",
         ];
-        $params = ['pageKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%'];
+        $params = ["pageKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%'];
 
         return [
             'where'  => $whereParts,
@@ -53,6 +55,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The relevance of pages is always maximum, so return a static value.
+     *
+     * @inheritdoc
      */
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
@@ -62,7 +66,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Since `buildRelevanceExpression` returns a static value, page results are
      * not ordered by relevance.
-     * @return bool
+     *
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -71,16 +76,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The title of a page result is always just its name.
-     * @return string
+     *
+     * @inheritdoc
      */
     protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return "f.name";
     }
 
-
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -88,7 +93,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The type of a page result depends on what sort of page it is, in the
+     * A page's type depends on what sort of page it is, in the
      * following order of preference:
      * * course: pages with a related course specification
      * * unit: pages with a related unit specification
@@ -96,6 +101,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * group: pages with a user group
      * * homepage: pages with no class code, but a homepage
      * * folder: pages without a homepage
+     *
+     * @inheritdoc
      */
     protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
@@ -124,6 +131,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The ID of a page result will simply be the page's ID.
+     *
+     * @inheritdoc
      */
     protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
@@ -133,7 +142,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * A page's date is its updated_at date.
      *
-     * @return string
+     * @inheritdoc
      */
     protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
@@ -142,7 +151,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * Pages have no recorded creator: thus, this will be null.
-     * @return string|null
+     *
+     * @inheritdoc
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
@@ -155,7 +165,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * (Whilst a page/folder is stored within another folder, pages are not
      * displayed underneath a folder.)
      *
-     * @return string|null
+     * @inheritdoc
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
@@ -165,6 +175,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Page results need to be fetched from the folder table: possibly joining
      * onto other tables to populate the result type and folder codes.
+     *
+     * @inheritdoc
      */
     protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
