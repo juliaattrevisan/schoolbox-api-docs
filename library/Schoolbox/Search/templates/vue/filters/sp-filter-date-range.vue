@@ -127,3 +127,12 @@ window.Vue.onMounted(() => {
         </div>
     </div>
 </template>
+
+<style>
+/* we use gap to add spacing, so remove unnecessary margins that are adding extra space */
+#sp-start-date-input,
+#sp-end-date-input,
+.adtp-btn {
+    margin: 0;
+}
+</style>
