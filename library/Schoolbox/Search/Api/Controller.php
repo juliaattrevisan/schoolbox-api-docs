@@ -186,14 +186,22 @@ class Controller extends Base
                 }
             }
 
-            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKey($keyword, $filter, $translatedResults);
-            foreach ($translatedResults as $resultKey => $translatedResult) {
-                if (
-                    // The array key will only exist for resultKeys corresponding to results having sub-results.
-                    array_key_exists($resultKey, $moreResultsExistByResultKey) &&
-                    !$moreResultsExistByResultKey[$resultKey]
-                ) {
-                    $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = null;
+            // If $nextCursor is null, there are no more results on the main query, and so we can be sure that there
+            // are no more results on the folder queries too (this case has been dealt with above, inside the foreach loop).
+            // If $nextCursor is not null, there are possibly more results on the main query (possibly, not definitely,
+            // to account for the case where the total number of results equals MAX_RESULT_LIMIT), and so possibly more
+            // sub-results in each folder-group.
+            if ($nextCursor !== null) {
+                // Do some more work to determine whether more sub-results exist for each folder-group of results.           
+                $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKey($keyword, $filter, $translatedResults);
+                foreach ($translatedResults as $resultKey => $translatedResult) {
+                    if (
+                        // The array key will only exist for resultKeys corresponding to results having sub-results.
+                        array_key_exists($resultKey, $moreResultsExistByResultKey) &&
+                        !$moreResultsExistByResultKey[$resultKey]
+                    ) {
+                        $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = null;
+                    }
                 }
             }
 
