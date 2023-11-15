@@ -15,6 +15,18 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
     /**
+     * To save us all this renaming
+     */
+    private const NAME = 'Learnosity';
+
+
+    /**
+     * This endpoint gets us learnosity credentials specially
+     */
+    private const SECRET_ENDPOINT = '%s/api/secret/learnosity/%s';
+
+
+    /**
      * Translate config.site_type into something that Instance Registry understands
      * (I guess they're different because andy reasons)
      *
@@ -39,18 +51,24 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function run(): void
     {
+        $this->getLogger()->info(sprintf(
+            'Fetching %s credentials from Instance Registry',
+            self::NAME
+        ));
+
+        /* We need this to determine which environment we are in
+         */
+        $siteType = $this->getConfig()->get('site_type');
+
         /* Obtain instance registry configuration vars,
          * cold exiting upon any failures
          */
-        [$irUrl, $irApiKey, $siteType] = $this->getIrConfig();
+        [$irUrl, $irApiKey] = $this->getIrConfig($siteType);
 
-        /* Remap siteType into something Instance Registry understands
+        /* Obtain learnosity credentials from instance registry in a set of key-value tuples,
+         * remapping siteType into something Instance Registry understands
          */
-        $siteType = self::ENVIRONMENT_MAP[$siteType];
-
-        /* Obtain learnosity credentials from instance registry in a set of key-value tuples
-         */
-        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, $siteType);
+        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, self::ENVIRONMENT_MAP[$siteType]);
 
         /* Shank them into our config table
          */
@@ -65,11 +83,12 @@ $app = new class extends CliTool\App
     /**
      * Return credentials to hit IR APIs, or exits if not found
      *
+     * @param string $siteType
      * @return array
      */
-    private function getIrConfig(): array
+    private function getIrConfig(string $siteType): array
     {
-        $this->getLogger()->info("Fetching IR API credentials from disk...");
+        $this->getLogger()->info('Fetching Instance Registry API credentials from disk...');
 
         $irUrl = exec("/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null");
         if (empty($irUrl)) {
@@ -83,10 +102,6 @@ $app = new class extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        /* We need this to determine which environment we are in
-         */
-        $siteType = $this->getConfig()->get('site_type');
-
         /* The Instance Registry API Key is obtained via password manager
          * It's *not* the one in your profile panel in Instance Registry
          */
@@ -97,10 +112,10 @@ $app = new class extends CliTool\App
             // 1. Need this to reflect the value that was accurate when this version was current
             // 2. vagrant provisioning sets the site_type to current value before executing upgrades.
             if (INSTANCE_ID === 'vagrantx' || in_array($siteType, ['dev', 'vagrant'], true)) {
-                $this->getLogger()->debug("No IR API_KEY and instance is development. That's fine. Exiting.");
+                $this->getLogger()->debug("No Instance Registry API_KEY and instance is development. That's fine. Exiting.");
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
-            $this->getLogger()->error("No IR API_KEY and instance ($siteType) is not development.");
+            $this->getLogger()->error("No Instance Registry API_KEY and instance ($siteType) is not development.");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
         return [$irUrl, $irApiKey, $siteType];
@@ -108,37 +123,42 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Fetch Learnosity credentials for this instance from the IR's API
+     * Fetch credentials for this instance from the IR's API
      *
      * @param string $irUrl
      * @param string $irApiKey
-     * @param string $siteType
+     * @param string $environment
      * @return array
      */
-    private function fetchCredentials(string $irUrl, string $irApiKey, string $siteType): array
+    private function fetchCredentials(string $irUrl, string $irApiKey, string $environment): array
     {
         $client = new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
 
         /* This endpoint is listed here: https://manage.schoolbox.cloud/api/docs
          */
-        $endpoint = sprintf('%s/api/secret/learnosity/%s',
+        $endpoint = sprintf(self::SECRET_ENDPOINT,
             $irUrl,
-            $siteType
+            $environment
         );
 
         /* Get the credentials from this special endpoint
          */
-        $this->getLogger()->info("Fetching Learnosity credentials from IR API...");
+        $this->getLogger()->info('Fetching credentials from Instance Registry API...');
 
         $response = $client->get($endpoint, [
             'headers' => [
-                "Authorization" => "Bearer $irApiKey",
+                "Authorization" => "Bearer {$irApiKey}",
                 "Content-Type"  => "application/json",
             ],
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            $this->getLogger()->error("Unable to fetch instance data from IR: ({$response->getStatusCode()})'{$response->getReasonPhrase()}'");
+            $this->getLogger()->error(sprintf(
+                'Unable to fetch instance data from IR: http %s %s',
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ));
+
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
@@ -150,6 +170,16 @@ $app = new class extends CliTool\App
         /* Re-map that again into something easily understood,
          * trimming values in case someone copypasted whitespaces/control chars for some reason
          */
+        return $this->buildPayload($content);
+    }
+
+
+    /**
+     * Re-map that again into something easily understood,
+     * trimming values in case someone copypasted whitespaces/control chars for some reason
+     */
+    protected function buildPayload(array $content): array
+    {
         return [
             'learnosity_consumer_key' => trim((string)$content['access-key-id']),
             'learnosity_consumer_secret' => trim((string)$content['secret-access-key'])
@@ -165,7 +195,7 @@ $app = new class extends CliTool\App
      */
     private function updateConfig(array $configTuples): void
     {
-        $this->getLogger()->info("Updating instance's DB with Learnosity credentials...");
+        $this->getLogger()->info("Updating instance's DB with fetched credentials...");
 
         $statement = $this->getDatabaseInternal()->prepareQuery(self::QUERY_UPDATE_CONFIG);
 
