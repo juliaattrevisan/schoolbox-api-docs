@@ -186,8 +186,7 @@ class Controller extends Base
                 }
             }
 
-//            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeyMultiQueryVersion($keyword, $filter, $translatedResults);
-            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKeySingleQueryVersion($keyword, $filter, $translatedResults);
+            $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKey($keyword, $filter, $translatedResults);
             foreach ($translatedResults as $resultKey => $translatedResult) {
                 if (
                     // The array key will only exist for resultKeys corresponding to results having subresults.
@@ -265,44 +264,7 @@ class Controller extends Base
      * @param array      $translatedResults
      * @return array
      */
-    private function getMoreResultsExistByResultKeyMultiQueryVersion(string $keyword, DataObject $filter, array $translatedResults): array
-    {
-        $moreResultsExistByResultKey = [];
-
-        foreach ($translatedResults as $resultKey => $translatedResult) {
-            if (!array_key_exists('_subResults', $translatedResult)) {
-                // This translated result does not have sub-results, so we are not interested.
-                continue;
-            }
-
-            // String $resultKey key will contain three tokens.  Examples: 'page.homepage.80', 'page.course.100'.
-            $tokens = explode('.', $resultKey);
-            $folderId = $tokens[count($tokens) - 1];
-
-            try {
-                $filter->folder = $this->folderMapper->findById($folderId);
-            } catch (MapperException $e) {
-                // Folder deleted or not found.  Just say no more results exist.
-                $moreResultsExistByResultKey[$resultKey] = false;
-                continue;
-            }
-
-            $cursorCode = $translatedResult['_subResults']['metadata']['cursor']['next'];
-            $resultSet = $this->populateResultSet($keyword, $filter, 1, $cursorCode);
-
-            $moreResultsExistByResultKey[$resultKey] = count($resultSet['results']) !== 0;
-        }
-
-        return $moreResultsExistByResultKey;
-    }
-
-    /**
-     * @param string     $keyword
-     * @param DataObject $filter
-     * @param array      $translatedResults
-     * @return array
-     */
-    private function getMoreResultsExistByResultKeySingleQueryVersion(string $keyword, DataObject $filter, array $translatedResults): array
+    private function getMoreResultsExistByResultKey(string $keyword, DataObject $filter, array $translatedResults): array
     {
         if (count($translatedResults) === 0) {
             return [];
