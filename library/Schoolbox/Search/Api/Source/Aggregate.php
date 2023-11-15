@@ -46,4 +46,21 @@ class Aggregate implements ISource
             ),
         );
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMoreResultsExistQueryAndParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        string $paramKeySuffix = ''
+    ): array {
+        return array_merge(
+            ...array_map(
+                   fn ($source) => $source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, $paramKeySuffix),
+                   $this->sources,
+               ),
+        );
+    }
 }

@@ -29,4 +29,21 @@ interface ISource
      * @return array<RawResult>
      */
     public function search(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): array;
+
+    /**
+     * Return a query for checking whether more results exist.
+     *
+     * @param string                $keyword
+     * @param FilterDataObject      $filter
+     * @param CursorDataObject|null $cursor
+     * @param string                $paramKeySuffix - Suffix to add to parameter keys
+     *                                                (useful if building repeated subqueries in larger query).
+     * @return array
+     */
+    public function getMoreResultsExistQueryAndParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        string $paramKeySuffix = ''
+    ): array;
 }
