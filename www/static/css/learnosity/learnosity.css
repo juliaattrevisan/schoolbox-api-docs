@@ -1382,12 +1382,12 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 150px;
-    top: 75px;
+    top: 70px;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 0px;
-    top: 75px;
+    top: 70px;
 }
 span.lrn-author-name-wrapper {
     border: 1px solid var(--form-border-color);
@@ -1610,6 +1610,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn-i-trash:before {
     content: "\e61b";
     font-family: "schoolbox";
+    vertical-align: middle;
 }
 
 /* update the pagination styles */
@@ -1867,6 +1868,25 @@ td.lrn-report-area::first-letter {
 }
 
 /* change toggle line height to make it consistent with other buttons */
-.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part,
+.lrn .lrn-author-ui .lrn-author-activity-button {
     line-height: unset !important;
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
+    padding: 0.5rem;
+}
+
+/* updated icons styles */
+.lrn-i-search::before {
+    content: "\e660";
+    font-family: "schoolbox";
+    vertical-align: middle;
+}
+.lrn-i-plus-small:before {
+    content: "\e600";
+    font-family: "schoolbox";
+    vertical-align: middle;
+}
+.lrn .lrn-author-ui .lrn-author-activity-button {
+    padding: 0.5rem 1.3rem;
 }
