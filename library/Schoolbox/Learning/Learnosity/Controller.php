@@ -1038,7 +1038,7 @@ class Controller extends Base
         $responseData = [];
 
         foreach ($responses as $response) {
-            $responseId = $response['response_id'];
+            $itemReference = $response['item_reference'];
 
             $updatedResponse = $response;
 
@@ -1052,7 +1052,7 @@ class Controller extends Base
             /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
              * ($mark must never exceed $maxMark) and/or otherwise sanitise data
              */
-            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$responseId], $updatedResponse['max_score']);
+            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$itemReference], $updatedResponse['max_score']);
 
             $mark = $sanitisedScore['score'];
             $maxMark = $sanitisedScore['max_score'];
