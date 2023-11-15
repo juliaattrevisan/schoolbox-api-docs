@@ -32,7 +32,7 @@ class Controller extends Base
     /**
      * Maximum number of search results to return per call.
      */
-    private const MAX_RESULT_LIMIT = 5;
+    private const MAX_RESULT_LIMIT = 20;
 
     /**
      * Minimum number of characters required to complete a search
@@ -225,7 +225,6 @@ class Controller extends Base
      * @throws NotFound
      * @api GET /api/search/folder/{folderId}
      * @since 23.1
-     *
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
