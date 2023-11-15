@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\InstanceRegistry;
+namespace Schoolbox\InstanceRegistry\Credentials;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
