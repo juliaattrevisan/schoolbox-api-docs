@@ -85,7 +85,6 @@ class Receiver implements IReceiver
         bool $public = true,
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
-
     ): Model {
         $storage = $this->storageMapper->createModel();
 
