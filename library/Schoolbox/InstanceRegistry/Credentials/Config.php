@@ -16,7 +16,7 @@ class Config
 {
     /**
      * Constructor.
-     * 
+     *
      * @param LoggerInterface $logger
      */
     public function __construct(private LoggerInterface $logger)

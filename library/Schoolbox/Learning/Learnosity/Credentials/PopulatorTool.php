@@ -40,7 +40,8 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
      */
     protected function generateEndpoint(string $irUrl, string $puppetCert, string $environment): string
     {
-        return sprintf($this->credentialsEndpoint,
+        return sprintf(
+            $this->credentialsEndpoint,
             $irUrl,
             $environment
         );
