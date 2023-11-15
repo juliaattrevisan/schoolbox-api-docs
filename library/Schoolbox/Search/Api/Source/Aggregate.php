@@ -58,9 +58,9 @@ class Aggregate implements ISource
     ): array {
         return array_merge(
             ...array_map(
-                   fn ($source) => $source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, $paramKeySuffix),
-                   $this->sources,
-               ),
+                fn ($source) => $source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, $paramKeySuffix),
+                $this->sources,
+            ),
         );
     }
 }
