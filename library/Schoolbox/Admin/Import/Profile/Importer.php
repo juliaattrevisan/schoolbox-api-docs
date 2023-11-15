@@ -45,6 +45,11 @@ class Importer
      */
     private const LOG_ERROR = 'Error';
 
+    /**
+     * campus name  db limit
+     */
+    public const CAMPUS_DB_LIMIT = 255;
+
 
     /**
      * Upload type
@@ -329,12 +334,27 @@ class Importer
                 $dob = new \Alaress_Date_Format($row['Date of Birth'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
             }
 
+            $campus = $row['Campus'];
+            if (self::CAMPUS_DB_LIMIT <= mb_strlen($campus)) {
+                $campus = substr($campus, 0, self::CAMPUS_DB_LIMIT);
+
+                /* Log it
+                 */
+                $this->log(sprintf(
+                    'User %s %s (%s). campus exceeds the %s char limit; truncating',
+                    $baseProfile->getFirstname(),
+                    $baseProfile->getLastname(),
+                    $baseProfile->getExternalId(),
+                    self::CAMPUS_DB_LIMIT
+                ), self::LOG_ERROR);
+            }
+
             $studentProfile
                 ->setDateOfBirth($dob)
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
                 ->setGender($row['Gender'])
-                ->setCampusName($row['Campus'])
+                ->setCampusName($campus)
                 ->setEmergencyContactName1($row['Emergency Contact Name 1'])
                 ->setEmergencyContactPhone1($row['Emergency Contact Phone 1'])
                 ->setEmergencyContactPhoneAlt1($row['Emergency Contact Phone Alt 1'])
