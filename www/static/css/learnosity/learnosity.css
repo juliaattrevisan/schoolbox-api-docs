@@ -1896,4 +1896,5 @@ td.lrn-report-area::first-letter {
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control {
     font-size: 1rem;
     padding: 0.5rem;
+    line-height: 0;
 }
