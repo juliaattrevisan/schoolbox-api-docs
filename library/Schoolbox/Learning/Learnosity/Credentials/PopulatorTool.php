@@ -31,7 +31,7 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
 
 
     /**
-     * Configure the url we use to botain credentials
+     * Configure the url we use to obtain credentials
      *
      * @param string $irUrl
      * @param string $puppetCert

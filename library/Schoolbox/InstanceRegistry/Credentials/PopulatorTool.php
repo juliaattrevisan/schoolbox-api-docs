@@ -134,7 +134,7 @@ abstract class PopulatorTool extends App
 
         if (200 !== $response->getStatusCode()) {
             $this->getLogger()->error(sprintf(
-                'Unable to fetch instance data from IR: http %s %s',
+                'Unable to fetch instance data from Instance Registry: HTTP %s %s',
                 $response->getStatusCode(),
                 $response->getReasonPhrase()
             ));
