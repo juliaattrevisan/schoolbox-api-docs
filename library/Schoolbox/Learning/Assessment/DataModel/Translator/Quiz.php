@@ -68,8 +68,8 @@ class Quiz implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the domainObject to dataModel
      *
-     * @param IAssessable|QuizObject         $domainObject
-     * @param IAssessableDataModel|QuizModel $dataModel
+     * @param IAssessable&QuizObject         $domainObject
+     * @param IAssessableDataModel&QuizModel $dataModel
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
