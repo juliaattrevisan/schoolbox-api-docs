@@ -35,6 +35,6 @@ interface IQueryParamBuilder
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         int $limit,
-//        string $paramKeySuffix = ''
+        string $paramKeySuffix = ''
     ): ?QueryParams;
 }
