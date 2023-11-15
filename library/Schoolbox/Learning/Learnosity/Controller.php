@@ -239,7 +239,25 @@ class Controller extends Base
                     'source' => false,
                     /* Tags are only spawned upon clicking Save, not before
                      */
-                    'tags_on_create' => $tags
+                    'tags_on_create' => $tags,
+                    /* Set the default player template to match our own template
+                     * NOTE: Updating this will not update existing quizzes, only new ones...
+                     */
+                    'enabled_player_templates' => [
+                        'schoolbox'
+                    ],
+                    'default_player_template' => 'schoolbox',
+                    'player_templates' => [
+                        [
+                            'reference' => 'schoolbox',
+                            'name' => 'Schoolbox',
+                            'regions' => Helper::LEARNOSITY_CONFIG_PLAYER_REGIONS,
+                            "navigation" => [
+                                "show_intro" => false,
+                                "show_outro" => false
+                            ],
+                        ]
+                    ]
                 ],
                 'dependencies' => [
                     'question_editor_api' => [
@@ -398,41 +416,7 @@ class Controller extends Base
                     "show_intro" => false,
                     "show_outro" => false
                 ],
-                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
-                 *
-                 * Perhaps more useful: https://reference.learnosity.com/items-api/initialization/config.regions
-                 */
-                'regions' => [
-                    'top-left' => [
-                        ['type' => 'title_element'],
-                    ],
-                    'top-right' => [
-                        ['type' => 'itemcount_element'],
-                        ['type' => 'reading_timer_element'],
-                        ['type' => 'timer_element'],
-                    ],
-                    'items' => [
-                        ['type' => 'progress_element'],
-                        ['type' => 'slider_element']
-                    ],
-                    'right' => [
-                        ['type' => 'save_button'],
-                        ['type' => 'reviewscreen_button'],
-                        ['type' => 'resource_button'],
-                        ['type' => 'flagitem_button'],
-                        ['type' => 'masking_button'],
-                        ['type' => 'verticaltoc_element'],
-                    ],
-                    'bottom-left' => [
-                        [
-                            'type' => 'previous_button',
-                            'show_label_option' => true
-                        ],
-                    ],
-                    'bottom-right' => [
-                        ['type' => 'next_button'],
-                    ]
-                ],
+                'regions' => Helper::LEARNOSITY_CONFIG_PLAYER_REGIONS,
                 /* Allowed Time
                  * Force hard time limits, kicking you out at the expiry
                  */
