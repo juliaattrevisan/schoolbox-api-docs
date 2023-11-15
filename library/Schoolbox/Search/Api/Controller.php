@@ -189,7 +189,7 @@ class Controller extends Base
             $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKey($keyword, $filter, $translatedResults);
             foreach ($translatedResults as $resultKey => $translatedResult) {
                 if (
-                    // The array key will only exist for resultKeys corresponding to results having subresults.
+                    // The array key will only exist for resultKeys corresponding to results having sub-results.
                     array_key_exists($resultKey, $moreResultsExistByResultKey) &&
                     !$moreResultsExistByResultKey[$resultKey]
                 ) {
@@ -286,7 +286,7 @@ class Controller extends Base
 
             try {
                 $filter->folder = $this->folderMapper->findById($folderId);
-            } catch (MapperException $e) {
+            } catch (MapperException) {
                 // Folder deleted or not found.  Skip.
                 continue;
             }
