@@ -38,7 +38,7 @@ function onSelected() {
 </script>
 
 <template>
-    <button class="search-result" :title="result.name" @click.prevent="onSelected">
+    <button class="search-result f-no-margins" :title="result.name" @click.prevent="onSelected">
         <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-if="props.isSingleSelect" v-html="addMarks(props.result.name, [props.query])"></span>
         <div v-else class="checklist">
