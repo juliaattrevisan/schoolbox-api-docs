@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification;
 use PDOStatement;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractCourseMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -93,12 +94,22 @@ class Mapper extends AbstractCourseMapper
     public function hydrateSelect(PDOStatement $statement)
     {
         $modelList = $this->createCollection();
+        // record of folder ids to hydrate curriculum codes from
+        $folderIds = [];
+
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getJoinMapper('folder');
+
+        /** @var NodeMapper $curriculumNodeMapper */
+        $curriculumNodeMapper = $folderMapper->getJoinMapper('curriculum_node_for_category');
+
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var FolderModel $folder */
             $folder = $this->hydrateJoin($row, 'folder', 'f');
+            $folderIds[] = $row['f.id'];
             /** @var HomepageConfig $homepage */
             $homepage = $this->hydrateJoin($row, 'folder.homepages', 'fh');
             $folder->setHomepage($homepage);
@@ -109,6 +120,23 @@ class Mapper extends AbstractCourseMapper
 
             // Add
             $modelList->add($model);
+        }
+
+        // fetch curric for joined folders
+        $folderCurricNodes = $curriculumNodeMapper->findForOtherMapper(
+            $folderMapper,
+            'curriculum_node_for_category',
+            $folderIds
+        );
+
+        foreach ($modelList as $model) {
+            if (isset($folderCurricNodes[$model->getFolder()->getId()])) {
+                // if joined folder has codes, then inject them back onto the folder
+                $model->getFolder()->setCurriculumNodes($folderCurricNodes[$model->getFolder()->getId()]);
+            } else {
+                // folder has no curric codes, set to empty collection
+                $model->getFolder()->setCurriculumNodes($curriculumNodeMapper->createCollection());
+            }
         }
         return $modelList;
     }
