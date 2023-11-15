@@ -5,21 +5,25 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
+import StudentNoScoreNote from "@schoolboxLearnosity/vue/student/student-no-score-note.vue";
+import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
+import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
 import { useItemsStore } from "../store/hmItemsStore";
-import hmStudentsStudentItemQuestion from "./hm-students-student-item-question.vue";
-import hmStudentsStudentItemComment from "./hm-students-student-item-comment.vue";
+import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item that's displayed
-    container: HTMLDivElement; // the parent container, to look for the relevant item
+    container: HTMLElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
 const itemsStore = useItemsStore();
-const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
+const studentsStore = useStudentsStore();
 
 /**
  * To display the item when it's the active item
+ * @returns {boolean} - whether the item is active
  */
 const isActive = window.Vue.computed(() => {
     if (itemsStore.isAttemptComment) {
@@ -27,28 +31,41 @@ const isActive = window.Vue.computed(() => {
     }
     return props.item.reference === itemsStore.activeItem?.reference;
 });
+
+/**
+ * To notify of a change in the score
+ * @param {StudentItemQuestion} question - the question to update
+ * @param {number} score - the score to save
+ */
+function onScoreUpdated(question: StudentItemQuestion, score: number) {
+    studentsStore.updateItemResponseScore(props.student, props.item, question, score);
+}
+
+/**
+ * To notify of a change in the comment
+ * @param {string} comment - the comment to save
+ */
+function onCommentUpdated(comment: string) {
+    studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment);
+}
 </script>
 
 <template>
     <transition>
-        <div v-if="isActive" class="l-flex-col l-gap-m">
-            <div v-if="hasQuestionsWithNoScore">
-                <div class="alert-box f-no-margins">
-                    Any questions within a card that don't have a score are considered marked when a comment is added to
-                    the card.
-                </div>
-            </div>
+        <div v-if="isActive" class="l-flex-col l-gap-m l-pad-m">
+            <student-no-score-note :item="props.item" />
             <div class="item-questions l-flex-col l-gap-m">
-                <hm-students-student-item-question
+                <student-item-question-display
                     v-for="question in props.item.questions"
                     :key="question.response_id"
                     :student="props.student"
                     :item="props.item"
                     :question="question"
                     :container="props.container"
+                    @update-score="onScoreUpdated"
                 />
             </div>
-            <hm-students-student-item-comment :student="props.student" :item="props.item" />
+            <student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
         </div>
     </transition>
 </template>
@@ -62,7 +79,7 @@ const isActive = window.Vue.computed(() => {
 }
 
 .v-enter-active {
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease-out;
 }
 .v-enter-from {
     opacity: 0;

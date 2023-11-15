@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To move between the items (called cards in sbx)
+ * To move between the items
  */
 
 import type { Ref } from "vue";
@@ -20,9 +20,13 @@ const { currentLabel, isOpen, onButtonSelected, close } = usePopOut(
     true
 );
 
+/**
+ * The text to display on the button
+ * @returns {string} The text to display on the button
+ */
 const buttonText = window.Vue.computed(() => {
     if (!store.isLoaded) {
-        return "Loading cards...";
+        return "Loading items...";
     }
     return itemsStore.activeItem.title;
 });
@@ -65,7 +69,7 @@ function onItemSelected(reference: string) {
             <path d="M0 24h32l-16-16z"></path>
         </svg>
     </button>
-    <div id="item-list" class="item-list l-flex-col l-flex--no-wrap" data-dropdown-content>
+    <div id="item-list" class="item-list l-flex-col l-flex--no-wrap f-no-margins" data-dropdown-content>
         <button
             v-for="item in itemsStore.items"
             :key="item.id"
@@ -111,7 +115,7 @@ function onItemSelected(reference: string) {
     max-height: 250px;
     overflow-y: scroll;
     position: absolute;
-    z-index: 10;
+    z-index: 20;
     &__button {
         background: var(--foreground-colour);
         display: inline-flex;

@@ -17,21 +17,17 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
-<div class="row">
-    <div class="small-12 columns">
-        <div id="horizontal-marking-container">
-            <horizontal-marking
-                    :title="'{{ assessment.title }}'"
-                    :items="{{ itemReferences|json_encode }}"
-                    :students="{{ students|json_encode }}"
-                    :item-responses="{{ itemResponses|json_encode }}"
-                    :attempt-comments="{{ attemptComments|json_encode }}"
-                    :urls="{{ urls|json_encode }}"
-                    :report-payloads="{{ reportPayloads }}"
-                    status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
-            />
-        </div>
-    </div>
+<div id="horizontal-marking-container">
+    <horizontal-marking
+        :title="'{{ assessment.title }}'"
+        :items="{{ itemReferences|json_encode }}"
+        :students="{{ students|json_encode }}"
+        :item-responses="{{ itemResponses|json_encode }}"
+        :attempt-comments="{{ attemptComments|json_encode }}"
+        :urls="{{ urls|json_encode }}"
+        :report-payloads="{{ reportPayloads }}"
+        post-feedback="{{ routeLookup('learnosity.postHoriziontalMarking', {assessment: assessment}) }}"
+        status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
+    />
 </div>
-
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>

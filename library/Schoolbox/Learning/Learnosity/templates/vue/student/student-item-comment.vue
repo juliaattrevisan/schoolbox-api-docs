@@ -11,14 +11,12 @@ import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
-import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item to display
 }
 const props = defineProps<Props>();
-const studentsStore = useStudentsStore();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
 const comment = useEditor(props.item.questions[0].response.comment ?? "", editorId, {
     targetElements: [`#${editorId}`],
@@ -26,6 +24,10 @@ const comment = useEditor(props.item.questions[0].response.comment ?? "", editor
 }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
+
+const emit = defineEmits<{
+    updateComment: [comment: string];
+}>();
 
 /**
  * To notify of the current save status
@@ -64,7 +66,7 @@ async function saveComment() {
         method: "POST",
         body: formData,
     });
-    studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment.value);
+    emit("updateComment", comment.value);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);

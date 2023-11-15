@@ -296,10 +296,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([$assessment->getTitle(),
-                                           $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
-                                          ])
-                                    ->add(['Modify Content', null]);
+            ->add([
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ])
+            ->add(['Modify Content', null]);
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
@@ -663,17 +664,19 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add(
-                                        [$assessment->getTitle(),
-                                         $this->routeGenerator->generate(
-                                             'learningAssessment.getSummary',
-                                             ['assessmentId' => $assessment->getId(),
-                                              'studentId' => $this->getUser()->getId()
-                                             ]
-                                         )
-                                        ]
-                                    )
-                                    ->add(['Result Summary']);
+            ->add(
+                [
+                    $assessment->getTitle(),
+                    $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId' => $this->getUser()->getId()
+                        ]
+                    )
+                ]
+            )
+            ->add(['Result Summary']);
 
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'assessment' => $assessment,
@@ -790,6 +793,17 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
+
+        /* The student who did the attempt
+        */
+        $studentData = [
+            'id' => $attempt->getUser()->getId(),
+            'name' => $attempt->getUser()->getFullName(),
+            'firstname' => $attempt->getUser()->getFirstname(),
+            'lastname' => $attempt->getUser()->getLastname(),
+            'elementId' => 'schoolbox-student'
+        ];
+
         /* This is what the student did
          */
         $reportPayload = [
@@ -829,32 +843,63 @@ class Controller extends Base
             $learnosityReference = $response['response_id'];
 
             $scores[$learnosityReference] = [
+                'learnosityReference' => $learnosityReference,
                 'score' => $response['score'],
-                'max' => $response['max_score']
+                'maxScore' => $response['max_score'],
+                'itemReference' => $response['item_reference']
             ];
         }
 
         /* Find all the comments for this attempt
          */
-        $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
 
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-            [$assessment->getTitle(),
+            [
+                $assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
 
             ]
         )
             ->add(['Feedback']);
 
+        /* Pregenerate all the urls for the user, because you can't manufacture them
+        * in javascript without risking desync with backend
+        */
+        $args = [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $attempt->getUser()->getId(),
+            'learnositySessionReference' => $attempt->getLearnosityReference()
+        ];
+
+        $urls = [
+            'studentId' => $attempt->getUser()->getId(),
+            'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+            'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+            'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+            'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+        ];
+
+        /* Retrieve the comment for this attempt
+        */
+        $attemptComment = [
+            'learnosityReference' => $attempt->getLearnosityReference(),
+            'studentId' => $attempt->getUser()->getId(),
+            'comment' => $attempt->getComment()
+        ];
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
+            'student' => $studentData,
+            'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
-            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
+            'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
+            'attemptComment' => $attemptComment,
+            'urls' => $urls
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
@@ -1251,8 +1296,10 @@ class Controller extends Base
 
         /* Obtain their scores from Learnosity
          */
+        $learnositySessions = array_values(array_filter($sessions));
+
         $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => array_values(array_filter($sessions))
+            'session_id' => $learnositySessions
         ])['data'];
 
         /* Reforge it into a generic set of tuples
@@ -1287,11 +1334,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([
-                                            $assessment->getTitle(),
-                                            $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
-                                          ])
-                                    ->add(['Horizontal Marking']);
+            ->add([
+                $assessment->getTitle(),
+                $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+            ])
+            ->add(['Horizontal Marking']);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'assessment' => $assessment,
@@ -1301,11 +1348,38 @@ class Controller extends Base
             'students' => $students,
             'itemResponses' => $itemResponses,
             'attemptComments' => $attemptComments,
-            'urls' => $urls
+            'urls' => $urls,
+            /* This list of learnosity references is used for the finalisation step
+             */
+            'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR)
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
+    }
+
+
+    /**
+     * Finalise the list of attempts whose learnosity_references match those
+     * sent in the POST array
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postHorizontalMarking(IAssessable $assessment): void
+    {
+        $refs = $this->requestPost->get('learnosityReferences');
+        $attempts = $this->attemptMapper->findByColumn('learnosity_reference', $refs);
+
+        foreach ($attempts as $attempt) {
+            $attempt->setReviewer($this->getUser())
+                ->setReviewed(\Alaress_Date_Format::now());
+
+            $this->attemptMapper->save($attempt);
+        }
     }
 
 

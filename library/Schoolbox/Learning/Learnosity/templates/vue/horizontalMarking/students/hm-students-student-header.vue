@@ -4,13 +4,13 @@
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
+import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-header-attempt-mark.vue";
 import { useItemsStore } from "../store/hmItemsStore";
-import HmStudentsStudentItemMark from "./hm-students-student-item-mark.vue";
-import HmStudentsStudentAttemptMark from "./hm-students-student-attempt-mark.vue";
 
 interface Props {
     student: Student; // the student to display
-    container: HTMLDivElement | null; // the element that the report is rendered into
+    container: HTMLElement | null; // the element that the report is rendered into
 }
 const props = defineProps<Props>();
 
@@ -29,8 +29,8 @@ function onToggleSelected() {
 </script>
 
 <template>
-    <div class="l-flex-row l-flex--justify-space l-gap-m f-no-margins">
-        <div class="l-flex-row l-flex--align-center l-gap-m">
+    <div class="l-flex-row l-flex--justify-space l-gap-m l-pad-m f-no-margins">
+        <div class="l-flex-row l-flex--align-center l-gap-m f-no-margins">
             <button
                 v-if="props.student.isReportLoaded"
                 :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
@@ -54,16 +54,16 @@ function onToggleSelected() {
                 }}</a>
             </h2>
         </div>
-        <div>
-            <template v-if="props.student.isReportLoaded">
-                <hm-students-student-item-mark
-                    v-for="item in props.student.items"
-                    :key="item.reference"
-                    :item="item"
-                    :container="(container as HTMLDivElement)"
-                />
-                <hm-students-student-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
-            </template>
+        <div v-if="props.student.isReportLoaded">
+            <student-item-mark
+                v-for="item in props.student.items"
+                :key="item.reference"
+                :item="item"
+                :container="(container as HTMLElement)"
+                :is-shown="item.reference === itemsStore.activeItem.reference"
+                :show-title="false"
+            />
+            <student-header-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
         </div>
     </div>
 </template>

@@ -120,6 +120,10 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/horizontal', 'getHorizontalMarking', $instructorPerms, $preloadAssessment);
 
+        /* Finalise a set of attempts via their learnosity_references
+         */
+        $this->register('POST', '/{assessmentId}/horizontal', 'postHorizontalMarking', $instructorPerms, $preloadAssessment);
+
         /* Provide updated score for a particular student response
          * (used predominantly in horizontal marking)
          */
