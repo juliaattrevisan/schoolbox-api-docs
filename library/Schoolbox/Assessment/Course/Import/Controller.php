@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -1054,12 +1055,39 @@ class Controller extends Base\Base
         foreach ($courseImpls as $courseImpl) {
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $implAssessment) {
-                    $this->lessonPlanActivitiesReplicator->replicate(
-                        $implAssessment->getSpecificationAssessment(),
-                        $implAssessment,
-                    );
+                    $specAssessment = $implAssessment->getSpecificationAssessment();
+                    if ($specAssessment) {
+                        // Replicate only if this assessment didn't already
+                        // exist in the unit.
+                        if (!$this->isAssessmentAlreadyInUnit($implAssessment, $unitImplData)) {
+                            $this->lessonPlanActivitiesReplicator->replicate($specAssessment, $implAssessment);
+                        }
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Did this assessment already exist in the unit implementation?
+     *
+     * * if the implementation assessment ID was passed in POST data, then it
+     *   already existed
+     * * otherwise, it did not exist
+     *
+     * @param IAssessable $implAssessment
+     * @param array       $unitImplData
+     * @return bool
+     */
+    private function isAssessmentAlreadyInUnit(IAssessable $implAssessment, array $unitImplData): bool
+    {
+        foreach ($unitImplData as $unitImplDatum) {
+            foreach (array_keys($unitImplDatum['a'] ?? []) as $assessmentId) {
+                if ($implAssessment->getId() === (int)$assessmentId) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -453,7 +453,7 @@ class Module extends BaseModule
     protected function preloadLessonPlanAPI(array $params): array
     {
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
         } catch (MapperException\Deleted $e) {
             $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
@@ -461,7 +461,7 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
         try {
-            $linkedAssessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['linkId']);
+            $linkedAssessment = $this->getAssessmentMapperProxy()->findById($params['linkId']);
         } catch (MapperException\Deleted $e) {
             $linkedAssessment = $e->getDeletedObject();
         } catch (MapperException $e) {
