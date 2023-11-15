@@ -591,27 +591,7 @@ class Controller extends Base
         if (null === $existingResponse) {
             return;
         }
-
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $existingAttempt->calculateNormalisedMark($mark, $maxMark);
-
-        /* Update the domain object synonymously which will desync from $existingAttempt
-         * so we need to sync them manually...
-         *
-         * This is required for getMarkScheme() to calculate human-readable mark
-         */
-        $existingResponse->setNormalisedMark($normalisedMark);
-        $existingResponse->setMarksAvailable($maxMark);
-
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $existingResponse);
-
-        /* Update the columns with newly-derived values
-         */
-        $existingAttempt
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark);
+        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording
@@ -1792,5 +1772,46 @@ class Controller extends Base
     ): ?QuizResponse {
         $response = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
         return $response instanceof QuizResponse ? $response : null;
+    }
+
+    /**
+     * Assign normalised and human-readable marks to `$attempt`.
+     *
+     * @param Model        $attempt
+     * @param QuizResponse $responseDomainObject The domain-level object corresponding to `$attempt`: required for
+     *                                           deriving a human-readable mark.
+     * @param IAssessable  $assessment           The assessment to which `$attempt` belongs: required for deriving a
+     *                                           human-readable mark.
+     * @param float        $mark
+     * @param float        $maxMark
+     * @return void
+     */
+    private function assignMarksToAttempt(
+        Model $attempt,
+        QuizResponse $responseDomainObject,
+        IAssessable $assessment,
+        float $mark,
+        float $maxMark
+    ): void {
+        /* Update normalised and human-readable marks
+         */
+        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
+
+        /* Update the domain object synonymously which will desync from $attempt
+         * so we need to sync them manually...
+         *
+         * This is required for getMarkScheme() to calculate human-readable mark
+         */
+        $responseDomainObject->setNormalisedMark($normalisedMark);
+        $responseDomainObject->setMarksAvailable($maxMark);
+
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
+
+        /* Update the columns with newly-derived values
+         */
+        $attempt
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
+            ->setMaxMark($maxMark);
     }
 }
