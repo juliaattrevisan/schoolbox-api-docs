@@ -335,12 +335,9 @@ class Controller extends Base
 
             [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, (string)$n++);
 
-            // TODO: Why is $subquery sometimes blank here?  Explain or fix.
-            if ($subquery !== '') {
-                $subqueries[] = $subquery . " AS `$resultKey`";
+            $subqueries[] = $subquery . " AS `$resultKey`";
 
-                $params = array_merge($params, $subqueryParams);
-            }
+            $params = array_merge($params, $subqueryParams);
         }
 
         if (count($subqueries) === 0) {

@@ -148,7 +148,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
-        return null;
+        return 'ft.categoryID';
     }
 
     /**
