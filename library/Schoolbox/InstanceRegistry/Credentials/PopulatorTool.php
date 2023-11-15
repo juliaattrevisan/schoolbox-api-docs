@@ -40,11 +40,10 @@ abstract class PopulatorTool extends App
      */
     private const ENVIRONMENT_MAP = [
         'stg' => 'staging',
-        /* TODO These two might be wrong?
-         *  Need to check in their respective environs.
+        'prod' => 'production',
+        /* Vagrants use a staging environment, I guess?
          */
-        'dev' => 'dev',
-        'prod' => 'prod'
+        'dev' => 'staging'
     ];
 
 
