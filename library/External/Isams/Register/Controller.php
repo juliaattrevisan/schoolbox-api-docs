@@ -43,13 +43,16 @@ class Controller extends BaseController
         // Hit the iSams API:
         // first, need to exchange client id/secret for an access token
         $apiUrl        = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
-        $tokenResponse = $this->httpClient->get(
-            $apiUrl
-                ->withPath('/auth/connect/token')
-                ->appendQueryParameters([
+        $tokenResponse = $this->httpClient->post(
+            $apiUrl->withPath('/auth/connect/token'),
+            [
+                RequestOptions::FORM_PARAMS => [
                     'client_id'     => $this->getConfigLoader()->get('external_isams_rest_api_client_id'),
                     'client_secret' => $this->getConfigLoader()->get('external_isams_rest_api_client_secret'),
-                ])
+                    'grant_type'    => 'client_credentials',
+                    'scope'         => 'restapi',
+                ]
+            ]
         );
         $tokenResponseBody = json_decode($tokenResponse->getBody()->getContents(), true);
         $accessToken       = $tokenResponseBody['access_token'];
