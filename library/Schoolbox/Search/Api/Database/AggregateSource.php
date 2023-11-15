@@ -83,8 +83,7 @@ class AggregateSource implements ISource
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         string $paramKeySuffix = ''
-    ): array
-    {
+    ): array {
         return $this->getQueryStringAndParams($keyword, $filter, $cursor, null, 'exists', $paramKeySuffix);
     }
 
@@ -105,8 +104,7 @@ class AggregateSource implements ISource
         ?int $limit,
         string $queryType,
         string $paramKeySuffix = ''
-    ): array
-    {
+    ): array {
         if (empty($this->queryParamBuilders)) {
             return ['', []];
         }
