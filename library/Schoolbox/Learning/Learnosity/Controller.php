@@ -21,9 +21,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
@@ -601,7 +601,6 @@ class Controller extends Base
          *
          * This is required for getMarkScheme() to calculate human-readable mark
          */
-        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\Model $existingResponse */
         $existingResponse->setNormalisedMark($normalisedMark);
         $existingResponse->setMarksAvailable($maxMark);
 
@@ -968,11 +967,16 @@ class Controller extends Base
         // need the existing response to determine a human-readable mark.
         $existingResponse = $this->extractExistingResponse($assessment, $student, $attempt);
 
+        // TODO as with posting a feedback:
+        //      what kind of error should we present to users? It's asynchronous
+        if (!$existingResponse) {
+            return;
+        }
+
         /* Update normalised and human-readable marks
          */
         $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
 
-        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\Model $existingResponse */
         $existingResponse->setNormalisedMark($normalisedMark);
         $existingResponse->setMarksAvailable($maxMark);
 
@@ -1779,10 +1783,14 @@ class Controller extends Base
      * @param IAssessable $assessment
      * @param User        $student
      * @param Model       $existingAttempt
-     * @return IResponse|null
+     * @return QuizResponse|null
      */
-    private function extractExistingResponse(IAssessable $assessment, User $student, Model $existingAttempt): ?IResponse
-    {
-        return $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+    private function extractExistingResponse(
+        IAssessable $assessment,
+        User $student,
+        Model $existingAttempt,
+    ): ?QuizResponse {
+        $response = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+        return $response instanceof QuizResponse ? $response : null;
     }
 }
