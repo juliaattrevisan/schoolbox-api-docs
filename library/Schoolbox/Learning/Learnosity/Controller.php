@@ -952,22 +952,11 @@ class Controller extends Base
         if (!$existingResponse) {
             return;
         }
-
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
-
-        $existingResponse->setNormalisedMark($normalisedMark);
-        $existingResponse->setMarksAvailable($maxMark);
-
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $existingResponse);
+        $this->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* Save the comment and new normalised mark
          */
         $attempt->setComment(trim($postData['attempt-comment']))
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark)
             ->setReviewer($this->getUser())
             ->setReviewed(\Alaress_Date_Format::now());
 
