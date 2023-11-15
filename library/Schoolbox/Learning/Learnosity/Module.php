@@ -28,6 +28,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -264,6 +265,12 @@ class Module extends BaseModule
             ['assessmentId' => $params['destinationId']],
             $student,
         )['assessment'];
+
+        // Not quizzes: invalid
+        // TODO apply to preloadAssessment?
+        if (!($sourceAssessment instanceof QuizDomainObject && $destinationAssessment instanceof QuizDomainObject)) {
+            throw new NotFound();
+        }
         return [
             'source'      => $sourceAssessment,
             'destination' => $destinationAssessment,

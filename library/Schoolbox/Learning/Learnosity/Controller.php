@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
@@ -1608,12 +1609,12 @@ class Controller extends Base
      * @api   POST /learning/learnosity/{sourceId}/copy/{destinationId}
      * @since 23.1
      *
-     * @param IAssessable $source
-     * @param IAssessable $destination
+     * @param QuizDomainObject $source
+     * @param QuizDomainObject $destination
      * @return void
      * @throws ValidationException
      */
-    public function postCopyQuizConstituents(IAssessable $source, IAssessable $destination): void
+    public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
         $jobId = $this->quizMapper->copyQuizConstituents($source, $destination);
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
