@@ -194,7 +194,7 @@ class Controller extends Base
     /**
      * Edit the contents of $assessment using the Learnosity system
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      * @throws Error
      * @throws RouteNotFound
@@ -203,7 +203,7 @@ class Controller extends Base
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function getContent(IAssessable $assessment): void
+    public function getContent(QuizDomainObject $assessment): void
     {
         $this->assertLearnosityImportCompleted($assessment);
 
@@ -341,7 +341,7 @@ class Controller extends Base
     /**
      * Let a student do an attempt in a Learnosity quiz
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @return void
      * @throws Deleted
@@ -355,7 +355,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getAttempt(IAssessable $assessment, \Schoolbox\User $student): void
+    public function getAttempt(QuizDomainObject $assessment, \Schoolbox\User $student): void
     {
         $this->assertLearnosityImportCompleted($assessment);
 
@@ -530,7 +530,7 @@ class Controller extends Base
      * randomly shut down some other dude's attempt; knowing their
      * learnosityReference should not be easily guessed
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @return void
      * @throws Deleted
@@ -542,7 +542,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postCompleteAttempt(IAssessable $assessment, \Schoolbox\User $student): void
+    public function postCompleteAttempt(QuizDomainObject $assessment, \Schoolbox\User $student): void
     {
         /* Find out what they scored by the automated system
          */
@@ -600,7 +600,7 @@ class Controller extends Base
      * The outro screen for completing an attempt;
      * show some basic stats about your attempt
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @param Model $attempt
      * @return void
@@ -609,7 +609,7 @@ class Controller extends Base
      * @throws \JsonException
      */
     public function getCompleteAttempt(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
@@ -662,7 +662,7 @@ class Controller extends Base
      * From a student's perspective,
      * show some in-depth stats about your attempt
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @param Model $attempt
      * @return void
@@ -671,7 +671,7 @@ class Controller extends Base
      * @throws \JsonException
      */
     public function getReview(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
@@ -749,7 +749,7 @@ class Controller extends Base
     /**
      * Provide feedback for an attempt
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @param Model $attempt
      * @throws Error
@@ -759,7 +759,7 @@ class Controller extends Base
      * @throws \RuntimeException
      */
     public function getFeedback(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
@@ -881,7 +881,7 @@ class Controller extends Base
     /**
      * Tell Learnosity about what our teachers marked each question
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @param Model $attempt
      * @return void
@@ -894,7 +894,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      */
     public function postFeedback(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
@@ -1096,7 +1096,7 @@ class Controller extends Base
      *
      * This is grossly inefficient but there aren't many options available to us
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      * @throws Error
      * @throws Exception
@@ -1106,7 +1106,7 @@ class Controller extends Base
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function getHorizontalMarking(IAssessable $assessment): void
+    public function getHorizontalMarking(QuizDomainObject $assessment): void
     {
         /* Get the quiz identifier
          */
@@ -1336,13 +1336,13 @@ class Controller extends Base
      * Finalise the list of attempts whose learnosity_references match those
      * sent in the POST array
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postHorizontalMarking(IAssessable $assessment): void
+    public function postHorizontalMarking(QuizDomainObject $assessment): void
     {
         $refs = $this->requestPost->get('learnosityReferences');
         $attempts = $this->attemptMapper->findByColumn('learnosity_reference', $refs);
@@ -1384,7 +1384,7 @@ class Controller extends Base
     /**
      * Persists a new score back to Learnosity for it to re-tally
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @param Model $attempt
      * @return void
@@ -1394,7 +1394,7 @@ class Controller extends Base
      * @throws \RuntimeException
      */
     public function postFeedbackScore(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
@@ -1465,7 +1465,7 @@ class Controller extends Base
      * Persists a new comment into quiz_feedback, associated with an attempt_id and a
      * Learnosity Reference (it's a response id, but there's no official name for this)
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @param Model $attempt
      * @return void
@@ -1474,7 +1474,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      */
     public function postFeedbackComment(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
@@ -1510,7 +1510,7 @@ class Controller extends Base
      * Post a comment about a particular Attempt into assess_attempt.comment
      * Predominantly used in horizontal marking's final screen
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @param User $student
      * @param Model $attempt
      * @return void
@@ -1519,7 +1519,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      */
     public function postFeedbackAttemptComment(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
@@ -1649,10 +1649,10 @@ class Controller extends Base
      * @api   POST /learning/learnosity/{assessmentId}/poll
      * @since 23.1
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      */
-    public function postPollQuizStatus(IAssessable $assessment): void
+    public function postPollQuizStatus(QuizDomainObject $assessment): void
     {
         // Not a quiz? error
         // No job ID? error
@@ -1732,7 +1732,7 @@ class Controller extends Base
     /**
      * Soft deletes all the attempt ids in $attemptIds
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      * @throws Deleted
      * @throws \DomainException
@@ -1743,7 +1743,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postDeleteAttempts(IAssessable $assessment): void
+    public function postDeleteAttempts(QuizDomainObject $assessment): void
     {
         $attemptIds = $this->requestPost->get('attemptIds');
 
@@ -1773,13 +1773,13 @@ class Controller extends Base
      * caches since none of these attempts should have been contributing
      * any marks
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      * @throws Exception
      * @throws InvalidColumnException
      * @throws \UnderflowException
      */
-    public function postDeleteUnreviewedAttempts(IAssessable $assessment): void
+    public function postDeleteUnreviewedAttempts(QuizDomainObject $assessment): void
     {
         $userIds = $this->requestPost->get('userIds');
 
@@ -1805,7 +1805,7 @@ class Controller extends Base
     /**
      * Sets reviewed_at for all the attempt ids in $attemptIds
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      * @throws DefinitionException
      * @throws Deleted
@@ -1816,7 +1816,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postMassReviewAttempts(IAssessable $assessment): void
+    public function postMassReviewAttempts(QuizDomainObject $assessment): void
     {
         $attemptIds = $this->requestPost->get('attemptIds');
 
@@ -1870,13 +1870,13 @@ class Controller extends Base
      * Extract the response object which matches `$existingAttempt` out of the
      * student's participation record.
      *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @param Model       $existingAttempt
+     * @param QuizDomainObject $assessment
+     * @param User             $student
+     * @param Model            $existingAttempt
      * @return QuizResponse|null
      */
     private function extractExistingResponse(
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         User $student,
         Model $existingAttempt,
     ): ?QuizResponse {
@@ -1887,19 +1887,19 @@ class Controller extends Base
     /**
      * Assign normalised and human-readable marks to `$attempt`.
      *
-     * @param Model        $attempt
-     * @param QuizResponse $responseDomainObject The domain-level object corresponding to `$attempt`: required for
-     *                                           deriving a human-readable mark.
-     * @param IAssessable  $assessment           The assessment to which `$attempt` belongs: required for deriving a
-     *                                           human-readable mark.
-     * @param float        $mark
-     * @param float        $maxMark
+     * @param Model             $attempt
+     * @param QuizResponse      $responseDomainObject The domain-level object corresponding to `$attempt`: required for
+     *                                                deriving a human-readable mark.
+     * @param QuizDomainObject  $assessment           The assessment to which `$attempt` belongs: required for deriving
+     *                                                a human-readable mark.
+     * @param float             $mark
+     * @param float             $maxMark
      * @return void
      */
     private function assignMarksToAttempt(
         Model $attempt,
         QuizResponse $responseDomainObject,
-        IAssessable $assessment,
+        QuizDomainObject $assessment,
         float $mark,
         float $maxMark
     ): void {
@@ -1931,11 +1931,11 @@ class Controller extends Base
      * * has been imported into Learnosity
      * * if it's being duplicated: that that duplication process has completed
      *
-     * @param IAssessable $assessment
+     * @param QuizDomainObject $assessment
      * @return void
      * @throws \RuntimeException if any of the above conditions are false
      */
-    private function assertLearnosityImportCompleted(IAssessable $assessment): void
+    private function assertLearnosityImportCompleted(QuizDomainObject $assessment): void
     {
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 

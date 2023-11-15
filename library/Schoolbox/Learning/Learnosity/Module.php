@@ -235,6 +235,11 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        // Not a quiz: invalid
+        if (!$assessment instanceof QuizDomainObject) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         return [
             'assessment' => $assessment
         ];
@@ -265,12 +270,6 @@ class Module extends BaseModule
             ['assessmentId' => $params['destinationId']],
             $student,
         )['assessment'];
-
-        // Not quizzes: invalid
-        // TODO apply to preloadAssessment?
-        if (!($sourceAssessment instanceof QuizDomainObject && $destinationAssessment instanceof QuizDomainObject)) {
-            throw new NotFound();
-        }
         return [
             'source'      => $sourceAssessment,
             'destination' => $destinationAssessment,
