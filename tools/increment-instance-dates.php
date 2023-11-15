@@ -83,6 +83,7 @@ $app = new class extends CliTool\App {
         'file'                                     => ['modified', 'submitted'],
         'forumPost'                                => ['date', 'modified'],
         'forumThread'                              => ['date', 'last_post_date'],
+        'folder'                                   => ['created_at', 'updated_at'],
         'homepage_log'                             => ['datetime'],
         'homepage_visits'                          => ['date'],
         'link'                                     => ['modified', 'submitted'],
@@ -104,6 +105,7 @@ $app = new class extends CliTool\App {
         'submission_return_file'                   => ['created_at', 'updated_at'],
         'task_completion'                          => ['completion_date'],
         'task_file'                                => ['created_at', 'updated_at'],
+        'textBox'                                   => ['created_at', 'updated_at'],
     ];
 
     private \Alaress\Database\Connector\IConnector $database;

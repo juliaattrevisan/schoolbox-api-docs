@@ -88,10 +88,16 @@ export function usePopOut(
     function animateOpen(position: ComputePositionReturn) {
         // don't animate if the user prefers reduced motion
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches ?? false;
-        gsap.from(content, {
+        gsap.killTweensOf(content);
+        gsap.set(content, {
             opacity: 0,
             scaleX: 0.95,
             scaleY: 0.95,
+        });
+        gsap.to(content, {
+            opacity: 1,
+            scaleX: 1,
+            scaleY: 1,
             transformOrigin: isFullWidth ? "top middle" : getTransformOrigin(position.placement),
             duration: reduceMotion ? 0 : 0.3,
         });

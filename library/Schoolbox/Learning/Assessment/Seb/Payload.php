@@ -137,6 +137,16 @@ class Payload
             'studentId' => $user->getId()
         ]);
 
+        // Allow access to quiz start URL, and in addition any URLs underneath
+        // (learnosity.getCompleteAttempt is underneath)
+        $quizStartUrl = $domain . $this->routeGenerator->generate(
+            'learnosity.getAttempt',
+            [
+                'assessmentId' => $assessment->getId(),
+                'studentId'    => $user->getId(),
+            ]
+        );
+
         $exitUrl = $domain . '/homepage/' . $assessment->getContext()->getFolder()->getId();
 
         /* Decide on a salt; I presume it should be derived from something unique to each
@@ -150,7 +160,7 @@ class Payload
             "{$domain}/login*",
             "{$assessmentUrl}*",
             "{$startUrl}*",
-            "{$domain}/assess/*",
+            "{$quizStartUrl}*",
             "{$domain}/storage/fetch.php*",
             "{$domain}/storage/image.php*",
             "{$domain}/cms/sendVideo.php*"

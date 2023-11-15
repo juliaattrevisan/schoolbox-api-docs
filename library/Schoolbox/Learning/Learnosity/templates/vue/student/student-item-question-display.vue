@@ -8,21 +8,23 @@ import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
-import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item that's displayed
     question: StudentItemQuestion; // the question that's displayed
-    container: HTMLDivElement; // the parent container, to look for the relevant item
+    container: HTMLElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
-const studentsStore = useStudentsStore();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
 const score = window.Vue.ref<string>(props.question.response.score?.toString() ?? "");
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
+
+const emit = defineEmits<{
+    updateScore: [question: StudentItemQuestion, score: number];
+}>();
 
 /**
  * To notify of the current save status
@@ -56,7 +58,7 @@ async function saveScore() {
     if (score.value.toString() === props.question.response.score?.toString()) {
         return;
     }
-    if (Number.isNaN(parseInt(score.value, 10))) {
+    if (Number.isNaN(parseFloat(score.value))) {
         score.value = "";
         return;
     }
@@ -68,7 +70,7 @@ async function saveScore() {
         method: "POST",
         body: formData,
     });
-    studentsStore.updateItemResponseScore(props.student, props.item, props.question, parseInt(score.value, 10));
+    emit("updateScore", props.question, parseFloat(score.value));
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
@@ -123,11 +125,11 @@ window.Vue.onBeforeUnmount(async () => {
 <template>
     <div class="l-flex-col l-gap-m l-pad-m--bottom question">
         <div ref="responsesEl"></div>
-        <div v-if="props.question.metadata.sample_answer">
+        <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
             <label>Sample answer</label>
             <input type="text" :value="question.metadata.sample_answer" readonly />
         </div>
-        <div v-if="props.question.response.maxScore">
+        <div v-if="props.question.response.maxScore" class="f-no-margins">
             <label>Score (max score: {{ props.question.response.maxScore }})</label>
             <input
                 :id="`customise-score-${props.question.response.learnosityReference}`"
@@ -157,7 +159,7 @@ window.Vue.onBeforeUnmount(async () => {
     }
 }
 .question {
-    border-bottom: 4px solid var(--body-background);
+    border-bottom: 2px solid var(--body-background);
 }
 /* as it's readonly, but we still want to make it fully readable  */
 input[readonly] {

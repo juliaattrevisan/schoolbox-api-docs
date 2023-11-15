@@ -24,7 +24,7 @@ window.Vue.watch(
     <div class="all-marked l-grid">
         <div class="all-marked__inner-container">
             <div class="empty-state-flex-centered">
-                <i class="icon-submissions"></i>
+                <i class="icon-quiz"></i>
                 <p>All students who have submitted an attempt have already been marked.</p>
             </div>
         </div>

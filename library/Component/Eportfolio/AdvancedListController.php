@@ -64,7 +64,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
         /* Controls
          */
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-            $zone = (new Zone('imagehashCreate'.$this->getInstance()->getId()))
+            $zone = (new Zone('imagehashCreate' . $this->getInstance()->getId()))
                 ->setFileVar('imagehash[]')
                 ->setThumbnailSize(64)
                 ->setModalTitle('Select Images')
@@ -92,7 +92,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 
                 /* Parse out the image if one was assigned
                  */
-                if (strlen($currentItem->getImagehash())) {
+                if ('' !== trim((string)$currentItem->getImagehash())) {
                     $this->setVar(array(
                         'LIST_ITEM_IMAGEHASH' => $currentItem->getImagehash(),
                     ));
@@ -106,7 +106,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
                  */
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     $this->parse('has_modify_button_block', 'has_modify_button');
-                    $zone = (new Zone('imagehashModify'.$this->getInstance()->getId().'-'.$currentItem->getId()) )
+                    $zone = (new Zone('imagehashModify' . $this->getInstance()->getId() . '-' . $currentItem->getId()) )
                         ->setFileVar('imagehash[]')
                         ->setThumbnailSize(64)
                         ->setModalTitle('Select Images')
@@ -116,7 +116,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
                         ->attachFiles([$currentItem->getImageHash()])
                         ->setReadOnly(false)
                         ->setMulti(false);
-                    if (strlen($currentItem->getImagehash())) {
+                    if ('' !== trim((string)$currentItem->getImagehash())) {
                         $zone->attachFiles([$currentItem->getImageHash()]);
                     }
                     $zone->renderIntoSitePage($this->getSitePage(), 'IMAGEHASH_MODIFY_ATTACH_ZONE');

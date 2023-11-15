@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
@@ -238,7 +239,25 @@ class Controller extends Base
                     'source' => false,
                     /* Tags are only spawned upon clicking Save, not before
                      */
-                    'tags_on_create' => $tags
+                    'tags_on_create' => $tags,
+                    /* Set the default player template to match our own template
+                     * NOTE: Updating this will not update existing quizzes, only new ones...
+                     */
+                    'enabled_player_templates' => [
+                        'schoolbox'
+                    ],
+                    'default_player_template' => 'schoolbox',
+                    'player_templates' => [
+                        [
+                            'reference' => 'schoolbox',
+                            'name' => 'Schoolbox',
+                            'regions' => Helper::LEARNOSITY_CONFIG_PLAYER_REGIONS,
+                            "navigation" => [
+                                "show_intro" => false,
+                                "show_outro" => false
+                            ],
+                        ]
+                    ]
                 ],
                 'dependencies' => [
                     'question_editor_api' => [
@@ -296,10 +315,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([$assessment->getTitle(),
-                                           $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
-                                          ])
-                                    ->add(['Modify Content', null]);
+            ->add([
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ])
+            ->add(['Modify Content', null]);
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
@@ -396,42 +416,7 @@ class Controller extends Base
                     "show_intro" => false,
                     "show_outro" => false
                 ],
-                /* https://help.learnosity.com/hc/en-us/articles/360000758337-Customizing-the-Assessment-Player-experience-with-Regions
-                 *
-                 * Perhaps more useful: https://reference.learnosity.com/items-api/initialization/config.regions
-                 */
-                'regions' => [
-                    'top-left' => [
-                        ['type' => 'title_element'],
-                    ],
-                    'top-right' => [
-                        ['type' => 'itemcount_element'],
-                        ['type' => 'reading_timer_element'],
-                        ['type' => 'timer_element'],
-                    ],
-                    'items' => [
-                        ['type' => 'progress_element'],
-                        ['type' => 'slider_element']
-                    ],
-                    'right' => [
-                        ['type' => 'save_button'],
-                        ['type' => 'reviewscreen_button'],
-                        ['type' => 'resource_button'],
-                        ['type' => 'accessibility_button'],
-                        ['type' => 'flagitem_button'],
-                        ['type' => 'masking_button'],
-                        ['type' => 'verticaltoc_element'],
-                    ],
-                    'bottom-left' => [
-                        [
-                            'type' => 'previous_button',
-                            'show_label_option' => true
-                        ],
-                    ],
-                    'bottom-right' => [
-                        ['type' => 'next_button'],
-                    ]
-                ],
+                'regions' => Helper::LEARNOSITY_CONFIG_PLAYER_REGIONS,
                 /* Allowed Time
                  * Force hard time limits, kicking you out at the expiry
                  */
@@ -583,35 +568,14 @@ class Controller extends Base
          * but we have no means to recover from that...and it shouldn't really
          * occur naturally
          */
-        $existingResponse = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
 
         /* TODO What kind of error should we present to users? It's asynchronous
          */
         if (null === $existingResponse) {
             return;
         }
-
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $existingAttempt->calculateNormalisedMark($mark, $maxMark);
-
-        /* Update the domain object synonymously which will desync from $existingAttempt
-         * so we need to sync them manually...
-         *
-         * This is required for getMarkScheme() to calculate human-readable mark
-         */
-        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\Model $existingResponse */
-        $existingResponse->setNormalisedMark($normalisedMark);
-        $existingResponse->setMarksAvailable($maxMark);
-
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $existingResponse);
-
-        /* Update the columns with newly-derived values
-         */
-        $existingAttempt
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark);
+        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording
@@ -664,17 +628,19 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add(
-                                        [$assessment->getTitle(),
-                                         $this->routeGenerator->generate(
-                                             'learningAssessment.getSummary',
-                                             ['assessmentId' => $assessment->getId(),
-                                              'studentId' => $this->getUser()->getId()
-                                             ]
-                                         )
-                                        ]
-                                    )
-                                    ->add(['Result Summary']);
+            ->add(
+                [
+                    $assessment->getTitle(),
+                    $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId' => $this->getUser()->getId()
+                        ]
+                    )
+                ]
+            )
+            ->add(['Result Summary']);
 
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'assessment' => $assessment,
@@ -791,6 +757,17 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
+
+        /* The student who did the attempt
+        */
+        $studentData = [
+            'id' => $attempt->getUser()->getId(),
+            'name' => $attempt->getUser()->getFullName(),
+            'firstname' => $attempt->getUser()->getFirstname(),
+            'lastname' => $attempt->getUser()->getLastname(),
+            'elementId' => 'schoolbox-student'
+        ];
+
         /* This is what the student did
          */
         $reportPayload = [
@@ -830,32 +807,63 @@ class Controller extends Base
             $learnosityReference = $response['response_id'];
 
             $scores[$learnosityReference] = [
+                'learnosityReference' => $learnosityReference,
                 'score' => $response['score'],
-                'max' => $response['max_score']
+                'maxScore' => $response['max_score'],
+                'itemReference' => $response['item_reference']
             ];
         }
 
         /* Find all the comments for this attempt
          */
-        $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
 
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-            [$assessment->getTitle(),
+            [
+                $assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
 
             ]
         )
             ->add(['Feedback']);
 
+        /* Pregenerate all the urls for the user, because you can't manufacture them
+        * in javascript without risking desync with backend
+        */
+        $args = [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $attempt->getUser()->getId(),
+            'learnositySessionReference' => $attempt->getLearnosityReference()
+        ];
+
+        $urls = [
+            'studentId' => $attempt->getUser()->getId(),
+            'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+            'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+            'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+            'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+        ];
+
+        /* Retrieve the comment for this attempt
+        */
+        $attemptComment = [
+            'learnosityReference' => $attempt->getLearnosityReference(),
+            'studentId' => $attempt->getUser()->getId(),
+            'comment' => $attempt->getComment()
+        ];
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
+            'student' => $studentData,
+            'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
-            'scores' => json_encode($scores, JSON_THROW_ON_ERROR),
-            'comments' => base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)),
+            'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
+            'attemptComment' => $attemptComment,
+            'urls' => $urls
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
@@ -919,17 +927,20 @@ class Controller extends Base
         $mark = $sanitisedScore['score'];
         $maxMark = $sanitisedScore['max_score'];
 
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+        // As with posting a feedback:
+        // need the existing response to determine a human-readable mark.
+        $existingResponse = $this->extractExistingResponse($assessment, $student, $attempt);
+
+        // TODO as with posting a feedback:
+        //      what kind of error should we present to users? It's asynchronous
+        if (!$existingResponse) {
+            return;
+        }
+        $this->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* Save the comment and new normalised mark
          */
         $attempt->setComment(trim($postData['attempt-comment']))
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark)
             ->setReviewer($this->getUser())
             ->setReviewed(\Alaress_Date_Format::now());
 
@@ -941,7 +952,7 @@ class Controller extends Base
          *
          * TODO make this algorithm cheaper
          */
-        foreach ($postData['comments'] as $learnosityReference => $comment) {
+        foreach ($postData['comment'] as $learnosityReference => $comment) {
             try {
                 $feedback = $this->feedbackMapper->findOneByColumnList([
                     'attempt_id' => $attempt->getId(),
@@ -984,7 +995,7 @@ class Controller extends Base
         $responseData = [];
 
         foreach ($responses as $response) {
-            $responseId = $response['response_id'];
+            $itemReference = $response['item_reference'];
 
             $updatedResponse = $response;
 
@@ -998,7 +1009,7 @@ class Controller extends Base
             /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
              * ($mark must never exceed $maxMark) and/or otherwise sanitise data
              */
-            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$responseId], $updatedResponse['max_score']);
+            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$itemReference], $updatedResponse['max_score']);
 
             $mark = $sanitisedScore['score'];
             $maxMark = $sanitisedScore['max_score'];
@@ -1252,8 +1263,10 @@ class Controller extends Base
 
         /* Obtain their scores from Learnosity
          */
+        $learnositySessions = array_values(array_filter($sessions));
+
         $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => array_values(array_filter($sessions))
+            'session_id' => $learnositySessions
         ])['data'];
 
         /* Reforge it into a generic set of tuples
@@ -1288,11 +1301,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([
-                                            $assessment->getTitle(),
-                                            $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
-                                          ])
-                                    ->add(['Horizontal Marking']);
+            ->add([
+                $assessment->getTitle(),
+                $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+            ])
+            ->add(['Horizontal Marking']);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'assessment' => $assessment,
@@ -1302,11 +1315,63 @@ class Controller extends Base
             'students' => $students,
             'itemResponses' => $itemResponses,
             'attemptComments' => $attemptComments,
-            'urls' => $urls
+            'urls' => $urls,
+            /* This list of learnosity references is used for the finalisation step
+             */
+            'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR)
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
         ));
+    }
+
+
+    /**
+     * Finalise the list of attempts whose learnosity_references match those
+     * sent in the POST array
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postHorizontalMarking(IAssessable $assessment): void
+    {
+        $refs = $this->requestPost->get('learnosityReferences');
+        $attempts = $this->attemptMapper->findByColumn('learnosity_reference', $refs);
+
+        // Get results from Learnosity, for writing to Schoolbox attempt
+        $results = $this->api->dataGetRequest(
+            '/sessions/scores',
+            ['session_id' => $refs],
+        );
+        $groupedResults = [];
+        foreach ($results['data'] as $result) {
+            $groupedResults[$result['session_id']] = $result;
+        }
+
+        foreach ($attempts as $attempt) {
+            // Assign marks to attempt based on results from Learnosity
+            $existingResponse = $this->extractExistingResponse($assessment, $attempt->getUser(), $attempt);
+            if ($existingResponse) {
+                $result = $groupedResults[$attempt->getLearnosityReference()] ?? null;
+                if ($result) {
+                    $this->assignMarksToAttempt(
+                        $attempt,
+                        $existingResponse,
+                        $assessment,
+                        $result['score'],
+                        $result['max_score'],
+                    );
+                }
+            }
+
+            $attempt->setReviewer($this->getUser())
+                ->setReviewed(\Alaress_Date_Format::now());
+
+            $this->attemptMapper->save($attempt);
+        }
     }
 
 
@@ -1687,5 +1752,64 @@ class Controller extends Base
              */
             (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
         }
+    }
+
+    /**
+     * Extract the response object which matches `$existingAttempt` out of the
+     * student's participation record.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @param Model       $existingAttempt
+     * @return QuizResponse|null
+     */
+    private function extractExistingResponse(
+        IAssessable $assessment,
+        User $student,
+        Model $existingAttempt,
+    ): ?QuizResponse {
+        $response = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+        return $response instanceof QuizResponse ? $response : null;
+    }
+
+    /**
+     * Assign normalised and human-readable marks to `$attempt`.
+     *
+     * @param Model        $attempt
+     * @param QuizResponse $responseDomainObject The domain-level object corresponding to `$attempt`: required for
+     *                                           deriving a human-readable mark.
+     * @param IAssessable  $assessment           The assessment to which `$attempt` belongs: required for deriving a
+     *                                           human-readable mark.
+     * @param float        $mark
+     * @param float        $maxMark
+     * @return void
+     */
+    private function assignMarksToAttempt(
+        Model $attempt,
+        QuizResponse $responseDomainObject,
+        IAssessable $assessment,
+        float $mark,
+        float $maxMark
+    ): void {
+        /* Update normalised and human-readable marks
+         */
+        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
+
+        /* Update the domain object synonymously which will desync from $attempt
+         * so we need to sync them manually...
+         *
+         * This is required for getMarkScheme() to calculate human-readable mark
+         */
+        $responseDomainObject->setNormalisedMark($normalisedMark);
+        $responseDomainObject->setMarksAvailable($maxMark);
+
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
+
+        /* Update the columns with newly-derived values
+         */
+        $attempt
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
+            ->setMaxMark($maxMark);
     }
 }

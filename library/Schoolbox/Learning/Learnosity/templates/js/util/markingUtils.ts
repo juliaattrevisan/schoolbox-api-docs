@@ -76,3 +76,69 @@ export function getStudentIsMarked(student: Student) {
 export function getUrls(urls: StudentUrls[], studentId: number) {
     return urls.find((urlsItem) => urlsItem.studentId === studentId) as StudentUrls;
 }
+
+/**
+ * Get the total item score
+ * @param {StudentItem} item - the item to get the score from
+ * @returns {number} - the total item score
+ */
+export function getItemScore(item: StudentItem) {
+    // loop through all questions and add up the score
+    return item.questions.reduce((total, question) => {
+        if (question.response.score) {
+            return total + question.response.score;
+        }
+        return total;
+    }, 0);
+}
+
+/**
+ * Get the total item max score
+ * @param {StudentItem} item - the item to get the score from
+ * @returns {number} - the total item max score
+ */
+export function getItemMaxScore(item: StudentItem) {
+    // loop through all questions and add up the max score
+    return item.questions.reduce((total, question) => {
+        if (question.response.maxScore) {
+            return total + question.response.maxScore;
+        }
+        return total;
+    }, 0);
+}
+
+/**
+ * Get the current total score for all items, so the total of all questions within each item
+ * @param {Student} student - the student to get the score from
+ * @returns {number} - the total attempt score
+ */
+export function getAttemptScore(student: Student) {
+    // loop through all student items and questions and add up the score
+    return student.items.reduce((totalScoreAcc, item) => {
+        const itemScore = item.questions.reduce((itemScoreAcc, question) => {
+            if (question.response.score) {
+                return itemScoreAcc + question.response.score;
+            }
+            return itemScoreAcc;
+        }, 0);
+        return totalScoreAcc + itemScore;
+    }, 0);
+}
+
+/**
+ * Get the max score for all items
+ * @param {Student} student - the student to get the max score from
+ * @returns {number} - the total attempt max score
+ */
+export function getAttemptMaxScore(student: Student) {
+    // loop through all student items and questions and add up the max score
+    return student.items.reduce((maxScoreAcc, item) => {
+        const itemMaxScore = item.questions.reduce((itemMaxScoreAcc, question) => {
+            if (question.response.maxScore) {
+                return itemMaxScoreAcc + question.response.maxScore;
+            }
+            return itemMaxScoreAcc;
+        }, 0);
+        return maxScoreAcc + itemMaxScore;
+    }, 0);
+}

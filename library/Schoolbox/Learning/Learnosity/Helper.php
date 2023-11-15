@@ -40,6 +40,44 @@ class Helper
      */
     public const LEARNOSITY_ITEM_STATUS_ARCHIVED = 'archived';
 
+    /**
+     * The configuration used for the regions to show in the Learnosity player
+     *
+     * Currently used for both Items API and Assess API initialisations but should be the same for both
+     * Items: https://reference.learnosity.com/items-api/initialization/config.regions
+     * Assess: https://reference.learnosity.com/assess-api/initialization/regions
+     */
+    public const LEARNOSITY_CONFIG_PLAYER_REGIONS = [
+        'top-left' => [
+            ['type' => 'title_element'],
+        ],
+        'top-right' => [
+            ['type' => 'itemcount_element'],
+            ['type' => 'reading_timer_element'],
+            ['type' => 'timer_element'],
+        ],
+        'items' => [
+            ['type' => 'progress_element'],
+            ['type' => 'slider_element']
+        ],
+        'right' => [
+            ['type' => 'save_button'],
+            ['type' => 'reviewscreen_button'],
+            ['type' => 'resource_button'],
+            ['type' => 'flagitem_button'],
+            ['type' => 'masking_button'],
+            ['type' => 'verticaltoc_element'],
+        ],
+        'bottom-left' => [
+            [
+                'type' => 'previous_button',
+                'show_label_option' => true
+            ],
+        ],
+        'bottom-right' => [
+            ['type' => 'next_button'],
+        ]
+    ];
 
     /**
      * Constructor.

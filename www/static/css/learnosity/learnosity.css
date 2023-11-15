@@ -4,7 +4,8 @@
 
 /* use our font everywhere */
 .lrn,
-.lrn-assess {
+.lrn-assess,
+h3.lrn-report-item-title {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
         Arial, sans-serif;
 }
@@ -48,12 +49,6 @@
 .lrn_response_wrapper input[type="number"]:disabled,
 .lrn_response_wrapper textarea:disabled {
     background-color: transparent;
-}
-
-/* change the accessibility modal button colour */
-.lrn-assess .lrn-dialogs-close-btn:after,
-.lrn-assess .lrn-dialogs-close-btn:before {
-    background-color: var(--content-ui-foreground);
 }
 
 /* general button, like previous question or resume quiz */
@@ -1163,15 +1158,20 @@ button.lrn-btn-save-dropdown {
 .lrn .lrn-author-ui .lrn-btn-save:hover:enabled .lrn-i-save:before {
     transform: none;
 }
+.lrn .lrn-author-ui .lrn-author-save-button-group {
+    width: 100%;
+}
+.lrn-author-save-button-group > .lrn-btn-save {
+    min-height: 2.5rem !important;
+    padding: 0.5rem !important;
+    width: 100% !important;
+}
 .lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary,
 .lrn .lrn-author-ui .lrn-btn-success[disabled],
 .lrn .lrn-author-ui .lrn-btn-success[disabled]:hover,
 .lrn .lrn-author-ui .lrn-btn-success[disabled]:focus {
     background-color: var(--content-ui-submit-background);
     color: var(--content-ui-submit-foreground);
-    min-height: 2.5rem !important;
-    padding: 0.5rem !important;
-    width: 100%;
 }
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
@@ -1300,21 +1300,14 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-divider > li {
     margin-bottom: 1px;
 }
-.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
-    width: 100%;
-}
 .lrn.lrn-author .lrn-author-item-nav-left,
 .lrn.lrn-author .lrn-author-item-nav-right {
     display: flex;
     width: 100%;
 }
-.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
-    width: 100%;
+.lrn.lrn-author .lrn-author-item-nav-left:empty {
+    display: none;
 }
-.lrn .lrn-author-ui .lrn-author-save-button-group {
-    width: 100%;
-}
-
 /* replace icons with sb icons */
 .lrn-i-preview::before {
     color: var(--content-ui-foreground);
@@ -1707,4 +1700,13 @@ span.lrn-list-view-empty-label {
 .lrn-i-edit::before {
     content: "\e645";
     font-family: "schoolbox";
+}
+
+/* shown in horizontal and vertical marking, remove the margins from the item mark */
+h3.lrn-report-item-title {
+    font-size: 1.25rem;
+    margin: 0;
+}
+.learnosity-report .lrn-circle {
+    margin: 0;
 }

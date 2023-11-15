@@ -103,42 +103,7 @@ class PayloadFactory
         $struct = [
             'data' => [
                 'config' => [
-                    /* TODO dedupe this with the other implementation, I suppose
-                     *  Not sure where it would go though
-                     */
-                    'regions' => [
-                        'top-left' => [
-                            ['type' => 'title_element'],
-                        ],
-                        'top-right' => [
-                            ['type' => 'itemcount_element'],
-                            ['type' => 'pause_button'],
-                            ['type' => 'reading_timer_element'],
-                            ['type' => 'timer_element'],
-                        ],
-                        'items' => [
-                            ['type' => 'progress_element'],
-                            ['type' => 'slider_element']
-                        ],
-                        'right' => [
-                            ['type' => 'save_button'],
-                            ['type' => 'reviewscreen_button'],
-                            ['type' => 'resource_button'],
-                            ['type' => 'accessibility_button'],
-                            ['type' => 'flagitem_button'],
-                            ['type' => 'masking_button'],
-                            ['type' => 'verticaltoc_element'],
-                        ],
-                        'bottom-left' => [
-                            [
-                                'type' => 'previous_button',
-                                'show_label_option' => true
-                            ],
-                        ],
-                        'bottom-right' => [
-                            ['type' => 'next_button'],
-                        ]
-                    ],
+                    'regions' => Helper::LEARNOSITY_CONFIG_PLAYER_REGIONS,
                     /* Time (duration)
                      */
                     'time' => [

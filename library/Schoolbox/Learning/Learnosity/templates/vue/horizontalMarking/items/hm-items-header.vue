@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Items (called Cards in sbx) heading display, containing the select item dropdown
+ * Items heading display, containing the select item dropdown
  */
 
 import HmItemsHeaderSelect from "./hm-items-header-select.vue";
@@ -8,7 +8,7 @@ import HmItemsHeaderSelect from "./hm-items-header-select.vue";
 
 <template>
     <div class="l-flex-col l-gap-s">
-        <h2 class="subheader">Cards</h2>
+        <h2 class="subheader f-no-margins">Items</h2>
         <hm-items-header-select />
     </div>
 </template>

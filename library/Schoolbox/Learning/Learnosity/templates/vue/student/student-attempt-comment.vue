@@ -7,13 +7,11 @@ import debounce from "lodash/debounce";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
     student: Student; // the student to display
 }
 const props = defineProps<Props>();
-const studentsStore = useStudentsStore();
 const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, {
     targetElements: [`#${editorId}`],
@@ -21,6 +19,10 @@ const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, 
 }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
+
+const emit = defineEmits<{
+    updateComment: [comment: string];
+}>();
 
 /**
  * To notify of the current save status
@@ -58,7 +60,7 @@ async function saveComment() {
         method: "POST",
         body: formData,
     });
-    studentsStore.updateAttemptComment(props.student, comment.value);
+    emit("updateComment", comment.value);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
@@ -88,16 +90,18 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div>
-        <div class="l-flex-col l-gap-m">
-            <div>
-                <label>Comment</label>
-                <textarea :id="editorId"></textarea>
-                <div class="save-container l-grid">
-                    <div class="save-container__inner-container">
-                        <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
-                            <em>{{ saveText }}</em>
-                        </div>
+    <div class="c-island l-flex-col l-gap-m l-pad-m">
+        <div>
+            <label>Comment</label>
+            <p class="meta">
+                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                details on creation.
+            </p>
+            <textarea :id="editorId"></textarea>
+            <div class="save-container l-grid">
+                <div class="save-container__inner-container">
+                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                        <em>{{ saveText }}</em>
                     </div>
                 </div>
             </div>

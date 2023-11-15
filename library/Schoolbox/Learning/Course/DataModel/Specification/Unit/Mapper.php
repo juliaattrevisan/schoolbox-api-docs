@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -48,6 +49,7 @@ class Mapper extends AbstractUnitMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
 
         // SoftDelete/Restore Assessments in UnitSpecification
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
@@ -90,11 +92,21 @@ class Mapper extends AbstractUnitMapper
     public function hydrateSelect(PDOStatement $statement)
     {
         $modelList = $this->createCollection();
+        // record of folder ids to hydrate curriculum codes from
+        $folderIds = [];
+
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getJoinMapper('folder');
+
+        /** @var NodeMapper $curriculumNodeMapper */
+        $curriculumNodeMapper = $folderMapper->getJoinMapper('curriculum_node_for_category');
+
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
 
             /** @var FolderModel $folder */
-            $folder = $this->hydrateJoin($row, 'folder', 'f');
+            $folder = $folderMapper->hydrate($row, 'f');
+            $folderIds[] = $row['f.id'];
             /** @var HomepageConfig $homepageConfig */
             $homepageConfig = $this->hydrateJoin($row, 'folder.homepages', 'fh');
             $folder->setHomepage($homepageConfig);
@@ -110,6 +122,23 @@ class Mapper extends AbstractUnitMapper
 
             // Add to list
             $modelList->setOffset($model->getId(), $model);
+        }
+
+        // fetch curric for joined folders
+        $folderCurricNodes = $curriculumNodeMapper->findForOtherMapper(
+            $folderMapper,
+            'curriculum_node_for_category',
+            $folderIds
+        );
+
+        foreach ($modelList as $model) {
+            if (isset($folderCurricNodes[$model->getFolder()->getId()])) {
+                // if joined folder has codes, then inject them back onto the folder
+                $model->getFolder()->setCurriculumNodes($folderCurricNodes[$model->getFolder()->getId()]);
+            } else {
+                // folder has no curric codes, set to empty collection
+                $model->getFolder()->setCurriculumNodes($curriculumNodeMapper->createCollection());
+            }
         }
         return $modelList;
     }

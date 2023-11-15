@@ -5,6 +5,7 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
+import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
     student: Student; // the item to display
@@ -16,15 +17,7 @@ const props = defineProps<Props>();
  * @returns {number} - the total score
  */
 const totalScore = window.Vue.computed(() => {
-    return props.student.items.reduce((totalScoreAcc, item) => {
-        const itemScore = item.questions.reduce((itemScoreAcc, question) => {
-            if (question.response.score) {
-                return itemScoreAcc + question.response.score;
-            }
-            return itemScoreAcc;
-        }, 0);
-        return totalScoreAcc + itemScore;
-    }, 0);
+    return getAttemptScore(props.student);
 });
 
 /**
@@ -32,15 +25,7 @@ const totalScore = window.Vue.computed(() => {
  * @returns {number} - the max score
  */
 const maxScore = window.Vue.computed(() => {
-    return props.student.items.reduce((maxScoreAcc, item) => {
-        const itemMaxScore = item.questions.reduce((itemMaxScoreAcc, question) => {
-            if (question.response.maxScore) {
-                return itemMaxScoreAcc + question.response.maxScore;
-            }
-            return itemMaxScoreAcc;
-        }, 0);
-        return maxScoreAcc + itemMaxScore;
-    }, 0);
+    return getAttemptMaxScore(props.student);
 });
 
 /**

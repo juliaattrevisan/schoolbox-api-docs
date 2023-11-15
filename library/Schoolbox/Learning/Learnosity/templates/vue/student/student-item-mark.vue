@@ -5,23 +5,24 @@
 
 import { gsap } from "gsap";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
+import { getItemScore, getItemMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
-import { useItemsStore } from "../store/hmItemsStore";
-import { useStudentsStore } from "../store/hmStudentsStore";
 
 interface Props {
     item: StudentItem; // the item to display
-    container: HTMLDivElement; // the parent container, to look for the relevant item
+    container: HTMLElement; // the parent container, to look for the relevant item
+    isShown: boolean; // whether to display the item or not
+    showTitle: boolean; // whether to show the item title or not
 }
 const props = defineProps<Props>();
-const itemsStore = useItemsStore();
-const markEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+const markEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the report into
 
 /**
  * To display the current item
+ * @returns {string} - the display style
  */
 const display = window.Vue.computed(() => {
-    return props.item.reference === itemsStore.activeItem.reference ? "block" : "none";
+    return props.isShown ? "block" : "none";
 });
 
 /**
@@ -37,12 +38,7 @@ const noScore = window.Vue.computed(() => {
  * @returns {number} - the total score
  */
 const totalScore = window.Vue.computed(() => {
-    return props.item.questions.reduce((total, question) => {
-        if (question.response.score) {
-            return total + question.response.score;
-        }
-        return total;
-    }, 0);
+    return getItemScore(props.item);
 });
 
 /**
@@ -50,12 +46,7 @@ const totalScore = window.Vue.computed(() => {
  * @returns {number} - the max score
  */
 const maxScore = window.Vue.computed(() => {
-    return props.item.questions.reduce((total, question) => {
-        if (question.response.maxScore) {
-            return total + question.response.maxScore;
-        }
-        return total;
-    }, 0);
+    return getItemMaxScore(props.item);
 });
 
 /**
@@ -158,7 +149,9 @@ function updateScoreDisplay() {
 window.Vue.onMounted(() => {
     const mark = props.container.querySelector(`[data-reference-title="${props.item.reference}"]`) as HTMLDivElement;
     if (mark) {
-        (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
+        if (!props.showTitle) {
+            (mark.firstChild as HTMLElement).nodeValue = ""; // clear the title, just leaving the mark design
+        }
         markEl.value?.appendChild(mark);
         updateScoreDisplay();
     }
