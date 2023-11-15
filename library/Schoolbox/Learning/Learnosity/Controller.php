@@ -238,7 +238,55 @@ class Controller extends Base
                     'source' => false,
                     /* Tags are only spawned upon clicking Save, not before
                      */
-                    'tags_on_create' => $tags
+                    'tags_on_create' => $tags,
+                    /* Set the default player template to match our own template
+                     * NOTE: Updating this will not update existing quizzes, only new ones...
+                     */
+                    'enabled_player_templates' => [
+                        'schoolbox'
+                    ],
+                    'default_player_template' => 'schoolbox',
+                    'player_templates' => [
+                        [
+                            'reference' => 'schoolbox',
+                            'name' => 'Schoolbox',
+                            'regions' => [
+                                'top-left' => [
+                                    ['type' => 'title_element'],
+                                ],
+                                'top-right' => [
+                                    ['type' => 'itemcount_element'],
+                                    ['type' => 'reading_timer_element'],
+                                    ['type' => 'timer_element'],
+                                ],
+                                'items' => [
+                                    ['type' => 'progress_element'],
+                                    ['type' => 'slider_element']
+                                ],
+                                'right' => [
+                                    ['type' => 'save_button'],
+                                    ['type' => 'reviewscreen_button'],
+                                    ['type' => 'resource_button'],
+                                    ['type' => 'flagitem_button'],
+                                    ['type' => 'masking_button'],
+                                    ['type' => 'verticaltoc_element'],
+                                ],
+                                'bottom-left' => [
+                                    [
+                                        'type' => 'previous_button',
+                                        'show_label_option' => true
+                                    ],
+                                ],
+                                'bottom-right' => [
+                                    ['type' => 'next_button'],
+                                ]
+                            ],
+                            "navigation" => [
+                                "show_intro" => false,
+                                "show_outro" => false
+                            ],
+                        ]
+                    ]
                 ],
                 'dependencies' => [
                     'question_editor_api' => [
@@ -296,10 +344,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([$assessment->getTitle(),
-                                           $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
-                                          ])
-                                    ->add(['Modify Content', null]);
+            ->add([
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ])
+            ->add(['Modify Content', null]);
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
@@ -663,17 +712,19 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add(
-                                        [$assessment->getTitle(),
-                                         $this->routeGenerator->generate(
-                                             'learningAssessment.getSummary',
-                                             ['assessmentId' => $assessment->getId(),
-                                              'studentId' => $this->getUser()->getId()
-                                             ]
-                                         )
-                                        ]
-                                    )
-                                    ->add(['Result Summary']);
+            ->add(
+                [
+                    $assessment->getTitle(),
+                    $this->routeGenerator->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId' => $this->getUser()->getId()
+                        ]
+                    )
+                ]
+            )
+            ->add(['Result Summary']);
 
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'assessment' => $assessment,
@@ -841,7 +892,8 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-            [$assessment->getTitle(),
+            [
+                $assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
 
             ]
@@ -1287,11 +1339,11 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                    ->add([
-                                            $assessment->getTitle(),
-                                            $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
-                                          ])
-                                    ->add(['Horizontal Marking']);
+            ->add([
+                $assessment->getTitle(),
+                $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+            ])
+            ->add(['Horizontal Marking']);
 
         $this->response = $this->responseFromTemplate('@learnosity/horizontal.twig', [
             'assessment' => $assessment,
