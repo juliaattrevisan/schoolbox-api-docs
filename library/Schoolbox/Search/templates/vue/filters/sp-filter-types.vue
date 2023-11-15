@@ -28,7 +28,7 @@ const filterTypesStore = useFilterTypesStore();
 .checklist {
     border: 1px solid var(--form-border-color);
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
     padding: var(--spacing-s);
 }
 </style>
