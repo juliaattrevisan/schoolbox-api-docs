@@ -995,7 +995,7 @@ class Controller extends Base
          *
          * TODO make this algorithm cheaper
          */
-        foreach ($postData['comments'] as $learnosityReference => $comment) {
+        foreach ($postData['comment'] as $learnosityReference => $comment) {
             try {
                 $feedback = $this->feedbackMapper->findOneByColumnList([
                     'attempt_id' => $attempt->getId(),
