@@ -1295,21 +1295,11 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-divider > li {
     margin-bottom: 1px;
 }
-.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
-    width: 100%;
-}
 .lrn.lrn-author .lrn-author-item-nav-left,
 .lrn.lrn-author .lrn-author-item-nav-right {
     display: flex;
     width: 100%;
 }
-.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
-    width: 100%;
-}
-.lrn .lrn-author-ui .lrn-author-save-button-group {
-    width: 100%;
-}
-
 /* replace icons with sb icons */
 .lrn-i-preview::before {
     color: var(--content-ui-foreground);
