@@ -59,12 +59,12 @@ abstract class PopulatorTool extends App
          */
         if ('' === $this->name) {
             $this->getLogger()->info('Please configure the name of this credentials populator.');
-            exit;
+            exit(0);
         }
 
         if ('' === $this->credentialsEndpoint) {
             $this->getLogger()->info('Please configure endpoint for obtaining credentials.');
-            exit;
+            exit(0);
         }
 
         $this->getLogger()->info(sprintf(
