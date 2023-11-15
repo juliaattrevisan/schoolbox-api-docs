@@ -192,7 +192,7 @@ class Controller extends Base
             // to account for the case where the total number of results equals MAX_RESULT_LIMIT), and so possibly more
             // sub-results in each folder-group.
             if ($nextCursor !== null) {
-                // Do some more work to determine whether more sub-results exist for each folder-group of results.           
+                // Do some more work to determine whether more sub-results exist for each folder-group of results.
                 $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKey($keyword, $filter, $translatedResults);
                 foreach ($translatedResults as $resultKey => $translatedResult) {
                     if (
