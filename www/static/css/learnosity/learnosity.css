@@ -1865,3 +1865,8 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 td.lrn-report-area::first-letter {
     text-transform: capitalize !important;
 }
+
+/* change toggle line height to make it consistent with other buttons */
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
+    line-height: unset !important;
+}
