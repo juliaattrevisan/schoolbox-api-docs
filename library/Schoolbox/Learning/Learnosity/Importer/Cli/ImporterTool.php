@@ -247,23 +247,54 @@ Learnosity Migrator
 Replicates legacy quizzes from schoolbox.assess into its modern Learnosity incarnation.
 Each question type and contents is mapped to their closest Learnosity synonyms.
 
+
+Assessments
+-----------
 You can specify a particular assessment to import; otherwise it imports everything
 that is:
  * alive (ie. everything that is not soft-deleted)
  * not already in learnosity (ie. assess.learnosity_reference is null)
 
+
+Size
+----
+Small quizzes (<= 50 things) are treated differently to large quizzes (> 50 things) because
+Learnosity has a limit on how big a data payload can be. Multiple small quizzes can potentially
+be consolidated into one payload together, saving us an API request that costs 2 seconds.
+
+Large quizzes must be spread out over multiple payloads. They require a whole different algorithm
+to process their contents specially. It'll be more costly in terms of time, but we cannot really
+avoid this due to Learnosity refusing to change their limits.
+
+Use --small to import only small quizzes.
+Use --large to import only large quizzes.
+
+
+Blueprint Option
+----------------
 Use --blueprint option in either mode to show the array struct we intended to send to Learnosity
 dumped to the cli. This is useful for manual inspection before committing to a --perform
 
+
+Verbosity
+---------
 As usual, verbose mode tells you all the debugging-level info about what the algorithm does.
 
-Usage: import.php --small|large [--assessment <assessmentId>] [--perform] [-vvv]
 
+Example Usage
+-------------
+Usage: import.php --small|large [--assessment <assessmentId>] [--blueprint] [--perform] [-vvv]
+
+// Small quiz import
+Example: import.php --small --perform -vvv
 Example: import.php --small --assessment=123456 --perform
 Example: import.php --small --assessment=123456 --blueprint -vvv
 
+// Large quiz import
+Example: import.php --large --perform -vvv
 Example: import.php --large --assessment=9876 --perform
 Example: import.php --large --assessment=9876 --blueprint -vvv
+
 
 HELP;
             return;
