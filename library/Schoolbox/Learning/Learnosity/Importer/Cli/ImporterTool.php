@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
+use Alaress\Lock\LockRefreshException;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
@@ -97,7 +98,7 @@ class ImporterTool extends CliTool\App
      * Maximum number of things per learnosity payload
      * (50 questions, 50 features, 50 items, 50 activities)
      */
-    private const LEARNOSITY_MAX_PAYLOAD_SIZE = 50;
+    private const LEARNOSITY_MAX_PAYLOAD_SIZE = 19;
 
 
     /**
@@ -385,7 +386,13 @@ HELP;
                     $legacyQuizIds
                 );
             } elseif ($this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
-                $this->importLarge();
+                $this->importLarge(
+                    $lock,
+                    $legacyQuizBuilder,
+                    $blueprintBuilder,
+                    $api,
+                    $legacyQuizIds
+                );
             }
         }
 
@@ -665,10 +672,81 @@ HELP;
     /**
      * Import large quizzes by spreading their guts out over multiple payloads
      *
+     * @param LockInterface $lock
+     * @param LegacyQuizBuilder $legacyQuizBuilder
+     * @param BlueprintBuilder $blueprintBuilder
+     * @param Api $api
+     * @param array $legacyQuizIds
      * @return void
+     * @throws LockRefreshException
      */
-    private function importLarge()
+    private function importLarge(
+        LockInterface $lock,
+        LegacyQuizBuilder $legacyQuizBuilder,
+        BlueprintBuilder $blueprintBuilder,
+        Api $api,
+        array $legacyQuizIds
+    ): void
     {
+        /* $legacyQuizIds is a bunch of identifiers
+         *
+         * We can perhaps minimise more Learnosity requests by batching $blueprints
+         * which typically represent a single quiz. There's a limit on the number of
+         * quizzes, but there's also a limit on number of features/questions/items
+         * which isn't particularly obvious
+         */
+        foreach ($legacyQuizIds as $legacyQuizId) {
+            /* Do all the stuff it used to do to produce a $blueprint
+             */
+            $this->refreshLock($lock);
+
+            /* Get the legacy quiz's contents
+             */
+            $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
+
+            /* Announce what we're doing
+             */
+            $this->getLogger()->info(sprintf(
+                'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                $legacyQuiz['title'],
+                $legacyQuiz['assessment_id'],
+                $legacyQuiz['assess_id']
+            ));
+
+            /* If this doesn't have an assessment_id, idk what this is,
+             * because you can't get here anymore.
+             */
+            if ('' === trim((string)$legacyQuiz['assessment_id'])) {
+                $this->getLogger()->warning(sprintf(
+                    'Missing assessment_id; skipping'
+                ));
+
+                continue;
+            }
+
+            /* Make the overall Learnosity payloads which we then send later with
+             * a little postprocessing to put things into the exactly correct format.
+             * Learnosity is really particular about such things.
+             */
+            try {
+                /* Choose which construction style you want
+                 */
+                if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
+                    $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
+                } else {
+                    $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+                }
+            } catch (\DomainException $e) {
+                $this->getLogger()->warning($e->getMessage());
+                $this->getLogger()->warning(sprintf(
+                    'Skipping assess_id %s',
+                    $legacyQuiz['assess_id']
+                ));
+
+                continue;
+            }
+        }
+
         return;
     }
 
