@@ -331,11 +331,12 @@ HELP;
 
         /* Check mandatory args first
          */
-        if (!$this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES) && !$this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
+        if (!$this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES) && !$this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES) && !$this->getOpt(self::OPT_LONG_ASSESSMENT_ID)) {
             $this->getLogger()->info(sprintf(
-                'Please select either --%s or --%s quiz sizes to import.',
+                'Please select either --%s or --%s quiz sizes to import, or specify an assessment id using --%s',
                 self::OPT_LONG_IMPORT_SMALL_QUIZZES,
-                self::OPT_LONG_IMPORT_LARGE_QUIZZES
+                self::OPT_LONG_IMPORT_LARGE_QUIZZES,
+                self::OPT_LONG_ASSESSMENT_ID
             ));
 
             exit;
@@ -404,6 +405,11 @@ HELP;
          */
         $this->metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
 
+        /* Log the title first lol
+         */
+        $this->getLogger()->info('Learnosity Migration.');
+        $this->getLogger()->info('');
+
         /* Find out if a particular assessment was chosen.
          * If so, find out whether we should use a distributed payload,
          * overriding whether you specified --small or --large params
@@ -423,12 +429,12 @@ HELP;
             } else {
                 $this->sizeStrat = self::OPT_LONG_IMPORT_LARGE_QUIZZES;
             }
-        }
 
-        $this->getLogger()->debug(sprintf(
-            'Detecting %s quiz size from provided assessment id; we are overriding cli params accordingly.',
-            $this->sizeStrat
-        ));
+            $this->getLogger()->debug(sprintf(
+                'Detecting %s quiz size from provided assessment id; we are overriding cli params accordingly.',
+                $this->sizeStrat
+            ));
+        }
 
         /* Precompile queries
          *
@@ -465,9 +471,6 @@ HELP;
 
         /* Commencing migration
          */
-        $this->getLogger()->info('Learnosity Migration.');
-        $this->getLogger()->info('');
-
         $overallStart = microtime(true);
 
         if (\count($legacyQuizIds)) {
