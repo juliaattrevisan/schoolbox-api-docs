@@ -57,17 +57,16 @@ class Controller extends BaseController
         );
         $tokenResponseBody = json_decode($tokenResponse->getBody()->getContents(), true);
         $accessToken       = $tokenResponseBody['access_token'];
+        $authHeader        = [
+            'authorization' => 'Bearer ' . $accessToken,
+        ];
 
         // Request 1: find registers
         // TODO these should be configured:
         //      also a mapping from codes to IDs should be cached
         $apiResponse = $this->httpClient->get(
             $apiUrl->withPath('/Main/api/registers/'),
-            [
-                RequestOptions::HEADERS => [
-                    'authorization' => 'Bearer ' . $accessToken,
-                ]
-            ]
+            [RequestOptions::HEADERS => $authHeader,],
         );
         $apiResponseBody = json_decode($apiResponse->getBody()->getContents(), true);
         $registers       = $apiResponseBody['registers'];
@@ -84,11 +83,7 @@ class Controller extends BaseController
 //                            '$filter' => "SchoolId eq '{$student->getExternalId()}'"
 //                        ])
 //                        ->withPath('/Main/api/students/registers/' . $registerId),
-//                    [
-//                        RequestOptions::HEADERS => [
-//                            'authorization' => 'Bearer ' . $accessToken,
-//                        ]
-//                    ]
+//                    [RequestOptions::HEADERS => $authHeader,],
 //                );
 //                $registerResponseBody = json_decode($registerResponse->getBody()->getContents(), true);
 //            } catch (ClientExceptionInterface $e) {
@@ -102,11 +97,7 @@ class Controller extends BaseController
             try {
                 $dateRangesResponse = $this->httpClient->get(
                     $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/dateranges'),
-                    [
-                        RequestOptions::HEADERS => [
-                            'authorization' => 'Bearer ' . $accessToken,
-                        ]
-                    ]
+                    [RequestOptions::HEADERS => $authHeader,],
                 );
                 $dateRangesResponseBody = json_decode($dateRangesResponse->getBody()->getContents(), true);
             } catch (ClientExceptionInterface $e) {
@@ -118,11 +109,7 @@ class Controller extends BaseController
             try {
                 $fieldsResponse = $this->httpClient->get(
                     $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/fields'),
-                    [
-                        RequestOptions::HEADERS => [
-                            'authorization' => 'Bearer ' . $accessToken,
-                        ]
-                    ]
+                    [RequestOptions::HEADERS => $authHeader,],
                 );
                 $fieldsResponseBody = json_decode($fieldsResponse->getBody()->getContents(), true);
             } catch (ClientExceptionInterface $e) {
@@ -131,14 +118,11 @@ class Controller extends BaseController
             }
 
             // Request 1.3: find metadata for fields
+            // This ought to be cacheable for a lot longer than student data
             try {
                 $metadataResponse = $this->httpClient->get(
                     $apiUrl->withPath('/Main/api/registers/' . $registerId . '/metadata'),
-                    [
-                        RequestOptions::HEADERS => [
-                            'authorization' => 'Bearer ' . $accessToken,
-                        ]
-                    ]
+                    [RequestOptions::HEADERS => $authHeader,],
                 );
                 $metadataResponseBody = json_decode($metadataResponse->getBody()->getContents(), true);
             } catch (ClientExceptionInterface $e) {
@@ -146,7 +130,25 @@ class Controller extends BaseController
                 $metadataResponseBody = [];
             }
 
-            new \Alaress_Probe($register, $metadataResponseBody, $dateRangesResponseBody, $fieldsResponseBody);
+            // Request 1.3.1: field data sources
+            $fields = [];
+            foreach (($metadataResponseBody['fields'] ?? []) as $field) {
+                if ($field['properties']['dataSourceUrl'] ?? null) {
+                    try {
+                        $dataSourceResponse = $this->httpClient->get(
+                            $field['properties']['dataSourceUrl'],
+                            [RequestOptions::HEADERS => $authHeader,],
+                        );
+                        $dataSourceResponseBody = json_decode($dataSourceResponse->getBody()->getContents(), true);
+                    } catch (ClientExceptionInterface $e) {
+                        // No metadata exists for this field: that's okay
+                        $dataSourceResponseBody = [];
+                    }
+                    $fields[$field['key']] = $dataSourceResponseBody;
+                }
+            }
+
+            new \Alaress_Probe($register, $metadataResponseBody, $fields, $dateRangesResponseBody, $fieldsResponseBody);
         }
 
         $this->response = $this->responseFromTemplate(
