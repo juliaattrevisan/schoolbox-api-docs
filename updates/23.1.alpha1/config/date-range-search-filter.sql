@@ -28,9 +28,9 @@ VALUES (
             FROM
                 `lu_config_type`
             WHERE
-                `type` = 'Localisation'
+                `type` = 'LMS Policy'
         ),
-        '0;School year:1;1 year (6 months in the past, 6 months in the future):2;2 years (1 year in the past, 1 year in the future):3;5 years (2.5 years in the past, 2.5 years in the future)',
+        '0;School year:1;1 year (6 months in the past, 6 months in the future):2;2 years (1 year in the past, 1 year in the future):3;5 years (4 years in the past, 1 year in the future)',
         'true',
         'false',
         'true',
@@ -44,7 +44,7 @@ VALUES (
                     FROM
                         `lu_config_type`
                     WHERE
-                        `type` = 'Localisation'
+                        `type` = 'LMS Policy'
                 )
         )
     );
