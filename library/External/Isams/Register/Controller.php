@@ -133,18 +133,24 @@ class Controller extends BaseController
             // Request 1.3.1: field data sources
             $fields = [];
             foreach (($metadataResponseBody['fields'] ?? []) as $field) {
-                if ($field['properties']['dataSourceUrl'] ?? null) {
-                    try {
-                        $dataSourceResponse = $this->httpClient->get(
-                            $field['properties']['dataSourceUrl'],
-                            [RequestOptions::HEADERS => $authHeader,],
-                        );
-                        $dataSourceResponseBody = json_decode($dataSourceResponse->getBody()->getContents(), true);
-                    } catch (ClientExceptionInterface $e) {
-                        // No metadata exists for this field: that's okay
-                        $dataSourceResponseBody = [];
+                // Fetch data source only if it's a list
+                $dataSource = strtolower($field['properties']['dataSource'] ?? '');
+                if (in_array($dataSource, ['private', 'shared'])) {
+                    if ($field['properties']['dataSourceUrl'] ?? null) {
+                        try {
+                            $dataSourceResponse = $this->httpClient->get(
+                                $field['properties']['dataSourceUrl'],
+                                [RequestOptions::HEADERS => $authHeader,],
+                            );
+                            $dataSourceResponseBody = json_decode($dataSourceResponse->getBody()->getContents(), true);
+                        } catch (ClientExceptionInterface $e) {
+                            // No metadata exists for this field: that's okay
+                            $dataSourceResponseBody = [];
+                        }
+                        foreach (($dataSourceResponseBody['items'] ?? []) as $item) {
+                            $fields[$field['key']][$item['value']] = $item['text'];
+                        }
                     }
-                    $fields[$field['key']] = $dataSourceResponseBody;
                 }
             }
 
