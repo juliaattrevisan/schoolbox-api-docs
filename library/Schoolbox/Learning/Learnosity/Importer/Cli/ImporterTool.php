@@ -333,10 +333,9 @@ HELP;
          */
         if (!$this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES) && !$this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES) && !$this->getOpt(self::OPT_LONG_ASSESSMENT_ID)) {
             $this->getLogger()->info(sprintf(
-                'Please select either --%s or --%s quiz sizes to import, or specify an assessment id using --%s',
+                'Please select either --%s or --%s quiz sizes to import, or specify an assessment id using --assessment',
                 self::OPT_LONG_IMPORT_SMALL_QUIZZES,
                 self::OPT_LONG_IMPORT_LARGE_QUIZZES,
-                self::OPT_LONG_ASSESSMENT_ID
             ));
 
             exit;
