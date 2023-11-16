@@ -355,6 +355,18 @@ class Controller extends Base
     {
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
+        if ($this->attemptMapper->getAttemptCountForStudent($quiz->getId(), $student->getId()) > $quiz->getMaxAttempts()) {
+            /* Redirect back to summary screen
+             */
+            $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+            ]);
+
+            $this->response = $this->redirectTemporary($redirect);
+            return;
+        }
+
         /* Generate a session (attempt) identifier
          *
          * First, see if an incomplete attempt exists; if it does,
