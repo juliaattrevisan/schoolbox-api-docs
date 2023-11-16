@@ -527,7 +527,9 @@
 
                 <div class="folder-title">
                     <div class="left">
-                        <h4>{{ folder.title }}</h4>
+                        {% block summaryFolderTitle %}
+                            <h4>{{ folder.title }}</h4>
+                        {% endblock %}
                     </div>
 
                     {% if showSummaryOverallGrade %}
@@ -567,7 +569,9 @@
             {% set weightedMean = studentGrade.weightedMean %}
             <div class="folder-title class-page summative-content">
                 <div class="left">
-                    <h4>{{ folder.title }}</h4>
+                    {% block classFolderTitle %}
+                        <h4>{{ folder.title }}</h4>
+                    {% endblock %}
                     {% for teacher in folder.teachers %}
                         <div class="card compact">
                             <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
