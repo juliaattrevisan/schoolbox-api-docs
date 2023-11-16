@@ -1581,7 +1581,7 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     font-weight: 400;
 }
 
-/* add "Add" before icon for adding question to a card */
+/* add "Add" before icon for adding question to an item */
 button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-widget-icon.lrn-i-plus:after {
     content: " Add";
 }
@@ -1684,7 +1684,7 @@ span.lrn-list-view-empty-label {
     width: auto;
 }
 .lrn-list-view-empty.lrn-author-ui-no-preview::after {
-    content: "\A You have no cards yet. A card is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
+    content: "\A You have no cards yet. An item is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
     white-space: pre;
 }
 
