@@ -647,7 +647,7 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
-            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
+            'returnUrl' => "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
 
