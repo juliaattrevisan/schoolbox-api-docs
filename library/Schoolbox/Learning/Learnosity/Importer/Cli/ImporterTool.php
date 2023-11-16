@@ -18,6 +18,7 @@ use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
+use Symfony\Component\Lock\LockInterface;
 
 class ImporterTool extends CliTool\App
 {
@@ -57,6 +58,24 @@ class ImporterTool extends CliTool\App
      * Show the payload we intend to send to learnosity land
      */
     private const OPT_LONG_BLUEPRINT = 'blueprint';
+
+
+    /**
+     * --small
+     *
+     * Import multiple small quizzes that can fit into a single learnosity payload,
+     * consolidating them, and minimising the number of payloads required to send
+     * all our data up to learnosity (each api requests costs 2 seconds)
+     */
+    private const OPT_LONG_IMPORT_SMALL_QUIZZES = 'small';
+
+
+    /**
+     * --large
+     *
+     * Import large quizzes that exceed learnosity's maximum payload size
+     */
+    private const OPT_LONG_IMPORT_LARGE_QUIZZES = 'large';
 
 
     /**
@@ -165,6 +184,8 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_HELP,
             self::OPT_LONG_ASSESSMENT_ID,
             self::OPT_LONG_BLUEPRINT,
+            self::OPT_LONG_IMPORT_SMALL_QUIZZES,
+            self::OPT_LONG_IMPORT_LARGE_QUIZZES,
             self::OPT_LONG_PRESERVE_SECTIONS,
         ];
     }
@@ -287,173 +308,17 @@ HELP;
 
         $overallStart = microtime(true);
 
-        /*
-            foreach $quiz in $quizzes
-                $this->refreshLock();
-
-                set up an Activity payload
-                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
-
-                foreach $section in $quiz
-                    $this->refreshLock();
-
-                    set up an Item payload
-                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
-
-                    foreach $question in $section
-                        $this->refreshLock();
-
-                        set up a new Question payload
-                        https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
-                            - detect question type
-                            - spawn importer accordingly
-                            - importer->import()
-
-                        you'll probably need its answers, too, from assess_answer
-                        which you need to deserialize. It's not particularly obvious
-                        what format this payload should be in, but try this:
-                        https://reference.learnosity.com/questions-api/questiontypes
-
-                    send the Item containing multiple Questions into Learnosity itself?
-                    https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
-
-                send the whole Activity, its Items and its Questions into Learnosity
-                https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
-
-                if successful, update the learnosity_reference so we know it ended up in learnosity
-                otherwise something went wrong and this row is still a candidate for import
-        */
         if (\count($legacyQuizIds)) {
-            try {
-                /* $legacyQuizIds is a bunch of identifiers
-                 *
-                 * We can perhaps minimise more Learnosity requests by batching $blueprints
-                 * which typically represent a single quiz. There's a limit on the number of
-                 * quizzes, but there's also a limit on number of features/questions/items
-                 * which isn't particularly obvious
-                 */
-                $consolidatedBlueprint = null;
-
-                foreach ($legacyQuizIds as $legacyQuizId) {
-                    /* Do all the stuff it used to do to produce a $blueprint
-                     */
-                    $this->refreshLock($lock);
-
-                    /* Get the legacy quiz's contents
-                     */
-                    $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
-
-                    /* Announce what we're doing
-                     */
-                    $this->getLogger()->info(sprintf(
-                        'Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                        $legacyQuiz['title'],
-                        $legacyQuiz['assessment_id'],
-                        $legacyQuiz['assess_id']
-                    ));
-
-                    /* If this doesn't have an assessment_id, idk what this is,
-                     * because you can't get here anymore.
-                     */
-                    if ('' === trim((string)$legacyQuiz['assessment_id'])) {
-                        $this->getLogger()->warning(sprintf(
-                            'Missing assessment_id; skipping'
-                        ));
-
-                        continue;
-                    }
-
-                    /* Make the overall Learnosity payloads which we then send later with
-                     * a little postprocessing to put things into the exactly correct format.
-                     * Learnosity is really particular about such things.
-                     */
-                    try {
-                        /* Choose which construction style you want
-                         */
-                        if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                            $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
-                        } else {
-                            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-                        }
-                    } catch (\DomainException $e) {
-                        $this->getLogger()->warning($e->getMessage());
-                        $this->getLogger()->warning(sprintf(
-                            'Skipping assess_id %s',
-                            $legacyQuiz['assess_id']
-                        ));
-
-                        continue;
-                    }
-
-                    /* Consolidate 1 quiz to start with
-                     *
-                     * Stack them up by their various strata -
-                     * all the features get combined, all the questions get combined,
-                     * all the items get combined and all the activities get combined.
-                     */
-                    if (null === $consolidatedBlueprint) {
-                        $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
-                        $this->numQuizzesImported++;
-
-                        $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
-
-                        continue;
-                    }
-
-                    /* Fetch the next quiz and perform a similar inspection
-                     * If adding it allows all payloads to be under their limit,
-                     * keep repeating this process until $nextQuiz causes one
-                     * of the payloads to exceed the limit
-                     */
-                    $canConsolidate = $blueprintBuilder->canConsolidate($consolidatedBlueprint, $blueprint);
-
-                    if ($canConsolidate) {
-                        $consolidatedBlueprint = $blueprintBuilder->consolidate($consolidatedBlueprint, $blueprint);
-                        $this->numQuizzesImported++;
-
-                        $this->getLogger()->debug('Consolidating quiz and continuing onwards');
-
-                        continue;
-                    }
-
-                    $this->getLogger()->info('Consolidation full; this quiz goes into next batch.');
-
-                    /* We've got a full $consolidatedBlueprints; we can't add another
-                     * Start doing some real work with Learnosity
-                     */
-                    $this->getLogger()->debug('Transmitting existing consolidation and setting this quiz for next consolidation');
-
-                    /* Send it
-                     */
-                    $this->transmit($api, $consolidatedBlueprint);
-
-                    /* Make the next $consolidatedBlueprint start with $blueprint
-                     * Rinse and repeat until all is done
-                     */
-                    $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
-
-                    /* Log counts as we progress
-                     */
-                    $this->numQuizzesImported++;
-                }
-
-                /* Remainder data
-                 * Transmit the last consolidated payload
-                 */
-                $this->getLogger()->debug('Transmitting final consolidated remainder');
-
-                /* Send it
-                 */
-                $this->transmit($api, $consolidatedBlueprint);
-            } catch (\Alaress\Lock\LockRefreshException $e) {
-                /* Lock TTL expired; just leave politely
-                 */
-                return;
-            } catch (\Exception $e) {
-                /* Some other random death
-                 */
-                $this->getLogger()->warning($e->getMessage());
-                return;
+            if ($this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES)) {
+                $this->importSmall(
+                    $lock,
+                    $legacyQuizBuilder,
+                    $blueprintBuilder,
+                    $api,
+                    $legacyQuizIds
+                );
+            } elseif ($this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
+                $this->importLarge();
             }
         }
 
@@ -539,6 +404,210 @@ HELP;
         $lock->release();
     }
 
+
+    /* Algorithmic approaches:
+     * Consolidate, for packing many small quizzes into as few payloads as possible
+     * Distribute, for unpacking large quizzes over multiple payloads
+     */
+
+    /**
+     *
+     * foreach $quiz in $quizzes
+     *      $this->refreshLock();
+     *
+     *      set up an Activity payload
+     *      https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+     *
+     *      foreach $section in $quiz
+     *          $this->refreshLock();
+     *
+     *          set up an Item payload
+     *          https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+     *
+     *          foreach $question in $section
+     *              $this->refreshLock();
+     *
+     *              set up a new Question payload
+     *              https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+     *              - detect question type
+     *              - spawn importer accordingly
+     *              - importer->import()
+     *
+     *              you'll probably need its answers, too, from assess_answer
+     *              which you need to deserialize. It's not particularly obvious
+     *              what format this payload should be in, but try this:
+     *              https://reference.learnosity.com/questions-api/questiontypes
+     *
+     *              send the Item containing multiple Questions into Learnosity itself?
+     *              https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setItems
+     *
+     *              send the whole Activity, its Items and its Questions into Learnosity
+     *              https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setActivities
+     *
+     *              if successful, update the learnosity_reference so we know it ended up in learnosity
+     *              otherwise something went wrong and this row is still a candidate for import
+     *
+     * @param LockInterface $lock
+     * @param LegacyQuizBuilder $legacyQuizBuilder
+     * @param BlueprintBuilder $blueprintBuilder
+     * @param Api $api
+     * @param array $legacyQuizIds
+     * @return void
+     */
+    private function importSmall(
+        LockInterface $lock,
+        LegacyQuizBuilder $legacyQuizBuilder,
+        BlueprintBuilder $blueprintBuilder,
+        Api $api,
+        array $legacyQuizIds
+    ): void {
+        try {
+            /* $legacyQuizIds is a bunch of identifiers
+             *
+             * We can perhaps minimise more Learnosity requests by batching $blueprints
+             * which typically represent a single quiz. There's a limit on the number of
+             * quizzes, but there's also a limit on number of features/questions/items
+             * which isn't particularly obvious
+             */
+            $consolidatedBlueprint = null;
+
+            foreach ($legacyQuizIds as $legacyQuizId) {
+                /* Do all the stuff it used to do to produce a $blueprint
+                 */
+                $this->refreshLock($lock);
+
+                /* Get the legacy quiz's contents
+                 */
+                $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
+
+                /* Announce what we're doing
+                 */
+                $this->getLogger()->info(sprintf(
+                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                    $legacyQuiz['title'],
+                    $legacyQuiz['assessment_id'],
+                    $legacyQuiz['assess_id']
+                ));
+
+                /* If this doesn't have an assessment_id, idk what this is,
+                 * because you can't get here anymore.
+                 */
+                if ('' === trim((string)$legacyQuiz['assessment_id'])) {
+                    $this->getLogger()->warning(sprintf(
+                        'Missing assessment_id; skipping'
+                    ));
+
+                    continue;
+                }
+
+                /* Make the overall Learnosity payloads which we then send later with
+                 * a little postprocessing to put things into the exactly correct format.
+                 * Learnosity is really particular about such things.
+                 */
+                try {
+                    /* Choose which construction style you want
+                     */
+                    if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
+                        $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
+                    } else {
+                        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+                    }
+                } catch (\DomainException $e) {
+                    $this->getLogger()->warning($e->getMessage());
+                    $this->getLogger()->warning(sprintf(
+                        'Skipping assess_id %s',
+                        $legacyQuiz['assess_id']
+                    ));
+
+                    continue;
+                }
+
+                /* Consolidate 1 quiz to start with
+                 *
+                 * Stack them up by their various strata -
+                 * all the features get combined, all the questions get combined,
+                 * all the items get combined and all the activities get combined.
+                 */
+                if (null === $consolidatedBlueprint) {
+                    $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
+                    $this->numQuizzesImported++;
+
+                    $this->getLogger()->debug('Consolidating initial quiz and continuing onwards');
+
+                    continue;
+                }
+
+                /* Fetch the next quiz and perform a similar inspection
+                 * If adding it allows all payloads to be under their limit,
+                 * keep repeating this process until $nextQuiz causes one
+                 * of the payloads to exceed the limit
+                 */
+                $canConsolidate = $blueprintBuilder->canConsolidate($consolidatedBlueprint, $blueprint);
+
+                if ($canConsolidate) {
+                    $consolidatedBlueprint = $blueprintBuilder->consolidate($consolidatedBlueprint, $blueprint);
+                    $this->numQuizzesImported++;
+
+                    $this->getLogger()->debug('Consolidating quiz and continuing onwards');
+
+                    continue;
+                }
+
+                $this->getLogger()->info('Consolidation full; this quiz goes into next batch.');
+
+                /* We've got a full $consolidatedBlueprints; we can't add another
+                 * Start doing some real work with Learnosity
+                 */
+                $this->getLogger()->debug('Transmitting existing consolidation and setting this quiz for next consolidation');
+
+                /* Send it
+                 */
+                $this->transmit($api, $consolidatedBlueprint);
+
+                /* Make the next $consolidatedBlueprint start with $blueprint
+                 * Rinse and repeat until all is done
+                 */
+                $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
+
+                /* Log counts as we progress
+                 */
+                $this->numQuizzesImported++;
+            }
+
+            /* Remainder data
+             * Transmit the last consolidated payload
+             */
+            $this->getLogger()->debug('Transmitting final consolidated remainder');
+
+            /* Send it
+             */
+            $this->transmit($api, $consolidatedBlueprint);
+        } catch (\Alaress\Lock\LockRefreshException $e) {
+            /* Lock TTL expired; just leave politely
+             */
+            exit;
+        } catch (\Exception $e) {
+            /* Some other random death
+             */
+            $this->getLogger()->warning($e->getMessage());
+            exit;
+        }
+    }
+
+
+    /**
+     * Import large quizzes by spreading their guts out over multiple payloads
+     *
+     * @return void
+     */
+    private function importLarge()
+    {
+        return;
+    }
+
+
+    /* Misc helpful stuff
+     */
 
     /**
      * Get a set of all schoolbox.assess primary identifiers because
