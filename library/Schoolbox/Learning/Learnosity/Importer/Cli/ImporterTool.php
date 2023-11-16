@@ -458,6 +458,7 @@ HELP;
 
         $this->getLogger()->info('');
 
+        print_r($this->metrics);
         foreach ($this->metrics as $endpoint => $data) {
             $this->getLogger()->info(sprintf(
                 '    %s: %s objects sent (approx. %s seconds total)',
@@ -778,6 +779,40 @@ HELP;
                 }
             }
 
+            /* Associations are always done last, once per quiz,
+             * and after their guts have been
+             */
+            $association = [
+                'quizId' => $blueprint['quizId'],
+                'assessmentId' => $blueprint['assessmentId'],
+                'activityLearnosityReference' => $blueprint['activityLearnosityReference']
+            ];
+
+            $this->getLogger()->info(sprintf(
+                'Associating quiz (assessment_id: %s, assess_id: %s) with %s...',
+                $association['assessmentId'],
+                $association['quizId'],
+                substr($association['activityLearnosityReference'], 0, 13)
+            ));
+
+            /* Associate learnosity quiz with ours
+             */
+            $endpointStart = microtime(true);
+
+            $this->associateStatement->execute([
+                'learnosityReference' => $association['activityLearnosityReference'],
+                'assessId' => $association['quizId']
+            ]);
+
+            $endpointEnd = microtime(true);
+
+            /* Capture time spent associating learnosity quizzes with our own
+             */
+            $this->metrics[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']++;
+            $this->metrics[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['duration'] += $endpointEnd - $endpointStart;
+
+            /* Capture time spent processing this quiz
+             */
             $batchEnd = microtime(true);
 
             /* Capture overall metrics
