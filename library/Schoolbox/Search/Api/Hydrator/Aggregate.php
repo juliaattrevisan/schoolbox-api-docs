@@ -75,7 +75,7 @@ class Aggregate implements IHydrator
         foreach ($this->hydrators as $hydrator) {
             $hydratorId = spl_object_id($hydrator);
             if (isset($groupedRawResults[$hydratorId])) {
-                $fullResults += $hydrator->hydrate($keyword, $filter, $groupedRawResults[$hydratorId], $viewer);
+                $fullResults = array_merge($fullResults, $hydrator->hydrate($keyword, $filter, $groupedRawResults[$hydratorId], $viewer));
             }
         }
 
