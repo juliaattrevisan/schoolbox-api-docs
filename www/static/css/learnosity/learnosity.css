@@ -1529,10 +1529,10 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 }
 /* removed min-height for add question section */
 .lrn.lrn-author {
-    min-height: unset;
+    min-height: unset !important;
 }
 .lrn.lrn-author .lrn-author-item-edit {
-    min-height: unset;
+    min-height: unset !important;
 }
 
 /*removed the horizontal scroll on the set correct question section */
