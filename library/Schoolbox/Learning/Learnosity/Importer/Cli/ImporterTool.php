@@ -844,7 +844,7 @@ HELP;
             }
 
             /* Associations are always done last, once per quiz,
-             * and after their guts have been
+             * and after their guts have been sent to Learnosity
              */
             $association = [
                 'quizId' => $blueprint['quizId'],
