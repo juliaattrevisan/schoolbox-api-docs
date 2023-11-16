@@ -122,14 +122,14 @@ window.Vue.watch(
                     <sp-filter-types />
                     <div class="l-flex-row l-flex--no-wrap l-gap-m">
                         <button
-                            class="button l-flex__item--1 icon-close"
+                            class="button l-flex__item--1 icon-close f-no-margins"
                             data-test="sp-filter-clear-button"
                             @click.prevent="onClearAllSelected"
                         >
                             Clear filters
                         </button>
                         <button
-                            class="button submit l-flex__item--1 icon-search"
+                            class="button submit l-flex__item--1 icon-search f-no-margins"
                             data-test="sp-filter-apply-button"
                             @click.prevent="onSearch"
                         >

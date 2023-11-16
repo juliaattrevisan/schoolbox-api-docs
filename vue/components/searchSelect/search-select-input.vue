@@ -28,7 +28,7 @@ function onInput(event: Event) {
     <input
         ref="queryInputEl"
         type="text"
-        class="search-input"
+        class="search-input f-no-margins"
         :placeholder="props.placeholder"
         data-test="search-select-input"
         @input="onInput"
