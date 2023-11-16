@@ -41,7 +41,7 @@ h3,
 h4,
 h5,
 h6 {
-    overflow-wrap: break-word; //Avoid text overflows
+    overflow-wrap: anywhere; //Avoid text overflows
 }
 
 $paragraph-font-family: inherit;
