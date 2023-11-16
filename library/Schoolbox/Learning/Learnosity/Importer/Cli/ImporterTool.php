@@ -746,6 +746,12 @@ HELP;
                 continue;
             }
 
+            /* Optionally show array payloads
+             */
+            if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+                print_r($blueprint);
+            }
+
             /* Distribute each blueprint payload into multiple learnosity payloads
              * but we don't know which payload is too big. This is the inverse of
              * consolidate()
@@ -754,17 +760,15 @@ HELP;
                 $endpoint = $payloadSequence['endpoint'];
 
                 if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
-                    if (\count($payloadSequence['payload']['features']) > self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                        $payload = [];
-                    } else {
-                        $payload = [];
-                    }
+                    $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence);
+                } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
+                    $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence);
+                } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
+                    $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence);
+                } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
+                    $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
                 }
             }
-
-
-
-            print_r($blueprint);die();
         }
 
         return;
@@ -818,7 +822,9 @@ HELP;
     private function accumulateMetrics(array $consolidatedBlueprint): void
     {
         foreach (self::ENDPOINT_INDEX as $type) {
-            $this->metrics[$type]['count'] += $consolidatedBlueprint[$type]['count'];
+            if (isset($consolidatedBlueprint[$type])) {
+                $this->metrics[$type]['count'] += $consolidatedBlueprint[$type]['count'];
+            }
         }
     }
 
@@ -925,6 +931,58 @@ HELP;
         ));
 
         $this->getLogger()->info('');
+    }
+
+
+    /**
+     * Expand each $payloadSequence into as many learnosity payloads are required
+     *
+     * @param Api $api
+     * @param string $key
+     * @param string $endpoint
+     * @param array $payloadSequence
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    private function transmitUnconsolidated(Api $api, string $key, string $endpoint, array $payloadSequence): void
+    {
+        $payload = [];
+
+        foreach ($payloadSequence['payload'][$key] as $object) {
+            $payload[$key][] = $object;
+
+            /* A special case for Questions endpoint which requires this random
+             * meta object outside of everything else -_-
+             */
+            if (isset($object['meta'])) {
+                $payload['meta'] = $object['meta'];
+            }
+
+            /* Check if we're full; if so, send it and make a new payload
+             * ready for the next iteration
+             */
+            if (\count($payloadSequence['payload'][$key]) === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                $api->dataSetRequest($endpoint, $payload);
+
+                $payload = [];
+            }
+        }
+
+        /* Send any remainders
+         */
+        if (\count($payload[$key])) {
+            $api->dataSetRequest($endpoint, $payload);
+        }
+
+        /* Accumulate some basic metrics
+         */
+        $this->accumulateMetrics([
+            $endpoint => [
+                'count' => $payloadSequence['count']
+            ]
+        ]);
     }
 
 
