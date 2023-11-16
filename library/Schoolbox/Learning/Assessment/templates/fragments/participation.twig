@@ -24,7 +24,7 @@
                     <div class="content small-12 medium-6 large-4 medium-offset-6 large-offset-8 columns" id="mass-buttons">
                         <nav>
                             <div class="flex-list buttons">
-                                <button
+                                {# <button
                                     class="button dropdown"
                                     id="customise-dropdown"
                                     data-dropdown="customise-options"
@@ -33,9 +33,9 @@
                                     disabled
                                 >
                                     Modify Participation
-                                </button>
-
-                                <button
+                                </button> #}
+                                <sbx-pop-out id="customise-dropdown" content-id="customise-options" button-title="Modify Participation">
+                                {# <button
                                     class="button icon-more icon hide"
                                     id="plan-dropdown"
                                     data-dropdown="plan-options"
@@ -43,7 +43,8 @@
                                     aria-expanded="false"
                                     title="Modify Plans"
                                 >
-                                </button>
+                                </button> #}
+                                <sbx-pop-out id="plan-dropdown" content-id="plan-options">
                             </div>
                             <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
                                 <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
