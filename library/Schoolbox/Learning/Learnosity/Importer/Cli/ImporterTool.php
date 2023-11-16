@@ -694,11 +694,6 @@ HELP;
     ): void
     {
         /* $legacyQuizIds is a bunch of identifiers
-         *
-         * We can perhaps minimise more Learnosity requests by batching $blueprints
-         * which typically represent a single quiz. There's a limit on the number of
-         * quizzes, but there's also a limit on number of features/questions/items
-         * which isn't particularly obvious
          */
         foreach ($legacyQuizIds as $legacyQuizId) {
             /* Do all the stuff it used to do to produce a $blueprint
