@@ -1,1 +1,25 @@
 <h1>{{ student.formatName }}</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Result</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for studentDatum in studentData %}
+        {% for field in (studentDatum.fields ?? []) %}
+            <td>
+                {%- for dateRange in studentDatum.dateRanges -%}
+                    {{ dateRange.from.localShort }}&mdash;{{ dateRange.to.localShort }}
+                    {% if not loop.last %}, {% endif %}
+                {%- endfor -%}
+            </td>
+            <td>{{ field.name }}</td>
+            <td>{{ field.value }}</td>
+        {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace External\Isams\Register;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Alaress_Date_Format;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -70,8 +71,12 @@ class Controller extends BaseController
         );
         $apiResponseBody = json_decode($apiResponse->getBody()->getContents(), true);
         $registers       = $apiResponseBody['registers'];
+        $globalData      = [];
+        $studentData     = [];
         foreach ($registers as $register) {
-            $registerId = $register['id'];
+            $registerId               = $register['id'];
+            $globalData[$registerId]  = $register;
+            $studentData[$registerId] = [];
 
 //            // Alternate request: find student register, filtered to $student:
 //            // This _does_ return filtered results, but doesn't include date
@@ -92,32 +97,7 @@ class Controller extends BaseController
 //            }
 //            new \Alaress_Probe($registerResponseBody);
 
-
-            // Request 1.1: find date ranges for student
-            try {
-                $dateRangesResponse = $this->httpClient->get(
-                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/dateranges'),
-                    [RequestOptions::HEADERS => $authHeader,],
-                );
-                $dateRangesResponseBody = json_decode($dateRangesResponse->getBody()->getContents(), true);
-            } catch (ClientExceptionInterface $e) {
-                // No record exists for this student: that's okay
-                $dateRangesResponseBody = [];
-            }
-
-            // Request 1.2: find fields for student
-            try {
-                $fieldsResponse = $this->httpClient->get(
-                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/fields'),
-                    [RequestOptions::HEADERS => $authHeader,],
-                );
-                $fieldsResponseBody = json_decode($fieldsResponse->getBody()->getContents(), true);
-            } catch (ClientExceptionInterface $e) {
-                // No record exists for this student: that's okay
-                $fieldsResponseBody = [];
-            }
-
-            // Request 1.3: find metadata for fields
+            // Request 1.1: find metadata for fields
             // This ought to be cacheable for a lot longer than student data
             try {
                 $metadataResponse = $this->httpClient->get(
@@ -130,16 +110,16 @@ class Controller extends BaseController
                 $metadataResponseBody = [];
             }
 
-            // Request 1.3.1: field data sources
-            $fields = [];
-            foreach (($metadataResponseBody['fields'] ?? []) as $field) {
+            // Request 1.1.1: field data sources
+            foreach (($metadataResponseBody['fields'] ?? []) as $metadataField) {
                 // Fetch data source only if it's a list
-                $dataSource = strtolower($field['properties']['dataSource'] ?? '');
+                $metadataFieldValues = null;
+                $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
                 if (in_array($dataSource, ['private', 'shared'])) {
-                    if ($field['properties']['dataSourceUrl'] ?? null) {
+                    if ($metadataField['properties']['dataSourceUrl'] ?? null) {
                         try {
                             $dataSourceResponse = $this->httpClient->get(
-                                $field['properties']['dataSourceUrl'],
+                                $metadataField['properties']['dataSourceUrl'],
                                 [RequestOptions::HEADERS => $authHeader,],
                             );
                             $dataSourceResponseBody = json_decode($dataSourceResponse->getBody()->getContents(), true);
@@ -148,18 +128,64 @@ class Controller extends BaseController
                             $dataSourceResponseBody = [];
                         }
                         foreach (($dataSourceResponseBody['items'] ?? []) as $item) {
-                            $fields[$field['key']][$item['value']] = $item['text'];
+                            $metadataFieldValues[$item['value']] = $item['text'];
                         }
                     }
                 }
+                $globalData[$registerId]['metadata'][strtolower($metadataField['key'])] = [
+                    'name'   => $metadataField['name'],
+                    'values' => $metadataFieldValues,
+                ];
             }
 
-            new \Alaress_Probe($register, $metadataResponseBody, $fields, $dateRangesResponseBody, $fieldsResponseBody);
+            // Request 1.2: find date ranges for student
+            try {
+                $dateRangesResponse = $this->httpClient->get(
+                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/dateranges'),
+                    [RequestOptions::HEADERS => $authHeader,],
+                );
+                $dateRangesResponseBody = json_decode($dateRangesResponse->getBody()->getContents(), true);
+            } catch (ClientExceptionInterface $e) {
+                // No record exists for this student: that's okay
+                $dateRangesResponseBody = [];
+            }
+
+            // Request 1.3: find fields for student
+            try {
+                $fieldsResponse = $this->httpClient->get(
+                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/fields'),
+                    [RequestOptions::HEADERS => $authHeader,],
+                );
+                $fieldsResponseBody = json_decode($fieldsResponse->getBody()->getContents(), true);
+            } catch (ClientExceptionInterface $e) {
+                // No record exists for this student: that's okay
+                $fieldsResponseBody = [];
+            }
+
+            // Collate student data
+            foreach (($fieldsResponseBody['fields'] ?? []) as $key => $fieldValue) {
+                $key = strtolower($key);
+                if (isset($fieldValue)) {
+                    $studentData[$registerId]['fields'][$key] = [
+                        'name'  => $globalData[$registerId]['metadata'][$key]['name'],
+                        'value' => $globalData[$registerId]['metadata'][$key]['values'][$fieldValue] ?? $fieldValue,
+                    ];
+                }
+            }
+            foreach (($dateRangesResponseBody['dateRanges'] ?? []) as $dateRange) {
+                $studentData[$registerId]['dateRanges'][] = [
+                    'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+                    'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+                ];
+            }
         }
 
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
-            ['student' => $student],
+            [
+                'student'     => $student,
+                'studentData' => $studentData,
+            ],
         );
     }
 }
