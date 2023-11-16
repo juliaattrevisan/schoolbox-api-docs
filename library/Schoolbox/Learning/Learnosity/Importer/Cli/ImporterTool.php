@@ -103,14 +103,33 @@ class ImporterTool extends CliTool\App
      * TODO Alternatively/additionally you can ignore quizzes that fulfil some set of
      *  conditions, minimising the size of the dataset.
      */
-    private const QUERY_LEGACY_QUIZ_IDS = "
-        SELECT assess_id
-        FROM assess
-        WHERE deleted_at IS NULL
-        AND availability = 'assess'
-        AND learnosity_reference IS NULL
-        AND external_id IS NULL
-        ORDER BY created_at DESC
+    private const QUERY_LEGACY_SMALL_QUIZ_IDS = "
+        SELECT assess.assess_id
+        FROM assess 
+        INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+        INNER JOIN assess_question question ON section.section_id = question.section_id
+        WHERE assess.deleted_at IS NULL
+        AND assess.availability = 'assess'
+        AND assess.learnosity_reference IS NULL
+        AND assess.external_id IS NULL
+        GROUP BY assess.assess_id
+        HAVING COUNT(question.question_id) <= 50
+        ORDER BY assess.created_at DESC
+    ";
+
+
+    private const QUERY_LEGACY_LARGE_QUIZ_IDS = "
+        SELECT assess.assess_id
+        FROM assess 
+        INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+        INNER JOIN assess_question question ON section.section_id = question.section_id
+        WHERE assess.deleted_at IS NULL
+        AND assess.availability = 'assess'
+        AND assess.learnosity_reference IS NULL
+        AND assess.external_id IS NULL
+        GROUP BY assess.assess_id
+        HAVING COUNT(question.question_id) > 50
+        ORDER BY assess.created_at DESC
     ";
 
 
@@ -214,12 +233,28 @@ dumped to the cli. This is useful for manual inspection before committing to a -
 
 As usual, verbose mode tells you all the debugging-level info about what the algorithm does.
 
-Usage: import.php [--assessment <assessmentId>] [--perform] [-vvv]
-Example: import.php --assessment=123456 --perform
-Example: import.php --assessment=123456 --blueprint -vvv
+Usage: import.php --small|large [--assessment <assessmentId>] [--perform] [-vvv]
+
+Example: import.php --small --assessment=123456 --perform
+Example: import.php --small --assessment=123456 --blueprint -vvv
+
+Example: import.php --large --assessment=9876 --perform
+Example: import.php --large --assessment=9876 --blueprint -vvv
 
 HELP;
             return;
+        }
+
+        /* Check mandatory args first
+         */
+        if (!$this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES) && !$this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
+            $this->getLogger()->info(sprintf(
+                'Please select either --%s or --%s quiz sizes to import.',
+                self::OPT_LONG_IMPORT_SMALL_QUIZZES,
+                self::OPT_LONG_IMPORT_LARGE_QUIZZES
+            ));
+
+            exit;
         }
 
         /* Decide how loudly to announce lock acquisition failure
@@ -278,8 +313,17 @@ HELP;
         $this->metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
 
         /* Precompile queries
+         *
+         * The legacy quiz ids are obtained based on which mode you're in,
+         * whether you're importing small quizzes or large quizzes.
+         * (Different selection crtieria apply due to payload size limitation)
          */
-        $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_IDS);
+        if ($this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES)) {
+            $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_SMALL_QUIZ_IDS);
+        } elseif ($this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
+            $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_LARGE_QUIZ_IDS);
+        }
+
         $this->legacyQuizIdStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_QUIZ_ID);
         $this->associateStatement = $this->getDatabaseInternal()->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
 
