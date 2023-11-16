@@ -440,17 +440,21 @@ HELP;
             $this->numQuizzesImported
         ));
 
-        /* Number of batches used
+        /* Report consolidation stats
          */
-        $this->getLogger()->info(sprintf(
-            '    Number of batches used: %s',
-            $this->numBatches
-        ));
+        if ($this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES)) {
+            /* Number of batches used
+             */
+            $this->getLogger()->info(sprintf(
+                '    Number of batches used: %s',
+                $this->numBatches
+            ));
 
-        $this->getLogger()->info(sprintf(
-            '    Average quizzes per batch: %s',
-            number_format($this->numQuizzesImported / $this->numBatches, 2)
-        ));
+            $this->getLogger()->info(sprintf(
+                '    Average quizzes per batch: %s',
+                number_format($this->numQuizzesImported / $this->numBatches, 2)
+            ));
+        }
 
         $this->getLogger()->info('');
 
@@ -752,6 +756,10 @@ HELP;
                 print_r($blueprint);
             }
 
+            /* Iterate and bombard Learnosity with api requests pewpewpew
+             */
+            $batchStart = microtime(true);
+
             /* Distribute each blueprint payload into multiple learnosity payloads
              * but we don't know which payload is too big. This is the inverse of
              * consolidate()
@@ -769,9 +777,15 @@ HELP;
                     $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
                 }
             }
-        }
 
-        return;
+            $batchEnd = microtime(true);
+
+            /* Capture overall metrics
+             */
+            $this->timing[] = $batchEnd - $batchStart;
+
+            $this->numQuizzesImported++;
+        }
     }
 
 
@@ -963,17 +977,57 @@ HELP;
             /* Check if we're full; if so, send it and make a new payload
              * ready for the next iteration
              */
-            if (\count($payloadSequence['payload'][$key]) === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                $api->dataSetRequest($endpoint, $payload);
+            $payloadSize = \count($payloadSequence['payload'][$key]);
+
+            if ($payloadSize === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                /* When perform mode is on, actually send it as batches of features, questions,
+                 * items, activities and just...hope/presumed that everything worked out
+                 */
+                if ($this->perform()) {
+                    $this->getLogger()->debug(sprintf(
+                        '%s: transmitting unconsolidated payload (size: %s) to Learnosity...',
+                        $endpoint,
+                        $payloadSize
+                    ));
+
+                    /* Capture endpoint-specific durations
+                     */
+                    $endpointStart = microtime(true);
+                    $api->dataSetRequest($endpoint, $payload);
+                    $endpointEnd = microtime(true);
+
+                    $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
+                }
 
                 $payload = [];
             }
         }
 
         /* Send any remainders
+         *
+         * When perform mode is on, actually send it as batches of features, questions,
+         * items, activities and just...hope/presumed that everything worked out
          */
-        if (\count($payload[$key])) {
-            $api->dataSetRequest($endpoint, $payload);
+        if ($this->perform()) {
+            $payloadSize = \count($payload[$key]);
+
+            /* Skip zero-sized payloads; Learnosity hates that
+             */
+            if ($payloadSize) {
+                $this->getLogger()->debug(sprintf(
+                    '%s: transmitting unconsolidated payload (size: %s) to Learnosity...',
+                    $endpoint,
+                    $payloadSize
+                ));
+
+                /* Capture endpoint-specific durations
+                 */
+                $endpointStart = microtime(true);
+                $api->dataSetRequest($endpoint, $payload);
+                $endpointEnd = microtime(true);
+
+                $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
+            }
         }
 
         /* Accumulate some basic metrics
