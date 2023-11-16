@@ -27,7 +27,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
  */
 function parseDateTimeString($input, $format)
 {
-    if (empty(trim($input))) {
+    if ('' === trim((string)$input)) {
         return '';
     }
 
