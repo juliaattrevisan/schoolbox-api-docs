@@ -43,7 +43,9 @@ abstract class PopulatorTool extends App
         'prod' => 'production',
         /* Vagrants use a staging environment, I guess?
          */
-        'dev' => 'staging'
+        'dev' => 'staging',
+        // Trials are production instances
+        'trial' => 'production',
     ];
 
 
