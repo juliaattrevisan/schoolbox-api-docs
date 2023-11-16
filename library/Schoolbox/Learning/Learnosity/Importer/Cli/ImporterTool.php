@@ -94,6 +94,13 @@ class ImporterTool extends CliTool\App
      */
 
     /**
+     * Maximum number of things per learnosity payload
+     * (50 questions, 50 features, 50 items, 50 activities)
+     */
+    private const LEARNOSITY_MAX_PAYLOAD_SIZE = 50;
+
+
+    /**
      * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
      * This is the default mechanism by which to mass-import everything.
      *
@@ -113,7 +120,7 @@ class ImporterTool extends CliTool\App
         AND assess.learnosity_reference IS NULL
         AND assess.external_id IS NULL
         GROUP BY assess.assess_id
-        HAVING COUNT(question.question_id) <= 50
+        HAVING COUNT(question.question_id) <= :payloadSize
         ORDER BY assess.created_at DESC
     ";
 
@@ -128,7 +135,7 @@ class ImporterTool extends CliTool\App
         AND assess.learnosity_reference IS NULL
         AND assess.external_id IS NULL
         GROUP BY assess.assess_id
-        HAVING COUNT(question.question_id) > 50
+        HAVING COUNT(question.question_id) > :payloadSize
         ORDER BY assess.created_at DESC
     ";
 
@@ -669,7 +676,9 @@ HELP;
     {
         if (null === $assessmentId) {
             $statement = $this->legacyQuizIdsStatement;
-            $statement->execute();
+            $statement->execute([
+                'payloadSize' => self::LEARNOSITY_MAX_PAYLOAD_SIZE
+            ]);
         } else {
             $statement = $this->legacyQuizIdStatement;
             $statement->execute([
