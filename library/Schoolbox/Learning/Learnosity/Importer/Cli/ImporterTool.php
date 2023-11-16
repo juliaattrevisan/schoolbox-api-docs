@@ -98,7 +98,7 @@ class ImporterTool extends CliTool\App
      * Maximum number of things per learnosity payload
      * (50 questions, 50 features, 50 items, 50 activities)
      */
-    private const LEARNOSITY_MAX_PAYLOAD_SIZE = 15;
+    private const LEARNOSITY_MAX_PAYLOAD_SIZE = 5;
 
 
     /**
@@ -186,6 +186,23 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * For a given assessment id, try to work out if this is a small quiz
+     * or a large quiz, as the import algorithm depends on this
+     */
+    private const QUERY_DETECT_SIZE = "
+        SELECT assess.assess_id, COUNT(question.question_id) AS num
+        FROM assess 
+        INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+        INNER JOIN assess_question question ON section.section_id = question.section_id
+        WHERE assess.deleted_at IS NULL
+        AND assess.availability = 'assess'
+        AND assess.external_id IS NULL
+        AND assess.assessment_id = :assessmentId
+        ORDER BY assess.created_at DESC
+    ";
+
+
+    /**
      * A set of prepared statements we can recycle
      *
      * @var \PDOStatement
@@ -193,6 +210,7 @@ class ImporterTool extends CliTool\App
     private \PDOStatement $legacyQuizIdsStatement;
     private \PDOStatement $legacyQuizIdStatement;
     private \PDOStatement $associateStatement;
+    private \PDOStatement $sizeStratStatement;
 
 
     /**
@@ -254,14 +272,6 @@ Replicates legacy quizzes from schoolbox.assess into its modern Learnosity incar
 Each question type and contents is mapped to their closest Learnosity synonyms.
 
 
-Assessments
------------
-You can specify a particular assessment to import; otherwise it imports everything
-that is:
- * alive (ie. everything that is not soft-deleted)
- * not already in learnosity (ie. assess.learnosity_reference is null)
-
-
 Size
 ----
 Small quizzes (<= 50 things) are treated differently to large quizzes (> 50 things) because
@@ -274,6 +284,19 @@ avoid this due to Learnosity refusing to change their limits.
 
 Use --small to import only small quizzes.
 Use --large to import only large quizzes.
+
+
+Assessments
+-----------
+You can specify a particular assessment to import; otherwise it imports everything
+that is:
+ * alive (ie. everything that is not soft-deleted)
+ * not already in learnosity (ie. assess.learnosity_reference is null)
+
+* Note that when you specify an assessment id, we try to figure out whether it's a small quiz or
+a large quiz for you. Whatever we find, we override your size param, disregarding --small and
+--large entirely. This saves you from having to manually determine whether an assessment is a
+small or large quiz and selecting the size yourself.
 
 
 Blueprint Option
@@ -380,6 +403,32 @@ HELP;
         /* Capture basic metrics
          */
         $this->metrics = array_fill_keys(self::ENDPOINT_INDEX, ['count' => 0, 'duration' => 0]);
+
+        /* Find out if a particular assessment was chosen.
+         * If so, find out whether we should use a distributed payload,
+         * overriding whether you specified --small or --large params
+         */
+        $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+
+        if ('' !== $assessmentId) {
+            $this->sizeStratStatement = $this->getDatabaseInternal()->prepare(self::QUERY_DETECT_SIZE);
+            $this->sizeStratStatement->execute([
+                'assessmentId' => $assessmentId
+            ]);
+
+            $numQuestions = $this->sizeStratStatement->fetch(\PDO::FETCH_ASSOC)['num'];
+
+            if ($numQuestions <= self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                $this->sizeStrat = self::OPT_LONG_IMPORT_SMALL_QUIZZES;
+            } else {
+                $this->sizeStrat = self::OPT_LONG_IMPORT_LARGE_QUIZZES;
+            }
+        }
+
+        $this->getLogger()->debug(sprintf(
+            'Detecting %s quiz size from provided assessment id; we are overriding cli params accordingly.',
+            $this->sizeStrat
+        ));
 
         /* Precompile queries
          *
