@@ -87,12 +87,15 @@ export function getToolbar(config: EditorConfig) {
             "|",
             "numberedList",
             "bulletedList",
+            "aiCommands",
+            "aiAssistant",
             "|",
             {
                 label: "Other",
                 icon: "threeVerticalDots",
                 items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
             },
+
         ];
     }
     /**
