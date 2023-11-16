@@ -86,7 +86,14 @@ abstract class PopulatorTool extends App
         /* Obtain learnosity credentials from instance registry in a set of key-value tuples,
          * remapping siteType into something Instance Registry understands
          */
-        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, $puppetCert, self::ENVIRONMENT_MAP[$siteType]);
+        $environment = self::ENVIRONMENT_MAP[$siteType] ?? null;
+        if (!isset($environment)) {
+            $this->getLogger()->error(
+                sprintf('Unknown site type "%s": must be one of stg, prod, dev, trial', $siteType),
+            );
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, $puppetCert, $environment);
 
         /* Shank them into our config table
          */
