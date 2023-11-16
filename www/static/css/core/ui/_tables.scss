@@ -142,8 +142,12 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
 table {
     border-collapse: separate;
     border-spacing: 0;
-    width: 100%;
     line-height: 1.4;
+    table-layout: fixed;
+    width: 100%;
+    td {
+        overflow: hidden;
+    }
     .card {
         padding: 0;
         img {
@@ -253,7 +257,9 @@ $rotate-th-width: $diagonal-cell-width;
 $rotate-span-width: 11rem;
 
 .diagonal-headings-table-container {
-    max-height: calc(100vh - 290px); /* 290px is the top offset of the .diagonal-headings-table-container when the page is in its widest layout.  Updated by Javascript on resize in courseMarkbookInner.twig */
+    max-height: calc(
+        100vh - 290px
+    ); /* 290px is the top offset of the .diagonal-headings-table-container when the page is in its widest layout.  Updated by Javascript on resize in courseMarkbookInner.twig */
     min-height: 600px; /* A min-height is needed to ensure the table is always viewable on mobile devices. */
     overflow: auto;
     padding-left: 0 !important;
@@ -269,7 +275,7 @@ $rotate-span-width: 11rem;
                 top: 0;
             }
 
-            th:nth-child(n+3) {
+            th:nth-child(n + 3) {
                 /* This is done so that the ths (which are not rotated) are invisible. */
                 visibility: hidden;
 
@@ -296,7 +302,7 @@ $rotate-span-width: 11rem;
 
         tr.average-headers {
             th.average-expander {
-               padding: 0.5rem !important;
+                padding: 0.5rem !important;
             }
         }
 
@@ -442,8 +448,6 @@ $rotate-span-width: 11rem;
     }
 }
 
-
-
 // Prevent long names causing first column to be excessively wide.
 table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     max-width: 200px;
@@ -518,7 +522,7 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     }
 
     thead th:nth-child(1) div,
-    thead th:nth-child(2) div, {
+    thead th:nth-child(2) div {
         border-right-width: 0 !important;
     }
 
@@ -568,7 +572,8 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         /** Remove unsightly margin from bottom of capability/indicator **/
         margin-bottom: 0;
     }
-    .capability, .indicator {
+    .capability,
+    .indicator {
         p {
             white-space: pre-wrap;
         }
