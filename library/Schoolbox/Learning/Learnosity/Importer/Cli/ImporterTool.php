@@ -1085,7 +1085,9 @@ HELP;
      */
     private function transmitUnconsolidated(Api $api, string $key, string $endpoint, array $payloadSequence): void
     {
-        $payload = [];
+        $payload = [
+            $key => []
+        ];
 
         foreach ($payloadSequence['payload'][$key] as $object) {
             $payload[$key][] = $object;
@@ -1122,7 +1124,9 @@ HELP;
                     $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
                 }
 
-                $payload = [];
+                $payload = [
+                    $key => []
+                ];
             }
         }
 
@@ -1130,6 +1134,10 @@ HELP;
          *
          * When perform mode is on, actually send it as batches of features, questions,
          * items, activities and just...hope/presumed that everything worked out
+         *
+         * Note that $payload might be empty because the quiz contained an exact multiple
+         * of the maximum payload size; in this case, $payload will be an empty array and
+         * there are no remainders in any of its keys.
          */
         if ($this->perform()) {
             $payloadSize = \count($payload[$key]);
