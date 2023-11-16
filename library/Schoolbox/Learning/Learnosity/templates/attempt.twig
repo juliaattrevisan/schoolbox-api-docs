@@ -23,6 +23,9 @@
 
 {% autoescape 'js' %}
 <script>
+    // Track if the time has ended or not
+    let timeEnded = false;
+
     /**
      * So we can add browser state when moving between items (cards)
      */
@@ -33,6 +36,13 @@
              */
             itemsApp.on("item:changed", function (itemIndex) {
                 window.location.hash = `#${itemIndex}`;
+            });
+
+            /**
+             * Track when the time has ended
+             */
+            itemsApp.on("time:end", function () {
+                timeEnded = true;
             });
 
             /**
@@ -61,6 +71,7 @@
                 }
             };
         },
+
         /* Log errors to console and to screen for users
          */
         errorListener: function(error) {
@@ -74,6 +85,16 @@
             document.getElementById('quiz-container').classList.add('columns');
 
             console.log(error);
+        },
+
+        /* Only warn the user while leaving the page if doing so will actually loose data.
+         * Learnosity's default implementation still shows the warning at the end of the time
+         * limit, even though it doesn't matter at that point as it will save anyway...
+         *
+         * The unload prompt will now only show if there is unsaved data and the time hasn't ended
+         */
+        customUnload: function() {
+            return !(timeEnded || itemsApp.safeToUnload())
         }
     };
 
