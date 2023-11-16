@@ -11,7 +11,7 @@ interface Props {
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 
-const maxUnexpandedActivities = 6;
+const maxUnexpandedActivities = 7;
 
 const isExpanded = window.Vue.computed(() => {
     if (props.activities.length <= maxUnexpandedActivities) return true;
@@ -64,11 +64,12 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
     bottom: 0;
     position: absolute;
     width: 100%;
-    background: white;
+    pointer-events: none;
 }
 .show-more-container button {
     margin: 5px;
     float: right;
+    pointer-events: all;
 }
 
 .activity-list {

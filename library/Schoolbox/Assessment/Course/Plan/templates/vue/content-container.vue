@@ -51,10 +51,11 @@ window.Vue.onMounted(() => {
     bottom: 0;
     position: absolute;
     width: 100%;
-    background: white;
+    pointer-events: none;
 }
 .show-more-container button {
     margin: 5px;
     float: right;
+    pointer-events: all;
 }
 </style>
