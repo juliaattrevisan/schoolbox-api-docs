@@ -636,7 +636,7 @@ HELP;
 
                 /* Send it
                  */
-                $this->transmit($api, $consolidatedBlueprint);
+                $this->transmitConsolidated($api, $consolidatedBlueprint);
 
                 /* Make the next $consolidatedBlueprint start with $blueprint
                  * Rinse and repeat until all is done
@@ -655,7 +655,7 @@ HELP;
 
             /* Send it
              */
-            $this->transmit($api, $consolidatedBlueprint);
+            $this->transmitConsolidated($api, $consolidatedBlueprint);
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
@@ -746,6 +746,22 @@ HELP;
                 continue;
             }
 
+            /* Distribute each blueprint payload into multiple learnosity payloads
+             * but we don't know which payload is too big. This is the inverse of
+             * consolidate()
+             */
+            foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+                $endpoint = $payloadSequence['endpoint'];
+
+                if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
+                    if (\count($payloadSequence['payload']['features']) > self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                        $payload = [];
+                    } else {
+                        $payload = [];
+                    }
+                }
+            }
+
 
 
             print_r($blueprint);die();
@@ -818,7 +834,7 @@ HELP;
      * @throws \PDOException
      * @throws \RuntimeException
      */
-    private function transmit(Api $api, array $consolidatedBlueprint): void
+    private function transmitConsolidated(Api $api, array $consolidatedBlueprint): void
     {
         /* Accumulate some basic metrics
          */
