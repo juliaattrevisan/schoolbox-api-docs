@@ -1333,7 +1333,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn .lrn-author-ui a.lrn-btn:focus {
     outline: none;
 }
-/* added right border to the cards row */
+/* added right border to the items row */
 .lrn.lrn-author
     .lrn-item-for-activity-list.lrn-item-for-activity-list-edit
     .lrn-list-view-item
@@ -1686,7 +1686,7 @@ span.lrn-list-view-empty-label {
     width: auto;
 }
 .lrn-list-view-empty.lrn-author-ui-no-preview::after {
-    content: "\A You have no cards yet. An item is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
+    content: "\A You have no items yet. An item is a single question or a collection of questions in a quiz.You need items to create a quiz.\A Select Find items or Create item to proceed.";
     white-space: pre;
 }
 
