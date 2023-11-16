@@ -208,6 +208,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * @var string
+     */
+    private string $sizeStrat;
+
+
+    /**
      * Some meaningful stats to show at the end of the import
      *
      * @var array
@@ -312,6 +318,14 @@ HELP;
             exit;
         }
 
+        /* Decide whether we're importing small quizzes or large quizzes
+         */
+        if ($this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES)) {
+            $this->sizeStrat = self::OPT_LONG_IMPORT_SMALL_QUIZZES;
+        } elseif ($this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
+            $this->sizeStrat = self::OPT_LONG_IMPORT_LARGE_QUIZZES;
+        }
+
         /* Decide how loudly to announce lock acquisition failure
          *
          * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
@@ -373,9 +387,9 @@ HELP;
          * whether you're importing small quizzes or large quizzes.
          * (Different selection crtieria apply due to payload size limitation)
          */
-        if ($this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES)) {
+        if (self::OPT_LONG_IMPORT_SMALL_QUIZZES === $this->sizeStrat) {
             $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_SMALL_QUIZ_IDS);
-        } elseif ($this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
+        } elseif (self::OPT_LONG_IMPORT_LARGE_QUIZZES === $this->sizeStrat) {
             $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_LARGE_QUIZ_IDS);
         }
 
@@ -408,7 +422,7 @@ HELP;
         $overallStart = microtime(true);
 
         if (\count($legacyQuizIds)) {
-            if ($this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES)) {
+            if (self::OPT_LONG_IMPORT_SMALL_QUIZZES === $this->sizeStrat) {
                 $this->importSmall(
                     $lock,
                     $legacyQuizBuilder,
@@ -416,7 +430,7 @@ HELP;
                     $api,
                     $legacyQuizIds
                 );
-            } elseif ($this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES)) {
+            } elseif (self::OPT_LONG_IMPORT_LARGE_QUIZZES === $this->sizeStrat) {
                 $this->importLarge(
                     $lock,
                     $legacyQuizBuilder,
@@ -473,7 +487,7 @@ HELP;
 
         /* Report consolidation stats
          */
-        if ($this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES)) {
+        if (self::OPT_LONG_IMPORT_SMALL_QUIZZES === $this->sizeStrat) {
             /* Number of batches used
              */
             $this->getLogger()->info(sprintf(
@@ -489,7 +503,6 @@ HELP;
 
         $this->getLogger()->info('');
 
-        print_r($this->metrics);
         foreach ($this->metrics as $endpoint => $data) {
             $this->getLogger()->info(sprintf(
                 '    %s: %s objects sent (approx. %s seconds total)',
