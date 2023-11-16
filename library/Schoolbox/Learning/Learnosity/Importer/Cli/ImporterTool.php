@@ -101,6 +101,9 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Quizzes that have less than LEARNOSITY_MAX_PAYLOAD_SIZE questions in them
+     * Learnosity payloads can potentially fit multiple quizzes' data in them
+     *
      * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
      * This is the default mechanism by which to mass-import everything.
      *
@@ -125,6 +128,19 @@ class ImporterTool extends CliTool\App
     ";
 
 
+    /**
+     * Quizzes that have at least LEARNOSITY_MAX_PAYLOAD_SIZE questions in them
+     * They're too big to fit in one payload, so we have to spread them out
+     *
+     * Get all the schoolbox.assess rows that aren't part of Learnosity Land already
+     * This is the default mechanism by which to mass-import everything.
+     *
+     * The ORDER BY clause loads the most recent quizzes first, and the oldest quizzes last
+     * so that schools can still keep going while this imports in the background.
+     *
+     * TODO Alternatively/additionally you can ignore quizzes that fulfil some set of
+     *  conditions, minimising the size of the dataset.
+     */
     private const QUERY_LEGACY_LARGE_QUIZ_IDS = "
         SELECT assess.assess_id
         FROM assess 
