@@ -303,13 +303,13 @@ Usage: import.php --small|large [--assessment <assessmentId>] [--blueprint] [--p
 
 // Small quiz import
 Example: import.php --small --perform -vvv
-Example: import.php --small --assessment=123456 --perform
-Example: import.php --small --assessment=123456 --blueprint -vvv
+Example: import.php --assessment=123456 --perform
+Example: import.php --assessment=123456 --blueprint -vvv
 
 // Large quiz import
 Example: import.php --large --perform -vvv
-Example: import.php --large --assessment=9876 --perform
-Example: import.php --large --assessment=9876 --blueprint -vvv
+Example: import.php --assessment=9876 --perform
+Example: import.php --assessment=9876 --blueprint -vvv
 
 
 HELP;
