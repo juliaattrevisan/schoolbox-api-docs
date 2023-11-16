@@ -35,8 +35,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
     props.buttonText ? props.buttonText : "Actions",
     props.contentId,
-    props.isFullWidth ? "bottom-start" : "bottom-end",
-    props.isFullWidth
+    props.isFullWidth ? "bottom-start" : "bottom-end"
 );
 </script>
 
