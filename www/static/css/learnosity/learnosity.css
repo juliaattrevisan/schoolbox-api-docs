@@ -1898,3 +1898,8 @@ td.lrn-report-area::first-letter {
     padding: 0.5rem;
     line-height: 0;
 }
+
+/* Added border between each question in an item */
+.lrn-author-widget-wrapper.lrn-author-widget-loaded.lrn-author-widget-draggable {
+    border-bottom: 1px solid var(--body-background) !important;
+}
