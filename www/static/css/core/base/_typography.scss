@@ -41,7 +41,8 @@ h3,
 h4,
 h5,
 h6 {
-    overflow-wrap: anywhere; //Avoid text overflows
+    overflow-wrap: break-word; // Avoid text overflows
+    overflow-wrap: anywhere; // Prefer when supported (which it mostly is: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap#anywhere)
 }
 
 $paragraph-font-family: inherit;
