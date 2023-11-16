@@ -58,11 +58,10 @@ class Controller extends BaseController
         $tokenResponseBody = json_decode($tokenResponse->getBody()->getContents(), true);
         $accessToken       = $tokenResponseBody['access_token'];
 
-        // Find registers?
+        // Request 1: find registers
         // TODO these should be configured:
         //      also a mapping from codes to IDs should be cached
         $apiResponse = $this->httpClient->get(
-//            $apiUrl->withPath('/Main/api/students/' . $student->getExternalId()),
             $apiUrl->withPath('/Main/api/registers/'),
             [
                 RequestOptions::HEADERS => [
@@ -71,42 +70,59 @@ class Controller extends BaseController
             ]
         );
         $apiResponseBody = json_decode($apiResponse->getBody()->getContents(), true);
-        $registerIds     = array_column($apiResponseBody['registers'], 'id');
-        foreach ($registerIds as $registerId) {
+        $registers       = $apiResponseBody['registers'];
+        foreach ($registers as $register) {
+            $registerId = $register['id'];
+
+            // Request 1.1: find date ranges for student
             try {
-                $apiResponse = $this->httpClient->get(
-//                    $apiUrl->withPath('/Main/api/students/registers/' . $registerId),
-                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/recordCollections/'),
-//                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/fields'),
+                $dateRangesResponse = $this->httpClient->get(
+                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/dateranges'),
                     [
                         RequestOptions::HEADERS => [
                             'authorization' => 'Bearer ' . $accessToken,
                         ]
                     ]
                 );
+                $dateRangesResponseBody = json_decode($dateRangesResponse->getBody()->getContents(), true);
             } catch (ClientExceptionInterface $e) {
                 // No record exists for this student: that's okay
-                continue;
+                $dateRangesResponseBody = [];
             }
-            $apiResponseBody     = json_decode($apiResponse->getBody()->getContents(), true);
-            $recordCollectionIds = array_column($apiResponseBody['recordCollections'], 'id');
-            foreach ($recordCollectionIds as $recordCollectionId) {
-                try {
-                    $apiResponse = $this->httpClient->get(
-                        $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/recordCollections/'. $recordCollectionId . '/records'),
-                        [
-                            RequestOptions::HEADERS => [
-                                'authorization' => 'Bearer ' . $accessToken,
-                            ]
+
+            // Request 1.2: find fields for student
+            try {
+                $fieldsResponse = $this->httpClient->get(
+                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/fields'),
+                    [
+                        RequestOptions::HEADERS => [
+                            'authorization' => 'Bearer ' . $accessToken,
                         ]
-                    );
-                } catch (ClientExceptionInterface $e) {
-                    // No record exists for this student: that's okay
-                    continue;
-                }
-                $apiResponseBody     = json_decode($apiResponse->getBody()->getContents(), true);
-                new \Alaress_Probe($apiResponseBody);
+                    ]
+                );
+                $fieldsResponseBody = json_decode($fieldsResponse->getBody()->getContents(), true);
+            } catch (ClientExceptionInterface $e) {
+                // No record exists for this student: that's okay
+                $fieldsResponseBody = [];
             }
+
+            // Request 1.3: find metadata for fields
+            try {
+                $metadataResponse = $this->httpClient->get(
+                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/metadata'),
+                    [
+                        RequestOptions::HEADERS => [
+                            'authorization' => 'Bearer ' . $accessToken,
+                        ]
+                    ]
+                );
+                $metadataResponseBody = json_decode($metadataResponse->getBody()->getContents(), true);
+            } catch (ClientExceptionInterface $e) {
+                // No metadata exists for this field: that's okay
+                $metadataResponseBody = [];
+            }
+
+            new \Alaress_Probe($register, $metadataResponseBody, $dateRangesResponseBody, $fieldsResponseBody);
         }
 
         $this->response = $this->responseFromTemplate(
