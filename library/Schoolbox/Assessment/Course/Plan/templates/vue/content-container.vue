@@ -51,6 +51,7 @@ window.Vue.onMounted(() => {
     bottom: 0;
     position: absolute;
     width: 100%;
+    background: linear-gradient(0deg, #fff 0%, #fff0 100%);
     pointer-events: none;
 }
 .show-more-container button {
