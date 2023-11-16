@@ -767,8 +767,7 @@ HELP;
         BlueprintBuilder $blueprintBuilder,
         Api $api,
         array $legacyQuizIds
-    ): void
-    {
+    ): void {
         /* $legacyQuizIds is a bunch of identifiers
          */
         foreach ($legacyQuizIds as $legacyQuizId) {
