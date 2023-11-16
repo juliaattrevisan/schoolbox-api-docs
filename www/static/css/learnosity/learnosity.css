@@ -1384,11 +1384,13 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-c
     position: absolute;
     right: 150px;
     top: 70px;
+    z-index: 1;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 0px;
     top: 70px;
+    z-index: 1;
 }
 span.lrn-author-name-wrapper {
     border: 1px solid var(--form-border-color);
