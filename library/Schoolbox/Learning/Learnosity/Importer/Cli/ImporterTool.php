@@ -977,9 +977,9 @@ HELP;
             /* Check if we're full; if so, send it and make a new payload
              * ready for the next iteration
              */
-            $payloadSize = \count($payloadSequence['payload'][$key]);
+            $currentPayloadSize = \count($payload[$key]);
 
-            if ($payloadSize === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+            if ($currentPayloadSize === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
                 /* When perform mode is on, actually send it as batches of features, questions,
                  * items, activities and just...hope/presumed that everything worked out
                  */
@@ -987,7 +987,7 @@ HELP;
                     $this->getLogger()->debug(sprintf(
                         '%s: transmitting unconsolidated payload (size: %s) to Learnosity...',
                         $endpoint,
-                        $payloadSize
+                        $currentPayloadSize
                     ));
 
                     /* Capture endpoint-specific durations
