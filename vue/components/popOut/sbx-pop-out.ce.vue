@@ -17,7 +17,7 @@ interface Props {
     /**
      * Whether the button is to be disabled
      */
-    isDisabled?: boolean;
+    disabled?: boolean;
     /**
      * Whether the button should be full width, stretching to the width of the parent container
      */
@@ -56,7 +56,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
         :data-test="`sbx-pop-out-${props.contentId}-button`"
-        :disabled="props.isDisabled"
+        :disabled="props.disabled"
         @click.prevent="onButtonSelected"
     >
         <!-- when an alternative icon should be used -->
