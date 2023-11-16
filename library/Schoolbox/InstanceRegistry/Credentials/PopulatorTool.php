@@ -123,7 +123,7 @@ abstract class PopulatorTool extends App
 
         /* Get the credentials from this special endpoint
          */
-        $this->getLogger()->info('Fetching credentials from Instance Registry API...');
+        $this->getLogger()->info(sprintf('Fetching credentials from Instance Registry API (environment: %s)...', $environment));
 
         $response = $client->get($endpoint, [
             'headers' => [
@@ -191,11 +191,7 @@ abstract class PopulatorTool extends App
                 'name'  => $configName,
             ]);
 
-            $this->getLogger()->debug(sprintf(
-                'Updated %s to %s',
-                $configName,
-                $configValue
-            ));
+            $this->getLogger()->debug(sprintf('Updated %s config value', $configName));
         }
     }
 
