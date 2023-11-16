@@ -73,8 +73,10 @@ export function getToolbar(config: EditorConfig) {
             "|",
             "heading",
             "|",
-            "link",
+            "aiCommands",
+            "aiAssistant",
             "|",
+            "link",
             "resource",
             "mediaEmbed",
             "emoji",
@@ -93,6 +95,7 @@ export function getToolbar(config: EditorConfig) {
                 icon: "threeVerticalDots",
                 items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
             },
+
         ];
     }
     /**

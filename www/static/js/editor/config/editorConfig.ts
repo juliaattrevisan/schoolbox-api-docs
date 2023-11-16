@@ -22,6 +22,8 @@ import { Alignment } from "@ckeditor/ckeditor5-alignment";
 import { FindAndReplace } from "@ckeditor/ckeditor5-find-and-replace";
 import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import { WordCount } from "@ckeditor/ckeditor5-word-count";
+import { AIAssistant } from "@ckeditor/ckeditor5-ai";
+
 import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
@@ -34,6 +36,7 @@ import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings";
+import { getAISettings } from "@js/editor/settings/aiSettings";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
@@ -74,6 +77,7 @@ export function getConfig(config: EditorConfig) {
             Eqneditor5,
             Resource,
             UITweaks,
+            AIAssistant,
         ],
         extraPlugins: [UploadAdapterPlugin],
         licenseKey: window.sbProps.ckeditor5LicenseKey,
@@ -88,6 +92,7 @@ export function getConfig(config: EditorConfig) {
         ...getTokensSettings(config),
         ...getWordCountSettings(),
         ...getHTMLSupportSettings(),
+        ...getAISettings(),
         sbConfig: { ...config }, // to be able to access our editor config from within the editor,
     };
 }
