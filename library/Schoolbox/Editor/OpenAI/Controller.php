@@ -41,7 +41,7 @@ class Controller extends Base
         $openAiKey = $this->getConfigLoader()->get('openai_key');
 
         if (!$openAiKey) {
-            $problem = (new ApiProblem('OpenAI API key is unavailable'))
+            $problem        = (new ApiProblem('OpenAI API key is unavailable'))
                 ->setStatus(404)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)
@@ -51,24 +51,44 @@ class Controller extends Base
 
         try {
             $openAiRequest = new Request('POST', self::OPENAI_API_ENDPOINT, [
-                'Authorization' => 'Bearer '.$openAiKey,
-                'Content-Type' => 'application/json',
-            ], $this->request->getBody());
+                'Authorization' => 'Bearer ' . $openAiKey,
+                'Content-Type'  => 'application/json',
+            ], $this->request->getBody()->getContents());
 
-            $stream = $this->client->send($openAiRequest)->getBody();
+            $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
-            header('Content-Type: application/json');
-            http_response_code(200);
 
-            // Stream the response to the client (cannot actually get this working)
-            while (!$stream->eof()) {
-                echo $stream->read(1024); // Adjust buffer size as needed
-                ob_flush();
-            }
+            // Handle the response when it arrives
+            $promise->then(
+                function ($response) {
+                    http_response_code(200);
+                    //header('X-Accel-Buffering: no');
+                    header('Content-Type: application/json');
+                    header('Content-Encoding: none');
+
+                    ob_implicit_flush(true);
+                    ob_end_flush();
+
+                    $stream = $response->getBody();
+
+                    // Read and proxy the data
+                    while (!$stream->eof()) {
+                        echo $stream->read(1024);
+                        //ob_flush();
+                        //flush();
+                    }
+                },
+                function ($reason) {
+                    // Handle error if the request fails
+                    $this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+                }
+            );
+
+            $promise->wait();
+
         } catch (GuzzleException $e) {
             $this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
-
         die();
     }
 }
