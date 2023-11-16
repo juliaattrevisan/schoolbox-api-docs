@@ -79,18 +79,6 @@ class ImporterTool extends CliTool\App
     private const OPT_LONG_IMPORT_LARGE_QUIZZES = 'large';
 
 
-    /**
-     * --preserve-sections
-     *
-     * Decide whether to preserve sections or not.
-     *
-     * Preserving sections interprets legacy quiz Sections as a single
-     * Learnosity Item, but is detrimental to question reuse and
-     * horizontal marking.
-     */
-    private const OPT_LONG_PRESERVE_SECTIONS = 'preserve-sections';
-
-
     /* For prepared statements
      */
 
@@ -253,7 +241,6 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_BLUEPRINT,
             self::OPT_LONG_IMPORT_SMALL_QUIZZES,
             self::OPT_LONG_IMPORT_LARGE_QUIZZES,
-            self::OPT_LONG_PRESERVE_SECTIONS,
         ];
     }
 
@@ -679,13 +666,7 @@ HELP;
                  * Learnosity is really particular about such things.
                  */
                 try {
-                    /* Choose which construction style you want
-                     */
-                    if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                        $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
-                    } else {
-                        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-                    }
+                    $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
                 } catch (\DomainException $e) {
                     $this->getLogger()->warning($e->getMessage());
                     $this->getLogger()->warning(sprintf(
@@ -824,13 +805,7 @@ HELP;
              * Learnosity is really particular about such things.
              */
             try {
-                /* Choose which construction style you want
-                 */
-                if ($this->getOpt(self::OPT_LONG_PRESERVE_SECTIONS)) {
-                    $blueprint = $blueprintBuilder->buildPreserveSections($legacyQuiz);
-                } else {
-                    $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-                }
+                $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
             } catch (\DomainException $e) {
                 $this->getLogger()->warning($e->getMessage());
                 $this->getLogger()->warning(sprintf(
