@@ -25,7 +25,7 @@ window.Vue.watch(
         <div class="all-marked__inner-container">
             <div class="empty-state-flex-centered">
                 <i class="icon-submissions"></i>
-                <p>All cards have already been marked.</p>
+                <p>All items have already been marked.</p>
             </div>
         </div>
     </div>
