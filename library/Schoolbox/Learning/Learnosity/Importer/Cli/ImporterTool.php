@@ -385,7 +385,7 @@ HELP;
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
          */
-        $blueprintBuilder = new BlueprintBuilder($schoolCode, $payloadFactory, $tagFactory, $contextLookup, $this->getLogger());
+        $blueprintBuilder = new BlueprintBuilder($schoolCode, $payloadFactory, $contextLookup, $this->getLogger());
 
         /* Capture basic metrics
          */

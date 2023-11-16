@@ -82,14 +82,12 @@ class BlueprintBuilder
      *
      * @param string $schoolCode
      * @param PayloadFactory $payloadFactory
-     * @param TagFactory $tagFactory
      * @param ContextLookup $contextLookup
      * @param LoggerInterface $logger
      */
     public function __construct(
         private string $schoolCode,
         private PayloadFactory $payloadFactory,
-        private TagFactory $tagFactory,
         private ContextLookup $contextLookup,
         private LoggerInterface $logger
     ) {
