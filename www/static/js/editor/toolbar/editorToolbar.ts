@@ -6,6 +6,18 @@
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 
 /**
+ * Display the AI toolbar options based on the existence of an sbProp
+ * created within templates/core/include/chrome.twig
+ * @returns {string[]} - the toolbar display
+ */
+function getToolbarAI() {
+    if (window.sbProps.hasEditorAI) {
+        return ["|", "aiCommands", "aiAssistant"];
+    }
+    return [];
+}
+
+/**
  * Display the toolbar options based on config
  * @param { EditorConfig } config - the config to use when creating the editor
  * @returns { Array } - the toolbar display
@@ -72,9 +84,7 @@ export function getToolbar(config: EditorConfig) {
             "style",
             "|",
             "heading",
-            "|",
-            "aiCommands",
-            "aiAssistant",
+            ...getToolbarAI(),
             "|",
             "link",
             "resource",
@@ -95,7 +105,6 @@ export function getToolbar(config: EditorConfig) {
                 icon: "threeVerticalDots",
                 items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
             },
-
         ];
     }
     /**
