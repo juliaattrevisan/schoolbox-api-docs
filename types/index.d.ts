@@ -16,17 +16,17 @@ declare global {
             dayjs: string;
         };
         sbProps: {
+            ckeditor5LicenseKey: string;
+            colourDefaults: { [key: string]: any };
+            editors: { [key: string]: Editor };
+            hasEditorAI: boolean; // to display the AI features within the editor
             lightGallery: Function;
             lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };
             imageLightboxLicenseKey: string;
-            ckeditor5LicenseKey: string;
             imageSlideshows: { [key: string]: any };
-            colourDefaults: { [key: string]: any };
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
-            editors: { [key: string]: Editor };
-            hasEditorAI: boolean;
         };
         schoolboxUser: {
             id: number;

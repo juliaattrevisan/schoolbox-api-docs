@@ -111,6 +111,7 @@
         window.sbProps.colourDefaults["swatches"] = [...chosenSkinColours, ...window.sbProps.colourDefaults["constant"]];
 
         {% if config.openai_key %}
+        // to display the AI features within the editor
         window.sbProps.hasEditorAI = true;
         {% endif %}
 
