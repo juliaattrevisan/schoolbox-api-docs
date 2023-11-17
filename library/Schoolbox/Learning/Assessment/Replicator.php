@@ -138,28 +138,33 @@ class Replicator
             return;
         }
 
-        // Callback to URL which replicates constituents
-        $baseUrl = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
-        $message = $this->messageFactory
-            ->setUser($creator)
-            ->setRequest(
-                $this->httpFactory
-                    ->createRequest(
-                        'POST',
-                        $baseUrl->withPath(
-                            $this->routeGenerator->generate(
-                                'learnosity.postCopyQuizConstituents',
-                                [
-                                    'sourceId'      => $source->getId(),
-                                    'destinationId' => $destination->getId(),
-                                ],
+        // Callback to URL which replicates constituents:
+        // only trigger once the transaction closes
+        $this->quizMapper->getDatabase()->onPersist(
+            function () use ($source, $destination, $creator) {
+                $baseUrl = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
+                $message = $this->messageFactory
+                    ->setUser($creator)
+                    ->setRequest(
+                        $this->httpFactory
+                            ->createRequest(
+                                'POST',
+                                $baseUrl->withPath(
+                                    $this->routeGenerator->generate(
+                                        'learnosity.postCopyQuizConstituents',
+                                        [
+                                            'sourceId'      => $source->getId(),
+                                            'destinationId' => $destination->getId(),
+                                        ],
+                                    )
+                                )
                             )
-                        )
+                            ->withHeader('accept', 'application/json')
                     )
-                    ->withHeader('accept', 'application/json')
-            )
-            ->build();
-        $this->messageProducer->send($message);
+                    ->build();
+                $this->messageProducer->send($message, maxRequeues: 10);
+            }
+        );
     }
 
 
