@@ -16,8 +16,8 @@ const hasQuestionsWithNoScore = props.item.questions.some((question) => question
 <template>
     <div v-if="hasQuestionsWithNoScore">
         <div class="alert-box f-no-margins">
-            Any questions within a card that don't have a score are considered marked when a comment is added to the
-            card.
+            Any questions within an item that don't have a score are considered marked when a comment is added to the
+            item.
         </div>
     </div>
 </template>

@@ -858,12 +858,14 @@ td.lrn-report-area {
     border: none;
     border-radius: 0px;
     color: var(--content-ui-foreground);
+    font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-active,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:not(:checked) ~ .lrn-author-toggle-right,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:checked ~ .lrn-author-toggle-left {
     background-color: var(--content-ui-selected);
     color: var(--content-ui-foreground);
+    font-size: 1rem;
 }
 
 /* author primary and secondary and disabled button styles */
@@ -873,7 +875,7 @@ td.lrn-report-area {
     border-radius: 0px !important;
     border: none;
     color: var(--content-ui-foreground);
-    font-size: 1rem;
+    font-size: 1rem !important;
 }
 .lrn .lrn-author-ui .lrn-btn-primary:hover,
 .lrn .lrn-author-ui .lrn-btn-sec:hover,
@@ -881,6 +883,7 @@ td.lrn-report-area {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
     text-decoration: none !important;
+    font-size: 1rem !important;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.lrn-author-disabled {
     background-color: var(--content-ui-background);
@@ -890,11 +893,13 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
     color: var(--content-ui-foreground);
     cursor: default;
     opacity: 0.5;
+    font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
     background: var(--content-ui-background);
     border: none;
     color: var(--content-ui-foreground);
+    font-size: 1rem;
 }
 
 /* Save button styles */
@@ -939,7 +944,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border-radius: 0px !important;
     border: none;
     color: var(--content-ui-foreground);
-    font-size: 12px;
+    font-size: 1rem;
+    line-height: inherit;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
@@ -1075,8 +1081,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
         Arial, sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
-    line-height: inherit !important;
-    min-height: 2.5rem !important;
+    line-height: unset;
     overflow: hidden !important;
     padding: 0.5rem !important;
     position: relative !important;
@@ -1311,7 +1316,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 /* replace icons with sb icons */
 .lrn-i-preview::before {
     color: var(--content-ui-foreground);
-    content: "\e62f";
+    content: "\e901";
     font-family: "schoolbox";
 }
 .lrn .lrn-author-ui .lrn-list-view-item .lrn-btn-default {
@@ -1327,7 +1332,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn .lrn-author-ui a.lrn-btn:focus {
     outline: none;
 }
-/* added right border to the cards row */
+/* added right border to the items row */
 .lrn.lrn-author
     .lrn-item-for-activity-list.lrn-item-for-activity-list-edit
     .lrn-list-view-item
@@ -1377,12 +1382,14 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 150px;
-    top: 55px;
+    top: 70px;
+    z-index: 1;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 0px;
-    top: 55px;
+    top: 70px;
+    z-index: 1;
 }
 span.lrn-author-name-wrapper {
     border: 1px solid var(--form-border-color);
@@ -1523,10 +1530,10 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 }
 /* removed min-height for add question section */
 .lrn.lrn-author {
-    min-height: unset;
+    min-height: unset !important;
 }
 .lrn.lrn-author .lrn-author-item-edit {
-    min-height: unset;
+    min-height: unset !important;
 }
 
 /*removed the horizontal scroll on the set correct question section */
@@ -1575,7 +1582,7 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     font-weight: 400;
 }
 
-/* add "Add" before icon for adding question to a card */
+/* add "Add" before icon for adding question to an item */
 button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-widget-icon.lrn-i-plus:after {
     content: " Add";
 }
@@ -1605,6 +1612,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn-i-trash:before {
     content: "\e61b";
     font-family: "schoolbox";
+    vertical-align: middle;
 }
 
 /* update the pagination styles */
@@ -1662,9 +1670,9 @@ span.lrn-list-view-empty-label {
     color: #999;
     font-size: 1rem;
     font-style: italic;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    padding: 2rem;
+    margin-bottom: 1rem !important;
+    margin-top: 3rem !important;
+    padding: 2rem !important;
     text-align: center;
     width: 100%;
 }
@@ -1677,7 +1685,7 @@ span.lrn-list-view-empty-label {
     width: auto;
 }
 .lrn-list-view-empty.lrn-author-ui-no-preview::after {
-    content: "\A You have no cards yet. A card is a single question or a collection of questions in a quiz.You need cards to create a quiz.\A Select Find Cards or Create Card to proceed.";
+    content: "\A You have no items yet. An item is a single question or a collection of questions in a quiz.You need items to create a quiz.\A Select Find items or Create item to proceed.";
     white-space: pre;
 }
 
@@ -1775,4 +1783,159 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
 }
 .lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
     width: 17.6666666667%;
+}
+
+/* Added space to the right of questions in the item authoring */
+.lrn-widget-drag-wrapper {
+    padding-right: 50px;
+}
+
+/* update Add items button styles */
+.lrn .lrn-author-ui .lrn-btn-primary[disabled],
+.lrn .lrn-author-ui .lrn-btn-primary[disabled]:hover,
+.lrn .lrn-author-ui .lrn-btn-primary[disabled]:focus {
+    background-color: var(--content-ui-background);
+    border-color: transparent;
+    border-radius: 0px;
+    box-shadow: none;
+    color: var(--content-ui-foreground);
+    cursor: default;
+    opacity: 0.5;
+    font-size: 1rem;
+}
+
+/* Add more padding to the bottom of the Learnosity container */
+#container {
+    padding: 1rem 1rem 3rem 1rem;
+}
+
+/* horizontally aligned the icon and text In add new item */
+span.lrn-author-widget-icon.lrn-i-plus::before {
+    display: none;
+}
+.lrn .lrn-author-ui .lrn-author-widget-text::before {
+    content: "\e600";
+    font-family: "schoolbox";
+    margin-right: 9px;
+}
+
+/* Updated empty state preview - when there are no items */
+.lrn-empty-activity-wrapper {
+    background-color: #ddd;
+    color: #999;
+    font-size: 1rem !important;
+    font-style: italic;
+    margin-bottom: 1rem !important;
+    margin-top: 3rem !important;
+    min-height: unset !important;
+    padding: 2rem !important;
+    text-align: center;
+    width: 100%;
+}
+.lrn-empty-activity-wrapper > span {
+    display: none;
+}
+.lrn-empty-activity-wrapper::after {
+    content: "\A No items to preview. Select Edit to proceed.";
+    white-space: pre;
+}
+
+/* updated notification side panel background colour to white*/
+.action-list {
+    background-color: #fff;
+}
+
+/* Change the style for disabled buttons to make it clear to the user the button is disabled */
+.lrn .lrn-author-ui .lrn-pagination-btn[aria-disabled="true"] > span {
+    opacity: 0.5;
+}
+
+/* fixed overlap of the masking  */
+.lrn .lrn-mask {
+    height: 90% !important;
+}
+.lrn button.lrn-mask:hover,
+.lrn button.lrn-mask:focus {
+    outline: unset !important;
+}
+
+/* Set z-index to fix dropdown and side panels open behind the quiz modal */
+.lrn.lrn-author,
+.lrn.lrn-assess {
+    z-index: 0;
+}
+
+/* Change result page table sentence to capitalise first letter */
+td.lrn-report-area::first-letter {
+    text-transform: capitalize !important;
+}
+
+/* change toggle line height to make it consistent with other buttons */
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part,
+.lrn .lrn-author-ui .lrn-author-activity-button {
+    line-height: inherit !important;
+}
+.lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
+    padding: 0.5rem;
+}
+
+/* updated icons styles */
+.lrn-i-search::before {
+    content: "\e660";
+    font-family: "schoolbox";
+    vertical-align: middle;
+}
+.lrn-i-plus-small:before {
+    content: "\e600";
+    font-family: "schoolbox";
+    vertical-align: middle;
+}
+.lrn .lrn-author-ui .lrn-author-activity-button {
+    padding: 0.5rem 1.3rem;
+}
+
+/* Made edit/preview button font sizes consistent */
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control {
+    font-size: 1rem;
+    padding: 0.5rem;
+    line-height: 0;
+}
+
+/* Added border between each question in an item */
+.lrn-author-widget-wrapper.lrn-author-widget-loaded.lrn-author-widget-draggable {
+    border-bottom: 1px solid var(--body-background) !important;
+}
+
+/* Fixed checkbox icon and alignment */
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span:before,
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span:after {
+    width: 1.375rem;
+    height: 1.375rem;
+}
+.lrn-i-tick:before,
+.lrn-i-published:before {
+    content: "\e604";
+    font-family: "schoolbox";
+}
+
+/* fixed save button hover style*/
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
+    outline: unset !important;
+}
+
+/* fixed search page checkbox inputs */
+.lrn .lrn-author-ui .lrn-list-view-select-col .lrn-check-box-wrapper .lrn-check-box-span {
+    height: 1.375rem !important;
+    width: 1.375rem !important;
+}
+.lrn .lrn-author-ui .lrn-list-view-col.lrn-list-view-select-col {
+    padding: 2rem;
+}
+
+/* fixed the correct answers tabs */
+.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger {
+    font-size: 1rem;
+    font-weight: 400;
+    min-height: 2.5rem !important;
 }
