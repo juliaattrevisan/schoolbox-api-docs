@@ -1505,13 +1505,15 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
 }
-.lrn .lrn-author-ui .lrn-input-group-btn {
+.lrn .lrn-author-ui .lrn-input-group-lg .lrn-input-group-btn {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
+    padding: 0.5rem 1rem;
 }
 .lrn .lrn-author-ui .lrn-input-group .lrn-form-control {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
+    padding: 0.5rem;
 }
 .lrn .lrn-author-ui .lrn-btn-save.lrn-btn-saving {
     color: var(--content-ui-foreground);
@@ -1709,4 +1711,68 @@ h3.lrn-report-item-title {
 }
 .learnosity-report .lrn-circle {
     margin: 0;
+}
+
+/* Hide reference from the search options */
+.lrn-itemlist-general-search > div:nth-of-type(2) {
+    display: none !important;
+}
+.lrn-itemlist-general-search > .lrn-form-tags-section {
+    display: none;
+}
+
+/* fixed search button in the drop down */
+button.lrn-btn.lrn-btn-sec.lrn-btn-search.lrn-i-search.lrn-col-xs-2:after {
+    content: "Search";
+    visibility: visible;
+    margin-left: 0.5em;
+}
+button.lrn-btn.lrn-btn-sec.lrn-btn-search.lrn-i-search.lrn-col-xs-2:before {
+    float: none !important;
+}
+.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-search {
+    width: 100% !important;
+}
+
+/* Hide empty space between search input and search button to make search input full width */
+form.lrn-form.lrn-form-list-search
+    > .lrn-author-flex-toolbar
+    > .lrn-author-flex-toolbar-item.lrn-author-flex-toolbar-item-lg.lrn-col-lg-only {
+    display: none !important;
+}
+
+/* Update search and clear button styles */
+.lrn .lrn-author-ui .lrn-btn,
+.lrn .lrn-author-ui a.lrn-btn {
+    padding: 0.5rem !important;
+}
+.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-lg [class^="lrn-i-"] {
+    font-size: 1rem;
+}
+.lrn .lrn-author-ui .lrn-btn-default {
+    background: var(--content-ui-background);
+    border-radius: 0px !important;
+    border: none;
+    color: var(--content-ui-foreground);
+    font-size: 1rem;
+}
+.lrn .lrn-author-ui .lrn-btn-default:hover {
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-hover) !important;
+    text-decoration: none !important;
+}
+.lrn-list-view-loaded > .lrn-list-view-empty.lrn-author-ui-no-preview::after {
+    content: "Your search did not return any items." !important;
+    white-space: pre;
+}
+button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
+    content: "\e60d" !important;
+    font-family: "schoolbox";
+    margin-right: 0.5em;
+}
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-10 {
+    width: 82.3333333333%;
+}
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
+    width: 17.6666666667%;
 }
