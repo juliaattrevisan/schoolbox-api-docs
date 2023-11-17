@@ -139,6 +139,16 @@
                 authorApp.saveActivity();
             });
 
+            /**
+             * On any "saveable" change that occurs on the main modify page, save the activity
+             * e.g. removing items or changing the order of items
+             */
+            authorApp.on('activityedit:saveable:changed', function(event) {
+                if (authorApp.getLocation().route === 'activities/:reference') {
+                    authorApp.saveActivity();
+                }
+            });
+
             {% if 'elite' != config.site_plan|lower %}
             authorApp.on('widgetedit:editor:ready', function(event) {
                 /* Artificially wait for their dom
