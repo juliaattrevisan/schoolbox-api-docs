@@ -1710,3 +1710,11 @@ h3.lrn-report-item-title {
 .learnosity-report .lrn-circle {
     margin: 0;
 }
+
+/* Hide reference from the search options */
+.lrn-itemlist-general-search > div:nth-of-type(2) {
+    display: none !important;
+}
+.lrn-itemlist-general-search > .lrn-form-tags-section {
+    display: none;
+}
