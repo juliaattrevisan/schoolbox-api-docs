@@ -1081,8 +1081,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
         Arial, sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
-    line-height: inherit !important;
-    min-height: 2.5rem !important;
+    line-height: unset;
     overflow: hidden !important;
     padding: 0.5rem !important;
     position: relative !important;
@@ -1930,4 +1929,11 @@ td.lrn-report-area::first-letter {
 }
 .lrn .lrn-author-ui .lrn-list-view-col.lrn-list-view-select-col {
     padding: 2rem;
+}
+
+/* fixed the correct answers tabs */
+.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger {
+    font-size: 1rem;
+    font-weight: 400;
+    min-height: 2.5rem !important;
 }
