@@ -74,6 +74,33 @@
 {% autoescape 'js' %}
 <script>
     /**
+     * Adjust the header of the question items list to be fixed when scrolling down
+     * Prevents the "Add items" button from being lost when scrolling down
+     */
+    function adjustItemsListHeader() {
+        const questionItemsListHeader = document.querySelector("ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-ui-no-preview");
+        const questionItemsList = document.querySelector("ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider:not(.lrn-author-ui-no-preview)")
+
+        if (questionItemsListHeader && questionItemsList) {
+            const questionItemsListHeaderRect= questionItemsListHeader.getBoundingClientRect();
+            const questionItemsListRect = questionItemsList.getBoundingClientRect();
+
+            if (questionItemsListRect.top < questionItemsListHeaderRect.height) {
+                questionItemsListHeader.style.position = 'fixed';
+                questionItemsListHeader.style.top = '0px';
+                questionItemsListHeader.style.width = questionItemsListRect.width + 'px';
+                questionItemsListHeader.style.zIndex = '100';
+            } else {
+                questionItemsListHeader.style.position = '';
+                questionItemsListHeader.style.top = '';
+                questionItemsListHeader.style.width = '';
+                questionItemsListHeader.style.zIndex = '';
+            }
+        }
+    }
+    window.addEventListener('scroll', adjustItemsListHeader);
+
+    /**
      * To add tags to the activity and also add browser state
      */
     const authorAppCallback = {
@@ -94,6 +121,14 @@
              */
             authorApp.on('render:activity', function(event) {
                 authorApp.setActivityTags({{ tags|raw }});
+            });
+
+            /**
+             * When the items list is rendered, including after every search or after sorting
+             * Need to re-apply the fixed header, as the items list is recreated and wipes our changes
+             */
+            authorApp.on('render:itemlist', function () {
+                adjustItemsListHeader();
             });
 
             {% if 'elite' != config.site_plan|lower %}
