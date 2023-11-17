@@ -1738,3 +1738,9 @@ form.lrn-form.lrn-form-list-search
     > .lrn-author-flex-toolbar-item.lrn-author-flex-toolbar-item-lg.lrn-col-lg-only {
     display: none !important;
 }
+
+/* search button padding */
+.lrn .lrn-author-ui .lrn-btn,
+.lrn .lrn-author-ui a.lrn-btn {
+    padding: 0.5rem !important;
+}
