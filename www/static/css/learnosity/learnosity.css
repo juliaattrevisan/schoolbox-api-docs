@@ -1505,13 +1505,15 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
 }
-.lrn .lrn-author-ui .lrn-input-group-btn {
+.lrn .lrn-author-ui .lrn-input-group-lg .lrn-input-group-btn {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
+    padding: 0.5rem 1rem;
 }
 .lrn .lrn-author-ui .lrn-input-group .lrn-form-control {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
+    padding: 0.5rem;
 }
 .lrn .lrn-author-ui .lrn-btn-save.lrn-btn-saving {
     color: var(--content-ui-foreground);
