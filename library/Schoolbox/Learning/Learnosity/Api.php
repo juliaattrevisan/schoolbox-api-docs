@@ -72,6 +72,17 @@ class Api
     private string $dataAPIReadHost;
 
     /**
+     * Possible job statuses.
+     *
+     * @see https://reference.learnosity.com/data-api/endpoints/jobs_endpoints
+     */
+    public const JOB_STATUS_QUEUED    = 'queued';
+    public const JOB_STATUS_RUNNING   = 'running';
+    public const JOB_STATUS_HALTED    = 'halted';
+    public const JOB_STATUS_COMPLETED = 'completed';
+
+
+    /**
      * Constructor.
      *
      * @param string      $serverName

@@ -68,8 +68,8 @@ class Quiz implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the domainObject to dataModel
      *
-     * @param IAssessable|QuizObject         $domainObject
-     * @param IAssessableDataModel|QuizModel $dataModel
+     * @param IAssessable&QuizObject         $domainObject
+     * @param IAssessableDataModel&QuizModel $dataModel
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
@@ -92,7 +92,10 @@ class Quiz implements IAssessmentTypeTranslator
             ->setMaxAttempts($domainObject->getMaxAttempts())
             ->setMarkVisibility($domainObject->getMarkVisibility())
             ->setExternalId($domainObject->getExternalId())
-            ->setLearnosityReference($domainObject->getLearnosityReference());
+            ->setLearnosityReference($domainObject->getLearnosityReference())
+            ->setLearnosityJobReference($domainObject->getLearnosityJobReference())
+            ->setLearnosityJobStatus($domainObject->getLearnosityJobStatus())
+        ;
 
         // Translate mark scheme
         // TODO move this to the mark scheme translator
@@ -111,8 +114,8 @@ class Quiz implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the dataModel to domainObject
      *
-     * @param IAssessableDataModel|QuizModel $dataModel
-     * @param IAssessable|QuizObject         $domainObject
+     * @param IAssessableDataModel&QuizModel $dataModel
+     * @param IAssessable&QuizObject         $domainObject
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
@@ -128,7 +131,10 @@ class Quiz implements IAssessmentTypeTranslator
             ->setCompletionMessage($dataModel->getCompletionMessage())
             ->setCreator($dataModel->getUser())
             ->setExternalId($dataModel->getExternalId())
-            ->setLearnosityReference($dataModel->getLearnosityReference());
+            ->setLearnosityReference($dataModel->getLearnosityReference())
+            ->setLearnosityJobReference($dataModel->getLearnosityJobReference())
+            ->setLearnosityJobStatus($dataModel->getLearnosityJobStatus())
+        ;
 
         // Copy mark type and grade group
         if (null !== $dataModel->getMarkType()) {

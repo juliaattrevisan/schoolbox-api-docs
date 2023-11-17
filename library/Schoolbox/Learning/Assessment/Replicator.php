@@ -8,12 +8,16 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Aura\Router\Generator;
+use Http\Discovery\Psr17Factory;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
 
 /**
@@ -22,14 +26,22 @@ use Schoolbox\User;
 class Replicator
 {
     /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param QuizMapper            $quizMapper
-     * @param RubricDataSource      $rubricMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy for querying assessments
+     * @param QuizMapper            $quizMapper            for performing actions on quizzes
+     * @param RubricDataSource      $rubricMapper          for performing actions on rubrics
+     * @param Psr17Factory          $httpFactory           for building HTTP requests to send in taskd messages
+     * @param MessageFactory        $messageFactory        for building messages to send to taskd
+     * @param Producer              $messageProducer       for sending messages to taskd
+     * @param Generator             $routeGenerator        for building URLs for HTTP requests to send to taskd
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
         private QuizMapper $quizMapper,
         private RubricDataSource $rubricMapper,
+        private Psr17Factory $httpFactory,
+        private MessageFactory $messageFactory,
+        private Producer $messageProducer,
+        private Generator $routeGenerator,
     ) {
     }
 
@@ -73,12 +85,7 @@ class Replicator
             $newAssessment->setSequence($sequence);
         }
 
-        /* Cloning a quiz means we need the new Learnosity Reference identifier
-         * that can only really be obtained after sending it to Learnosity; we
-         * store the Learnosity Reference in the $assessment itself, thus making
-         * Learnosity content cloning have a sequential dependency here.
-         */
-        $this->replicateQuizConstituents($source, $newAssessment);
+        $this->preprocessQuiz($newAssessment);
 
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
         $destinationContext->getAssessables()->add($newAssessment);
@@ -86,7 +93,30 @@ class Replicator
         // Copy DueWork Rubrics
         $this->replicateDueWorkRubric($source, $newAssessment);
 
+        // Copy Quiz Sections/Questions/Solutions
+        $this->replicateQuizConstituents($source, $newAssessment, $newOwner);
+
         return $newAssessment;
+    }
+
+
+    /**
+     * Preprocess `$destination` if it's a quiz: setting its Learnosity
+     * references to null, and its job status to Pending.
+     *
+     * @param IAssessable $destination
+     * @return void
+     */
+    private function preprocessQuiz(IAssessable $destination): void
+    {
+        if (!$destination instanceof Quiz) {
+            return;
+        }
+        $destination
+            ->setLearnosityReference(null)
+            ->setLearnosityJobReference(null)
+            ->setLearnosityJobStatus(Quiz::LEARNOSITY_JOB_STATUS_PENDING)
+        ;
     }
 
 
@@ -94,23 +124,47 @@ class Replicator
      * Copy any quiz sections, questions and solutions to `$destination` from
      * `$source`.
      *
+     * Uses `$creator` as the authenticated user for the copy quiz constituents
+     * request.
+     *
      * @param IAssessable $source
      * @param IAssessable $destination
      * @return void
      * @throws \DomainException
      */
-    private function replicateQuizConstituents(IAssessable $source, IAssessable $destination): void
+    public function replicateQuizConstituents(IAssessable $source, IAssessable $destination, User $creator): void
     {
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
         }
 
-        /* Clone an existing Learnosity Activity
-         * Get the cloned activity's Learnosity Reference
-         * Assign this new Learnosity Reference to $destination's instance
-         * Save it
-         */
-        $this->quizMapper->copyQuizConstituents($source, $destination);
+        // Callback to URL which replicates constituents:
+        // only trigger once the transaction closes
+        $this->quizMapper->getDatabase()->onPersist(
+            function () use ($source, $destination, $creator) {
+                $baseUrl = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
+                $message = $this->messageFactory
+                    ->setUser($creator)
+                    ->setRequest(
+                        $this->httpFactory
+                            ->createRequest(
+                                'POST',
+                                $baseUrl->withPath(
+                                    $this->routeGenerator->generate(
+                                        'learnosity.postCopyQuizConstituents',
+                                        [
+                                            'sourceId'      => $source->getId(),
+                                            'destinationId' => $destination->getId(),
+                                        ],
+                                    )
+                                )
+                            )
+                            ->withHeader('accept', 'application/json')
+                    )
+                    ->build();
+                $this->messageProducer->send($message, maxRequeues: 10);
+            }
+        );
     }
 
 

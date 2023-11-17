@@ -171,11 +171,7 @@ class Module extends BaseModule
             $this->getAssessmentMapperProxy(),
             $this->getCourseImplementationMapper(),
             $this->getUnitImplementationMapper(),
-            new Replicator(
-                $this->getAssessmentMapperProxy(),
-                $this->getQuizMapper(),
-                $this->getMapperFactory()->get(RubricDataSource::class),
-            ),
+            $this->injector->get('assessment.replicator'),
             $this->injector->get('filters.assessmentIdFinder'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $lessonPlanActivitiesReplicator,

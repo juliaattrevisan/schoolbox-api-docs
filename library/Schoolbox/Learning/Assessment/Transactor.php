@@ -216,7 +216,7 @@ class Transactor
         // If relocated, remove original assessment
         if ($originalAssessment && $this->assessment->getId() !== $originalAssessment->getId()) {
             if ($this->assessment instanceof Quiz) {
-                $this->quizMapper->copyQuizConstituents($originalAssessment->getId(), $this->assessment->getId());
+                $this->replicator->replicateQuizConstituents($originalAssessment, $this->assessment, $currentUser);
             }
             if ($this->assessment instanceof Project) {
                 /** @var Project $originalAssessment */

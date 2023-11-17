@@ -28,6 +28,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -143,6 +144,24 @@ class Module extends BaseModule
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
 
+        // Async callback for copying contents from one quiz to another
+        $this->register(
+            self::METHOD_POST,
+            '/{sourceId}/copy/{destinationId}',
+            'postCopyQuizConstituents',
+            $instructorPerms,
+            fn ($params) => $this->preloadAssessmentAndDestinationAssessment($params),
+        );
+
+        // Async callback for polling quiz import's status
+        $this->register(
+            self::METHOD_POST,
+            '/{assessmentId}/poll',
+            'postPollQuizStatus',
+            $instructorPerms,
+            $preloadAssessment,
+        );
+
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
@@ -216,8 +235,44 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        // Not a quiz: invalid
+        if (!$assessment instanceof QuizDomainObject) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         return [
             'assessment' => $assessment
+        ];
+    }
+
+
+    /**
+     * Convert route params into an assessment object, and a destination
+     * assessment object.
+     *
+     * @param array     $params
+     * @param User|null $student
+     * @return array
+     * @throws ApplicationException\Exception If assessment is not found
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     */
+    protected function preloadAssessmentAndDestinationAssessment(array $params, User $student = null): array
+    {
+        $sourceAssessment      = $this->preloadAssessment(
+            ['assessmentId' => $params['sourceId']],
+            $student
+        )['assessment'];
+        $destinationAssessment = $this->preloadAssessment(
+            ['assessmentId' => $params['destinationId']],
+            $student,
+        )['assessment'];
+        return [
+            'source'      => $sourceAssessment,
+            'destination' => $destinationAssessment,
         ];
     }
 
@@ -356,6 +411,9 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->injector->get('httpFactory'),
+            $this->injector->get('taskd.httpRequestMessageFactory'),
+            $this->injector->get('taskd.messageProducer'),
         );
     }
 

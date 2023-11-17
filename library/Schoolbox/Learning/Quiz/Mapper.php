@@ -17,7 +17,7 @@ use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
@@ -25,11 +25,7 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
-use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswerModel;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestionModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\User;
@@ -86,6 +82,20 @@ class Mapper extends BaseMapper
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('external_id', self::TYPE_STRING);
         $this->uses('learnosity_reference', self::TYPE_STRING);
+        $this->uses('learnosity_job_reference', self::TYPE_STRING);
+        $this->uses(
+            'learnosity_job_status',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [
+                null,
+                Model::LEARNOSITY_JOB_STATUS_PENDING,
+                Model::LEARNOSITY_JOB_STATUS_PROCESSING,
+                Model::LEARNOSITY_JOB_STATUS_COMPLETED,
+                Model::LEARNOSITY_JOB_STATUS_FAILED,
+            ],
+        );
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
@@ -227,14 +237,14 @@ class Mapper extends BaseMapper
      *
      * For now, this call will throw an exception if the destination Quiz already has Sections.
      *
-     * @param IAssessable $source
-     * @param IAssessable $destination
-     * @return bool
+     * @param QuizDomainModel $source
+     * @param QuizDomainModel $destination
+     * @return string|null The Learnosity job ID for duplicating activities
      * @throws \DomainException
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function copyQuizConstituents(IAssessable $source, IAssessable $destination): bool
+    public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
     {
         $learnosityVersion = $this->getConfigLoader()->get('learnosity_version');
         $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
@@ -288,60 +298,45 @@ class Mapper extends BaseMapper
                     ]
                 ]
             ]);
+            $learnosityJobReference = $response['data']['job_reference'] ?? null;
 
+            // Assign and save Learnosity reference
             /* FIXME projects need some special treatment of some kind,
              *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
              *  which won't have a Learnosity Reference field...weird behaviours
              *  But Why?
              */
             $destination->setLearnosityReference($newLearnosityReference);
+            $destination->setLearnosityJobReference($learnosityJobReference);
+            if ($destination->getId()) {
+                $this->database->prepareQuery(
+                    "
+                        UPDATE {$this->database->getQuoter()->quoteIdentifier($this->table)}
+                        SET learnosity_reference = ?,
+                            learnosity_job_reference = ?,
+                            learnosity_job_status = ?
+                        WHERE assessment_id = ?
+                    ",
+                    [
+                        $newLearnosityReference,
+                        $learnosityJobReference,
+                        Model::LEARNOSITY_JOB_STATUS_PROCESSING,
+                        $destination->getId(),
+                    ],
+                )->execute();
+            }
 
             /* TODO Also redefine the tags in the cloned thing...but how?
              *  You don't know when it finishes the cloning.
              *
              * FIXME Add Polling Mechanism
              */
+
+            // Return whatever the job ID from Learnosity was
+            return $learnosityJobReference;
         }
 
-
-        //        $sectionMapper = $this->getJoinMapper('sections');
-        //        $questionMapper = QuizQuestionMapper::getInstance();
-        //        $solutionMapper = QuizSolutionMapper::getInstance();
-        //
-        //        /** @var Model $sourceQuiz */
-        //        $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
-        //        $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
-        //
-        //        foreach ($sourceQuiz->getSections() as $section) {
-        //            $questions = $questionMapper->findByColumn('section_id', $section->getId());
-        //            $section->setQuestions($questions);
-        //        }
-        //
-        //        /** @var Model $destinationQuiz */
-        //        $destinationQuiz = $this->findOneByColumn('assessment_id', $destinationAssessmentId);
-        //
-        //        // Ensure that we don't clobber destination Sections
-        //        $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
-        //        if ($destinationQuiz->getSections()->count()) {
-        //            throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
-        //        }
-        //
-        //        // Clone and Save Sections, Questions + Solutions
-        //        foreach ($sourceQuiz->getSections() as $section) {
-        //            $clonedSection = clone $section;
-        //            $clonedSection->setQuiz($destinationQuiz);
-        //            $destinationQuiz->getSections()->add($clonedSection);
-        //            $sectionMapper->save($clonedSection);
-        //
-        //            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
-        //                $questionMapper->save($clonedQuestion);
-        //                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
-        //                    $solutionMapper->save($clonedQuestion->getSolution());
-        //                }
-        //            }
-        //        }
-
-        return true;
+        return null;
     }
 
     /**

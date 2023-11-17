@@ -59,6 +59,16 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     const DURATION_UNLIMITED = 0;
 
+
+    /**
+     * Possible statuses for Learnosity jobs.
+     */
+    public const LEARNOSITY_JOB_STATUS_PENDING = 'pending';
+    public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';
+    public const LEARNOSITY_JOB_STATUS_COMPLETED = 'completed';
+    public const LEARNOSITY_JOB_STATUS_FAILED = 'failed';
+
+
     /**
     * @var Folder
     */
@@ -190,6 +200,22 @@ class Model implements ISoftDeletable, IAssessableDataModel
      * @var string|null
      */
     private ?string $learnosityReference = null;
+
+
+    /**
+     * The Learnosity job reference identifier which associates an import of
+     * Learnosity data from one quiz to another.
+     *
+     * @var string|null
+     */
+    private ?string $learnosityJobReference = null;
+
+
+    /**
+     * The status of the Learnosity job: if set, this is one of the
+     * `self::LEARNOSITY_JOB_STATUS_*` constants.
+     */
+    private ?string $learnosityJobStatus = null;
 
 
     /**
@@ -795,6 +821,46 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function setLearnosityReference(?string $learnosityReference): self
     {
         $this->learnosityReference = $learnosityReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityJobReference(): ?string
+    {
+        return $this->learnosityJobReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityJobReference
+     * @return $this
+     */
+    public function setLearnosityJobReference(?string $learnosityJobReference): self
+    {
+        $this->learnosityJobReference = $learnosityJobReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityJobStatus(): ?string
+    {
+        return $this->learnosityJobStatus;
+    }
+
+
+    /**
+     * @param string|null $learnosityJobStatus
+     * @return $this
+     */
+    public function setLearnosityJobStatus(?string $learnosityJobStatus): self
+    {
+        $this->learnosityJobStatus = $learnosityJobStatus;
         return $this;
     }
 

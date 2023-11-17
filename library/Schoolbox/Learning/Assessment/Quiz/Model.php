@@ -47,12 +47,37 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Possible statuses for Learnosity jobs.
+     */
+    public const LEARNOSITY_JOB_STATUS_PENDING = 'pending';
+    public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';
+    public const LEARNOSITY_JOB_STATUS_COMPLETED = 'completed';
+    public const LEARNOSITY_JOB_STATUS_FAILED = 'failed';
+
+
+    /**
      * Learnosity reference identifier, to associate our quiz
      * with a Learnosity quiz.
      *
      * @var string|null
      */
     private ?string $learnosityReference = null;
+
+
+    /**
+     * The Learnosity job reference identifier which associates an import of
+     * Learnosity data from one quiz to another.
+     *
+     * @var string|null
+     */
+    private ?string $learnosityJobReference = null;
+
+
+    /**
+     * The status of the Learnosity job: if set, this is one of the
+     * `self::LEARNOSITY_JOB_STATUS_*` constants.
+     */
+    private ?string $learnosityJobStatus = null;
 
 
     /**
@@ -117,6 +142,20 @@ class Model extends AbstractAssessment
         return 'Quiz';
     }
 
+    /**
+     * This quiz's clone does not inherit the source object's Learnosity
+     * reference: the Learnosity data will be copied in a separate step.
+     *
+     * @return static
+     */
+    public function cloneForCopy()
+    {
+        /** @var static $clone */
+        $clone = parent::cloneForCopy();
+        $clone->setLearnosityReference(null);
+        $clone->setLearnosityJobReference(null);
+        return $clone;
+    }
 
     /**
      * Overwrite fields from `$source` into this object.
@@ -131,15 +170,20 @@ class Model extends AbstractAssessment
      * * external ID: this uniquely identifies the base assessment within
      *   another system, so it should not be copied
      *
+     * This implementation clears the Learnosity reference: the Learnosity data
+     * will be copied from `$source` in a separate step.
+     *
      * @param self $source
      * @return $this
      */
     public function overwrite(IAssessable $source): IAssessable
     {
         parent::overwrite($source);
-        $this->completionMessage = $source->completionMessage;
-        $this->duration          = $source->duration;
-        $this->maxAttempts       = $source->maxAttempts;
+        $this->completionMessage      = $source->completionMessage;
+        $this->duration               = $source->duration;
+        $this->maxAttempts            = $source->maxAttempts;
+        $this->learnosityReference    = null;
+        $this->learnosityJobReference = null;
         return $this;
     }
 
@@ -550,6 +594,46 @@ class Model extends AbstractAssessment
     public function setLearnosityReference(?string $learnosityReference): self
     {
         $this->learnosityReference = $learnosityReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityJobReference(): ?string
+    {
+        return $this->learnosityJobReference;
+    }
+
+
+    /**
+     * @param string|null $learnosityJobReference
+     * @return Model
+     */
+    public function setLearnosityJobReference(?string $learnosityJobReference): self
+    {
+        $this->learnosityJobReference = $learnosityJobReference;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityJobStatus(): ?string
+    {
+        return $this->learnosityJobStatus;
+    }
+
+
+    /**
+     * @param string|null $learnosityJobStatus
+     * @return $this
+     */
+    public function setLearnosityJobStatus(?string $learnosityJobStatus): self
+    {
+        $this->learnosityJobStatus = $learnosityJobStatus;
         return $this;
     }
 }
