@@ -14,5 +14,6 @@ declare(strict_types=1);
  *  and the credentials aren't populated until afterwards.
  *  That makes migration a two-step process, not one.
  */
-passthru('php ' . __DIR__ .  '/../../../tools/learnosity/import.php --perform');
+passthru('php ' . __DIR__ .  '/../../../tools/learnosity/import.php --small --perform');
+passthru('php ' . __DIR__ .  '/../../../tools/learnosity/import.php --large --perform');
 exit();
