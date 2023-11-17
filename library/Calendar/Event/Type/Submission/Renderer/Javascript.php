@@ -11,6 +11,7 @@
 
 namespace Calendar\Event\Type\Submission\Renderer;
 
+use Schoolbox\Learning\Assessment\Redirect;
 use Scrub;
 
 /**
@@ -183,7 +184,17 @@ class Javascript extends Base
                 ]
             );
         }
+
         if (!$moreDetailsLink) {
+            $returnUrl = $this->getRouteIfAuthorized(
+                'learningUpcoming.getUpcomingForStudent',
+                [
+                    'studentId' => $this->user->getId(),
+                    'student'   => $this->user,
+                    'date'      => $this->getEvent()->getStartTime()->getURLDate()
+                ]
+            );
+
             $moreDetailsLink = $this->getRouteIfAuthorized(
                 'learningAssessment.getSummary',
                 [
@@ -192,7 +203,7 @@ class Javascript extends Base
                     'studentId'    => $this->user->getId(),
                     'student'      => $this->user,
                 ]
-            );
+            ) . '?' . Redirect::RETURN_URL . '=' . Redirect::encode($returnUrl);
         }
 
         return [
