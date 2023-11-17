@@ -270,11 +270,11 @@ class Controller extends Base
                 $endDate =
                     \Alaress_Date_Format::now()->addYears(1)->endOfDay()->getJson();
                 break;
-            case 3: // 5 years (2.5 years in the past, 2.5 years in the future)
+            case 3: // 5 years (4 years in the past, 1 year in the future)
                 $startDate =
-                    \Alaress_Date_Format::now()->addYears(-2)->addMonths(-6)->startOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addYears(-4)->startOfDay()->getJson();
                 $endDate =
-                    \Alaress_Date_Format::now()->addYears(2)->addMonths(6)->endOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addYears(1)->endOfDay()->getJson();
                 break;
             default: // default to School year
                 $startDate =
