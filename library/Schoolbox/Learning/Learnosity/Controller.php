@@ -319,7 +319,7 @@ class Controller extends Base
                 $assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
             ])
-            ->add(['Modify Content', null]);
+            ->add(['Modify Contents', null]);
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
@@ -328,7 +328,7 @@ class Controller extends Base
             'tags' => json_encode($tags, JSON_THROW_ON_ERROR),
             'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
         ], sprintf(
-            'Modify contents of %s',
+            'Modify Contents of %s',
             $assessment->getTitle()
         ));
     }
