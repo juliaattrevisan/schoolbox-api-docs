@@ -109,6 +109,11 @@
 
         window.sbProps.colourDefaults["skinUnique"] = uniqueSkinColours;
         window.sbProps.colourDefaults["swatches"] = [...chosenSkinColours, ...window.sbProps.colourDefaults["constant"]];
+
+        {% if config.openai_key %}
+        window.sbProps.hasEditorAI = true;
+        {% endif %}
+
     </script>
     {% endautoescape %}
 

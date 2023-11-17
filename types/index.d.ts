@@ -26,6 +26,7 @@ declare global {
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             editors: { [key: string]: Editor };
+            hasEditorAI: boolean;
         };
         schoolboxUser: {
             id: number;
