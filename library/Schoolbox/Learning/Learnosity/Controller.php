@@ -319,7 +319,7 @@ class Controller extends Base
                 $assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
             ])
-            ->add(['Modify Content', null]);
+            ->add(['Modify Contents', null]);
 
         $this->response = $this->responseFromTemplate('@learnosity/content.twig', [
             'assessment'  => $assessment,
@@ -328,7 +328,7 @@ class Controller extends Base
             'tags' => json_encode($tags, JSON_THROW_ON_ERROR),
             'returnUrl'   => Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL) ?? ''),
         ], sprintf(
-            'Modify contents of %s',
+            'Modify Contents of %s',
             $assessment->getTitle()
         ));
     }
@@ -731,15 +731,32 @@ class Controller extends Base
 
         /* Breadcrumbs
          */
-        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-            [
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser());
+
+        /* Assessment summary/status node
+         * This depends on the current user's permissions/role to figure out where you should go
+         * Note that Specifications don't get status/summary screens; idk how you'd get there
+         * from an attempt review screen that couldn't possibly exist, but ok
+         */
+        if ($this->getUser()->getRole()->isStaff()) {
+            /* Not that you should ever get here because staff won't get a link
+             * to view their own attempt, but ok
+             */
+            $assessmentNode = [
                 $assessment->getTitle(),
                 $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
-            ]
-        );
-        $breadcrumbs->add([
-            'Review', null
-        ]);
+            ];
+        } else {
+            $assessmentNode = [
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]) : null
+            ];
+        }
+
+        $breadcrumbs->add($assessmentNode)
+            ->add([
+                'Review', null
+            ]);
 
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
             'assessment' => $assessment,
