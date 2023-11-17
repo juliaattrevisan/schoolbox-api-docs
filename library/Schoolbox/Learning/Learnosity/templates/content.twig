@@ -131,6 +131,14 @@
                 adjustItemsListHeader();
             });
 
+            /**
+             * When an item is added through the items list, save the activity. This avoids some confusion
+             * where the user is given a "saved" message but it only added the items, not saved the activity
+             */
+            authorApp.on('activityedit:items:added', function () {
+                authorApp.saveActivity();
+            });
+
             {% if 'elite' != config.site_plan|lower %}
             authorApp.on('widgetedit:editor:ready', function(event) {
                 /* Artificially wait for their dom
