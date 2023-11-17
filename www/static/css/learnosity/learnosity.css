@@ -1783,6 +1783,8 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
 }
 .lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
     width: 17.6666666667%;
+}
+
 /* Added space to the right of questions in the item authoring */
 .lrn-widget-drag-wrapper {
     padding-right: 50px;
