@@ -1731,3 +1731,10 @@ button.lrn-btn.lrn-btn-sec.lrn-btn-search.lrn-i-search.lrn-col-xs-2:before {
 .lrn.lrn-author .lrn-tool-panel-search .lrn-btn-search {
     width: 100% !important;
 }
+
+/* Hide empty space between search input and search button to make search input full width */
+form.lrn-form.lrn-form-list-search
+    > .lrn-author-flex-toolbar
+    > .lrn-author-flex-toolbar-item.lrn-author-flex-toolbar-item-lg.lrn-col-lg-only {
+    display: none !important;
+}
