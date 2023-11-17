@@ -115,10 +115,22 @@
             });
 
             /**
-             * Go to initial browser location. The window location hash includes
-             * the # at the start, so we strip it with some basic regex.
+             * Navigate to the correct part of the app based on the hash
              */
-            authorApp.navigate(window.location.hash.replace(/^#/, ""));
+            function navigateAuthorApp () {
+                const hash = window.location.hash.replace(/^#/, ""); // strip the # from the hash
+                const jsonMatch = hash.match(/\{(.|\n)*\}/);
+                // if the hash contains json, we need to encode it first before passing it to the app
+                if (jsonMatch) {
+                    const prefix = hash.substring(0, jsonMatch.index);
+                    const jsonString = decodeURIComponent(jsonMatch[0]);
+                    const modifiedHash = `${prefix}${encodeURIComponent(jsonString)}`;
+                    authorApp.navigate(modifiedHash);
+                } else {
+                    authorApp.navigate(hash);
+                }
+            }
+            navigateAuthorApp();
 
             /**
              * Listen for hash changes so we can navigate to the correct part of the app
@@ -128,7 +140,7 @@
                 if (window.location.hash === "") {
                     history.back();
                 } else {
-                    authorApp.navigate(window.location.hash.replace(/^#/, ""));
+                    navigateAuthorApp();
                 }
             };
         },
