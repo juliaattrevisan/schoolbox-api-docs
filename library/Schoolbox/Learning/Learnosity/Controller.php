@@ -396,7 +396,7 @@ class Controller extends Base
                     ],
                     'onsubmit_redirect_url' => false,
                     /* You were idle too long. Go back to the intro if Learnosity
-                     * saves your session ahd kicks you out, I guess? At least it
+                     * saves your session and kicks you out, I guess? At least it
                      * can prompt you to Resume Quiz from there.
                      */
                     'onsave_redirect_url' => $this->router->getGenerator()->generate('learningAssessment.getSummary', [
@@ -494,6 +494,8 @@ class Controller extends Base
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
 
+        $returnUrlEncoded = $this->requestQuery->get(Redirect::RETURN_URL);
+
         $this->response = $this->responseFromTemplate('@learnosity/attempt.twig', [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
@@ -507,11 +509,13 @@ class Controller extends Base
             ]),
             /* Redirect to here when we are ready
              */
-            'outroUrl' => $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
-                'assessmentId' => $assessment->getId(),
-                'studentId' => $student->getId(),
-                'learnositySessionReference' => $attempt->getLearnosityReference()
-            ]),
+            'outroUrl' => (
+                $this->router->getGenerator()->generate('learnosity.getCompleteAttempt', [
+                    'assessmentId' => $assessment->getId(),
+                    'studentId' => $student->getId(),
+                    'learnositySessionReference' => $attempt->getLearnosityReference()
+                ]) . ($returnUrlEncoded === null ? '' : '/?' . Redirect::RETURN_URL . "=$returnUrlEncoded")
+            ),
             'learnositySessionReference' => $attempt->getLearnosityReference(),
         ], "Attempt {$assessment->getTitle()}");
     }
@@ -642,12 +646,14 @@ class Controller extends Base
             )
             ->add(['Result Summary']);
 
+        $returnUrlEncoded = $this->requestQuery->get(Redirect::RETURN_URL);
+
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
-            'returnUrl' => "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}"
+            'returnUrl' => $returnUrlEncoded === null ? '': Redirect::decode($returnUrlEncoded),
         ], "Result for {$assessment->getTitle()}");
     }
 

@@ -328,6 +328,7 @@ class Controller extends Assessment\Controller
             'externalRedirectUrl' => $externalRedirectUrl,
             'lastViews' => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
             'participant' => $participant,
+            'returnUrlName' => Redirect::RETURN_URL,
             'returnUrlEncoded' => $this->requestQuery->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (Already encoded, so encoding/decoding necessary).
         ];
 

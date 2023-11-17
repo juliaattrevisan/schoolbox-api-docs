@@ -14,6 +14,7 @@
  # @param string $externalRedirectUrl          A url in a third party system (newington canvas) that is relevant to this quiz
  # @param array $lastViews                     A set of (roletype, info) tuples about when a student/parent visited this page
  # @param Participant $participant             A participant of this assessment, used to figure out exclusions and special CAP stuff
+ # @param string $returnUrlName                The name of the url parameter to contain $returnUrlEncoded
  # @param string $returnUrlEncoded             An encoded url to visit when navigating between screens and you finsih a workflow somehwere
  #}
 
@@ -79,7 +80,9 @@
         {% if existingAttempt %}
             {% set callToAction = 'Resume Quiz' %}
         {% endif %}
-        <a class="button submit" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}">{{ callToAction }}</a>
+        <a class="button submit" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}?{{ returnUrlName }}={{ returnUrlEncoded }}">
+            {{ callToAction }}
+        </a>
     </div>
     {% endif %}
 </div>
