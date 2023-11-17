@@ -1718,3 +1718,16 @@ h3.lrn-report-item-title {
 .lrn-itemlist-general-search > .lrn-form-tags-section {
     display: none;
 }
+
+/* fixed search button in the drop down */
+button.lrn-btn.lrn-btn-sec.lrn-btn-search.lrn-i-search.lrn-col-xs-2:after {
+    content: "Search";
+    visibility: visible;
+    margin-left: 0.5em;
+}
+button.lrn-btn.lrn-btn-sec.lrn-btn-search.lrn-i-search.lrn-col-xs-2:before {
+    float: none !important;
+}
+.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-search {
+    width: 100% !important;
+}
