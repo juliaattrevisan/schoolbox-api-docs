@@ -1739,8 +1739,38 @@ form.lrn-form.lrn-form-list-search
     display: none !important;
 }
 
-/* search button padding */
+/* Update search and clear button styles */
 .lrn .lrn-author-ui .lrn-btn,
 .lrn .lrn-author-ui a.lrn-btn {
     padding: 0.5rem !important;
+}
+.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-lg [class^="lrn-i-"] {
+    font-size: 1rem;
+}
+.lrn .lrn-author-ui .lrn-btn-default {
+    background: var(--content-ui-background);
+    border-radius: 0px !important;
+    border: none;
+    color: var(--content-ui-foreground);
+    font-size: 1rem;
+}
+.lrn .lrn-author-ui .lrn-btn-default:hover {
+    color: var(--content-ui-foreground) !important;
+    background-color: var(--content-ui-hover) !important;
+    text-decoration: none !important;
+}
+.lrn-list-view-loaded > .lrn-list-view-empty.lrn-author-ui-no-preview::after {
+    content: "Your search did not return any items." !important;
+    white-space: pre;
+}
+button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
+    content: "\e60d" !important;
+    font-family: "schoolbox";
+    margin-right: 0.5em;
+}
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-10 {
+    width: 82.3333333333%;
+}
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
+    width: 17.6666666667%;
 }
