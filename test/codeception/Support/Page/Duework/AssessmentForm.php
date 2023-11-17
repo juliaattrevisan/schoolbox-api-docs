@@ -227,7 +227,7 @@ class AssessmentForm
             $i->waitForElementVisible('#participants > li[data-participant="' . $userId . '"]');
         }
         $i->click('#participants > li[data-participant="' . $userId . '"]');
-        $i->click('#customise-dropdown');
+        $i->clickElementInWebComponent('[data-test=sbx-pop-out-customise-options]', '[data-test=sbx-pop-out-customise-options-button]');
         $i->click('Exclude from assessment', '#customise-options');
         // If the user has submitted something, it'll display Please Confirm popup.
         if ($confirm) {
@@ -252,7 +252,7 @@ class AssessmentForm
         $i->click('#participation-container > legend');
         $i->waitForElementVisible('#participants > li[data-participant="' . $userId . '"]');
         $i->click('#participants > li[data-participant="' . $userId . '"]');
-        $i->click('#customise-dropdown');
+        $i->clickElementInWebComponent('[data-test=sbx-pop-out-customise-options]', '[data-test=sbx-pop-out-customise-options-button]');
         $i->click('a#participant-customise');
         $i->waitForText('Create New Learning Plan');
         $i->fillField('input#plan-name', $planName);

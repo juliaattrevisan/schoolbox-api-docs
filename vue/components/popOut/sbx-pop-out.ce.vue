@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Used to display a list of actions in a dropdown menu upon clicking a button (the jellytot!)
+ * Used to display a list of actions in a dropdown menu upon clicking a button (typically the jellytot)
  */
 import type { Ref } from "vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
@@ -17,10 +17,9 @@ interface Props {
     /**
      * Whether the button is to be disabled
      */
-    isDisabled?: boolean;
+    disabled?: boolean;
     /**
-     * Whether the button should be full width, strecthing to the width of the parent container
-     * with the linked content also matching the width of the button
+     * Whether the button should be full width, stretching to the width of the parent container
      */
     isFullWidth?: boolean;
     /**
@@ -36,8 +35,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
     props.buttonText ? props.buttonText : "Actions",
     props.contentId,
-    props.isFullWidth ? "bottom-start" : "bottom-end",
-    props.isFullWidth
+    props.isFullWidth ? "bottom-start" : "bottom-end"
 );
 </script>
 
@@ -57,7 +55,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
         :data-test="`sbx-pop-out-${props.contentId}-button`"
-        :disabled="props.isDisabled"
+        :disabled="props.disabled"
         @click.prevent="onButtonSelected"
     >
         <!-- when an alternative icon should be used -->

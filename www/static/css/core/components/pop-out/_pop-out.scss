@@ -41,7 +41,7 @@ button.f-match-existing-icon-only-styles {
 button.f-match-existing-button-styles {
     height: 40px !important;
     min-height: 40px !important;
-    padding: 0;
+    padding: 0 var(--spacing-m);
     // to provide more space for the icon
     span {
         padding-right: var(--spacing-s);

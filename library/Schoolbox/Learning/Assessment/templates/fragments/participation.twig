@@ -21,29 +21,11 @@
         {% if assessment.allParticipants | length %}
             <div id="participation-settings">
                 <div class="row">
-                    <div class="content small-12 medium-6 large-4 medium-offset-6 large-offset-8 columns" id="mass-buttons">
+                    <div class="content small-12">
                         <nav>
-                            <div class="flex-list buttons">
-                                <button
-                                    class="button dropdown"
-                                    id="customise-dropdown"
-                                    data-dropdown="customise-options"
-                                    aria-controls="customise-options"
-                                    aria-expanded="false"
-                                    disabled
-                                >
-                                    Modify Participation
-                                </button>
-
-                                <button
-                                    class="button icon-more icon hide"
-                                    id="plan-dropdown"
-                                    data-dropdown="plan-options"
-                                    aria-controls="customise-options"
-                                    aria-expanded="false"
-                                    title="Modify Plans"
-                                >
-                                </button>
+                            <div class="flex-list buttons l-flex--justify-end">
+                                <sbx-pop-out id="customise-dropdown" content-id="customise-options" button-text="Modify Participation" disabled is-arrow-icon data-test="sbx-pop-out-customise-options"></sbx-pop-out>
+                                <sbx-pop-out id="plan-dropdown" class="hide" content-id="plan-options"></sbx-pop-out>
                             </div>
                             <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
                                 <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
