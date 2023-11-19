@@ -205,7 +205,7 @@ class Controller extends Base
      */
     public function getContent(QuizDomainObject $assessment): void
     {
-        $this->assertLearnosityImportCompleted($assessment);
+        $assessment->assertUsable();
 
         /* Tags for presetting without requiring the additional
          * authorApp.saveActivity() upon spawn. "create" (such as
@@ -357,7 +357,7 @@ class Controller extends Base
      */
     public function getAttempt(QuizDomainObject $assessment, \Schoolbox\User $student): void
     {
-        $this->assertLearnosityImportCompleted($assessment);
+        $assessment->assertUsable();
 
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
@@ -1955,50 +1955,5 @@ class Controller extends Base
             ->setMark($humanReadableMark)
             ->setNormalisedMark($normalisedMark)
             ->setMaxMark($maxMark);
-    }
-
-    /**
-     * Assert that this assessment:
-     * * is a quiz
-     * * has been imported into Learnosity
-     * * if it's being duplicated: that that duplication process has completed
-     *
-     * @param QuizDomainObject $assessment
-     * @return void
-     * @throws \RuntimeException if any of the above conditions are false
-     */
-    private function assertLearnosityImportCompleted(QuizDomainObject $assessment): void
-    {
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-
-        if ('' === (string)$quiz->getLearnosityReference()) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Assessment %s is not in learnosity; try importing it with the cli tool',
-                    $assessment->getId()
-                )
-            );
-        }
-
-        // Is there a duplication job? If so block until completed
-        if ($quiz->getLearnosityJobReference()) {
-            $jobStatus = $quiz->getLearnosityJobStatus();
-            if ($jobStatus === Quiz::LEARNOSITY_JOB_STATUS_FAILED) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Assessment %s duplication process has failed; please contact support',
-                        $assessment->getId()
-                    )
-                );
-            }
-            if ($jobStatus !== Quiz::LEARNOSITY_JOB_STATUS_COMPLETED) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Assessment %s duplication process has not yet completed; try again later',
-                        $assessment->getId()
-                    )
-                );
-            }
-        }
     }
 }
