@@ -10,15 +10,13 @@ import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/Studen
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 
 /**
- * Get the response for a student item question
+ * Get the response for a student item question if available
  * @param {StudentItemQuestionResponse[]} itemResponses - the item responses to get the response from
  * @param {string} responseId - the response id to get the response for
  * @returns {StudentItemQuestionResponse} - the response
  */
 function getItemResponse(itemResponses: StudentItemQuestionResponse[], responseId: string) {
-    return itemResponses.find(
-        (itemResponse) => itemResponse.learnosityReference === responseId
-    ) as StudentItemQuestionResponse;
+    return itemResponses.find((itemResponse) => itemResponse.learnosityReference === responseId);
 }
 
 /**
@@ -34,6 +32,7 @@ export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $
         return {
             ...question,
             response,
+            hasResponse: response === undefined,
         };
     });
     return questions;
