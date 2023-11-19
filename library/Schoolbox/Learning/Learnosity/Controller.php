@@ -361,7 +361,10 @@ class Controller extends Base
 
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
-        if ($this->attemptMapper->getAttemptCountForStudent($quiz->getId(), $student->getId()) >= $quiz->getMaxAttempts()) {
+        if (
+            $quiz->getMaxAttempts() !== 0 && // Max attempts zero means no maximum.
+            $this->attemptMapper->getAttemptCountForStudent($quiz->getId(), $student->getId()) >= $quiz->getMaxAttempts()
+        ) {
             /* Redirect back to summary screen
              */
             $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
