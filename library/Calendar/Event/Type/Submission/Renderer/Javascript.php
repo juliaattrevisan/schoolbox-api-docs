@@ -21,7 +21,6 @@ use Scrub;
  */
 class Javascript extends Base
 {
-
     /**
      * Visitor
      *
