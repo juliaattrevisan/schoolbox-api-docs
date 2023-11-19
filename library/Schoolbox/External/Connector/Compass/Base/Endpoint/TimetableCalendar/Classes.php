@@ -316,6 +316,19 @@ class Classes implements IStrategy
                      * the wrong place. In that case it retries and dies
                      */
 
+                    /*
+                     * Activity is not part of this academic period, ignore it and move along....
+                     */
+                    if ((string)$academicGroupCode !== (string)$activity['academicYear']['importIdentifier']) {
+                        $this->log->debug(sprintf(
+                            'Activity %s not part of the academic group code, expected: %s actual %s; skipping',
+                            $activity['name'],
+                            $academicGroupCode,
+                            $activity['academicYear']['importIdentifier']
+                        ));
+
+                        continue;
+                    }
                     /* Unknown activity type
                      */
                     if (!isset(self::ACTIVITY_TYPES[$activityType])) {
