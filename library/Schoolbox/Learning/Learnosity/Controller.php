@@ -653,7 +653,11 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
-            'returnUrl' => $returnUrlEncoded === null ? '' : Redirect::decode($returnUrlEncoded),
+            'returnUrl' => (
+                $returnUrlEncoded === null ?
+                "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}" :
+                Redirect::decode($returnUrlEncoded)
+            ),
         ], "Result for {$assessment->getTitle()}");
     }
 
