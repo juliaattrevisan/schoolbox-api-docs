@@ -85,8 +85,9 @@ class AcademicGroups
             }
 
             $this->log->info(sprintf(
-                'Academic Group %s found',
-                $academicGroup['name']
+                'Academic Group %s (%s) found',
+                $academicGroup['name'],
+                $academicGroup['academicGroupCode']
             ));
 
             $stack[] = $academicGroup;

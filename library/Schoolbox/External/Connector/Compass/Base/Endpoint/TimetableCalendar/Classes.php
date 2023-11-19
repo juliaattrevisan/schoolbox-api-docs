@@ -316,6 +316,13 @@ class Classes implements IStrategy
                      * the wrong place. In that case it retries and dies
                      */
 
+                    // do we have an academic year on the activity
+                    if (!isset($activity['academicYear']['importIdentifier'])) {
+                        $this->log->debug("Activity has no academic year or importIdentifer");
+                        new \Alaress_Probe($activity);
+                        continue;
+                    }
+
                     /*
                      * Activity is not part of this academic period, ignore it and move along....
                      */
