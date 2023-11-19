@@ -72,8 +72,8 @@ export const useStudentStore = defineStore("qfStudent", () => {
      */
     function setInitialQuestionIsMarked(item: StudentItem) {
         item.questions.forEach((question) => {
-            if (question.hasResponse) {
-                const response = question.response as StudentItemQuestionResponse;
+            if (question.response) {
+                const { response } = question;
                 if (response.maxScore === null) {
                     response.isMarked =
                         item.questions[0].response.comment &&

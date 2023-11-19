@@ -32,7 +32,6 @@ export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $
         return {
             ...question,
             response,
-            hasResponse: response !== undefined,
         };
     });
     return questions;
@@ -55,7 +54,7 @@ export function getAttemptResponse(attemptComments: StudentAttemptComment[], stu
  */
 export function getItemIsMarked(item: StudentItem) {
     // if any questions don't have a response, then the item is not marked
-    if (item.questions.some(($question) => !$question.hasResponse)) {
+    if (item.questions.some(($question) => !$question.response)) {
         return false;
     }
     return item.questions.every(($question) => ($question.response as StudentItemQuestionResponse).isMarked);

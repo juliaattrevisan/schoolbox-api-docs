@@ -44,7 +44,7 @@ window.Vue.watch(
  * @param {number} score - the score to save
  */
 function onScoreUpdated(question: StudentItemQuestion, score: number) {
-    studentStore.updateItemResponseScore(props.student, props.item, question, score);
+    studentStore.updateItemResponseScore(props.item, question, score);
 }
 
 /**
@@ -52,7 +52,7 @@ function onScoreUpdated(question: StudentItemQuestion, score: number) {
  * @param {string} comment - the comment to save
  */
 function onCommentUpdated(comment: string) {
-    studentStore.updateItemComment(props.student, props.item, props.item.questions[0], comment);
+    studentStore.updateItemComment(props.item, props.item.questions[0], comment);
 }
 </script>
 
