@@ -316,26 +316,6 @@ class Classes implements IStrategy
                      * the wrong place. In that case it retries and dies
                      */
 
-                    // do we have an academic year on the activity
-                    if (!isset($activity['academicYear']['importIdentifier'])) {
-                        $this->log->debug("Activity has no academic year or importIdentifer");
-                        new \Alaress_Probe($activity);
-                        continue;
-                    }
-
-                    /*
-                     * Activity is not part of this academic period, ignore it and move along....
-                     */
-                    if ((string)$academicGroupCode !== (string)$activity['academicYear']['importIdentifier']) {
-                        $this->log->debug(sprintf(
-                            'Activity %s not part of the academic group code, expected: %s actual %s; skipping',
-                            $activity['name'],
-                            $academicGroupCode,
-                            $activity['academicYear']['importIdentifier']
-                        ));
-
-                        continue;
-                    }
                     /* Unknown activity type
                      */
                     if (!isset(self::ACTIVITY_TYPES[$activityType])) {
@@ -381,6 +361,30 @@ class Classes implements IStrategy
                             'Activity %s starting on %s has no instances; skipping',
                             $activity['name'],
                             $activity['start']
+                        ));
+
+                        continue;
+                    }
+
+                    // do we have an academic year on the activity
+                    if (!isset($activity['academicYear']['importIdentifier'])) {
+                        $this->log->debug(sprintf(
+                            "Activity has no academic year academicYear: %s, Activity Type: %s",
+                            $activity['name'],
+                            $activityType
+                        ));
+                        continue;
+                    }
+
+                    /*
+                     * Activity is not part of this academic period, ignore it and move along....
+                     */
+                    if ((string)$academicGroupCode !== (string)$activity['academicYear']['importIdentifier']) {
+                        $this->log->debug(sprintf(
+                            'Activity %s not part of the academic group code, expected: %s actual %s; skipping',
+                            $activity['name'],
+                            $academicGroupCode,
+                            $activity['academicYear']['importIdentifier']
                         ));
 
                         continue;
