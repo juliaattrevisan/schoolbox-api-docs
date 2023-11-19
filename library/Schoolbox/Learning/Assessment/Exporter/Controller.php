@@ -84,6 +84,7 @@ class Controller extends BaseController
      */
     public function getExportFormForAssessment(IAssessable $assessment): void
     {
+        $assessment->assertUsable();
         $assessmentImpls = $this->buildImplementationsForSpecification($assessment);
 
         $notImported = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
@@ -258,6 +259,7 @@ class Controller extends BaseController
      */
     public function postExportForAssessment(IAssessable $assessment): void
     {
+        $assessment->assertUsable();
         $importedImplementations     = $this->requestPost->get('unitImplementation', []);
         $importedImplementationDates = $this->requestPost->get('unit', []);
         // get corresponding assessment impls in the unit impls selected by the user.
