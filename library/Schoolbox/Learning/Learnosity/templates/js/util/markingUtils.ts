@@ -32,7 +32,7 @@ export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $
         return {
             ...question,
             response,
-            hasResponse: response === undefined,
+            hasResponse: response !== undefined,
         };
     });
     return questions;
@@ -54,7 +54,11 @@ export function getAttemptResponse(attemptComments: StudentAttemptComment[], stu
  * @returns {boolean} - whether the item is marked
  */
 export function getItemIsMarked(item: StudentItem) {
-    return item.questions.every(($question) => $question.response.isMarked);
+    // if any questions don't have a response, then the item is not marked
+    if (item.questions.some(($question) => !$question.hasResponse)) {
+        return false;
+    }
+    return item.questions.every(($question) => ($question.response as StudentItemQuestionResponse).isMarked);
 }
 
 /**
@@ -84,7 +88,7 @@ export function getUrls(urls: StudentUrls[], studentId: number) {
 export function getItemScore(item: StudentItem) {
     // loop through all questions and add up the score
     return item.questions.reduce((total, question) => {
-        if (question.response.score) {
+        if (question.response && question.response.score) {
             return total + question.response.score;
         }
         return total;
@@ -99,7 +103,7 @@ export function getItemScore(item: StudentItem) {
 export function getItemMaxScore(item: StudentItem) {
     // loop through all questions and add up the max score
     return item.questions.reduce((total, question) => {
-        if (question.response.maxScore) {
+        if (question.response && question.response.maxScore) {
             return total + question.response.maxScore;
         }
         return total;
@@ -115,7 +119,7 @@ export function getAttemptScore(student: Student) {
     // loop through all student items and questions and add up the score
     return student.items.reduce((totalScoreAcc, item) => {
         const itemScore = item.questions.reduce((itemScoreAcc, question) => {
-            if (question.response.score) {
+            if (question.response && question.response.score) {
                 return itemScoreAcc + question.response.score;
             }
             return itemScoreAcc;
@@ -133,7 +137,7 @@ export function getAttemptMaxScore(student: Student) {
     // loop through all student items and questions and add up the max score
     return student.items.reduce((maxScoreAcc, item) => {
         const itemMaxScore = item.questions.reduce((itemMaxScoreAcc, question) => {
-            if (question.response.maxScore) {
+            if (question.response && question.response.maxScore) {
                 return itemMaxScoreAcc + question.response.maxScore;
             }
             return itemMaxScoreAcc;

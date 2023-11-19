@@ -72,13 +72,16 @@ export const useStudentStore = defineStore("qfStudent", () => {
      */
     function setInitialQuestionIsMarked(item: StudentItem) {
         item.questions.forEach((question) => {
-            if (question.response && question.response.maxScore === null) {
-                question.response.isMarked =
-                    item.questions[0].response.comment &&
-                    item.questions[0].response.comment !== null &&
-                    item.questions[0].response.comment !== "";
-            } else {
-                question.response.isMarked = question.response.score !== null;
+            if (question.hasResponse) {
+                const response = question.response as StudentItemQuestionResponse;
+                if (response.maxScore === null) {
+                    response.isMarked =
+                        item.questions[0].response.comment &&
+                        item.questions[0].response.comment !== null &&
+                        item.questions[0].response.comment !== "";
+                } else {
+                    response.isMarked = response.score !== null;
+                }
             }
         });
     }
@@ -128,17 +131,11 @@ export const useStudentStore = defineStore("qfStudent", () => {
 
     /**
      * To update the score of a question
-     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item that contains the question to update
      * @param {StudentItemQuestion} question - the question to update
      * @param {number} score - the score to update
      */
-    function updateItemResponseScore(
-        $student: Student,
-        item: StudentItem,
-        question: StudentItemQuestion,
-        score: number
-    ) {
+    function updateItemResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
         (question.response as StudentItemQuestionResponse).score = score;
         (question.response as StudentItemQuestionResponse).isMarked = true;
         updateIsMarked(item);
@@ -146,12 +143,11 @@ export const useStudentStore = defineStore("qfStudent", () => {
 
     /**
      * To update the comment of an item
-     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item to update
      * @param {StudentItemQuestion} question - the question to update
      * @param {string} comment - the comment to update
      */
-    function updateItemComment($student: Student, item: StudentItem, question: StudentItemQuestion, comment: string) {
+    function updateItemComment(item: StudentItem, question: StudentItemQuestion, comment: string) {
         (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(

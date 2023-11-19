@@ -11,5 +11,5 @@ export type StudentItemQuestion = {
     };
     response_id: string;
     response?: StudentItemQuestionResponse;
-    hasResponse?: boolean;
+    hasResponse: boolean;
 };
