@@ -511,7 +511,9 @@ class DataTransferObject
     {
         foreach ($assessmentSpecs as $unitSpecId => $unitSpecAssessmentSpecs) {
             foreach ($unitSpecAssessmentSpecs as $assessmentSpec) {
-                $this->addAssessmentSpec($unitSpecId, $assessmentSpec);
+                if ($assessmentSpec->isUsable()) {
+                    $this->addAssessmentSpec($unitSpecId, $assessmentSpec);
+                }
             }
         }
     }
