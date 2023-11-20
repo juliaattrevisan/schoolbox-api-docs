@@ -35,9 +35,9 @@ const isActive = window.Vue.computed(() => {
 });
 
 /**
- * Need to prevent moving to another item while the score is being saved
+ * Need to prevent moving to another item while the score or comment is being saved
  */
-function onScoreUpdating() {
+function onUpdating() {
     store.isProcessing = true;
 }
 
@@ -72,11 +72,16 @@ function onCommentUpdated(comment: string) {
                     :item="props.item"
                     :question="question"
                     :container="props.container"
-                    @updating-score="onScoreUpdating"
+                    @updating-score="onUpdating"
                     @updated-score="onScoreUpdated"
                 />
             </div>
-            <student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
+            <student-item-comment
+                :student="props.student"
+                :item="props.item"
+                @updating-comment="onUpdating"
+                @updated-comment="onCommentUpdated"
+            />
         </div>
     </transition>
 </template>

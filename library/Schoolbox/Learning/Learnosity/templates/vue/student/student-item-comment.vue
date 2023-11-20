@@ -18,7 +18,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
-const comment = useEditor(props.item.questions[0].response.comment ?? "", editorId, {
+const comment = useEditor(props.item.questions[0].response?.comment ?? "", editorId, {
     targetElements: [`#${editorId}`],
     hasTokens: true,
 }); // Use a ckeditor for the comments field
@@ -26,7 +26,8 @@ const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
 const emit = defineEmits<{
-    updateComment: [comment: string];
+    updatingComment: [];
+    updatedComment: [comment: string];
 }>();
 
 /**
@@ -55,10 +56,17 @@ const saveContainerHeight = window.Vue.computed(() => {
  * Save the comment if it's changed
  */
 async function saveComment() {
+    if (props.item.questions === undefined || props.item.questions[0].response === undefined) {
+        return;
+    }
+    if (isSaving.value) {
+        return;
+    }
     if (comment.value === props.item.questions[0].response.comment) {
         return;
     }
     isSaving.value = true;
+    emit("updatingComment");
     const formData = new FormData();
     formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
     formData.append("comment", comment.value);
@@ -66,7 +74,7 @@ async function saveComment() {
         method: "POST",
         body: formData,
     });
-    emit("updateComment", comment.value);
+    emit("updatedComment", comment.value);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
