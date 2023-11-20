@@ -2,7 +2,7 @@
  * To load the reports data and pass it to the other stores
  */
 
-import type { Item } from "@schoolboxLearnosity/js/types/Item";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { addTargetsToMarks } from "@schoolboxLearnosity/js/util/domUtils";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
@@ -12,6 +12,7 @@ import { useStudentsStore } from "../store/hmStudentsStore";
  * @param {string} reportPayloads - the report payload
  */
 export function loadReports(reportPayloads: string[]) {
+    let loadedCount = 0;
     for (let i = 0; i < reportPayloads.length; i += 1) {
         const initOptions = JSON.parse(reportPayloads[i]);
         // To link the report to the student
@@ -29,16 +30,18 @@ export function loadReports(reportPayloads: string[]) {
                 attemptReport.on("ready:itemsApi", (itemsApp) => {
                     // Load the items for the student
                     itemsApp.getItems(($items: object) => {
-                        const items: Item[] = [];
+                        const items: StudentItem[] = [];
                         // grab each item object and push it into the items array
-                        Object.values($items).forEach((item: Item) => {
+                        Object.values($items).forEach((item: StudentItem) => {
                             items.push(item);
                         });
                         useStudentsStore().addItems(reportId, items);
                         addTargetsToMarks(reportId);
                         // add the questions to the items, as they aren't included in the initial payload
-                        useItemsStore().addQuestions(items);
+                        useItemsStore().addQuestions(items, loadedCount === reportPayloads.length - 1);
+                        loadedCount += 1;
                     });
+
                     // to notify the report has loaded
                     useStudentsStore().reportLoaded(reportId);
                 });

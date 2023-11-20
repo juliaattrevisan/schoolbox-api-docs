@@ -2,7 +2,7 @@
  * To load the reports data and pass it to the other stores
  */
 
-import type { Item } from "@schoolboxLearnosity/js/types/Item";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { addTargetsToMarks } from "@schoolboxLearnosity/js/util/domUtils";
 import { useStudentStore } from "../store/qfStudentStore";
 
@@ -26,9 +26,9 @@ export function loadReport(initOptions: object) {
             attemptReport.on("ready:itemsApi", (itemsApp) => {
                 // Load the items for the student
                 itemsApp.getItems(($items: object) => {
-                    const items: Item[] = [];
+                    const items: StudentItem[] = [];
                     // grab each item object and push it into the items array
-                    Object.values($items).forEach((item: Item) => {
+                    Object.values($items).forEach((item: StudentItem) => {
                         items.push(item);
                     });
                     useStudentStore().addItems(items);

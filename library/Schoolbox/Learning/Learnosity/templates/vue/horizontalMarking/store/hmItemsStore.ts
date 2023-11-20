@@ -1,5 +1,5 @@
 /**
- * Holds the items (card in sbx) and the active item (the one being marked)
+ * Holds the items and the active item (the one being marked)
  */
 
 import { defineStore } from "pinia";
@@ -8,6 +8,7 @@ import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 
 export const useItemsStore = defineStore("hmItems", () => {
     const items = window.Vue.ref<Item[]>([]);
+    const itemReferenceList = window.Vue.ref<string[]>([]);
     const activeItem = window.Vue.ref<Item>({
         id: "",
         reference: "",
@@ -20,7 +21,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     const hasNextItem = window.Vue.computed(() => activeItemIndex.value < items.value.length - 1);
     const isNextFinalReview = window.Vue.computed(() => items.value[activeItemIndex.value + 1]?.isAttemptComment);
     const isAttemptComment = window.Vue.computed(() => activeItem.value.isAttemptComment === true);
-    const hasInvalidAttempts = window.Vue.ref<boolean>(false);
+    const hasVariedAttempts = window.Vue.ref<boolean>(false); // if different students have attempted a different number of items/questions
 
     /**
      * store any passed through properties
@@ -30,16 +31,15 @@ export const useItemsStore = defineStore("hmItems", () => {
         $items.forEach((item) => {
             items.value.push({
                 ...item,
-                questions: [],
                 isAttemptComment: false,
             });
         });
+        itemReferenceList.value = items.value.map((item) => item.reference);
         // we add in an 'dummy' item for the final 'item' which allows the opportunity to provide final feedback for each student
         const lastItemForReview = {
             id: "0",
             reference: "attempt-comments",
             title: "Overall Comments",
-            questions: [],
             isAttemptComment: true,
         };
         items.value.push(lastItemForReview);
@@ -49,25 +49,45 @@ export const useItemsStore = defineStore("hmItems", () => {
      * Add questions to the items, unlike the items initially loaded, the items linked to students loaded
      * via the reports api contain the questions, so we add them here
      * @param {StudentItem[]} $items - the items to reference
+     * @param {boolean} isLastAttempt - if this is the last attempt that will be loaded
      */
-    function addQuestions($items: StudentItem[]) {
+    function addQuestions($items: StudentItem[], isLastAttempt: boolean) {
         /**
-         * if the incoming student items is less than the store items (-1 to account for the overall comments item),
-         * we know that the student did not attempt all the latest items, and we need to flag this
+         * to only get student items that are also in the store items, as a quiz could have had items removed after the student attempted the quiz
          */
-        if ($items.length < items.value.length - 1) {
-            hasInvalidAttempts.value = true;
-            return;
+        const validItems = $items.filter((item) => itemReferenceList.value.includes(item.reference));
+        if (validItems.length !== itemReferenceList.value.length) {
+            hasVariedAttempts.value = true;
         }
-        // we cant assume the items are coming in from the API in the same order as the items we have stored
-        // we'll need to match them up by reference
-        $items.forEach((item) => {
+        /**
+         * we need to remove any student items that are not in the store items,
+         * as a quiz could have had items removed after the student attempted the quiz
+         */
+        // const validItems = $items.filter((item) => itemReferenceList.value.includes(item.reference));
+        // if ($items.length !== validItems.length) {
+        //     hasVariedAttempts.value = true;
+        // }
+
+        // only do this if last attempt to check?
+
+        /**
+         * we cant assume the items are coming in from the API in the same order as the items we have stored,
+         * we'll need to match them up by reference
+         */
+        validItems.forEach((item) => {
             const matchedItem = items.value.find((storedItem) => storedItem.reference === item.reference) as Item;
+            // if (matchedItem.questions) {
+            // questions have not been added yet
             matchedItem.questions = item.questions;
+            // }
         });
         // only show those items with questions and the final review
-        items.value = items.value.filter((item) => item.questions.length > 0 || item.isAttemptComment);
-        activeItem.value = { ...items.value[0] };
+        if (isLastAttempt) {
+            items.value = items.value.filter(
+                (item) => (item.questions && item.questions.length > 0) || item.isAttemptComment
+            );
+            activeItem.value = { ...items.value[0] };
+        }
     }
 
     /**
@@ -106,7 +126,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         hasNextItem,
         isNextFinalReview,
         isAttemptComment,
-        hasInvalidAttempts,
+        hasVariedAttempts,
         init,
         addQuestions,
         setActiveItem,
