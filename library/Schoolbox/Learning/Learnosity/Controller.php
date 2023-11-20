@@ -362,7 +362,7 @@ class Controller extends Base
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
         if (
-            $quiz->getMaxAttempts() !== 0 && // Max attempts zero means no maximum.
+            !$quiz->isAttemptsUnlimited() &&
             $this->attemptMapper->getAttemptCountForStudent($quiz->getId(), $student->getId()) >= $quiz->getMaxAttempts()
         ) {
             /* Redirect back to summary screen
