@@ -129,6 +129,7 @@ class Helper
      * @param string $status
      * @return void
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function changeState(string $learnosityReference, string $status): void
