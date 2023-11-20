@@ -369,7 +369,7 @@ class Classes implements IStrategy
                     // do we have an academic year on the activity
                     if (!isset($activity['academicYear']['importIdentifier'])) {
                         $this->log->debug(sprintf(
-                            "Activity has no academic year academicYear: %s, Activity Type: %s",
+                            "Activity: %s has no academic year academicYear, Activity Type: %s",
                             $activity['name'],
                             $activityType
                         ));
