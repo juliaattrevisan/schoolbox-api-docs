@@ -30,12 +30,12 @@ class AggregateSource implements ISource
     /**
      * Constructor
      *
-     * @param IConnector         $connector
-     * @param IQueryParamBuilder ...$matchers
+     * @param IConnector $connector
+     * @param array<IQueryParamBuilder> $matchers
      */
     public function __construct(
         private IConnector $connector,
-        IQueryParamBuilder ...$matchers,
+        array $matchers
     ) {
         $this->queryParamBuilders = $matchers;
     }

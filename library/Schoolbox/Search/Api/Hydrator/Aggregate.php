@@ -23,9 +23,9 @@ class Aggregate implements IHydrator
     /**
      * Constructor
      *
-     * @param IHydrator ...$hydrators
+     * @param array<IHydrator> $hydrators
      */
-    public function __construct(IHydrator ...$hydrators)
+    public function __construct(array $hydrators)
     {
         $this->hydrators = $hydrators;
     }

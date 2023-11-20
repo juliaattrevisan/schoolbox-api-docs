@@ -18,6 +18,7 @@ use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -102,92 +103,98 @@ class Module extends BaseModule
         // Need an httpRequest.
         $httpRequest = $this->injector->get('httpRequest');
 
+        $queryParamBuilders = [
+            new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
+            new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter()),
+        ];
+
+        $hydrators = [
+            new Database\ResultType\User\Hydrator(
+                $mapperFactory->get(UserMapper::class),
+                $userNameFormatter,
+                $config,
+                $routeGenerator,
+                $authorizer
+            ),
+            new Database\ResultType\News\Hydrator(
+                $mapperFactory->get(NewsMapper::class),
+                $articleResolver,
+                $routeGenerator,
+                $authorizer
+            ),
+            new Database\ResultType\Page\Hydrator(
+                $mapperFactory->get(FolderMapper::class),
+                Access::getInstance(),
+                $routeGenerator,
+                $authorizer
+            ),
+            new Database\ResultType\File\Hydrator(
+                $mapperFactory->get(FileMapper::class),
+                Access::getInstance(),
+                new PrefixGenerator($this->getConfig()),
+            ),
+            new Database\ResultType\Event\Hydrator(
+                $mapperFactory->get(UserMapper::class),
+                $mapperFactory->get(FolderMapper::class),
+            ),
+            new Database\ResultType\Link\Hydrator(
+                $mapperFactory->get(LinkMapper::class),
+                Access::getInstance(),
+            ),
+            new Database\ResultType\Textbox\Hydrator(
+                $mapperFactory->get(TextboxMapper::class),
+                $mapperFactory->get(FolderMapper::class),
+                Access::getInstance(),
+                $routeGenerator,
+                $authorizer
+            ),
+            new Database\ResultType\Blog\Hydrator(
+                $mapperFactory->get(BlogMapper::class),
+                Access::getInstance(),
+            ),
+            new Database\ResultType\Tile\Hydrator(
+                $mapperFactory->get(TileMapper::class),
+                $mapperFactory->get(TileLayoutMapper::class),
+                $mapperFactory->get(FolderMapper::class),
+                Access::getInstance(),
+            ),
+            new Database\ResultType\Forum\Hydrator(
+                $mapperFactory->get(PostMapper::class),
+                $mapperFactory->get(ThreadMapper::class),
+                Access::getInstance(),
+            ),
+            new Database\ResultType\Assessment\Hydrator(
+                $assessmentMapperProxy,
+                $mapperFactory->get(UserMapper::class),
+                Access::getInstance(),
+                $routeGenerator,
+                $authorizer,
+                $httpRequest
+            ),
+        ];
+
+        if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
+            $queryParamBuilders[] = new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter());
+            $hydrators[] = new Database\ResultType\Badge\Hydrator(
+                $mapperFactory->get(BadgeMapper::class),
+                new PrefixGenerator($this->getConfig()),
+                $routeGenerator,
+                $authorizer
+            );
+        }
+
         return new Controller(
-            new Database\AggregateSource(
-                $database,
-                new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
-                new Database\ResultType\News\QueryParamBuilder(),
-                new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
-                new Database\ResultType\File\QueryParamBuilder(),
-                new Database\ResultType\Event\QueryParamBuilder(),
-                new Database\ResultType\Link\QueryParamBuilder(),
-                new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
-                new Database\ResultType\Blog\QueryParamBuilder(),
-                new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter()),
-                new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
-                new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
-                new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter()),
-            ),
-            new Hydrator\Aggregate(
-                new Database\ResultType\User\Hydrator(
-                    $mapperFactory->get(UserMapper::class),
-                    $userNameFormatter,
-                    $config,
-                    $routeGenerator,
-                    $authorizer
-                ),
-                new Database\ResultType\News\Hydrator(
-                    $mapperFactory->get(NewsMapper::class),
-                    $articleResolver,
-                    $routeGenerator,
-                    $authorizer
-                ),
-                new Database\ResultType\Page\Hydrator(
-                    $mapperFactory->get(FolderMapper::class),
-                    Access::getInstance(),
-                    $routeGenerator,
-                    $authorizer
-                ),
-                new Database\ResultType\File\Hydrator(
-                    $mapperFactory->get(FileMapper::class),
-                    Access::getInstance(),
-                    new PrefixGenerator($this->getConfig()),
-                ),
-                new Database\ResultType\Event\Hydrator(
-                    $mapperFactory->get(UserMapper::class),
-                    $mapperFactory->get(FolderMapper::class),
-                ),
-                new Database\ResultType\Link\Hydrator(
-                    $mapperFactory->get(LinkMapper::class),
-                    Access::getInstance(),
-                ),
-                new Database\ResultType\Textbox\Hydrator(
-                    $mapperFactory->get(TextboxMapper::class),
-                    $mapperFactory->get(FolderMapper::class),
-                    Access::getInstance(),
-                    $routeGenerator,
-                    $authorizer
-                ),
-                new Database\ResultType\Blog\Hydrator(
-                    $mapperFactory->get(BlogMapper::class),
-                    Access::getInstance(),
-                ),
-                new Database\ResultType\Badge\Hydrator(
-                    $mapperFactory->get(BadgeMapper::class),
-                    new PrefixGenerator($this->getConfig()),
-                    $routeGenerator,
-                    $authorizer
-                ),
-                new Database\ResultType\Tile\Hydrator(
-                    $mapperFactory->get(TileMapper::class),
-                    $mapperFactory->get(TileLayoutMapper::class),
-                    $mapperFactory->get(FolderMapper::class),
-                    Access::getInstance(),
-                ),
-                new Database\ResultType\Forum\Hydrator(
-                    $mapperFactory->get(PostMapper::class),
-                    $mapperFactory->get(ThreadMapper::class),
-                    Access::getInstance(),
-                ),
-                new Database\ResultType\Assessment\Hydrator(
-                    $assessmentMapperProxy,
-                    $mapperFactory->get(UserMapper::class),
-                    Access::getInstance(),
-                    $routeGenerator,
-                    $authorizer,
-                    $httpRequest
-                ),
-            ),
+            new Database\AggregateSource($database, $queryParamBuilders),
+            new Hydrator\Aggregate($hydrators),
             new Hydrator\Translator\FullResultToArray(
                 new UserTranslator(),
                 new FolderTranslator(0),
