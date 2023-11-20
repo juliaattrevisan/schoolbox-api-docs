@@ -114,7 +114,6 @@ class Module extends BaseModule
             new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
             new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
             new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter()),
         ];
 
         $hydrators = [
@@ -172,14 +171,6 @@ class Module extends BaseModule
                 $mapperFactory->get(ThreadMapper::class),
                 Access::getInstance(),
             ),
-            new Database\ResultType\Assessment\Hydrator(
-                $assessmentMapperProxy,
-                $mapperFactory->get(UserMapper::class),
-                Access::getInstance(),
-                $routeGenerator,
-                $authorizer,
-                $httpRequest
-            ),
         ];
 
         if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
@@ -189,6 +180,18 @@ class Module extends BaseModule
                 new PrefixGenerator($this->getConfig()),
                 $routeGenerator,
                 $authorizer
+            );
+        }
+
+        if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            $queryParamBuilders[] = new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter());
+            $hydrators[] = new Database\ResultType\Assessment\Hydrator(
+                $assessmentMapperProxy,
+                $mapperFactory->get(UserMapper::class),
+                Access::getInstance(),
+                $routeGenerator,
+                $authorizer,
+                $httpRequest
             );
         }
 
