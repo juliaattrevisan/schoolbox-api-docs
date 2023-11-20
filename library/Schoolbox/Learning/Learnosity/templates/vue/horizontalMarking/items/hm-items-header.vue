@@ -12,7 +12,7 @@ const itemsStore = useItemsStore();
 <template>
     <div class="l-flex-col l-gap-s">
         <h2 class="subheader f-no-margins">Items</h2>
-        <div v-if="itemsStore.hasVariedAttempts" class="alert-box f-no-margins">
+        <div v-if="itemsStore.hasVariedAttempts" class="alert-box warning f-no-margins">
             This quiz has been modified after attempts have already been submitted. As such the scores for each attempt
             may not match.
         </div>
