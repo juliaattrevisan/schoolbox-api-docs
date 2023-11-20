@@ -166,8 +166,8 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         question: StudentItemQuestion,
         score: number
     ) {
-        question.response.score = score;
-        question.response.isMarked = true;
+        (question.response as StudentItemQuestionResponse).score = score;
+        (question.response as StudentItemQuestionResponse).isMarked = true;
         updateIsMarked(student, item);
     }
 
@@ -179,11 +179,13 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {string} comment - the comment to update
      */
     function updateItemComment(student: Student, item: StudentItem, question: StudentItemQuestion, comment: string) {
-        question.response.comment = comment;
+        (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
-        const questionsWithoutMaxScore = item.questions.filter(($question) => $question.response.maxScore === null);
+        const questionsWithoutMaxScore = item.questions.filter(
+            ($question) => ($question.response as StudentItemQuestionResponse).maxScore === null
+        );
         questionsWithoutMaxScore.forEach(($question) => {
-            $question.response.isMarked = true;
+            ($question.response as StudentItemQuestionResponse).isMarked = true;
         });
         updateIsMarked(student, item);
     }
