@@ -12,7 +12,6 @@ import { useStudentsStore } from "../store/hmStudentsStore";
  * @param {string} reportPayloads - the report payload
  */
 export function loadReports(reportPayloads: string[]) {
-    let loadedCount = 0;
     for (let i = 0; i < reportPayloads.length; i += 1) {
         const initOptions = JSON.parse(reportPayloads[i]);
         // To link the report to the student
@@ -38,8 +37,7 @@ export function loadReports(reportPayloads: string[]) {
                         useStudentsStore().addItems(reportId, items);
                         addTargetsToMarks(reportId);
                         // add the questions to the items, as they aren't included in the initial payload
-                        useItemsStore().addQuestions(items, loadedCount === reportPayloads.length - 1);
-                        loadedCount += 1;
+                        useItemsStore().addQuestions(items, i === reportPayloads.length - 1);
                     });
 
                     // to notify the report has loaded

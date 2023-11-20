@@ -24,13 +24,15 @@ import { onClickOutside } from "@vueuse/core";
  * @param {string} buttonLabel - The label to display on the button
  * @param {string} contentId - The id of the pop out content
  * @param {string} optimalPlacement - The optimal placement of the pop out content
+ * @param {boolean} isFullWidth - whether to display the pop out content has full width
  * @returns {object} - The isOpen ref
  */
 export function usePopOut(
     button: Ref<HTMLButtonElement>,
     buttonLabel: string,
     contentId: string,
-    optimalPlacement = "bottom-end"
+    optimalPlacement = "bottom-end",
+    isFullWidth = false
 ) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     let content: HTMLElement; // The content to display when the button is selected
@@ -141,6 +143,10 @@ export function usePopOut(
         // the button will always match the colour of the content when open
         button.value.style.backgroundColor = window.getComputedStyle(content).getPropertyValue("background-color");
         cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition as () => void);
+        if (isFullWidth) {
+            // make the content the same width of the button
+            content.style.width = `${button.value.offsetWidth}px`;
+        }
         const position = await getPosition();
         animateOpen(position);
     }

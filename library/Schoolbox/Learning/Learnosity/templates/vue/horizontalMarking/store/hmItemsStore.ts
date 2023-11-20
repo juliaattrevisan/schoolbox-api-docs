@@ -52,37 +52,24 @@ export const useItemsStore = defineStore("hmItems", () => {
      * @param {boolean} isLastAttempt - if this is the last attempt that will be loaded
      */
     function addQuestions($items: StudentItem[], isLastAttempt: boolean) {
-        /**
-         * to only get student items that are also in the store items, as a quiz could have had items removed after the student attempted the quiz
-         */
+        // to only get student items that are also in the store items, as a quiz could have been modified after the student attempted the quiz
         const validItems = $items.filter((item) => itemReferenceList.value.includes(item.reference));
         if (validItems.length !== itemReferenceList.value.length) {
             hasVariedAttempts.value = true;
         }
-        /**
-         * we need to remove any student items that are not in the store items,
-         * as a quiz could have had items removed after the student attempted the quiz
-         */
-        // const validItems = $items.filter((item) => itemReferenceList.value.includes(item.reference));
-        // if ($items.length !== validItems.length) {
-        //     hasVariedAttempts.value = true;
-        // }
-
-        // only do this if last attempt to check?
-
         /**
          * we cant assume the items are coming in from the API in the same order as the items we have stored,
          * we'll need to match them up by reference
          */
         validItems.forEach((item) => {
             const matchedItem = items.value.find((storedItem) => storedItem.reference === item.reference) as Item;
-            // if (matchedItem.questions) {
-            // questions have not been added yet
-            matchedItem.questions = item.questions;
-            // }
+            // if the questions have already been added, we don't need to overwrite them
+            if (matchedItem && !matchedItem.questions) {
+                matchedItem.questions = item.questions;
+            }
         });
-        // only show those items with questions and the final review
         if (isLastAttempt) {
+            // only show those items with questions and the final review
             items.value = items.value.filter(
                 (item) => (item.questions && item.questions.length > 0) || item.isAttemptComment
             );
@@ -121,6 +108,7 @@ export const useItemsStore = defineStore("hmItems", () => {
 
     return {
         items,
+        itemReferenceList,
         activeItem,
         hasPreviousItem,
         hasNextItem,

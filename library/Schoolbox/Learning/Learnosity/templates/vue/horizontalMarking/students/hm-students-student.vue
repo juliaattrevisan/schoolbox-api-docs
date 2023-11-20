@@ -24,14 +24,6 @@ const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
 /**
- * To notify the selected item was not available to the student during their attempt
- * @returns {boolean} - true if the student has unavailable items
- */
-const hasUnavailableItems = window.Vue.computed(() => {
-    return props.student.items.length < itemsStore.items.length - 1;
-});
-
-/**
  * To show/hide the response when selected
  */
 function onToggleSelected() {
@@ -113,7 +105,6 @@ function onAttemptCommentUpdated(comment: string) {
                     @update-comment="onAttemptCommentUpdated"
                 />
                 <hm-students-student-unavailable-item
-                    v-if="hasUnavailableItems"
                     :student="props.student"
                     @update-comment="onAttemptCommentUpdated"
                 />
