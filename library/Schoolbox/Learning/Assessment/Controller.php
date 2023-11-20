@@ -473,12 +473,28 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $postReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
-        $returnUrl     = $this->determineRedirect(
-            $assessmentInfo['assessment'],
-            $postReturnUrl,
-            $assessmentInfo[Redirect::RETURN_URL],
-            $assessmentInfo['relocated']
-        );
+
+        /* Quizzes go to the Modify Contents screen in Learnosity when you update
+         * the quiz settings; unlike everything else
+         */
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            /**
+             * Always go to the screen when a quiz has been created,
+             * but send the return url with it
+             */
+            $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', ['assessmentId' => $assessment->getId()]);
+
+            if ($postReturnUrl) {
+                $returnUrl .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
+            }
+        } else {
+            $returnUrl = $this->determineRedirect(
+                $assessmentInfo['assessment'],
+                $postReturnUrl,
+                $assessmentInfo[Redirect::RETURN_URL],
+                $assessmentInfo['relocated']
+            );
+        }
 
         // we're done here
         $this->redirect($returnUrl);
