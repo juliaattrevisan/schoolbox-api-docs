@@ -1731,7 +1731,7 @@ class Controller extends Base
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
-                // including failure
+            // including failure
             default => 400,
         };
         $this->response = $this
