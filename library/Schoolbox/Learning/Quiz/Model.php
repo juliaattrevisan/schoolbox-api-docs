@@ -290,7 +290,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     public function isAttemptsUnlimited(): bool
     {
-        return $this->attempts === self::ATTEMPTS_UNLIMITED;
+        return $this->max_attempts === self::ATTEMPTS_UNLIMITED;
     }
 
     /**

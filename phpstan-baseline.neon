@@ -4641,11 +4641,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Model.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\>&Schoolbox\\\\GenericCollection\\) and 0 will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Model.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Mapper.php
