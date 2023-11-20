@@ -19,7 +19,7 @@ interface Props {
 const props = defineProps<Props>();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
-const score = window.Vue.ref<string>(props.question.response.score?.toString() ?? "");
+const score = window.Vue.ref<string>("");
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
@@ -92,15 +92,18 @@ const debounceSave = debounce(() => {
  * add some quick validation to prevent the score input going below 0 and above the max score and save the score
  */
 window.Vue.watch(score, (newScore) => {
+    // can't go below 0
     if (parseFloat(newScore) < 0) {
         score.value = "0";
         return;
     }
+    // keep it within the max score
     if (
-        (props.question.response as StudentItemQuestionResponse).maxScore &&
-        parseFloat(newScore) > (props.question.response as StudentItemQuestionResponse).maxScore
+        props.question.response &&
+        props.question.response.maxScore &&
+        parseFloat(newScore) > props.question.response.maxScore
     ) {
-        score.value = (props.question.response as StudentItemQuestionResponse).maxScore.toString();
+        score.value = props.question.response.maxScore.toString();
         return;
     }
     debounceSave();
@@ -115,6 +118,7 @@ window.Vue.onMounted(() => {
             `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
         ) as HTMLDivElement;
         responsesEl.value?.appendChild(response);
+        score.value = props.question.response.score?.toString() ?? "";
     }
 });
 
@@ -160,6 +164,9 @@ window.Vue.onBeforeUnmount(async () => {
                 </div>
             </div>
         </template>
+        <div v-else class="alert-box f-no-margins">
+            This question was not in the quiz when the student attempted the quiz.
+        </div>
     </div>
 </template>
 
