@@ -10,10 +10,33 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../../../conf/core/require.php';
+
 /* FIXME but...this requires credentials in order to proceed
  *  and the credentials aren't populated until afterwards.
  *  That makes migration a two-step process, not one.
  */
-passthru('php ' . __DIR__ .  '/../../../tools/learnosity/import.php --small --perform');
-passthru('php ' . __DIR__ .  '/../../../tools/learnosity/import.php --large --perform');
+$importScript = 'php ' . __DIR__ .  '/../../../tools/learnosity/import.php';
+$logFile      = '/var/log/schoolbox/' . INSTANCE_ID . '/learnosity-import.log';
+$commands     = [
+    $importScript . ' --small --perform >> ' . $logFile . ' 2>&1',
+    $importScript . ' --large --perform >> ' . $logFile . ' 2>&1',
+];
+$command      = implode(' && ', $commands);
+
+// Run the whole thing in background
+echo "Running Learnosity import commands in background process:\n" . implode("\n", $commands) . "\n";
+$proc       = proc_open(
+    "($command)",
+    [
+        0 => STDIN,
+        1 => STDOUT,
+        2 => STDERR,
+    ],
+    $pipes,
+);
+$procStatus = proc_get_status($proc);
+printf("Beginning Learnosity import (pid: %d)\n", $procStatus['pid']);
+
+// Exit: the import will continue to run in background
 exit();
