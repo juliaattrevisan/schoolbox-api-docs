@@ -48,6 +48,15 @@ const saveContainerHeight = window.Vue.computed(() => {
 });
 
 /**
+ * To notify the user that they're leaving the page while data is being saved
+ * @param {BeforeUnloadEvent} event - the event to prevent
+ */
+function beforeUnloadHandler(event: BeforeUnloadEvent) {
+    event.preventDefault();
+    event.returnValue = "";
+}
+
+/**
  * Save the comment if it's changed
  */
 async function saveComment() {
@@ -59,6 +68,7 @@ async function saveComment() {
     }
     isSaving.value = true;
     emit("updatingComment");
+    window.addEventListener("beforeunload", beforeUnloadHandler);
     const formData = new FormData();
     formData.append("comment", comment.value);
     await fetch(props.student.urls.attemptComment, {
@@ -66,6 +76,7 @@ async function saveComment() {
         body: formData,
     });
     emit("updatedComment", comment.value);
+    window.removeEventListener("beforeunload", beforeUnloadHandler);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);

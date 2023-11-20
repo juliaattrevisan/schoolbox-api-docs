@@ -51,6 +51,15 @@ const saveContainerHeight = window.Vue.computed(() => {
 });
 
 /**
+ * To notify the user that they're leaving the page while data is being saved
+ * @param {BeforeUnloadEvent} event - the event to prevent
+ */
+function beforeUnloadHandler(event: BeforeUnloadEvent) {
+    event.preventDefault();
+    event.returnValue = "";
+}
+
+/**
  * Save the score if it's changed and valid
  */
 async function saveScore() {
@@ -69,6 +78,7 @@ async function saveScore() {
     }
     isSaving.value = true;
     emit("updatingScore");
+    window.addEventListener("beforeunload", beforeUnloadHandler);
     const formData = new FormData();
     formData.append(
         "learnosityReference",
@@ -80,6 +90,7 @@ async function saveScore() {
         body: formData,
     });
     emit("updatedScore", props.question, parseFloat(score.value));
+    window.removeEventListener("beforeunload", beforeUnloadHandler);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
