@@ -22,7 +22,6 @@ use Alaress_Date_Format;
  */
 class DataTransferObject
 {
-
     /**
      * Is this an import modification (rather than new import) ?
      *
@@ -308,8 +307,8 @@ class DataTransferObject
                 // Base case: non-project
                 if (!$spec instanceof Project) {
                     $openSpan = $spec->getDefaultOpenSpan();
-                } // Recursive case: Project
-                else {
+                } else {
+                    // Recursive case: Project
                     // Does any assessment inside this project have a null open_span?
                     $openSpan = $this->recursiveGetDefaultOpenSpan($spec);
                 }
@@ -317,8 +316,8 @@ class DataTransferObject
                 // Does it not have a open span?
                 if (null === $openSpan) {
                     $end = $unitClose;
-                } // Else it does have an open span
-                else {
+                } else {
+                    // Else it does have an open span
                     $tempEnd = clone $nextAvailable;
                     $tempEnd->addDays($openSpan);
                     $tempEnd->addSeconds(-1);
@@ -329,8 +328,8 @@ class DataTransferObject
                         $nextAvailable = clone $unitClose;
                         $nextAvailable = $nextAvailable->startOfDay();
                         $end           = $unitClose;
-                    } // Else assessment ends before end of unit
-                    else {
+                    } else {
+                        // Else assessment ends before end of unit
                         // Increment next and set assessment end
                         $nextAvailable->addDays($spec->getDefaultOpenSpan());
                         $end = $tempEnd;
@@ -344,8 +343,8 @@ class DataTransferObject
                 $due->endOfDay();
                 $spec->setDueAt($due->setTimeFromString($this->defaultDueTime));
                 $spec->setCloseAt($end);
-            } // Else this is an import-modify.
-            else {
+            } else {
+                // Else this is an import-modify.
                 /* Import-modify:
                  * * Pairs may be spec-only, impl-only, or pair
                  * * Ignore AssessmentSpec.defaultOpenSpans
@@ -430,8 +429,8 @@ class DataTransferObject
                     return null;
                 }
                 $totalOpenSpan += $subAssessment->getDefaultOpenSpan();
-            } // Recursive Case: project
-            else {
+            } else {
+                // Recursive Case: project
                 $openSpan = $this->recursiveGetDefaultOpenSpan($subAssessment);
                 if (null === $openSpan) {
                     return null;
@@ -590,8 +589,8 @@ class DataTransferObject
             // Is this a fresh unit import?
             if (!$this->unitImplementations[$unitSpecId]->getId()) {
                 $this->selectedAssessmentCounts[$unitSpecId] = $this->availableAssessmentCounts[$unitSpecId];
-            } // Else modification of existing unit import.
-            else {
+            } else {
+                // Else modification of existing unit import.
                 $count = 0;
                 foreach ($assessmentPairs as $assessmentPair) {
                     $count += $assessmentPair->getAssessmentImplCount();
