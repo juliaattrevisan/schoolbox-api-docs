@@ -71,7 +71,9 @@ UPDATE assess_attempt
 
 -- represent norm_mark for old attempts
 UPDATE assess_attempt
-SET norm_mark = FORMAT(100 * mark / max_mark, 11);
+INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
+SET norm_mark = FORMAT(100 * mark / max_mark, 11)
+WHERE assess.availability = 'assess';
 
 -- change data type
 ALTER TABLE `assess_attempt`
@@ -81,7 +83,9 @@ ALTER TABLE `assess_attempt`
 -- use this trim tactic to remove trailing zeroes (wild!)
 -- https://stackoverflow.com/questions/7968531/remove-trailing-zeros-in-decimal-value-with-changing-length
 UPDATE assess_attempt
-SET mark = CONCAT(trim(mark)+0, " / ", trim(max_mark)+0);
+INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
+SET mark = CONCAT(trim(mark)+0, " / ", trim(max_mark)+0)
+WHERE assess.availability = 'assess';
 
 -- Reset duration to 0 for Unlimited, rather than -1
 ALTER TABLE `assess`
