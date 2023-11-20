@@ -41,7 +41,7 @@ alter table submission_box add column _rubric_capability_grade_group_id int(11) 
 update submission_box set _rubric_capability_grade_group_id = rubric_capability_grade_group_id;
 update submission_box sb
     left join submission_grade_group sgg on sb._rubric_capability_grade_group_id = sgg.id
-set sb.rubric_capability_mark_type_id = sgg.id;
+set sb.rubric_capability_grade_group_id = sgg.id;
 alter table submission_box add constraint fk_rubric_capability_grade_group foreign key (rubric_capability_grade_group_id)
     references submission_grade_group (id);
 
