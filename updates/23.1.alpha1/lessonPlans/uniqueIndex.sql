@@ -32,7 +32,7 @@ alter table submission_box add column _rubric_capability_mark_type_id int(11) un
 update submission_box set _rubric_capability_mark_type_id = rubric_capability_mark_type_id;
 alter table submission_box modify column rubric_capability_mark_type_id int(11);
 update submission_box sb
-left join submission_mark_type smt on sb._rubric_capability_mark_type_id = smt.mark_type_id
+left join submission_mark_type smt on sb.rubric_capability_mark_type_id = smt.mark_type_id
 set sb.rubric_capability_mark_type_id = smt.mark_type_id;
 alter table submission_box add constraint fk_rubric_capability_mark_type foreign key (rubric_capability_mark_type_id)
     references submission_mark_type (mark_type_id);
@@ -40,7 +40,7 @@ alter table submission_box add constraint fk_rubric_capability_mark_type foreign
 alter table submission_box add column _rubric_capability_grade_group_id int(11) after rubric_capability_grade_group_id;
 update submission_box set _rubric_capability_grade_group_id = rubric_capability_grade_group_id;
 update submission_box sb
-    left join submission_grade_group sgg on sb._rubric_capability_grade_group_id = sgg.id
+    left join submission_grade_group sgg on sb.rubric_capability_grade_group_id = sgg.id
 set sb.rubric_capability_grade_group_id = sgg.id;
 alter table submission_box add constraint fk_rubric_capability_grade_group foreign key (rubric_capability_grade_group_id)
     references submission_grade_group (id);
