@@ -48,6 +48,29 @@ export function getAttemptResponse(attemptComments: StudentAttemptComment[], stu
 }
 
 /**
+ * Loop through each question in the item and check for a score to determine if the question is already marked.
+ * If there is no maxScore, we assume that the question is considered marked if the first question contains a comment.
+ * So the first question comment covers isMarked for any questions within the item that don't have a maxScore
+ * @param { StudentItem } item - the item to check
+ */
+export function setInitialQuestionIsMarked(item: StudentItem) {
+    const firstQuestion = item.questions[0];
+    item.questions.forEach((question) => {
+        if (question.response) {
+            const { response } = question;
+            if (response.maxScore === null) {
+                response.isMarked =
+                    (firstQuestion.response as StudentItemQuestionResponse).comment !== undefined &&
+                    (firstQuestion.response as StudentItemQuestionResponse).comment !== null &&
+                    (firstQuestion.response as StudentItemQuestionResponse).comment !== "";
+            } else {
+                response.isMarked = response.score !== null;
+            }
+        }
+    });
+}
+
+/**
  * Whether the item is marked, loop through all questions and check if they are all marked
  * @param {StudentItem} item - the item to check
  * @returns {boolean} - whether the item is marked

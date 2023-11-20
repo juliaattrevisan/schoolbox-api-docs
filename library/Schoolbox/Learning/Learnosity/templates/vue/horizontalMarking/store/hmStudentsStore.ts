@@ -14,6 +14,7 @@ import {
     getAttemptResponse,
     getItemIsMarked,
     getStudentIsMarked,
+    setInitialQuestionIsMarked,
     getUrls,
 } from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./horizontalMarkingStore";
@@ -54,25 +55,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         itemResponses.value = $itemResponses;
         attemptComments.value = $attemptComments;
         urls.value = $urls;
-    }
-
-    /**
-     * Loop through each question in the item and check for a score to determine if the question is already marked.
-     * If there is no maxScore, we assume that the question is considered marked if the first question contains a comment.
-     * So the first question comment covers isMarked for any questions within the item that don't have a maxScore
-     * @param { StudentItem } item - the item to check
-     */
-    function setInitialQuestionIsMarked(item: StudentItem) {
-        item.questions.forEach((question) => {
-            if (question.response.maxScore === null) {
-                question.response.isMarked =
-                    item.questions[0].response.comment &&
-                    item.questions[0].response.comment !== null &&
-                    item.questions[0].response.comment !== "";
-            } else {
-                question.response.isMarked = question.response.score !== null;
-            }
-        });
     }
 
     /**
