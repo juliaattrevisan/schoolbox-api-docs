@@ -156,7 +156,8 @@ class Controller extends Base
             ];
         }
 
-        if ($configLoader->get(ConfigMapper::NAME_BADGES_ENABLED) &&
+        if (
+            $configLoader->get(ConfigMapper::NAME_BADGES_ENABLED) &&
             ($loggedInUserRole->isStudent() || $loggedInUserRole->isStaff())
         ) {
             $filters[] = ["title" => "Badges", "value" => "badge"];
