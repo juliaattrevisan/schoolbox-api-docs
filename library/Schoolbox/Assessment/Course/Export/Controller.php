@@ -8,6 +8,7 @@
 namespace Schoolbox\Assessment\Course\Export;
 
 use Alaress\Web\Controller\Base;
+use RuntimeException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
@@ -61,11 +62,13 @@ class Controller extends Base
      * @param UnitSpec\Model $unitSpec
      * @param IAssessable    $assessment
      * @return void
+     * @throws RuntimeException if `$assessment` isn't in a usable state
      */
     public function postAssessmentIntoUnit(
         UnitSpec\Model $unitSpec,
         IAssessable $assessment,
     ): void {
+        $assessment->assertUsable();
         $newAssessment = $this->copyAssessmentToContext($assessment, $unitSpec);
 
         // TODO return the same format as the assessment API?
@@ -91,10 +94,12 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws RuntimeException if `$assessment` isn't in a usable state
      */
     public function putAssessmentIntoUnit(
         IAssessable $assessment,
     ): void {
+        $assessment->assertUsable();
         $updatedSpecAssessment = $this->overwriteAssessment(
             $assessment,
             $assessment->getSpecificationAssessment(),

@@ -741,6 +741,20 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+    /**
+     * By default: all assessments are usable.
+     */
+    public function isUsable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * By default: all assessments are usable.
+     */
+    public function assertUsable(): void
+    {
+    }
 
     /**
      * @inheritdoc

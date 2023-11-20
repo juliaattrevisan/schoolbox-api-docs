@@ -15,6 +15,7 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use InvalidArgumentException;
+use RuntimeException;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -338,6 +339,57 @@ class Model extends AbstractAssessment
             'due'     => $this->getDueAt(),
             'late'    => $this->getCloseAt()
         ]);
+    }
+
+    /**
+     * By default: all assessments are usable.
+     */
+    public function isUsable(): bool
+    {
+        try {
+            $this->assertUsable();
+            return true;
+        } catch (RuntimeException) {
+            return false;
+        }
+    }
+
+    /**
+     * Assert that this quiz:
+     * * has been imported into Learnosity
+     * * if it's being duplicated: that that duplication process has completed
+     */
+    public function assertUsable(): void
+    {
+        if ('' === (string)$this->getLearnosityReference()) {
+            throw new RuntimeException(
+                sprintf(
+                    'Assessment %s is not in learnosity; try importing it with the cli tool',
+                    $this->getId()
+                )
+            );
+        }
+
+        // Is there a duplication job? If so block until completed
+        if ($this->getLearnosityJobReference()) {
+            $jobStatus = $this->getLearnosityJobStatus();
+            if ($jobStatus === self::LEARNOSITY_JOB_STATUS_FAILED) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Assessment %s duplication process has failed; please contact support',
+                        $this->getId()
+                    )
+                );
+            }
+            if ($jobStatus !== self::LEARNOSITY_JOB_STATUS_COMPLETED) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Assessment %s duplication process has not yet completed; try again later',
+                        $this->getId()
+                    )
+                );
+            }
+        }
     }
 
     /**

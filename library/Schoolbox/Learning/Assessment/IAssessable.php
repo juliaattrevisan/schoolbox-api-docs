@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
+use RuntimeException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -454,6 +455,26 @@ interface IAssessable extends ISoftDeletable
      * @throws InvalidArgumentException if the dates are not validly set
      */
     public function assertValidDates();
+
+    /**
+     * Can this assessment actually be used as an assessment in its current
+     * state?
+     *
+     * Usually it will be: if it is not, it won't be able to be attempted or
+     * imported.
+     *
+     * @return bool
+     */
+    public function isUsable(): bool;
+
+    /**
+     * Assert that this assessment can actually be used as an assessment
+     * according to `$this->isUsable`, and raises an appropriate exception if
+     * it is not.
+     *
+     * @throws RuntimeException if it cannot be used
+     */
+    public function assertUsable(): void;
 
     /**
      * Is feedback on this Assessment visible to this user?
