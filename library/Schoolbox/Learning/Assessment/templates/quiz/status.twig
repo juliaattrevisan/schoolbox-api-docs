@@ -156,14 +156,14 @@
 
                 {% if latestResponse %}
                     {% if latestResponse.submitted %}
-                        {% if latestFeedback %}
-                        <div class="grade {{ urgencyClass }}-bg">
-                            <span>{{ latestFeedback.humanReadableMark }}</span>
-                        </div>
-                        {% else %}
-                        <div class="grade review">
-                            <span>Awaiting Review</span>
-                        </div>
+                        {% if not latestFeedback %}
+                            <div class="grade review">
+                                <span>Awaiting Review</span>
+                            </div>
+                        {% elseif latestFeedback.normalisedMark|length %}
+                            <div class="grade {{ urgencyClass }}-bg">
+                                <span>{{ latestFeedback.humanReadableMark }}</span>
+                            </div>
                         {% endif %}
                     {% else %}
                         <div class="grade in-progress">
@@ -353,6 +353,9 @@
                     $actionBar.attr('data-mass-review', '');
                     $actionBar.find('[data-interaction-review]').show();
                     $a.hide();
+
+                    // Hide the "In Progress" grade indicator, as it is now inaccurate
+                    $a.closest('li').find(".grade").hide();
                 });
             });
         });
