@@ -52,7 +52,7 @@ function onItemSelected(reference: string) {
         :aria-expanded="isOpen"
         aria-controls="item-list"
         :aria-pressed="isOpen"
-        :disabled="!store.isLoaded"
+        :disabled="!store.isLoaded || store.isProcessing"
         @click.prevent="onButtonSelected"
     >
         <span>{{ buttonText }}</span>

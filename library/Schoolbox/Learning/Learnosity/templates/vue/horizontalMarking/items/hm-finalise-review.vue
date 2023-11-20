@@ -97,7 +97,7 @@ function onCancelSelected() {
     <button
         v-if="itemsStore.isAttemptComment"
         class="button full-width icon-approve submit"
-        :disabled="!store.isLoaded"
+        :disabled="!store.isLoaded || store.isProcessing"
         @click.prevent="onSelected"
     >
         {{ buttonText }}

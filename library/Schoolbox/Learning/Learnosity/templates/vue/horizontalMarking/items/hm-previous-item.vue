@@ -3,8 +3,10 @@
  * To move to the previous item (card) if available
  */
 
+import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 
+const store = useStore();
 const itemsStore = useItemsStore();
 
 /**
@@ -19,7 +21,7 @@ function onSelected() {
     <button
         v-if="itemsStore.hasPreviousItem"
         class="button full-width icon-previous"
-        :disabled="!itemsStore.hasPreviousItem"
+        :disabled="!itemsStore.hasPreviousItem || store.isProcessing"
         @click.prevent="onSelected"
     >
         Previous Item
