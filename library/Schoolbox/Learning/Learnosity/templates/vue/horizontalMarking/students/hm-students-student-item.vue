@@ -57,6 +57,7 @@ function onScoreUpdated(question: StudentItemQuestion, score: number) {
  */
 function onCommentUpdated(comment: string) {
     studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment);
+    store.isProcessing = false;
 }
 </script>
 
