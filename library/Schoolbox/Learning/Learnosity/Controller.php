@@ -374,6 +374,9 @@ class Controller extends Base
         }
 
         if (
+            // Check we have not yet reached max_attempts.  Note this restriction does not apply to staff or superusers.
+            !$student->isSuperuser() &&
+            !$student->getRole()->isStaff() &&
             !$quiz->isAttemptsUnlimited() &&
             $this->attemptMapper->getAttemptCountForStudent($quiz->getId(), $student->getId()) >= $quiz->getMaxAttempts()
         ) {
