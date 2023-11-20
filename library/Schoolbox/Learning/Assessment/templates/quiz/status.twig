@@ -281,7 +281,7 @@
                 userSelector: '[data-mass-review]',
                 onSubmit: function (toReview) {
                     let list = toReview.map(function () {
-                        return $(this).find('[data-interaction-review]').attr('data-interaction-review') }
+                        return $(this).closest('li').find('[data-mass-review]').attr('data-mass-review') !== undefined }
                     ).get();
 
                     $.post(
