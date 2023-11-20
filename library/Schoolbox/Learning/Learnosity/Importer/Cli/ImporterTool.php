@@ -104,7 +104,7 @@ class ImporterTool extends CliTool\App
      */
     private const QUERY_LEGACY_SMALL_QUIZ_IDS = "
         SELECT assess.assess_id
-        FROM assess 
+        FROM assess
         INNER JOIN assess_section section ON assess.assess_id = section.assess_id
         INNER JOIN assess_question question ON section.section_id = question.section_id
         WHERE assess.deleted_at IS NULL
@@ -132,7 +132,7 @@ class ImporterTool extends CliTool\App
      */
     private const QUERY_LEGACY_LARGE_QUIZ_IDS = "
         SELECT assess.assess_id
-        FROM assess 
+        FROM assess
         INNER JOIN assess_section section ON assess.assess_id = section.assess_id
         INNER JOIN assess_question question ON section.section_id = question.section_id
         WHERE assess.deleted_at IS NULL
@@ -179,7 +179,7 @@ class ImporterTool extends CliTool\App
      */
     private const QUERY_DETECT_SIZE = "
         SELECT assess.assess_id, COUNT(question.question_id) AS num
-        FROM assess 
+        FROM assess
         INNER JOIN assess_section section ON assess.assess_id = section.assess_id
         INNER JOIN assess_question question ON section.section_id = question.section_id
         WHERE assess.deleted_at IS NULL
@@ -393,6 +393,7 @@ HELP;
 
         /* Log the title first lol
          */
+        $this->getLogger()->info('');
         $this->getLogger()->info('Learnosity Migration.');
         $this->getLogger()->info('');
 
@@ -429,8 +430,10 @@ HELP;
          * (Different selection crtieria apply due to payload size limitation)
          */
         if (self::OPT_LONG_IMPORT_SMALL_QUIZZES === $this->sizeStrat) {
+            $this->getLogger()->info(sprintf('Migrating using small quiz strategy.'));
             $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_SMALL_QUIZ_IDS);
         } elseif (self::OPT_LONG_IMPORT_LARGE_QUIZZES === $this->sizeStrat) {
+            $this->getLogger()->info(sprintf('Migrating using large quiz strategy.'));
             $this->legacyQuizIdsStatement = $this->getDatabaseInternal()->prepare(self::QUERY_LEGACY_LARGE_QUIZ_IDS);
         }
 
