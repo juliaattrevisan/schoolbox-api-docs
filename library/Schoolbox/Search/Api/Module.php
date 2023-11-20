@@ -173,6 +173,9 @@ class Module extends BaseModule
             ),
         ];
 
+        $userMapper = $mapperFactory->get(UserMapper::class);
+        $loggedInUserRole = $userMapper->getSessionUser()->getRole();
+
         if (
             // See similar check in Search/Controller->getFiltersRawArray().
             $config->get(ConfigMapper::NAME_BADGES_ENABLED) &&
