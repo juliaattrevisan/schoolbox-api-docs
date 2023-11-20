@@ -48,24 +48,24 @@ export const useItemsStore = defineStore("hmItems", () => {
     /**
      * Add questions to the items, unlike the items initially loaded, the items linked to students loaded
      * via the reports api contain the questions, so we add them here
-     * @param {StudentItem[]} $items - the items to reference
+     * @param {StudentItem[]} $studentItems - the items to reference
      * @param {boolean} isLastAttempt - if this is the last attempt that will be loaded
      */
-    function addQuestions($items: StudentItem[], isLastAttempt: boolean) {
+    function addQuestions($studentItems: StudentItem[], isLastAttempt: boolean) {
         // to only get student items that are also in the store items, as a quiz could have been modified after the student attempted the quiz
-        const validItems = $items.filter((item) => itemReferenceList.value.includes(item.reference));
-        if (validItems.length !== itemReferenceList.value.length) {
+        const validStudentItems = $studentItems.filter((item) => itemReferenceList.value.includes(item.reference));
+        if (validStudentItems.length !== itemReferenceList.value.length) {
             hasVariedAttempts.value = true;
         }
         /**
          * we cant assume the items are coming in from the API in the same order as the items we have stored,
          * we'll need to match them up by reference
          */
-        validItems.forEach((item) => {
-            const matchedItem = items.value.find((storedItem) => storedItem.reference === item.reference) as Item;
+        validStudentItems.forEach((studentItem) => {
+            const matchedItem = items.value.find((storedItem) => storedItem.reference === studentItem.reference);
             // if the questions have already been added, we don't need to overwrite them
             if (matchedItem && !matchedItem.questions) {
-                matchedItem.questions = item.questions;
+                matchedItem.questions = studentItem.questions;
             }
         });
         if (isLastAttempt) {
