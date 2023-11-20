@@ -44,7 +44,7 @@ function getFormData() {
     // run through all the items and add the total score and comment for each item
     studentStore.student.items.forEach((item) => {
         formData.append(`scores[${item.reference}]`, getItemScore(item).toString());
-        formData.append(`comment[${item.reference}]`, item.questions[0].response.comment ?? "");
+        formData.append(`comment[${item.reference}]`, item.questions[0].response?.comment ?? "");
     });
     formData.append(`attempt-comment`, studentStore.student.attemptComment.comment ?? ""); //
     return formData;
@@ -95,7 +95,11 @@ function onCancelSelected() {
 </script>
 
 <template>
-    <button class="button full-width icon-approve submit" :disabled="!store.isLoaded" @click.prevent="onSelected">
+    <button
+        class="button full-width icon-approve submit"
+        :disabled="!store.isLoaded || store.isProcessing"
+        @click.prevent="onSelected"
+    >
         {{ buttonText }}
     </button>
     <reveal-modal ref="modalEl" :close-on-background-click="false" @closed="onCancelSelected">
