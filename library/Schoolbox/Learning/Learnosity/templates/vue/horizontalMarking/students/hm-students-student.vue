@@ -6,6 +6,7 @@
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import StudentAttemptComment from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
+import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentHeader from "./hm-students-student-header.vue";
@@ -20,6 +21,7 @@ const props = defineProps<Props>();
 const studentEl = window.Vue.ref<HTMLElement | null>(null); // the entire student container
 const responseEl = window.Vue.ref<HTMLElement | null>(null); // the response container
 const responseContentEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the report into
+const store = useStore();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
@@ -71,11 +73,19 @@ window.Vue.watch(
 );
 
 /**
+ * Need to prevent moving to another item while the comment is being saved
+ */
+function onAttemptCommentUpdating() {
+    store.isProcessing = true;
+}
+
+/**
  * To notify of a change in the comment
  * @param {string} comment - the comment to save
  */
 function onAttemptCommentUpdated(comment: string) {
     studentsStore.updateAttemptComment(props.student, comment);
+    store.isProcessing = false;
 }
 </script>
 
@@ -102,12 +112,10 @@ function onAttemptCommentUpdated(comment: string) {
                 <student-attempt-comment
                     v-if="itemsStore.isAttemptComment"
                     :student="props.student"
-                    @update-comment="onAttemptCommentUpdated"
+                    @updating-comment="onAttemptCommentUpdating"
+                    @updated-comment="onAttemptCommentUpdated"
                 />
-                <hm-students-student-unavailable-item
-                    :student="props.student"
-                    @update-comment="onAttemptCommentUpdated"
-                />
+                <hm-students-student-unavailable-item :student="props.student" />
             </template>
         </div>
     </div>

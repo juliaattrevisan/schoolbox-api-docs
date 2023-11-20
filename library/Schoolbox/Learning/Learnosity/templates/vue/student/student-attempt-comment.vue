@@ -21,7 +21,8 @@ const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
 const emit = defineEmits<{
-    updateComment: [comment: string];
+    updatingComment: [];
+    updatedComment: [comment: string];
 }>();
 
 /**
@@ -50,17 +51,21 @@ const saveContainerHeight = window.Vue.computed(() => {
  * Save the comment if it's changed
  */
 async function saveComment() {
+    if (isSaving.value) {
+        return;
+    }
     if (comment.value === props.student.attemptComment.comment) {
         return;
     }
     isSaving.value = true;
+    emit("updatingComment");
     const formData = new FormData();
     formData.append("comment", comment.value);
     await fetch(props.student.urls.attemptComment, {
         method: "POST",
         body: formData,
     });
-    emit("updateComment", comment.value);
+    emit("updatedComment", comment.value);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
