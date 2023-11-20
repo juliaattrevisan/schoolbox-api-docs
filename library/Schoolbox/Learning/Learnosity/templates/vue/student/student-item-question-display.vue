@@ -24,7 +24,8 @@ const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
 const emit = defineEmits<{
-    updateScore: [question: StudentItemQuestion, score: number];
+    updatingScore: [];
+    updatedScore: [question: StudentItemQuestion, score: number];
 }>();
 
 /**
@@ -53,6 +54,9 @@ const saveContainerHeight = window.Vue.computed(() => {
  * Save the score if it's changed and valid
  */
 async function saveScore() {
+    if (isSaving.value) {
+        return;
+    }
     if (score.value.toString() === "") {
         return;
     }
@@ -64,6 +68,7 @@ async function saveScore() {
         return;
     }
     isSaving.value = true;
+    emit("updatingScore");
     const formData = new FormData();
     formData.append(
         "learnosityReference",
@@ -74,7 +79,7 @@ async function saveScore() {
         method: "POST",
         body: formData,
     });
-    emit("updateScore", props.question, parseFloat(score.value));
+    emit("updatedScore", props.question, parseFloat(score.value));
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);

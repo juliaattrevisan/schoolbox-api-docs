@@ -9,6 +9,7 @@ import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentI
 import StudentNoScoreNote from "@schoolboxLearnosity/vue/student/student-no-score-note.vue";
 import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
 import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
+import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
@@ -18,6 +19,7 @@ interface Props {
     container: HTMLElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
+const store = useStore();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
@@ -33,12 +35,20 @@ const isActive = window.Vue.computed(() => {
 });
 
 /**
+ * Need to prevent moving to another item while the score is being saved
+ */
+function onScoreUpdating() {
+    store.isProcessing = true;
+}
+
+/**
  * To notify of a change in the score
  * @param {StudentItemQuestion} question - the question to update
  * @param {number} score - the score to save
  */
 function onScoreUpdated(question: StudentItemQuestion, score: number) {
     studentsStore.updateItemResponseScore(props.student, props.item, question, score);
+    store.isProcessing = false;
 }
 
 /**
@@ -62,7 +72,8 @@ function onCommentUpdated(comment: string) {
                     :item="props.item"
                     :question="question"
                     :container="props.container"
-                    @update-score="onScoreUpdated"
+                    @updating-score="onScoreUpdating"
+                    @updated-score="onScoreUpdated"
                 />
             </div>
             <student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
