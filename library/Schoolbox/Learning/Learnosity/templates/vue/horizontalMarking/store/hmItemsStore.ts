@@ -51,7 +51,10 @@ export const useItemsStore = defineStore("hmItems", () => {
      * @param {StudentItem[]} $items - the items to reference
      */
     function addQuestions($items: StudentItem[]) {
-        // if the incoming student item is less than the items we have stored (-1 to account for the overall comments item), we know that the attempt is invalid
+        /**
+         * if the incoming student items is less than the store items (-1 to account for the overall comments item),
+         * we know that the student did not attempt all the latest items, and we need to flag this
+         */
         if ($items.length < items.value.length - 1) {
             hasInvalidAttempts.value = true;
             return;
