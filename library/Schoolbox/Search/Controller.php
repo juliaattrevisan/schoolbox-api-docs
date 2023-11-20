@@ -157,6 +157,7 @@ class Controller extends Base
         }
 
         if (
+            // See similar check in Search/Api/Module->buildController().
             $configLoader->get(ConfigMapper::NAME_BADGES_ENABLED) &&
             ($loggedInUserRole->isStudent() || $loggedInUserRole->isStaff())
         ) {
