@@ -37,9 +37,7 @@ export function loadReports(reportPayloads: string[]) {
                         useStudentsStore().addItems(reportId, items);
                         addTargetsToMarks(reportId);
                         // add the questions to the items, as they aren't included in the initial payload
-                        if (i === 1) {
-                            useItemsStore().addQuestions(items);
-                        }
+                        useItemsStore().addQuestions(items);
                     });
                     // to notify the report has loaded
                     useStudentsStore().reportLoaded(reportId);

@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { Item } from "@schoolboxLearnosity/js/types/Item";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 
 export const useItemsStore = defineStore("hmItems", () => {
     const items = window.Vue.ref<Item[]>([]);
@@ -19,6 +20,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     const hasNextItem = window.Vue.computed(() => activeItemIndex.value < items.value.length - 1);
     const isNextFinalReview = window.Vue.computed(() => items.value[activeItemIndex.value + 1]?.isAttemptComment);
     const isAttemptComment = window.Vue.computed(() => activeItem.value.isAttemptComment === true);
+    const hasInvalidAttempts = window.Vue.ref<boolean>(false);
 
     /**
      * store any passed through properties
@@ -46,9 +48,14 @@ export const useItemsStore = defineStore("hmItems", () => {
     /**
      * Add questions to the items, unlike the items initially loaded, the items linked to students loaded
      * via the reports api contain the questions, so we add them here
-     * @param {Item[]} $items - the items to reference
+     * @param {StudentItem[]} $items - the items to reference
      */
-    function addQuestions($items: Item[]) {
+    function addQuestions($items: StudentItem[]) {
+        // if the incoming student item is less than the items we have stored (-1 to account for the overall comments item), we know that the attempt is invalid
+        if ($items.length < items.value.length - 1) {
+            hasInvalidAttempts.value = true;
+            return;
+        }
         // we cant assume the items are coming in from the API in the same order as the items we have stored
         // we'll need to match them up by reference
         $items.forEach((item) => {
@@ -96,6 +103,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         hasNextItem,
         isNextFinalReview,
         isAttemptComment,
+        hasInvalidAttempts,
         init,
         addQuestions,
         setActiveItem,
