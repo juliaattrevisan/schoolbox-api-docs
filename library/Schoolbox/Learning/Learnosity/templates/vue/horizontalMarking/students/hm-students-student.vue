@@ -10,6 +10,7 @@ import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentHeader from "./hm-students-student-header.vue";
 import HmStudentsStudentItem from "./hm-students-student-item.vue";
+import HmStudentsStudentUnavailableItem from "./hm-students-student-unavailable-item.vue";
 
 interface Props {
     student: Student; // the student to display
@@ -21,6 +22,14 @@ const responseEl = window.Vue.ref<HTMLElement | null>(null); // the response con
 const responseContentEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the report into
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
+
+/**
+ * To notify the selected item was not available to the student during their attempt
+ * @returns {boolean} - true if the student has unavailable items
+ */
+const hasUnavailableItems = window.Vue.computed(() => {
+    return props.student.items.length < itemsStore.items.length - 1;
+});
 
 /**
  * To show/hide the response when selected
@@ -100,6 +109,11 @@ function onAttemptCommentUpdated(comment: string) {
                 />
                 <student-attempt-comment
                     v-if="itemsStore.isAttemptComment"
+                    :student="props.student"
+                    @update-comment="onAttemptCommentUpdated"
+                />
+                <hm-students-student-unavailable-item
+                    v-if="hasUnavailableItems"
                     :student="props.student"
                     @update-comment="onAttemptCommentUpdated"
                 />
