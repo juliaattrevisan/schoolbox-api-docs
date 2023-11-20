@@ -366,6 +366,30 @@ class Classes implements IStrategy
                         continue;
                     }
 
+                    // do we have an academic year on the activity
+                    if (!isset($activity['academicYear']['importIdentifier'])) {
+                        $this->log->debug(sprintf(
+                            "Activity: %s has no academic year academicYear, Activity Type: %s",
+                            $activity['name'],
+                            $activityType
+                        ));
+                        continue;
+                    }
+
+                    /*
+                     * Activity is not part of this academic period, ignore it and move along....
+                     */
+                    if ((string)$academicGroupCode !== (string)$activity['academicYear']['importIdentifier']) {
+                        $this->log->debug(sprintf(
+                            'Activity %s not part of the academic group code, expected: %s actual %s; skipping',
+                            $activity['name'],
+                            $academicGroupCode,
+                            $activity['academicYear']['importIdentifier']
+                        ));
+
+                        continue;
+                    }
+
                     /* Get a list of student external ids, and a list of teacher external ids
                      * then create schoolbox events and their relationships
                      */

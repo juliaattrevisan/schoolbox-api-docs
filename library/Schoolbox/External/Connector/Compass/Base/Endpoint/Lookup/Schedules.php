@@ -69,9 +69,10 @@ class Schedules
 
         $stack = [];
         $subjectLookup = new Subject($this->api);
+        $year = date('Y');
 
         foreach ($academicGroups as $academicGroup) {
-            $year = $academicGroup['academicGroupCode'];
+            $academicGroupCode = $academicGroup['academicGroupCode'];
 
             $this->log->debug(sprintf(
                 'Fetching Schedules for Academic Group %s',
@@ -92,19 +93,19 @@ class Schedules
                     \count($schedule['activities'])
                 ));
 
-                $stack[$year]['schedules'][] = $schedule;
+                $stack[$academicGroupCode]['schedules'][] = $schedule;
             }
 
             /* Dig out the actual names of an Activity
              */
             $this->log->debug(sprintf(
                 'Mining all the Subjects in year %s for their nice human readable names...',
-                $year
+                $academicGroupCode
             ));
 
             /* Compile all the identifiers from every schedule this year
              */
-            $stack[$year]['subjects'] = array_merge($stack[$year]['subjects'] ?? [], $subjectLookup->generate($year));
+            $stack[$academicGroupCode]['subjects'] = array_merge($stack[$academicGroupCode]['subjects'] ?? [], $subjectLookup->generate($year));
         }
 
         /* This definitely gets super expensive, so cache this thing
