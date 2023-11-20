@@ -26,5 +26,17 @@ $command      = implode(' && ', $commands);
 
 // Run the whole thing in background
 echo "Running Learnosity import commands in background process:\n" . implode("\n", $commands) . "\n";
-passthru('(' . $command . ') & echo "Beginning Learnosity import (pid: ${!})"');
+$proc       = proc_open(
+    "($command)",
+    [
+        0 => STDIN,
+        1 => STDOUT,
+        2 => STDERR,
+    ],
+    $pipes,
+);
+$procStatus = proc_get_status($proc);
+printf("Beginning Learnosity import (pid: %d)\n", $procStatus['pid']);
+
+// Exit: the import will continue to run in background
 exit();
