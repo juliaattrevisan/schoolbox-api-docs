@@ -276,16 +276,22 @@ class Controller extends Assessment\Controller
         $plan['finish']      = $participant ? $participant->getDueDate() : $assessment->getDueAt();
         $plan['close']       = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
 
-        // Close any expired attempts before checking for in-progress
+        // Note on need for consistency when dealing with permissions
+        // ----------------------------------------------------------
+        // It is important that the permission checks that determine whether the 'start quiz' button is displayed (in this
+        // function) are the same as those used on the quiz page itself (Learnosity/Controller->getAttempt()).  Otherwise,
+        // either an enabled 'start quiz' button will lead to a permission error on the quiz page, or directly accessing
+        // the quiz page will enable users to bypass permission checks that prevent the 'start quiz' button from displaying.
+        // See Learnosity/Controller->getAttempt() (where the same permission checks are used).
         $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now);
-
-        // Can I attempt this?
+        $this->quizMapper->closeExpiredAttempts($quiz, $now); // Close any expired attempts before checking for in-progress
         // TODO this should eventually be route permission based
-        $actionValidator = new ActionValidator($now, $this->getAccess());
-
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $canAttempt = ($this->getUser()->getId() === $student->getId()) && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
+        $actionValidator = new ActionValidator($now, $this->getAccess());
+        $canAttempt = (
+            $this->getUser()->getId() === $student->getId()) && // A user may not attempt a quiz on behalf of another user.
+            $actionValidator->canAttemptQuiz($this->getUser(), $assessment, $this->getConfigLoader()
+        );
 
         /**
          * record view
