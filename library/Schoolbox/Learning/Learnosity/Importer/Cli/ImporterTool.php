@@ -1077,7 +1077,7 @@ HELP;
          */
         if ($this->perform()) {
             $this->getLogger()->info(sprintf(
-                'Importing %s consolidated quizzes into Learnosity. Go smoke a brisket, this might take a while.',
+                'Importing %s consolidated quizzes into Learnosity.',
                 $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
             ));
 
