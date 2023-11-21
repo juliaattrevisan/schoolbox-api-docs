@@ -830,6 +830,10 @@ HELP;
      * @param array $legacyQuizIds
      * @return void
      * @throws LockRefreshException
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
      */
     private function importLarge(
         LockInterface $lock,
