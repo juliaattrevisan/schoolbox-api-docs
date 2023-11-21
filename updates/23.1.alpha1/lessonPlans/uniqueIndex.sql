@@ -24,10 +24,24 @@ alter table lti_assessment
     add constraint lti_assessment_assessment_id_fk
         foreign key (assessment_id) references assessment (id);
 
-### Submission box missing foreign keys
+### Submission box missing foreign keys:
+### * back up the previous column value
+### * update the current column to a value guaranteed to match the FK value
+### * apply the FK
+alter table submission_box add column _rubric_capability_mark_type_id int(11) unsigned after rubric_capability_mark_type_id;
+update submission_box set _rubric_capability_mark_type_id = rubric_capability_mark_type_id;
 alter table submission_box modify column rubric_capability_mark_type_id int(11);
+update submission_box sb
+left join submission_mark_type smt on sb.rubric_capability_mark_type_id = smt.mark_type_id
+set sb.rubric_capability_mark_type_id = smt.mark_type_id;
 alter table submission_box add constraint fk_rubric_capability_mark_type foreign key (rubric_capability_mark_type_id)
     references submission_mark_type (mark_type_id);
+
+alter table submission_box add column _rubric_capability_grade_group_id int(11) after rubric_capability_grade_group_id;
+update submission_box set _rubric_capability_grade_group_id = rubric_capability_grade_group_id;
+update submission_box sb
+    left join submission_grade_group sgg on sb.rubric_capability_grade_group_id = sgg.id
+set sb.rubric_capability_grade_group_id = sgg.id;
 alter table submission_box add constraint fk_rubric_capability_grade_group foreign key (rubric_capability_grade_group_id)
     references submission_grade_group (id);
 
