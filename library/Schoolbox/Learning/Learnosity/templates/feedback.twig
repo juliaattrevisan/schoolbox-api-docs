@@ -24,8 +24,8 @@
     <div id="quiz-feedback-container">
         <quiz-feedback
             :student="{{ student|json_encode }}"
-            :item-responses="{{ itemResponses|json_encode }}"
             :report-init-options="{{ reportInitOptions }}"
+            :item-responses="{{ itemResponses|json_encode }}"
             :attempt-comment="{{ attemptComment|json_encode }}"
             :urls="{{ urls|json_encode }}"
             post-feedback="{{ routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnositySessionReference: attempt.learnosityReference}) }}"

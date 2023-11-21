@@ -15,12 +15,12 @@ import QfFinaliseReview from "./qf-finalise-review.vue";
 
 interface Props {
     student: Student; // the student who has attempted the quiz
+    reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
     attemptComment: StudentAttemptComment; // StudentAttemptComment all the overall attempt comments for the quiz
-    urls: StudentUrls; // the urls to use for the students to update their scores and comments
-    reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
-    postFeedback: string; // the URL to post the feedback to
-    statusPage: string; // the status page to link to once user has finished marking
+    urls?: StudentUrls; // the urls to use for the students to update their scores and comments
+    postFeedback?: string; // the URL to post the feedback to
+    statusPage?: string; // the status page to link to once user has finished marking
 }
 const props = defineProps<Props>();
 const store = useStore();

@@ -13,12 +13,16 @@ export const useStore = defineStore("quizFeedback", () => {
 
     /**
      * store any passed through properties
-     * @param {string} $postFeedback - the feedback url to post to
-     * @param {string} $statusPage - the link to the status page
+     * @param {string|undefined} $postFeedback - the feedback url to post to
+     * @param {string|undefined} $statusPage - the link to the status page
      */
-    function init($postFeedback: string, $statusPage: string) {
-        postFeedback.value = $postFeedback;
-        statusPage.value = $statusPage;
+    function init($postFeedback: string | undefined, $statusPage: string | undefined) {
+        if ($postFeedback !== undefined) {
+            postFeedback.value = $postFeedback;
+        }
+        if ($statusPage !== undefined) {
+            statusPage.value = $statusPage;
+        }
     }
 
     return {

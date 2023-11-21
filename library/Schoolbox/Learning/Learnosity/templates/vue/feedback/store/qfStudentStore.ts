@@ -55,7 +55,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
         $student: Student,
         $itemResponses: StudentItemQuestionResponse[],
         $attemptComment: StudentAttemptComment,
-        $urls: StudentUrls
+        $urls?: StudentUrls
     ) {
         student.value = {
             ...$student,
@@ -63,7 +63,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             hasReport: false,
             items: [],
             attemptComment: $attemptComment,
-            urls: $urls,
+            urls: $urls !== undefined ? $urls : undefined,
             showMarked: true,
         };
         itemResponses.value = $itemResponses;
