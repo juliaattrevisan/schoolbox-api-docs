@@ -11,5 +11,4 @@ namespace Schoolbox\Learning\Learnosity;
 
 class ApiException extends \RuntimeException
 {
-
 }
