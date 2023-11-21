@@ -280,26 +280,12 @@ class Controller extends Assessment\Controller
         $now = Alaress_Date_Format::now();
         $this->quizMapper->closeExpiredAttempts($quiz, $now);
 
-        // Find how many items the quiz has in total
-        $itemCount = 0;
-        if ($quiz->getLearnosityReference()) {
-            $api = new Api(
-                (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
-                $this->getConfigLoader()->get('learnosity_version'),
-                $this->getConfigLoader()->get('learnosity_consumer_key'),
-                $this->getConfigLoader()->get('learnosity_consumer_secret'),
-                new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-            );
-
-            $itemCount = (new Helper($api))->getActivityItemCount($assessment->getLearnosityReference());
-        }
-
         // Can I attempt this?
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator($now, $this->getAccess());
 
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $canAttempt = $itemCount > 0 && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
+        $canAttempt = $actionValidator->canAttemptQuiz($this->getUser(), $assessment, $this->getConfigLoader());
 
         /**
          * record view
@@ -326,7 +312,6 @@ class Controller extends Assessment\Controller
             'attempts' => $attempts,
             'existingAttempt' => $existingAttempt,
             'plan' => $plan,
-            'itemCount' => $itemCount,
             /* All the older summary screen stuff is below
              */
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
