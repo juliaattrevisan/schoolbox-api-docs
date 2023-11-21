@@ -105,15 +105,35 @@ class ImporterTool extends CliTool\App
     private const QUERY_LEGACY_SMALL_QUIZ_IDS = "
         SELECT assess.assess_id
         FROM assess
-        INNER JOIN assess_section section ON assess.assess_id = section.assess_id
-        INNER JOIN assess_question question ON section.section_id = question.section_id
-        WHERE assess.deleted_at IS NULL
-        AND assess.availability = 'assess'
-        AND assess.learnosity_reference IS NULL
-        AND assess.external_id IS NULL
-        GROUP BY assess.assess_id
-        HAVING COUNT(question.question_id) <= :payloadSize
-        ORDER BY assess.created_at DESC
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(question.question_id) AS numQuestions
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            INNER JOIN assess_question question ON section.section_id = question.section_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            AND question.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) a ON assess.assess_id = a.assess_id
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(section.section_id) AS numSections
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) b ON assess.assess_id = b.assess_id
+        WHERE availability = 'assess'
+        AND deleted_at IS NULL
+        AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) <= :payloadSize
     ";
 
 
@@ -133,15 +153,35 @@ class ImporterTool extends CliTool\App
     private const QUERY_LEGACY_LARGE_QUIZ_IDS = "
         SELECT assess.assess_id
         FROM assess
-        INNER JOIN assess_section section ON assess.assess_id = section.assess_id
-        INNER JOIN assess_question question ON section.section_id = question.section_id
-        WHERE assess.deleted_at IS NULL
-        AND assess.availability = 'assess'
-        AND assess.learnosity_reference IS NULL
-        AND assess.external_id IS NULL
-        GROUP BY assess.assess_id
-        HAVING COUNT(question.question_id) > :payloadSize
-        ORDER BY assess.created_at DESC
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(question.question_id) AS numQuestions
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            INNER JOIN assess_question question ON section.section_id = question.section_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            AND question.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) a ON assess.assess_id = a.assess_id
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(section.section_id) AS numSections
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) b ON assess.assess_id = b.assess_id
+        WHERE availability = 'assess'
+        AND deleted_at IS NULL
+        AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) > :payloadSize
     ";
 
 
@@ -178,15 +218,36 @@ class ImporterTool extends CliTool\App
      * or a large quiz, as the import algorithm depends on this
      */
     private const QUERY_DETECT_SIZE = "
-        SELECT assess.assess_id, COUNT(question.question_id) AS num
+        SELECT assess.assess_id, numQuestions + numSections AS num
         FROM assess
-        INNER JOIN assess_section section ON assess.assess_id = section.assess_id
-        INNER JOIN assess_question question ON section.section_id = question.section_id
-        WHERE assess.deleted_at IS NULL
-        AND assess.availability = 'assess'
-        AND assess.external_id IS NULL
-        AND assess.assessment_id = :assessmentId
-        ORDER BY assess.created_at DESC
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(question.question_id) AS numQuestions
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            INNER JOIN assess_question question ON section.section_id = question.section_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            AND question.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) a ON assess.assess_id = a.assess_id
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(section.section_id) AS numSections
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) b ON assess.assess_id = b.assess_id
+        WHERE availability = 'assess'
+        AND assessment_id = :assessmentId
     ";
 
 
@@ -409,7 +470,12 @@ HELP;
                 'assessmentId' => $assessmentId
             ]);
 
-            $numQuestions = $this->sizeStratStatement->fetch(\PDO::FETCH_ASSOC)['num'];
+            $numQuestions = $this->sizeStratStatement->fetch(\PDO::FETCH_ASSOC)['num'] ?? 0;
+            if ($numQuestions === 0) {
+                $this->getLogger()->info(sprintf('assessment_id %d has nothing to migrate: exiting.', $assessmentId));
+                $this->getLogger()->info('');
+                return;
+            }
 
             if ($numQuestions <= self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
                 $this->sizeStrat = self::OPT_LONG_IMPORT_SMALL_QUIZZES;
@@ -635,6 +701,11 @@ HELP;
              */
             $consolidatedBlueprint = null;
 
+            /* Nice counter for cli watching zzz
+             */
+            $i = 0;
+            $n = \count($legacyQuizIds);
+
             foreach ($legacyQuizIds as $legacyQuizId) {
                 /* Do all the stuff it used to do to produce a $blueprint
                  */
@@ -647,7 +718,9 @@ HELP;
                 /* Announce what we're doing
                  */
                 $this->getLogger()->info(sprintf(
-                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                    '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                    ++$i,
+                    $n,
                     $legacyQuiz['title'],
                     $legacyQuiz['assessment_id'],
                     $legacyQuiz['assess_id']
@@ -763,6 +836,10 @@ HELP;
      * @param array $legacyQuizIds
      * @return void
      * @throws LockRefreshException
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
      */
     private function importLarge(
         LockInterface $lock,
@@ -771,6 +848,11 @@ HELP;
         Api $api,
         array $legacyQuizIds
     ): void {
+        /* Nice counter for cli watching zzz
+         */
+        $i = 0;
+        $n = \count($legacyQuizIds);
+
         /* $legacyQuizIds is a bunch of identifiers
          */
         foreach ($legacyQuizIds as $legacyQuizId) {
@@ -785,7 +867,9 @@ HELP;
             /* Announce what we're doing
              */
             $this->getLogger()->info(sprintf(
-                'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                ++$i,
+                $n,
                 $legacyQuiz['title'],
                 $legacyQuiz['assessment_id'],
                 $legacyQuiz['assess_id']
