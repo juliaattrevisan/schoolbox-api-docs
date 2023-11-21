@@ -66,6 +66,9 @@ async function saveScore() {
     if (isSaving.value) {
         return;
     }
+    if (props.student.urls === undefined) {
+        return;
+    }
     if (score.value.toString() === "") {
         return;
     }

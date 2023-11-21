@@ -78,6 +78,9 @@ async function saveComment() {
     if (comment.value === props.item.questions[0].response.comment) {
         return;
     }
+    if (props.student.urls === undefined) {
+        return;
+    }
     isSaving.value = true;
     emit("updatingComment");
     window.addEventListener("beforeunload", beforeUnloadHandler);

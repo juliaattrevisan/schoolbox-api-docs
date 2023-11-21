@@ -7,6 +7,7 @@ import debounce from "lodash/debounce";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { StudentUrls } from "./StudentUrls";
 
 interface Props {
     student: Student; // the student to display
@@ -64,6 +65,9 @@ async function saveComment() {
         return;
     }
     if (comment.value === props.student.attemptComment.comment) {
+        return;
+    }
+    if (props.student.urls === undefined) {
         return;
     }
     isSaving.value = true;
