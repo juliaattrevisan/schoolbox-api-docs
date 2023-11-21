@@ -132,7 +132,14 @@
     /* Allowed Time elapsed
      */
     itemsApp.on('time:end', function() {
+        document.getElementById("learnosity_assess").setAttribute("data-time-ended", "true");
         completeAttempt();
     });
 </script>
+<style>
+/* Hide the submit confirmation modal after the time has ended */
+#learnosity_assess[data-time-ended="true"] [id^="test-save-submit"] {
+    display: none !important;
+}
+</style>
 {% endautoescape %}
