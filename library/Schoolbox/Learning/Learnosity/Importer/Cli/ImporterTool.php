@@ -132,6 +132,7 @@ class ImporterTool extends CliTool\App
             ORDER BY assess.created_at DESC
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
+        AND deleted_at IS NULL
         AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) <= :payloadSize
     ";
 
@@ -179,6 +180,7 @@ class ImporterTool extends CliTool\App
             ORDER BY assess.created_at DESC
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
+        AND deleted_at IS NULL
         AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) > :payloadSize
     ";
 
