@@ -361,6 +361,18 @@ class Controller extends Base
 
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
+        // A user may not attempt a quiz on behalf of another user.
+        if ($this->getUser()->getId() !== $student->getId()) {
+            /* Redirect back to summary screen
+             */
+            $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+            ]);
+            $this->response = $this->redirectTemporary($redirect);
+            return;
+        }
+
         if (
             !$quiz->isAttemptsUnlimited() &&
             $this->attemptMapper->getAttemptCountForStudent($quiz->getId(), $student->getId()) >= $quiz->getMaxAttempts()
