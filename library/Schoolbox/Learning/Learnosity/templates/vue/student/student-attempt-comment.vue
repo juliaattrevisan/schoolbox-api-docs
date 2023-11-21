@@ -7,7 +7,6 @@ import debounce from "lodash/debounce";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import type { StudentUrls } from "./StudentUrls";
 
 interface Props {
     student: Student; // the student to display

@@ -18,6 +18,7 @@ interface Props {
     reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
     attemptComment: StudentAttemptComment; // StudentAttemptComment all the overall attempt comments for the quiz
+    isReadOnly: boolean; // whether is in feedback mode, where the teacher can provide feedback to the student
     urls?: StudentUrls; // the urls to use for the students to update their scores and comments
     postFeedback?: string; // the URL to post the feedback to
     statusPage?: string; // the status page to link to once user has finished marking
@@ -31,7 +32,7 @@ const studentStore = useStudentStore();
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.postFeedback, props.statusPage);
+    store.init(props.isReadOnly, props.postFeedback, props.statusPage);
     useStudentStore().init(props.student, props.itemResponses, props.attemptComment, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions);

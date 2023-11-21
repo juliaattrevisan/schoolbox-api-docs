@@ -5,6 +5,7 @@
 import { defineStore } from "pinia";
 
 export const useStore = defineStore("quizFeedback", () => {
+    const isReadOnly = window.Vue.ref<boolean>(false); // whether is in feedback mode, where the teacher can provide feedback to the student
     const isProcessing = window.Vue.ref<boolean>(false); // to disable various events while processing, like trying to mark the next card before the current one has finished marking
     const isLoaded = window.Vue.ref<boolean>(false); // to show the loading spinner while the reports are loading
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
@@ -13,10 +14,12 @@ export const useStore = defineStore("quizFeedback", () => {
 
     /**
      * store any passed through properties
+     * @param {boolean} $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
      * @param {string|undefined} $postFeedback - the feedback url to post to
      * @param {string|undefined} $statusPage - the link to the status page
      */
-    function init($postFeedback: string | undefined, $statusPage: string | undefined) {
+    function init($isReadOnly: boolean, $postFeedback: string | undefined, $statusPage: string | undefined) {
+        isReadOnly.value = $isReadOnly;
         if ($postFeedback !== undefined) {
             postFeedback.value = $postFeedback;
         }
