@@ -152,15 +152,34 @@ class ImporterTool extends CliTool\App
     private const QUERY_LEGACY_LARGE_QUIZ_IDS = "
         SELECT assess.assess_id
         FROM assess
-        INNER JOIN assess_section section ON assess.assess_id = section.assess_id
-        INNER JOIN assess_question question ON section.section_id = question.section_id
-        WHERE assess.deleted_at IS NULL
-        AND assess.availability = 'assess'
-        AND assess.learnosity_reference IS NULL
-        AND assess.external_id IS NULL
-        GROUP BY assess.assess_id
-        HAVING COUNT(question.question_id) > :payloadSize
-        ORDER BY assess.created_at DESC
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(question.question_id) AS numQuestions
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            INNER JOIN assess_question question ON section.section_id = question.section_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            AND question.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) a ON assess.assess_id = a.assess_id
+        LEFT JOIN (
+            SELECT assess.assess_id, COUNT(section.section_id) AS numSections
+            FROM assess
+            INNER JOIN assess_section section ON assess.assess_id = section.assess_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess.learnosity_reference IS NULL
+            AND assess.external_id IS NULL
+            AND section.deleted_at IS NULL
+            GROUP BY assess.assess_id
+            ORDER BY assess.created_at DESC
+        ) b ON assess.assess_id = b.assess_id
+        WHERE availability = 'assess'
+        AND (a.numQuestions + b.numSections) > :payloadSize
     ";
 
 
