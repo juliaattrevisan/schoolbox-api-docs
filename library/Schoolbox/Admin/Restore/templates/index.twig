@@ -76,6 +76,13 @@
 </script>
 {% endautoescape %}
 
+<style>
+/* to allow horizontal scrolling of tables within the tabs */
+.tabs-content > .content.active {
+    overflow-x: auto;
+}
+</style>
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -156,4 +163,3 @@
     </div>
 </div>
 <div id='toaster' class="toast" data-toast></div>
-
