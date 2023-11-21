@@ -247,7 +247,6 @@ class ImporterTool extends CliTool\App
             ORDER BY assess.created_at DESC
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
-        AND (a.numQuestions + b.numSections) <= :payloadSize
         AND assessment_id = :assessmentId
     ";
 
@@ -471,7 +470,12 @@ HELP;
                 'assessmentId' => $assessmentId
             ]);
 
-            $numQuestions = $this->sizeStratStatement->fetch(\PDO::FETCH_ASSOC)['num'];
+            $numQuestions = $this->sizeStratStatement->fetch(\PDO::FETCH_ASSOC)['num'] ?? 0;
+            if ($numQuestions === 0) {
+                $this->getLogger()->info(sprintf('assessment_id %d has nothing to migrate: exiting.', $assessmentId));
+                $this->getLogger()->info('');
+                return;
+            }
 
             if ($numQuestions <= self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
                 $this->sizeStrat = self::OPT_LONG_IMPORT_SMALL_QUIZZES;
