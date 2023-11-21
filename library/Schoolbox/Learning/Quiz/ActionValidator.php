@@ -10,11 +10,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Quiz;
 
+use Alaress\Lumberjack\Logger;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
 use Schoolbox\User;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 
 /**
  * Defines the business rules for what actions are available for a quiz or quiz attempt, respecting the new
@@ -78,12 +82,34 @@ class ActionValidator
      *
      * @param User       $user
      * @param Quiz\Model $quiz
+     * @param IConfigLoader|null $config
      * @return bool
      */
-    public function canAttemptQuiz(User $user, Quiz\Model $quiz): bool
+    public function canAttemptQuiz(User $user, Quiz\Model $quiz, IConfigLoader $config = null): bool
     {
         if (!$this->canSeeQuiz($user, $quiz)) {
             return false;
+        }
+
+        // If the quiz is not in Learnosity, it can't be attempted
+        if (!$quiz->getLearnosityReference()) {
+            return false;
+        }
+
+        // If the quiz has no items, it can't be attempted
+        if ($config) {
+            $learnosityApi = new Api(
+                (new \Schoolbox\Url\Factory($config))->buildFullyQualified()->getHost(),
+                $config->get('learnosity_version'),
+                $config->get('learnosity_consumer_key'),
+                $config->get('learnosity_consumer_secret'),
+                new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+            );
+
+            $itemCount = (new Helper($learnosityApi))->getActivityItemCount($quiz->getLearnosityReference());
+            if ($itemCount === 0) {
+                return false;
+            }
         }
 
         $isInstructor = $this->access->isInstructor($user, $quiz->getContext()->getFolder());

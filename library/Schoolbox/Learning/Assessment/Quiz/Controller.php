@@ -10,6 +10,7 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Alaress_Date_Format;
+use Alaress\Lumberjack\Logger;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use External\Canvas\Importer\CanvasDb;
@@ -30,6 +31,8 @@ use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -282,7 +285,7 @@ class Controller extends Assessment\Controller
         $actionValidator = new ActionValidator($now, $this->getAccess());
 
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $canAttempt = $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
+        $canAttempt = $actionValidator->canAttemptQuiz($this->getUser(), $assessment, $this->getConfigLoader());
 
         /**
          * record view
