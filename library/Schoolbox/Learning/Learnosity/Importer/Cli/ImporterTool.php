@@ -430,7 +430,7 @@ HELP;
 
         /* Used to manufacture an array containing all the legacy quiz's contents
          */
-        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal());
+        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal(), $this->getLogger());
 
         /* Generates sets of tags for Activities' and Items' assignations
          */

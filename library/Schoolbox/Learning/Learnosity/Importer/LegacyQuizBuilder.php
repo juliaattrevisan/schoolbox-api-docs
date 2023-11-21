@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Alaress\Database\Connector\IConnector;
+use Psr\Log\LoggerInterface;
 
 /**
  * Takes a given schoolbox.assess_id and fetches all the sections, questions,
@@ -83,8 +84,9 @@ class LegacyQuizBuilder
      * ideally you only need to instantiate this once
      *
      * @param IConnector $db
+     * @param LoggerInterface $logger
      */
-    public function __construct(IConnector $db)
+    public function __construct(IConnector $db, private LoggerInterface $logger)
     {
         $this->quizStatement = $db->prepare(self::QUERY_QUIZ);
         $this->sectionsStatement = $db->prepare(self::QUERY_SECTION);
@@ -132,22 +134,36 @@ class LegacyQuizBuilder
             while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $questionRow['_answers'] = [];
 
-                /* Decompile config
-                 */
-                $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
-
                 /* Get each question's answers
                  */
                 $this->answerStatement->execute([
                     'questionId' => $questionRow['question_id']
                 ]);
 
-                while ($answerRow = $this->answerStatement->fetch(\PDO::FETCH_ASSOC)) {
-                    $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
+                try {
+                    while ($answerRow = $this->answerStatement->fetch(\PDO::FETCH_ASSOC)) {
+                        $answerRow['answer'] = $this->decompileAnswer($questionRow, $answerRow);
 
-                    $questionRow['_answers'][] = $answerRow;
+                        $questionRow['_answers'][] = $answerRow;
+                    }
+                } catch (\RuntimeException $e) {
+                    /* This question has busted answers
+                     * Skip it quietly
+                     */
+                    $this->logger->debug(sprintf(
+                        'question_id %s missing serialized answers; skipping',
+                        $questionRow['question_id']
+                    ));
+
+                    continue;
                 }
 
+                /* Decompile config
+                 */
+                $questionRow['config'] = $this->decompileQuestionConfig($questionRow);
+
+                /* Stack it up
+                 */
                 $sectionRow['_questions'][] = $questionRow;
             }
 
@@ -183,6 +199,7 @@ class LegacyQuizBuilder
      * @param array $question
      * @param array $answer
      * @return mixed
+     * @throws \RuntimeException
      */
     private function decompileAnswer(array $question, array $answer): mixed
     {
@@ -196,6 +213,13 @@ class LegacyQuizBuilder
         ];
 
         if (in_array($question['type_id'], $serializedAnswers, false)) {
+            /* Sometimes there's busted data we can't unserialize; it's not there.
+             * This should cause us to skip this question entirely
+             */
+            if ('' === trim((string)$answer['answer'])) {
+                throw new \RuntimeException('Question is missing serialized answers.');
+            }
+
             return unserialize($answer['answer'], [
                 'allowed_classes' => true
             ]);
