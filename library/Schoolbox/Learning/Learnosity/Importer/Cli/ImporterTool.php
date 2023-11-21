@@ -133,6 +133,8 @@ class ImporterTool extends CliTool\App
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
         AND deleted_at IS NULL
+        AND learnosity_reference IS NULL
+        AND external_id IS NULL
         AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) <= :payloadSize
     ";
 
@@ -181,6 +183,8 @@ class ImporterTool extends CliTool\App
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
         AND deleted_at IS NULL
+        AND learnosity_reference IS NULL
+        AND external_id IS NULL
         AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) > :payloadSize
     ";
 
@@ -248,6 +252,8 @@ class ImporterTool extends CliTool\App
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
         AND assessment_id = :assessmentId
+        AND learnosity_reference IS NULL
+        AND external_id IS NULL
     ";
 
 
