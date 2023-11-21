@@ -89,6 +89,25 @@ class Helper
     {
     }
 
+    /**
+     * Get the number of items (questions) in a particular Learnosity Activity
+     *
+     * @param string $learnosityReference
+     * @return int
+     */
+    public function getActivityItemCount(string $learnosityReference): int
+    {
+        $activities = $this->api->dataGetRequest('/itembank/activities', [
+            'references' => [
+                $learnosityReference
+            ]
+        ]);
+
+        /* $activities['data'] is a one-element stack in this usage.
+         * For activities with no items, the items attribute is not present.
+         */
+        return count($activities['data'][0]['data']['items'] ?? []);
+    }
 
     /**
      * Archive (soft-delete) a particular Learnosity Activity
