@@ -695,6 +695,11 @@ HELP;
              */
             $consolidatedBlueprint = null;
 
+            /* Nice counter for cli watching zzz
+             */
+            $i = 0;
+            $n = \count($legacyQuizIds);
+
             foreach ($legacyQuizIds as $legacyQuizId) {
                 /* Do all the stuff it used to do to produce a $blueprint
                  */
@@ -707,7 +712,9 @@ HELP;
                 /* Announce what we're doing
                  */
                 $this->getLogger()->info(sprintf(
-                    'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                    '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                    ++$i,
+                    $n,
                     $legacyQuiz['title'],
                     $legacyQuiz['assessment_id'],
                     $legacyQuiz['assess_id']
@@ -831,6 +838,11 @@ HELP;
         Api $api,
         array $legacyQuizIds
     ): void {
+        /* Nice counter for cli watching zzz
+         */
+        $i = 0;
+        $n = \count($legacyQuizIds);
+
         /* $legacyQuizIds is a bunch of identifiers
          */
         foreach ($legacyQuizIds as $legacyQuizId) {
@@ -845,7 +857,9 @@ HELP;
             /* Announce what we're doing
              */
             $this->getLogger()->info(sprintf(
-                'Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
+                ++$i,
+                $n,
                 $legacyQuiz['title'],
                 $legacyQuiz['assessment_id'],
                 $legacyQuiz['assess_id']
