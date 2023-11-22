@@ -88,9 +88,9 @@ class LegacyQuizBuilder
      * @param LoggerInterface $logger
      */
     public function __construct(
-        IConnector                   $db,
+        IConnector $db,
         private InlineImageConverter $inlineImageConverter,
-        private LoggerInterface      $logger
+        private LoggerInterface $logger
     ) {
         $this->quizStatement = $db->prepare(self::QUERY_QUIZ);
         $this->sectionsStatement = $db->prepare(self::QUERY_SECTION);
