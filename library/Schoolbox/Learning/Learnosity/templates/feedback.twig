@@ -27,7 +27,7 @@
             :report-init-options="{{ reportInitOptions }}"
             :item-responses="{{ itemResponses|json_encode }}"
             :attempt-comment="{{ attemptComment|json_encode }}"
-            :is-read-only="false"
+            :is-read-only="true"
             :urls="{{ urls|json_encode }}"
             post-feedback="{{ routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnositySessionReference: attempt.learnosityReference}) }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"

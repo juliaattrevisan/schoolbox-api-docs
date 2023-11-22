@@ -29,6 +29,7 @@ export const useStore = defineStore("quizFeedback", () => {
     }
 
     return {
+        isReadOnly,
         isProcessing,
         isLoaded,
         init,

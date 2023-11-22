@@ -73,6 +73,7 @@ function onCommentUpdated(comment: string) {
                     :item="props.item"
                     :question="question"
                     :container="props.container"
+                    :is-read-only="false"
                     @updating-score="onUpdating"
                     @updated-score="onScoreUpdated"
                 />
