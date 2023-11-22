@@ -21,6 +21,22 @@
     </div>
 </div>
 
+<template data-template="time-up">
+    <div class="app-panel lrn-dialog-default" style="opacity: 1; display: block" data-modal="time-up">
+        <div class="lrn-assess-modal-dialog modal-dialog">
+            <div class="lrn-assess-modal-content modal-content" aria-modal="true" role="alertdialog">
+                <div class="lrn-assess-modal-header modal-header">
+                    <h2>Time's Up</h2>
+                </div>
+                <div class="lrn-assess-modal-body modal-body">
+                    <p>Please wait while your answers are submitted.</p>
+                    <div class="lrn-assess-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
 {% autoescape 'js' %}
 <script>
     // Track if the time has ended or not
@@ -133,6 +149,11 @@
      */
     itemsApp.on('time:end', function() {
         document.getElementById("learnosity_assess").setAttribute("data-time-ended", "true");
+
+        const dialogs = document.querySelector("#learnosity_assess .dialogs");
+        const newModal = document.querySelector("template[data-template='time-up']").content.cloneNode(true);
+        dialogs.appendChild(newModal);
+
         completeAttempt();
     });
 </script>
