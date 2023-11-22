@@ -159,9 +159,9 @@ class Api
      * @param string $endpoint
      * @param array $payload
      * @return mixed
+     * @throws ApiException
      * @throws ValidationException
      * @throws \JsonException
-     * @throws \RuntimeException
      */
     public function dataGetRequest(string $endpoint, array $payload): mixed
     {
@@ -175,9 +175,9 @@ class Api
      * @param string $endpoint
      * @param array $payload
      * @return mixed
+     * @throws ApiException
      * @throws ValidationException
      * @throws \JsonException
-     * @throws \RuntimeException
      */
     public function dataSetRequest(string $endpoint, array $payload): mixed
     {
@@ -191,9 +191,9 @@ class Api
      * @param string $endpoint
      * @param array $payload
      * @return mixed
+     * @throws ApiException
      * @throws ValidationException
      * @throws \JsonException
-     * @throws \RuntimeException
      */
     public function dataUpdateRequest(string $endpoint, array $payload): mixed
     {
@@ -212,10 +212,9 @@ class Api
      * @param array $payload
      * @param string $actionType
      * @return mixed
+     * @throws ApiException
      * @throws ValidationException
      * @throws \JsonException
-     * @throws \RuntimeException
-     * @throws \Exception
      */
     private function dataRequest(string $host, string $endpoint, array $payload, string $actionType): mixed
     {
@@ -259,7 +258,7 @@ class Api
                     /* Some other unrecoverable error; retrying won't help
                      * Just surface this exception
                      */
-                    throw new \RuntimeException(sprintf(
+                    throw new ApiException(sprintf(
                         "%s %s: %s.\n\nHTTP %s %s",
                         $actionType,
                         $url,
@@ -318,7 +317,7 @@ class Api
 
         /* Couldn't recover
          */
-        throw new \RuntimeException(sprintf(
+        throw new ApiException(sprintf(
             '%s %s failed after %s retries',
             $actionType,
             $url,

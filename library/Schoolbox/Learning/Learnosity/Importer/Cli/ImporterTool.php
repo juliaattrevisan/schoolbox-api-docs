@@ -13,6 +13,7 @@ use Alaress\Lock\LockRefreshException;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
 use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
@@ -435,7 +436,7 @@ HELP;
 
         /* Used to manufacture an array containing all the legacy quiz's contents
          */
-        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal());
+        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal(), $this->getLogger());
 
         /* Generates sets of tags for Activities' and Items' assignations
          */
@@ -923,18 +924,38 @@ HELP;
              * but we don't know which payload is too big. This is the inverse of
              * consolidate()
              */
+            $error = false;
+
             foreach ($blueprint['payloadSequence'] as $payloadSequence) {
                 $endpoint = $payloadSequence['endpoint'];
 
-                if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
-                    $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence);
-                } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
-                    $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence);
-                } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
-                    $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence);
-                } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
-                    $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
+                try {
+                    if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
+                        $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence);
+                    } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
+                        $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence);
+                    } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
+                        $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence);
+                    } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
+                        $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
+                    }
+                } catch (ApiException $e) {
+                    $error = true;
+
+                    /* Warn us, then keep going
+                     */
+                    $this->getLogger()->warning($e->getMessage());
+                    $this->getLogger()->warning('Unconsolidated payload abandoned.');
+
+                    break;
                 }
+            }
+
+            /* Something died during transmission
+             * walk past and keep going
+             */
+            if ($error) {
+                continue;
             }
 
             /* Associations are always done last, once per quiz,
@@ -1045,7 +1066,6 @@ HELP;
      * @throws ValidationException
      * @throws \JsonException
      * @throws \PDOException
-     * @throws \RuntimeException
      */
     private function transmitConsolidated(Api $api, array $consolidatedBlueprint): void
     {
@@ -1064,7 +1084,7 @@ HELP;
          */
         if ($this->perform()) {
             $this->getLogger()->info(sprintf(
-                'Importing %s consolidated quizzes into Learnosity. This might take a while.',
+                'Importing %s consolidated quizzes into Learnosity.',
                 $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
             ));
 
@@ -1110,7 +1130,16 @@ HELP;
                      * Or, there's just an empty section somehow.
                      */
                     if ($data['count'] > 0) {
-                        $api->dataSetRequest($data['endpoint'], $data['payload']);
+                        try {
+                            $api->dataSetRequest($data['endpoint'], $data['payload']);
+                        } catch (ApiException $e) {
+                            /* Warn us, then keep going
+                             */
+                            $this->getLogger()->warning($e->getMessage());
+                            $this->getLogger()->warning('Consolidated payload abandoned.');
+
+                            continue;
+                        }
                     }
                 }
 
@@ -1151,7 +1180,7 @@ HELP;
      * @return void
      * @throws ValidationException
      * @throws \JsonException
-     * @throws \RuntimeException
+     * @throws ApiException
      */
     private function transmitUnconsolidated(Api $api, string $key, string $endpoint, array $payloadSequence): void
     {
