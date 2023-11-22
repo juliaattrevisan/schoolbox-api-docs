@@ -57,7 +57,6 @@ class MatchingPairs extends Base implements IStrategy
 
         return [
             'instant_feedback' => false,
-            'max_length' => 250,
             'possible_responses' => $possibleAnswers,
             'stimulus' => $this->produceQuestionText($question['question']),
             'stimulus_list' => $stimulusList,
