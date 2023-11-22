@@ -375,7 +375,7 @@ class Controller extends Base
         $actionValidator = new ActionValidator($now, Access::getInstance());
         $canAttempt = (
             $this->getUser()->getId() === $student->getId() && // A user may not attempt a quiz on behalf of another user.
-            $actionValidator->canAttemptQuiz($this->getUser(), $assessment)
+            $actionValidator->canAttemptQuiz($this->getUser(), $assessment, $this->getConfigLoader())
         );
 
         if (!$canAttempt) {
