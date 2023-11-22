@@ -373,10 +373,12 @@ class Controller extends Base
         $now = Alaress_Date_Format::now();
         $this->quizMapper->closeExpiredAttempts($quiz, $now); // Close any expired attempts before checking for in-progress.
         $actionValidator = new ActionValidator($now, Access::getInstance());
-        if (
-            $this->getUser()->getId() !== $student->getId() || // A user may not attempt a quiz on behalf of another user.
-            !$actionValidator->canAttemptQuiz($this->getUser(), $assessment)
-        ) {
+        $canAttempt = (
+            $this->getUser()->getId() === $student->getId() && // A user may not attempt a quiz on behalf of another user.
+            $actionValidator->canAttemptQuiz($this->getUser(), $assessment)
+        );
+
+        if (!$canAttempt) {
             /* Redirect back to summary screen
              */
             $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
