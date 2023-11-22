@@ -63,6 +63,7 @@ function onAttemptCommentUpdated(comment: string) {
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
                 <student-attempt-comment
                     :student="props.student"
+                    :is-read-only="store.isReadOnly"
                     @updating-comment="onAttemptCommentUpdating"
                     @updated-comment="onAttemptCommentUpdated"
                 />

@@ -112,6 +112,7 @@ function onAttemptCommentUpdated(comment: string) {
                 <student-attempt-comment
                     v-if="itemsStore.isAttemptComment"
                     :student="props.student"
+                    :is-read-only="false"
                     @updating-comment="onAttemptCommentUpdating"
                     @updated-comment="onAttemptCommentUpdated"
                 />

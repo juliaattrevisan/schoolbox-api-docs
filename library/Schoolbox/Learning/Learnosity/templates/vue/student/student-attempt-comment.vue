@@ -10,13 +10,16 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 
 interface Props {
     student: Student; // the student to display
+    isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
 }
 const props = defineProps<Props>();
 const editorId = `final-review-comment-${props.student.elementId}`;
-const comment = useEditor(props.student.attemptComment.comment ?? "", editorId, {
-    targetElements: [`#${editorId}`],
-    hasTokens: true,
-}); // Use a ckeditor for the comments field
+const comment = props.isReadOnly
+    ? window.Vue.ref("")
+    : useEditor(props.student.attemptComment.comment ?? "", editorId, {
+          targetElements: [`#${editorId}`],
+          hasTokens: true,
+      }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
@@ -112,18 +115,32 @@ window.Vue.onUnmounted(async () => {
     <div class="c-island l-flex-col l-gap-m l-pad-m">
         <div>
             <label>Comment</label>
-            <p class="meta">
-                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
-                details on creation.
+            <p
+                v-if="
+                    (props.isReadOnly && props.student.attemptComment.comment === null) ||
+                    (props.isReadOnly && props.student.attemptComment.comment === '')
+                "
+            >
+                <em>No comment added.</em>
             </p>
-            <textarea :id="editorId"></textarea>
-            <div class="save-container l-grid">
-                <div class="save-container__inner-container">
-                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
-                        <em>{{ saveText }}</em>
+            <div
+                v-else-if="props.isReadOnly && props.student.attemptComment.comment !== ''"
+                v-html="props.student.attemptComment.comment"
+            ></div>
+            <template v-else>
+                <p class="meta">
+                    Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                    details on creation.
+                </p>
+                <textarea :id="editorId"></textarea>
+                <div class="save-container l-grid">
+                    <div class="save-container__inner-container">
+                        <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                            <em>{{ saveText }}</em>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </template>
         </div>
     </div>
 </template>
