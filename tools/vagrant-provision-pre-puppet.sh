@@ -65,6 +65,10 @@ function setup_aws_cli() {
 }
 
 function setup_aws_sso() {
+  if grep -q 'default' /root/.aws/credentials; then
+    echo "AWS using static creds"
+    return
+  fi
   echo "Setting up AWS SSO"
   mkdir -p /root/.aws
   echo "[default]
