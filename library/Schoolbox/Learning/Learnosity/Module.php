@@ -188,9 +188,9 @@ class Module extends BaseModule
 
 
     /**
-     * The current user is the $studentId referenced in the url,
-     * or you're a staff (meant to stop students accessing other
-     * student's urls)
+     * The logged-in user is either:
+     *  - the student user referenced in the url (meant to stop students accessing other student's urls),
+     *  - or a staff member.
      *
      * @return Rule\LazyCallback
      */
