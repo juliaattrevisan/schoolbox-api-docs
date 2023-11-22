@@ -864,8 +864,6 @@ HELP;
         /* $legacyQuizIds is a bunch of identifiers
          */
         foreach ($legacyQuizIds as $legacyQuizId) {
-            /* Do all the stuff it used to do to produce a $blueprint
-             */
             $this->refreshLock($lock);
 
             /* Get the legacy quiz's contents
@@ -927,21 +925,19 @@ HELP;
             $error = false;
 
             foreach ($blueprint['payloadSequence'] as $payloadSequence) {
-                /* Do all the stuff it used to do to produce a $blueprint
-                 */
                 $this->refreshLock($lock);
 
                 $endpoint = $payloadSequence['endpoint'];
 
                 try {
                     if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
-                        $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence);
+                        $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence, $lock);
                     } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
-                        $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence);
+                        $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence, $lock);
                     } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
-                        $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence);
+                        $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence, $lock);
                     } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
-                        $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
+                        $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence, $lock);
                     }
                 } catch (ApiException $e) {
                     $error = true;
@@ -1181,18 +1177,27 @@ HELP;
      * @param string $key
      * @param string $endpoint
      * @param array $payloadSequence
+     * @param LockInterface $lock
      * @return void
+     * @throws ApiException
+     * @throws LockRefreshException
      * @throws ValidationException
      * @throws \JsonException
-     * @throws ApiException
      */
-    private function transmitUnconsolidated(Api $api, string $key, string $endpoint, array $payloadSequence): void
-    {
+    private function transmitUnconsolidated(
+        Api $api,
+        string $key,
+        string $endpoint,
+        array $payloadSequence,
+        LockInterface $lock
+    ): void {
         $payload = [
             $key => []
         ];
 
         foreach ($payloadSequence['payload'][$key] as $object) {
+            $this->refreshLock($lock);
+
             $payload[$key][] = $object;
 
             /* A special case for Questions endpoint which requires this random
