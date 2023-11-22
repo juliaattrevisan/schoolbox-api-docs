@@ -142,7 +142,7 @@ class LegacyQuizBuilder
                 /* Clean out any weird whitespace/control chars from the end of this,
                  * and convert base64 inline images to storage files
                  */
-                $questionRow['question'] = $this->inlineImageConverter->convert($questionRow['question']);
+                $questionRow['question'] = $this->inlineImageConverter->convert((string)$questionRow['question']);
 
                 /* Get each question's answers
                  */
