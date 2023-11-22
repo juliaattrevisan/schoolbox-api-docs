@@ -142,7 +142,19 @@ class LegacyQuizBuilder
                 /* Clean out any weird whitespace/control chars from the end of this,
                  * and convert base64 inline images to storage files
                  */
-                $questionRow['question'] = $this->inlineImageConverter->convert((string)$questionRow['question']);
+                try {
+                    $questionRow['question'] = $this->inlineImageConverter->convert((string)$questionRow['question']);
+                } catch (\RuntimeException $e) {
+                    /* This question has busted html
+                     * Skip it quietly
+                     */
+                    $this->logger->debug(sprintf(
+                        'question_id %s has unparseable html - it might be truncated; skipping',
+                        $questionRow['question_id']
+                    ));
+
+                    continue;
+                }
 
                 /* Get each question's answers
                  */

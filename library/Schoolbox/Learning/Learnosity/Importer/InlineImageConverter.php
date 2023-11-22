@@ -63,11 +63,20 @@ class InlineImageConverter
      * @param string $html
      * @return string
      * @throws \DOMException
+     * @throws \RuntimeException
      */
     public function convert(string $html): string
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML($html);
+
+        try {
+            $dom->loadHTML($html);
+        } catch (\ErrorException $e) {
+            /* Could not parse document; it's been truncated due to maximum length somewhere in our db.
+             * It's literally half an html...I guess we have to skip it for now?
+             */
+            throw new \RuntimeException('Truncated data: could not parse xml');
+        }
 
         $xpath = new \DOMXPath($dom);
         $nodes = $xpath->query('//*[@src]');
