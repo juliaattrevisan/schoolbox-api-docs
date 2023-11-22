@@ -445,7 +445,7 @@ HELP;
          */
         $legacyQuizBuilder = new LegacyQuizBuilder(
             $this->getDatabaseInternal(),
-            new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance()),
+            new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger()),
             $this->getLogger()
         );
 

@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer;
 
+use Psr\Log\LoggerInterface;
+use Schoolbox\Resource\Storage\Mapper;
+
 /**
  * Converts a base64 encoded image into a storage reference with a relative url
  */
@@ -49,9 +52,10 @@ class InlineImageConverter
     /**
      * Constructor.
      *
-     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param Mapper $storageMapper
+     * @param LoggerInterface $logger
      */
-    public function __construct(private \Schoolbox\Resource\Storage\Mapper $storageMapper)
+    public function __construct(private \Schoolbox\Resource\Storage\Mapper $storageMapper, private LoggerInterface $logger)
     {
     }
 
@@ -93,6 +97,8 @@ class InlineImageConverter
             /* base64 inline image detected; perform replacement
              */
             if ($isInline) {
+                $this->logger->debug('Generating storage file for inline image');
+
                 $imageData = base64_decode($matches[2]);
                 $extension = $matches[1];
 
