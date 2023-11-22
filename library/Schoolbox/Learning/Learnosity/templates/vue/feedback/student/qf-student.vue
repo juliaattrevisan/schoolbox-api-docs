@@ -47,7 +47,7 @@ function onAttemptCommentUpdated(comment: string) {
         <template v-if="props.student.isReportLoaded">
             <div class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Items</h2>
-                <qf-student-show-marked />
+                <qf-student-show-marked v-if="!store.isReadOnly" />
                 <div class="l-flex-col l-gap-l">
                     <qf-student-item
                         v-for="item in props.student.items"
