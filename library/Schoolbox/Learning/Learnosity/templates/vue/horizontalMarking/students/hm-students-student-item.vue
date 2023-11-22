@@ -81,6 +81,7 @@ function onCommentUpdated(comment: string) {
             <student-item-comment
                 :student="props.student"
                 :item="props.item"
+                :is-read-only="false"
                 @updating-comment="onUpdating"
                 @updated-comment="onCommentUpdated"
             />
