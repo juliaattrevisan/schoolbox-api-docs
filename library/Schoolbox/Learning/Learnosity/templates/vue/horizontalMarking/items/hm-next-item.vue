@@ -29,7 +29,7 @@ function onSelected() {
         v-if="!itemsStore.isAttemptComment"
         class="button full-width icon-next"
         :style="`${itemsStore.isNextFinalReview ? 'font-weight: bold' : ''}`"
-        :disabled="!store.isLoaded || !itemsStore.hasNextItem"
+        :disabled="!store.isLoaded || store.isProcessing || !itemsStore.hasNextItem"
         @click.prevent="onSelected"
     >
         {{ buttonTitle }}

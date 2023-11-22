@@ -2,26 +2,9 @@
  * To load the reports data and pass it to the other stores
  */
 
-import type { Item } from "@schoolboxLearnosity/js/types/Item";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import { addTargetsToMarks } from "@schoolboxLearnosity/js/util/domUtils";
 import { useStudentStore } from "../store/qfStudentStore";
-
-/**
- * To move the marks (which are in the title div) out of the response container
- * we need to add an attribute to each title div so it can be properly targeted, as they all just have the same class name
- * @param {string} reportId - the report id
- */
-function addTargetsToMarks(reportId: string) {
-    const report = document.getElementById(reportId);
-    const reportItemResponseIds: string[] = [];
-    const reportItemResponses = report?.querySelectorAll("[data-reference]");
-    reportItemResponses?.forEach((response) => {
-        reportItemResponseIds.push((response as HTMLDivElement).dataset.reference as string);
-    });
-    const reportItemTitles = report?.querySelectorAll(".lrn-report-item-title");
-    reportItemTitles?.forEach((title, index) => {
-        (title as HTMLDivElement).dataset.referenceTitle = reportItemResponseIds[index];
-    });
-}
 
 /**
  * To load the reports data and pass it to the other stores
@@ -43,9 +26,9 @@ export function loadReport(initOptions: object) {
             attemptReport.on("ready:itemsApi", (itemsApp) => {
                 // Load the items for the student
                 itemsApp.getItems(($items: object) => {
-                    const items: Item[] = [];
+                    const items: StudentItem[] = [];
                     // grab each item object and push it into the items array
-                    Object.values($items).forEach((item: Item) => {
+                    Object.values($items).forEach((item: StudentItem) => {
                         items.push(item);
                     });
                     useStudentStore().addItems(items);

@@ -3,6 +3,7 @@
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  */
 
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { EditorEvent, type EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
@@ -42,6 +43,13 @@ export function useEditor($currentValue: string, ckeditorSelector: string, edito
                 await injectScript(ckeditorScript);
             }
             const ckeditorElement = document.getElementById(ckeditorSelector) as HTMLElement;
+
+            // avoid creating multiple editors for the same selector
+            if (window.sbProps.editors[ckeditorSelector] !== undefined) {
+                const editor = window.sbProps.editors[ckeditorSelector] as ClassicEditor;
+                ckeditorElement.replaceWith(editor.ui.view.element as HTMLElement);
+                return;
+            }
 
             ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
                 onEditorCreated(event as CustomEvent);

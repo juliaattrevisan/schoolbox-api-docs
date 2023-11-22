@@ -2,27 +2,10 @@
  * To load the reports data and pass it to the other stores
  */
 
-import type { Item } from "@schoolboxLearnosity/js/types/Item";
+import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import { addTargetsToMarks } from "@schoolboxLearnosity/js/util/domUtils";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
-
-/**
- * To move the marks (which are in the title div) out of the response container into <hm-students-student-mark>
- * we need to add an attribute to each title div so it can be properly targeted, as they all just have the same class name
- * @param {string} reportId - the report id
- */
-function addTargetsToMarks(reportId: string) {
-    const report = document.getElementById(reportId);
-    const reportItemResponseIds: string[] = [];
-    const reportItemResponses = report?.querySelectorAll("[data-reference]");
-    reportItemResponses?.forEach((response) => {
-        reportItemResponseIds.push((response as HTMLDivElement).dataset.reference as string);
-    });
-    const reportItemTitles = report?.querySelectorAll(".lrn-report-item-title");
-    reportItemTitles?.forEach((title, index) => {
-        (title as HTMLDivElement).dataset.referenceTitle = reportItemResponseIds[index];
-    });
-}
 
 /**
  * store any passed through properties
@@ -31,10 +14,8 @@ function addTargetsToMarks(reportId: string) {
 export function loadReports(reportPayloads: string[]) {
     for (let i = 0; i < reportPayloads.length; i += 1) {
         const initOptions = JSON.parse(reportPayloads[i]);
-
         // To link the report to the student
         const reportId = initOptions.request.reports[0].id as string;
-
         /**
          * Every report gets its own callback; this is because the readyListeners()
          * don't have any idea which report they are in, which means we can't tell
@@ -44,24 +25,19 @@ export function loadReports(reportPayloads: string[]) {
         const reportCallback = {
             readyListener: () => {
                 const attemptReport = reportsApp.getReport(reportId);
-
                 // itemsApi only spawns if you used session-detail-by-item
                 attemptReport.on("ready:itemsApi", (itemsApp) => {
                     // Load the items for the student
                     itemsApp.getItems(($items: object) => {
-                        const items: Item[] = [];
+                        const items: StudentItem[] = [];
                         // grab each item object and push it into the items array
-                        Object.values($items).forEach((item: Item) => {
+                        Object.values($items).forEach((item: StudentItem) => {
                             items.push(item);
                         });
                         useStudentsStore().addItems(reportId, items);
-
                         addTargetsToMarks(reportId);
-
                         // add the questions to the items, as they aren't included in the initial payload
-                        if (i === 0) {
-                            useItemsStore().addQuestions(items);
-                        }
+                        useItemsStore().addQuestions(items, i === reportPayloads.length - 1);
                     });
 
                     // to notify the report has loaded
@@ -69,7 +45,6 @@ export function loadReports(reportPayloads: string[]) {
                 });
             },
         };
-
         // Initialise reports for each attempt
         let reportsApp = LearnosityReports.init(initOptions, reportCallback);
     }

@@ -9,7 +9,12 @@ import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentI
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
 import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
-import { getItemQuestions, getItemIsMarked, getStudentIsMarked } from "@schoolboxLearnosity/js/util/markingUtils";
+import {
+    getItemQuestions,
+    getItemIsMarked,
+    getStudentIsMarked,
+    setInitialQuestionIsMarked,
+} from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./quizFeedbackStore";
 
 export const useStudentStore = defineStore("qfStudent", () => {
@@ -65,25 +70,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
     }
 
     /**
-     * Loop through each question in the item and check for a score to determine if the question is already marked.
-     * If there is no maxScore, we assume that the question is considered marked if the first question contains a comment.
-     * So the first question comment covers isMarked for any questions within the item that don't have a maxScore
-     * @param { StudentItem } item - the item to check
-     */
-    function setInitialQuestionIsMarked(item: StudentItem) {
-        item.questions.forEach((question) => {
-            if (question.response.maxScore === null) {
-                question.response.isMarked =
-                    item.questions[0].response.comment &&
-                    item.questions[0].response.comment !== null &&
-                    item.questions[0].response.comment !== "";
-            } else {
-                question.response.isMarked = question.response.score !== null;
-            }
-        });
-    }
-
-    /**
      * Add items to a student
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
@@ -119,47 +105,41 @@ export const useStudentStore = defineStore("qfStudent", () => {
 
     /**
      * To update the isMarked property of an item and student
-     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item to update
      */
-    function updateIsMarked($student: Student, item: StudentItem) {
+    function updateIsMarked(item: StudentItem) {
         item.isMarked = getItemIsMarked(item);
         student.value.isMarked = getStudentIsMarked(student.value);
     }
 
     /**
      * To update the score of a question
-     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item that contains the question to update
      * @param {StudentItemQuestion} question - the question to update
      * @param {number} score - the score to update
      */
-    function updateItemResponseScore(
-        $student: Student,
-        item: StudentItem,
-        question: StudentItemQuestion,
-        score: number
-    ) {
-        question.response.score = score;
-        question.response.isMarked = true;
-        updateIsMarked($student, item);
+    function updateItemResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
+        (question.response as StudentItemQuestionResponse).score = score;
+        (question.response as StudentItemQuestionResponse).isMarked = true;
+        updateIsMarked(item);
     }
 
     /**
      * To update the comment of an item
-     * @param {Student} $student - the student to update
      * @param {StudentItem} item - the item to update
      * @param {StudentItemQuestion} question - the question to update
      * @param {string} comment - the comment to update
      */
-    function updateItemComment($student: Student, item: StudentItem, question: StudentItemQuestion, comment: string) {
-        question.response.comment = comment;
+    function updateItemComment(item: StudentItem, question: StudentItemQuestion, comment: string) {
+        (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
-        const questionsWithoutMaxScore = item.questions.filter(($question) => $question.response.maxScore === null);
+        const questionsWithoutMaxScore = item.questions.filter(
+            ($question) => ($question.response as StudentItemQuestionResponse).maxScore === null
+        );
         questionsWithoutMaxScore.forEach(($question) => {
-            $question.response.isMarked = true;
+            ($question.response as StudentItemQuestionResponse).isMarked = true;
         });
-        updateIsMarked($student, item);
+        updateIsMarked(item);
     }
 
     /**

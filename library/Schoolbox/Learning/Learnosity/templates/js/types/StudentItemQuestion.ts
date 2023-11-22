@@ -10,5 +10,5 @@ export type StudentItemQuestion = {
         sheet_reference: string;
     };
     response_id: string;
-    response: StudentItemQuestionResponse;
+    response?: StudentItemQuestionResponse;
 };

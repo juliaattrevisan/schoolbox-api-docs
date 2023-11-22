@@ -9,6 +9,6 @@ export type Item = {
     reference: string;
     title: string;
     isAttemptComment: boolean;
-    questions: StudentItemQuestion[];
+    questions?: StudentItemQuestion[];
     isMarked?: boolean;
 };

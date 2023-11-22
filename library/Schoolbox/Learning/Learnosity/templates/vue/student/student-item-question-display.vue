@@ -8,6 +8,7 @@ import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
+import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
 
 interface Props {
     student: Student; // the student to display
@@ -18,12 +19,13 @@ interface Props {
 const props = defineProps<Props>();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
-const score = window.Vue.ref<string>(props.question.response.score?.toString() ?? "");
+const score = window.Vue.ref<string>("");
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
 const emit = defineEmits<{
-    updateScore: [question: StudentItemQuestion, score: number];
+    updatingScore: [];
+    updatedScore: [question: StudentItemQuestion, score: number];
 }>();
 
 /**
@@ -49,13 +51,25 @@ const saveContainerHeight = window.Vue.computed(() => {
 });
 
 /**
+ * To notify the user that they're leaving the page while data is being saved
+ * @param {BeforeUnloadEvent} event - the event to prevent
+ */
+function beforeUnloadHandler(event: BeforeUnloadEvent) {
+    event.preventDefault();
+    event.returnValue = "";
+}
+
+/**
  * Save the score if it's changed and valid
  */
 async function saveScore() {
+    if (isSaving.value) {
+        return;
+    }
     if (score.value.toString() === "") {
         return;
     }
-    if (score.value.toString() === props.question.response.score?.toString()) {
+    if (score.value.toString() === (props.question.response as StudentItemQuestionResponse).score?.toString()) {
         return;
     }
     if (Number.isNaN(parseFloat(score.value))) {
@@ -63,14 +77,20 @@ async function saveScore() {
         return;
     }
     isSaving.value = true;
+    emit("updatingScore");
+    window.addEventListener("beforeunload", beforeUnloadHandler);
     const formData = new FormData();
-    formData.append("learnosityReference", props.question.response.learnosityReference);
+    formData.append(
+        "learnosityReference",
+        (props.question.response as StudentItemQuestionResponse).learnosityReference
+    );
     formData.append("score", score.value);
     await fetch(props.student.urls.score, {
         method: "POST",
         body: formData,
     });
-    emit("updateScore", props.question, parseFloat(score.value));
+    emit("updatedScore", props.question, parseFloat(score.value));
+    window.removeEventListener("beforeunload", beforeUnloadHandler);
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
@@ -88,11 +108,17 @@ const debounceSave = debounce(() => {
  * add some quick validation to prevent the score input going below 0 and above the max score and save the score
  */
 window.Vue.watch(score, (newScore) => {
+    // can't go below 0
     if (parseFloat(newScore) < 0) {
         score.value = "0";
         return;
     }
-    if (props.question.response.maxScore && parseFloat(newScore) > props.question.response.maxScore) {
+    // keep it within the max score
+    if (
+        props.question.response &&
+        props.question.response.maxScore &&
+        parseFloat(newScore) > props.question.response.maxScore
+    ) {
         score.value = props.question.response.maxScore.toString();
         return;
     }
@@ -103,10 +129,13 @@ window.Vue.watch(score, (newScore) => {
  * Mve the item response element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
-    const response = props.container.querySelector(
-        `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
-    ) as HTMLDivElement;
-    responsesEl.value?.appendChild(response);
+    if (props.question.response) {
+        const response = props.container.querySelector(
+            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
+        ) as HTMLDivElement;
+        responsesEl.value?.appendChild(response);
+        score.value = props.question.response.score?.toString() ?? "";
+    }
 });
 
 /**
@@ -114,38 +143,45 @@ window.Vue.onMounted(() => {
  * and also update the score in case the user has changed it
  */
 window.Vue.onBeforeUnmount(async () => {
-    const response = responsesEl.value?.querySelector(
-        `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
-    ) as HTMLDivElement;
-    props.container.appendChild(response);
-    await saveScore();
+    if (props.question.response) {
+        const response = responsesEl.value?.querySelector(
+            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
+        ) as HTMLDivElement;
+        props.container.appendChild(response);
+        await saveScore();
+    }
 });
 </script>
 
 <template>
     <div class="l-flex-col l-gap-m l-pad-m--bottom question">
-        <div ref="responsesEl"></div>
-        <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
-            <label>Sample answer</label>
-            <input type="text" :value="question.metadata.sample_answer" readonly />
-        </div>
-        <div v-if="props.question.response.maxScore" class="f-no-margins">
-            <label>Score (max score: {{ props.question.response.maxScore }})</label>
-            <input
-                :id="`customise-score-${props.question.response.learnosityReference}`"
-                ref="scoreEl"
-                v-model="score"
-                type="number"
-                min="0"
-                :max="props.question.response.maxScore"
-            />
-            <div class="save-container l-grid">
-                <div class="save-container__inner-container">
-                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
-                        <em>{{ saveText }}</em>
+        <template v-if="props.question.response">
+            <div ref="responsesEl"></div>
+            <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
+                <label>Sample answer</label>
+                <input type="text" :value="question.metadata.sample_answer" readonly />
+            </div>
+            <div v-if="props.question.response.maxScore" class="f-no-margins">
+                <label>Score (max score: {{ props.question.response.maxScore }})</label>
+                <input
+                    :id="`customise-score-${props.question.response.learnosityReference}`"
+                    ref="scoreEl"
+                    v-model="score"
+                    type="number"
+                    min="0"
+                    :max="props.question.response.maxScore"
+                />
+                <div class="save-container l-grid">
+                    <div class="save-container__inner-container">
+                        <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                            <em>{{ saveText }}</em>
+                        </div>
                     </div>
                 </div>
             </div>
+        </template>
+        <div v-else class="alert-box f-no-margins">
+            This question was not in the quiz when the student attempted the quiz.
         </div>
     </div>
 </template>

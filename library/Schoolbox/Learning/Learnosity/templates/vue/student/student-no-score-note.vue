@@ -10,7 +10,9 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const hasQuestionsWithNoScore = props.item.questions.some((question) => question.response.maxScore === null);
+const hasQuestionsWithNoScore = props.item.questions.some(
+    (question) => question.response && question.response.maxScore === null
+);
 </script>
 
 <template>

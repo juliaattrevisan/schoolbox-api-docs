@@ -10,15 +10,13 @@ import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/Studen
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 
 /**
- * Get the response for a student item question
+ * Get the response for a student item question if available
  * @param {StudentItemQuestionResponse[]} itemResponses - the item responses to get the response from
  * @param {string} responseId - the response id to get the response for
  * @returns {StudentItemQuestionResponse} - the response
  */
 function getItemResponse(itemResponses: StudentItemQuestionResponse[], responseId: string) {
-    return itemResponses.find(
-        (itemResponse) => itemResponse.learnosityReference === responseId
-    ) as StudentItemQuestionResponse;
+    return itemResponses.find((itemResponse) => itemResponse.learnosityReference === responseId);
 }
 
 /**
@@ -50,12 +48,39 @@ export function getAttemptResponse(attemptComments: StudentAttemptComment[], stu
 }
 
 /**
+ * Loop through each question in the item and check for a score to determine if the question is already marked.
+ * If there is no maxScore, we assume that the question is considered marked if the first question contains a comment.
+ * So the first question comment covers isMarked for any questions within the item that don't have a maxScore
+ * @param { StudentItem } item - the item to check
+ */
+export function setInitialQuestionIsMarked(item: StudentItem) {
+    const firstQuestion = item.questions[0];
+    item.questions.forEach((question) => {
+        if (question.response) {
+            const { response } = question;
+            if (response.maxScore === null) {
+                response.isMarked =
+                    (firstQuestion.response as StudentItemQuestionResponse).comment !== undefined &&
+                    (firstQuestion.response as StudentItemQuestionResponse).comment !== null &&
+                    (firstQuestion.response as StudentItemQuestionResponse).comment !== "";
+            } else {
+                response.isMarked = response.score !== null;
+            }
+        }
+    });
+}
+
+/**
  * Whether the item is marked, loop through all questions and check if they are all marked
  * @param {StudentItem} item - the item to check
  * @returns {boolean} - whether the item is marked
  */
 export function getItemIsMarked(item: StudentItem) {
-    return item.questions.every(($question) => $question.response.isMarked);
+    // if any questions don't have a response, then the item is not marked
+    if (item.questions.some(($question) => !$question.response)) {
+        return false;
+    }
+    return item.questions.every(($question) => ($question.response as StudentItemQuestionResponse).isMarked);
 }
 
 /**
@@ -85,7 +110,7 @@ export function getUrls(urls: StudentUrls[], studentId: number) {
 export function getItemScore(item: StudentItem) {
     // loop through all questions and add up the score
     return item.questions.reduce((total, question) => {
-        if (question.response.score) {
+        if (question.response && question.response.score) {
             return total + question.response.score;
         }
         return total;
@@ -100,7 +125,7 @@ export function getItemScore(item: StudentItem) {
 export function getItemMaxScore(item: StudentItem) {
     // loop through all questions and add up the max score
     return item.questions.reduce((total, question) => {
-        if (question.response.maxScore) {
+        if (question.response && question.response.maxScore) {
             return total + question.response.maxScore;
         }
         return total;
@@ -116,7 +141,7 @@ export function getAttemptScore(student: Student) {
     // loop through all student items and questions and add up the score
     return student.items.reduce((totalScoreAcc, item) => {
         const itemScore = item.questions.reduce((itemScoreAcc, question) => {
-            if (question.response.score) {
+            if (question.response && question.response.score) {
                 return itemScoreAcc + question.response.score;
             }
             return itemScoreAcc;
@@ -134,7 +159,7 @@ export function getAttemptMaxScore(student: Student) {
     // loop through all student items and questions and add up the max score
     return student.items.reduce((maxScoreAcc, item) => {
         const itemMaxScore = item.questions.reduce((itemMaxScoreAcc, question) => {
-            if (question.response.maxScore) {
+            if (question.response && question.response.maxScore) {
                 return itemMaxScoreAcc + question.response.maxScore;
             }
             return itemMaxScoreAcc;

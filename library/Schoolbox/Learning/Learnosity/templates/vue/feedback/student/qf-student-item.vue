@@ -11,6 +11,7 @@ import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.
 import StudentNoScoreNote from "@schoolboxLearnosity/vue/student/student-no-score-note.vue";
 import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
 import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
+import { useStore } from "../store/quizFeedbackStore";
 import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
     container: HTMLDivElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
+const store = useStore();
 const studentStore = useStudentStore();
 const itemEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the item into
 
@@ -39,12 +41,20 @@ window.Vue.watch(
 );
 
 /**
+ * Need to prevent moving to another item while the score or comment is being saved
+ */
+function onUpdating() {
+    store.isProcessing = true;
+}
+
+/**
  * To notify of a change in the score
  * @param {StudentItemQuestion} question - the question to update
  * @param {number} score - the score to save
  */
 function onScoreUpdated(question: StudentItemQuestion, score: number) {
-    studentStore.updateItemResponseScore(props.student, props.item, question, score);
+    studentStore.updateItemResponseScore(props.item, question, score);
+    store.isProcessing = false;
 }
 
 /**
@@ -52,7 +62,8 @@ function onScoreUpdated(question: StudentItemQuestion, score: number) {
  * @param {string} comment - the comment to save
  */
 function onCommentUpdated(comment: string) {
-    studentStore.updateItemComment(props.student, props.item, props.item.questions[0], comment);
+    studentStore.updateItemComment(props.item, props.item.questions[0], comment);
+    store.isProcessing = false;
 }
 </script>
 
@@ -73,10 +84,16 @@ function onCommentUpdated(comment: string) {
                 :item="props.item"
                 :question="question"
                 :container="props.container"
-                @update-score="onScoreUpdated"
+                @updating-score="onUpdating"
+                @updated-score="onScoreUpdated"
             />
         </div>
-        <student-item-comment :student="props.student" :item="props.item" @update-comment="onCommentUpdated" />
+        <student-item-comment
+            :student="props.student"
+            :item="props.item"
+            @updating-comment="onUpdating"
+            @updated-comment="onCommentUpdated"
+        />
     </div>
 </template>
 

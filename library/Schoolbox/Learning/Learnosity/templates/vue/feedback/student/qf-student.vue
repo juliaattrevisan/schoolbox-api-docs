@@ -9,14 +9,23 @@ import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
 import QfStudentShowMarked from "./qf-student-show-marked.vue";
 import QfStudentAllMarked from "./qf-student-all-marked.vue";
+import { useStore } from "../store/quizFeedbackStore";
 import { useStudentStore } from "../store/qfStudentStore";
 
 interface Props {
     student: Student; // the student to display
 }
 const props = defineProps<Props>();
+const store = useStore();
 
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
+
+/**
+ * Need to prevent moving to another item while the comment is being saved
+ */
+function onAttemptCommentUpdating() {
+    store.isProcessing = true;
+}
 
 /**
  * To notify of a change in the comment
@@ -24,6 +33,7 @@ const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the el
  */
 function onAttemptCommentUpdated(comment: string) {
     useStudentStore().updateAttemptComment(props.student, comment);
+    store.isProcessing = false;
 }
 </script>
 
@@ -51,7 +61,11 @@ function onAttemptCommentUpdated(comment: string) {
             </div>
             <div class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
-                <student-attempt-comment :student="props.student" @update-comment="onAttemptCommentUpdated" />
+                <student-attempt-comment
+                    :student="props.student"
+                    @updating-comment="onAttemptCommentUpdating"
+                    @updated-comment="onAttemptCommentUpdated"
+                />
             </div>
         </template>
     </div>
