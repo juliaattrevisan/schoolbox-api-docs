@@ -148,7 +148,7 @@ class LegacyQuizBuilder
                     /* This question has busted html
                      * Skip it quietly
                      */
-                    $this->logger->debug(sprintf(
+                    $this->logger->warning(sprintf(
                         'question_id %s has unparseable html - it might be truncated; skipping',
                         $questionRow['question_id']
                     ));
