@@ -91,6 +91,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Number of times to retry association queries
+     */
+    private const NUM_RETRY = 3;
+
+
+    /**
      * Quizzes that have less than LEARNOSITY_MAX_PAYLOAD_SIZE questions in them
      * Learnosity payloads can potentially fit multiple quizzes' data in them
      *
@@ -978,10 +984,14 @@ HELP;
              */
             $endpointStart = microtime(true);
 
-            $this->associateStatement->execute([
-                'learnosityReference' => $association['activityLearnosityReference'],
-                'assessId' => $association['quizId']
-            ]);
+            /* Associate with a retry mechanism
+             */
+            try {
+                $this->associate($association);
+            } catch (\RuntimeException $e) {
+                $this->getLogger()->warning($e->getMessage());
+                continue;
+            }
 
             $endpointEnd = microtime(true);
 
@@ -1005,6 +1015,41 @@ HELP;
 
     /* Misc helpful stuff
      */
+
+    /**
+     * Associate legacy quiz with learnosity quiz, using a retry system
+     * in case our db went away for some reason
+     *
+     * @param array $association
+     * @return void
+     * @throws \RuntimeException
+     */
+    private function associate(array $association): void
+    {
+        $numFails = 0;
+
+        while ($numFails < self::NUM_RETRY) {
+            try {
+                $this->associateStatement->execute([
+                    'learnosityReference' => $association['activityLearnosityReference'],
+                    'assessId' => $association['quizId']
+                ]);
+
+                return;
+            } catch (\PDOException $e) {
+                $this->getLogger()->warning($e->getMessage());
+                $numFails++;
+            }
+        }
+
+        throw new \RuntimeException(sprintf(
+            'Could not associate learnosity quiz %s with legacy quiz %s after %s tries',
+            $association['activityLearnosityReference'],
+            $association['quizId'],
+            $numFails
+        ));
+    }
+
 
     /**
      * Get a set of all schoolbox.assess primary identifiers because
@@ -1106,10 +1151,14 @@ HELP;
                             substr($association['activityLearnosityReference'], 0, 13)
                         ));
 
-                        $this->associateStatement->execute([
-                            'learnosityReference' => $association['activityLearnosityReference'],
-                            'assessId' => $association['quizId']
-                        ]);
+                        /* Associate with a retry mechanism
+                         */
+                        try {
+                            $this->associate($association);
+                        } catch (\RuntimeException $e) {
+                            $this->getLogger()->warning($e->getMessage());
+                            continue;
+                        }
                     }
                 } else {
                     $this->getLogger()->debug(sprintf(
