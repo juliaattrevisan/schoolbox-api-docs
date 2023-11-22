@@ -107,7 +107,7 @@ class InlineImageConverter
             }
         }
 
-        return $dom->saveHTML();
+        return trim($dom->saveHTML());
     }
 
 
