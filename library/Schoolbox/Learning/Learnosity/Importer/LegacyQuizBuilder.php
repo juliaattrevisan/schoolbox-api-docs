@@ -134,6 +134,10 @@ class LegacyQuizBuilder
             while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $questionRow['_answers'] = [];
 
+                /* Clean out any weird whitespace/control chars from the end of this
+                 */
+                $questionRow['question'] = trim((string)$questionRow['question']);
+
                 /* Get each question's answers
                  */
                 $this->answerStatement->execute([
@@ -220,11 +224,15 @@ class LegacyQuizBuilder
                 throw new \RuntimeException('Question is missing serialized answers.');
             }
 
+            /* I don't *think* any serialized values permitted newline chars in
+             * legacy quiz implementation...might need to trim all the serialized
+             * values if you get error 22007 in learnosity land.
+             */
             return unserialize($answer['answer'], [
                 'allowed_classes' => true
             ]);
         }
 
-        return $answer['answer'];
+        return trim((string)$answer['answer']);
     }
 }
