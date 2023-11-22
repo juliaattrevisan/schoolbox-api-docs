@@ -927,6 +927,10 @@ HELP;
             $error = false;
 
             foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+                /* Do all the stuff it used to do to produce a $blueprint
+                 */
+                $this->refreshLock($lock);
+
                 $endpoint = $payloadSequence['endpoint'];
 
                 try {
