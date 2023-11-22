@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Learning\Learnosity\TagFactory;
 
 /**
  * Build an array of payloads that we intend to send to Learnosity
