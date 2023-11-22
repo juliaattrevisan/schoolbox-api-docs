@@ -36,10 +36,14 @@ class InlineImageConverter
 
     /**
      * An arbitrary name for an inline image.
-     *
-     * TODO What should it be called?
      */
-    private const NEW_FILENAME = 'inline image.%s';
+    private const NEW_FILENAME = '%s.%s';
+
+
+    /**
+     * Default filename if an alt/title tag didn't exist
+     */
+    private const DEFAULT_NEW_FILENAME = 'inline image';
 
 
     /**
@@ -84,10 +88,12 @@ class InlineImageConverter
 
                 /* Calculate new filename
                  */
-                $newFilename = sprintf(
-                    self::NEW_FILENAME,
-                    $matches[1]
-                );
+                $newFilename = $this->generateFilename($node);
+
+//                $newFilename = sprintf(
+//                    self::NEW_FILENAME,
+//                    $matches[1]
+//                );
 
                 /* Shank it into storage
                  */
@@ -105,5 +111,29 @@ class InlineImageConverter
         }
 
         return $dom->saveHTML();
+    }
+
+
+    /**
+     * Decide on a filename based on the attributes found in the img node
+     *
+     * @param $node
+     * @return string
+     */
+    private function generateFilename($node): string
+    {
+        /* If there's a meaningful alt attribute, use that
+         * Note that for some reason, alt text might be base64-encoded as well
+         */
+
+        /* If there's a meaningful title, use that
+         * Note that for some reason, title text might be base64-encoded as well
+         * (I haven't seen this yet in the wild though
+         */
+
+        /* Otherwise, just use the default filename for lack of anything better
+         */
+
+        return $filename;
     }
 }
