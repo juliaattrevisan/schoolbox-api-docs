@@ -180,7 +180,7 @@
          # Action Bar at the bottom of each participant's row
          #}
         {% set canFinish  = latestResponse and not latestResponse.submitted %}
-        {% set canPublish = (latestResponse.submitted ?? false) and (not latestFeedback or not latestFeedback.published) %}
+        {% set canPublish = latestResponse and latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
         {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
         {# Hide if no attempts, or attempt has published review #}
@@ -196,7 +196,17 @@
             {% set buttons %}
                 {% if canDelete  %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookup('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
                 {% if canFinish  %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>{% endif %}
-                {% if canPublish and latestResponse and latestResponse.learnosityReference %}<a class="button" data-interaction-review="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: participant.user.id, learnositySessionReference: latestResponse.learnosityReference}) }}">Review Attempt</a>{% endif %}
+
+                {% if canPublish or canFinish %}
+                    <a
+                        {% if not canPublish %}style="display:none"{% endif %}
+                        class="button"
+                        data-interaction-review="{{ latestResponse.id }}"
+                        href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: participant.user.id, learnositySessionReference: latestResponse.learnosityReference}) }}"
+                    >
+                        Review Attempt
+                    </a>
+                {% endif %}
             {% endset %}
         {% endapply %}
 
@@ -278,10 +288,10 @@
                     return 'Mark ' + len + ' Selected as Reviewed';
                 },
                 userList: $participantList,
-                userSelector: '[data-mass-review]',
+                userSelector: ' [data-interaction-review]:not([style*="display:none"])',
                 onSubmit: function (toReview) {
                     let list = toReview.map(function () {
-                        return $(this).closest('li').find('[data-mass-review]').attr('data-mass-review') !== undefined }
+                        return $(this).find('[data-interaction-review]').attr('data-interaction-review') }
                     ).get();
 
                     $.post(
@@ -354,8 +364,20 @@
                     $actionBar.find('[data-interaction-review]').show();
                     $a.hide();
 
-                    // Hide the "In Progress" grade indicator, as it is now inaccurate
-                    $a.closest('li').find(".grade").hide();
+                    // Update status for bulk actions to work
+                    const participantRow = $a.closest('li');
+                    participantRow.attr('data-status', '{{ statusPending }}');
+
+                    // Change "In Progress" grade indicator to "Awaiting Review"
+                    const gradeIndicator = participantRow.find(".grade");
+                    gradeIndicator.removeClass('in-progress').addClass('review');
+                    gradeIndicator.find('span').text('Awaiting Review');
+
+                    // Update status icon and label accordingly
+                    participantRow.find('.meta [data-status-label]').text('{{ labelPending }}');
+                    const statusIcon = participantRow.find('.meta [data-status]');
+                    statusIcon.removeClass('{{ statusIncomplete }}').addClass('{{ statusPending }}');
+                    statusIcon.attr('title', '{{ labelPending }}');
                 });
             });
         });
