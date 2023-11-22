@@ -75,7 +75,7 @@ function onCommentUpdated(comment: string) {
             :is-shown="true"
             :show-title="true"
         />
-        <student-no-score-note :item="props.item" />
+        <student-no-score-note v-if="!store.isReadOnly" :item="props.item" />
         <div class="item-questions l-flex-col l-gap-l">
             <student-item-question-display
                 v-for="question in props.item.questions"
