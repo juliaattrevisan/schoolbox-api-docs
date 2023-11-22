@@ -16,6 +16,7 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
 use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
+use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
@@ -442,7 +443,11 @@ HELP;
 
         /* Used to manufacture an array containing all the legacy quiz's contents
          */
-        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal(), $this->getLogger());
+        $legacyQuizBuilder = new LegacyQuizBuilder(
+            $this->getDatabaseInternal(),
+            new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance()),
+            $this->getLogger()
+        );
 
         /* Generates sets of tags for Activities' and Items' assignations
          */

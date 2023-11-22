@@ -84,10 +84,14 @@ class LegacyQuizBuilder
      * ideally you only need to instantiate this once
      *
      * @param IConnector $db
+     * @param InlineImageConverter $inlineImageConverter
      * @param LoggerInterface $logger
      */
-    public function __construct(IConnector $db, private LoggerInterface $logger)
-    {
+    public function __construct(
+        IConnector                   $db,
+        private InlineImageConverter $inlineImageConverter,
+        private LoggerInterface      $logger
+    ) {
         $this->quizStatement = $db->prepare(self::QUERY_QUIZ);
         $this->sectionsStatement = $db->prepare(self::QUERY_SECTION);
         $this->questionStatement = $db->prepare(self::QUERY_QUESTION);
@@ -102,6 +106,7 @@ class LegacyQuizBuilder
      *
      * @param int $assessId
      * @return array
+     * @throws \DOMException
      * @throws \JsonException
      * @throws \PDOException
      */
@@ -134,9 +139,10 @@ class LegacyQuizBuilder
             while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $questionRow['_answers'] = [];
 
-                /* Clean out any weird whitespace/control chars from the end of this
+                /* Clean out any weird whitespace/control chars from the end of this,
+                 * and convert base64 inline images to storage files
                  */
-                $questionRow['question'] = trim((string)$questionRow['question']);
+                $questionRow['question'] = $this->inlineImageConverter->convert($questionRow['question']);
 
                 /* Get each question's answers
                  */
