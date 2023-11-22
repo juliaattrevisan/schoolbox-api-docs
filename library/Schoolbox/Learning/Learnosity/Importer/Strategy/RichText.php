@@ -36,9 +36,13 @@ class RichText extends Base implements IStrategy
     public function convert(array $question): array
     {
         return [
-            /* Apparently the upper limit is 100,000
+            /* Apparently the upper limit is 100,000 chars which
+             * somehow equates to 10,000 words
+             *
+             * https://reference.learnosity.com/questions-api/questiontypes#longtextV2
+             * "Maximum number of words that can be entered in the field. Maximum: 100,000 chars ~ 10,000 words"
              */
-            'max_length' => 99999,
+            'max_length' => 10000,
             'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
