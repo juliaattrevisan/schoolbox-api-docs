@@ -85,15 +85,11 @@ class InlineImageConverter
              */
             if ($isInline) {
                 $imageData = base64_decode($matches[2]);
+                $extension = $matches[1];
 
                 /* Calculate new filename
                  */
-                $newFilename = $this->generateFilename($node);
-
-//                $newFilename = sprintf(
-//                    self::NEW_FILENAME,
-//                    $matches[1]
-//                );
+                $newFilename = $this->generateFilename($node, $extension);
 
                 /* Shank it into storage
                  */
@@ -105,6 +101,7 @@ class InlineImageConverter
 
                 $replacement = $dom->createElement('img');
                 $replacement->setAttribute('src', $newSrc);
+                $replacement->setAttribute('alt', $storage->getFilename());
 
                 $node->parentNode->replaceChild($replacement, $node);
             }
@@ -118,30 +115,31 @@ class InlineImageConverter
      * Decide on a filename based on the attributes found in the img node
      *
      * @param \DOMElement $node
+     * @param string $extension
      * @return string
      */
-    private function generateFilename(\DOMElement $node): string
+    private function generateFilename(\DOMElement $node, string $extension): string
     {
         /* If there's a meaningful alt attribute, use that
          * Note that for some reason, alt text might be encoded as well
          * Not sure what kind of encoding it is, but it's not base64
          */
-        $alt = $node->getAttribute('alt');
+        $alt = trim($node->getAttribute('alt'));
 
-        $decodedAlt = base64_decode($alt);
-
-        new \Alaress_Probe($alt, $decodedAlt);
-
-        /* If there's a meaningful title, use that
-         * Note that for some reason, title text might be base64-encoded as well
-         * Not sure what kind of encoding it is, but it's not base64
-         *
-         * (I haven't seen this yet in the wild though)
-         */
+        if ('' !== $alt) {
+            return sprintf(
+                self::NEW_FILENAME,
+                $alt,
+                $extension
+            );
+        }
 
         /* Otherwise, just use the default filename for lack of anything better
          */
-
-        return $filename;
+        return sprintf(
+            self::NEW_FILENAME,
+            self::DEFAULT_NEW_FILENAME,
+            $extension
+        );
     }
 }
