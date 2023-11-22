@@ -726,19 +726,28 @@ HELP;
             $n = \count($legacyQuizIds);
 
             foreach ($legacyQuizIds as $legacyQuizId) {
-                /* Do all the stuff it used to do to produce a $blueprint
-                 */
                 $this->refreshLock($lock);
+
+                /* Preincrement for this loop
+                 */
+                ++$i;
 
                 /* Get the legacy quiz's contents
                  */
+                $this->getLogger()->info(sprintf(
+                    '%s/%s Precompiling legacy quiz (assess_id: %s)...',
+                    $i,
+                    $n,
+                    $legacyQuizId
+                ));
+
                 $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
 
                 /* Announce what we're doing
                  */
                 $this->getLogger()->info(sprintf(
                     '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                    ++$i,
+                    $i,
                     $n,
                     $legacyQuiz['title'],
                     $legacyQuiz['assessment_id'],
@@ -877,15 +886,26 @@ HELP;
         foreach ($legacyQuizIds as $legacyQuizId) {
             $this->refreshLock($lock);
 
+            /* Preincrement for this loop
+             */
+            ++$i;
+
             /* Get the legacy quiz's contents
              */
+            $this->getLogger()->info(sprintf(
+                '%s/%s Precompiling legacy quiz (assess_id: %s)...',
+                $i,
+                $n,
+                $legacyQuizId
+            ));
+
             $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
 
             /* Announce what we're doing
              */
             $this->getLogger()->info(sprintf(
                 '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                ++$i,
+                $i,
                 $n,
                 $legacyQuiz['title'],
                 $legacyQuiz['assessment_id'],
