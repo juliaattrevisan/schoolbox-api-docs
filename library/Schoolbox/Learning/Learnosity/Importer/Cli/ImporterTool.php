@@ -734,7 +734,7 @@ HELP;
 
                 /* Get the legacy quiz's contents
                  */
-                $this->getLogger()->info(sprintf(
+                $this->getLogger()->debug(sprintf(
                     '%s/%s Precompiling legacy quiz (assess_id: %s)...',
                     $i,
                     $n,
@@ -892,7 +892,7 @@ HELP;
 
             /* Get the legacy quiz's contents
              */
-            $this->getLogger()->info(sprintf(
+            $this->getLogger()->debug(sprintf(
                 '%s/%s Precompiling legacy quiz (assess_id: %s)...',
                 $i,
                 $n,
