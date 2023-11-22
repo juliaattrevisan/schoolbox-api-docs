@@ -42,7 +42,7 @@ window.Vue.onMounted(async () => {
 <template>
     <div class="l-flex-col l-gap-m">
         <qf-student :student="studentStore.student" />
-        <qf-finalise-review v-if="studentStore.student.isReportLoaded" />
+        <qf-finalise-review v-if="!props.isReadOnly && studentStore.student.isReportLoaded" />
     </div>
 </template>
 
