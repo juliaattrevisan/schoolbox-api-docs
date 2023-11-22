@@ -35,7 +35,7 @@ class ImporterTool extends CliTool\App
      * Decide how long this should be based on your usage
      * You might have to adjust it, but it should cover the cost of an iteration
      */
-    private const LOCK_TTL = 60;
+    private const LOCK_TTL = 180;
 
 
     /**
