@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Lumberjack\Logger;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
 use Schoolbox\User;
@@ -80,10 +81,11 @@ class ActionValidator
     /**
      * Returns whether the specified user is permitted to attempt the quiz.
      *
-     * @param User       $user
+     * @param User $user
      * @param Quiz\Model $quiz
      * @param IConfigLoader|null $config
      * @return bool
+     * @throws Exception
      */
     public function canAttemptQuiz(User $user, Quiz\Model $quiz, IConfigLoader $config = null): bool
     {
