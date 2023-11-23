@@ -8,7 +8,7 @@
         {% if attempt.finish %}
             Submitted <time>{{ attempt.finish.relativeDayWithoutMidnight }}</time>
         {% else %}
-            <em>Attempt in progress</em>
+            <em>Attempt in progress - started <time>{{ attempt.start.relativeDayWithoutMidnight }}</time></em>
         {% endif %}
         {% endapply %}</li>
 
