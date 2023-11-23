@@ -17,6 +17,9 @@
 <div class="row">
     <div id="student-review-container" class="small-12 island">
         <h1>{{ assessment.title }}</h1>
+        {% include '@learnosity/meta.twig' with {
+            attempt: attempt
+        } only %}
 
         <h2 class="subheader">Student Review</h2>
         <section class="content">
