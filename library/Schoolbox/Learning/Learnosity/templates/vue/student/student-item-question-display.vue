@@ -174,6 +174,7 @@ window.Vue.onBeforeUnmount(async () => {
                     type="number"
                     min="0"
                     :max="props.question.response.maxScore"
+                    :readonly="props.isReadOnly"
                 />
                 <div class="save-container l-grid">
                     <div class="save-container__inner-container">
