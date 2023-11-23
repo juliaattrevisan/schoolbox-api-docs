@@ -826,10 +826,10 @@ class Controller extends Base
             'reports' => [
                 [
                     /* DOM element id, where this goes in
-                         *
-                         * It's configurable by us, unlike the other anchors for
-                         * Author and Items api
-                         */
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
                     'id' => 'schoolbox-student',
                     'type' => 'session-detail-by-item',
                     'session_id' => $attempt->getLearnosityReference(),
