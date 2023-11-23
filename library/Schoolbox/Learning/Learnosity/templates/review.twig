@@ -26,9 +26,11 @@
             <div id="schoolbox-student"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
         </section>
 
-        <section class="content">
-            <div id="schoolbox-completion-summary"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
-        </section>
+        {% if attempt.finish %}
+            <section class="content">
+                <div id="schoolbox-completion-summary"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
+            </section>
+        {% endif %}
 
         {% if attempt.reviewed and attempt.comment|length %}
         <div id="overall-comment-container" style="display:none">
