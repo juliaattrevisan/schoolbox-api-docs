@@ -1970,3 +1970,11 @@ td.lrn-report-area::first-letter {
 .lrn.lrn-assess .app-panel.review-screen .panel-header > h2:focus {
     outline: unset;
 }
+
+/* Hid the border of the place holder for correct answer in the Image annotation upload question */
+.lrn-qe .lrn-qe-ui .lrn-qe-image-validation-areas-no-image .lrn-qe-image-validation-areas-message {
+    border-top: unset;
+    border-right: unset;
+    border-left: unset;
+    border-bottom: 1px solid #ccc;
+}
