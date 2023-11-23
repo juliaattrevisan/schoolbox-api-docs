@@ -173,8 +173,9 @@ class LegacyQuizBuilder
                      * Skip it quietly
                      */
                     $this->logger->debug(sprintf(
-                        'question_id %s missing serialized answers; skipping',
-                        $questionRow['question_id']
+                        'question_id %s not decompilable (%s); skipping',
+                        $questionRow['question_id'],
+                        $e->getMessage(),
                     ));
 
                     continue;
@@ -246,9 +247,22 @@ class LegacyQuizBuilder
              * legacy quiz implementation...might need to trim all the serialized
              * values if you get error 22007 in learnosity land.
              */
-            return unserialize($answer['answer'], [
+            $decompiledAnswer = unserialize($answer['answer'], [
                 'allowed_classes' => true
             ]);
+
+            // Some busted data may deserialize as null or false, or another
+            // non-iterable value: skip those questions as well
+            if (!isset($decompiledAnswer)) {
+                throw new \RuntimeException('Question\'s answer deserialized to null.');
+            }
+            if ($decompiledAnswer === false) {
+                throw new \RuntimeException('Question\'s answer deserialized to false.');
+            }
+            if (!is_iterable($decompiledAnswer)) {
+                throw new \RuntimeException('Question\'s answer deserialized to a non-iterable value.');
+            }
+            return $decompiledAnswer;
         }
 
         return trim((string)$answer['answer']);
