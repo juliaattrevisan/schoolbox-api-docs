@@ -1939,3 +1939,8 @@ td.lrn-report-area::first-letter {
     font-weight: 400;
     min-height: 2.5rem !important;
 }
+
+/* fixed the color picker container */
+.lrn-qe .lrn-qe-ui .lrn-qe-color-picker .lrn-color-picker {
+    border: none;
+}
