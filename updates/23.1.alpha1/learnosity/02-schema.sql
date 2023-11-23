@@ -69,10 +69,17 @@ ALTER TABLE `assess_attempt`
 UPDATE assess_attempt
     SET _mark = mark;
 
--- represent norm_mark for old attempts
+-- represent norm_mark for old attempts:
+-- ensure that it's between 0 and 100
 UPDATE assess_attempt
 INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
-SET norm_mark = FORMAT(100 * mark / max_mark, 11)
+SET norm_mark = FORMAT(
+    GREATEST(
+        0,
+        LEAST(100, 100 * mark / max_mark)
+    ),
+    11
+)
 WHERE assess.availability = 'assess';
 
 -- change data type
