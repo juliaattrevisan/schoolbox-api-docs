@@ -21,6 +21,7 @@ interface AllResults {
 
 const isFocused = window.Vue.ref(false);
 const isActive = window.Vue.ref(false); // If the search input is active, to add the active styles
+const isSelected = window.Vue.ref(false); // If the search input is selected
 const keyword = window.Vue.ref("");
 const results = window.Vue.ref<Result[]>([]);
 const isOpen = window.Vue.ref(false);
@@ -109,6 +110,7 @@ function onEnter() {
  * Submit the form, heading to the search page
  */
 function onClicked() {
+    console.warn("onClicked");
     if (keyword.value.length === 0) {
         window.location.href = "/search";
     } else {
@@ -122,6 +124,7 @@ function onClicked() {
 function onClickOutside() {
     isFocused.value = false;
     isActive.value = false;
+    isSelected.value = false;
 }
 
 /**
@@ -129,6 +132,7 @@ function onClickOutside() {
  */
 function onFocusOver() {
     isFocused.value = true;
+    isSelected.value = true;
 }
 
 /**
@@ -187,6 +191,21 @@ function formatPortrait(id: string) {
     return `${paths.portrait}${id}&size=square64`;
 }
 
+/**
+ * The search button href, if the keyword is empty, go to the search page
+ * @returns {string} - The href
+ */
+const searchButtonHref = window.Vue.computed(() => {
+    if (keyword.value.length === 0) {
+        return "/search";
+    }
+    return `${paths.searchPage}${keyword.value}`;
+});
+
+/**
+ * The search button text, if the keyword is empty, display 'Advanced Search'
+ * @returns {string} - The text
+ */
 const searchButtonText = window.Vue.computed(() => {
     if (keyword.value.length === 0) {
         return "Advanced Search";
@@ -206,6 +225,7 @@ const searchButtonText = window.Vue.computed(() => {
     >
         <search-input
             :is-active-when-empty="false"
+            :is-selected="isSelected"
             @input="onInput"
             @key-down="onArrowDown"
             @key-up="onArrowUp"
@@ -255,8 +275,8 @@ const searchButtonText = window.Vue.computed(() => {
                     View all {{ totalCount }} users
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="l-flex-row l-gap-s">
-                        <div class="c-img c-img--round">
+                    <div class="l-flex-row l-gap-s l-pad-s">
+                        <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>
                             </div>
@@ -272,7 +292,7 @@ const searchButtonText = window.Vue.computed(() => {
                 </div>
             </div>
             <div class="l-flex-col">
-                <a class="button f-no-margins t-lh--normal icon-search" :href="`/search?keyword=${keyword}`">
+                <a class="button f-no-margins t-lh--normal icon-search" :href="searchButtonHref">
                     {{ searchButtonText }}
                 </a>
             </div>

@@ -10,6 +10,7 @@
 interface Props {
     initialInput?: string; // to prefill the input
     isActiveWhenEmpty?: boolean; // can be selected while the input is empty
+    isSelected?: boolean; // to enable selecting the search page when the input is empty
 }
 const props = withDefaults(defineProps<Props>(), {
     initialInput: "",
@@ -74,7 +75,7 @@ function onClicked() {
         emit("click");
         return;
     }
-    if (hasInputFocus.value) {
+    if (props.isSelected && hasInputFocus.value) {
         emit("click");
         return;
     }
