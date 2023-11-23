@@ -73,7 +73,7 @@ async function saveScore() {
     if (score.value.toString() === "") {
         return;
     }
-    if (score.value.toString() === (props.question.response as StudentItemQuestionResponse).score?.toString()) {
+    if (score.value.toString() === props.question.response?.score?.toString()) {
         return;
     }
     if (Number.isNaN(parseFloat(score.value))) {

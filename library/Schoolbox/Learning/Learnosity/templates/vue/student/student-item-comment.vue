@@ -21,7 +21,7 @@ const props = defineProps<Props>();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
 const comment = props.isReadOnly
     ? window.Vue.ref("")
-    : useEditor(props.item.questions[0].response.comment ?? "", editorId, {
+    : useEditor(props.item.questions[0].response?.comment ?? "", editorId, {
           targetElements: [`#${editorId}`],
           hasTokens: true,
       }); // Use a ckeditor for the comments field
@@ -129,15 +129,15 @@ window.Vue.onUnmounted(async () => {
         <label>Comment</label>
         <p
             v-if="
-                (props.isReadOnly && props.item.questions[0].response.comment === undefined) ||
-                (props.isReadOnly && props.item.questions[0].response.comment === '')
+                (props.isReadOnly && props.item.questions[0].response?.comment === undefined) ||
+                (props.isReadOnly && props.item.questions[0].response?.comment === '')
             "
         >
             <em>No comment added.</em>
         </p>
         <div
-            v-else-if="props.isReadOnly && props.item.questions[0].response.comment !== ''"
-            v-html="props.item.questions[0].response.comment"
+            v-else-if="props.isReadOnly && props.item.questions[0].response?.comment !== ''"
+            v-html="props.item.questions[0].response?.comment"
         ></div>
         <template v-else>
             <p class="meta">
