@@ -50,6 +50,13 @@ class InlineImageConverter
 
 
     /**
+     * Content type prefix: required for forcing the DOM parser to recognise
+     * the HTML to convert as UTF-8 encoded.
+     */
+    private const META_CONTENT_TYPE_PREFIX = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+
+
+    /**
      * Constructor.
      *
      * @param Mapper $storageMapper
@@ -74,7 +81,7 @@ class InlineImageConverter
         $dom = new \DOMDocument();
 
         try {
-            $dom->loadHTML($html);
+            $dom->loadHTML(self::META_CONTENT_TYPE_PREFIX . $html);
         } catch (\ErrorException $e) {
             /* Could not parse document; it's been truncated due to maximum length somewhere in our db.
              * It's literally half an html...I guess we have to skip it for now?
