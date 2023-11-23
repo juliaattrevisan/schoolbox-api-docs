@@ -116,7 +116,7 @@ window.Vue.watch(score, (newScore) => {
     // keep it within the max score
     if (
         props.question.response &&
-        props.question.response.maxScore &&
+        props.question.response?.maxScore &&
         parseFloat(newScore) > props.question.response.maxScore
     ) {
         score.value = props.question.response.maxScore.toString();
@@ -161,7 +161,7 @@ window.Vue.onBeforeUnmount(async () => {
                 <label>Sample answer</label>
                 <input type="text" :value="question.metadata.sample_answer" readonly />
             </div>
-            <div v-if="props.question.response.maxScore" class="f-no-margins">
+            <div v-if="props.question.response?.maxScore" class="f-no-margins">
                 <label>Score (max score: {{ props.question.response.maxScore }})</label>
                 <input
                     :id="`customise-score-${props.question.response.learnosityReference}`"

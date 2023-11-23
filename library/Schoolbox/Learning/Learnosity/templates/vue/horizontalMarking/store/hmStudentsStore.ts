@@ -182,7 +182,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(
-            ($question) => ($question.response as StudentItemQuestionResponse).maxScore === null
+            ($question) => ($question.response as StudentItemQuestionResponse)?.maxScore === null
         );
         questionsWithoutMaxScore.forEach(($question) => {
             ($question.response as StudentItemQuestionResponse).isMarked = true;
