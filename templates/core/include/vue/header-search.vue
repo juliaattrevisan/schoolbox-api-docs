@@ -35,7 +35,8 @@ const paths = {
     portrait: "/portrait.php?id=",
     searchEndpoint: "/user/search?keyword=",
     userPage: "/search/user/",
-    searchPage: "/search?keyword=",
+    searchPage: "/search",
+    searchPageWithKeyword: "/search?keyword=",
 };
 
 /**
@@ -110,9 +111,8 @@ function onEnter() {
  * Submit the form, heading to the search page
  */
 function onClicked() {
-    console.warn("onClicked");
     if (keyword.value.length === 0) {
-        window.location.href = "/search";
+        window.location.href = paths.searchPage;
     } else {
         (formElement.value as HTMLFormElement).submit();
     }
@@ -197,9 +197,9 @@ function formatPortrait(id: string) {
  */
 const searchButtonHref = window.Vue.computed(() => {
     if (keyword.value.length === 0) {
-        return "/search";
+        return paths.searchPage;
     }
-    return `${paths.searchPage}${keyword.value}`;
+    return `${paths.searchPageWithKeyword}${keyword.value}`;
 });
 
 /**
@@ -270,7 +270,7 @@ const searchButtonText = window.Vue.computed(() => {
                 <a
                     v-if="results.length && totalCount > results.length"
                     class="c-card c-card--link c-card--active"
-                    :href="`${paths.searchPage}${keyword}#user`"
+                    :href="`${paths.searchPageWithKeyword}${keyword}#user`"
                 >
                     View all {{ totalCount }} users
                 </a>
