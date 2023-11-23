@@ -153,7 +153,7 @@ function onMouseOver() {
         offCanvasWrap.classList.remove("move-right");
     }
     /**
-     * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
+     * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible every time
      * the user does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the
      * search-is-active class
      *
@@ -245,7 +245,7 @@ function formatPortrait(id: string) {
                     class="c-card c-card--link c-card--active"
                     :href="`${paths.searchPage}${keyword}#user`"
                 >
-                    <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
+                    View all {{ totalCount }} users
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
                     <div class="l-flex-row l-gap-s">
@@ -261,11 +261,11 @@ function formatPortrait(id: string) {
                     </div>
                 </div>
                 <template v-if="!isLoading && !results.length">
-                    <div class="c-card">
-                        <span class="meta">No users were found matching "{{ keyword }}"</span>
+                    <div class="c-card l-pad-s">
+                        <em>No users were found matching "{{ keyword }}"</em>
                     </div>
-                    <a class="c-card c-card--link c-card--active" :href="`${paths.searchPage}${keyword}#all`">
-                        <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
+                    <a class="button f-no-margins t-lh--normal" :href="`/search?keyword=${keyword}`">
+                        Search everything for "{{ keyword }}"
                     </a>
                 </template>
             </div>
