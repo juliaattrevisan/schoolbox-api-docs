@@ -63,7 +63,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             hasReport: false,
             items: [],
             attemptComment: $attemptComment,
-            urls: $urls !== undefined ? $urls : undefined,
+            urls: $urls === undefined ? undefined : $urls,
             showMarked: true,
         };
         itemResponses.value = $itemResponses;

@@ -130,7 +130,7 @@ window.Vue.watch(score, (newScore) => {
 });
 
 /**
- * Mve the item response element from the entire quiz response into our own container
+ * Move the item response element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
     if (props.question.response) {
