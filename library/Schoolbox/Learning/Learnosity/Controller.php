@@ -761,6 +761,20 @@ class Controller extends Base
     }
 
     /**
+     * Retrieve the comment for this attempt
+     * @param Model $attempt
+     * @return array
+     */
+    private function getAttemptComment(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    {
+        return  [
+            'learnosityReference' => $attempt->getLearnosityReference(),
+            'studentId' => $attempt->getUser()->getId(),
+            'comment' => $attempt->getComment()
+        ];
+    }
+
+    /**
      * From a student's perspective,
      * show some in-depth stats about your attempt
      *
@@ -826,14 +840,6 @@ class Controller extends Base
             ],
         ];
 
-        /* Retrieve the comment for this attempt
-        */
-        $attemptComment = [
-            'learnosityReference' => $attempt->getLearnosityReference(),
-            'studentId' => $attempt->getUser()->getId(),
-            'comment' => $attempt->getComment()
-        ];
-
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser());
@@ -871,7 +877,7 @@ class Controller extends Base
             'attempt' => $attempt,
             'lastViews' => $lastView->getTwigViews($assessment, $student, $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
             'itemResponses' => $this->getItemResponses($attempt),
-            'attemptComment' => $attemptComment,
+            'attemptComment' => $this->getAttemptComment($attempt),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
@@ -943,14 +949,6 @@ class Controller extends Base
             'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
         ];
 
-        /* Retrieve the comment for this attempt
-        */
-        $attemptComment = [
-            'learnosityReference' => $attempt->getLearnosityReference(),
-            'studentId' => $attempt->getUser()->getId(),
-            'comment' => $attempt->getComment()
-        ];
-
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'student' => $this->getStudentData($attempt),
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
@@ -958,7 +956,7 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'attempt' => $attempt,
             'itemResponses' => $this->getItemResponses($attempt),
-            'attemptComment' => $attemptComment,
+            'attemptComment' => $this->getAttemptComment($attempt),
             'urls' => $urls
         ], sprintf(
             'Feedback for %s in %s',
