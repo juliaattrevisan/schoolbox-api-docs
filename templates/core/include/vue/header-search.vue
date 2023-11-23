@@ -236,7 +236,7 @@ const searchButtonText = window.Vue.computed(() => {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isFocused" class="c-header-search__results">
+        <div v-show="isSelected" class="c-header-search__results">
             <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
                     <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
