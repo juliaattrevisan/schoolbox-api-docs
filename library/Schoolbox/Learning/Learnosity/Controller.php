@@ -752,6 +752,17 @@ class Controller extends Base
         /* If a teacher reviewed the attempt, show their feedback information
          * Otherwise just show what the student did.
          */
+
+        /* The student who did the attempt
+        */
+        $studentData = [
+            'id' => $attempt->getUser()->getId(),
+            'name' => $attempt->getUser()->getFullName(),
+            'firstname' => $attempt->getUser()->getFirstname(),
+            'lastname' => $attempt->getUser()->getLastname(),
+            'elementId' => 'schoolbox-student'
+        ];
+
         if (null !== $attempt->getReviewed()) {
             $payload['reports'][] = [
                 /* DOM element id, where this goes in
@@ -790,6 +801,43 @@ class Controller extends Base
             $comments = [];
         }
 
+        /* These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+
+        foreach ($responses as $response) {
+            $learnosityReference = $response['response_id'];
+
+            $scores[$learnosityReference] = [
+                'learnosityReference' => $learnosityReference,
+                'score' => $response['score'],
+                'maxScore' => $response['max_score'],
+                'itemReference' => $response['item_reference']
+            ];
+        }
+
+        /* Find all the comments for this attempt
+         */
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+
+        /* Retrieve the comment for this attempt
+        */
+        $attemptComment = [
+            'learnosityReference' => $attempt->getLearnosityReference(),
+            'studentId' => $attempt->getUser()->getId(),
+            'comment' => $attempt->getComment()
+        ];
+
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser());
@@ -820,11 +868,14 @@ class Controller extends Base
             ]);
 
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
+            'student' => $studentData,
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
-            'initOptions' => $this->api->initOptions('reports', $payload),
+            'reportInitOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
-            'comments' => $comments ? base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)) : null,
+            'lastViews' => $lastView->getTwigViews($assessment, $student, $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
+            'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
+            'attemptComment' => $attemptComment,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
@@ -949,7 +1000,6 @@ class Controller extends Base
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
-            'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
             'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
             'attemptComment' => $attemptComment,
@@ -1783,7 +1833,7 @@ class Controller extends Base
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
-            // including failure
+                // including failure
             default => 400,
         };
         $this->response = $this

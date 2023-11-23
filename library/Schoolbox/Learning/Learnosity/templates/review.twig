@@ -1,11 +1,13 @@
 {##
  # Student reviews their attempt, with teacher feedback if such exists
  #
+ # @param object student                   The student's data
+ # @param string|array $reportInitOptions  Learnosity API initialisation object
  # @param IAssessable $assessment          Our schoolbgox quiz instance
  # @param array $breadcrumbs               A context trail at the top of the screeen
- # @param string|array $initOptions        Learnosity API initialisation object
  # @param Attempt\Model $attempt           The student's attempt from our local db
- # @param array $comments                  A list of comment tuples that contain per-question comments
+ # @param string $itemResponses            A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
+ # @param string $attemptComment           The overall comment for the attempt
  # @param string $returnUrl                A redirect destination we remembered from some previous place
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -14,101 +16,20 @@
 <script src="https://reports-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 
-<div class="row">
-    <div id="student-review-container" class="small-12 island">
-        <h1>{{ assessment.title }}</h1>
-        {% include '@learnosity/meta.twig' with {
-            attempt: attempt
-        } only %}
-
-        <h2 class="subheader">Student Review</h2>
-        {% if attempt.finish %}
-            <section class="content">
-                <div id="schoolbox-completion-summary"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
-            </section>
-        {% endif %}
-
-        <section class="content">
-            <div id="schoolbox-student"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
-        </section>
-
-        {% if attempt.reviewed and attempt.comment|length %}
-        <div id="overall-comment-container" style="display:none">
-            <h2 class="subheader">Overall comments from {{ attempt.reviewer.fullname }}</h2>
-            <section class="content">
-                <article>{{ attempt.comment|purify }}</article>
-            </section>
-        </div>
-        {% endif %}
+<div class="l-flex-col l-gap-l l-pad-m f-no-margins">
+    <h1>Feedback for {{ assessment.title }}</h1>
+    {% include '@learnosity/meta.twig' with {
+        attempt: attempt,
+        lastViews: lastViews
+    } only %}
+    <div id="quiz-feedback-container">
+        <quiz-feedback
+            :student="{{ student|json_encode }}"
+            :report-init-options="{{ reportInitOptions }}"
+            :item-responses="{{ itemResponses|json_encode }}"
+            :attempt-comment="{{ attemptComment|json_encode }}"
+            :is-read-only="true"
+        />
     </div>
 </div>
-
-{% autoescape 'js' %}
-<script>
-    {# Show a different report style if feedback was given
-     # This uses a whole different payload compared to the
-     # one where there was no feedback
-     #}
-    {% if attempt.reviewed %}
-        let attemptComments = JSON.parse(atob('{{ comments|raw }}'));
-
-        let reportCallback = {
-            readyListener: function() {
-                let attemptReport = reportsApp.getReport('schoolbox-student');
-
-                /* itemsApi only spawns if you used session-detail-by-item
-                 */
-                attemptReport.on('ready:itemsApi', function(itemsApp) {
-                    window.itemsApp = itemsApp;
-
-                    itemsApp.getQuestions(function(questions) {
-                        $.each(questions, function(index, element) {
-                            /* Access different parts of the dom directly, to place
-                             * our input fields etc.
-                             */
-                            let learnosityReference = element.metadata.sheet_reference;
-                            let learnosityReferenceTuple = element.response_id;
-
-                            /* Containers into which we inject things
-                             */
-                            let container = $('[data-reference="' + learnosityReference + '"]');
-
-                            container.append('' +
-                                '<div class="alert-box highlight">' +
-                                    '<article>' + attemptComments[learnosityReferenceTuple] + '</article>' +
-                                '</div>' +
-                            '');
-                        });
-                    });
-
-                    /* Show container when ready
-                     */
-                    document.getElementById('overall-comment-container').style.display = '';
-                });
-            },
-            /* Log errors to console and to screen for users
-             */
-            errorListener: function(error) {
-                let errorElement = document.createElement('div');
-                errorElement.classList.add('alert-box', 'warning');
-                errorElement.innerHTML = '<p>There was a problem loading this attempt.</p>';
-                errorElement.innerHTML += '<p>' + error.code + ' ' + error.msg + '</p>';
-
-                document.getElementById('schoolbox-student').replaceWith(errorElement);
-                document.getElementById('student-review-container').classList.remove('island');
-                document.getElementById('student-review-container').classList.add('columns');
-
-                console.log(error);
-            }
-        }
-
-        let reportsApp = LearnosityReports.init(
-            {{ initOptions | raw }}, reportCallback
-        );
-    {% else %}
-        let reportsApp = LearnosityReports.init(
-            {{ initOptions | raw }}
-        );
-    {% endif %}
-</script>
-{% endautoescape %}
+<script src="{{ CDN_PREFIX }}/js/bundle/quizFeedback.js?v={{ config.site_version }}"></script>
