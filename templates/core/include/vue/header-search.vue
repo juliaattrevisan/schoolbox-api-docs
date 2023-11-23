@@ -109,7 +109,11 @@ function onEnter() {
  * Submit the form, heading to the search page
  */
 function onClicked() {
-    (formElement.value as HTMLFormElement).submit();
+    if (keyword.value.length === 0) {
+        window.location.href = "/search";
+    } else {
+        (formElement.value as HTMLFormElement).submit();
+    }
 }
 
 /**

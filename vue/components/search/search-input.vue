@@ -33,7 +33,7 @@ const inputElement = window.Vue.ref<HTMLInputElement | null>(null);
 const hasInputFocus = window.Vue.ref(false);
 
 /**
- * Input updated, update internaly and dispatch emit
+ * Input updated, update internally and dispatch emit
  * @param {Event} event - The event object
  */
 function onInput(event: Event) {
