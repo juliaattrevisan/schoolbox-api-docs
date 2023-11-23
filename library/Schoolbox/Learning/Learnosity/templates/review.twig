@@ -21,6 +21,11 @@
         attempt: attempt,
         lastViews: lastViews
     } only %}
+    {% if attempt.reviewed == false %}
+    <div class="alert-box warning f-no-margins">
+        This attempt has not yet been reviewed by a teacher so the mark is unconfirmed and may change following review.
+    </div>
+    {% endif %}
     <div id="quiz-feedback-container">
         <quiz-feedback
             :student="{{ student|json_encode }}"
