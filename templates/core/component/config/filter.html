@@ -1,4 +1,4 @@
-<ul class="c-chips l-gap-xs">
+<ul class="c-chips l-gap-xs" id="component{COMPONENT_INSTANCE_ID}-filter-chips-container">
     <!-- BEGIN filters -->
     <li>
         <input type="hidden" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="0" />
@@ -9,3 +9,17 @@
     </li>
     <!-- END filters -->
 </ul>
+
+<script>
+    // Avoid toggling the first checkbox when clicking on the label or outside the checkbox
+    document.getElementById('component{COMPONENT_INSTANCE_ID}-filter-chips-container')
+        .closest("label:not([for])")
+        .addEventListener("click", (e) => {
+            if (e.target.tagName === "LABEL" && e.target.getAttribute("for") === null) {
+                e.preventDefault();
+            } else if (e.target.tagName === "UL") {
+                e.preventDefault();
+            }
+        }
+    );
+</script>
