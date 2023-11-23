@@ -137,22 +137,25 @@ class ImportFactory
 
         $query = "
             SELECT
-                us.id                 AS 'us.id',
-                usf.name              AS 'usf.name',
-                sa.id                 AS 'sa.id',
-                sa.title              AS 'sa.title',
-                sa.default_open_span  AS 'sa.default_open_span',
-                sa.sequence           AS 'sa.sequence',
-                sa.work_type_id       AS 'sa.work_type_id',
-                sa.deleted_at         AS 'sa.deleted_at',
-                lwt.name              AS 'lwt.name',
-                sdw.assessment_id     AS 'sdw.id',
-                sdw.accept_submission AS 'sdw.accept_submission',
-                sdw.multi_submission  AS 'sdw.multi_submission',
-                sqz.assessment_id     AS 'sqz.id',
-                stk.assessment_id     AS 'stk.id',
-                spr.assessment_id     AS 'spr.id',
-                slt.assessment_id     AS 'slt.id',
+                us.id                        AS 'us.id',
+                usf.name                     AS 'usf.name',
+                sa.id                        AS 'sa.id',
+                sa.title                     AS 'sa.title',
+                sa.default_open_span         AS 'sa.default_open_span',
+                sa.sequence                  AS 'sa.sequence',
+                sa.work_type_id              AS 'sa.work_type_id',
+                sa.deleted_at                AS 'sa.deleted_at',
+                lwt.name                     AS 'lwt.name',
+                sdw.assessment_id            AS 'sdw.id',
+                sdw.accept_submission        AS 'sdw.accept_submission',
+                sdw.multi_submission         AS 'sdw.multi_submission',
+                sqz.assessment_id            AS 'sqz.id',
+                sqz.learnosity_reference     AS 'sqz.learnosity_reference',
+                sqz.learnosity_job_reference AS 'sqz.learnosity_job_reference',
+                sqz.learnosity_job_status    AS 'sqz.learnosity_job_status',
+                stk.assessment_id            AS 'stk.id',
+                spr.assessment_id            AS 'spr.id',
+                slt.assessment_id            AS 'slt.id',
                 specLessonPlan.assessment_id AS 'specLessonPlan.id'
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
@@ -809,6 +812,11 @@ class ImportFactory
             );
         } elseif ($row['sqz.id']) {
             $assessmentSpec = new QuizAssessment();
+            $assessmentSpec
+                ->setLearnosityReference($row['sqz.learnosity_reference'])
+                ->setLearnosityJobReference($row['sqz.learnosity_job_reference'])
+                ->setLearnosityJobStatus($row['sqz.learnosity_job_status'])
+            ;
         } elseif ($row['stk.id']) {
             $assessmentSpec = new TaskAssessment();
         } elseif ($row['slt.id']) {
