@@ -84,10 +84,14 @@ class LegacyQuizBuilder
      * ideally you only need to instantiate this once
      *
      * @param IConnector $db
+     * @param InlineImageConverter $inlineImageConverter
      * @param LoggerInterface $logger
      */
-    public function __construct(IConnector $db, private LoggerInterface $logger)
-    {
+    public function __construct(
+        IConnector $db,
+        private InlineImageConverter $inlineImageConverter,
+        private LoggerInterface $logger
+    ) {
         $this->quizStatement = $db->prepare(self::QUERY_QUIZ);
         $this->sectionsStatement = $db->prepare(self::QUERY_SECTION);
         $this->questionStatement = $db->prepare(self::QUERY_QUESTION);
@@ -102,6 +106,7 @@ class LegacyQuizBuilder
      *
      * @param int $assessId
      * @return array
+     * @throws \DOMException
      * @throws \JsonException
      * @throws \PDOException
      */
@@ -133,6 +138,23 @@ class LegacyQuizBuilder
 
             while ($questionRow = $this->questionStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $questionRow['_answers'] = [];
+
+                /* Clean out any weird whitespace/control chars from the end of this,
+                 * and convert base64 inline images to storage files
+                 */
+                try {
+                    $questionRow['question'] = $this->inlineImageConverter->convert((string)$questionRow['question']);
+                } catch (\RuntimeException $e) {
+                    /* This question has busted html
+                     * Skip it quietly
+                     */
+                    $this->logger->warning(sprintf(
+                        'question_id %s has unparseable html - it might be truncated; skipping',
+                        $questionRow['question_id']
+                    ));
+
+                    continue;
+                }
 
                 /* Get each question's answers
                  */
@@ -220,11 +242,15 @@ class LegacyQuizBuilder
                 throw new \RuntimeException('Question is missing serialized answers.');
             }
 
+            /* I don't *think* any serialized values permitted newline chars in
+             * legacy quiz implementation...might need to trim all the serialized
+             * values if you get error 22007 in learnosity land.
+             */
             return unserialize($answer['answer'], [
                 'allowed_classes' => true
             ]);
         }
 
-        return $answer['answer'];
+        return trim((string)$answer['answer']);
     }
 }

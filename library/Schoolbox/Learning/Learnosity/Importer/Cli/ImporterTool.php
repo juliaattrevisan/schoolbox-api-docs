@@ -16,6 +16,7 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
 use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
+use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
@@ -88,6 +89,12 @@ class ImporterTool extends CliTool\App
      * (50 questions, 50 features, 50 items, 50 activities)
      */
     private const LEARNOSITY_MAX_PAYLOAD_SIZE = 50;
+
+
+    /**
+     * Number of times to retry association queries
+     */
+    private const NUM_RETRY = 3;
 
 
     /**
@@ -436,7 +443,11 @@ HELP;
 
         /* Used to manufacture an array containing all the legacy quiz's contents
          */
-        $legacyQuizBuilder = new LegacyQuizBuilder($this->getDatabaseInternal(), $this->getLogger());
+        $legacyQuizBuilder = new LegacyQuizBuilder(
+            $this->getDatabaseInternal(),
+            new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger()),
+            $this->getLogger()
+        );
 
         /* Generates sets of tags for Activities' and Items' assignations
          */
@@ -715,19 +726,28 @@ HELP;
             $n = \count($legacyQuizIds);
 
             foreach ($legacyQuizIds as $legacyQuizId) {
-                /* Do all the stuff it used to do to produce a $blueprint
-                 */
                 $this->refreshLock($lock);
+
+                /* Preincrement for this loop
+                 */
+                ++$i;
 
                 /* Get the legacy quiz's contents
                  */
+                $this->getLogger()->debug(sprintf(
+                    '%s/%s Precompiling legacy quiz (assess_id: %s)...',
+                    $i,
+                    $n,
+                    $legacyQuizId
+                ));
+
                 $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
 
                 /* Announce what we're doing
                  */
                 $this->getLogger()->info(sprintf(
                     '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                    ++$i,
+                    $i,
                     $n,
                     $legacyQuiz['title'],
                     $legacyQuiz['assessment_id'],
@@ -866,15 +886,26 @@ HELP;
         foreach ($legacyQuizIds as $legacyQuizId) {
             $this->refreshLock($lock);
 
+            /* Preincrement for this loop
+             */
+            ++$i;
+
             /* Get the legacy quiz's contents
              */
+            $this->getLogger()->debug(sprintf(
+                '%s/%s Precompiling legacy quiz (assess_id: %s)...',
+                $i,
+                $n,
+                $legacyQuizId
+            ));
+
             $legacyQuiz = $legacyQuizBuilder->build($legacyQuizId);
 
             /* Announce what we're doing
              */
             $this->getLogger()->info(sprintf(
                 '%s/%s Processing "%s" (assessment_id: %s, assess_id: %s)...',
-                ++$i,
+                $i,
                 $n,
                 $legacyQuiz['title'],
                 $legacyQuiz['assessment_id'],
@@ -978,10 +1009,14 @@ HELP;
              */
             $endpointStart = microtime(true);
 
-            $this->associateStatement->execute([
-                'learnosityReference' => $association['activityLearnosityReference'],
-                'assessId' => $association['quizId']
-            ]);
+            /* Associate with a retry mechanism
+             */
+            try {
+                $this->associate($association);
+            } catch (\RuntimeException $e) {
+                $this->getLogger()->warning($e->getMessage());
+                continue;
+            }
 
             $endpointEnd = microtime(true);
 
@@ -1005,6 +1040,41 @@ HELP;
 
     /* Misc helpful stuff
      */
+
+    /**
+     * Associate legacy quiz with learnosity quiz, using a retry system
+     * in case our db went away for some reason
+     *
+     * @param array $association
+     * @return void
+     * @throws \RuntimeException
+     */
+    private function associate(array $association): void
+    {
+        $numFails = 0;
+
+        while ($numFails < self::NUM_RETRY) {
+            try {
+                $this->associateStatement->execute([
+                    'learnosityReference' => $association['activityLearnosityReference'],
+                    'assessId' => $association['quizId']
+                ]);
+
+                return;
+            } catch (\PDOException $e) {
+                $this->getLogger()->warning($e->getMessage());
+                $numFails++;
+            }
+        }
+
+        throw new \RuntimeException(sprintf(
+            'Could not associate learnosity quiz %s with legacy quiz %s after %s tries',
+            $association['activityLearnosityReference'],
+            $association['quizId'],
+            $numFails
+        ));
+    }
+
 
     /**
      * Get a set of all schoolbox.assess primary identifiers because
@@ -1106,10 +1176,14 @@ HELP;
                             substr($association['activityLearnosityReference'], 0, 13)
                         ));
 
-                        $this->associateStatement->execute([
-                            'learnosityReference' => $association['activityLearnosityReference'],
-                            'assessId' => $association['quizId']
-                        ]);
+                        /* Associate with a retry mechanism
+                         */
+                        try {
+                            $this->associate($association);
+                        } catch (\RuntimeException $e) {
+                            $this->getLogger()->warning($e->getMessage());
+                            continue;
+                        }
                     }
                 } else {
                     $this->getLogger()->debug(sprintf(
