@@ -112,7 +112,7 @@ class InlineImageConverter
 
                 /* Calculate new filename
                  */
-                $newFilename = $this->generateFilename($node, $extension);
+                $newFilename = $this->generateFilename($extension);
 
                 /* Shank it into storage
                  */
@@ -148,28 +148,11 @@ class InlineImageConverter
     /**
      * Decide on a filename based on the attributes found in the img node
      *
-     * @param \DOMElement $node
      * @param string $extension
      * @return string
      */
-    private function generateFilename(\DOMElement $node, string $extension): string
+    private function generateFilename(string $extension): string
     {
-        /* If there's a meaningful alt attribute, use that
-         * Note that for some reason, alt text might be encoded as well
-         * Not sure what kind of encoding it is, but it's not base64
-         */
-        $alt = trim($node->getAttribute('alt'));
-
-        if ('' !== $alt) {
-            return sprintf(
-                self::NEW_FILENAME,
-                $alt,
-                $extension
-            );
-        }
-
-        /* Otherwise, just use the default filename for lack of anything better
-         */
         return sprintf(
             self::NEW_FILENAME,
             self::DEFAULT_NEW_FILENAME,
