@@ -1,23 +1,24 @@
-### Lesson plan assessment_id should be unique
+### Lesson plan assessment_id should be unique:
+### however, I have seen bad data which is too painful to fix right now
 alter table lesson_plan
     drop foreign key fk_lesson_plan_assessment;
 
 drop index assessment_id on lesson_plan;
 
-create unique index fk_lesson_plan_assessment
+create index fk_lesson_plan_assessment
     on lesson_plan (assessment_id);
 
 alter table lesson_plan
     add constraint fk_lesson_plan_assessment
         foreign key (assessment_id) references assessment (id);
 
-### LTI assessment_id should be unique
+### Likewise, LTI assessment_id should be unique: but bad data
 alter table lti_assessment
     drop foreign key lti_assessment_assessment_id_fk;
 
 drop index lti_assessment_assessment_id_fk on lti_assessment;
 
-create unique index lti_assessment_assessment_id_fk
+create index lti_assessment_assessment_id_fk
     on lti_assessment (assessment_id);
 
 alter table lti_assessment
