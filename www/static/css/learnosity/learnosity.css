@@ -1939,3 +1939,34 @@ td.lrn-report-area::first-letter {
     font-weight: 400;
     min-height: 2.5rem !important;
 }
+
+/* fixed the color picker container */
+.lrn-qe .lrn-qe-ui .lrn-qe-color-picker .lrn-color-picker {
+    border: none;
+}
+
+/* fixed edit/add buttons in the questions to be consistent with other buttons */
+.lrn-qe
+    .lrn-qe-ui
+    .lrn-qe-image-preview-wrapper
+    .lrn-qe-preview-outer
+    .lrn-qe-asset-button-wrapper
+    .lrn-qe-btn-asset-uploader {
+    box-shadow: unset;
+    height: unset;
+    left: 0 !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    top: auto;
+    width: 100% !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-image-preview-wrapper .lrn-qe-preview-outer .lrn-qe-asset-button-wrapper {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+}
+
+/* Removed the dotted border for review h2 title in the player */
+.lrn.lrn-assess .app-panel.review-screen .panel-header > h2:focus {
+    outline: unset;
+}
