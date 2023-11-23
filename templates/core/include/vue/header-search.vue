@@ -186,6 +186,13 @@ function onMouseOut() {
 function formatPortrait(id: string) {
     return `${paths.portrait}${id}&size=square64`;
 }
+
+const searchButtonText = window.Vue.computed(() => {
+    if (keyword.value.length === 0) {
+        return "Advanced Search";
+    }
+    return `Search everything for "${keyword.value}"`;
+});
 </script>
 
 <template>
@@ -209,8 +216,8 @@ function formatPortrait(id: string) {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
-            <div class="l-flex-col">
+        <div v-show="isFocused" class="c-header-search__results">
+            <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
                     <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
                 </div>
@@ -260,14 +267,14 @@ function formatPortrait(id: string) {
                         </div>
                     </div>
                 </div>
-                <template v-if="!isLoading && !results.length">
-                    <div class="c-card l-pad-s">
-                        <em>No users were found matching "{{ keyword }}"</em>
-                    </div>
-                    <a class="button f-no-margins t-lh--normal" :href="`/search?keyword=${keyword}`">
-                        Search everything for "{{ keyword }}"
-                    </a>
-                </template>
+                <div v-if="!isLoading && !results.length" class="c-card l-pad-s">
+                    <em>No users were found matching "{{ keyword }}"</em>
+                </div>
+            </div>
+            <div class="l-flex-col">
+                <a class="button f-no-margins t-lh--normal icon-search" :href="`/search?keyword=${keyword}`">
+                    {{ searchButtonText }}
+                </a>
             </div>
         </div>
     </form>
