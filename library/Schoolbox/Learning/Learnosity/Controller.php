@@ -705,6 +705,20 @@ class Controller extends Base
         ], "Result for {$assessment->getTitle()}");
     }
 
+    /**
+     * The student who did the attempt
+     * @param Model $attempt
+     */
+    private function getStudentData(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    {
+        return [
+            'id' => $attempt->getUser()->getId(),
+            'name' => $attempt->getUser()->getFullName(),
+            'firstname' => $attempt->getUser()->getFirstname(),
+            'lastname' => $attempt->getUser()->getLastname(),
+            'elementId' => 'schoolbox-student'
+        ];
+    }
 
     /**
      * From a student's perspective,
@@ -752,16 +766,6 @@ class Controller extends Base
         /* If a teacher reviewed the attempt, show their feedback information
          * Otherwise just show what the student did.
          */
-
-        /* The student who did the attempt
-        */
-        $studentData = [
-            'id' => $attempt->getUser()->getId(),
-            'name' => $attempt->getUser()->getFullName(),
-            'firstname' => $attempt->getUser()->getFirstname(),
-            'lastname' => $attempt->getUser()->getLastname(),
-            'elementId' => 'schoolbox-student'
-        ];
 
         $reportPayload = [
             'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
@@ -849,7 +853,7 @@ class Controller extends Base
             ]);
 
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
-            'student' => $studentData,
+            'student' => $this->getStudentData($attempt),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
@@ -860,7 +864,6 @@ class Controller extends Base
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
-
 
     /**
      * Provide feedback for an attempt
@@ -879,16 +882,6 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-
-        /* The student who did the attempt
-        */
-        $studentData = [
-            'id' => $attempt->getUser()->getId(),
-            'name' => $attempt->getUser()->getFullName(),
-            'firstname' => $attempt->getUser()->getFirstname(),
-            'lastname' => $attempt->getUser()->getLastname(),
-            'elementId' => 'schoolbox-student'
-        ];
 
         /* This is what the student did
          */
@@ -977,7 +970,7 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
-            'student' => $studentData,
+            'student' => $this->getStudentData($attempt),
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
