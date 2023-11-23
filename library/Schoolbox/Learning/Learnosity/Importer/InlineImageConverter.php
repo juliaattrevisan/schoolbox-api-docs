@@ -82,9 +82,9 @@ class InlineImageConverter
             throw new \RuntimeException('Truncated data: could not parse xml');
         }
 
-        $xpath = new \DOMXPath($dom);
-        $nodes = $xpath->query('//*[@src]');
-
+        $xpath     = new \DOMXPath($dom);
+        $nodes     = $xpath->query('//*[@src]');
+        $hasInline = false;
         foreach ($nodes as $node) {
             /* The src tag, a mega-huge base64 string
              */
@@ -97,6 +97,7 @@ class InlineImageConverter
             /* base64 inline image detected; perform replacement
              */
             if ($isInline) {
+                $hasInline = true;
                 $this->logger->debug('Generating storage file for inline image');
 
                 $imageData = base64_decode($matches[2]);
@@ -120,6 +121,11 @@ class InlineImageConverter
 
                 $node->parentNode->replaceChild($replacement, $node);
             }
+        }
+
+        // No inline elements? Just return $html unmodified
+        if (!$hasInline) {
+            return $html;
         }
 
         // Only include the body parts in the converted HTML, not the entire
