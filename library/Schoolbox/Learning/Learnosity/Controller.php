@@ -708,6 +708,7 @@ class Controller extends Base
     /**
      * The student who did the attempt
      * @param Model $attempt
+     * @return array
      */
     private function getStudentData(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
     {
@@ -718,6 +719,45 @@ class Controller extends Base
             'lastname' => $attempt->getUser()->getLastname(),
             'elementId' => 'schoolbox-student'
         ];
+    }
+
+    /**
+     * The student who did the attempt
+     * @param Model $attempt
+     * @return array
+     */
+    private function getItemResponses(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    {
+        /* These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+
+        foreach ($responses as $response) {
+            $learnosityReference = $response['response_id'];
+
+            $scores[$learnosityReference] = [
+                'learnosityReference' => $learnosityReference,
+                'score' => $response['score'],
+                'maxScore' => $response['max_score'],
+                'itemReference' => $response['item_reference']
+            ];
+        }
+
+        /* Find all the comments for this attempt
+         */
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+
+        return array_values(array_merge_recursive($scores, $responseComments));
     }
 
     /**
@@ -786,35 +826,6 @@ class Controller extends Base
             ],
         ];
 
-        /* These are the scores they obtained for the one session we chose
-         * (It'll still come to us as an array of sessions though)
-         */
-        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => [
-                $attempt->getLearnosityReference()
-            ]
-        ])['data'][0]['responses'];
-
-        /* Reforge it into a generic set of tuples
-         * because we need to shank it in via frontend
-         */
-        $scores = [];
-
-        foreach ($responses as $response) {
-            $learnosityReference = $response['response_id'];
-
-            $scores[$learnosityReference] = [
-                'learnosityReference' => $learnosityReference,
-                'score' => $response['score'],
-                'maxScore' => $response['max_score'],
-                'itemReference' => $response['item_reference']
-            ];
-        }
-
-        /* Find all the comments for this attempt
-         */
-        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
-
         /* Retrieve the comment for this attempt
         */
         $attemptComment = [
@@ -859,7 +870,7 @@ class Controller extends Base
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
             'lastViews' => $lastView->getTwigViews($assessment, $student, $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
-            'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
+            'itemResponses' => $this->getItemResponses($attempt),
             'attemptComment' => $attemptComment,
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
@@ -904,35 +915,6 @@ class Controller extends Base
             ],
         ];
 
-        /* These are the scores they obtained for the one session we chose
-         * (It'll still come to us as an array of sessions though)
-         */
-        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => [
-                $attempt->getLearnosityReference()
-            ]
-        ])['data'][0]['responses'];
-
-        /* Reforge it into a generic set of tuples
-         * because we need to shank it in via frontend
-         */
-        $scores = [];
-
-        foreach ($responses as $response) {
-            $learnosityReference = $response['response_id'];
-
-            $scores[$learnosityReference] = [
-                'learnosityReference' => $learnosityReference,
-                'score' => $response['score'],
-                'maxScore' => $response['max_score'],
-                'itemReference' => $response['item_reference']
-            ];
-        }
-
-        /* Find all the comments for this attempt
-         */
-        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
-
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
@@ -975,7 +957,7 @@ class Controller extends Base
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'attempt' => $attempt,
-            'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
+            'itemResponses' => $this->getItemResponses($attempt),
             'attemptComment' => $attemptComment,
             'urls' => $urls
         ], sprintf(
