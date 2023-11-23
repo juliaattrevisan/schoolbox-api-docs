@@ -122,7 +122,13 @@ class InlineImageConverter
             }
         }
 
-        return trim($dom->saveHTML());
+        // Only include the body parts in the converted HTML, not the entire
+        // HTML document which loadHTML generates
+        $bodyParts = [];
+        foreach ($xpath->query('//body/*') as $bodyPart) {
+            $bodyParts[] = trim($dom->saveHTML($bodyPart));
+        }
+        return implode("\n", $bodyParts);
     }
 
 
