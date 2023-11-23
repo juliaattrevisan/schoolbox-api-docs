@@ -724,7 +724,7 @@ class Controller extends Base
                          * It's configurable by us, unlike the other anchors for
                          * Author and Items api
                          */
-                        'id' => 'schoolbox-result-1',
+                        'id' => 'schoolbox-completion-summary',
                         'type' => 'sessions-summary-by-question',
                         'session_ids' => [
                             $attempt->getLearnosityReference()
