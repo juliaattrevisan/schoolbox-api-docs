@@ -30,6 +30,7 @@ const emit = defineEmits<{
 
 const currentInput = window.Vue.ref<string>((props.initialInput as string) ?? "");
 const inputElement = window.Vue.ref<HTMLInputElement | null>(null);
+const hasInputFocus = window.Vue.ref(false);
 
 /**
  * Input updated, update internaly and dispatch emit
@@ -67,12 +68,17 @@ function onKeyEnter() {
 function onClicked() {
     if (props.isActiveWhenEmpty) {
         emit("click");
+        return;
     }
     if (currentInput.value.length > 0) {
         emit("click");
-    } else {
-        inputElement.value?.focus();
+        return;
     }
+    if (hasInputFocus.value) {
+        emit("click");
+        return;
+    }
+    inputElement.value?.focus();
 }
 
 /**
@@ -80,6 +86,7 @@ function onClicked() {
  * @param {FocusEvent} event - The event object
  */
 function onFocusOver(event: FocusEvent) {
+    hasInputFocus.value = true;
     emit("focusOver", event);
 }
 
