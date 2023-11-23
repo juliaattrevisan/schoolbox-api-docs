@@ -1965,3 +1965,8 @@ td.lrn-report-area::first-letter {
     top: 0 !important;
     width: 100% !important;
 }
+
+/* Removed the dotted border for review h2 title in the player */
+.lrn.lrn-assess .app-panel.review-screen .panel-header > h2:focus {
+    outline: unset;
+}
