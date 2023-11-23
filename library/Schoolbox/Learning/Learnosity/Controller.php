@@ -21,7 +21,6 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
@@ -718,7 +717,19 @@ class Controller extends Base
                         'questions_api_init_options' => [
                             'showCorrectAnswers' => false
                         ]
-                    ]
+                    ],
+                    [
+                        /* DOM element id, where this goes in
+                         *
+                         * It's configurable by us, unlike the other anchors for
+                         * Author and Items api
+                         */
+                        'id' => 'schoolbox-result-1',
+                        'type' => 'sessions-summary-by-question',
+                        'session_ids' => [
+                            $attempt->getLearnosityReference()
+                        ]
+                    ],
                 ],
             ];
 
@@ -743,7 +754,7 @@ class Controller extends Base
                         'questions_api_init_options' => [
                             'showCorrectAnswers' => false
                         ]
-                    ]
+                    ],
                 ],
             ];
 
