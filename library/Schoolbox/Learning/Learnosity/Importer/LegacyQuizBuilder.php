@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Learnosity\Importer\Strategy\Factory;
 
 /**
  * Takes a given schoolbox.assess_id and fetches all the sections, questions,
@@ -84,11 +85,13 @@ class LegacyQuizBuilder
      * ideally you only need to instantiate this once
      *
      * @param IConnector $db
+     * @param Factory $strategyFactory
      * @param InlineImageConverter $inlineImageConverter
      * @param LoggerInterface $logger
      */
     public function __construct(
         IConnector $db,
+        private Strategy\Factory $strategyFactory,
         private InlineImageConverter $inlineImageConverter,
         private LoggerInterface $logger
     ) {
@@ -172,9 +175,10 @@ class LegacyQuizBuilder
                     /* This question has busted answers
                      * Skip it quietly
                      */
-                    $this->logger->debug(sprintf(
-                        'question_id %s missing serialized answers; skipping',
-                        $questionRow['question_id']
+                    $this->logger->warning(sprintf(
+                        'question_id %s has broken serialization: %s; skipping',
+                        $questionRow['question_id'],
+                        $e->getMessage()
                     ));
 
                     continue;
@@ -228,29 +232,6 @@ class LegacyQuizBuilder
         /* Quiz only uses types 2, 4 and 5
          * (6,8,9,10,17 are all Survey)
          */
-        $serializedAnswers = [
-            Strategy\Multi::QUESTION_TYPE_ID,
-            Strategy\MatchingPairs::QUESTION_TYPE_ID,
-            Strategy\Radio::QUESTION_TYPE_ID,
-        ];
-
-        if (in_array($question['type_id'], $serializedAnswers, false)) {
-            /* Sometimes there's busted data we can't unserialize; it's not there.
-             * This should cause us to skip this question entirely
-             */
-            if ('' === trim((string)$answer['answer'])) {
-                throw new \RuntimeException('Question is missing serialized answers.');
-            }
-
-            /* I don't *think* any serialized values permitted newline chars in
-             * legacy quiz implementation...might need to trim all the serialized
-             * values if you get error 22007 in learnosity land.
-             */
-            return unserialize($answer['answer'], [
-                'allowed_classes' => true
-            ]);
-        }
-
-        return trim((string)$answer['answer']);
+        return $this->strategyFactory->produce((int)$question['type_id'])?->decompileAnswer($answer);
     }
 }
