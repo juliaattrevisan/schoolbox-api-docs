@@ -1,5 +1,6 @@
 {##
- # attempt - Quiz\Attempt\Model
+ # @param Quiz\Attempt\Model $attempt
+ # @param array $lastViews - Array returned by LatestView->getTwigViews()
  #}
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
 
@@ -27,12 +28,12 @@
             {% endapply %}</li>
     {% endif %}
 
-    <li class="icon-view">{% apply spaceless %}
-        {% set student = attempt.user %}
-        <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
-        {% if lastViews is not empty %}
+    {% if lastViews is not empty %}
+        <li class="icon-view">{% apply spaceless %}
+            {% set student = attempt.user %}
+            <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {{ lastViews.student.status }}
             {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
-        {% endif %}
-    {% endapply %}</li>
+        {% endapply %}</li>
+    {% endif %}
 </ul>
