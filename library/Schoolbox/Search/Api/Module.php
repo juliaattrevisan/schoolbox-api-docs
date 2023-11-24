@@ -173,14 +173,7 @@ class Module extends BaseModule
             ),
         ];
 
-        $userMapper = $mapperFactory->get(UserMapper::class);
-        $loggedInUserRole = $userMapper->getSessionUser()->getRole();
-
-        if (
-            // See similar check in Search/Controller->getFiltersRawArray().
-            $config->get(ConfigMapper::NAME_BADGES_ENABLED) &&
-            ($loggedInUserRole->isStudent() || $loggedInUserRole->isStaff())
-        ) {
+        if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
             $queryParamBuilders[] = new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter());
             $hydrators[] = new Database\ResultType\Badge\Hydrator(
                 $mapperFactory->get(BadgeMapper::class),
