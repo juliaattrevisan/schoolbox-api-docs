@@ -203,8 +203,8 @@ class Module extends BaseModule
         }
 
         return new Controller(
-            new Database\AggregateSource($database, $queryParamBuilders),
-            new Hydrator\Aggregate($hydrators),
+            new Database\AggregateSource($database, ...$queryParamBuilders),
+            new Hydrator\Aggregate(...$hydrators),
             new Hydrator\Translator\FullResultToArray(
                 new UserTranslator(),
                 new FolderTranslator(0),
