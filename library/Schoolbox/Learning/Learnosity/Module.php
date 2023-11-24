@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
@@ -414,6 +415,8 @@ class Module extends BaseModule
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),
             $this->injector->get('taskd.messageProducer'),
+            $this->getMapperFactory()->get(LatestViewMapper::class),
+            Access::getInstance(),
         );
     }
 

@@ -26,4 +26,13 @@
             Reviewed by {{ attempt.reviewer.fullname }}, {{ attempt.reviewed.relativeDayWithoutMidnight }}
             {% endapply %}</li>
     {% endif %}
+
+    <li class="icon-view">{% apply spaceless %}
+        {% set student = attempt.user %}
+        <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
+        {% if lastViews is not empty %}
+            {{ lastViews.student.status }}
+            {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
+        {% endif %}
+    {% endapply %}</li>
 </ul>

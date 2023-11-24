@@ -7,6 +7,7 @@
  # @param Attempt\Model $attempt           The student's attempt from our local db
  # @param array $comments                  A list of comment tuples that contain per-question comments
  # @param string $returnUrl                A redirect destination we remembered from some previous place
+ # @param array $lastViews                 Array returned by LatestView->getTwigViews()
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -18,10 +19,12 @@
     <div id="student-review-container" class="small-12 island">
         <h1>{{ assessment.title }}</h1>
         {% include '@learnosity/meta.twig' with {
-            attempt: attempt
+            attempt: attempt,
+            lastViews: lastViews
         } only %}
 
         <h2 class="subheader">Student Review</h2>
+
         <section class="content">
             <div id="schoolbox-student"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
         </section>
