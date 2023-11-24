@@ -238,8 +238,8 @@ const searchButtonText = window.Vue.computed(() => {
         />
         <div v-show="isSelected" class="c-header-search__results">
             <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
-                <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
-                    <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
+                <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end l-pad-s">
+                    <em>Showing {{ results.length }} of {{ totalCount }} matching users</em>
                 </div>
                 <a
                     v-for="(result, i) in results"
@@ -269,8 +269,8 @@ const searchButtonText = window.Vue.computed(() => {
                 </a>
                 <a
                     v-if="results.length && totalCount > results.length"
-                    class="c-card c-card--link c-card--active"
-                    :href="`${paths.searchPageWithKeyword}${keyword}#user`"
+                    class="c-card c-card--link c-card--active l-pad-s"
+                    :href="`${paths.searchPageWithKeyword}${keyword}`"
                 >
                     View all {{ totalCount }} users
                 </a>
@@ -281,7 +281,7 @@ const searchButtonText = window.Vue.computed(() => {
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--justify-center l-flex__item--1">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-s">
                             <h3></h3>
                             <span></span>
                         </div>
