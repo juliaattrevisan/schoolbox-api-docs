@@ -57,15 +57,17 @@ export const useItemsStore = defineStore("hmItems", () => {
         if (validStudentItems.length !== itemReferenceList.value.length) {
             hasVariedAttempts.value = true;
         }
-        /**
-         * we cant assume the items are coming in from the API in the same order as the items we have stored,
-         * we'll need to match them up by reference
-         */
+        // we cant assume the items are coming in from the API in the same order as the items we have stored,
+        // we'll need to match them up by reference
         validStudentItems.forEach((studentItem) => {
             const matchedItem = items.value.find((storedItem) => storedItem.reference === studentItem.reference);
-            // if the questions have already been added, we don't need to overwrite them
-            if (matchedItem && !matchedItem.questions) {
-                matchedItem.questions = studentItem.questions;
+            // add in all the questions for the matched item, we don't need to worry about duplicates, as the questions aren't referenced
+            // except to check if the item has any questions below (which is why we need to add them in)
+            if (matchedItem) {
+                matchedItem.questions =
+                    matchedItem.questions === undefined
+                        ? [...studentItem.questions]
+                        : [...matchedItem.questions, ...studentItem.questions];
             }
         });
         if (isLastAttempt) {

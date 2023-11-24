@@ -30,7 +30,7 @@ const display = window.Vue.computed(() => {
  * @returns {boolean} - the total score
  */
 const noScore = window.Vue.computed(() => {
-    return props.item.questions.every((question) => question.response.maxScore === null);
+    return props.item.questions.every((question) => question.response?.maxScore === null);
 });
 
 /**

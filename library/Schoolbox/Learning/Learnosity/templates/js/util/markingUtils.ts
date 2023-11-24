@@ -58,7 +58,7 @@ export function setInitialQuestionIsMarked(item: StudentItem) {
     item.questions.forEach((question) => {
         if (question.response) {
             const { response } = question;
-            if (response.maxScore === null) {
+            if (response?.maxScore === null) {
                 response.isMarked =
                     (firstQuestion.response as StudentItemQuestionResponse).comment !== undefined &&
                     (firstQuestion.response as StudentItemQuestionResponse).comment !== null &&
@@ -125,7 +125,7 @@ export function getItemScore(item: StudentItem) {
 export function getItemMaxScore(item: StudentItem) {
     // loop through all questions and add up the max score
     return item.questions.reduce((total, question) => {
-        if (question.response && question.response.maxScore) {
+        if (question.response && question.response?.maxScore) {
             return total + question.response.maxScore;
         }
         return total;
@@ -159,7 +159,7 @@ export function getAttemptMaxScore(student: Student) {
     // loop through all student items and questions and add up the max score
     return student.items.reduce((maxScoreAcc, item) => {
         const itemMaxScore = item.questions.reduce((itemMaxScoreAcc, question) => {
-            if (question.response && question.response.maxScore) {
+            if (question.response && question.response?.maxScore) {
                 return itemMaxScoreAcc + question.response.maxScore;
             }
             return itemMaxScoreAcc;
