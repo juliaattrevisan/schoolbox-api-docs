@@ -253,7 +253,24 @@ class Api
                  * The place where the json response would be contains some random text string instead
                  */
                 if (null === $json || $response->getStatusCode() < 200 || $response->getStatusCode() > 202) {
-                    $errorPayload = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+                    $responseBody = $response->getBody();
+
+                    /* Sometimes getBody() returns a bool for some reason
+                     * We can't really do much with that
+                     */
+                    if (is_bool($responseBody)) {
+                        throw new ApiException(sprintf(
+                            "%s %s: boolean returned.\n\nHTTP %s %s",
+                            $actionType,
+                            $url,
+                            $response->getStatusCode(),
+                            $response->getBody()
+                        ));
+                    }
+
+                    /* Try to decode what learnosity told us
+                     */
+                    $errorPayload = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
 
                     /* Some other unrecoverable error; retrying won't help
                      * Just surface this exception
