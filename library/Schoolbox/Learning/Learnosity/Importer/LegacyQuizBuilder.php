@@ -231,33 +231,6 @@ class LegacyQuizBuilder
         /* Quiz only uses types 2, 4 and 5
          * (6,8,9,10,17 are all Survey)
          */
-        $strategy = $this->strategyFactory->produce((int)$question['type_id']);
-
-        return $strategy->decompileAnswer($answer);
-
-//        $serializedAnswers = [
-//            Strategy\Multi::QUESTION_TYPE_ID,
-//            Strategy\MatchingPairs::QUESTION_TYPE_ID,
-//            Strategy\Radio::QUESTION_TYPE_ID,
-//        ];
-//
-//        if (in_array($question['type_id'], $serializedAnswers, false)) {
-//            /* Sometimes there's busted data we can't unserialize; it's not there.
-//             * This should cause us to skip this question entirely
-//             */
-//            if ('' === trim((string)$answer['answer'])) {
-//                throw new \RuntimeException('Question is missing serialized answers.');
-//            }
-//
-//            /* I don't *think* any serialized values permitted newline chars in
-//             * legacy quiz implementation...might need to trim all the serialized
-//             * values if you get error 22007 in learnosity land.
-//             */
-//            return unserialize($answer['answer'], [
-//                'allowed_classes' => true
-//            ]);
-//        }
-
-        return trim((string)$answer['answer']);
+        return $this->strategyFactory->produce((int)$question['type_id'])?->decompileAnswer($answer);
     }
 }
