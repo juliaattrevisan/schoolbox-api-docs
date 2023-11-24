@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Learnosity\Importer\Strategy\Factory;
 
 /**
  * Takes a given schoolbox.assess_id and fetches all the sections, questions,
@@ -84,11 +85,13 @@ class LegacyQuizBuilder
      * ideally you only need to instantiate this once
      *
      * @param IConnector $db
+     * @param Factory $strategyFactory
      * @param InlineImageConverter $inlineImageConverter
      * @param LoggerInterface $logger
      */
     public function __construct(
         IConnector $db,
+        private Strategy\Factory $strategyFactory,
         private InlineImageConverter $inlineImageConverter,
         private LoggerInterface $logger
     ) {
@@ -173,9 +176,8 @@ class LegacyQuizBuilder
                      * Skip it quietly
                      */
                     $this->logger->debug(sprintf(
-                        'question_id %s not decompilable (%s); skipping',
-                        $questionRow['question_id'],
-                        $e->getMessage(),
+                        'question_id %s missing serialized answers; skipping',
+                        $questionRow['question_id']
                     ));
 
                     continue;
@@ -229,41 +231,32 @@ class LegacyQuizBuilder
         /* Quiz only uses types 2, 4 and 5
          * (6,8,9,10,17 are all Survey)
          */
-        $serializedAnswers = [
-            Strategy\Multi::QUESTION_TYPE_ID,
-            Strategy\MatchingPairs::QUESTION_TYPE_ID,
-            Strategy\Radio::QUESTION_TYPE_ID,
-        ];
+        $strategy = $this->strategyFactory->produce((int)$question['type_id']);
 
-        if (in_array($question['type_id'], $serializedAnswers, false)) {
-            /* Sometimes there's busted data we can't unserialize; it's not there.
-             * This should cause us to skip this question entirely
-             */
-            if ('' === trim((string)$answer['answer'])) {
-                throw new \RuntimeException('Question is missing serialized answers.');
-            }
+        return $strategy->decompileAnswer($answer);
 
-            /* I don't *think* any serialized values permitted newline chars in
-             * legacy quiz implementation...might need to trim all the serialized
-             * values if you get error 22007 in learnosity land.
-             */
-            $decompiledAnswer = unserialize($answer['answer'], [
-                'allowed_classes' => true
-            ]);
-
-            // Some busted data may deserialize as null or false, or another
-            // non-iterable value: skip those questions as well
-            if (!isset($decompiledAnswer)) {
-                throw new \RuntimeException('Question\'s answer deserialized to null.');
-            }
-            if ($decompiledAnswer === false) {
-                throw new \RuntimeException('Question\'s answer deserialized to false.');
-            }
-            if (!is_iterable($decompiledAnswer)) {
-                throw new \RuntimeException('Question\'s answer deserialized to a non-iterable value.');
-            }
-            return $decompiledAnswer;
-        }
+//        $serializedAnswers = [
+//            Strategy\Multi::QUESTION_TYPE_ID,
+//            Strategy\MatchingPairs::QUESTION_TYPE_ID,
+//            Strategy\Radio::QUESTION_TYPE_ID,
+//        ];
+//
+//        if (in_array($question['type_id'], $serializedAnswers, false)) {
+//            /* Sometimes there's busted data we can't unserialize; it's not there.
+//             * This should cause us to skip this question entirely
+//             */
+//            if ('' === trim((string)$answer['answer'])) {
+//                throw new \RuntimeException('Question is missing serialized answers.');
+//            }
+//
+//            /* I don't *think* any serialized values permitted newline chars in
+//             * legacy quiz implementation...might need to trim all the serialized
+//             * values if you get error 22007 in learnosity land.
+//             */
+//            return unserialize($answer['answer'], [
+//                'allowed_classes' => true
+//            ]);
+//        }
 
         return trim((string)$answer['answer']);
     }

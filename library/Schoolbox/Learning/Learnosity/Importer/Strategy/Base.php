@@ -36,4 +36,50 @@ class Base
     {
         return \Scrub::htmlAbsoluteUri($question, $this->domain);
     }
+
+
+    /**
+     * Decompiles $answer's serialized value
+     *
+     * Sometimes there's broken data which means it can't succeed
+     *
+     * @param array $answer
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    protected function decompileSerializedAnswer(array $answer): mixed
+    {
+        $decompiledAnswer = unserialize($answer['answer'], [
+            'allowed_classes' => true
+        ]);
+
+        // Some busted data may deserialize as null or false, or another
+        // non-iterable value: skip those questions as well
+        if (!isset($decompiledAnswer)) {
+            throw new \RuntimeException('answer deserialized to null.');
+        }
+
+        if ($decompiledAnswer === false) {
+            throw new \RuntimeException('answer deserialized to false.');
+        }
+
+        if (!is_iterable($decompiledAnswer)) {
+            throw new \RuntimeException('answer deserialized to a non-iterable value.');
+        }
+
+        return $decompiledAnswer;
+    }
+
+
+    /**
+     * Returns $answer's value as provided; it doesn't need deserializing,
+     * just some trimming
+     *
+     * @param array $answer
+     * @return mixed
+     */
+    protected function decompileNonserializedAnswer(array $answer): mixed
+    {
+        return trim((string)$answer['answer']);
+    }
 }

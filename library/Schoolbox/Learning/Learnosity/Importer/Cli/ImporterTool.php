@@ -441,10 +441,15 @@ HELP;
             $this->getLogger()
         );
 
+        /* Used to make representations of questions and answers
+         */
+        $strategyFactory = new Strategy\Factory($domain);
+
         /* Used to manufacture an array containing all the legacy quiz's contents
          */
         $legacyQuizBuilder = new LegacyQuizBuilder(
             $this->getDatabaseInternal(),
+            $strategyFactory,
             new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger()),
             $this->getLogger()
         );
@@ -459,7 +464,7 @@ HELP;
 
         /* Generates payload array structs
          */
-        $payloadFactory = new PayloadFactory(new Strategy\Factory($domain));
+        $payloadFactory = new PayloadFactory($strategyFactory);
 
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity

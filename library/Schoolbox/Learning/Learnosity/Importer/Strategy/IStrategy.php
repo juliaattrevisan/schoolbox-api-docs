@@ -27,4 +27,14 @@ interface IStrategy
      * @return array
      */
     public function convert(array $question): array;
+
+
+    /**
+     * Decompile any serialized contents of $answer, managing any broken
+     * deserializations specially
+     *
+     * Questions that don't have serialized data (short answer, richtext, etc)
+     * return their inputs.
+     */
+    public function decompileAnswer(array $answer): mixed;
 }

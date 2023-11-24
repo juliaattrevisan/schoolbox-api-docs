@@ -84,4 +84,16 @@ class Radio extends Base implements IStrategy
             ]
         ];
     }
+
+
+    /**
+     * @inheritDoc
+     * @param array $answer
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    public function decompileAnswer(array $answer): mixed
+    {
+        return $this->decompileSerializedAnswer($answer);
+    }
 }
