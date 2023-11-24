@@ -65,7 +65,11 @@ function beforeUnloadHandler(event: BeforeUnloadEvent) {
  * Save the comment if it's changed
  */
 async function saveComment() {
-    if (props.item.questions === undefined || props.item.questions[0].response === undefined) {
+    if (
+        props.item.questions === undefined ||
+        props.item.questions[0].response === undefined ||
+        props.item.questions[0].response.comment === undefined
+    ) {
         return;
     }
     if (isSaving.value) {
