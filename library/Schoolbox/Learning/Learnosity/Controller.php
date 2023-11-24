@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Learnosity;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Http\Discovery\Psr17Factory;
 use LearnositySdk\Exceptions\ValidationException;
@@ -21,7 +22,6 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
@@ -29,11 +29,13 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
+use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\Url\Factory;
@@ -361,22 +363,22 @@ class Controller extends Base
 
         $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
-        // A user may not attempt a quiz on behalf of another user.
-        if ($this->getUser()->getId() !== $student->getId()) {
-            /* Redirect back to summary screen
-             */
-            $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
-                'assessmentId' => $assessment->getId(),
-                'studentId' => $student->getId(),
-            ]);
-            $this->response = $this->redirectTemporary($redirect);
-            return;
-        }
+        // Note on need for consistency when dealing with permissions
+        // ----------------------------------------------------------
+        // It is important that the permission checks on the quiz page itself (here in this function) are the same as
+        // those that determine whether the 'start quiz' button is displayed (on the quiz summary page).  Otherwise,
+        // either an enabled 'start quiz' button will lead to a permission error on the quiz page, or directly accessing
+        // the quiz page will enable users to bypass permission checks that prevent the 'start quiz' button from displaying.
+        // See library/Schoolbox/Learning/Assessment/Quiz/Controller.php (where the same permission checks are used).
+        $now = Alaress_Date_Format::now();
+        $this->quizMapper->closeExpiredAttempts($quiz, $now); // Close any expired attempts before checking for in-progress.
+        $actionValidator = new ActionValidator($now, Access::getInstance());
+        $canAttempt = (
+            $this->getUser()->getId() === $student->getId() && // A user may not attempt a quiz on behalf of another user.
+            $actionValidator->canAttemptQuiz($this->getUser(), $assessment, $this->getConfigLoader())
+        );
 
-        if (
-            !$quiz->isAttemptsUnlimited() &&
-            $this->attemptMapper->getAttemptCountForStudent($quiz->getId(), $student->getId()) >= $quiz->getMaxAttempts()
-        ) {
+        if (!$canAttempt) {
             /* Redirect back to summary screen
              */
             $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [

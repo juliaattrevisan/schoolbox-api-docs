@@ -188,9 +188,9 @@ class Module extends BaseModule
 
 
     /**
-     * The current user is the $studentId referenced in the url,
-     * or you're a staff (meant to stop students accessing other
-     * student's urls)
+     * The current user is:
+     *  - the same user that is referenced in the URL (meant to stop any user from accessing another user's URL),
+     *  - and either a student or a staff member.
      *
      * @return Rule\LazyCallback
      */
@@ -199,12 +199,10 @@ class Module extends BaseModule
         return new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
+                new Rule\IsUser('studentId'),
                 new Rule\Any(
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\All(
-                        new Rule\HasRole(Role::STUDENT),
-                        new Rule\IsUser('studentId')
-                    )
+                    new Rule\HasRole(Role::STUDENT),
                 ),
             );
         });
