@@ -49,6 +49,14 @@ class Base
      */
     protected function decompileSerializedAnswer(array $answer): mixed
     {
+        /* Note that in old data, unserialize could return a variety of possibilities
+         * It's possible that $answer['answer'] might be:
+         *
+         *     - actually null
+         *     - a string 'N;' due to json stringify breaking somehow
+         *     - empty string ''
+         *     - something else entirely
+         */
         $decompiledAnswer = unserialize($answer['answer'], [
             'allowed_classes' => true
         ]);
@@ -59,7 +67,7 @@ class Base
             throw new \RuntimeException('answer deserialized to null.');
         }
 
-        if ($decompiledAnswer === false) {
+        if (false === $decompiledAnswer) {
             throw new \RuntimeException('answer deserialized to false.');
         }
 

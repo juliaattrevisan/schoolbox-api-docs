@@ -175,9 +175,10 @@ class LegacyQuizBuilder
                     /* This question has busted answers
                      * Skip it quietly
                      */
-                    $this->logger->debug(sprintf(
-                        'question_id %s missing serialized answers; skipping',
-                        $questionRow['question_id']
+                    $this->logger->warning(sprintf(
+                        'question_id %s has broken serialization: %s; skipping',
+                        $questionRow['question_id'],
+                        $e->getMessage()
                     ));
 
                     continue;
