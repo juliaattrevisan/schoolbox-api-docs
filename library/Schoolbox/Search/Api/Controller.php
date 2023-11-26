@@ -238,7 +238,7 @@ class Controller extends Base
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
-        $this->pruneDependenciesBasedOnUserPermissions();
+        $this->pruneDependenciesDueToUserPermissions();
 
         $keyword = trim($this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
