@@ -49,6 +49,12 @@ class Base
      */
     protected function decompileSerializedAnswer(array $answer): mixed
     {
+        // Skip if the compiled answer is not a string at all
+        $compiledAnswer = $answer['answer'] ?? null;
+        if (!is_string($compiledAnswer)) {
+            throw new \RuntimeException(sprintf('answer is not a string (type: %s)', gettype($compiledAnswer)));
+        }
+
         /* Note that in old data, unserialize could return a variety of possibilities
          * It's possible that $answer['answer'] might be:
          *
@@ -57,7 +63,7 @@ class Base
          *     - empty string ''
          *     - something else entirely
          */
-        $decompiledAnswer = unserialize($answer['answer'], [
+        $decompiledAnswer = unserialize($compiledAnswer, [
             'allowed_classes' => true
         ]);
 
