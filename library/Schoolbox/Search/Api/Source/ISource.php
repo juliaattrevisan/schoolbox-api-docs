@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Source;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
+use Schoolbox\User;
 
 /**
  * A source for a search.
@@ -46,4 +47,11 @@ interface ISource
         ?CursorDataObject $cursor,
         string $paramKeySuffix = ''
     ): array;
+
+    /**
+     * @param User $loggedInUser
+     * @return void
+     * @see IHydrator/pruneHydratorsDueToUserPermissions() (Similar function for Hydrators)
+     */
+    public function pruneQueryParamBuildersDueToUserPermissions(User $loggedInUser): void;
 }
