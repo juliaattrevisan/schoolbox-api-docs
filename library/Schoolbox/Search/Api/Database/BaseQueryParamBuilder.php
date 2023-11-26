@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Database;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
+use Schoolbox\User;
 
 /**
  * Abstract base class for query param builders.
@@ -362,4 +363,14 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * @return string
      */
     abstract protected function buildFromStatement(string $paramKeySuffix = ''): string;
+
+    /**
+     * @param User $loggedInUser
+     * @return void
+     * @see BaseHydrator/pruneHydratorsDueToUserPermissions() (Similar function for Hydrators)
+     */
+    public function pruneQueryParamBuildersDueToUserPermissions(User $loggedInUser): void
+    {
+        // Do nothing.  Override this function if pruning of QueryParamBuilders due to user permissions is needed.
+    }
 }

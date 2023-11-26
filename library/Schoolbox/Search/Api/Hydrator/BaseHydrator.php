@@ -14,6 +14,7 @@ use Psr\Http\Message\UriInterface;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Url\Uri;
+use Schoolbox\User;
 
 /**
  * Base hydrator, with a simple implementation of `accepts` which requires a
@@ -170,5 +171,15 @@ abstract class BaseHydrator implements IHydrator
     public function truncate(string $content, int $maxChars = self::DESCRIPTION_LENGTH): string
     {
         return mb_strcut($content, 0, $maxChars, self::ENCODING);
+    }
+
+    /**
+     * @param User $loggedInUser
+     * @return void
+     * @see BaseQueryParamBuilder/pruneQueryParamBuildersDueToUserPermissions() (Similar function for QueryParamBuilders)
+     */
+    public function pruneHydratorsDueToUserPermissions(User $loggedInUser): void
+    {
+        // Do nothing.  Override this function if pruning of Hydrators due to user permissions is needed.
     }
 }
