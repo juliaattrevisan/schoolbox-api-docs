@@ -73,6 +73,8 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
+        $this->pruneDependenciesBasedOnUserPermissions();
+
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
@@ -236,6 +238,8 @@ class Controller extends Base
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
+        $this->pruneDependenciesBasedOnUserPermissions();
+
         $keyword = trim($this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), $folder);
@@ -402,5 +406,18 @@ class Controller extends Base
         }
 
         return ['results' => $fullResults, 'nextCursor' => $nextCursor];
+    }
+
+    /**
+     *
+     */
+    private function pruneDependenciesBasedOnUserPermissions(): void
+    {
+        // Now that we have access to the logged-in user, we can prune the list of QueryParamBuilders and Hydrators
+        // based on user role.  This could not be done in Search/Api/Module because the logged-in user is not available
+        // there.  Note that this cannot be done in the constructor either, because the user object is injected after
+        // the constructor has been called (see call to $constructor->setUser() in WebRequest/Kernel->outputAuraContent().
+        $this->source->pruneQueryParamBuildersDueToUserPermissions($this->getUser());
+        $this->hydrator->pruneHydratorsDueToUserPermissions($this->getUser());
     }
 }

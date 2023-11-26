@@ -15,6 +15,8 @@ use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\Source\ISource;
+use Schoolbox\Search\Api\Database\ResultType\Badge;
+use Schoolbox\User;
 
 /**
  * Search results source, aggregating results from multiple database search
@@ -155,5 +157,31 @@ class AggregateSource implements ISource
         }
 
         return [$queryString, $params];
+    }
+
+    /**
+     * @param User $loggedInUser
+     * @return void
+     * @see Aggregate/pruneHydratorsDueToUserPermissions() (Similar function for Hydrators)
+     */
+    public function pruneQueryParamBuildersDueToUserPermissions(User $loggedInUser): void
+    {
+        $queryParamBuildersToKeep = [];
+        $loggedInUserRole = $loggedInUser->getRole();
+
+        foreach ($this->queryParamBuilders as $queryParamBuilder) {
+            if (
+                $queryParamBuilder instanceof Badge\QueryParamBuilder &&
+                !$loggedInUserRole->isStudent() &&
+                !$loggedInUserRole->isStaff()
+            ) {
+                // Badges should only be searchable for students and staff, so prune this QueryParamBuilder.
+                continue;
+            }
+
+            $queryParamBuildersToKeep[] = $queryParamBuilder;
+        }
+
+        $this->queryParamBuilders = $queryParamBuildersToKeep;
     }
 }

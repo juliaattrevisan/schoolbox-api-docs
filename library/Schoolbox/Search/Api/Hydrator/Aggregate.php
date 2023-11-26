@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Hydrator;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
+use Schoolbox\Search\Api\Database\ResultType\Badge;
 
 class Aggregate implements IHydrator
 {
@@ -84,5 +85,31 @@ class Aggregate implements IHydrator
 
         // Filter out any results that are null, and flatten
         return array_values(array_filter($fullResults, fn ($x) => isset($x)));
+    }
+
+    /**
+     * @param User $loggedInUser
+     * @return void
+     * @see AggregateSource/pruneQueryParamBuildersDueToUserPermissions() (Similar function for QueryParamBuilders)
+     */
+    public function pruneHydratorsDueToUserPermissions(User $loggedInUser): void
+    {
+        $hydratorsToKeep = [];
+        $loggedInUserRole = $loggedInUser->getRole();
+
+        foreach ($this->hydrators as $hydrator) {
+            if (
+                $hydrator instanceof Badge\Hydrator &&
+                !$loggedInUserRole->isStudent() &&
+                !$loggedInUserRole->isStaff()
+            ) {
+                // Badges should only be searchable for students and staff, so prune this QueryParamBuilder.
+                continue;
+            }
+
+            $hydratorsToKeep[] = $hydrator;
+        }
+
+        $this->hydrators = $hydratorsToKeep;
     }
 }
