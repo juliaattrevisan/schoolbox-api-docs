@@ -73,7 +73,7 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $this->pruneDependenciesBasedOnUserPermissions();
+        $this->pruneDependenciesDueToUserPermissions();
 
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
@@ -411,7 +411,7 @@ class Controller extends Base
     /**
      * @return void
      */
-    private function pruneDependenciesBasedOnUserPermissions(): void
+    private function pruneDependenciesDueToUserPermissions(): void
     {
         // Now that we have access to the logged-in user, we can prune the list of QueryParamBuilders and Hydrators
         // based on user permissions.  This could not be done in Search/Api/Module because the logged-in user is not
