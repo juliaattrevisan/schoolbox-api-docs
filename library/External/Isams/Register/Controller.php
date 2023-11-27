@@ -23,7 +23,6 @@ use Schoolbox\User;
  */
 class Controller extends BaseController
 {
-
     private CacheHelper $cacheHelper;
 
     /**
@@ -84,19 +83,9 @@ class Controller extends BaseController
 
             // Request 1.1: find metadata for fields
             // This ought to be cacheable for a lot longer than student data
-            try {
-                $metadataResponse = $this->httpClient->get(
-                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/metadata'),
-                    [RequestOptions::HEADERS => $authHeader,],
-                );
-                $metadataResponseBody = json_decode($metadataResponse->getBody()->getContents(), true);
-            } catch (ClientExceptionInterface $e) {
-                // No metadata exists for this field: that's okay
-                $metadataResponseBody = [];
-            }
 
             // Request 1.1.1: field data sources
-            foreach (($metadataResponseBody['fields'] ?? []) as $metadataField) {
+            foreach ($this->cacheHelper->getMetadataFields($registerId) as $metadataField) {
                 // Fetch data source only if it's a list
                 $metadataFieldValues = null;
                 $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');

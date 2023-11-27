@@ -31,7 +31,12 @@ class CacheHelper
     /**
      * Where to cache the registers array
      */
-    public const REGISTERS_CACHE_KEY = 'registers';
+    public const REGISTERS_CACHE_KEY = 'isams_reg_registers';
+
+    /**
+     * Where to cache the metadata array
+     */
+    public const METADATA_CACHE_KEY = 'isams_reg_metadata_%s';
 
     /**
      * Constructor
@@ -106,5 +111,37 @@ class CacheHelper
             $this->cache->set(self::REGISTERS_CACHE_KEY, $registers, self::STORAGE_CACHE_DEFAULT_TTL);
         }
         return $registers;
+    }
+
+    /**
+     * Retrieve the metadata fields for the specified Register ID
+     *
+     * @param int $registerId
+     * @return array|mixed
+     * @throws InvalidArgumentException
+     */
+    public function getMetadataFields(int $registerId)
+    {
+        $metadata = $this->cache->get(sprintf(self::METADATA_CACHE_KEY, $registerId));
+
+        if (!isset($metadata)) {
+            // This ought to be cacheable for a lot longer than student data
+            try {
+                $metadataResponse     = $this->httpClient->get(
+                    $this->apiUrl->withPath('/Main/api/registers/' . $registerId . '/metadata'),
+                    [
+                        RequestOptions::HEADERS => [
+                            'authorization' => 'Bearer ' . $this->getToken(),
+                        ],
+                    ],
+                );
+                $metadata = json_decode($metadataResponse->getBody()->getContents(), true);
+                $this->cache->set(sprintf(self::METADATA_CACHE_KEY, $registerId), $metadata, self::STORAGE_CACHE_DEFAULT_TTL);
+            } catch (ClientExceptionInterface $e) {
+                // No metadata exists for this field: that's okay
+                return  [];
+            }
+        }
+        return $metadata['fields'];
     }
 }
