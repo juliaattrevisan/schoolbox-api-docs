@@ -567,9 +567,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             // deal with this yourself
             case self::PIPE_METHOD_ACKNOWLEDGE:
-                $subscription = $this->subscriptionManager->getUserSubscription($instanceId, $userId);
-                $markAsRead   = [];
-                foreach ((array)$data[1] as $msgId) {
+                $subscription     = $this->subscriptionManager->getUserSubscription($instanceId, $userId);
+                $markAsRead       = [];
+                [, , $messageIds] = $data;
+                foreach ($messageIds as $msgId) {
                     if ($subscription->acknowledgeMessage($msgId)) {
                         $markAsRead[] = $msgId;
                     }
