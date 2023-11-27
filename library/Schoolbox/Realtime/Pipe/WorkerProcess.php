@@ -24,7 +24,7 @@ use ReflectionException;
 use RuntimeException;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper;
-use Schoolbox\Realtime\MessageList\IListFactory;
+use Schoolbox\Realtime\MessageList\MultiInstance\IListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
@@ -126,7 +126,7 @@ class WorkerProcess extends AbstractProcess
 
         try {
             // get ALL messages in this queue and make them prettae!
-            $this->factory->listed($userId)->fetchIntoBundle($decorator, true);
+            $this->factory->listed($instanceId, $userId)->fetchIntoBundle($decorator, true);
 
             // wrap in an array to preserve keys during transport
             return [ $decorator->renderAsSocketArray(false, $limit) ];

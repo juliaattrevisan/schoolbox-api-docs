@@ -7,13 +7,13 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Di\Configurator;
-use Schoolbox\Realtime\MessageList\ListFactory;
+use Schoolbox\MultiInstance\RedisClientRepository;
 use Schoolbox\Application\Daemon;
+use Schoolbox\Realtime\MessageList\MultiInstance\ListFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel("Worker", [Daemon\Kernel::OPTION_ERRORS => E_ALL]);
@@ -26,10 +26,10 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     // we open stream(3) as our data output stream
     $writer = new \Alaress\WorkerCrew\Worker\PipeWriter($strat, $log, fopen('php://fd/3', 'wb'));
 
-    /** @var ClientInterface $redis */
-    $redis = $di->get('redis.storage');
+    /** @var RedisClientRepository $redisClientRepository */
+    $redisClientRepository = $di->get('multiInstance.redisStorageClientRepository');
 
-    $listFactory = new ListFactory(INSTANCE_ID, $redis);
+    $listFactory = new ListFactory($redisClientRepository);
 
     $configurator = new Configurator($di);
 

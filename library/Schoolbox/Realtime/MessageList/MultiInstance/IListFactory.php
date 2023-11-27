@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Realtime\MessageList\MultiInstance;
+namespace Schoolbox\Realtime\MessageList\MultiInstance;
 
 use Alaress\Async\Queue\QueueInterface;
 
