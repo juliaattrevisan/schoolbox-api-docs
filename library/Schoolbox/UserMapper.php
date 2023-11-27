@@ -838,7 +838,7 @@ class UserMapper extends Mapper
         /** @var ClientInterface $redis */
         $redis   = self::getDi()->get('redis.storage');
         $factory = new Schoolbox\Realtime\MessageList\ListFactory(INSTANCE_ID, $redis);
-        $factory->listed(INSTANCE_ID, $user->getId())->drain();
+        $factory->listed($user->getId())->drain();
         $factory->unread($user->getId())->drain();
         $factory->digest($user->getId())->drain();
     }

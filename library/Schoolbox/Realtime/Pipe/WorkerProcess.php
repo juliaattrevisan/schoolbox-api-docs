@@ -126,7 +126,7 @@ class WorkerProcess extends AbstractProcess
 
         try {
             // get ALL messages in this queue and make them prettae!
-            $this->factory->listed($instanceId, $userId)->fetchIntoBundle($decorator, true);
+            $this->factory->listed($userId)->fetchIntoBundle($decorator, true);
 
             // wrap in an array to preserve keys during transport
             return [ $decorator->renderAsSocketArray(false, $limit) ];

@@ -26,8 +26,6 @@ class ListFactory implements IListFactory
 
 
     /**
-     * TODO replace $redis with instance-agnostic redis factory
-     *
      * @param string          $instanceId
      * @param ClientInterface $redis
      */
@@ -39,13 +37,12 @@ class ListFactory implements IListFactory
 
 
     /**
-     * @param string $instanceId
-     * @param int    $userId
+     * @param int $userId
      * @return QueueInterface
      */
-    public function listed(string $instanceId, int $userId)
+    public function listed($userId)
     {
-        return new Listed($this->redis, $instanceId, $userId);
+        return new Listed($this->redis, $this->instanceId, $userId);
     }
 
 
@@ -75,7 +72,7 @@ class ListFactory implements IListFactory
      */
     public function instant($userId)
     {
-        return new Composite($this->listed($this->instanceId, $userId), $this->unread($userId));
+        return new Composite($this->listed($userId), $this->unread($userId));
     }
 
 
