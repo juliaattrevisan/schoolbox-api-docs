@@ -165,14 +165,15 @@ window.Vue.onBeforeUnmount(async () => {
             </div>
             <div v-if="props.question.response?.maxScore" class="f-no-margins">
                 <label>Score (max score: {{ props.question.response.maxScore }})</label>
+                <p v-if="props.isReadOnly">{{ score }}</p>
                 <input
+                    v-else
                     :id="`customise-score-${props.question.response.learnosityReference}`"
                     ref="scoreEl"
                     v-model="score"
                     type="number"
                     min="0"
                     :max="props.question.response.maxScore"
-                    :readonly="props.isReadOnly"
                 />
                 <div class="save-container l-grid">
                     <div class="save-container__inner-container">
