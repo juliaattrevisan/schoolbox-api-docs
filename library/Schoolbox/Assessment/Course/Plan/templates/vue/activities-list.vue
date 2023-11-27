@@ -56,8 +56,19 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
 </template>
 
 <style scoped>
+.card.compact {
+    padding-right: 0;
+}
+
 .card.compact > * {
     height: 2.5rem;
+}
+
+.card.compact a p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .show-more-container {
@@ -75,6 +86,7 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
 
 .activity-list {
     height: 100%;
+    width: 400px;
     padding: 0 0 5px 0;
 }
 
