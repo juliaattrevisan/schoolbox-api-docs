@@ -53,6 +53,8 @@ class Module extends BaseModule
             $studentRegisterPermission,
             $studentRegisterPreload,
         );
+
+        $this->register(self::METHOD_GET, '/getRegisterList', 'getRegisterList', new Rule\IsSuperuser());
     }
 
     /**

@@ -123,4 +123,13 @@ class Controller extends BaseController
             ],
         );
     }
+
+    public function getRegisterList()
+    {
+        $apiUrl = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
+
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
+
+        new \Alaress_Probe($this->cacheHelper->getRegisters());
+    }
 }
