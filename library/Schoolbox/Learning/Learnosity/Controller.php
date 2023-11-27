@@ -705,36 +705,42 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        if (null !== $attempt->getReviewed()) {
-            $payload = [
-                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-                'reports' => [
-                    [
-                        /* DOM element id, where this goes in
-                         *
-                         * It's configurable by us, unlike the other anchors for
-                         * Author and Items api
-                         */
-                        'id' => 'schoolbox-student',
-                        'type' => 'session-detail-by-item',
-                        'session_id' => $attempt->getLearnosityReference(),
-                        'questions_api_init_options' => [
-                            'showCorrectAnswers' => false
-                        ]
-                    ],
-                    [
-                        /* DOM element id, where this goes in
-                         *
-                         * It's configurable by us, unlike the other anchors for
-                         * Author and Items api
-                         */
-                        'id' => 'schoolbox-completion-summary',
-                        'type' => 'sessions-summary-by-question',
-                        'session_ids' => [
-                            $attempt->getLearnosityReference()
-                        ]
-                    ],
+        /* Common elements to both code paths
+         * Completion summary always displays
+         */
+        $payload = [
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
+            'reports' => [
+                [
+                    /* DOM element id, where this goes in
+                     *
+                     * It's configurable by us, unlike the other anchors for
+                     * Author and Items api
+                     */
+                    'id' => 'schoolbox-completion-summary',
+                    'type' => 'sessions-summary-by-question',
+                    'session_ids' => [
+                        $attempt->getLearnosityReference()
+                    ]
                 ],
+            ]
+        ];
+
+        /* Conditional reports
+         */
+        if (null !== $attempt->getReviewed()) {
+            $payload['reports'][] = [
+                /* DOM element id, where this goes in
+                 *
+                 * It's configurable by us, unlike the other anchors for
+                 * Author and Items api
+                 */
+                'id' => 'schoolbox-student',
+                'type' => 'session-detail-by-item',
+                'session_id' => $attempt->getLearnosityReference(),
+                'questions_api_init_options' => [
+                    'showCorrectAnswers' => false
+                ]
             ];
 
             /* If there's a feedback for this attempt, get it
@@ -743,23 +749,18 @@ class Controller extends Base
              */
             $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
         } else {
-            $payload = [
-                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-                'reports' => [
-                    [
-                        /* DOM element id, where this goes in
-                         *
-                         * It's configurable by us, unlike the other anchors for
-                         * Author and Items api
-                         */
-                        'id' => 'schoolbox-student',
-                        'type' => 'session-detail-by-question',
-                        'session_id' => $attempt->getLearnosityReference(),
-                        'questions_api_init_options' => [
-                            'showCorrectAnswers' => false
-                        ]
-                    ],
-                ],
+            $payload['reports'][] = [
+                /* DOM element id, where this goes in
+                 *
+                 * It's configurable by us, unlike the other anchors for
+                 * Author and Items api
+                 */
+                'id' => 'schoolbox-student',
+                'type' => 'session-detail-by-question',
+                'session_id' => $attempt->getLearnosityReference(),
+                'questions_api_init_options' => [
+                    'showCorrectAnswers' => false
+                ]
             ];
 
             $comments = [];
