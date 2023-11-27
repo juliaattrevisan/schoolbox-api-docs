@@ -37,6 +37,7 @@ const paths = {
     userPage: "/search/user/",
     searchPage: "/search",
     searchPageWithKeyword: "/search?keyword=",
+    usersFilter: `filter=%7B"date"%3A%7B%7D%2C"creator"%3A%7B%7D%2C"types"%3A%5B"user"%2C"user.guest"%2C"user.parent"%2C"user.staff"%2C"user.student"%5D%7D`,
 };
 
 /**
@@ -270,7 +271,7 @@ const searchButtonText = window.Vue.computed(() => {
                 <a
                     v-if="results.length && totalCount > results.length"
                     class="c-card c-card--link c-card--active l-pad-s"
-                    :href="`${paths.searchPageWithKeyword}${keyword}`"
+                    :href="`${paths.searchPageWithKeyword}${keyword}&${paths.usersFilter}`"
                 >
                     View all {{ totalCount }} users
                 </a>
