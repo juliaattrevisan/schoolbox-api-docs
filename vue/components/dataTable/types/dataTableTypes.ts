@@ -6,6 +6,7 @@ export interface ColumnConfig {
     heading: string; // the heading of each column
     class?: string; // to allow any custom styling, such as hiding a column on smaller screens
     isSortable?: boolean; // to disable sorting of a column, by default all columns are sortable
+    isHidden?: boolean; // to hide a column, typically used to add extra search data to the table
     template?: TemplateConfig; // to allow custom templates to be used in the column
 }
 
