@@ -156,6 +156,14 @@ class CacheHelper
         return $metadata['fields'];
     }
 
+    /**
+     * Retrieve the student date ranges for the specified Register ID
+     *
+     * @param int    $registerId
+     * @param string $externalId
+     * @return array|mixed
+     * @throws InvalidArgumentException
+     */
     public function getStudentDateRanges(int $registerId, string $externalId)
     {
         $dateRanges = $this->cache->get(sprintf(self::STUDENT_DATES_CACHE_KEY, $registerId, $externalId));
