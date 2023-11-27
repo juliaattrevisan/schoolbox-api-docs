@@ -24,7 +24,6 @@ const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
 const emit = defineEmits<{
-    updatingComment: [];
     updatedComment: [comment: string];
 }>();
 
@@ -73,7 +72,7 @@ async function saveComment() {
         return;
     }
     isSaving.value = true;
-    emit("updatingComment");
+    emit("updatedComment", comment.value);
     window.addEventListener("beforeunload", beforeUnloadHandler);
     const formData = new FormData();
     formData.append("comment", comment.value);
@@ -81,7 +80,6 @@ async function saveComment() {
         method: "POST",
         body: formData,
     });
-    emit("updatedComment", comment.value);
     window.removeEventListener("beforeunload", beforeUnloadHandler);
     isSavedDelay.value = true;
     isSaving.value = false;

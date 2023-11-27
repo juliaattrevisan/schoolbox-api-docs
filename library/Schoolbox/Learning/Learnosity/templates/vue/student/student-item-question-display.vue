@@ -25,7 +25,6 @@ const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
 const emit = defineEmits<{
-    updatingScore: [];
     updatedScore: [question: StudentItemQuestion, score: number];
 }>();
 
@@ -81,7 +80,7 @@ async function saveScore() {
         return;
     }
     isSaving.value = true;
-    emit("updatingScore");
+    emit("updatedScore", props.question, parseFloat(score.value));
     window.addEventListener("beforeunload", beforeUnloadHandler);
     const formData = new FormData();
     formData.append(
@@ -93,7 +92,6 @@ async function saveScore() {
         method: "POST",
         body: formData,
     });
-    emit("updatedScore", props.question, parseFloat(score.value));
     window.removeEventListener("beforeunload", beforeUnloadHandler);
     isSavedDelay.value = true;
     isSaving.value = false;

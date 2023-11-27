@@ -9,7 +9,6 @@ import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentI
 import StudentNoScoreNote from "@schoolboxLearnosity/vue/student/student-no-score-note.vue";
 import StudentItemQuestionDisplay from "@schoolboxLearnosity/vue/student/student-item-question-display.vue";
 import StudentItemComment from "@schoolboxLearnosity/vue/student/student-item-comment.vue";
-import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
@@ -19,7 +18,6 @@ interface Props {
     container: HTMLElement; // the parent container, to look for the relevant item
 }
 const props = defineProps<Props>();
-const store = useStore();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
@@ -35,20 +33,12 @@ const isActive = window.Vue.computed(() => {
 });
 
 /**
- * Need to prevent moving to another item while the score or comment is being saved
- */
-function onUpdating() {
-    store.isProcessing = true;
-}
-
-/**
  * To notify of a change in the score
  * @param {StudentItemQuestion} question - the question to update
  * @param {number} score - the score to save
  */
 function onScoreUpdated(question: StudentItemQuestion, score: number) {
     studentsStore.updateItemResponseScore(props.student, props.item, question, score);
-    store.isProcessing = false;
 }
 
 /**
@@ -57,7 +47,6 @@ function onScoreUpdated(question: StudentItemQuestion, score: number) {
  */
 function onCommentUpdated(comment: string) {
     studentsStore.updateItemComment(props.student, props.item, props.item.questions[0], comment);
-    store.isProcessing = false;
 }
 </script>
 
@@ -74,7 +63,6 @@ function onCommentUpdated(comment: string) {
                     :question="question"
                     :container="props.container"
                     :is-read-only="false"
-                    @updating-score="onUpdating"
                     @updated-score="onScoreUpdated"
                 />
             </div>
@@ -82,7 +70,6 @@ function onCommentUpdated(comment: string) {
                 :student="props.student"
                 :item="props.item"
                 :is-read-only="false"
-                @updating-comment="onUpdating"
                 @updated-comment="onCommentUpdated"
             />
         </div>

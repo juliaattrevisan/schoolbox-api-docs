@@ -73,19 +73,11 @@ window.Vue.watch(
 );
 
 /**
- * Need to prevent moving to another item while the comment is being saved
- */
-function onAttemptCommentUpdating() {
-    store.isProcessing = true;
-}
-
-/**
  * To notify of a change in the comment
  * @param {string} comment - the comment to save
  */
 function onAttemptCommentUpdated(comment: string) {
     studentsStore.updateAttemptComment(props.student, comment);
-    store.isProcessing = false;
 }
 </script>
 
@@ -113,7 +105,6 @@ function onAttemptCommentUpdated(comment: string) {
                     v-if="itemsStore.isAttemptComment"
                     :student="props.student"
                     :is-read-only="false"
-                    @updating-comment="onAttemptCommentUpdating"
                     @updated-comment="onAttemptCommentUpdated"
                 />
                 <hm-students-student-unavailable-item :student="props.student" />

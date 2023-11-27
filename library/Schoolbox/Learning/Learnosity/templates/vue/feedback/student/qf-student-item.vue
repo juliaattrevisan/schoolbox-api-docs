@@ -41,20 +41,12 @@ window.Vue.watch(
 );
 
 /**
- * Need to prevent moving to another item while the score or comment is being saved
- */
-function onUpdating() {
-    store.isProcessing = true;
-}
-
-/**
  * To notify of a change in the score
  * @param {StudentItemQuestion} question - the question to update
  * @param {number} score - the score to save
  */
 function onScoreUpdated(question: StudentItemQuestion, score: number) {
     studentStore.updateItemResponseScore(props.item, question, score);
-    store.isProcessing = false;
 }
 
 /**
@@ -63,7 +55,6 @@ function onScoreUpdated(question: StudentItemQuestion, score: number) {
  */
 function onCommentUpdated(comment: string) {
     studentStore.updateItemComment(props.item, props.item.questions[0], comment);
-    store.isProcessing = false;
 }
 </script>
 
@@ -85,7 +76,6 @@ function onCommentUpdated(comment: string) {
                 :question="question"
                 :container="props.container"
                 :is-read-only="store.isReadOnly"
-                @updating-score="onUpdating"
                 @updated-score="onScoreUpdated"
             />
         </div>
@@ -93,7 +83,6 @@ function onCommentUpdated(comment: string) {
             :student="props.student"
             :item="props.item"
             :is-read-only="store.isReadOnly"
-            @updating-comment="onUpdating"
             @updated-comment="onCommentUpdated"
         />
     </div>

@@ -21,19 +21,11 @@ const store = useStore();
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 
 /**
- * Need to prevent moving to another item while the comment is being saved
- */
-function onAttemptCommentUpdating() {
-    store.isProcessing = true;
-}
-
-/**
  * To notify of a change in the comment
  * @param {string} comment - the comment to save
  */
 function onAttemptCommentUpdated(comment: string) {
     useStudentStore().updateAttemptComment(props.student, comment);
-    store.isProcessing = false;
 }
 </script>
 
@@ -64,7 +56,6 @@ function onAttemptCommentUpdated(comment: string) {
                 <student-attempt-comment
                     :student="props.student"
                     :is-read-only="store.isReadOnly"
-                    @updating-comment="onAttemptCommentUpdating"
                     @updated-comment="onAttemptCommentUpdated"
                 />
             </div>
