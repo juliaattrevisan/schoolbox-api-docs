@@ -173,7 +173,12 @@ class Module extends BaseModule
             ),
         ];
 
+        // See similar check in Search/Controller->getFiltersRawArray().
         if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
+            // Note that the QueryParamBuilder and Hydrator added here might be removed in the controller if it turns
+            // out that the user does not have access to badges.  User permission based checks cannot be done here
+            // because the logged-in user object is not available here.
+            // @see Search/Api/Controller->pruneDependenciesDueToUserPermissions().
             $queryParamBuilders[] = new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter());
             $hydrators[] = new Database\ResultType\Badge\Hydrator(
                 $mapperFactory->get(BadgeMapper::class),

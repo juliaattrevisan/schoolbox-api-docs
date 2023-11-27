@@ -416,7 +416,7 @@ class Controller extends Base
         // Now that we have access to the logged-in user, we can prune the list of QueryParamBuilders and Hydrators
         // based on user permissions.  This could not be done in Search/Api/Module because the logged-in user is not
         // available there.  This could not be done in the constructor either, because the user object is injected after
-        // the constructor has been called. (see call to $constructor->setUser() in WebRequest/Kernel->outputAuraContent().
+        // the constructor has been called. (see call to $constructor->setUser() in WebRequest/Kernel->outputAuraContent()).
         $this->source->pruneQueryParamBuildersDueToUserPermissions($this->getUser());
         $this->hydrator->pruneHydratorsDueToUserPermissions($this->getUser());
     }
