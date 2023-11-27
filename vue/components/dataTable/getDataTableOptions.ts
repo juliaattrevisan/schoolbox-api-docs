@@ -1,6 +1,7 @@
 /**
  * To return the options for the vue-tables-2 component linked
  * specifically to the <data-table> component implementation
+ * Refer to https://matanya.gitbook.io/vue-tables-2/options-api for a full list of options.
  */
 
 import getDefaultOptions from "@schoolboxVue/components/vueTables2/getDefaultOptions";
@@ -51,7 +52,7 @@ function getSortable(columnConfig: ColumnConfig[]) {
 /**
  * any hidden columns, typically used to add extra search data to the table
  * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {TableOptions} the columns that are sortable
+ * @returns {TableOptions} the columns that are hidden
  */
 function getHiddenColumns(columnConfig: ColumnConfig[]) {
     const hiddenColumns: string[] = [];
