@@ -3,7 +3,7 @@
  */
 
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
-import { addTargetsToMarks } from "@schoolboxLearnosity/js/util/domUtils";
+import { addTargetsToMarks, disableTextAreas } from "@schoolboxLearnosity/js/util/domUtils";
 import { useStudentStore } from "../store/qfStudentStore";
 
 /**
@@ -33,6 +33,7 @@ export function loadReport(initOptions: object) {
                     });
                     useStudentStore().addItems(items);
                     addTargetsToMarks(reportId);
+                    disableTextAreas(reportId);
                 });
                 // to notify the report has loaded
                 useStudentStore().reportLoaded();
