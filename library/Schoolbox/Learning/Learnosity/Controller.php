@@ -834,7 +834,7 @@ class Controller extends Base
                     'type' => 'session-detail-by-item',
                     'session_id' => $attempt->getLearnosityReference(),
                     'questions_api_init_options' => [
-                        'showCorrectAnswers' => false
+                        'showCorrectAnswers' => true
                     ]
                 ]
             ],
@@ -915,7 +915,7 @@ class Controller extends Base
                     'type' => 'session-detail-by-item',
                     'session_id' => $attempt->getLearnosityReference(),
                     'questions_api_init_options' => [
-                        'showCorrectAnswers' => false
+                        'showCorrectAnswers' => true
                     ]
                 ]
             ],
