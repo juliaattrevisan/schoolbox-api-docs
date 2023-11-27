@@ -2,3 +2,13 @@
 {% block profileHeading %}
     <h1>{{ user.formatName }}'s Learning Studio</h1>
 {% endblock %}
+
+{% block buttons %}
+    {{ parent() }}
+
+    {% set isamsRegister = routeLookupIfAuthorized("isamsRegister.getStudent", {studentId: user.id}) %}
+    {% if isamsRegister %}
+        <li><a class="icon-progress" href="{{ isamsRegister }}">Student Registers</a></li>
+    {% endif %}
+
+{% endblock %}
