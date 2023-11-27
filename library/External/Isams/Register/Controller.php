@@ -112,18 +112,6 @@ class Controller extends BaseController
                 ];
             }
 
-            // Request 1.2: find date ranges for student
-            try {
-                $dateRangesResponse = $this->httpClient->get(
-                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/dateranges'),
-                    [RequestOptions::HEADERS => $authHeader,],
-                );
-                $dateRangesResponseBody = json_decode($dateRangesResponse->getBody()->getContents(), true);
-            } catch (ClientExceptionInterface $e) {
-                // No record exists for this student: that's okay
-                $dateRangesResponseBody = [];
-            }
-
             // Request 1.3: find fields for student
             try {
                 $fieldsResponse = $this->httpClient->get(
@@ -146,7 +134,7 @@ class Controller extends BaseController
                     ];
                 }
             }
-            foreach (($dateRangesResponseBody['dateRanges'] ?? []) as $dateRange) {
+            foreach ($this->cacheHelper->getStudentDateRanges($registerId, $student->getExternalId()) as $dateRange) {
                 $studentData[$registerId]['dateRanges'][] = [
                     'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
                     'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),

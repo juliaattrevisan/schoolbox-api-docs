@@ -10,6 +10,7 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Uri;
+use Schoolbox\User;
 
 class CacheHelper
 {
@@ -22,6 +23,11 @@ class CacheHelper
      * Default: cache storage response 30 min.
      */
     private const STORAGE_CACHE_DEFAULT_TTL = 1800;
+
+    /**
+     * Default: cache student data 30 min.
+     */
+    private const STUDENT_CACHE_DEFAULT_TTL = 1800;
 
     /**
      * Where to cache JWKS?
@@ -37,6 +43,11 @@ class CacheHelper
      * Where to cache the metadata array
      */
     public const METADATA_CACHE_KEY = 'isams_reg_metadata_%s';
+
+    /**
+     * Where to cache the student dates array
+     */
+    public const STUDENT_DATES_CACHE_KEY = 'isams_reg_%s_student_dates_%s';
 
     /**
      * Constructor
@@ -143,5 +154,30 @@ class CacheHelper
             }
         }
         return $metadata['fields'];
+    }
+
+    public function getStudentDateRanges(int $registerId, string $externalId)
+    {
+        $dateRanges = $this->cache->get(sprintf(self::STUDENT_DATES_CACHE_KEY, $registerId, $externalId));
+
+        if (!isset($dateRanges)) {
+            // Request 1.2: find date ranges for student
+            try {
+                $dateRangesResponse     = $this->httpClient->get(
+                    $this->apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $externalId . '/dateranges'),
+                    [
+                        RequestOptions::HEADERS => [
+                            'authorization' => 'Bearer ' . $this->getToken(),
+                        ],
+                    ],
+                );
+                $dateRanges = json_decode($dateRangesResponse->getBody()->getContents(), true);
+                $this->cache->set(sprintf(self::STUDENT_DATES_CACHE_KEY, $registerId, $externalId), $dateRanges, self::STUDENT_CACHE_DEFAULT_TTL);
+            } catch (ClientExceptionInterface $e) {
+                // No record exists for this student: that's okay
+                return [];
+            }
+        }
+        return $dateRanges['dateRanges'];
     }
 }
