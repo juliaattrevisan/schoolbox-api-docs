@@ -17,12 +17,12 @@ use Alaress\Async\Queue\QueueInterface;
  */
 interface IListFactory
 {
-
     /**
-     * @param int $userId
+     * @param string $instanceId
+     * @param int    $userId
      * @return QueueInterface
      */
-    public function listed($userId);
+    public function listed(string $instanceId, int $userId);
 
 
     /**

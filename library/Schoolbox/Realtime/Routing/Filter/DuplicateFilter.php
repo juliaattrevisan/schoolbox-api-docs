@@ -39,7 +39,8 @@ class DuplicateFilter implements FilterInterface
      */
     public function validate(Instance $message, User $user)
     {
-        if ($this->factory->listed($user->getId())->contains($message)) {
+        // TODO how do I get instance ID in here?
+        if ($this->factory->listed($user->getId(), $user->getId())->contains($message)) {
             throw new FilterException('User has already seen this message');
         }
 

@@ -185,7 +185,7 @@ abstract class AbstractNotificationTest extends AbstractTest
         // load the data into your hat, and pull out a rabbit
         $decorator = new Decorator();
 
-        $this->listFactory->listed($userId)->fetchIntoBundle($decorator);
+        $this->listFactory->listed(INSTANCE_ID, $userId)->fetchIntoBundle($decorator);
 
         return $decorator->getNotifications();
     }
