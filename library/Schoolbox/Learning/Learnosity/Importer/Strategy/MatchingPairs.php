@@ -46,8 +46,21 @@ class MatchingPairs extends Base implements IStrategy
         $correctAnswers = [];
 
         foreach ($possibleAnswers as $possibleAnswer) {
-            $stimulusList[] = trim($possibleAnswer->answerLeft);
-            $correctAnswers[] = trim($possibleAnswer->answerRight);
+            $left = trim((string)($possibleAnswer->answerLeft ?? ''));
+            $right = trim((string)($possibleAnswer->answerRight ?? ''));
+
+            /* Skip left/right combinations that are meaningless
+             * These weren't intended, but somehow exist in prod data
+             * They don't convey anything to users
+             *
+             * But what happens when this brokenness is the only option available?
+             */
+            if (('' === $left) || ('' === $right)) {
+                continue;
+            }
+
+            $stimulusList[] = $left;
+            $correctAnswers[] = $right;
         }
 
         /* Randomise whatever this was
