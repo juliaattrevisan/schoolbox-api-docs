@@ -32,22 +32,22 @@ class CacheHelper
     /**
      * Where to cache JWKS?
      */
-    public const JWKS_CACHE_KEY = 'isams_reg_jwks';
+    public const JWKS_CACHE_KEY = 'isams_registers_jwks';
 
     /**
      * Where to cache the registers array
      */
-    public const REGISTERS_CACHE_KEY = 'isams_reg_registers';
+    public const REGISTERS_CACHE_KEY = 'isams_registers';
 
     /**
      * Where to cache the metadata array
      */
-    public const METADATA_CACHE_KEY = 'isams_reg_metadata_%s';
+    public const METADATA_CACHE_KEY = 'isams_register_%s_metadata';
 
     /**
      * Where to cache the student dates array
      */
-    public const STUDENT_DATES_CACHE_KEY = 'isams_reg_%s_student_dates_%s';
+    public const STUDENT_DATES_CACHE_KEY = 'isams_register_%s_student_dates_%s';
 
     /**
      * Constructor
