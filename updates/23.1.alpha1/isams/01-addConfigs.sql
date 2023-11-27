@@ -2,8 +2,8 @@ SELECT `id` INTO @type FROM `lu_config_type` WHERE `type` = 'External DB';
 SELECT max(sequence) INTO @sequence FROM `config` c WHERE type_id = @type;
 INSERT INTO `config`(
     `name`,
-    `value`,
     `title`,
+    `value`,
     `description`,
     `field_id`,
     `type_id`,
@@ -52,4 +52,31 @@ INSERT INTO `config`(
     'false',
     'settings',
     @sequence + 3
-)
+),(
+     'external_isams_student_registers',
+     'iSAMS Student Registers Filter',
+     '',
+     'a csv list of codes to show on the Student Registers page',
+     (SELECT `id` FROM `lu_config_field` WHERE `field` = 'input'),
+     @type,
+     '',
+     'true',
+     'false',
+     'false',
+     'settings',
+     @sequence + 3
+ ),(
+     'external_isams_financial_registers',
+     'iSAMS Financial Registers Filter',
+     '',
+     'a csv list of codes to show on the Financial Registers page',
+     (SELECT `id` FROM `lu_config_field` WHERE `field` = 'input'),
+     @type,
+     '',
+     'true',
+     'false',
+     'false',
+     'settings',
+     @sequence + 3
+ )
+

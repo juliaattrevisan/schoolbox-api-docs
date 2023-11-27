@@ -15,6 +15,7 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Uri;
 
@@ -95,8 +96,8 @@ class CacheHelper
                 $this->apiUrl->withPath('/auth/connect/token'),
                 [
                     RequestOptions::FORM_PARAMS => [
-                        'client_id'     => $this->configLoader->get('external_isams_rest_api_client_id'),
-                        'client_secret' => $this->configLoader->get('external_isams_rest_api_client_secret'),
+                        'client_id'     => $this->configLoader->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_CLIENT_ID),
+                        'client_secret' => $this->configLoader->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_CLIENT_SECRET),
                         'grant_type'    => 'client_credentials',
                         'scope'         => 'restapi',
                     ]

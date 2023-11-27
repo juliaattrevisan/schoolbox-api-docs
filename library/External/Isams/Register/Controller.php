@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use GuzzleHttp\Client as HttpClient;
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
@@ -45,7 +46,7 @@ class Controller extends BaseController
     public function getStudent(User $student): void
     {
         // Hit the iSams API:
-        $apiUrl = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
+        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
         // first, need to exchange client id/secret for an access token
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
@@ -126,7 +127,7 @@ class Controller extends BaseController
 
     public function getRegisterList()
     {
-        $apiUrl = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
+        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
 
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
