@@ -12,8 +12,6 @@ namespace External\Isams\Register;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\RequestOptions;
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
@@ -50,9 +48,6 @@ class Controller extends BaseController
         $apiUrl = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
         // first, need to exchange client id/secret for an access token
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
-        $authHeader        = [
-            'authorization' => 'Bearer ' . $this->cacheHelper->getToken(),
-        ];
 
         $registers       = $this->cacheHelper->getRegisters();
         $globalData      = [];

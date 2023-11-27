@@ -1,16 +1,22 @@
 <?php
 
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
 namespace External\Isams\Register;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Uri;
-use Schoolbox\User;
 
 class CacheHelper
 {
@@ -74,8 +80,7 @@ class CacheHelper
      * Retrieve Bearer Token from the OIDC
      *
      * @return string
-     * @throws ClientExceptionInterface if something went wrong fetching
-     *                                  OIDC discovery or JWKS URIs
+     * @throws ClientExceptionInterface if something went wrong fetching JWKS
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
@@ -109,10 +114,13 @@ class CacheHelper
      *
      * @return mixed
      * @throws ClientExceptionInterface
-     * @throws InvalidArgumentException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws ClientExceptionInterface if something went wrong fetching JWKS
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     * @throws GuzzleException
      */
-    public function getRegisters()
+    public function getRegisters(): mixed
     {
         $registers = $this->cache->get(self::REGISTERS_CACHE_KEY);
         if (!isset($registers)) {
@@ -139,9 +147,11 @@ class CacheHelper
      *
      * @param int $registerId
      * @return array|mixed
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function getMetadataFields(int $registerId)
+    public function getMetadataFields(int $registerId): mixed
     {
         $metadata = $this->cache->get(sprintf(self::METADATA_CACHE_KEY, $registerId));
 
@@ -172,9 +182,11 @@ class CacheHelper
      * @param int    $registerId
      * @param string $externalId
      * @return array|mixed
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function getStudentDateRanges(int $registerId, string $externalId)
+    public function getStudentDateRanges(int $registerId, string $externalId): mixed
     {
         $dateRanges = $this->cache->get(sprintf(self::STUDENT_DATES_CACHE_KEY, $registerId, $externalId));
 
@@ -205,9 +217,11 @@ class CacheHelper
      * @param int    $registerId
      * @param string $externalId
      * @return array|mixed
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function getStudentFields(int $registerId, string $externalId)
+    public function getStudentFields(int $registerId, string $externalId): mixed
     {
         $studentFields = $this->cache->get(sprintf(self::STUDENT_FIELDS_CACHE_KEY, $registerId, $externalId));
 
@@ -238,9 +252,11 @@ class CacheHelper
      *
      * @param string $dataSourceUrl
      * @return array|mixed
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function getDataSource(string $dataSourceUrl)
+    public function getDataSource(string $dataSourceUrl): mixed
     {
         $dataSource = $this->cache->get(sprintf(self::DATASOURCE_FIELDS_CACHE_KEY, $dataSourceUrl));
 
