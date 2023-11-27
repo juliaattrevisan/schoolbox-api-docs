@@ -50,6 +50,11 @@ class CacheHelper
     public const STUDENT_DATES_CACHE_KEY = 'isams_register_%s_student_dates_%s';
 
     /**
+     * Where to cache the student fields array
+     */
+    public const STUDENT_FIELDS_CACHE_KEY = 'isams_register_%s_student_fields_%s';
+
+    /**
      * Constructor
      *
      * @param HttpClient $httpClient for querying iSams
@@ -187,5 +192,38 @@ class CacheHelper
             }
         }
         return $dateRanges['dateRanges'];
+    }
+
+    /**
+     * Retrieve the student date ranges for the specified Register ID
+     *
+     * @param int    $registerId
+     * @param string $externalId
+     * @return array|mixed
+     * @throws InvalidArgumentException
+     */
+    public function getStudentFields(int $registerId, string $externalId)
+    {
+        $studentFields = $this->cache->get(sprintf(self::STUDENT_FIELDS_CACHE_KEY, $registerId, $externalId));
+
+        if (!isset($studentFields)) {
+            // Request 1.3: find fields for student
+            try {
+                $fieldsResponse     = $this->httpClient->get(
+                    $this->apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $externalId . '/fields'),
+                    [
+                        RequestOptions::HEADERS => [
+                            'authorization' => 'Bearer ' . $this->getToken(),
+                        ],
+                    ],
+                );
+                $studentFields = json_decode($fieldsResponse->getBody()->getContents(), true);
+                $this->cache->set(sprintf(self::STUDENT_FIELDS_CACHE_KEY, $registerId, $externalId), $studentFields, self::STUDENT_CACHE_DEFAULT_TTL);
+            } catch (ClientExceptionInterface $e) {
+                // No record exists for this student: that's okay
+                return [];
+            }
+        }
+        return $studentFields['fields'];
     }
 }

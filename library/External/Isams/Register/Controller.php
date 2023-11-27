@@ -112,20 +112,8 @@ class Controller extends BaseController
                 ];
             }
 
-            // Request 1.3: find fields for student
-            try {
-                $fieldsResponse = $this->httpClient->get(
-                    $apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $student->getExternalId() . '/fields'),
-                    [RequestOptions::HEADERS => $authHeader,],
-                );
-                $fieldsResponseBody = json_decode($fieldsResponse->getBody()->getContents(), true);
-            } catch (ClientExceptionInterface $e) {
-                // No record exists for this student: that's okay
-                $fieldsResponseBody = [];
-            }
-
             // Collate student data
-            foreach (($fieldsResponseBody['fields'] ?? []) as $key => $fieldValue) {
+            foreach ($this->cacheHelper->getStudentFields($registerId, $student->getExternalId()) as $key => $fieldValue) {
                 $key = strtolower($key);
                 if (isset($fieldValue)) {
                     $studentData[$registerId]['fields'][$key] = [
