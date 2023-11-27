@@ -46,15 +46,28 @@ class Multi extends Base implements IStrategy
         /* Note that $possibleAnswers deserialized into stdClass instances
          */
         foreach ($possibleAnswers as $possibleAnswer) {
+            $description = trim($possibleAnswer->description ?? '');
+            $value = trim($possibleAnswer->value ?? '');
+
+            /* Skip descriptions/values that are meaningless
+             * These weren't intended, but somehow exist in prod data
+             * They don't convey anything to users
+             *
+             * But what happens when this brokenness is the only option available?
+             */
+            if (('' === $description) || ('' === $value)) {
+                continue;
+            }
+
             $options[] = [
-                'label' => trim($possibleAnswer->description),
-                'value' => trim($possibleAnswer->value),
+                'label' => $description,
+                'value' => $value,
             ];
 
             /* Remember the correct answer(s)
              */
             if ($possibleAnswer->correct) {
-                $correct[] = trim($possibleAnswer->value);
+                $correct[] = $value;
             }
         }
 
