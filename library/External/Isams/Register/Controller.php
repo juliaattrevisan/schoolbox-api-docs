@@ -50,20 +50,12 @@ class Controller extends BaseController
         // Hit the iSams API:
         $apiUrl = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
         // first, need to exchange client id/secret for an access token
-        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader());
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
         $authHeader        = [
             'authorization' => 'Bearer ' . $this->cacheHelper->getToken(),
         ];
 
-        // Request 1: find registers
-        // TODO these should be configured:
-        //      also a mapping from codes to IDs should be cached
-        $apiResponse = $this->httpClient->get(
-            $apiUrl->withPath('/Main/api/registers/'),
-            [RequestOptions::HEADERS => $authHeader,],
-        );
-        $apiResponseBody = json_decode($apiResponse->getBody()->getContents(), true);
-        $registers       = $apiResponseBody['registers'];
+        $registers       = $this->cacheHelper->getRegisters();
         $globalData      = [];
         $studentData     = [];
         foreach ($registers as $register) {

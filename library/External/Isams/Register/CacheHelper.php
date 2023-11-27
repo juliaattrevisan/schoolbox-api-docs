@@ -19,9 +19,19 @@ class CacheHelper
     private const JWKS_CACHE_DEFAULT_TTL = 3600;
 
     /**
+     * Default: cache storage response 30 min.
+     */
+    private const STORAGE_CACHE_DEFAULT_TTL = 1800;
+
+    /**
      * Where to cache JWKS?
      */
     public const JWKS_CACHE_KEY = 'isams_reg_jwks';
+
+    /**
+     * Where to cache the registers array
+     */
+    public const REGISTERS_CACHE_KEY = 'registers';
 
     /**
      * Constructor
@@ -29,7 +39,7 @@ class CacheHelper
      * @param HttpClient $httpClient for querying iSams
      * @param CacheInterface $cache for caching the api response
      */
-    public function __construct(private HttpClient $httpClient, private CacheInterface $cache, private IConfigLoader $configLoader)
+    public function __construct(private HttpClient $httpClient, private CacheInterface $cache, private IConfigLoader $configLoader, private Uri $apiUrl)
     {
     }
 
@@ -50,9 +60,8 @@ class CacheHelper
         // does the cache exist? then lets use it. else generate and request the jwks
         if (!isset($jwks)) {
             // first, need to exchange client id/secret for an access token
-            $apiUrl        = new Uri($this->configLoader->get('external_isams_rest_api_host'));
             $tokenResponse = $this->httpClient->post(
-                $apiUrl->withPath('/auth/connect/token'),
+                $this->apiUrl->withPath('/auth/connect/token'),
                 [
                     RequestOptions::FORM_PARAMS => [
                         'client_id'     => $this->configLoader->get('external_isams_rest_api_client_id'),
@@ -67,5 +76,35 @@ class CacheHelper
             $this->cache->set(self::JWKS_CACHE_KEY, $jwks, $jwks['expires_in'] ?? self::JWKS_CACHE_DEFAULT_TTL);
         }
         return $jwks['access_token'];
+    }
+
+    /**
+     * Retrieve the Registers from Isams
+     *
+     * @return mixed
+     * @throws ClientExceptionInterface
+     * @throws InvalidArgumentException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getRegisters()
+    {
+        $registers = $this->cache->get(self::REGISTERS_CACHE_KEY);
+        if (!isset($registers)) {
+            // Request 1: find registers
+            // TODO these should be configured:
+            //      also a mapping from codes to IDs should be cached
+            $apiResponse     = $this->httpClient->get(
+                $this->apiUrl->withPath('/Main/api/registers/'),
+                [
+                    RequestOptions::HEADERS => [
+                        'authorization' => 'Bearer ' . $this->getToken(),
+                    ],
+                ],
+            );
+            $apiResponseBody = json_decode($apiResponse->getBody()->getContents(), true);
+            $registers       = $apiResponseBody['registers'];
+            $this->cache->set(self::REGISTERS_CACHE_KEY, $registers, self::STORAGE_CACHE_DEFAULT_TTL);
+        }
+        return $registers;
     }
 }
