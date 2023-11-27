@@ -222,7 +222,7 @@ const searchButtonText = window.Vue.computed(() => {
         v-on-click-outside="onClickOutside"
         class="c-header-search"
         action="/search"
-        :class="{ focus: isFocused }"
+        :class="{ focus: isSelected }"
     >
         <search-input
             :is-active-when-empty="false"
