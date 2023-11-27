@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
@@ -22,12 +23,16 @@ use Schoolbox\User;
  */
 class Controller extends BaseController
 {
+
+    private CacheHelper $cacheHelper;
+
     /**
      * Constructor
      *
      * @param HttpClient $httpClient for querying iSams
+     * @param CacheInterface $cache for caching the api response
      */
-    public function __construct(private HttpClient $httpClient)
+    public function __construct(private HttpClient $httpClient, private CacheInterface $cache)
     {
     }
 
@@ -43,23 +48,11 @@ class Controller extends BaseController
     public function getStudent(User $student): void
     {
         // Hit the iSams API:
+        $apiUrl = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
         // first, need to exchange client id/secret for an access token
-        $apiUrl        = new Uri($this->getConfigLoader()->get('external_isams_rest_api_host'));
-        $tokenResponse = $this->httpClient->post(
-            $apiUrl->withPath('/auth/connect/token'),
-            [
-                RequestOptions::FORM_PARAMS => [
-                    'client_id'     => $this->getConfigLoader()->get('external_isams_rest_api_client_id'),
-                    'client_secret' => $this->getConfigLoader()->get('external_isams_rest_api_client_secret'),
-                    'grant_type'    => 'client_credentials',
-                    'scope'         => 'restapi',
-                ]
-            ]
-        );
-        $tokenResponseBody = json_decode($tokenResponse->getBody()->getContents(), true);
-        $accessToken       = $tokenResponseBody['access_token'];
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader());
         $authHeader        = [
-            'authorization' => 'Bearer ' . $accessToken,
+            'authorization' => 'Bearer ' . $this->cacheHelper->getToken(),
         ];
 
         // Request 1: find registers

@@ -62,6 +62,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('httpClient'),
+            $this->injector->get('oidc.cache'),
         );
     }
 
