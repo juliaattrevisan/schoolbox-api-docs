@@ -91,17 +91,7 @@ class Controller extends BaseController
                 $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
                 if (in_array($dataSource, ['private', 'shared'])) {
                     if ($metadataField['properties']['dataSourceUrl'] ?? null) {
-                        try {
-                            $dataSourceResponse = $this->httpClient->get(
-                                $metadataField['properties']['dataSourceUrl'],
-                                [RequestOptions::HEADERS => $authHeader,],
-                            );
-                            $dataSourceResponseBody = json_decode($dataSourceResponse->getBody()->getContents(), true);
-                        } catch (ClientExceptionInterface $e) {
-                            // No metadata exists for this field: that's okay
-                            $dataSourceResponseBody = [];
-                        }
-                        foreach (($dataSourceResponseBody['items'] ?? []) as $item) {
+                        foreach ($this->cacheHelper->getDataSource($metadataField['properties']['dataSourceUrl']) as $item) {
                             $metadataFieldValues[$item['value']] = $item['text'];
                         }
                     }

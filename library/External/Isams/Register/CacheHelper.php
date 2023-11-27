@@ -55,6 +55,11 @@ class CacheHelper
     public const STUDENT_FIELDS_CACHE_KEY = 'isams_register_%s_student_fields_%s';
 
     /**
+     * Where to cache the student fields array
+     */
+    public const DATASOURCE_FIELDS_CACHE_KEY = 'isams_register_datasource_%s';
+
+    /**
      * Constructor
      *
      * @param HttpClient $httpClient for querying iSams
@@ -225,5 +230,37 @@ class CacheHelper
             }
         }
         return $studentFields['fields'];
+    }
+
+    /**
+     * Retrieve the Data Source as specified by the Metadata Field
+     * @see self::getMetadataFields
+     *
+     * @param string $dataSourceUrl
+     * @return array|mixed
+     * @throws InvalidArgumentException
+     */
+    public function getDataSource(string $dataSourceUrl)
+    {
+        $dataSource = $this->cache->get(sprintf(self::DATASOURCE_FIELDS_CACHE_KEY, $dataSourceUrl));
+
+        if (!isset($dataSource)) {
+            try {
+                $dataSourceResponse     = $this->httpClient->get(
+                    $dataSourceUrl,
+                    [
+                        RequestOptions::HEADERS => [
+                            'authorization' => 'Bearer ' . $this->getToken(),
+                        ],
+                    ],
+                );
+                $dataSource = json_decode($dataSourceResponse->getBody()->getContents(), true);
+                $this->cache->set(sprintf(self::DATASOURCE_FIELDS_CACHE_KEY, $dataSourceUrl), $dataSource, self::STORAGE_CACHE_DEFAULT_TTL);
+            } catch (ClientExceptionInterface $e) {
+                // No metadata exists for this field: that's okay
+                return [];
+            }
+        }
+        return $dataSource['items'];
     }
 }
