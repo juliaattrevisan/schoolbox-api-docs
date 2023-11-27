@@ -50,10 +50,16 @@ class Controller extends BaseController
         // first, need to exchange client id/secret for an access token
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
+        $allowedRegisters = explode(',', $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
+
         $registers       = $this->cacheHelper->getRegisters();
         $globalData      = [];
         $studentData     = [];
         foreach ($registers as $register) {
+            if (!in_array($register['code'], $allowedRegisters)) {
+                // not a filtered register Ignoring...
+                continue;
+            }
             $registerId               = $register['id'];
             $globalData[$registerId]  = $register;
             $studentData[$registerId] = [];
