@@ -49,6 +49,21 @@ function getSortable(columnConfig: ColumnConfig[]) {
 }
 
 /**
+ * any hidden columns, typically used to add extra search data to the table
+ * @param {ColumnConfig[]} columnConfig - the configuration for the columns
+ * @returns {TableOptions} the columns that are sortable
+ */
+function getHiddenColumns(columnConfig: ColumnConfig[]) {
+    const hiddenColumns: string[] = [];
+    columnConfig.forEach((column) => {
+        if (column.isHidden) {
+            hiddenColumns.push(column.key);
+        }
+    });
+    return { hiddenColumns };
+}
+
+/**
  *
  * @param {ColumnConfig} columnConfig - the configuration for the columns
  * @param {tableOptions} tableOptions - the options passed to the vue-tables-2 component
@@ -60,6 +75,7 @@ export function getOptions(columnConfig: ColumnConfig[], tableOptions: TableOpti
         ...getColumnsClasses(columnConfig),
         ...getHeadings(columnConfig),
         ...getSortable(columnConfig),
+        ...getHiddenColumns(columnConfig),
         ...tableOptions,
     };
 }
