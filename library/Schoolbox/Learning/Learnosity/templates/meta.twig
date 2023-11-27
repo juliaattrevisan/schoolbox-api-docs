@@ -13,7 +13,7 @@
         {% endapply %}</li>
 
     <li class="icon-time-value" title="Attempt Time Taken">{% apply spaceless %}
-        Time taken
+        Time taken:
         {% if attempt.finish %}
             {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
         {% else %}

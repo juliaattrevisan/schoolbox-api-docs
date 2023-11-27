@@ -710,23 +710,29 @@ class Controller extends Base
          */
         $payload = [
             'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-            'reports' => [
-                [
-                    /* DOM element id, where this goes in
-                     *
-                     * It's configurable by us, unlike the other anchors for
-                     * Author and Items api
-                     */
-                    'id' => 'schoolbox-completion-summary',
-                    'type' => 'sessions-summary-by-question',
-                    'session_ids' => [
-                        $attempt->getLearnosityReference()
-                    ]
-                ],
-            ]
+            'reports' => []
         ];
 
         /* Conditional reports
+         *     - If an attempt is finished, provide the completion summary (unsure how people get here, but ok)
+         */
+        if ($attempt->isFinished()) {
+            $payload['reports'][] = [
+                /* DOM element id, where this goes in
+                 *
+                 * It's configurable by us, unlike the other anchors for
+                 * Author and Items api
+                 */
+                'id' => 'schoolbox-completion-summary',
+                'type' => 'sessions-summary-by-question',
+                'session_ids' => [
+                    $attempt->getLearnosityReference()
+                ]
+            ];
+        }
+
+        /* If a teacher reviewed the attempt, show their feedback information
+         * Otherwise just show what the student did.
          */
         if (null !== $attempt->getReviewed()) {
             $payload['reports'][] = [
