@@ -46,8 +46,8 @@ class MatchingPairs extends Base implements IStrategy
         $correctAnswers = [];
 
         foreach ($possibleAnswers as $possibleAnswer) {
-            $left = trim((string)($possibleAnswer->answerLeft ?? ''));
-            $right = trim((string)($possibleAnswer->answerRight ?? ''));
+            $left = trim($possibleAnswer->answerLeft ?? '');
+            $right = trim($possibleAnswer->answerRight ?? '');
 
             /* Skip left/right combinations that are meaningless
              * These weren't intended, but somehow exist in prod data

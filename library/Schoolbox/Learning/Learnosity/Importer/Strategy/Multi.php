@@ -46,8 +46,8 @@ class Multi extends Base implements IStrategy
         /* Note that $possibleAnswers deserialized into stdClass instances
          */
         foreach ($possibleAnswers as $possibleAnswer) {
-            $description = trim((string)($possibleAnswer->description ?? ''));
-            $value = trim((string)($possibleAnswer->value ?? ''));
+            $description = trim($possibleAnswer->description ?? '');
+            $value = trim($possibleAnswer->value ?? '');
 
             /* Skip descriptions/values that are meaningless
              * These weren't intended, but somehow exist in prod data
