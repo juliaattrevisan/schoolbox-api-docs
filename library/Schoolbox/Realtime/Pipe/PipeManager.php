@@ -300,7 +300,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
 
         foreach ($data as $command => $value) {
-            $arguments = [$userId, $value];
+            $arguments = [$instanceId, $userId, $value];
 
             if ($pipe->isLocked()) {
                 // pipe has a command active: don't permit another until this one is finished
