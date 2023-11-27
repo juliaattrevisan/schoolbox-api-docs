@@ -95,11 +95,11 @@ const tableOptions = {
         "givenName",
         "preferredName",
         "lastName",
+        "fullName",
         "role",
         "campus",
         "yearLevel",
         "house",
-        "fullName",
     ], // these are all added to name, but we need to add them to tableColumns so we can search them
     orderBy: {
         //initial sorting display
