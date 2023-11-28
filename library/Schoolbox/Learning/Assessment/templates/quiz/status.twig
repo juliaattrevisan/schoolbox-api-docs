@@ -212,7 +212,7 @@
                  #}
                 {% if latestResponse.learnosityReference ?? null %}
                     {% if canDelete %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
-                    {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.postCompleteAttempt', {assessmentId: assessment.id, studentId: latestResponse.submittedBy.id}) }}">Finish Attempt</a>{% endif %}
+                    {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.learnosityReference }}" href="{{ routeLookupIfAuthorized('learnosity.postCompleteAttempt', {assessmentId: assessment.id, studentId: latestResponse.submittedBy.id}) }}">Finish Attempt</a>{% endif %}
 
                     {% if canPublish or canFinish %}
                         <a
@@ -375,7 +375,7 @@
 
                 $.post(
                     $a.attr('href'),
-                    { attemptId: $a.attr('data-interaction-finish')}
+                    { learnosityReference: $a.attr('data-interaction-finish')}
                 ).done(function () {
                     var $actionBar = $a.closest('[data-action-bar]');
                     $actionBar.attr('data-mass-review', '');

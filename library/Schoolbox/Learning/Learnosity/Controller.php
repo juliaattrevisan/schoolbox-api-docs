@@ -587,6 +587,13 @@ class Controller extends Base
             ]
         ]);
 
+        /* The learnosityReference posted here doesn't exist
+         * TODO What kind of error should we present to users? It's asynchronous
+         */
+        if (!\count($result['data'])) {
+            throw new \UnexpectedValueException('Empty result payload for attempt.');
+        }
+
         /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
          * ($mark must never exceed $maxMark) and/or otherwise sanitise data
          */
@@ -616,6 +623,7 @@ class Controller extends Base
         if (null === $existingResponse) {
             return;
         }
+
         $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
