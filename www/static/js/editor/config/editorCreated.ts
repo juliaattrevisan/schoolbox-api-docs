@@ -108,6 +108,7 @@ async function addIframelyEmbed(config: EditorConfig, editor: Editor) {
  * The process.env.NODE_ENV is built into node/webpack:
  * https://webpack.js.org/configuration/mode/
  * so it will only be imported in development mode, not in production
+ * No longer used, but kept for any future debugging needs
  * @param { Editor } editor - the CKEditor instance
  */
 async function attachInspector(editor: Editor) {
@@ -119,7 +120,6 @@ async function attachInspector(editor: Editor) {
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
- *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
@@ -130,5 +130,4 @@ export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, c
     disableAutoMedia(editor, config);
     removeValidation();
     await addIframelyEmbed(config, editor);
-    await attachInspector(editor);
 }
