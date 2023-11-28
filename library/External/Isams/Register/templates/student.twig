@@ -3,7 +3,7 @@
 <table>
     <thead>
     <tr>
-        {% if studentData.first.dateRanges is defined and studentData.first.dateRanges %}
+        {% if hasDateRange %}
             <th>Date</th>
         {% endif %}
         <th>Name</th>
@@ -15,7 +15,7 @@
     {% for studentDatum in studentData %}
         {% for field in (studentDatum.fields ?? []) %}
             <tr>
-            {% if studentDatum.dateRanges is defined and studentDatum.dateRanges %}
+            {% if hasDateRange and studentDatum.dateRanges is defined and studentDatum.dateRanges %}
                 <td>
                 {%- for dateRange in studentDatum.dateRanges -%}
                     {{ dateRange.from.localShort }}&mdash;{{ dateRange.to.localShort }}

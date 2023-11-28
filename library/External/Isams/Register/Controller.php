@@ -102,6 +102,7 @@ class Controller extends BaseController
             $registerId               = $register['id'];
             $globalData[$registerId]  = $register;
             $studentData[$registerId] = [];
+            $hasDateRange = false;
 
 //            // Alternate request: find student register, filtered to $student:
 //            // This _does_ return filtered results, but doesn't include date
@@ -182,6 +183,7 @@ class Controller extends BaseController
                 }
             }
             foreach ($this->cacheHelper->getStudentDateRanges($registerId, $student->getExternalId()) as $dateRange) {
+                $hasDateRange = true;
                 $studentData[$registerId]['dateRanges'][] = [
                     'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
                     'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
@@ -190,8 +192,9 @@ class Controller extends BaseController
             $this->response = $this->responseFromTemplate(
                 '@isamsRegister/student.twig',
                 [
-                    'student'     => $student,
-                    'studentData' => array_values($studentData),
+                    'student'       => $student,
+                    'studentData'   => array_values($studentData),
+                    'hasDateRange'  => $hasDateRange
                 ],
             );
             return;
