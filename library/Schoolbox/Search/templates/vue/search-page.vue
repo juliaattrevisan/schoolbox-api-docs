@@ -39,6 +39,9 @@ const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
 const searchPageEl = window.Vue.ref<HTMLDivElement>();
 
+const isBadgeModalOpen = window.Vue.ref(false); // whether the modal to display the badge details is open
+const currentBadge = window.Vue.ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
+
 /**
  * Initialise the resize observer to check the width of the search page container
  * This is done so the search page moves to single column at a certain breakpoint
@@ -70,6 +73,14 @@ window.Vue.onMounted(async () => {
         await searchStore.search(false);
     }
 });
+
+/**
+ * the badge modal is closed, so we should set the boolean to
+ * false so we can open it again
+ */
+function onBadgeModalClosed() {
+    isBadgeModalOpen.value = false;
+}
 </script>
 
 <template>
@@ -86,6 +97,7 @@ window.Vue.onMounted(async () => {
             <sp-results v-else-if="resultsStore.hasResults" />
         </div>
     </div>
+    <badge-modal :is-open="isBadgeModalOpen" :badge="currentBadge" @closed="onBadgeModalClosed" />
 </template>
 
 <style lang="scss" scoped>
