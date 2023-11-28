@@ -195,8 +195,6 @@ class Controller extends BaseController
      */
     public function getParent(string $registerCode)
     {
-        // parents should have their children hydrated...
-        (new \Schoolbox\External\User())->loadChildren([$this->getUser()]);
         // check if we have a valid register code
         // Hit the iSams API:
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
