@@ -124,6 +124,11 @@ class Controller extends BaseController
 
             // Request 1.1.1: field data sources
             foreach ($this->cacheHelper->getMetadataFields($registerId) as $metadataField) {
+                // check if we are wanting this field...
+                if (!in_array(strtolower($metadataField['key']), $registersConfig[strtolower($register['code'])])) {
+                    // not one of the requested field... ignoring
+                    continue;
+                }
                 // Fetch data source only if it's a list
                 $metadataFieldValues = null;
                 $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
@@ -143,6 +148,11 @@ class Controller extends BaseController
             // Collate student data
             foreach ($this->cacheHelper->getStudentFields($registerId, $student->getExternalId()) as $key => $fieldValue) {
                 $key = strtolower($key);
+                // check if we are wanting this field...
+                if (!in_array(strtolower($key), $registersConfig[strtolower($register['code'])])) {
+                    // not one of the requested field... ignoring
+                    continue;
+                }
                 if (isset($fieldValue)) {
                     $studentData[$registerId]['fields'][$key] = [
                         'name'  => $globalData[$registerId]['metadata'][$key]['name'],
