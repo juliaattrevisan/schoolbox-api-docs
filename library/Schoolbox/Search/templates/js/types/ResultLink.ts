@@ -1,5 +1,5 @@
 /**
- * A link to peform further actions on a result
+ * A link to perform further actions on a result
  */
 export type ResultLink = {
     id: number;
