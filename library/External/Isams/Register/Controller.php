@@ -82,8 +82,6 @@ class Controller extends BaseController
         }
 
         $registers       = $this->cacheHelper->getRegisters();
-        $globalData      = [];
-        $studentData     = [];
         foreach ($registers as $register) {
 
             /**
@@ -98,80 +96,15 @@ class Controller extends BaseController
                 // the requested register Ignoring...
                 continue;
             }
-            $registerId               = $register['id'];
-            $globalData[$registerId]  = $register;
-            $studentData[$registerId] = [];
-            $hasDateRange = false;
 
-            // Request 1.1.1: field data sources
-            foreach ($this->cacheHelper->getMetadataFields($registerId) as $metadataField) {
-                // check if we are wanting this field...
-                if (!in_array(strtolower($metadataField['key']), $registersConfig[strtolower($register['code'])])) {
-                    // not one of the requested field... ignoring
-                    continue;
-                }
-                // Fetch data source only if it's a list
-                $metadataFieldValues = null;
-                $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
-                if (in_array($dataSource, ['private', 'shared'])) {
-                    if ($metadataField['properties']['dataSourceUrl'] ?? null) {
-                        foreach ($this->cacheHelper->getDataSource($metadataField['properties']['dataSourceUrl']) as $item) {
-                            $metadataFieldValues[$item['value']] = $item['text'];
-                        }
-                    }
-                }
-                $globalData[$registerId]['metadata'][strtolower($metadataField['key'])] = [
-                    'name'   => $metadataField['name'],
-                    'values' => $metadataFieldValues,
-                    'type'   => $metadataField['type']
-                ];
-            }
-
-            // Collate student data
-            foreach ($this->cacheHelper->getStudentFields($registerId, $student->getExternalId()) as $key => $fieldValue) {
-                $key = strtolower($key);
-                // check if we are wanting this field...
-                if (!in_array(strtolower($key), $registersConfig[strtolower($register['code'])])) {
-                    // not one of the requested field... ignoring
-                    continue;
-                }
-                if (isset($fieldValue)) {
-                    // switch for types of fields??? and TextboxField can also be links?
-                    $value = $globalData[$registerId]['metadata'][$key]['values'][$fieldValue] ?? $fieldValue;
-                    $type = $globalData[$registerId]['metadata'][$key]['type'];
-                    switch ($globalData[$registerId]['metadata'][$key]['type']) {
-                        case 'TextboxField':
-                            // am I a URL?
-                            $url = new \Url($value);
-                            if ($url->isUrl()) {
-                                $type = 'url';
-                            }
-                            break;
-                        case 'DateTimeField':
-                            $value = new Alaress_Date_Format($value, Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                            break;
-                        default:
-                    }
-                    $studentData[$registerId]['fields'][$key] = [
-                        'name'  => $globalData[$registerId]['metadata'][$key]['name'],
-                        'value' => $value,
-                        'type' => $type,
-                    ];
-                }
-            }
-            foreach ($this->cacheHelper->getStudentDateRanges($registerId, $student->getExternalId()) as $dateRange) {
-                $hasDateRange = true;
-                $studentData[$registerId]['dateRanges'][] = [
-                    'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                    'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                ];
-            }
+            $studentData = [
+                'user' => $student,
+                'data' => $this->getDataFromRegister($student, $register, $registersConfig),
+            ];
             $this->response = $this->responseFromTemplate(
                 '@isamsRegister/student.twig',
                 [
-                    'student'       => $student,
-                    'studentData'   => array_values($studentData),
-                    'hasDateRange'  => $hasDateRange
+                    'studentData'   => [$studentData], // need an array of students, dummy this here
                 ],
             );
             return;
@@ -257,7 +190,7 @@ class Controller extends BaseController
 
             // display to the parent
             $this->response = $this->responseFromTemplate(
-                '@isamsRegister/parent.twig',
+                '@isamsRegister/student.twig',
                 [
                     'studentData'   => array_values($studentData)
                 ],

@@ -1,9 +1,10 @@
-<h1>{{ student.formatName }}</h1>
+{% for child in studentData %}
+<h1>{{ child.user.formatName }}</h1>
 
 <table>
     <thead>
     <tr>
-        {% if hasDateRange %}
+        {% if child.data.hasDateRange %}
             <th>Date</th>
         {% endif %}
         <th>Name</th>
@@ -11,12 +12,11 @@
     </tr>
     </thead>
     <tbody>
-    {% for studentDatum in studentData %}
-        {% for field in (studentDatum.fields ?? []) %}
+        {% for field in (child.data.fields ?? []) %}
             <tr>
-            {% if hasDateRange and studentDatum.dateRanges is defined and studentDatum.dateRanges %}
+            {% if child.data.hasDateRange and child.data.dateRanges is defined and child.data.dateRanges %}
                 <td>
-                {%- for dateRange in studentDatum.dateRanges -%}
+                {%- for dateRange in child.data.dateRanges -%}
                     {{ dateRange.from.localShort }}&mdash;{{ dateRange.to.localShort }}
                     {% if not loop.last %}, {% endif %}
                 {%- endfor -%}
@@ -32,6 +32,7 @@
             </td>
             </tr>
         {% endfor %}
-    {% endfor %}
     </tbody>
 </table>
+
+{% endfor %}
