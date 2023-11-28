@@ -148,6 +148,7 @@ class Helper
      * @param string $status
      * @return void
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function changeState(string $learnosityReference, string $status): void
@@ -188,8 +189,15 @@ class Helper
             /* This quiz might not have any questions (items) in it
              */
             if (isset($activity['data']['items'])) {
-                foreach ($activity['data']['items'] as $item) {
-                    $itemReferences[] = $item['reference'];
+                foreach ($activity['data']['items'] as $itemReference) {
+                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                     */
+                    if (!is_array($itemReference)) {
+                        $itemReferences[] = $itemReference;
+                    } else {
+                        $itemReferences[] = $itemReference['reference'];
+                    }
                 }
             }
 

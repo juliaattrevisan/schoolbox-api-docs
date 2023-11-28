@@ -350,31 +350,6 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Decide which URL to send the client back to
-     *
-     * @param IAssessable $assessment
-     * @param string|null $postReturnUrl
-     * @param string      $defaultReturnUrl
-     * @param bool        $relocated
-     * @return string
-     * @throws Exception
-     */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false): string
-    {
-        /**
-         * Always go to the screen when a quiz has been created,
-         * but send the return url with it
-         */
-        $redirect = $this->getRouteIfAuthorized('learnosity.getContent', ['assessmentId' => $assessment->getId()]);
-
-        if ($postReturnUrl) {
-            $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
-        }
-        return $redirect;
-    }
-
-
-    /**
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
      * @since 165
      *
