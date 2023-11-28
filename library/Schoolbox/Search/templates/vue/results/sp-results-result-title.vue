@@ -4,8 +4,10 @@
  */
 
 import { addMarks } from "@js/util/domUtils";
-import { Result } from "../../js/types/Result";
+import type { Result } from "../../js/types/Result";
+import { ResultTypes } from "../../js/types/ResultTypes";
 import { useQueryStore } from "../store/spQueryStore";
+import { useBadgeStore } from "./store/spBadgeStore";
 
 interface Props {
     result: Result; // the result to display
@@ -16,6 +18,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const queryStore = useQueryStore();
+const badgeStore = useBadgeStore();
+
+/**
+ * When a badge is selected, set it in the store
+ */
+function onBadgeSelected() {
+    badgeStore.setSelectedBadge(props.result);
+}
 </script>
 
 <template>
@@ -28,7 +38,15 @@ const queryStore = useQueryStore();
         <h6 v-else v-html="addMarks(props.result.title, queryStore.queryWordList)"></h6>
     </template>
     <template v-else>
-        <h3 v-if="props.result.url">
+        <h3 v-if="props.result.type === ResultTypes.BADGE">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <a
+                href="#open-badge-modal"
+                @click.prevent="onBadgeSelected"
+                v-html="addMarks(props.result.title, queryStore.queryWordList)"
+            ></a>
+        </h3>
+        <h3 v-else-if="props.result.url">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <a :href="props.result.url" v-html="addMarks(props.result.title, queryStore.queryWordList)"></a>
         </h3>

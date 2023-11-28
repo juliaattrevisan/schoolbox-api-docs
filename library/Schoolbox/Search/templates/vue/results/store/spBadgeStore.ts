@@ -4,6 +4,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { BadgeUsageObject } from "@schoolboxCurriculum/types/Node";
 import type { Result } from "../../../js/types/Result";
 
 type BadgeAward = {
@@ -17,7 +18,18 @@ type BadgeAward = {
 };
 
 export const useBadgeStore = defineStore("spBadgeStore", () => {
+    const isBadgeModalOpen = window.Vue.ref(false);
+    const currentBadge = window.Vue.ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
     const selectedBadge = window.Vue.ref<BadgeAward | null>(null);
+
+    /**
+     * Opens a modal window for viewing this badge's full details.
+     * @param { BadgeUsageObject } badge - the badge to display
+     */
+    function openDetailModal(badge: BadgeUsageObject) {
+        currentBadge.value = badge;
+        isBadgeModalOpen.value = true;
+    }
 
     /**
      * Set the selected badge
@@ -45,6 +57,9 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
     }
 
     return {
+        isBadgeModalOpen,
+        currentBadge,
+        openDetailModal,
         selectedBadge,
         setSelectedBadge,
         unsetSelectedBadge,

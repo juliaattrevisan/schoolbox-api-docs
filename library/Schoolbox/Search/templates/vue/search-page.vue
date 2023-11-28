@@ -15,6 +15,7 @@ import type { FilterType } from "./filters/store/spFilterTypesStore";
 import type { FilterDateRange } from "./filters/store/spFilterDateRangeStore";
 import { useSearchStore } from "./store/spSearchStore";
 import { useResultsStore } from "./results/store/spResultsStore";
+import { useBadgeStore } from "./results/store/spBadgeStore";
 import { Creator } from "./filters/store/spFilterCreatorsStore";
 import { SEARCH_PARAM } from "./store/spQueryStore";
 
@@ -38,10 +39,8 @@ store.init(
 
 const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
+const badgeStore = useBadgeStore();
 const searchPageEl = window.Vue.ref<HTMLDivElement>();
-
-const isBadgeModalOpen = window.Vue.ref(false); // whether the modal to display the badge details is open
-const currentBadge = window.Vue.ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
 
 /**
  * Initialise the resize observer to check the width of the search page container
@@ -80,7 +79,7 @@ window.Vue.onMounted(async () => {
  * false so we can open it again
  */
 function onBadgeModalClosed() {
-    isBadgeModalOpen.value = false;
+    badgeStore.isBadgeModalOpen = false;
 }
 </script>
 
@@ -98,7 +97,7 @@ function onBadgeModalClosed() {
             <sp-results v-else-if="resultsStore.hasResults" />
         </div>
     </div>
-    <badge-modal :is-open="isBadgeModalOpen" :badge="currentBadge" @closed="onBadgeModalClosed" />
+    <badge-modal :is-open="badgeStore.isBadgeModalOpen" :badge="badgeStore.currentBadge" @closed="onBadgeModalClosed" />
 </template>
 
 <style lang="scss" scoped>

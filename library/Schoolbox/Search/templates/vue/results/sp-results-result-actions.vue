@@ -10,7 +10,7 @@ interface Props {
     result: Result; // the result to display
 }
 const props = defineProps<Props>();
-const badgeAwardStore = useBadgeStore();
+const badgeStore = useBadgeStore();
 </script>
 
 <template>
@@ -22,7 +22,7 @@ const badgeAwardStore = useBadgeStore();
                 <a
                     :class="link.icon"
                     @click.prevent="
-                        badgeAwardStore.setSelectedBadge(props.result, 'achievement', link.data!.achievementExpiry!)
+                        badgeStore.setSelectedBadge(props.result, 'achievement', link.data!.achievementExpiry!)
                     "
                     >{{ link.title }}</a
                 >
@@ -30,7 +30,7 @@ const badgeAwardStore = useBadgeStore();
             <template v-else-if="link.action === 'setGoalModal'">
                 <a
                     :class="link.icon"
-                    @click.prevent="badgeAwardStore.setSelectedBadge(props.result, 'goal', link.data!.goalExpiry!)"
+                    @click.prevent="badgeStore.setSelectedBadge(props.result, 'goal', link.data!.goalExpiry!)"
                     >{{ link.title }}</a
                 >
             </template>
