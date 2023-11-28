@@ -53,6 +53,7 @@ export const useSearchStore = defineStore("spSearch", () => {
 
     /**
      * search for nodes that match
+     * @param {boolean} simulateRedirect - whether to simulate a redirect
      */
     async function search(simulateRedirect: boolean) {
         useQueryStore().setActive();
