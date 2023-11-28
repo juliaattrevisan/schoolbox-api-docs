@@ -24,7 +24,7 @@ use ReflectionException;
 use RuntimeException;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper;
-use Schoolbox\Realtime\MessageList\IListFactory;
+use Schoolbox\Realtime\MessageList\MultiInstance\IListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
@@ -73,8 +73,8 @@ class WorkerProcess extends AbstractProcess
             switch ($command) {
                 // retrieve messages
                 case DefaultDispatchStrategy::TASK_FETCH:
-                    [$userId, $count] = $args;
-                    return $this->fetch($userId, $count);
+                    [$instanceId, $userId, $count] = $args;
+                    return $this->fetch($instanceId, $userId, $count);
 
                 // publish messages
                 case DefaultDispatchStrategy::TASK_PUBLISH:
@@ -113,19 +113,20 @@ class WorkerProcess extends AbstractProcess
     /**
      * Process fetch
      *
-     * @param int $userId
-     * @param int $limit
+     * @param string $instanceId The instance ID which `$userId` belongs within.
+     * @param int    $userId     The user ID to fetch for.
+     * @param int    $limit      The max results to fetch.
      * @throws PDOException
      * @return array
      */
-    protected function fetch($userId, $limit = 0)
+    protected function fetch(string $instanceId, int $userId, int $limit = 0): array
     {
         $this->log->debug(sprintf('Fetching %s for user %d', $limit ?: 'all', $userId));
         $decorator = new Decorator();
 
         try {
             // get ALL messages in this queue and make them prettae!
-            $this->factory->listed($userId)->fetchIntoBundle($decorator, true);
+            $this->factory->listed($instanceId, $userId)->fetchIntoBundle($decorator, true);
 
             // wrap in an array to preserve keys during transport
             return [ $decorator->renderAsSocketArray(false, $limit) ];

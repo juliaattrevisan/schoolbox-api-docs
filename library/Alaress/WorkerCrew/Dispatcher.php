@@ -50,9 +50,9 @@ class Dispatcher implements DispatcherInterface
      * @param LoggerInterface              $log
      * @param DispatchStrategyInterface    $strat
      */
-    public function __construct($loop, $msgHandler, $log, $strat = null)
+    public function __construct($loop, $msgHandler, $log, $strat)
     {
-        $this->strat = $strat ? : new DefaultDispatchStrategy();
+        $this->strat = $strat;
 
         // pool of workers
         $this->pool = new Pool($loop, $msgHandler, $this->strat, $log);

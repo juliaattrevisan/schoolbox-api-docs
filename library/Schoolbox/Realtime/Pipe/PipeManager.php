@@ -300,7 +300,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
 
         foreach ($data as $command => $value) {
-            $arguments = [$userId, $value];
+            $arguments = [$instanceId, $userId, $value];
 
             if ($pipe->isLocked()) {
                 // pipe has a command active: don't permit another until this one is finished
@@ -567,9 +567,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             // deal with this yourself
             case self::PIPE_METHOD_ACKNOWLEDGE:
-                $subscription = $this->subscriptionManager->getUserSubscription($instanceId, $userId);
-                $markAsRead   = [];
-                foreach ((array)$data[1] as $msgId) {
+                $subscription     = $this->subscriptionManager->getUserSubscription($instanceId, $userId);
+                $markAsRead       = [];
+                [, , $messageIds] = $data;
+                foreach ($messageIds as $msgId) {
                     if ($subscription->acknowledgeMessage($msgId)) {
                         $markAsRead[] = $msgId;
                     }
