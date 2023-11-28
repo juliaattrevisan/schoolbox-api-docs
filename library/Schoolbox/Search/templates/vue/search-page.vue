@@ -50,6 +50,9 @@ function initResizeObserver() {
     resizeObserver.observe(searchPageEl.value as HTMLDivElement);
 }
 
+/**
+ * When the back button is pressed, reload the page if there's a search query
+ */
 window.onpopstate = () => {
     const searchParams = new URLSearchParams(document.location.search);
     if (searchParams.has(SEARCH_PARAM)) {
@@ -70,7 +73,10 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div ref="searchPageEl" :class="`c-search-page ${store.isSingleColumn ? 'c-search-page--single-column' : ''}`">
+    <div
+        ref="searchPageEl"
+        :class="`search-page l-grid l-gap-xl ${store.isSingleColumn ? 'search-page--single-column' : ''}`"
+    >
         <sp-filters class="c-search-page__filters" />
         <div class="c-search-page__results l-flex-col l-gap-m">
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
@@ -83,9 +89,7 @@ window.Vue.onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
-.c-search-page {
-    display: grid;
-    gap: var(--spacing-xl);
+.search-page {
     grid-template-areas: "filters results";
     grid-template-columns: 400px 1fr;
     grid-template-rows: 1fr auto;
