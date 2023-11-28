@@ -3,8 +3,8 @@
 <table>
     <thead>
     <tr>
-        {% if studentData.first.dateRanges is defined %}
-        <th>Date</th>
+        {% if studentData.first.dateRanges is defined and studentData.first.dateRanges %}
+            <th>Date</th>
         {% endif %}
         <th>Name</th>
         <th>type</th>

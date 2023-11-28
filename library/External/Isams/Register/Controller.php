@@ -191,7 +191,7 @@ class Controller extends BaseController
                 '@isamsRegister/student.twig',
                 [
                     'student'     => $student,
-                    'studentData' => $studentData,
+                    'studentData' => array_values($studentData),
                 ],
             );
             return;
