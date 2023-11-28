@@ -211,8 +211,8 @@
                  # We might make a "museum" for these old attempts one day
                  #}
                 {% if latestResponse.learnosityReference ?? null %}
-                    {% if canDelete %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookup('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
-                    {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>{% endif %}
+                    {% if canDelete %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
+                    {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.postCompleteAttempt', {assessmentId: assessment.id, studentId: latestResponse.submittedBy.id}) }}">Finish Attempt</a>{% endif %}
 
                     {% if canPublish or canFinish %}
                         <a

@@ -61,6 +61,10 @@ class Module extends BaseModule
          */
         $learnerIsUserPerms = $this->learnerIsUserPerms();
 
+        /* A special rule about who can finish an attempt
+         */
+        $canFinishAttempt = $this->canFinishAttempt();
+
         $preloadAssessment = function ($params) {
             return $this->preloadAssessment($params);
         };
@@ -83,7 +87,7 @@ class Module extends BaseModule
 
         /* Async complete an attempt (set finished datetime)
          */
-        $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $learnerIsUserPerms, $preloadParticipant);
+        $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $canFinishAttempt, $preloadParticipant);
 
         /* Conclude an attempt
          */
@@ -204,6 +208,31 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\HasRole(Role::STAFF),
                     new Rule\HasRole(Role::STUDENT),
+                ),
+            );
+        });
+    }
+
+
+    /**
+     * Students usually finish attempts themselves, but sometimes they don't;
+     * Teachers have the option to arbitrarily finish it on their behalf.
+     * This used to happen when people never clicked the final Submit button
+     * and the same could occur for Learnosity where they skip the last modal
+     *
+     * @return Rule\LazyCallback
+     */
+    private function canFinishAttempt(): Rule\LazyCallback
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\All(
+                        new Rule\HasRole(Role::STUDENT),
+                        new Rule\IsUser('studentId')
+                    )
                 ),
             );
         });
