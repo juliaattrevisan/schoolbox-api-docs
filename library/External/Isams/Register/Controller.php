@@ -135,6 +135,33 @@ class Controller extends BaseController
 
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
-        new \Alaress_Probe($this->cacheHelper->getRegisters());
+        $this->response = $this->responseAsJson(
+            [
+                'registers' => $this->cacheHelper->getRegisters(),
+            ]
+        );
+    }
+
+    public function getFieldList(string $registerQuery)
+    {
+        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
+
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
+
+        $registers       = $this->cacheHelper->getRegisters();
+        foreach ($registers as $register) {
+            if (!(strtolower($register['code']) === strtolower($registerQuery) || $register['id'] === (int)$registerQuery)) {
+                // the requested register Ignoring...
+                continue;
+            }
+
+            $this->response = $this->responseAsJson(
+                [
+                    'register' => $register,
+                    'fields' => $this->cacheHelper->getMetadataFields($register['id'])
+                ]
+            );
+            return;
+        }
     }
 }

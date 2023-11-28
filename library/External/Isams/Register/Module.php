@@ -54,7 +54,8 @@ class Module extends BaseModule
             $studentRegisterPreload,
         );
 
-        $this->register(self::METHOD_GET, '/getRegisterList', 'getRegisterList', new Rule\IsSuperuser());
+        $this->register(self::METHOD_GET, '/list', 'getRegisterList', new Rule\IsSuperuser());
+        $this->register(self::METHOD_GET, '/{registerQuery}/getFieldList', 'getFieldList', new Rule\IsSuperuser());
     }
 
     /**
