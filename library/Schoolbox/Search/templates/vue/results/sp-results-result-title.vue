@@ -24,7 +24,7 @@ const badgeStore = useBadgeStore();
  * When a badge is selected, set it in the store
  */
 function onBadgeSelected() {
-    badgeStore.setSelectedBadge(props.result);
+    badgeStore.openDetailModal(props.result);
 }
 </script>
 
