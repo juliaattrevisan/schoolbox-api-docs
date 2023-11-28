@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use GuzzleHttp\Client as HttpClient;
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
@@ -43,7 +44,7 @@ class Controller extends BaseController
      * @param User $student
      * @return void
      */
-    public function getStudent(string $registerQuery, User $student): void
+    public function getStudent(string $registerCode, User $student): void
     {
         // Hit the iSams API:
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
@@ -54,7 +55,7 @@ class Controller extends BaseController
         $globalData      = [];
         $studentData     = [];
         foreach ($registers as $register) {
-            if (!(strtolower($register['code']) === strtolower($registerQuery) || $register['id'] === (int)$registerQuery)) {
+            if (strtolower($register['code']) !== strtolower($registerCode)) {
                 // the requested register Ignoring...
                 continue;
             }
@@ -118,15 +119,18 @@ class Controller extends BaseController
                     'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ];
             }
+            $this->response = $this->responseFromTemplate(
+                '@isamsRegister/student.twig',
+                [
+                    'student'     => $student,
+                    'studentData' => $studentData,
+                ],
+            );
         }
-
-        $this->response = $this->responseFromTemplate(
-            '@isamsRegister/student.twig',
-            [
-                'student'     => $student,
-                'studentData' => $studentData,
-            ],
-        );
+        /**
+         * Unable to find requested register...
+         */
+        throw new NotFound();
     }
 
     public function getRegisterList()
@@ -142,7 +146,7 @@ class Controller extends BaseController
         );
     }
 
-    public function getFieldList(string $registerQuery)
+    public function getFieldList(string $registerCode)
     {
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
 
@@ -150,7 +154,7 @@ class Controller extends BaseController
 
         $registers       = $this->cacheHelper->getRegisters();
         foreach ($registers as $register) {
-            if (!(strtolower($register['code']) === strtolower($registerQuery) || $register['id'] === (int)$registerQuery)) {
+            if (strtolower($register['code']) !== strtolower($registerCode)) {
                 // the requested register Ignoring...
                 continue;
             }
@@ -163,5 +167,9 @@ class Controller extends BaseController
             );
             return;
         }
+        /**
+         * Unable to find requested register...
+         */
+        throw new NotFound();
     }
 }

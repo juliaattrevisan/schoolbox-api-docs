@@ -48,14 +48,14 @@ class Module extends BaseModule
         };
         $this->register(
             self::METHOD_GET,
-            '/{registerQuery}/student/{studentId}',
+            '/{registerCode}/student/{studentId}',
             'getStudent',
             $studentRegisterPermission,
             $studentRegisterPreload,
         );
 
         $this->register(self::METHOD_GET, '/list', 'getRegisterList', new Rule\IsSuperuser());
-        $this->register(self::METHOD_GET, '/{registerQuery}/getFieldList', 'getFieldList', new Rule\IsSuperuser());
+        $this->register(self::METHOD_GET, '/{registerCode}/getFieldList', 'getFieldList', new Rule\IsSuperuser());
     }
 
     /**
