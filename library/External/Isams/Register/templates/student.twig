@@ -1,5 +1,9 @@
 {% for child in studentData %}
-<h1>{{ child.user.formatName }}</h1>
+    <div class="small-12 card">
+        {% include 'include/portrait.twig' with {user: child.user, description: child.user.formatName} only %}
+        <h1>{{ child.user.formatName }}</h1>
+    </div>
+
 
 <table>
     <thead>
