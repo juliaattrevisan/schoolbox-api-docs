@@ -126,6 +126,7 @@ class Controller extends BaseController
                     'studentData' => $studentData,
                 ],
             );
+            return;
         }
         /**
          * Unable to find requested register...
