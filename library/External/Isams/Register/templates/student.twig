@@ -3,8 +3,11 @@
 <table>
     <thead>
     <tr>
+        {% if studentData.first.dateRanges is defined %}
         <th>Date</th>
+        {% endif %}
         <th>Name</th>
+        <th>type</th>
         <th>Result</th>
     </tr>
     </thead>
@@ -12,14 +15,25 @@
     {% for studentDatum in studentData %}
         {% for field in (studentDatum.fields ?? []) %}
             <tr>
-            <td>
+            {% if studentDatum.dateRanges is defined and studentDatum.dateRanges %}
+                <td>
                 {%- for dateRange in studentDatum.dateRanges -%}
                     {{ dateRange.from.localShort }}&mdash;{{ dateRange.to.localShort }}
                     {% if not loop.last %}, {% endif %}
                 {%- endfor -%}
             </td>
+            {%  endif %}
             <td>{{ field.name }}</td>
-            <td>{{ field.value }}</td>
+            <td>
+                {{ field.type }}
+            </td>
+            <td>
+            {% if field.type == 'url' %}
+                <a href="{{ field.value }}">Download</a>
+            {% else %}
+                {{ field.value }}
+            {% endif %}
+            </td>
             </tr>
         {% endfor %}
     {% endfor %}

@@ -84,6 +84,9 @@ class Controller extends BaseController
         $globalData      = [];
         $studentData     = [];
         foreach ($registers as $register) {
+//            new \Alaress_Probe($this->cacheHelper->getStudentFields($register['id'], $student->getExternalId()));
+//continue;
+
             /**
              * if the requested register is not in the allowed registers
              * OR
@@ -142,6 +145,7 @@ class Controller extends BaseController
                 $globalData[$registerId]['metadata'][strtolower($metadataField['key'])] = [
                     'name'   => $metadataField['name'],
                     'values' => $metadataFieldValues,
+                    'type'   => $metadataField['type']
                 ];
             }
 
@@ -154,9 +158,26 @@ class Controller extends BaseController
                     continue;
                 }
                 if (isset($fieldValue)) {
+                    // switch for types of fields??? and TextboxField can also be links?
+                    $value = $globalData[$registerId]['metadata'][$key]['values'][$fieldValue] ?? $fieldValue;
+                    $type = $globalData[$registerId]['metadata'][$key]['type'];
+                    switch ($globalData[$registerId]['metadata'][$key]['type']) {
+                        case 'TextboxField':
+                            // am I a URL?
+                            $url = new \Url($value);
+                            if ($url->isUrl()) {
+                                $type = 'url';
+                            }
+                            break;
+                        case 'DateTimeField':
+                            $value = new Alaress_Date_Format($value, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                            break;
+                        default:
+                    }
                     $studentData[$registerId]['fields'][$key] = [
                         'name'  => $globalData[$registerId]['metadata'][$key]['name'],
-                        'value' => $globalData[$registerId]['metadata'][$key]['values'][$fieldValue] ?? $fieldValue,
+                        'value' => $value,
+                        'type' => $type,
                     ];
                 }
             }
