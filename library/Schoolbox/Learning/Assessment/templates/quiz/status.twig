@@ -154,21 +154,30 @@
 
                 {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
 
+                {# Quiz Attempts could be in either Learnosity, or our legacy quiz system
+                 # Legacy Quiz attempts are not going to be in learnosity
+                 #
+                 # So if we have a learnosity_reference, make a link to learnosity feedback screen
+                 # Otherwise, prohibit the link; users won't be able to see legacy attempts anymore.
+                 # We might make a "museum" for these old attempts one day
+                 #}
                 {% if latestResponse %}
-                    {% if latestResponse.submitted %}
-                        {% if not latestFeedback %}
-                            <div class="grade review">
-                                <span>Awaiting Review</span>
-                            </div>
-                        {% elseif latestFeedback.normalisedMark|length %}
-                            <div class="grade {{ urgencyClass }}-bg">
-                                <span>{{ latestFeedback.humanReadableMark }}</span>
+                    {% if latestResponse.learnosityReference %}
+                        {% if latestResponse.submitted %}
+                            {% if not latestFeedback %}
+                                <div class="grade review">
+                                    <span>Awaiting Review</span>
+                                </div>
+                            {% elseif latestFeedback.normalisedMark|length %}
+                                <div class="grade {{ urgencyClass }}-bg">
+                                    <span>{{ latestFeedback.humanReadableMark }}</span>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="grade in-progress">
+                                <span>In Progress</span>
                             </div>
                         {% endif %}
-                    {% else %}
-                        <div class="grade in-progress">
-                            <span>In Progress</span>
-                        </div>
                     {% endif %}
                 {% else %}
                     &ndash;
@@ -202,8 +211,8 @@
                  # We might make a "museum" for these old attempts one day
                  #}
                 {% if latestResponse.learnosityReference ?? null %}
-                    {% if canDelete  %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookup('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
-                    {% if canFinish  %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>{% endif %}
+                    {% if canDelete %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookup('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
+                    {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Finish Attempt</a>{% endif %}
 
                     {% if canPublish or canFinish %}
                         <a
