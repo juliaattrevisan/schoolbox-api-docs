@@ -63,9 +63,16 @@ class Base
          *     - empty string ''
          *     - something else entirely
          */
-        $decompiledAnswer = unserialize($compiledAnswer, [
-            'allowed_classes' => true
-        ]);
+        try {
+            $decompiledAnswer = unserialize($compiledAnswer, [
+                'allowed_classes' => true
+            ]);
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (\ErrorException $e) {
+            // This is not redundant for our purposes:
+            // Schoolbox's CLI context catches notices raised by invalid data
+            // and raises an `\ErrorException`.
+            throw new \RuntimeException(sprintf('answer could not deserialize (%s)', $e->getMessage()));
+        }
 
         // Some busted data may deserialize as null or false, or another
         // non-iterable value: skip those questions as well

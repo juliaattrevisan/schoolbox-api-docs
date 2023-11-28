@@ -850,11 +850,6 @@ HELP;
             /* Lock TTL expired; just leave politely
              */
             exit;
-        } catch (\Exception $e) {
-            /* Some other random death
-             */
-            $this->getLogger()->warning($e->getMessage());
-            exit;
         }
     }
 

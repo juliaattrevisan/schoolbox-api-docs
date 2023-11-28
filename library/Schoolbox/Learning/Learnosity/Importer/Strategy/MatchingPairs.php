@@ -38,7 +38,7 @@ class MatchingPairs extends Base implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $possibleAnswers = $question['_answers'][0]['answer'];
+        $possibleAnswers = $question['_answers'][0]['answer'] ?? [];
 
         /* Compile into a learnosity-friendly struct
          */
