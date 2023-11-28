@@ -401,21 +401,34 @@ class Hydrator extends BaseHydrator
     {
         $links = [];
 
+        $returnUrl = (
+            // Note $this->request is the request to the search API, not the search page.
+            // The return URL must point to the search page, with the same query string as was used in the search API request.
+            $this->routeGenerator->generate('search.search') . '?' . $this->request->getUri()->getQuery()
+        );
+
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $returnUrl = (
-                // Note $this->request is the request to the search API, not the search page.
-                // The return URL must point to the search page, with the same query string as was used in the search API request.
-                $this->routeGenerator->generate('search.search') . '?' . $this->request->getUri()->getQuery()
-            );
-
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
                 'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
-                'title' => 'Modify',
+                'title' => 'Modify' . ($assessment instanceof Assessment\Quiz\Model ? ' Settings' : ''), // For quizzes, differentiate from 'Modify Content'.
                 'icon' => 'icon-modify',
             ];
+        }
+
+        if ($assessment instanceof Assessment\Quiz\Model) {
+            $route = 'learnosity.getContent';
+            $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                $links[] = [
+                    // All assessment types use the same URL for their 'Modify' page.
+                    'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
+                    'title' => 'Modify Content',
+                    'icon' => 'icon-modify',
+                ];
+            }
         }
 
         if (!($assessment instanceof Assessment\LessonPlan\Model) && $assessment->isImplementation()) {
