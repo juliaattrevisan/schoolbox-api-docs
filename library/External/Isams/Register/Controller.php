@@ -84,8 +84,6 @@ class Controller extends BaseController
         $globalData      = [];
         $studentData     = [];
         foreach ($registers as $register) {
-//            new \Alaress_Probe($this->cacheHelper->getStudentFields($register['id'], $student->getExternalId()));
-//continue;
 
             /**
              * if the requested register is not in the allowed registers
@@ -103,28 +101,6 @@ class Controller extends BaseController
             $globalData[$registerId]  = $register;
             $studentData[$registerId] = [];
             $hasDateRange = false;
-
-//            // Alternate request: find student register, filtered to $student:
-//            // This _does_ return filtered results, but doesn't include date
-//            // ranges or metadata
-//            try {
-//                $registerResponse = $this->httpClient->get(
-//                    $apiUrl
-//                        ->appendQueryParameters([
-//                            '$filter' => "SchoolId eq '{$student->getExternalId()}'"
-//                        ])
-//                        ->withPath('/Main/api/students/registers/' . $registerId),
-//                    [RequestOptions::HEADERS => $authHeader,],
-//                );
-//                $registerResponseBody = json_decode($registerResponse->getBody()->getContents(), true);
-//            } catch (ClientExceptionInterface $e) {
-//                // No record exists for this student: that's okay
-//                $registerResponseBody = [];
-//            }
-//            new \Alaress_Probe($registerResponseBody);
-
-            // Request 1.1: find metadata for fields
-            // This ought to be cacheable for a lot longer than student data
 
             // Request 1.1.1: field data sources
             foreach ($this->cacheHelper->getMetadataFields($registerId) as $metadataField) {

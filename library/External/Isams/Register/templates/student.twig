@@ -7,7 +7,6 @@
             <th>Date</th>
         {% endif %}
         <th>Name</th>
-        <th>type</th>
         <th>Result</th>
     </tr>
     </thead>
@@ -24,9 +23,6 @@
             </td>
             {%  endif %}
             <td>{{ field.name }}</td>
-            <td>
-                {{ field.type }}
-            </td>
             <td>
             {% if field.type == 'url' %}
                 <a href="{{ field.value }}">Download</a>
