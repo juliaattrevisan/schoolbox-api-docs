@@ -31,16 +31,17 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         int $limit,
+        string $paramKeySuffix = ''
     ): ?QueryParams {
-        ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword);
+        ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
 
-        $relevancePart = $this->buildRelevanceExpression();
-        $titlePart     = $this->buildTitleExpression();
-        $typePart      = $this->buildTypeExpression();
-        $idPart        = $this->buildIdExpression();
-        $datePart      = $this->buildDateExpression();
-        $creatorPart   = $this->buildCreatorExpression();
-        $folderPart    = $this->buildFolderExpression();
+        $relevancePart = $this->buildRelevanceExpression($paramKeySuffix);
+        $titlePart     = $this->buildTitleExpression($paramKeySuffix);
+        $typePart      = $this->buildTypeExpression($paramKeySuffix);
+        $idPart        = $this->buildIdExpression($paramKeySuffix);
+        $datePart      = $this->buildDateExpression($paramKeySuffix);
+        $creatorPart   = $this->buildCreatorExpression($paramKeySuffix);
+        $folderPart    = $this->buildFolderExpression($paramKeySuffix);
         $havingParts   = [];
 
         // Apply filter
@@ -74,8 +75,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         if ($filter->fromDate) {
             // No date part? Exclude this type of result entirely
             if (isset($datePart)) {
-                $whereParts[]             = "DATE($datePart) >= :filterFromDate";
-                $params['filterFromDate'] = $filter->fromDate->getDatabaseDate(); // IMPORTANT: There must be no time component on this date.
+                $whereParts[] = "DATE($datePart) >= :filterFromDate$paramKeySuffix";
+                $params["filterFromDate$paramKeySuffix"] = $filter->fromDate->getDatabaseDate(); // IMPORTANT: There must be no time component on this date.
             } else {
                 return null;
             }
@@ -83,8 +84,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         if ($filter->toDate) {
             // No date part? Exclude this type of result entirely
             if (isset($datePart)) {
-                $whereParts[]           = "DATE($datePart) <= :filterToDate";
-                $params['filterToDate'] = $filter->toDate->getDatabaseDate(); // IMPORTANT: There must be no time component on this date.
+                $whereParts[] = "DATE($datePart) <= :filterToDate$paramKeySuffix";
+                $params["filterToDate$paramKeySuffix"] = $filter->toDate->getDatabaseDate(); // IMPORTANT: There must be no time component on this date.
             } else {
                 return null;
             }
@@ -92,8 +93,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         if ($filter->creator) {
             // No creator part? Exclude this type of result entirely
             if (isset($creatorPart)) {
-                $whereParts[]            = "$creatorPart = :filterCreator";
-                $params['filterCreator'] = $filter->creator->getId();
+                $whereParts[] = "$creatorPart = :filterCreator$paramKeySuffix";
+                $params["filterCreator$paramKeySuffix"] = $filter->creator->getId();
             } else {
                 return null;
             }
@@ -101,8 +102,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         if ($filter->folder) {
             // No folder part? Exclude this type of result entirely
             if (isset($folderPart)) {
-                $whereParts[]           = "$folderPart = :filterFolder";
-                $params['filterFolder'] = $filter->folder->getId();
+                $whereParts[] = "$folderPart = :filterFolder$paramKeySuffix";
+                $params["filterFolder$paramKeySuffix"] = $filter->folder->getId();
             } else {
                 return null;
             }
@@ -115,21 +116,21 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 //  * The direction of the comparisons here (> or <) must match the directions used in the ORDER BY clause below, in the following way:
                 //     * ORDER BY ASC  below implies < here.
                 //     * ORDER BY DESC below implies > here.
-                "($relevancePart < :cursorRelevance)", // < because ORDER BY relevance DESC.
-                "($relevancePart = :cursorRelevance AND $titlePart > :cursorTitle)", // > because ORDER BY title ASC.
-                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart > :cursorType)", // > because ORDER BY type ASC.
-                "($relevancePart = :cursorRelevance AND $titlePart = :cursorTitle AND $typePart = :cursorType AND $idPart < :cursorId)", // < because ORDER BY id DESC.
+                "($relevancePart < :cursorRelevance$paramKeySuffix)", // < because ORDER BY relevance DESC.
+                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart > :cursorTitle$paramKeySuffix)", // > because ORDER BY title ASC.
+                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart > :cursorType$paramKeySuffix)", // > because ORDER BY type ASC.
+                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart = :cursorType$paramKeySuffix AND $idPart < :cursorId$paramKeySuffix)", // < because ORDER BY id DESC.
             ];
 
-            $whereParts[]              = '(' . implode(' OR ', $cursorSearchParts) . ')';
-            $params['cursorRelevance'] = $cursor->relevance;
-            $params['cursorType']      = $cursor->type;
-            $params['cursorTitle']     = $cursor->title;
-            $params['cursorId']        = $cursor->id;
+            $whereParts[] = '(' . implode(' OR ', $cursorSearchParts) . ')';
+            $params["cursorRelevance$paramKeySuffix"] = $cursor->relevance;
+            $params["cursorType$paramKeySuffix"]      = $cursor->type;
+            $params["cursorTitle$paramKeySuffix"]     = $cursor->title;
+            $params["cursorId$paramKeySuffix"]        = $cursor->id;
         }
 
         // Build query and params
-        $from = $this->buildFromStatement();
+        $from = $this->buildFromStatement($paramKeySuffix);
         $query = (
             "SELECT DISTINCT
                 $idPart        AS id,
@@ -154,9 +155,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $orderParts[] = "`type` ASC";
         $orderParts[] = "$idPart DESC";
         $query .= ' ORDER BY ' . implode(', ', $orderParts);
-        $query .= ' LIMIT :limit';
+        $query .= " LIMIT :limit$paramKeySuffix";
 
-        $params['limit'] = $limit;
+        $params["limit$paramKeySuffix"] = $limit;
+
         return new QueryParams($query, $params);
     }
 
@@ -238,9 +240,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * Build the base set of WHERE parts and their params.
      *
      * @param string $keyword The search term from `buildMatchQueryParams`.
+     * @param string $paramKeySuffix
      * @return array{where: array<string>, params: array}
      */
-    abstract protected function buildBaseWhereParams(string $keyword): array;
+    abstract protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array;
 
     /**
      * Build the expression for determining the relevance for an item in this
@@ -253,9 +256,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * matches the search term: thus, this doesn't take the `$keyword` from
      * `buildMatchQueryParams`.
      *
+     * @param string $paramKeySuffix
      * @return string An SQL expression for determining
      */
-    abstract protected function buildRelevanceExpression(): string;
+    abstract protected function buildRelevanceExpression(string $paramKeySuffix = ''): string;
 
     /**
      * Does the relevance of an item depend on the evaluation of an expression?
@@ -274,10 +278,14 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *
      * This should evaluate to a string value.
      *
+     * @param string $paramKeySuffix
      * @return string
      */
-    abstract protected function buildTitleExpression(): string;
+    abstract protected function buildTitleExpression(string $paramKeySuffix = ''): string;
 
+    /**
+     * @return string
+     */
     abstract protected function getType(): string;
 
     /**
@@ -286,9 +294,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *
      * This should evaluate to a string value.
      *
+     * @param string $paramKeySuffix
      * @return string
      */
-    abstract protected function buildTypeExpression(): string;
+    abstract protected function buildTypeExpression(string $paramKeySuffix = ''): string;
 
     /**
      * Build the expression for determining the ID for an item in this
@@ -296,9 +305,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *
      * This should evaluate to an integer value.
      *
+     * @param string $paramKeySuffix
      * @return string
      */
-    abstract protected function buildIdExpression(): string;
+    abstract protected function buildIdExpression(string $paramKeySuffix = ''): string;
 
     /**
      * Build the expression for determining the date for an item in this
@@ -306,12 +316,13 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *
      * This should evaluate to a database datetime value.
      *
+     * @param string $paramKeySuffix
      * @return string|null The expression, or `null` if this item type does not
      *                     have a date.
      *                     (Items without dates will never match if there is a
      *                     date filter on the search.)
      */
-    abstract protected function buildDateExpression(): ?string;
+    abstract protected function buildDateExpression(string $paramKeySuffix = ''): ?string;
 
     /**
      * Build the expression for determining the creator for an item in this
@@ -320,12 +331,13 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * This should evaluate to an integer value, corresponding to the creator of
      * this item.
      *
+     * @param string $paramKeySuffix
      * @return string|null The expression, or `null` if this item type does not
      *                     have a creator.
      *                     (Items without creators will never match if there is
      *                     a creator filter on the search.)
      */
-    abstract protected function buildCreatorExpression(): ?string;
+    abstract protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string;
 
     /**
      * Build the expression for determining the folder for an item in this
@@ -334,18 +346,20 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * This should evaluate to an integer value, corresponding to the folder the
      * item belongs in.
      *
+     * @param string $paramKeySuffix
      * @return string|null The expression, or `null` if this item type does not
      *                     have a folder.
      *                     (Items without folder will never match if there is a
      *                     folder filter on the search.)
      */
-    abstract protected function buildFolderExpression(): ?string;
+    abstract protected function buildFolderExpression(string $paramKeySuffix = ''): ?string;
 
     /**
      * Build the FROM part of the query, including any joins; e.g.:
      * "FROM table t JOIN other_table ot ON ..."
      *
+     * @param string $paramKeySuffix
      * @return string
      */
-    abstract protected function buildFromStatement(): string;
+    abstract protected function buildFromStatement(string $paramKeySuffix = ''): string;
 }

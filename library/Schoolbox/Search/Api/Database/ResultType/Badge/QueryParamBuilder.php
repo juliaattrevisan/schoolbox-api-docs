@@ -33,22 +33,21 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * hidden badges _are_ fetched (as whether the viewer can view the badge will be determined in the hydrator)
      * * badges whose name or body contain `$keyword` are fetched
      *
-     * @param string $keyword
-     * @return array
+     * @inheritdoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'b.deleted_at IS NULL'
         ];
         $keywordSearchParts = [
-            'b.name LIKE :badgeKeywordLike',
-            'b.body LIKE :badgeKeywordLike',
+            "b.name LIKE :badgeKeywordLike$paramKeySuffix",
+            "b.body LIKE :badgeKeywordLike$paramKeySuffix",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params = [
-            'badgeNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'badgeKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "badgeNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "badgeKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -60,12 +59,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The relevance of a badge is its updated_at time.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':badgeNow',
+            ":badgeNow$paramKeySuffix",
             'b.updated_at',
             7,
             56,
@@ -75,7 +74,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Badges are ordered by relevance, as they have an updated_at time.
      *
-     * @return bool
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -85,15 +84,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The closest thing to a title for a badge is badge.name.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'b.name';
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -101,9 +100,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -111,9 +110,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The badge's ID is simply its `id` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'b.id';
     }
@@ -121,9 +120,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The badge's date is its updated_at date.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'b.updated_at';
     }
@@ -131,9 +130,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The badge's creator is badge.created_by.
      *
-     * @return string|null
+     * @inheritdoc
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return 'b.created_by';
     }
@@ -141,9 +140,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The badge table is not linked to the folder table, so return null here.
      *
-     * @return string|null
+     * @inheritdoc
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -151,9 +150,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Badges are fetched from the `badge` table.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM badge b

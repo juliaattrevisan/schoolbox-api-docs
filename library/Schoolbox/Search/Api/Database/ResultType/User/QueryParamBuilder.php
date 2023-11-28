@@ -42,8 +42,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * users whose external ID matches `$keyword` are fetched
      * * users whose title + (first name or preferred name) + last name is like
      *   `$keyword` are fetched
+     *
+     * @inheritdoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         // Don't show deleted users
         $whereParts = ['u.deleted_at IS NULL'];
@@ -58,15 +60,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         $keywordSearchParts = ['u.synergy_id = :userKeyword'];
         $params             = ['userKeyword' => $keyword];
         if (mb_strlen($keyword, self::ENCODING) >= 2) {
-            $keywordSearchParts[]      = "u.username LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "u.firstname LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "u.preferred_name LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "u.lastname LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.firstname, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.firstname, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.preferred_name, u.lastname) LIKE :userKeywordLike";
-            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.lastname) LIKE :userKeywordLike";
+            $keywordSearchParts[]      = "u.username LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "u.firstname LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "u.preferred_name LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "u.lastname LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.firstname, u.lastname) LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.firstname, u.lastname) LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.preferred_name, u.lastname) LIKE :userKeywordLike$paramKeySuffix";
+            $keywordSearchParts[]      = "CONCAT_WS(' ', u.title, u.lastname) LIKE :userKeywordLike$paramKeySuffix";
             $params['userKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
         }
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
@@ -79,9 +81,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
     /**
      * The relevance of users is always maximum, so return a static value.
-     * @return string
+     *
+     * @inheritdoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return '1';
     }
@@ -89,7 +92,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Since `buildRelevanceExpression` returns a static value, user results are
      * not ordered by relevance.
-     * @return bool
+     *
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -99,15 +103,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The title of a user result is always their full name (preferred if
      * present, otherwise fall back to first name).
-     * @return string
+     *
+     * @inheritdoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return "CONCAT_WS(' ', u.chosen_name, u.lastname)";
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -115,46 +120,51 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The type of a user result will be "user.$roleType".
-     * @return string
+     * A user's type will be "user.$roleType".
+     *
+     * @inheritdoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return "CONCAT('" . Hydrator::BASE_TYPE . ".', r.group_type)";
     }
 
     /**
      * The ID of a user result will simply be the user's ID.
-     * @return string
+     *
+     * @inheritdoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'u.id';
     }
 
     /**
      * The date of a user result will be their last updated date.
-     * @return string
+     *
+     * @inheritdoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'u.updated_at';
     }
 
     /**
      * Users have no recorded creator: thus, this will always be null.
-     * @return string|null
+     *
+     * @inheritdoc
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
 
     /**
      * Users do not have folders, thus this returns `null`.
-     * @return string|null
+     *
+     * @inheritdoc
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -162,9 +172,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * User results need to be fetched from the user and groups (a.k.a. roles)
      * tables.
-     * @return string
+     *
+     * @inheritdoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return "
             FROM `user` u

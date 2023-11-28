@@ -33,10 +33,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * hidden tiles _are_ fetched (as whether the viewer can view the tile will be determined in the hydrator)
      * * tiles whose title_text or link contain `$keyword` are fetched
      *
-     * @param string $keyword
-     * @return array
+     * @inheritdoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts         = [
             't.deleted_at IS NULL',
@@ -44,13 +43,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             // Tiles without a title should not appear in search results (AC for SA-8841).
-            'TRIM(t.title_text)<>"" AND t.title_text LIKE :tileKeywordLike',
-            'TRIM(t.title_text)<>"" AND t.link LIKE :tileKeywordLike',
+            "TRIM(t.title_text)<>'' AND t.title_text LIKE :tileKeywordLike$paramKeySuffix",
+            "TRIM(t.title_text)<>'' AND t.link LIKE :tileKeywordLike$paramKeySuffix",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
-            'tileNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'tileKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "tileNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "tileKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -62,12 +61,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The relevance of a tile is its modified_at time.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':tileNow',
+            ":tileNow$paramKeySuffix",
             't.modified_at',
             7,
             56,
@@ -77,9 +76,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Tiles are ordered by relevance, as they have a modified time.
      *
-     * @return bool
+     * @inheritdoc
      */
-    protected function isOrderedByRelevance(): bool
+    protected function isOrderedByRelevance(string $paramKeySuffix = ''): bool
     {
         return true;
     }
@@ -87,15 +86,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The title of a tile is tile.title_text.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 't.title_text';
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -103,9 +102,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -113,9 +112,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's ID is simply in its `id` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 't.id';
     }
@@ -123,9 +122,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's date is its modified date.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 't.modified_at';
     }
@@ -133,9 +132,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Tiles do not have a creator.
      *
-     * @return string|null
+     * @inheritdoc
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return null;
     }
@@ -143,9 +142,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The tile's folder is its tile_layout_for_folder.folder_id column.
      *
-     * @return string
+     * @inheritdoc
      */
-    public function buildFolderExpression(): string
+    public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
         return 'tlf.folder_id';
     }
@@ -153,9 +152,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Tiles are fetched from the `tile` table.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM tile t

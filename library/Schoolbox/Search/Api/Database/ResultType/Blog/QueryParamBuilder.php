@@ -29,20 +29,21 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @see \Calendar::getDayEvents
      * @inheritDoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'b.deleted_at IS NULL',
             'f.deleted_at IS NULL',
         ];
         $params = [
-            'blogNow' => Alaress_Date_Format::now()->getDatabase(),
+            "blogNow$paramKeySuffix" => Alaress_Date_Format::now()->getDatabase(),
+            "blogKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%'
         ];
         $keywordSearchParts = [
-            'b.heading LIKE :blogKeywordLike',
-            'b.body LIKE :blogKeywordLike',
+            "b.heading LIKE :blogKeywordLike$paramKeySuffix",
+            "b.body LIKE :blogKeywordLike$paramKeySuffix",
         ];
-        $params['blogKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
+
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
             'where'  => $whereParts,
@@ -53,10 +54,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':blogNow',
+            ":blogNow$paramKeySuffix",
             'b.created_at',
             7,
             56,
@@ -74,13 +75,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'b.heading';
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -90,7 +91,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -98,7 +99,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'b.id';
     }
@@ -106,7 +107,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'b.created_at';
     }
@@ -114,7 +115,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         return 'b.owner_id';
     }
@@ -122,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM blog b
@@ -131,9 +132,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string|null
+     * @inheritdoc
      */
-    protected function buildFolderExpression(): ?string
+    protected function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return 'f.id';
     }

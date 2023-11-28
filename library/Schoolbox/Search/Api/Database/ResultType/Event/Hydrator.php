@@ -110,7 +110,7 @@ class Hydrator extends BaseHydrator
                     $event->getStartTime(),
                     // TODO: is this correct?
                     $event->getCategoryCollection()?->first() ? $folders->offsetGet($event->getCategoryCollection()->first()->getCategoryId()) : null,
-                    null,
+                    $event->getLocation(),
                     null,
                     'calendar',
                     $this->truncateAroundKeyword($keyword, $eventDetailTextOnly) ?? $this->truncate($eventDetailTextOnly),

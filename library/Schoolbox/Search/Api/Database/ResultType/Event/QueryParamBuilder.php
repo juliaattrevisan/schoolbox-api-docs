@@ -29,22 +29,21 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * @see \Calendar::getDayEvents
      * @inheritDoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'e.deleted_at IS NULL',
             'f.deleted_at IS NULL',
         ];
         $params = [
-            'eventNow' => Alaress_Date_Format::now()->getDatabase(),
+            "eventNow$paramKeySuffix" => Alaress_Date_Format::now()->getDatabase(),
         ];
-
         $keywordSearchParts = [
-            'e.title LIKE :eventKeywordLike',
-            'e.detail LIKE :eventKeywordLike',
-            'e.location LIKE :eventKeywordLike',
+            "e.title LIKE :eventKeywordLike$paramKeySuffix",
+            "e.detail LIKE :eventKeywordLike$paramKeySuffix",
+            "e.location LIKE :eventKeywordLike$paramKeySuffix",
         ];
-        $params['eventKeywordLike'] = '%' . $this->quoter->escapeForLike($keyword) . '%';
+        $params["eventKeywordLike$paramKeySuffix"] = '%' . $this->quoter->escapeForLike($keyword) . '%';
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
             'where'  => $whereParts,
@@ -55,10 +54,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':eventNow',
+            ":eventNow$paramKeySuffix",
             'e.start_datetime',
             7,
             56,
@@ -76,13 +75,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'e.title';
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -92,7 +91,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -100,7 +99,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'e.id';
     }
@@ -108,7 +107,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'e.start_datetime';
     }
@@ -116,7 +115,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         return 'e.author_id'; // TODO: owner??
     }
@@ -124,19 +123,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritDoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM event e
             LEFT JOIN event_folder evf ON e.id = evf.event_id
-            LEFT JOIN folder       f   ON evf.folder_id = f.id
+            LEFT JOIN folder f ON evf.folder_id = f.id
         ';
     }
 
     /**
-     * @return string|null
+     * @inheritdoc
      */
-    protected function buildFolderExpression(): ?string
+    protected function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
         return 'f.id';
     }

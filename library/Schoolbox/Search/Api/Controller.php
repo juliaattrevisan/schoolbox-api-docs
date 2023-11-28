@@ -9,16 +9,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use LogicException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\Hydrator\IHydrator;
 use Schoolbox\Search\Api\Hydrator\Translator\FullResultToArray;
+use Schoolbox\Search\Api\SearchFilter\DataObject;
 use Schoolbox\Search\Api\Source\ISource;
 use Schoolbox\UserMapper;
 
@@ -47,6 +49,7 @@ class Controller extends Base
      * @param UserMapper        $userMapper           Finds the user model corresponding to the creator in the filter.
      * @param Folder\Mapper     $folderMapper         Fully hydrates the folder in a raw result, so that its type may be
      *                                                determined.
+     * @param IConnector        $connector
      */
     public function __construct(
         private ISource $source,
@@ -54,6 +57,7 @@ class Controller extends Base
         private FullResultToArray $fullResultTranslator,
         private UserMapper $userMapper,
         private Folder\Mapper $folderMapper,
+        private IConnector $connector,
     ) {
     }
 
@@ -76,7 +80,12 @@ class Controller extends Base
         $cursor = null;
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
-            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
+                $keyword,
+                $filter,
+                $limit,
+                $this->requestQuery->get('cursor')
+            );
 
             $translatedResults = [];
             foreach ($results as $result) {
@@ -113,11 +122,11 @@ class Controller extends Base
                     } else {
                         $folderResultType .= 'other';
                     }
-                    $folderResultKey  = $folderResultType . '.' . $folderResultId;
+                    $folderResultKey = $folderResultType . '.' . $folderResultId;
                     if (!isset($translatedResults[$folderResultKey])) {
                         // Finagle a raw result for the folder, and hydrate that
                         // into a full result.
-                        $rawFolderResult = new RawResult(
+                        $rawFolderResult = new Cursor\RawResult(
                             (string)$folderResultId,
                             $result->folder->getTitle(),
                             $folderResultType,
@@ -161,16 +170,41 @@ class Controller extends Base
                     ];
                     $translatedResults[$folderResultKey]['_subResults']['data'][] = $translatedResult;
 
-                    // Use the cursor object to build a pointer to the next
-                    // result within this page
-                    $cursor ??= new Cursor\Cursor($this->source, $keyword, $filter, $limit);
-                    $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
-                        new Collection([$result])
-                    );
+                    if ($nextCursor === null) {
+                        // If there are no more results on the main query, there are no more results on the folder queries too.
+                        $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = null;
+                    } else {
+                        // Use the cursor object to build a pointer to the next
+                        // result within this page
+                        $cursor ??= new Cursor\Cursor($this->source, $keyword, $filter, $limit);
+                        $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
+                            new Collection([$result])
+                        );
+                    }
                 } else {
                     $translatedResults[$resultKey] = $translatedResult;
                 }
             }
+
+            // If $nextCursor is null, there are no more results on the main query, and so we can be sure that there
+            // are no more results on the folder queries too (this case has been dealt with above, inside the foreach loop).
+            // If $nextCursor is not null, there are possibly more results on the main query (possibly, not definitely,
+            // to account for the case where the total number of results equals MAX_RESULT_LIMIT), and so possibly more
+            // sub-results in each folder-group.
+            if ($nextCursor !== null) {
+                // Do some more work to determine whether more sub-results exist for each folder-group of results.
+                $moreResultsExistByResultKey = $this->getMoreResultsExistByResultKey($keyword, $filter, $translatedResults);
+                foreach ($translatedResults as $resultKey => $translatedResult) {
+                    if (
+                        // The array key will only exist for resultKeys corresponding to results having sub-results.
+                        array_key_exists($resultKey, $moreResultsExistByResultKey) &&
+                        !$moreResultsExistByResultKey[$resultKey]
+                    ) {
+                        $translatedResults[$resultKey]['_subResults']['metadata']['cursor']['next'] = null;
+                    }
+                }
+            }
+
             $translatedResults = array_values($translatedResults);
 
             // Finally output the response
@@ -194,11 +228,11 @@ class Controller extends Base
     /**
      * Search for all results which match a keyword within a folder.
      *
+     * @param Folder\Model $folder
      * @return void
      * @throws NotFound
      * @api GET /api/search/folder/{folderId}
      * @since 23.1
-     *
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
@@ -208,7 +242,12 @@ class Controller extends Base
         $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
 
         if (mb_strlen($keyword) >= 2) {
-            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet($keyword, $filter, $limit);
+            ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
+                $keyword,
+                $filter,
+                $limit,
+                $this->requestQuery->get('cursor')
+            );
 
             // Finally output the response
             $this->response = $this->responseAsJson(
@@ -229,14 +268,98 @@ class Controller extends Base
     }
 
     /**
+     * Return an array like the following:
+     *    [
+     *       'page.unit.14'    => 1, // More results exist for this result key.
+     *       'page.course.120' => 0, // No more results exist for this result key.
+     *       ...
+     *    ]
+     *
+     * Method:
+     *    The array above is obtained by running a query like the following.
+     *    The purpose of doing this in single query instead of many queries is to reduce the load on the server, and
+     *    reduce search query reduce response times.
+     *    SELECT
+     *       IF(
+     *          EXISTS([search within folder 1 beyond cursor]),
+     *          1,
+     *          0
+     *       ) AS `page.unit.14`,
+     *       IF(
+     *          EXISTS([search within folder 2 beyond cursor]),
+     *          1,
+     *          0
+     *       ) AS `page.course.120`,
+     *       ...
+     *    );
+     * @param string     $keyword
+     * @param DataObject $filter
+     * @param array      $translatedResults
+     * @return array
+     */
+    private function getMoreResultsExistByResultKey(string $keyword, DataObject $filter, array $translatedResults): array
+    {
+        if (count($translatedResults) === 0) {
+            return [];
+        }
+
+        $subqueries = [];
+        $params = [];
+        $n = 0;
+
+        foreach ($translatedResults as $resultKey => $translatedResult) {
+            if (!array_key_exists('_subResults', $translatedResult)) {
+                // This translated result does not have sub-results, so we are not interested.
+                continue;
+            }
+
+            // String $resultKey key will contain three tokens.  Examples: 'page.homepage.80', 'page.course.100'.
+            $tokens = explode('.', $resultKey);
+            $folderId = $tokens[count($tokens) - 1];
+
+            try {
+                $filter->folder = $this->folderMapper->findById($folderId);
+            } catch (MapperException) {
+                // Folder deleted or not found.  Skip.
+                continue;
+            }
+
+            $cursorCode = $translatedResult['_subResults']['metadata']['cursor']['next'];
+            $codec = new Cursor\Codec();
+            $cursor = $codec->decode($cursorCode);
+
+            [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, (string)$n++);
+
+            $subqueries[] = $subquery . " AS `$resultKey`";
+
+            $params = array_merge($params, $subqueryParams);
+        }
+
+        if (count($subqueries) === 0) {
+            return [];
+        }
+
+        $queryString = 'SELECT ' . implode(",\n", $subqueries);
+
+        $rows = $this->connector->executeQuery($queryString, $params)->fetchAll();
+
+        if (count($rows) !== 1) {
+            throw new LogicException('Expected one row from query.');
+        }
+
+        return $rows[0];
+    }
+
+    /**
      * Build a result set from the keyword, filter and limit.
      *
      * @param string                  $keyword
      * @param SearchFilter\DataObject $filter
      * @param int                     $limit
-     * @return array{results: array<FullResult>, nextCursor: string}
+     * @param string|null             $cursorCode
+     * @return array{results: array<FullResult>, nextCursor: string|null}
      */
-    private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit): array
+    private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit, ?string $cursorCode): array
     {
         $cursor = new Cursor\Cursor(
             $this->source,
@@ -252,7 +375,7 @@ class Controller extends Base
         // even if the hydrator filters out results.
         $i             = 0;
         $fullResults   = [];
-        $nextCursor    = $this->requestQuery->get('cursor');
+        $nextCursor    = $cursorCode;
         while (count($fullResults) < $limit && $i++ < 100) {
             // Get next set of raw results, and the cursor for the next
             // iteration.

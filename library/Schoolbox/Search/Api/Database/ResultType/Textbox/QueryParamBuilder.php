@@ -36,16 +36,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * hidden textboxes _are_ fetched (as whether the viewer can view the textbox will be determined in the hydrator)
      * * textboxes whose url or comment or description contain `$keyword` are fetched
      *
-     * @param string $keyword
-     * @return array
+     * @inheritdoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         return [
             'where'  => [], // All the where conditions are specified in buildFromStatement().
             'params' => [
-                'textboxNow'         => Alaress_Date_Format::now()->getDatabase(),
-                'textboxKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+                "textboxNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+                "textboxKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
             ]
         ];
     }
@@ -53,17 +52,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The relevance of a matched textbox is determined by its updated_at time.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return '`relevance`';
     }
 
     /**
-     * Textboxes are ordered by relevance, as they have a updated_at time.
+     * Textboxes are ordered by relevance, as they have an updated_at time.
      *
-     * @return bool
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -73,15 +72,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The textbox's title is its `heading`.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return '`title`';
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -89,9 +88,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -99,9 +98,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The textbox's ID is simply in its `textBoxID` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return '`textboxInstanceId`';
     }
@@ -109,9 +108,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * A textbox's date is its updated_at date.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return '`textboxUpdatedAt`';
     }
@@ -119,9 +118,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Textboxes currently have no creator stored in the database, so return null.
      *
-     * @return string|null
+     * @inheritdoc
      */
-    protected function buildCreatorExpression(): ?string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): ?string
     {
         return '`textboxCreatedBy`';
     }
@@ -129,9 +128,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The textbox's folder is its `categoryID` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    public function buildFolderExpression(): string
+    public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
         return '`folderId`';
     }
@@ -139,18 +138,18 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Textboxes are fetched from the `textBox` table.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         $linearDecayExpression1 = $this->buildLinearDecayExpression(
-            ':textboxNow',
+            ":textboxNow$paramKeySuffix",
             'tb.updated_at',
             7,
             56
         );
         $linearDecayExpression2 = $this->buildLinearDecayExpression(
-            ':textboxNow',
+            ":textboxNow$paramKeySuffix",
             'tb2.updated_at',
             7,
             56
@@ -172,45 +171,45 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         //  * "$textboxId-$componentInstanceId-$folderId"
         //  * Example with integer IDs: "1-4081-80"
         //  * Example with integer IDs and not used in any component "94--"
-        return '
+        return "
             FROM (
                 SELECT
-                CONCAT(tb.textBoxID, "-", cci.component_instance_id, "-", fo.id) AS textboxInstanceId,
+                CONCAT(tb.textBoxID, '-', cci.component_instance_id, '-', fo.id) AS textboxInstanceId,
                 tb.heading AS title,
-                ' . $linearDecayExpression1 . ' AS relevance,
+                $linearDecayExpression1 AS relevance,
                 fo.id AS folderId,
                 tb.updated_at AS textboxUpdatedAt,
                 tb.created_by AS textboxCreatedBy
                 FROM component_instance ci
                 JOIN component_config_instance cci ON cci.component_instance_id=ci.id
                 JOIN component_config_definition ccd ON (
-                    ccd.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
+                    ccd.key='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "' AND
                     ccd.id=cci.component_config_definition_id
                 )
                 JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
                 JOIN folder fo ON fo.id=ci.identifier
-                WHERE ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
+                WHERE ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
                 AND tb.deleted_at IS NULL
                 AND fo.deleted_at IS NULL
                 AND (
-                    tb.heading LIKE :textboxKeywordLike OR
-                    tb.body LIKE :textboxKeywordLike OR
+                    tb.heading LIKE :textboxKeywordLike$paramKeySuffix OR
+                    tb.body LIKE :textboxKeywordLike$paramKeySuffix OR
                     EXISTS(
                         SELECT *
                         FROM component_config_instance cci2
                         JOIN component_config_definition ccd2 ON (
-                            ccd2.key = "' . Component_Config_Componentname::KEY . '" AND
+                            ccd2.key = '" . Component_Config_Componentname::KEY . "' AND
                             ccd2.id=cci2.component_config_definition_id
                         )
                         WHERE cci2.component_instance_id=ci.id
-                        AND cci2.value LIKE :textboxKeywordLike
+                        AND cci2.value LIKE :textboxKeywordLike$paramKeySuffix
                     )
                 )
                 UNION
                 SELECT
-                CONCAT(tb2.textBoxID, "--") AS textboxInstanceId,
+                CONCAT(tb2.textBoxID, '--') AS textboxInstanceId,
                 tb2.heading AS title,
-                ' . $linearDecayExpression2 . ' AS relevance,
+                $linearDecayExpression2 AS relevance,
                 NULL AS folderId,
                 tb2.updated_at AS textboxUpdatedAt,
                 tb2.created_by AS textboxCreatedBy
@@ -219,16 +218,16 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     cci2.component_config_definition_id = (
                         SELECT id
                         FROM component_config_definition ccd2
-                        WHERE ccd2.key = "' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"
+                        WHERE ccd2.key = '" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
                     ) AND
                     cci2.value = CAST(tb2.textBoxID AS NCHAR)
                 )
                 WHERE tb2.deleted_at IS NULL
                 AND (
-                   tb2.heading LIKE :textboxKeywordLike OR
-                   tb2.body LIKE :textboxKeywordLike
+                   tb2.heading LIKE :textboxKeywordLike$paramKeySuffix OR
+                   tb2.body LIKE :textboxKeywordLike$paramKeySuffix
                 )
                 AND cci2.id IS NULL
-            ) AS dummy';
+            ) AS dummy";
     }
 }

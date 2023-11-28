@@ -33,24 +33,23 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * the search returns:
      *    * each thread whose title contains the keyword, or among whose posts is at least one post that contains the keyword.
      *
-     * @param string $keyword
-     * @return array
+     * @inheritdoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts = [
             'fp.deleted="false"', // The type of forumPost.deleted is enum('true', 'false').
             'ft.deleted="false"', // The type of forumThread.deleted is enum('true', 'false').
         ];
         $keywordSearchParts = [
-            'ft.title LIKE :postKeywordLike',
-            'fp.body LIKE :postKeywordLike',
+            "ft.title LIKE :postKeywordLike$paramKeySuffix",
+            "fp.body LIKE :postKeywordLike$paramKeySuffix",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params = [
-            'postNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'postKeyword'     => $this->quoter->escapeForLike($keyword),
-            'postKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "postNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "postKeyword$paramKeySuffix"     => $this->quoter->escapeForLike($keyword),
+            "postKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -62,13 +61,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The relevance of a post is its modified time.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':postNow',
-            $this->getSubqueryForMostRelevantPostInThread('modified'),
+            ":postNow$paramKeySuffix",
+            $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix),
             7,
             56,
         );
@@ -77,7 +76,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Forum posts are ordered by relevance, as they have a modified time.
      *
-     * @return bool
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -89,15 +88,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * Return the thread title because if a thread title contains the keyword, the thread should be included in the
      * search result.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'ft.title';
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -105,9 +104,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -115,41 +114,41 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The post's ID is its `postID` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('postID');
+        return $this->getSubqueryForMostRelevantPostInThread('postID', $paramKeySuffix);
     }
 
     /**
      * The post's date is its modified date.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('modified');
+        return $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix);
     }
 
     /**
      * The post's creator is its `userID` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('userID');
+        return $this->getSubqueryForMostRelevantPostInThread('userID', $paramKeySuffix);
     }
 
     /**
      * Forum posts do not have a folder.
      *
-     * @return string|null
+     * @inheritdoc
      */
-    public function buildFolderExpression(): ?string
+    public function buildFolderExpression(string $paramKeySuffix = ''): ?string
     {
-        return null;
+        return 'ft.categoryID';
     }
 
     /**
@@ -164,9 +163,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *  * the most recent post that contains the keyword, or
      *  * the most recent post (if no post contains the keyword)
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM forumThread ft
@@ -183,19 +182,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * The current method is good enough for now.
      *
      * @param string $columnToSelect
+     * @param string $paramKeySuffix
      * @return string
      */
-    private function getSubqueryForMostRelevantPostInThread(string $columnToSelect): string
+    private function getSubqueryForMostRelevantPostInThread(string $columnToSelect, string $paramKeySuffix): string
     {
         return (
             // Select from the most recent post in the thread whose body contains the keyword, otherwise the most recent post.
             '(
-                SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . '
+                SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . "
                 FROM  forumPost AS fp2
                 WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE(:postKeyword, fp2.body)>0 DESC, fp2.modified DESC, fp2.postID ASC
+                ORDER BY LOCATE(:postKeyword$paramKeySuffix, fp2.body)>0 DESC, fp2.modified DESC, fp2.postID ASC
                 LIMIT 1
-             )'
+             )"
             // NOTE: Order by "fp2.postID ASC" above is necessary so that consistent results are returned each time
             //       the query runs given that fp2.modified may not be unique.
         );

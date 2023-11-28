@@ -33,24 +33,23 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      * * hidden links _are_ fetched (as whether the viewer can view the link will be determined in the hydrator)
      * * links whose url or comment or description contain `$keyword` are fetched
      *
-     * @param string $keyword
-     * @return array
+     * @inheritdoc
      */
-    protected function buildBaseWhereParams(string $keyword): array
+    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
         $whereParts         = [
             'l.deleted_at IS NULL',
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
-            'l.description LIKE :linkKeywordLike',
-            'l.comment LIKE :linkKeywordLike',
-            'l.url LIKE :linkKeywordLike',
+            "l.description LIKE :linkKeywordLike$paramKeySuffix",
+            "l.comment LIKE :linkKeywordLike$paramKeySuffix",
+            "l.url LIKE :linkKeywordLike$paramKeySuffix",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
-            'linkNow'         => Alaress_Date_Format::now()->getDatabase(),
-            'linkKeywordLike' => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "linkNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "linkKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -62,12 +61,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The relevance of a link is its modified time.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildRelevanceExpression(): string
+    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
         return $this->buildLinearDecayExpression(
-            ':linkNow',
+            ":linkNow$paramKeySuffix",
             'l.modified',
             7,
             56,
@@ -77,7 +76,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Links are ordered by relevance, as they have a modified time.
      *
-     * @return bool
+     * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
     {
@@ -87,15 +86,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The closest thing to a title for a link is link.description.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTitleExpression(): string
+    protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
         return 'l.description';
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getType(): string
     {
@@ -103,9 +102,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function buildTypeExpression(): string
+    protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
         return '"' . Hydrator::BASE_TYPE . '"';
     }
@@ -113,9 +112,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The link's ID is simply in its `id` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildIdExpression(): string
+    protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
         return 'l.id';
     }
@@ -123,9 +122,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The link's date is its modified date.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildDateExpression(): string
+    protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
         return 'l.modified';
     }
@@ -133,9 +132,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The link's creator is its `owner` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildCreatorExpression(): string
+    protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
         return 'l.owner';
     }
@@ -143,9 +142,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * The link's folder is its `category` column.
      *
-     * @return string
+     * @inheritdoc
      */
-    public function buildFolderExpression(): string
+    public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
         return 'l.category';
     }
@@ -153,9 +152,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * Links are fetched from the `link` table.
      *
-     * @return string
+     * @inheritdoc
      */
-    protected function buildFromStatement(): string
+    protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
         return '
             FROM link l

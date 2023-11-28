@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database;
 
 use Alaress\Database\Connector\IConnector;
+use InvalidArgumentException;
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
@@ -48,41 +49,13 @@ class AggregateSource implements ISource
      */
     public function search(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): array
     {
-        if (empty($this->queryParamBuilders)) {
+        [$queryString, $params] = $this->getQueryStringAndParams($keyword, $filter, $cursor, $limit, 'select');
+
+        if ($queryString === '') {
+            // This can happen if a filter has been specified that guarantees the query will return no results.
+            // E.g. Specifying a folder and restricting to users.  Users are not connected to folders, so no result possible.
             return [];
         }
-        $queries = [];
-        $params  = [];
-        foreach ($this->queryParamBuilders as $queryParamBuilder) {
-            $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit);
-            if ($queryParams) {
-                $queries[] = $queryParams->query;
-                $params    = array_merge($params, $queryParams->params);
-            }
-        }
-        if (empty($queries)) {
-            return [];
-        }
-
-        // UNION all queries together
-        $queryString = 'SELECT * FROM (('
-            . implode(') UNION ALL (', $queries)
-            . ')) AS combined';
-
-        // Apply ordering here too.
-        // IMPORTANT:
-        //  * Order here must match order in library/Schoolbox/Search/Api/Database/BaseQueryParamBuilder->buildMatchQueryParams().
-        //  * The order of `id` is DESC because all other things being equal, we want more recently created rows to
-        //    appear before less recently created rows.
-        $queryString .= '
-            ORDER BY
-                relevance DESC,
-                title ASC,
-                type ASC,
-                id DESC
-            LIMIT :limit
-        ';
-        $params['limit'] = $limit;
 
         $rawMatches = [];
         foreach ($this->connector->executeQuery($queryString, $params) as $row) {
@@ -95,5 +68,91 @@ class AggregateSource implements ISource
         }
 
         return $rawMatches;
+    }
+
+    /**
+     * @param string                $keyword
+     * @param FilterDataObject      $filter
+     * @param CursorDataObject|null $cursor
+     * @param string                $paramKeySuffix - Suffix to add to parameter keys
+     *                                                (useful if building repeated subqueries in larger query).
+     * @return array
+     */
+    public function getMoreResultsExistQueryAndParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        string $paramKeySuffix = ''
+    ): array {
+        return $this->getQueryStringAndParams($keyword, $filter, $cursor, null, 'exists', $paramKeySuffix);
+    }
+
+    /**
+     * @param string                $keyword
+     * @param FilterDataObject      $filter
+     * @param CursorDataObject|null $cursor
+     * @param int|null              $limit
+     * @param string                $queryType      - Expected values: {'select', 'exists'}.
+     * @param string                $paramKeySuffix - Suffix to add to parameter keys
+     *                                                (useful if building repeated subqueries in larger query).
+     * @return array
+     */
+    private function getQueryStringAndParams(
+        string $keyword,
+        FilterDataObject $filter,
+        ?CursorDataObject $cursor,
+        ?int $limit,
+        string $queryType,
+        string $paramKeySuffix = ''
+    ): array {
+        if (empty($this->queryParamBuilders)) {
+            return ['', []];
+        }
+
+        $queries = [];
+        $params = [];
+        foreach ($this->queryParamBuilders as $queryParamBuilder) {
+            $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit ?? 1, $paramKeySuffix);
+            if ($queryParams) {
+                $queries[] = $queryParams->query;
+                $params    = array_merge($params, $queryParams->params);
+            }
+        }
+
+        if (empty($queries)) {
+            return ['', []];
+        }
+
+        $existsOnly = match ($queryType) {
+            'select' => false,
+            'exists' => true,
+            default => throw new InvalidArgumentException("Unexpected queryType '$queryType'."),
+        };
+
+        // UNION all queries together.
+        $queryString = (
+            ($existsOnly ? 'IF(EXISTS(' : 'SELECT * FROM (') .
+            '(' . implode(') UNION ALL (', $queries) . ')' .
+            ($existsOnly ? '), 1, 0)' : ') AS combined')
+        );
+
+        if (!$existsOnly) {
+            // Apply ordering here too.
+            // IMPORTANT:
+            //  * Order here must match order in library/Schoolbox/Search/Api/Database/BaseQueryParamBuilder->buildMatchQueryParams().
+            //  * The order of `id` is DESC because all other things being equal, we want more recently created rows to
+            //    appear before less recently created rows.
+            $queryString .= "
+                ORDER BY
+                    relevance DESC,
+                    title ASC,
+                    type ASC,
+                    id DESC
+                LIMIT :limit$paramKeySuffix
+            ";
+            $params['limit'] = $limit;
+        }
+
+        return [$queryString, $params];
     }
 }
