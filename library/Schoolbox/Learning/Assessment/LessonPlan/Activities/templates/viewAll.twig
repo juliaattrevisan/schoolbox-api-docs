@@ -66,7 +66,7 @@
     <section>
         <ul class="action-list">
             <li>
-                <ul class="information-list">
+                <ul class="information-list threaded">
                     {% for unit in course.units %}
                         <li class="interact" data-unit="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
                             <ul class="action-list">
@@ -148,7 +148,7 @@
                                         {% set hasCourseRoutes = saveToCourseRoute is not empty %}
                                     {% endif %}
 
-                                    <li class="interact" data-unit-assessment="{{ assessment.id }}">
+                                    <li class="interact child" data-unit-assessment="{{ assessment.id }}">
                                         <div{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %}>
                                             <div class="list-item">
                                                 <div class="small-12 compact card wrap-down">
