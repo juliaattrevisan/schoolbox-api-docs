@@ -28,6 +28,7 @@ const tableColumns = [
     "givenName",
     "preferredName",
     "lastName",
+    "fullName",
     "role",
     "campus",
     "yearLevel",
@@ -89,7 +90,17 @@ const tableOptions = {
         name: "Name",
         accessType: "Access",
     },
-    hiddenColumns: ["firstName", "givenName", "preferredName", "lastName", "role", "campus", "yearLevel", "house"], //these are all added to name, but we need to add them to tableColumns so we can search them
+    hiddenColumns: [
+        "firstName",
+        "givenName",
+        "preferredName",
+        "lastName",
+        "fullName",
+        "role",
+        "campus",
+        "yearLevel",
+        "house",
+    ], // these are all added to name, but we need to add them to tableColumns so we can search them
     orderBy: {
         //initial sorting display
         ascending: true,
