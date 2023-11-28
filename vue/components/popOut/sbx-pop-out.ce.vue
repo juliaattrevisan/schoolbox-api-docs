@@ -27,6 +27,10 @@ interface Props {
      * depending on whether the button is opened or closed
      */
     isArrowIcon?: boolean;
+    /**
+     * Close the dropdown when the content is clicked
+     */
+    isCloseOnContentClick?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -35,7 +39,9 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     button as Ref<HTMLButtonElement>,
     props.buttonText ? props.buttonText : "Actions",
     props.contentId,
-    props.isFullWidth ? "bottom-start" : "bottom-end"
+    props.isFullWidth ? "bottom-start" : "bottom-end",
+    props.isFullWidth,
+    props.isCloseOnContentClick
 );
 </script>
 
