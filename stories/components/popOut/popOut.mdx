@@ -1,4 +1,4 @@
-import { Canvas, Meta, Stories, Controls } from "@storybook/blocks";
+import { Meta, Stories } from "@storybook/blocks";
 
 import * as PopOutStories from "./popOut.stories";
 
@@ -8,15 +8,20 @@ import * as PopOutStories from "./popOut.stories";
 
 To toggle the display of further navigation or control actions.
 
--   It will display whatever is assigned to it via: `content-id="dropdown-1"`
--   An alternative icon can be passed in via the single slot using: `<div slot="icon"><svg /></div>`
--   To add text to the button, use `button-text="My Buton Text"`
+| Property                | Type      | Description                                                                                                                                       |
+| ----------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content-id`            | `string`  | The id of the content to display                                                                                                                  |
+| `button-text`           | `string`  | The text to display on the button                                                                                                                 |
+| `disabled`              | `boolean` | Whether the button is to be disabled                                                                                                              |
+| `isFullWidth`           | `boolean` | Whether the button should be full width, stretching to the width of the parent container                                                          |
+| `isArrowIcon`           | `boolean` | Whether to use an arrow icon instead of the default icon, which will switch the icon rotation depending on whether the button is opened or closed |
+| `isCloseOnContentClick` | `boolean` | Close the dropdown when the content is clicked                                                                                                    |
 
 **Please note:**
 
 -   There are currently some style variations when comparing Storybook/Schoolbox. This is due to some complications so Storybook's Webpack is not yet set up exactly as our Schoolbox Webpack is. As such styles will vary slightly, so be sure to also review in Schoolbox.
--   That only the dropdown button is currently contained within the component. The dropdown content is not.
--   The central div `#container` is currently used to determine the position of the dropdown content, so the component must be contained wiithin this container
+-   Only the dropdown button is currently contained within the component. The dropdown content is not.
+-   The central SBX div `#container` is currently used to determine the position of the dropdown content, so the component must be contained wiithin this container
 
 ```
 <sbx-pop-out content-id="dropdown-1" button-text="Modify Participation">
