@@ -16,6 +16,11 @@ use Alaress\Async\Queue\QueueInterface;
  *
  * `\Schoolbox\Realtime\MessageList\IListFactory` is the single-instance
  * version of this interface.
+ *
+ * Currently, only `listed` is defined: that is because only listed messages
+ * need to be fetched by a multi-instance process (in this case, the socket
+ * daemon's worker). It'd be simple to copy the other methods to this class
+ * when required (e.g. should the schedule daemon is made multi-instance).
  */
 interface IListFactory
 {
