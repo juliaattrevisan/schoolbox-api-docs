@@ -4,6 +4,7 @@
  */
 
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
+import BadgeModal from "@schoolboxBadge/vue/badge-modal";
 import SpResultsPrompt from "./results/sp-results-prompt.vue";
 import SpResultsError from "./results/sp-results-error.vue";
 import SpResultsNone from "./results/sp-results-none.vue";

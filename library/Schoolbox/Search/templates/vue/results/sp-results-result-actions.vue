@@ -3,14 +3,14 @@
  * To provide access to further actions on a result
  */
 
-import { useSPBadgeAwardStore } from "./store/spBadgeAwardStore";
+import { useBadgeStore } from "./store/spBadgeStore";
 import { Result } from "../../js/types/Result";
 
 interface Props {
     result: Result; // the result to display
 }
 const props = defineProps<Props>();
-const badgeAwardStore = useSPBadgeAwardStore();
+const badgeAwardStore = useBadgeStore();
 </script>
 
 <template>

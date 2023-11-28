@@ -2,9 +2,9 @@
 import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time.vue";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import BadgeAward from "@schoolboxBadge/Award/vue/badgeAward.vue";
-import { useSPBadgeAwardStore } from "./store/spBadgeAwardStore";
+import { useBadgeStore } from "./store/spBadgeStore";
 
-const badgeAwardStore = useSPBadgeAwardStore();
+const badgeAwardStore = useBadgeStore();
 </script>
 
 <template>

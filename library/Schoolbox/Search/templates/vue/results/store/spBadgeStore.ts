@@ -1,3 +1,8 @@
+/**
+ * Handles badge related events for the search page,
+ * including opening the badge modal and awarding them as goals and achievements
+ */
+
 import { defineStore } from "pinia";
 import type { Result } from "../../../js/types/Result";
 
@@ -11,7 +16,7 @@ type BadgeAward = {
     };
 };
 
-export const useSPBadgeAwardStore = defineStore("spBadgeAwardStore", () => {
+export const useBadgeStore = defineStore("spBadgeStore", () => {
     const selectedBadge = window.Vue.ref<BadgeAward | null>(null);
 
     /**
