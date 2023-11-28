@@ -18,17 +18,17 @@ type BadgeAward = {
 };
 
 export const useBadgeStore = defineStore("spBadgeStore", () => {
-    const isBadgeModalOpen = window.Vue.ref(false);
-    const currentBadge = window.Vue.ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
-    const selectedBadge = window.Vue.ref<BadgeAward | null>(null);
+    const isDetailModalOpen = window.Vue.ref(false); // to display a badges details
+    const detailBadge = window.Vue.ref<BadgeUsageObject | null>(null); // to badge to display details for
+    const awardBadge = window.Vue.ref<BadgeAward | null>(null); // the badge to award
 
     /**
      * Opens a modal window for viewing this badge's full details.
      * @param { BadgeUsageObject } badge - the badge to display
      */
     function openDetailModal(badge: BadgeUsageObject) {
-        currentBadge.value = badge;
-        isBadgeModalOpen.value = true;
+        detailBadge.value = badge;
+        isDetailModalOpen.value = true;
     }
 
     /**
@@ -38,7 +38,7 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
      * @param {BadgeAward["expiry"]} awardExpiry The expiry of the award
      */
     function setSelectedBadge(badge: Result, awardType: BadgeAward["type"], awardExpiry: BadgeAward["expiry"]) {
-        selectedBadge.value = {
+        awardBadge.value = {
             id: badge.id,
             expiry: awardExpiry,
             name: badge.title,
@@ -53,14 +53,14 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
      * Unset the selected badge
      */
     function unsetSelectedBadge() {
-        selectedBadge.value = null;
+        awardBadge.value = null;
     }
 
     return {
-        isBadgeModalOpen,
-        currentBadge,
+        isDetailModalOpen,
+        detailBadge,
         openDetailModal,
-        selectedBadge,
+        awardBadge,
         setSelectedBadge,
         unsetSelectedBadge,
     };

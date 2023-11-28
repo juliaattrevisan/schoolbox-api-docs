@@ -10,18 +10,18 @@ const badgeStore = useBadgeStore();
 <template>
     <sequential-reveal-modal
         size="medium"
-        :is-open="badgeStore.selectedBadge !== null"
+        :is-open="badgeStore.awardBadge !== null"
         @closed="badgeStore.unsetSelectedBadge()"
     >
         <template #sequence-1>
-            <template v-if="badgeStore.selectedBadge !== null">
+            <template v-if="badgeStore.awardBadge !== null">
                 <badge-award
-                    v-if="badgeStore.selectedBadge.type === 'achievement'"
-                    :key="`awardAchievement-${badgeStore.selectedBadge.id}`"
+                    v-if="badgeStore.awardBadge.type === 'achievement'"
+                    :key="`awardAchievement-${badgeStore.awardBadge.id}`"
                     type="achievement"
-                    :badge="badgeStore.selectedBadge"
-                    :expiry="badgeStore.selectedBadge.expiry"
-                    :endpoint="`/learning/badge/award/${badgeStore.selectedBadge.id}/achievement`"
+                    :badge="badgeStore.awardBadge"
+                    :expiry="badgeStore.awardBadge.expiry"
+                    :endpoint="`/learning/badge/award/${badgeStore.awardBadge.id}/achievement`"
                     :is-modal-open="true"
                     placeholder="Search for users to award achievement to"
                     toast-activate-message="Awarding achievement..."
@@ -46,12 +46,12 @@ const badgeStore = useBadgeStore();
                 </badge-award>
 
                 <badge-award
-                    v-else-if="badgeStore.selectedBadge.type === 'goal'"
-                    :key="`setGoal-${badgeStore.selectedBadge.id}`"
+                    v-else-if="badgeStore.awardBadge.type === 'goal'"
+                    :key="`setGoal-${badgeStore.awardBadge.id}`"
                     type="goal"
-                    :badge="badgeStore.selectedBadge"
-                    :expiry="badgeStore.selectedBadge.expiry"
-                    :endpoint="`/learning/badge/award/${badgeStore.selectedBadge.id}/goal`"
+                    :badge="badgeStore.awardBadge"
+                    :expiry="badgeStore.awardBadge.expiry"
+                    :endpoint="`/learning/badge/award/${badgeStore.awardBadge.id}/goal`"
                     :is-modal-open="true"
                     placeholder="Search for users to award achievement to"
                     toast-activate-message="Setting goal..."

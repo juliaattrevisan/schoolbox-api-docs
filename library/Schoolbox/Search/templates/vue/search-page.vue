@@ -79,7 +79,7 @@ window.Vue.onMounted(async () => {
  * false so we can open it again
  */
 function onBadgeModalClosed() {
-    badgeStore.isBadgeModalOpen = false;
+    badgeStore.isDetailModalOpen = false;
 }
 </script>
 
@@ -97,7 +97,7 @@ function onBadgeModalClosed() {
             <sp-results v-else-if="resultsStore.hasResults" />
         </div>
     </div>
-    <badge-modal :is-open="badgeStore.isBadgeModalOpen" :badge="badgeStore.currentBadge" @closed="onBadgeModalClosed" />
+    <badge-modal :is-open="badgeStore.isDetailModalOpen" :badge="badgeStore.detailBadge" @closed="onBadgeModalClosed" />
 </template>
 
 <style lang="scss" scoped>
