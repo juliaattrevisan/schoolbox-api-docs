@@ -31,7 +31,6 @@ use Schoolbox\Learning\Turnitin\Cli\HistoricalTool;
 use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Resource\Storage\Cli\ExpiryTool;
 use Schoolbox\Video\CommandLineTool\Processor;
-use Schoolbox\Intellischool\CommandLineTool\DataSync;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
 
@@ -78,9 +77,6 @@ class Inspector extends CliTool\App
         RetrofitTool::TURNITIN_LOCK_NAME => 'Turnitin File Retrofitter (./tools/turnitin/retrofit.php)',
         CleanserTool::TURNITIN_LOCK_NAME => 'Turnitin Group Cleanser (./tools/turnitin/cleanser.php)',
         HistoricalTool::TURNITIN_LOCK_NAME => 'Turnitin Historical (./tools/turnitin/historical.php)',
-
-        //Intellischool CLI tool
-        DataSync::LOCK_NAME      =>  'Intellischool Sync Handler (./tools/intellischool/dataSync.php)',
 
         /* Canvas Announcements Importer
          */
