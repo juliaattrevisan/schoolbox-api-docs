@@ -30,7 +30,7 @@ export const Default: Story = {
         template: `
             <div id="container" class="l-flex-col l-flex--justify-space" style="height: 600px;">
                 <div class="l-flex-row l-flex--justify-space">
-                    <sbx-pop-out content-id="dropdown-1"></sbx-pop-out>
+                    <sbx-pop-out content-id="dropdown-1" is-close-on-content-click></sbx-pop-out>
                     <sbx-pop-out content-id="dropdown-2">
                         <template #icon>
                             <svg
@@ -53,6 +53,7 @@ export const Default: Story = {
                             </svg>
                         </template>
                     </sbx-pop-out>
+                    <sbx-pop-out content-id="dropdown-5" button-text="Filter" is-arrow-icon></sbx-pop-out>
                 </div>
                 <div class="l-flex-row l-flex--justify-space">
                     <sbx-pop-out content-id="dropdown-3" button-text="Modify Participation"></sbx-pop-out>
@@ -78,6 +79,12 @@ export const Default: Story = {
                 <li class="separator">Manage</li>
                 <li><a>Course Markbook</a></li>
                 <li><a>Delete</a></li>
+            </ul>
+            <ul data-dropdown-content="" class="f-dropdown" id="dropdown-5">
+                <li><a>Learning</a></li>
+                <li><a>Personal Development</a></li>
+                <li><a>Community</a></li>
+                <li><a>Extra-Curriculuar</a></li>
             </ul>
         `,
     }),
