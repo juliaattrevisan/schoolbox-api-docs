@@ -29,6 +29,17 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
+        /**
+         * Only show the parent register to parents
+         */
+        $parentRegisterPermission = new Rule\HasRole(Role::PARENT);
+
+        /**
+         * Only show the register for students to the following:
+         * Staff who can see profiles
+         * the student themselves
+         * the parent of the specified student
+         */
         $studentRegisterPermission = new Rule\Any(
             new Rule\IsUserOrParentOfUser(
                 $this->getExternalUser(),
@@ -52,6 +63,12 @@ class Module extends BaseModule
             'getStudent',
             $studentRegisterPermission,
             $studentRegisterPreload,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/{registerCode}/parent',
+            'getParent',
+            $parentRegisterPermission,
         );
 
         $this->register(self::METHOD_GET, '/list', 'getRegisterList', new Rule\IsSuperuser());

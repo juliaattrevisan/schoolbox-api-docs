@@ -134,6 +134,16 @@ class Controller extends BaseController
         throw new NotFound();
     }
 
+    /**
+     * Part 2: ISAMS: Financial Registers
+     *
+     * @return void
+     */
+    public function getParent()
+    {
+        return;
+    }
+
     public function getRegisterList()
     {
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
