@@ -10,6 +10,7 @@
 interface Props {
     initialInput?: string; // to prefill the input
     isActiveWhenEmpty?: boolean; // can be selected while the input is empty
+    isSelected?: boolean; // to enable selecting the search page when the input is empty
 }
 const props = withDefaults(defineProps<Props>(), {
     initialInput: "",
@@ -30,9 +31,10 @@ const emit = defineEmits<{
 
 const currentInput = window.Vue.ref<string>((props.initialInput as string) ?? "");
 const inputElement = window.Vue.ref<HTMLInputElement | null>(null);
+const hasInputFocus = window.Vue.ref(false);
 
 /**
- * Input updated, update internaly and dispatch emit
+ * Input updated, update internally and dispatch emit
  * @param {Event} event - The event object
  */
 function onInput(event: Event) {
@@ -67,12 +69,17 @@ function onKeyEnter() {
 function onClicked() {
     if (props.isActiveWhenEmpty) {
         emit("click");
+        return;
     }
     if (currentInput.value.length > 0) {
         emit("click");
-    } else {
-        inputElement.value?.focus();
+        return;
     }
+    if (props.isSelected && hasInputFocus.value) {
+        emit("click");
+        return;
+    }
+    inputElement.value?.focus();
 }
 
 /**
@@ -80,6 +87,7 @@ function onClicked() {
  * @param {FocusEvent} event - The event object
  */
 function onFocusOver(event: FocusEvent) {
+    hasInputFocus.value = true;
     emit("focusOver", event);
 }
 

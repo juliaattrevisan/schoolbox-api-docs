@@ -21,6 +21,7 @@ interface AllResults {
 
 const isFocused = window.Vue.ref(false);
 const isActive = window.Vue.ref(false); // If the search input is active, to add the active styles
+const isSelected = window.Vue.ref(false); // If the search input is selected
 const keyword = window.Vue.ref("");
 const results = window.Vue.ref<Result[]>([]);
 const isOpen = window.Vue.ref(false);
@@ -34,7 +35,9 @@ const paths = {
     portrait: "/portrait.php?id=",
     searchEndpoint: "/user/search?keyword=",
     userPage: "/search/user/",
-    searchPage: "/search?keyword=",
+    searchPage: "/search",
+    searchPageWithKeyword: "/search?keyword=",
+    usersFilter: `filter=%7B"date"%3A%7B%7D%2C"creator"%3A%7B%7D%2C"types"%3A%5B"user"%2C"user.guest"%2C"user.parent"%2C"user.staff"%2C"user.student"%5D%7D`,
 };
 
 /**
@@ -109,7 +112,11 @@ function onEnter() {
  * Submit the form, heading to the search page
  */
 function onClicked() {
-    (formElement.value as HTMLFormElement).submit();
+    if (keyword.value.length === 0) {
+        window.location.href = paths.searchPage;
+    } else {
+        (formElement.value as HTMLFormElement).submit();
+    }
 }
 
 /**
@@ -118,6 +125,7 @@ function onClicked() {
 function onClickOutside() {
     isFocused.value = false;
     isActive.value = false;
+    isSelected.value = false;
 }
 
 /**
@@ -125,6 +133,7 @@ function onClickOutside() {
  */
 function onFocusOver() {
     isFocused.value = true;
+    isSelected.value = true;
 }
 
 /**
@@ -149,7 +158,7 @@ function onMouseOver() {
         offCanvasWrap.classList.remove("move-right");
     }
     /**
-     * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
+     * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible every time
      * the user does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the
      * search-is-active class
      *
@@ -182,6 +191,28 @@ function onMouseOut() {
 function formatPortrait(id: string) {
     return `${paths.portrait}${id}&size=square64`;
 }
+
+/**
+ * The search button href, if the keyword is empty, go to the search page
+ * @returns {string} - The href
+ */
+const searchButtonHref = window.Vue.computed(() => {
+    if (keyword.value.length === 0) {
+        return paths.searchPage;
+    }
+    return `${paths.searchPageWithKeyword}${keyword.value}`;
+});
+
+/**
+ * The search button text, if the keyword is empty, display 'Advanced Search'
+ * @returns {string} - The text
+ */
+const searchButtonText = window.Vue.computed(() => {
+    if (keyword.value.length === 0) {
+        return "Advanced Search";
+    }
+    return `Search everything for "${keyword.value}"`;
+});
 </script>
 
 <template>
@@ -191,10 +222,11 @@ function formatPortrait(id: string) {
         v-on-click-outside="onClickOutside"
         class="c-header-search"
         action="/search"
-        :class="{ focus: isFocused }"
+        :class="{ focus: isSelected }"
     >
         <search-input
             :is-active-when-empty="false"
+            :is-selected="isSelected"
             @input="onInput"
             @key-down="onArrowDown"
             @key-up="onArrowUp"
@@ -205,10 +237,10 @@ function formatPortrait(id: string) {
             @mouse-out="onMouseOut"
             @click="onClicked"
         />
-        <div v-show="isFocused && isOpen && keyword.length >= minKeywordLength" class="c-header-search__results">
-            <div class="l-flex-col">
-                <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end">
-                    <span class="meta">Showing {{ results.length }} of {{ totalCount }} matching users</span>
+        <div v-show="isSelected" class="c-header-search__results">
+            <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
+                <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end l-pad-s">
+                    <em>Showing {{ results.length }} of {{ totalCount }} matching users</em>
                 </div>
                 <a
                     v-for="(result, i) in results"
@@ -238,32 +270,32 @@ function formatPortrait(id: string) {
                 </a>
                 <a
                     v-if="results.length && totalCount > results.length"
-                    class="c-card c-card--link c-card--active"
-                    :href="`${paths.searchPage}${keyword}#user`"
+                    class="c-card c-card--link c-card--active l-pad-s"
+                    :href="`${paths.searchPageWithKeyword}${keyword}&${paths.usersFilter}`"
                 >
-                    <a :href="`${paths.searchPage}${keyword}#user`">View all {{ totalCount }} users</a>
+                    View all {{ totalCount }} users
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="l-flex-row l-gap-s">
-                        <div class="c-img c-img--round">
+                    <div class="l-flex-row l-gap-s l-pad-s">
+                        <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="l-flex-col l-flex--justify-center l-flex__item--1">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-s">
                             <h3></h3>
                             <span></span>
                         </div>
                     </div>
                 </div>
-                <template v-if="!isLoading && !results.length">
-                    <div class="c-card">
-                        <span class="meta">No users were found matching "{{ keyword }}"</span>
-                    </div>
-                    <a class="c-card c-card--link c-card--active" :href="`${paths.searchPage}${keyword}#all`">
-                        <a :href="`${paths.searchPage}${keyword}#all`">Search everything for "{{ keyword }}"</a>
-                    </a>
-                </template>
+                <div v-if="!isLoading && !results.length" class="c-card l-pad-s">
+                    <em>No users were found matching "{{ keyword }}"</em>
+                </div>
+            </div>
+            <div class="l-flex-col">
+                <a class="button f-no-margins t-lh--normal icon-search" :href="searchButtonHref">
+                    {{ searchButtonText }}
+                </a>
             </div>
         </div>
     </form>
