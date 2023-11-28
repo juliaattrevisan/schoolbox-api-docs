@@ -35,12 +35,12 @@ const columnsConfig = [
         },
     },
     {
-        key: "StaffPreferredName",
+        key: "StaffFirstname",
         heading: "First name",
         template: {
             component: "link",
             componentData: {
-                text: "StaffPreferredName",
+                text: "StaffFirstname",
                 href: "profile_url",
                 title: "View profile",
                 hasNoWrap: true,
@@ -59,6 +59,11 @@ const columnsConfig = [
                 hasNoWrap: true,
             },
         },
+    },
+    {
+        key: "fullname",
+        heading: "Full name",
+        isHidden: true, // this column is hidden by default
     },
     {
         key: "StaffDepartment",

@@ -92,6 +92,11 @@ class Payload
                 $staff['StaffFirstname'] = $staffPreferredName;
             }
             // Firstname only exists, so just keep using it...
+
+            /* Provide Preferred Fullname and Formal Fullname, for search plugin reasons
+             */
+            $staff['fullname'] = trim("{$staff['StaffFirstname']} {$staff['StaffSurname']}");
+            $staff['preferredFullname'] = trim("{$staff['StaffPreferredName']} {$staff['StaffSurname']}");
         }
 
         unset($staff);
