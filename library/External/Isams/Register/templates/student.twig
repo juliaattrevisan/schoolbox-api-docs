@@ -11,6 +11,7 @@
     <tbody>
     {% for studentDatum in studentData %}
         {% for field in (studentDatum.fields ?? []) %}
+            <tr>
             <td>
                 {%- for dateRange in studentDatum.dateRanges -%}
                     {{ dateRange.from.localShort }}&mdash;{{ dateRange.to.localShort }}
@@ -19,6 +20,7 @@
             </td>
             <td>{{ field.name }}</td>
             <td>{{ field.value }}</td>
+            </tr>
         {% endfor %}
     {% endfor %}
     </tbody>

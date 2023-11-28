@@ -48,7 +48,7 @@ class Module extends BaseModule
         };
         $this->register(
             self::METHOD_GET,
-            '/student/{studentId}',
+            '/{registerQuery}/student/{studentId}',
             'getStudent',
             $studentRegisterPermission,
             $studentRegisterPreload,

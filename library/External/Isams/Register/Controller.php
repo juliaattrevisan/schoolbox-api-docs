@@ -37,27 +37,25 @@ class Controller extends BaseController
     /**
      * Get the register for a student.
      *
-     * @api GET /modules/isams/register/student/{studentId}
+     * @api GET /modules/isams/register/{register}/student/{studentId}
      * @since 23.1
      *
      * @param User $student
      * @return void
      */
-    public function getStudent(User $student): void
+    public function getStudent(string $registerQuery, User $student): void
     {
         // Hit the iSams API:
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
         // first, need to exchange client id/secret for an access token
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
-        $allowedRegisters = explode(',', $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
-
         $registers       = $this->cacheHelper->getRegisters();
         $globalData      = [];
         $studentData     = [];
         foreach ($registers as $register) {
-            if (!in_array($register['code'], $allowedRegisters)) {
-                // not a filtered register Ignoring...
+            if (!(strtolower($register['code']) === strtolower($registerQuery) || $register['id'] === (int)$registerQuery)) {
+                // the requested register Ignoring...
                 continue;
             }
             $registerId               = $register['id'];
