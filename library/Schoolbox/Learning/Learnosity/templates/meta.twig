@@ -1,39 +1,37 @@
 {##
  # @param Quiz\Attempt\Model $attempt
- # @param array $lastViews - Array returned by LatestView->getTwigViews()
  #}
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
 
 <ul class="meta">
     <li class="icon-calendar" title="Submitted Date/Time">{% apply spaceless %}
         {% if attempt.finish %}
-            Submitted <time>{{ attempt.finish.relativeDayWithoutMidnight }}</time>
+            Finished <time>{{ attempt.finish.relativeDayWithoutMidnight }}</time>
         {% else %}
             <em>Attempt in progress - started <time>{{ attempt.start.relativeDayWithoutMidnight }}</time></em>
         {% endif %}
-        {% endapply %}</li>
+        {% endapply %}
+    </li>
 
     <li class="icon-time-value" title="Attempt Time Taken">{% apply spaceless %}
-        Time taken
+        Time taken:
         {% if attempt.finish %}
             {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
         {% else %}
             <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
         {% endif %}
-        {% endapply %}</li>
+        {% endapply %}
+    </li>
 
     {% if attempt.reviewed %}
-        <li class="icon-view" title="Attempt Time Taken">{% apply spaceless %}
-            Reviewed by {{ attempt.reviewer.fullname }}, {{ attempt.reviewed.relativeDayWithoutMidnight }}
-            {% endapply %}</li>
-    {% endif %}
-
-    {% if lastViews is not empty %}
-        <li class="icon-view">{% apply spaceless %}
-            {% set student = attempt.user %}
-            <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
-            {{ lastViews.student.status }}
-            {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
-        {% endapply %}</li>
+        <li class="icon-staff-students" title="Attempt Time Taken">{% apply spaceless %}
+            Reviewed by
+                {% if attempt.reviewer.deleted %}
+                    {{ attempt.reviewer.fullname }}
+                {% else %}
+                    <a href="/search/user/{{ attempt.reviewer.id }}">{{ attempt.reviewer.fullname }}</a>
+                {% endif %} {{ attempt.reviewed.relativeDayWithoutMidnight }}
+            {% endapply %}
+        </li>
     {% endif %}
 </ul>

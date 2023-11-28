@@ -27,8 +27,6 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
-use Schoolbox\Learning\Assessment\Views\LatestView;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -148,23 +146,22 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param Factory                                 $urlFactory
+     * @param Factory $urlFactory
      * @param BreadcrumbFactory $bakery
      * @param string $learnosityVersion
-     * @param string                                  $learnosityConsumerKey
-     * @param string                                  $learnosityConsumerSecret
-     * @param ErrorMapper                             $errorMapper
-     * @param AssessmentMapperProxy                   $assessmentDataSource
-     * @param Mapper                                  $resultCacheMapper
-     * @param \Schoolbox\Learning\Quiz\Mapper         $quizMapper
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentDataSource
+     * @param Mapper $resultCacheMapper
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
      * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
-     * @param Feedback\Mapper                         $feedbackMapper
-     * @param UserMapper                              $userMapper
-     * @param Psr17Factory                            $httpFactory     for creating HTTP requests
-     * @param MessageFactory                          $messageFactory  for creating messages to send to taskd
-     * @param Producer                                $messageProducer for sending messages to taskd
-     * @param LatestViewMapper                        $latestViewMapper
-     * @param Access                                  $access
+     * @param Feedback\Mapper $feedbackMapper
+     * @param UserMapper $userMapper
+     * @param Psr17Factory $httpFactory for creating HTTP requests
+     * @param MessageFactory $messageFactory for creating messages to send to taskd
+     * @param Producer $messageProducer for sending messages to taskd
+     * @throws \DomainException
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
@@ -182,8 +179,6 @@ class Controller extends Base
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
-        private LatestViewMapper $latestViewMapper,
-        private Access $access
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -710,36 +705,48 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
+        /* Common elements to both code paths
+         * Completion summary always displays
+         */
+        $payload = [
+            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
+            'reports' => []
+        ];
+
+        /* Conditional reports
+         *     - If an attempt is finished, provide the completion summary (unsure how people get here, but ok)
+         */
+        if ($attempt->isFinished()) {
+            $payload['reports'][] = [
+                /* DOM element id, where this goes in
+                 *
+                 * It's configurable by us, unlike the other anchors for
+                 * Author and Items api
+                 */
+                'id' => 'schoolbox-completion-summary',
+                'type' => 'sessions-summary-by-question',
+                'session_ids' => [
+                    $attempt->getLearnosityReference()
+                ]
+            ];
+        }
+
+        /* If a teacher reviewed the attempt, show their feedback information
+         * Otherwise just show what the student did.
+         */
         if (null !== $attempt->getReviewed()) {
-            $payload = [
-                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-                'reports' => [
-                    [
-                        /* DOM element id, where this goes in
-                         *
-                         * It's configurable by us, unlike the other anchors for
-                         * Author and Items api
-                         */
-                        'id' => 'schoolbox-student',
-                        'type' => 'session-detail-by-item',
-                        'session_id' => $attempt->getLearnosityReference(),
-                        'questions_api_init_options' => [
-                            'showCorrectAnswers' => false
-                        ]
-                    ],
-                    [
-                        /* DOM element id, where this goes in
-                         *
-                         * It's configurable by us, unlike the other anchors for
-                         * Author and Items api
-                         */
-                        'id' => 'schoolbox-completion-summary',
-                        'type' => 'sessions-summary-by-question',
-                        'session_ids' => [
-                            $attempt->getLearnosityReference()
-                        ]
-                    ],
-                ],
+            $payload['reports'][] = [
+                /* DOM element id, where this goes in
+                 *
+                 * It's configurable by us, unlike the other anchors for
+                 * Author and Items api
+                 */
+                'id' => 'schoolbox-student',
+                'type' => 'session-detail-by-item',
+                'session_id' => $attempt->getLearnosityReference(),
+                'questions_api_init_options' => [
+                    'showCorrectAnswers' => true
+                ]
             ];
 
             /* If there's a feedback for this attempt, get it
@@ -748,23 +755,18 @@ class Controller extends Base
              */
             $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
         } else {
-            $payload = [
-                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-                'reports' => [
-                    [
-                        /* DOM element id, where this goes in
-                         *
-                         * It's configurable by us, unlike the other anchors for
-                         * Author and Items api
-                         */
-                        'id' => 'schoolbox-student',
-                        'type' => 'session-detail-by-question',
-                        'session_id' => $attempt->getLearnosityReference(),
-                        'questions_api_init_options' => [
-                            'showCorrectAnswers' => false
-                        ]
-                    ],
-                ],
+            $payload['reports'][] = [
+                /* DOM element id, where this goes in
+                 *
+                 * It's configurable by us, unlike the other anchors for
+                 * Author and Items api
+                 */
+                'id' => 'schoolbox-student',
+                'type' => 'session-detail-by-question',
+                'session_id' => $attempt->getLearnosityReference(),
+                'questions_api_init_options' => [
+                    'showCorrectAnswers' => false
+                ]
             ];
 
             $comments = [];
@@ -799,24 +801,12 @@ class Controller extends Base
                 'Review', null
             ]);
 
-        $lastView = new LatestView(
-            $this->latestViewMapper,
-            new \Schoolbox\External\User(
-                $this->getConfigLoader()->get('external_type'),
-                new \External_Class(),
-                new \External_User(),
-                $this->userMapper
-            )
-        );
-        $lastView->addNewView($assessment, $student, $this->getUser());
-
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
             'comments' => $comments ? base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)) : null,
-            'lastViews' => $lastView->getTwigViews($assessment, $student, $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }

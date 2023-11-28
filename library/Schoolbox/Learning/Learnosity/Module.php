@@ -413,8 +413,6 @@ class Module extends BaseModule
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),
             $this->injector->get('taskd.messageProducer'),
-            $this->getMapperFactory()->get(LatestViewMapper::class),
-            Access::getInstance(),
         );
     }
 
