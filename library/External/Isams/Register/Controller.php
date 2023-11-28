@@ -51,11 +51,48 @@ class Controller extends BaseController
         // first, need to exchange client id/secret for an access token
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
+        /**
+         * register1 => [
+         *  field1
+         *  field2
+         * ]
+         */
+        $allowedRegisters = [];
+        $registersConfig = [];
+        /**
+         * allowed registers is a multi dimentional csv
+         *
+         * Example:
+         * register1,field1,field2,field6
+         * register2,field1
+         * register6,field7,field12
+         */
+        $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '';
+        if ('' !== $config) {
+            // explode to find how many registers we will be working with...
+            foreach (preg_split('/\R/', strtolower($config)) as $registerConfig) {
+                // explode again to extract the registers, and their fields
+                // first object entry is the register, later items are the allowed fields
+                $tmp = explode(',', $registerConfig);
+                $registerTitle = array_shift($tmp);
+                $registersConfig[$registerTitle] = $tmp;
+                $allowedRegisters[] = $registerTitle;
+            }
+        }
+
         $registers       = $this->cacheHelper->getRegisters();
         $globalData      = [];
         $studentData     = [];
         foreach ($registers as $register) {
-            if (strtolower($register['code']) !== strtolower($registerCode)) {
+            /**
+             * if the requested register is not in the allowed registers
+             * OR
+             * if the requested register is not in the current register
+             * then continue onto the next register
+             *
+             * we will either only display 1 register, or throw NotFound.
+             */
+            if (!in_array(strtolower($register['code']), $allowedRegisters) || strtolower($register['code']) !== strtolower($registerCode)) {
                 // the requested register Ignoring...
                 continue;
             }
