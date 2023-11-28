@@ -35,6 +35,44 @@
             student: participant.user
         } only %}
     </div>
+    {% elseif isQuiz %}
+        {# Quiz Attempts could be in either Learnosity, or our legacy quiz system
+         # Legacy Quiz attempts are not going to be in learnosity
+         #
+         # So if we have a learnosity_reference, make a link to learnosity feedback screen
+         # Otherwise, prohibit the link; users won't be able to see legacy attempts anymore.
+         # We might make a "museum" for these old attempts one day
+         #}
+        {% if response.learnosityReference %}
+            {% set quizAttemptRoute = routeLookup('learnosity.getFeedback', {
+                assessmentId: response.assessable.id,
+                studentId: response.submittedBy.id,
+                learnositySessionReference: response.learnosityReference
+            }) %}
+
+            <a class="link-row" href="{{ quizAttemptRoute }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+                <div class="compact card small-12">
+                    <div>
+                        {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
+                        <p>
+                            {{ participant.user.fullName }}
+                            <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        {% else %}
+            {# Legacy Attempt; this goes nowhere, for now #}
+            <div class="compact card small-12">
+                <div>
+                    {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
+                    <p>
+                        {{ participant.user.fullName }}
+                        <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
     {% else %}
     <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
         <div class="compact card small-12">
