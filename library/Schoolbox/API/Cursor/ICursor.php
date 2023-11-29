@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Cursor;
 
 use Schoolbox\Collection;
+use Schoolbox\User;
 
 /**
  * Interface for all cursor implementations.
@@ -73,5 +74,5 @@ interface ICursor
      *                                   no cursor is yet known.
      * @return Collection
      */
-    public function retrieveResults(?string $encodedCursor): Collection;
+    public function retrieveResults(?string $encodedCursor, User $loggedInUser): Collection;
 }

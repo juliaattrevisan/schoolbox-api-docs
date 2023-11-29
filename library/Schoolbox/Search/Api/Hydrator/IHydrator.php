@@ -51,11 +51,4 @@ interface IHydrator
      * @return array<int, FullResult|null>
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array;
-
-    /**
-     * @param User $loggedInUser
-     * @return void
-     * @see ISource/pruneQueryParamBuildersDueToUserPermissions() (Similar function for QueryParamBuilders)
-     */
-    public function pruneHydratorsDueToUserPermissions(User $loggedInUser): void;
 }

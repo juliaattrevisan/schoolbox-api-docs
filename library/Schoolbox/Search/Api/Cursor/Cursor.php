@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\Source\ISource;
+use Schoolbox\User;
 
 /**
  * Cursor for the search API.
@@ -84,15 +85,17 @@ class Cursor implements ICursor
 
     /**
      * @param string|null $encodedCursor
+     * @param User $loggedInUser
      * @return GenericCollection<RawResult>
      */
-    public function retrieveResults(?string $encodedCursor): Collection
+    public function retrieveResults(?string $encodedCursor, User $loggedInUser): Collection
     {
         /** @var DataObject|null $cursor */
         $cursor = $this->codec->decode($encodedCursor);
         return new GenericCollection(
             RawResult::class,
             $this->source->search(
+                $loggedInUser,
                 $this->keyword,
                 $this->filter,
                 $cursor,

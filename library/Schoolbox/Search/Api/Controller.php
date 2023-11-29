@@ -73,8 +73,6 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
-        $this->pruneDependenciesDueToUserPermissions();
-
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
@@ -238,8 +236,6 @@ class Controller extends Base
      */
     public function getSearchWithinFolder(Folder\Model $folder): void
     {
-        $this->pruneDependenciesDueToUserPermissions();
-
         $keyword = trim($this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), $folder);
@@ -332,7 +328,7 @@ class Controller extends Base
             $codec = new Cursor\Codec();
             $cursor = $codec->decode($cursorCode);
 
-            [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, (string)$n++);
+            [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($this->getUser(), $keyword, $filter, $cursor, (string)$n++);
 
             $subqueries[] = $subquery . " AS `$resultKey`";
 
@@ -377,7 +373,8 @@ class Controller extends Base
         );
 
         // Fetch results from cursor and hydrate
-        $nextRawResults = $cursor->retrieveResults($cursorCode);
+        $loggedInUser   = $this->getUser();
+        $nextRawResults = $cursor->retrieveResults($cursorCode, $loggedInUser);
         $nextCursor     = $cursor->next($nextRawResults);
         $fullResults    = $this->hydrator->hydrate($keyword, $filter, $nextRawResults->getAll(), $this->user);
 
@@ -398,7 +395,7 @@ class Controller extends Base
                 // if there are none, clear the next cursor so that the user is
                 // not prompted for more results when we know there's none.
                 $previewCursor  = new Cursor\Cursor($this->source, $keyword, $filter, 1);
-                $previewResults = $previewCursor->retrieveResults($nextCursor);
+                $previewResults = $previewCursor->retrieveResults($nextCursor, $loggedInUser);
                 if (count($previewResults) === 0) {
                     $nextCursor = null;
                 }
@@ -406,18 +403,5 @@ class Controller extends Base
         }
 
         return ['results' => $fullResults, 'nextCursor' => $nextCursor];
-    }
-
-    /**
-     * @return void
-     */
-    private function pruneDependenciesDueToUserPermissions(): void
-    {
-        // Now that we have access to the logged-in user, we can prune the list of QueryParamBuilders and Hydrators
-        // based on user permissions.  This could not be done in Search/Api/Module because the logged-in user is not
-        // available there.  This could not be done in the constructor either, because the user object is injected after
-        // the constructor has been called. (see call to $constructor->setUser() in WebRequest/Kernel->outputAuraContent()).
-        $this->source->pruneQueryParamBuildersDueToUserPermissions($this->getUser());
-        $this->hydrator->pruneHydratorsDueToUserPermissions($this->getUser());
     }
 }

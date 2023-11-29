@@ -174,12 +174,13 @@ abstract class BaseHydrator implements IHydrator
     }
 
     /**
-     * @param User $loggedInUser
-     * @return void
-     * @see BaseQueryParamBuilder/pruneQueryParamBuildersDueToUserPermissions() (Similar function for QueryParamBuilders)
+     * @param User $user
+     * @return bool
+     * @see BaseQueryParamBuilder/isRelevantToUser() (Similar function for QueryParamBuilders)
      */
-    public function pruneHydratorsDueToUserPermissions(User $loggedInUser): void
+    public function isRelevantToUser(User $user): bool
     {
-        // Do nothing.  Override this function if pruning of Hydrators due to user permissions is needed.
+        // Override this function if user permissions can render a Hydrator irrelevant to a user.
+        return true;
     }
 }

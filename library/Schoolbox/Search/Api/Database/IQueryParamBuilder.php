@@ -20,10 +20,10 @@ interface IQueryParamBuilder
     /**
      * Builds a query and parameters for finding matches.
      *
-     * @param string                $keyword The search term.
-     * @param FilterDataObject      $filter  A set of filters to apply at the query building level.
-     * @param CursorDataObject|null $cursor  A cursor to apply when building the query.
-     * @param int                   $limit   The maximum number of results to retrieve.
+     * @param string                $keyword      The search term.
+     * @param FilterDataObject      $filter       A set of filters to apply at the query building level.
+     * @param CursorDataObject|null $cursor       A cursor to apply when building the query.
+     * @param int                   $limit        The maximum number of results to retrieve.
      *
      * @return QueryParams|null The query and parameters to use to find matches,
      *                          or null if this builder is not to be used at

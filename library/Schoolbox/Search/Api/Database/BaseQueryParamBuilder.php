@@ -365,12 +365,13 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     abstract protected function buildFromStatement(string $paramKeySuffix = ''): string;
 
     /**
-     * @param User $loggedInUser
-     * @return void
-     * @see BaseHydrator/pruneHydratorsDueToUserPermissions() (Similar function for Hydrators)
+     * @param User $user
+     * @return bool
+     * @see BaseHydrator/isRelevantToUser() (Similar function for Hydrators)
      */
-    public function pruneQueryParamBuildersDueToUserPermissions(User $loggedInUser): void
+    public function isRelevantToUser(User $user): bool
     {
-        // Do nothing.  Override this function if pruning of QueryParamBuilders due to user permissions is needed.
+        // Override this function if user permissions can render a QueryParamBuilder irrelevant to a user.
+        return true;
     }
 }

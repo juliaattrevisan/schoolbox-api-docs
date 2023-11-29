@@ -181,4 +181,14 @@ class Hydrator extends BaseHydrator
 
         return $links;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRelevantToUser(User $user): bool
+    {
+        // Badges are only relevant to student and staff users.
+        $userRole = $user->getRole();
+        return ($userRole->isStudent() || $userRole->isStaff());
+    }
 }
