@@ -36,7 +36,7 @@ function onAttemptCommentUpdated(comment: string) {
             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
             <div :id="props.student.elementId"></div>
         </div>
-        <div class="l-flex-col l-gap-s">
+        <div v-if="store.isReadOnly" class="l-flex-col l-gap-s">
             <h2 class="subheader f-no-margins">Summary</h2>
             <!-- {% if attempt.finish %} -->
             <div id="schoolbox-completion-summary"></div>
