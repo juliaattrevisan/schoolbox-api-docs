@@ -117,13 +117,18 @@ class LatestView
         $lastViews = $this->mapper->findByColumnList([
             'assessment_id'  => $assessment->getId(),
             'participant_id' => $student->getId(),
-        ]);
+        ])->indexByCallback(static function(Model $lastView) {
+            /* Index by participant and user id
+             * so we know who has been here
+             */
+            return $lastView->getUser()->getId();
+        });
 
         /**
          * set the student values
          */
         /** @var Model|null $studentView */
-        $studentView = $lastViews->getBy('user', $student);
+        $studentView = $lastViews->getOffset($student->getId());
 
         /**
          * check if there was a view recorded? in our special table
@@ -167,7 +172,7 @@ class LatestView
              * check if viewed?
              */
             /** @var Model|null $parentView */
-            $parentView = $lastViews->getBy('user', $parent);
+            $parentView = $lastViews->getOffset($parent->getId());
             if (null !== $parentView) {
                 $parentDate = $parentView->getLastVisit();
                 $view['date'] = $parentDate->getLong();
