@@ -251,9 +251,8 @@ class Controller extends BaseController
      * @param array $register // array of the register object
      * @param array $registersConfig // approved list of fields to show
      * @return array
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    private function getDataFromRegister(User $user, array $register, array $registersConfig)
+    private function getDataFromRegister(User $user, array $register, array $registersConfig): array
     {
         $globalData  = $register;
         $userData = ['hasDateRange' => false];
