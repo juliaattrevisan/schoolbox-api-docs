@@ -126,8 +126,6 @@ class CacheHelper
         $registers = $this->cache->get(self::REGISTERS_CACHE_KEY);
         if (!isset($registers)) {
             // Request 1: find registers
-            // TODO these should be configured:
-            //      also a mapping from codes to IDs should be cached
             $apiResponse     = $this->httpClient->get(
                 $this->apiUrl->withPath('/Main/api/registers/'),
                 [

@@ -82,6 +82,7 @@ class Controller extends BaseController
         }
 
         $registers       = $this->cacheHelper->getRegisters();
+        $studentData     = [];
         foreach ($registers as $register) {
 
             /**
@@ -97,14 +98,14 @@ class Controller extends BaseController
                 continue;
             }
 
-            $studentData = [
+            $studentData[] = [
                 'user' => $student,
                 'data' => $this->getDataFromRegister($student, $register, $registersConfig),
             ];
             $this->response = $this->responseFromTemplate(
                 '@isamsRegister/student.twig',
                 [
-                    'studentData'   => [$studentData], // need an array of students, dummy this here
+                    'studentData'   => $studentData, // need an array of students, dummy this here
                 ],
             );
             return;
@@ -192,7 +193,7 @@ class Controller extends BaseController
             $this->response = $this->responseFromTemplate(
                 '@isamsRegister/student.twig',
                 [
-                    'studentData'   => array_values($studentData)
+                    'studentData'   => $studentData
                 ],
             );
             return;
@@ -246,7 +247,7 @@ class Controller extends BaseController
     /**
      * Fetch data for user from ISAMS Register endpoints
      *
-     * @param User $user // the we want data for
+     * @param User $user // the user we want data for
      * @param array $register // array of the register object
      * @param array $registersConfig // approved list of fields to show
      * @return array
