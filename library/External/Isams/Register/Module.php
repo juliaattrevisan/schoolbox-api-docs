@@ -71,8 +71,11 @@ class Module extends BaseModule
             $parentRegisterPermission,
         );
 
-        $this->register(self::METHOD_GET, '/list', 'getRegisterList', new Rule\IsSuperuser());
-        $this->register(self::METHOD_GET, '/{registerCode}/getFieldList', 'getFieldList', new Rule\IsSuperuser());
+        /**
+         * debug endpoints, can be removed
+         */
+        $this->register(self::METHOD_GET, '/list', 'getRegisterList', new Rule\IsSchoolboxAdmin());
+        $this->register(self::METHOD_GET, '/{registerCode}/getFieldList', 'getFieldList', new Rule\IsSchoolboxAdmin());
     }
 
     /**

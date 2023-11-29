@@ -204,6 +204,9 @@ class Controller extends BaseController
         throw new NotFound();
     }
 
+    /**
+     * debug endpoint, can be removed
+     */
     public function getRegisterList()
     {
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
@@ -217,6 +220,9 @@ class Controller extends BaseController
         );
     }
 
+    /**
+     * debug endpoint, can be removed
+     */
     public function getFieldList(string $registerCode)
     {
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
