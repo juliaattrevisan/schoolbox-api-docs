@@ -413,7 +413,7 @@ class Hydrator extends BaseHydrator
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
                 'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
-                'title' => 'Modify' . ($assessment instanceof Assessment\Quiz\Model ? ' Settings' : ''), // For quizzes, differentiate from 'Modify Content'.
+                'title' => 'Modify' . ($assessment instanceof Assessment\Quiz\Model ? ' Settings' : ''), // For quizzes, differentiate from 'Modify Contents'.
                 'icon' => 'icon-modify',
             ];
         }
@@ -425,7 +425,7 @@ class Hydrator extends BaseHydrator
                 $links[] = [
                     // All assessment types use the same URL for their 'Modify' page.
                     'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
-                    'title' => 'Modify Content',
+                    'title' => 'Modify Contents',
                     'icon' => 'icon-modify',
                 ];
             }
