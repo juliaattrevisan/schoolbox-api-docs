@@ -34,10 +34,7 @@ const emit = defineEmits<{
  * @returns {string} - the text to display
  */
 const saveText = window.Vue.computed(() => {
-    if (isSaving.value) {
-        return "Saving...";
-    }
-    return "Score saved";
+    return isSaving.value ? "Saving..." : "Score saved";
 });
 
 /**
@@ -160,30 +157,32 @@ window.Vue.onBeforeUnmount(async () => {
     <div class="l-flex-col l-gap-m l-pad-m--bottom question">
         <template v-if="props.question.response">
             <div ref="responsesEl"></div>
-            <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
-                <label>Sample answer</label>
-                <p>{{ question.metadata.sample_answer }}</p>
-            </div>
-            <div v-if="props.question.response?.maxScore" class="f-no-margins">
-                <label>Score (max score: {{ props.question.response.maxScore }})</label>
-                <p v-if="props.isReadOnly">{{ score }}</p>
-                <input
-                    v-else
-                    :id="`customise-score-${props.question.response.learnosityReference}`"
-                    ref="scoreEl"
-                    v-model="score"
-                    type="number"
-                    min="0"
-                    :max="props.question.response.maxScore"
-                />
-                <div class="save-container l-grid">
-                    <div class="save-container__inner-container">
-                        <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
-                            <em>{{ saveText }}</em>
+            <template v-if="props.isReviewed">
+                <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
+                    <label>Sample answer</label>
+                    <p>{{ question.metadata.sample_answer }}</p>
+                </div>
+                <div v-if="props.question.response?.maxScore" class="f-no-margins">
+                    <label>Score (max score: {{ props.question.response.maxScore }})</label>
+                    <p v-if="props.isReadOnly">{{ score }}</p>
+                    <input
+                        v-else
+                        :id="`customise-score-${props.question.response.learnosityReference}`"
+                        ref="scoreEl"
+                        v-model="score"
+                        type="number"
+                        min="0"
+                        :max="props.question.response.maxScore"
+                    />
+                    <div class="save-container l-grid">
+                        <div class="save-container__inner-container">
+                            <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                                <em>{{ saveText }}</em>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </template>
         </template>
         <div v-else class="alert-box f-no-margins">
             This question was not in the quiz when the student attempted the quiz.
