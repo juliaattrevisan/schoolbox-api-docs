@@ -16,6 +16,7 @@ interface Props {
     question: StudentItemQuestion; // the question that's displayed
     container: HTMLElement; // the parent container, to look for the relevant item
     isReadOnly: boolean; // whether the question is readonly
+    isReviewed: boolean; // whether the question has been reviewed
 }
 const props = defineProps<Props>();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into

@@ -76,6 +76,7 @@ function onCommentUpdated(comment: string) {
                 :question="question"
                 :container="props.container"
                 :is-read-only="store.isReadOnly"
+                :is-reviewed="store.isReviewed"
                 @updated-score="onScoreUpdated"
             />
         </div>
