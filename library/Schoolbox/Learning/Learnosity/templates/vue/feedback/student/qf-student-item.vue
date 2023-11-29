@@ -80,6 +80,7 @@ function onCommentUpdated(comment: string) {
             />
         </div>
         <student-item-comment
+            v-if="store.isReviewed"
             :student="props.student"
             :item="props.item"
             :is-read-only="store.isReadOnly"
