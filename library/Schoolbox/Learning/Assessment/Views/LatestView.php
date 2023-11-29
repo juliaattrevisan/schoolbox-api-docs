@@ -117,9 +117,8 @@ class LatestView
         $lastViews = $this->mapper->findByColumnList([
             'assessment_id'  => $assessment->getId(),
             'participant_id' => $student->getId(),
-        ])->indexByCallback(static function(Model $lastView) {
-            /* Index by participant and user id
-             * so we know who has been here
+        ])->indexByCallback(static function (Model $lastView) {
+            /* Index by user id so we know who has been here
              */
             return $lastView->getUser()->getId();
         });
