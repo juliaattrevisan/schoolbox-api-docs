@@ -22,7 +22,7 @@ if [[ -n $INSTANCE_ID ]]; then
 else
   instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list | sort);
 fi
-for daemon in socketd digestd scheduled; do
+for daemon in digestd scheduled; do
     for instance_id in $instance_list; do
         echo "starting schoolbox-cloud-$daemon@$instance_id"
         systemctl start "schoolbox-cloud-$daemon@$instance_id"

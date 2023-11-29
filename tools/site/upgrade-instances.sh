@@ -250,6 +250,7 @@ function restart_daemons(){
     for instance in $instance_list; do
       INSTANCE_ID="$instance" /usr/share/schoolbox/tools/notif/allrestart
     done
+    systemctl restart schoolbox-cloud-socketd.service
   else
     log "---skipping daemon restart on secondary host---";
   fi
