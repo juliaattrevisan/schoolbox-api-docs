@@ -875,7 +875,6 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
-            'lastViews' => $lastView->getTwigViews($assessment, $student, $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
             'itemResponses' => $this->getItemResponses($attempt),
             'attemptComment' => $this->getAttemptComment($attempt),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
