@@ -130,7 +130,11 @@
                     </td>
                     <td>
                         {% if attempt.reviewed %}
-                            <a href="/search/user/{{ attempt.reviewer.id }}">{{ attempt.reviewer.fullname }}</a>
+                            {% if attempt.reviewer.deleted %}
+                                {{ attempt.reviewer.fullname }}
+                            {% else %}
+                                <a href="/search/user/{{ attempt.reviewer.id }}">{{ attempt.reviewer.fullname }}</a>
+                            {% endif %}
                         {% else %}
                             —
                         {% endif %}

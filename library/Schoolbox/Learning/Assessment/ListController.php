@@ -303,10 +303,18 @@ class ListController extends Web\Controller\Base
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
             }
 
+            /* Special redirect for quiz creation in Learnosity Land
+             */
+            $defaultReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
+
+            if (AssessmentType::TYPE_QUIZ === $type) {
+                $defaultReturnUrl = $this->routeGenerator->generate('learnosity.getContent', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+            }
+
             $this->redirect($controller->determineRedirect(
                 $assessmentInfo['assessment'],
                 $explicitReturnUrl,
-                $assessmentInfo[Redirect::RETURN_URL],
+                $defaultReturnUrl,
                 $assessmentInfo['relocated']
             ));
         } catch (DomainException $e) {

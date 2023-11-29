@@ -582,6 +582,23 @@ class Controller extends Base
             ]
         ]);
 
+        /* The learnosityReference posted here doesn't exist
+         * TODO What kind of error should we present to users? It's asynchronous
+         */
+        if (!\count($result['data'])) {
+            throw new \UnexpectedValueException('Empty result payload for attempt.');
+        }
+
+        /* Find out if this attempt was in Incomplete status
+         * Users don't always officially conclude their attempts
+         */
+//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE === $result['data'][0]['status']) {
+//            /* FIXME Need to load their Session, then complete it on their behalf,
+//             *  then reload their $result like we originally tried...but how?
+//             *  There's no endpoint to update a Session's status...
+//             */
+//        }
+
         /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
          * ($mark must never exceed $maxMark) and/or otherwise sanitise data
          */
@@ -611,6 +628,7 @@ class Controller extends Base
         if (null === $existingResponse) {
             return;
         }
+
         $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;

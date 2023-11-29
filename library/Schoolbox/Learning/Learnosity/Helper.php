@@ -40,6 +40,14 @@ class Helper
      */
     public const LEARNOSITY_ITEM_STATUS_ARCHIVED = 'archived';
 
+
+    /**
+     * Attempt Status is sometimes Incomplete when students don't conclude
+     * their own attempts officially
+     */
+    public const LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE = 'Incomplete';
+
+
     /**
      * The configuration used for the regions to show in the Learnosity player
      *
