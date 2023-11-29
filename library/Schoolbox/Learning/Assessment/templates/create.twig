@@ -71,6 +71,8 @@
              */
             $('input[data-mage-next="part-2"]').mage({
                 onXhrDone: function(data) {
+                    $('#part2loader').hide();
+
                     $('#assessmentForm')
                         .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) }}')
                         .find('[data-assessment-details]')
@@ -117,6 +119,8 @@
              * to send the user straight to the next section
              */
             $('input[name=type]').click(function() {
+                $('#part2loader').show();
+
                 $('[data-mage-next=part-2]').trigger('click');
             });
 
@@ -178,6 +182,8 @@
                 {% endif %}
 
                 <fieldset class="content" data-mage="part-2" {% if assessmentType is not defined %}disabled="disabled"{% endif %}>
+                    <div id="part2loader" class="loader" style="display:none"></div>
+
                     {% if (returnUrl ?? '') | length %}
                         <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
                     {% endif %}
