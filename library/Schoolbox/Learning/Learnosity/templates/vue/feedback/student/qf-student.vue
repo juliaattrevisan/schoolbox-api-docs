@@ -57,7 +57,7 @@ function onAttemptCommentUpdated(comment: string) {
                     <qf-student-all-marked />
                 </div>
             </div>
-            <div class="l-flex-col l-gap-s">
+            <div v-if="store.isReviewed" class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
                 <student-attempt-comment
                     :student="props.student"
