@@ -35,6 +35,12 @@ use Schoolbox\Url\Uri;
 class Controller extends Base
 {
     /**
+     * Session keys in which the OIDC state and nonce are stored.
+     */
+    private const SESSION_STATE_KEY = 'oidcState';
+    private const SESSION_NONCE_KEY = 'oidcNonce';
+
+    /**
      * Constructor
      *
      * @param Client         $httpClient Required for querying discovery URL
@@ -118,8 +124,8 @@ class Controller extends Base
         $authorizationUrl = $oidcProvider->getAuthorizationUrl($oauthOptions);
 
         // Get the state and nonce generated for you and store it to the session
-        $this->session->set('oidcState', $oidcProvider->getState());
-        $this->session->set('oidcNonce', $nonce);
+        $this->session->set(self::SESSION_STATE_KEY, $oidcProvider->getState());
+        $this->session->set(self::SESSION_NONCE_KEY, $nonce);
 
         // Redirect the user to the authorization URL
         $this->response = $this->redirectTemporary($authorizationUrl);
@@ -141,11 +147,11 @@ class Controller extends Base
     {
         // check state and nonce
         $requestState = $this->requestQuery->get('state');
-        $sessionState = $this->session->get('oidcState');
         $requestNonce = $this->requestQuery->get('nonce');
-        $sessionNonce = $this->session->get('oidcNonce');
-        $this->session->set('oidcState', null);
-        $this->session->set('oidcNonce', null);
+        $sessionState = $this->session->get(self::SESSION_STATE_KEY);
+        $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
+        $this->session->set(self::SESSION_STATE_KEY, null);
+        $this->session->set(self::SESSION_NONCE_KEY, null);
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
             $this->sendError('State sent to and received from OIDC provider do not match');
             return;
