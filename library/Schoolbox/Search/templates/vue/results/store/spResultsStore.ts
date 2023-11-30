@@ -70,10 +70,10 @@ export const useResultsStore = defineStore("spResults", () => {
     /**
      * Add the loaded sub results into the results
      * @param {Result[]} moreSubResults - the sub results to set
-     * @param {number} resultId - the parent id of the result the new sub results are from
+     * @param {number} parentIndex - the index of the parent result
      */
-    function setMoreSubResults(moreSubResults: Result[], resultId: number) {
-        const parentResult = allResults.value.find((result) => result.id === resultId) as Result;
+    function setMoreSubResults(moreSubResults: Result[], parentIndex: number) {
+        const parentResult = allResults.value[parentIndex] as Result;
         (parentResult._subResults as Results).data = [
             ...(parentResult._subResults?.data as Result[]),
             ...moreSubResults,

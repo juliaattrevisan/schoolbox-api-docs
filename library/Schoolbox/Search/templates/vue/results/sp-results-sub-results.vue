@@ -15,6 +15,7 @@ import SpResultsSubResult from "./sp-results-sub-result.vue";
 
 interface Props {
     result: Result; // the result to display
+    parentIndex: number; // the index of the parent result
 }
 const props = defineProps<Props>();
 
@@ -49,9 +50,8 @@ const showLoadMore = window.Vue.computed(() => {
 function getEndpointWithParams() {
     const newQueryParams = useStore().getQueryParams();
     newQueryParams.append("cursor", props.result._subResults?.metadata?.cursor.next as string);
-    return props.result._subResults === undefined
-        ? ""
-        : `${props.result._subResults.metadata.url}?${newQueryParams.toString()}`;
+    const subResultsUrl = props.result._subResults?.metadata.url as string;
+    return props.result._subResults === undefined ? "" : `${subResultsUrl}?${newQueryParams.toString()}`;
 }
 
 /**
@@ -64,7 +64,7 @@ async function loadMore() {
     if (loadedResults.data.length === 0) {
         hasLoadedAllResults.value = true;
     } else {
-        useResultsStore().setMoreSubResults(loadedResults.data, props.result.id);
+        useResultsStore().setMoreSubResults(loadedResults.data, props.parentIndex);
         moreResultsCount.value += 1;
         // If cursor.next has not been supplied with the sub-results, we have loaded all sub-results.
         if (loadedResults.metadata.cursor.next === null) {
