@@ -144,15 +144,13 @@ class Controller extends Base
         $sessionState = $this->session->get('oidcState');
         $requestNonce = $this->requestQuery->get('nonce');
         $sessionNonce = $this->session->get('oidcNonce');
+        $this->session->set('oidcState', null);
+        $this->session->set('oidcNonce', null);
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
-            $this->session->set('oidcState', null);
-            $this->session->set('oidcNonce', null);
             $this->sendError('State sent to and received from OIDC provider do not match');
             return;
         }
         if (!isset($requestNonce, $sessionNonce) || $requestNonce !== $sessionNonce) {
-            $this->session->set('oidcState', null);
-            $this->session->set('oidcNonce', null);
             $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return;
         }
