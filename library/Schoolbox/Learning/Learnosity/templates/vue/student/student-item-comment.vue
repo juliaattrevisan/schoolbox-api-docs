@@ -67,17 +67,13 @@ function beforeUnloadHandler(event: BeforeUnloadEvent) {
  * Save the comment if it's changed
  */
 async function saveComment() {
-    if (
-        props.item.questions === undefined ||
-        props.item.questions[0].response === undefined ||
-        props.item.questions[0].response.comment === undefined
-    ) {
+    if (comment.value === "") {
         return;
     }
     if (isSaving.value) {
         return;
     }
-    if (comment.value === props.item.questions[0].response.comment) {
+    if (comment.value === props.item.questions[0].response?.comment) {
         return;
     }
     if (props.student.urls === undefined) {
