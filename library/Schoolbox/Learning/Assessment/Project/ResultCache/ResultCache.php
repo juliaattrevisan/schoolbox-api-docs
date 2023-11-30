@@ -159,6 +159,11 @@ class ResultCache
         $normalisedMark = $participant->generateNormalisedMark(true);
         $humanReadableMark = $participant->generateHumanReadableMark(true);
 
+        if (null === $normalisedMark) {
+            // ignore null results these have no feedback, so shouldn't persist to the db..
+            return null;
+        }
+
         // Normalised mark must be within the bounds [0, 100].
         // This restriction should (I think?) be in
         // `\Schoolbox\Learning\Assessment\Summator\AbstractSummator::summate`
