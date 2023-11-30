@@ -3,7 +3,7 @@
  * To provide the opportunity for a final comment
  */
 
-import debounce from "lodash/debounce";
+import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
@@ -88,18 +88,15 @@ async function saveComment() {
 }
 
 /**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSave = debounce(() => {
-    void saveComment();
-}, 1000);
-
-/**
  * save the comment when it's changed
  */
-window.Vue.watch(comment, () => {
-    debounceSave();
-});
+watchDebounced(
+    comment,
+    () => {
+        void saveComment();
+    },
+    { debounce: 1000 }
+);
 
 /**
  * Save any unsaved changes

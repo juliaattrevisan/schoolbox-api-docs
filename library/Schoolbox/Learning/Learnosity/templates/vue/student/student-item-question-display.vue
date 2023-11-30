@@ -3,7 +3,7 @@
  * Contains a students response to a question and will save the score if updated
  */
 
-import debounce from "lodash/debounce";
+import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
@@ -98,32 +98,28 @@ async function saveScore() {
 }
 
 /**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSave = debounce(() => {
-    void saveScore();
-}, 300);
-
-/**
  * add some quick validation to prevent the score input going below 0 and above the max score and save the score
  */
-window.Vue.watch(score, (newScore) => {
-    // can't go below 0
-    if (parseFloat(newScore) < 0) {
-        score.value = "0";
-        return;
-    }
-    // keep it within the max score
-    if (
-        props.question.response &&
-        props.question.response?.maxScore &&
-        parseFloat(newScore) > props.question.response.maxScore
-    ) {
-        score.value = props.question.response.maxScore.toString();
-        return;
-    }
-    debounceSave();
-});
+watchDebounced(
+    score,
+    (newScore) => {
+        if (parseFloat(newScore) < 0) {
+            score.value = "0";
+            return;
+        }
+        // keep it within the max score
+        if (
+            props.question.response &&
+            props.question.response?.maxScore &&
+            parseFloat(newScore) > props.question.response.maxScore
+        ) {
+            score.value = props.question.response.maxScore.toString();
+            return;
+        }
+        void saveScore();
+    },
+    { debounce: 300 }
+);
 
 /**
  * Move the item response element from the entire quiz response into our own container

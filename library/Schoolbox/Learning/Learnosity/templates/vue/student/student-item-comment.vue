@@ -106,6 +106,13 @@ watchDebounced(
     },
     { debounce: 1000 }
 );
+
+/**
+ * Save any unsaved changes
+ */
+window.Vue.onUnmounted(async () => {
+    await saveComment();
+});
 </script>
 
 <template>
