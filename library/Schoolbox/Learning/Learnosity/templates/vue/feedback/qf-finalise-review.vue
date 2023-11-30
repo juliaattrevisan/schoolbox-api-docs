@@ -19,7 +19,7 @@ const isFinalising = window.Vue.ref(false); // to show the finalising text on th
  */
 const buttonText = window.Vue.computed(() => {
     if (store.isReviewed) {
-        return isFinalising.value ? "Update..." : "Update Review";
+        return isFinalising.value ? "Updating..." : "Update Review";
     }
     // to change the button text when finalising
     return isFinalising.value ? "Finalising..." : "Finalise Review";

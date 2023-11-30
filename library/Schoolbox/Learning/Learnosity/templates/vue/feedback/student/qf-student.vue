@@ -38,9 +38,7 @@ function onAttemptCommentUpdated(comment: string) {
         </div>
         <div v-if="store.isReadOnly" class="l-flex-col l-gap-s">
             <h2 class="subheader f-no-margins">Summary</h2>
-            <!-- {% if attempt.finish %} -->
             <div id="schoolbox-completion-summary"></div>
-            <!-- {% endif %} -->
         </div>
         <template v-if="props.student.isReportLoaded">
             <div class="l-flex-col l-gap-s">
@@ -57,7 +55,7 @@ function onAttemptCommentUpdated(comment: string) {
                     <qf-student-all-marked />
                 </div>
             </div>
-            <div v-if="store.isReviewed" class="l-flex-col l-gap-s">
+            <div v-if="store.isReviewed || !store.isReadOnly" class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
                 <student-attempt-comment
                     :student="props.student"
