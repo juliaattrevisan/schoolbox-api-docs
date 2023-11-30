@@ -32,7 +32,10 @@ class Module extends BaseModule
         /**
          * Only show the parent register to parents
          */
-        $parentRegisterPermission = new Rule\HasRole(Role::PARENT);
+        $parentRegisterPermission = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::PARENT)
+        );
 
         /**
          * Only show the register for students to the following:
@@ -40,13 +43,16 @@ class Module extends BaseModule
          * the student themselves
          * the parent of the specified student
          */
-        $studentRegisterPermission = new Rule\Any(
-            new Rule\IsUserOrParentOfUser(
-                $this->getExternalUser(),
-                $this->getMapperFactory()->get(UserMapper::class),
-                'studentId',
-            ),
-            new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_PROFILE, Role::STAFF),
+        $studentRegisterPermission = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsUserOrParentOfUser(
+                    $this->getExternalUser(),
+                    $this->getMapperFactory()->get(UserMapper::class),
+                    'studentId',
+                ),
+                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_PROFILE, Role::STAFF),
+            )
         );
         $studentRegisterPreload = function (array $params) {
             $student = $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']);
