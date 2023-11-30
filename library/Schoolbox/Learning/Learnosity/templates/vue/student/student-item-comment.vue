@@ -102,7 +102,6 @@ async function saveComment() {
 watchDebounced(
     comment,
     () => {
-        console.warn("watch - comment changed");
         void saveComment();
     },
     { debounce: 1000 }
