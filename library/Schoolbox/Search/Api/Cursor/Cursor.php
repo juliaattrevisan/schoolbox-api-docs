@@ -89,8 +89,7 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        throw new \BadFunctionCallException('Please use retrieveResultsDependingOnUserPermissions() instead.');
-        return new Collection();
+        return new Collection(['Please use Search/Api/Cursor->retrieveResultsDependingOnUserPermissions() instead.']);
     }
 
     /**
