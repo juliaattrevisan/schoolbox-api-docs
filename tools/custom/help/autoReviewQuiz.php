@@ -81,19 +81,6 @@ HELP;
             aa.reviewed_at IS NULL
                 AND aa.finish IS NOT NULL
                 AND aa.deleted_at IS NULL
-                AND aa.assess_id IN (SELECT
-                    a.assess_id
-                FROM
-                    assess a
-                        JOIN
-                    assess_section ass ON a.assess_id = ass.assess_id
-                        JOIN
-                    assess_question aq ON ass.section_id = aq.section_id
-                        AND aq.deleted_at IS NULL
-                        JOIN
-                    assess_luQuestionType lqt ON aq.type_id = lqt.type_id
-                        AND lqt.automated_marking = TRUE
-                GROUP BY assess_id)
         ORDER BY aa.finish DESC;");
 
         $completedAttempts->execute();
@@ -131,24 +118,11 @@ HELP;
     private function updateAttempt(int $attemptID)
     {
         $db     = $this->getDatabaseInternal();
-        $query = $db->prepareQuery("UPDATE assess_attempt,
-        (SELECT
-               if((SUM(ar.mark) >= 9999999999999.99), if((SUM(aq.marks) >= 9999999999999.99), 9999999999999.99, SUM(aq.marks)), SUM(ar.mark))  AS mark,
-               if((SUM(aq.marks) >= 9999999999999.99), 9999999999999.99, SUM(aq.marks))  AS max_mark,
-               aa.attempt_id
-           FROM assess_attempt aa
-                    JOIN assess q ON q.assess_id = aa.assess_id
-                    LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-                    LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
-           WHERE aa.attempt_id = :attemptId
-             AND ar.deleted_at IS NULL
-             AND aq.deleted_at IS NULL
-           GROUP BY aa.assess_id, aa.attempt_id) as newVal
+        $query = $db->prepareQuery("UPDATE assess_attempt
         SET
-          assess_attempt.max_mark = newVal.max_mark,
-          assess_attempt.mark  = newVal.mark,
-          assess_attempt.reviewed_at = assess_attempt.finish
-        WHERE assess_attempt.attempt_id = newVal.attempt_id;");
+          assess_attempt.reviewed_at = assess_attempt.finish,
+          assess_attempt.reviewer_id = 1
+        WHERE assess_attempt.attempt_id = :attemptId;");
         $query->execute(['attemptId' => $attemptID]);
     }
 };
