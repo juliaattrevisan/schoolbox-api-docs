@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database;
 
 use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
+use Schoolbox\User;
 
 /**
  * A builder for a search within a database.
@@ -37,4 +38,11 @@ interface IQueryParamBuilder
         int $limit,
         string $paramKeySuffix = ''
     ): ?QueryParams;
+
+    /**
+     * @param User $user
+     * @return bool
+     * @see IHydrator/isRelevantToUser() (Similar function for Hydrators)
+     */
+    public function isRelevantToUser(User $user): bool;
 }
