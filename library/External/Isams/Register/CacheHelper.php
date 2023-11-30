@@ -92,7 +92,7 @@ class CacheHelper
     {
         $jwks       = $this->cache->get(self::JWKS_CACHE_KEY);
         // does the cache exist? then lets use it. else generate and request the jwks
-        if (!isset($jwks)) {
+        if (!is_array($jwks)) {
             // first, need to exchange client id/secret for an access token
             $tokenResponse = $this->httpClient->post(
                 $this->apiUrl->withPath('/auth/connect/token'),
