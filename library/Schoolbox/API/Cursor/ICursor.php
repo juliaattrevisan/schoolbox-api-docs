@@ -74,5 +74,5 @@ interface ICursor
      *                                   no cursor is yet known.
      * @return Collection
      */
-    public function retrieveResults(?string $encodedCursor, User $loggedInUser): Collection;
+    public function retrieveResults(?string $encodedCursor): Collection;
 }

@@ -373,8 +373,7 @@ class Controller extends Base
         );
 
         // Fetch results from cursor and hydrate
-        $loggedInUser   = $this->getUser();
-        $nextRawResults = $cursor->retrieveResults($cursorCode, $loggedInUser);
+        $nextRawResults = $cursor->retrieveResults($cursorCode);
         $nextCursor     = $cursor->next($nextRawResults);
         $fullResults    = $this->hydrator->hydrate($keyword, $filter, $nextRawResults->getAll(), $this->user);
 
@@ -395,7 +394,7 @@ class Controller extends Base
                 // if there are none, clear the next cursor so that the user is
                 // not prompted for more results when we know there's none.
                 $previewCursor  = new Cursor\Cursor($this->source, $keyword, $filter, 1);
-                $previewResults = $previewCursor->retrieveResults($nextCursor, $loggedInUser);
+                $previewResults = $previewCursor->retrieveResults($nextCursor);
                 if (count($previewResults) === 0) {
                     $nextCursor = null;
                 }

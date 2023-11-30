@@ -85,10 +85,20 @@ class Cursor implements ICursor
 
     /**
      * @param string|null $encodedCursor
+     * @return GenericCollection<RawResult>
+     */
+    public function retrieveResults(?string $encodedCursor): Collection
+    {
+        throw new \BadFunctionCallException('Please use retrieveResultsDependingOnUserPermissions() instead.');
+        return new Collection();
+    }
+
+    /**
+     * @param string|null $encodedCursor
      * @param User $loggedInUser
      * @return GenericCollection<RawResult>
      */
-    public function retrieveResults(?string $encodedCursor, User $loggedInUser): Collection
+    public function retrieveResultsDependingOnUserPermissions(?string $encodedCursor, User $loggedInUser): Collection
     {
         /** @var DataObject|null $cursor */
         $cursor = $this->codec->decode($encodedCursor);
