@@ -6,7 +6,7 @@
  * So the first comment is considered the comment for the entire item regardless of how many questions are in the item
  */
 
-import debounce from "lodash/debounce";
+import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
@@ -97,18 +97,16 @@ async function saveComment() {
 }
 
 /**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSave = debounce(() => {
-    void saveComment();
-}, 1000);
-
-/**
  * save the comment when it's changed
  */
-window.Vue.watch(comment, () => {
-    debounceSave();
-});
+watchDebounced(
+    comment,
+    () => {
+        console.warn("watch - comment changed");
+        void saveComment();
+    },
+    { debounce: 1000 }
+);
 </script>
 
 <template>
