@@ -32,12 +32,14 @@ class Cursor implements ICursor
     /**
      * Constructor
      *
-     * @param ISource          $source  A source for search results.
-     * @param string           $keyword A keyword to search for.
-     * @param FilterDataObject $filter  A set of filters to apply to the search.
-     * @param int              $limit   The max number of results to fetch.
+     * @param User             $loggedInUser The logged-in user.
+     * @param ISource          $source       A source for search results.
+     * @param string           $keyword      A keyword to search for.
+     * @param FilterDataObject $filter       A set of filters to apply to the search.
+     * @param int              $limit        The max number of results to fetch.
      */
     public function __construct(
+        private User $loggedInUser,
         private ISource $source,
         private string $keyword,
         private FilterDataObject $filter,
@@ -89,22 +91,12 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        return new Collection(['Please use Search/Api/Cursor->retrieveResultsDependingOnUserPermissions() instead.']);
-    }
-
-    /**
-     * @param string|null $encodedCursor
-     * @param User $loggedInUser
-     * @return GenericCollection<RawResult>
-     */
-    public function retrieveResultsDependingOnUserPermissions(?string $encodedCursor, User $loggedInUser): Collection
-    {
         /** @var DataObject|null $cursor */
         $cursor = $this->codec->decode($encodedCursor);
         return new GenericCollection(
             RawResult::class,
             $this->source->search(
-                $loggedInUser,
+                $this->loggedInUser,
                 $this->keyword,
                 $this->filter,
                 $cursor,
