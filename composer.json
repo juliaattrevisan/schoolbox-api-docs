@@ -96,7 +96,6 @@
         "ext-ldap": "*",
         "oat-sa/lib-lti1p3-deep-linking": "^4.0",
         "oat-sa/lib-lti1p3-nrps": "^7.0",
-        "intelliscl/sdk": "dev-main#974ee202ec0675ecd1ab4c0b23895526955c251b",
         "apple/apn-push": "^3.1",
         "symfony/mime": "^6.0.9",
         "symfony/mailer": "^v6.0.8",

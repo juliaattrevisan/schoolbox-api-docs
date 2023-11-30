@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d3b28fb06ddce7be382a5fc992ff6680",
+    "content-hash": "fca0f21362caeb55706ac6cb1ae04dad",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2732,65 +2732,6 @@
             "time": "2023-03-05T03:23:48+00:00"
         },
         {
-            "name": "intelliscl/sdk",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:intelliscl/sdk-php.git",
-                "reference": "974ee202ec0675ecd1ab4c0b23895526955c251b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/intelliscl/sdk-php/zipball/974ee202ec0675ecd1ab4c0b23895526955c251b",
-                "reference": "974ee202ec0675ecd1ab4c0b23895526955c251b",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-pdo": "*",
-                "firebase/php-jwt": "^5.4 || ^6.0",
-                "guzzlehttp/guzzle": "^7.0",
-                "guzzlehttp/psr7": "^1.8.4 || ^2.1.1",
-                "kamermans/guzzle-oauth2-subscriber": "^1.0.8",
-                "microsoft/azure-storage-blob": "^1.5.2",
-                "php": ">=7.4",
-                "psr/log": "^1|^2|^3"
-            },
-            "suggest": {
-                "ext-openssl": "For Launch Token signing",
-                "ext-pdo_mysql": "For MySQL databases",
-                "ext-pdo_pgsql": "For Postgre databases",
-                "ext-pdo_sqlsrv": "For MsSQL databases"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Intellischool\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Intellischool",
-                    "homepage": "https://intellischool.co"
-                }
-            ],
-            "description": "Intellischool SDK for PHP",
-            "homepage": "https://intellischool.co",
-            "keywords": [
-                "LTI",
-                "api",
-                "intellischool",
-                "lti launch",
-                "sdk"
-            ],
-            "time": "2022-12-01T03:03:06+00:00"
-        },
-        {
             "name": "jean85/pretty-package-versions",
             "version": "2.0.5",
             "source": {
@@ -2848,51 +2789,6 @@
                 "source": "https://github.com/Jean85/pretty-package-versions/tree/2.0.5"
             },
             "time": "2021-10-08T21:21:46+00:00"
-        },
-        {
-            "name": "kamermans/guzzle-oauth2-subscriber",
-            "version": "v1.0.12",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kamermans/guzzle-oauth2-subscriber.git",
-                "reference": "e1f3a78155fb37410f0103ef57b51fbd4fafd806"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kamermans/guzzle-oauth2-subscriber/zipball/e1f3a78155fb37410f0103ef57b51fbd4fafd806",
-                "reference": "e1f3a78155fb37410f0103ef57b51fbd4fafd806",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "~4.0|~5.0|~6.0|~7.0",
-                "php": ">=5.4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "kamermans\\OAuth2\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Steve Kamerman",
-                    "email": "stevekamerman@gmail.com"
-                }
-            ],
-            "description": "OAuth 2.0 client for Guzzle 4, 5, 6 and 7+",
-            "keywords": [
-                "Guzzle",
-                "oauth"
-            ],
-            "support": {
-                "issues": "https://github.com/kamermans/guzzle-oauth2-subscriber/issues",
-                "source": "https://github.com/kamermans/guzzle-oauth2-subscriber/tree/v1.0.12"
-            },
-            "time": "2022-08-17T13:15:21+00:00"
         },
         {
             "name": "karriere/json-decoder",
@@ -4357,102 +4253,6 @@
                 "source": "https://github.com/maximebf/php-debugbar/tree/v1.18.2"
             },
             "time": "2023-02-04T15:27:00+00:00"
-        },
-        {
-            "name": "microsoft/azure-storage-blob",
-            "version": "1.5.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Azure/azure-storage-blob-php.git",
-                "reference": "1023ce1dbf062351a32ca5ec72ad1fd4a504f1bf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Azure/azure-storage-blob-php/zipball/1023ce1dbf062351a32ca5ec72ad1fd4a504f1bf",
-                "reference": "1023ce1dbf062351a32ca5ec72ad1fd4a504f1bf",
-                "shasum": ""
-            },
-            "require": {
-                "microsoft/azure-storage-common": "~1.5",
-                "php": ">=5.6.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MicrosoftAzure\\Storage\\Blob\\": "src/Blob"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Azure Storage PHP Client Library",
-                    "email": "dmsh@microsoft.com"
-                }
-            ],
-            "description": "This project provides a set of PHP client libraries that make it easy to access Microsoft Azure Storage Blob APIs.",
-            "keywords": [
-                "azure",
-                "blob",
-                "php",
-                "sdk",
-                "storage"
-            ],
-            "support": {
-                "issues": "https://github.com/Azure/azure-storage-blob-php/issues",
-                "source": "https://github.com/Azure/azure-storage-blob-php/tree/v1.5.4"
-            },
-            "time": "2022-09-02T02:13:06+00:00"
-        },
-        {
-            "name": "microsoft/azure-storage-common",
-            "version": "1.5.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Azure/azure-storage-common-php.git",
-                "reference": "8ca7b1bf4c9ca7c663e75a02a0035b05b37196a0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Azure/azure-storage-common-php/zipball/8ca7b1bf4c9ca7c663e75a02a0035b05b37196a0",
-                "reference": "8ca7b1bf4c9ca7c663e75a02a0035b05b37196a0",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "~6.0|^7.0",
-                "php": ">=5.6.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MicrosoftAzure\\Storage\\Common\\": "src/Common"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Azure Storage PHP Client Library",
-                    "email": "dmsh@microsoft.com"
-                }
-            ],
-            "description": "This project provides a set of common code shared by Azure Storage Blob, Table, Queue and File PHP client libraries.",
-            "keywords": [
-                "azure",
-                "common",
-                "php",
-                "sdk",
-                "storage"
-            ],
-            "support": {
-                "issues": "https://github.com/Azure/azure-storage-common-php/issues",
-                "source": "https://github.com/Azure/azure-storage-common-php/tree/v1.5.2"
-            },
-            "time": "2021-10-09T03:03:47+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -15290,7 +15090,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "intelliscl/sdk": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
