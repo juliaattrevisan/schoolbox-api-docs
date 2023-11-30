@@ -12,29 +12,22 @@ namespace Schoolbox\Learning\Assessment\Views;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
 class LatestView
 {
     /**
-     * LastView Mapper Instance
-     * @var Mapper
-     */
-    private Mapper $mapper;
-
-    private \Schoolbox\External\User $externalUser;
-
-    /**
      * Constructor
      * @param Mapper $mapper
      * @param \Schoolbox\External\User $externalUser
      */
-    public function __construct(Mapper $mapper, \Schoolbox\External\User $externalUser)
+    public function __construct(private Mapper $mapper, private \Schoolbox\External\User $externalUser)
     {
-        $this->mapper = $mapper;
-        $this->externalUser = $externalUser;
     }
+
 
     /**
      * add record?
@@ -43,6 +36,10 @@ class LatestView
      * @param IAssessable $assessment
      * @param User $participant (student)
      * @param User $user (student, parent's)
+     * @throws \PDOException
+     * @throws Exception
+     * @throws Deleted
+     * @throws \UnexpectedValueException
      */
     public function addNewView(IAssessable $assessment, User $participant, User $user): void
     {
@@ -50,13 +47,13 @@ class LatestView
          * find if record exists
          */
         try {
-            $last_view = $this->mapper->findOneByColumnList([
-                'assessment_id'     => $assessment->getId(),
-                'participant_id'    => $participant->getId(),
-                'user_id'           => $user->getId(),
-                                                            ]);
+            $lastView = $this->mapper->findOneByColumnList([
+                'assessment_id' => $assessment->getId(),
+                'participant_id' => $participant->getId(),
+                'user_id' => $user->getId(),
+            ]);
         } catch (NotFound $e) {
-            $last_view = $this->mapper->createModel()
+            $lastView = $this->mapper->createModel()
                 ->setAssessment($assessment)
                 ->setParticipant($participant)
                 ->setUser($user);
@@ -65,7 +62,7 @@ class LatestView
         /**
          * update time to now
          */
-        $last_view->setLastVisit(\Alaress_Date_Format::now());
+        $lastView->setLastVisit(\Alaress_Date_Format::now());
 
         /**
          * check if use is either that student or the parents, then save
@@ -78,9 +75,10 @@ class LatestView
             /**
              * save record
              */
-            $this->mapper->save($last_view);
+            $this->mapper->save($lastView);
         }
     }
+
 
     /**
      * get twig view data
@@ -101,32 +99,35 @@ class LatestView
     {
         //if no participant, must be submitting the assessment, so exit
         $participant = $assessment->getParticipantIfExtant($student);
-        if (null === $participant || false == $isInstructor) {
+        if (null === $participant || false === $isInstructor) {
             return [];
         }
 
         $views = [
             'student' => [
-                'name'      => $student->getFullName(),
-                'status'    => 'is yet to view',
-                'object'    => 'assessment',
-                'date'      => null,
+                'name' => $student->getFullName(),
+                'status' => 'is yet to view',
+                'object' => 'assessment',
+                'date' => null,
             ],
-            'parents'   => [],
-
+            'parents' => [],
         ];
 
-        /** @var Model[]|GenericCollection $last_views */
-        $last_views = $this->mapper->findByColumnList([
-                                                     'assessment_id'  => $assessment->getId(),
-                                                     'participant_id' => $student->getId(),
-                                                 ]);
+        /** @var Model[]|GenericCollection $lastViews */
+        $lastViews = $this->mapper->findByColumnList([
+            'assessment_id'  => $assessment->getId(),
+            'participant_id' => $student->getId(),
+        ])->indexByCallback(static function (Model $lastView) {
+            /* Index by user id so we know who has been here
+             */
+            return $lastView->getUser()->getId();
+        });
 
         /**
          * set the student values
          */
         /** @var Model|null $studentView */
-        $studentView = $last_views->getBy('user', $student);
+        $studentView = $lastViews->getOffset($student->getId());
 
         /**
          * check if there was a view recorded? in our special table
@@ -139,7 +140,7 @@ class LatestView
             $views['student']['status'] = 'has viewed';
 
             $studentDate = $studentView->getLastVisit();
-            $views['student']['date']   = $studentDate->getLong();
+            $views['student']['date'] = $studentDate->getLong();
 
             $feedback = $participant->getAuthoritativeFeedback(true);
             if (null !== $feedback && $feedback->getPublishedAt() < $studentDate) {
@@ -160,17 +161,17 @@ class LatestView
              * set basic data
              */
             $view = [
-                'name'      => $parent->getFullName(),
-                'id'        => $parent->getId(),
-                'status'    => 'has not viewed',
-                'object'    => 'assessment',
-                'date'      => null,
+                'name' => $parent->getFullName(),
+                'id' => $parent->getId(),
+                'status' => 'has not viewed',
+                'object' => 'assessment',
+                'date' => null,
             ];
             /**
              * check if viewed?
              */
             /** @var Model|null $parentView */
-            $parentView = $last_views->getBy('user', $parent);
+            $parentView = $lastViews->getOffset($parent->getId());
             if (null !== $parentView) {
                 $parentDate = $parentView->getLastVisit();
                 $view['date'] = $parentDate->getLong();
