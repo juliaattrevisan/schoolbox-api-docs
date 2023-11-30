@@ -303,18 +303,28 @@ class ListController extends Web\Controller\Base
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
             }
 
-            /* Special redirect for quiz creation in Learnosity Land
+            /* Quizzes go to the Modify Contents screen in Learnosity when you update
+             * the quiz settings; unlike everything else
              */
-            $defaultReturnUrl = $assessmentInfo[Redirect::RETURN_URL];
+            if ($assessmentInfo['assessment'] instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+                /**
+                 * Always go to the screen when a quiz has been created,
+                 * but send the return url with it
+                 */
+                $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
 
-            if (AssessmentType::TYPE_QUIZ === $type) {
-                $defaultReturnUrl = $this->routeGenerator->generate('learnosity.getContent', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+                if ($explicitReturnUrl) {
+                    $returnUrl .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";
+                }
+
+                $this->redirect($returnUrl);
+                return;
             }
 
             $this->redirect($controller->determineRedirect(
                 $assessmentInfo['assessment'],
                 $explicitReturnUrl,
-                $defaultReturnUrl,
+                $assessmentInfo[Redirect::RETURN_URL],
                 $assessmentInfo['relocated']
             ));
         } catch (DomainException $e) {
