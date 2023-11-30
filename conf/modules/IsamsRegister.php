@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
+use External\IConnector;
 use External\Isams\Register\Module;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -29,8 +30,8 @@ class IsamsRegister implements ModuleConfigInterface
     {
         $config = $di->get('config');
         if (
-            $config->get(ConfigMapper::NAME_EXTERNAL_TYPE) == 'isams'
-            || $config->get(ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE) == Factory::ISAMS
+            IConnector::EXTERNAL_TYPE_ISAMS === $config->get(ConfigMapper::NAME_EXTERNAL_TYPE)
+            || Factory::ISAMS === $config->get(ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE)
         ) {
             $module = new Module($di);
             $module->registerModule('/modules/isams/register');
