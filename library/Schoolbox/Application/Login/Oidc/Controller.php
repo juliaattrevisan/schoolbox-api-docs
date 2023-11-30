@@ -117,8 +117,9 @@ class Controller extends Base
         $oidcProvider     = $this->buildOidcProvider();
         $authorizationUrl = $oidcProvider->getAuthorizationUrl($oauthOptions);
 
-        // Get the state generated for you and store it to the session
+        // Get the state and nonce generated for you and store it to the session
         $this->session->set('oidcState', $oidcProvider->getState());
+        $this->session->set('oidcNonce', $nonce);
 
         // Redirect the user to the authorization URL
         $this->response = $this->redirectTemporary($authorizationUrl);
@@ -138,12 +139,21 @@ class Controller extends Base
      */
     private function receiveAuthorizationResponse(string $code): void
     {
-        // check oauth2state
+        // check state and nonce
         $requestState = $this->requestQuery->get('state');
         $sessionState = $this->session->get('oidcState');
+        $requestNonce = $this->requestQuery->get('nonce');
+        $sessionNonce = $this->session->get('oidcNonce');
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
             $this->session->set('oidcState', null);
+            $this->session->set('oidcNonce', null);
             $this->sendError('State sent to and received from OIDC provider do not match');
+            return;
+        }
+        if (!isset($requestNonce, $sessionNonce) || $requestNonce !== $sessionNonce) {
+            $this->session->set('oidcState', null);
+            $this->session->set('oidcNonce', null);
+            $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return;
         }
 
