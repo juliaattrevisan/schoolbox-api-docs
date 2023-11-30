@@ -64,7 +64,7 @@ INSERT INTO `config`(
      'false',
      'false',
      'settings',
-     @sequence + 3
+     @sequence + 4
  ),(
      'external_isams_financial_registers',
      'iSAMS Financial Registers Filter',
@@ -77,6 +77,6 @@ INSERT INTO `config`(
      'false',
      'false',
      'settings',
-     @sequence + 3
+     @sequence + 5
  )
 
