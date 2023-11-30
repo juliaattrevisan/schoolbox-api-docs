@@ -99,6 +99,7 @@ class Controller extends Base
      */
     private function sendAuthorizationRequest(): void
     {
+        $nonce        = Uuid::uuid4()->toString();
         $oauthOptions = [
             // Which scope is used to identify a user?
             // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
@@ -106,7 +107,8 @@ class Controller extends Base
             'scope'         => 'openid',
             'response_type' => 'code token',
             'response_mode' => 'form_post',
-            'state'         => $this->buildState(),
+            'state'         => $this->buildState($nonce),
+            'nonce'         => $nonce,
             'x-client-sku'  => Instance::APPLICATION_NAME . '-' . INSTANCE_ID,
             'x-client-ver'  => $this->getConfigLoader()->get('site_version'),
         ];
@@ -227,13 +229,14 @@ class Controller extends Base
     /**
      * Build a state value containing a nonce and a path to redirect to.
      *
+     * @param string $nonce
      * @return string
      */
-    private function buildState(): string
+    private function buildState(string $nonce): string
     {
         $payload = [
             'redirect' => $this->requestQuery->get('page') ?? '/',
-            'nonce'    => Uuid::uuid4(),
+            'nonce'    => $nonce,
         ];
         return $this->codec->encode($payload);
     }
