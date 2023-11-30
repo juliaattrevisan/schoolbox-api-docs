@@ -51,11 +51,4 @@ interface IHydrator
      * @return array<int, FullResult|null>
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array;
-
-    /**
-     * @param User $user
-     * @return bool
-     * @see IQueryParamBuilder/isRelevantToUser() (Similar function for QueryParamBuilders)
-     */
-    public function isRelevantToUser(User $user): bool;
 }

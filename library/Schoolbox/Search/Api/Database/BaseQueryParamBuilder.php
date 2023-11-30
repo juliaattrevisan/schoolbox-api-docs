@@ -367,7 +367,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     /**
      * @param User $user
      * @return bool
-     * @see BaseHydrator/isRelevantToUser() (Similar function for Hydrators)
      */
     public function isRelevantToUser(User $user): bool
     {
