@@ -31,14 +31,15 @@ $app = new class extends CliTool\App
         $instanceInfo = new Version($this->getConfig());
         if ($instanceInfo->isCloudHosted()) {
             $maxDelay = 120;
-            $delay    = $maxDelay * (random_int(0, PHP_INT_MAX) / PHP_INT_MAX);
+            $delay    = random_int(0, $maxDelay);
             $this->getLogger()->info(
                 sprintf(
-                    'This is a cloud instance: jittering for %0.3f (max: %d) seconds',
+                    'This is a cloud instance: jittering for %d (max: %d) seconds...',
                     $delay,
                     $maxDelay,
                 )
             );
+            sleep($delay);
         } else {
             $this->getLogger()->info('This is not a cloud instance: no need to jitter');
         }
