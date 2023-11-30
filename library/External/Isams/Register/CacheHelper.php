@@ -69,8 +69,10 @@ class CacheHelper
     /**
      * Constructor
      *
-     * @param HttpClient $httpClient for querying iSams
-     * @param CacheInterface $cache for caching the api response
+     * @param HttpClient     $httpClient    for querying iSams
+     * @param CacheInterface $cache         for caching the api response
+     * @param IConfigLoader  $configLoader  to extract other secrects
+     * @param Uri            $apiUrl        base api endpoint to work with
      */
     public function __construct(private HttpClient $httpClient, private CacheInterface $cache, private IConfigLoader $configLoader, private Uri $apiUrl)
     {
