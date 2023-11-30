@@ -67,7 +67,7 @@ function beforeUnloadHandler(event: BeforeUnloadEvent) {
  * Save the comment if it's changed
  */
 async function saveComment() {
-    if (comment.value === "") {
+    if (props.item.questions[0].response === undefined) {
         return;
     }
     if (isSaving.value) {
@@ -108,13 +108,6 @@ const debounceSave = debounce(() => {
  */
 window.Vue.watch(comment, () => {
     debounceSave();
-});
-
-/**
- * Save any unsaved changes
- */
-window.Vue.onUnmounted(async () => {
-    await saveComment();
 });
 </script>
 
