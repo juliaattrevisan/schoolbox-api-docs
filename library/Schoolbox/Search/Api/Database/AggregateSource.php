@@ -110,9 +110,10 @@ class AggregateSource implements ISource
         }
 
         $queries = [];
-        $params = [];
+        $params  = [];
+        $limit   ??= 1;
         foreach ($this->queryParamBuilders as $queryParamBuilder) {
-            $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit ?? 1, $paramKeySuffix);
+            $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit, $paramKeySuffix);
             if ($queryParams) {
                 $queries[] = $queryParams->query;
                 $params    = array_merge($params, $queryParams->params);
@@ -148,9 +149,9 @@ class AggregateSource implements ISource
                     title ASC,
                     type ASC,
                     id DESC
-                LIMIT :limit$paramKeySuffix
+                LIMIT :overallLimit$paramKeySuffix
             ";
-            $params['limit'] = $limit;
+            $params["overallLimit$paramKeySuffix"] = $limit * count($this->queryParamBuilders);
         }
 
         return [$queryString, $params];
