@@ -58,6 +58,16 @@ class Module extends BaseModule
             new Rule\IsLoggedIn()
         );
 
+        /* Get a Badge
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/{badgeId}',
+            'getBadge',
+            $manageBadgesRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
+        );
+
         // HTML view of a list of badges
         $this->register(
             self::METHOD_GET,
@@ -95,7 +105,6 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
-        // Create a badge
         /* Delete a Badge
          */
         $this->register(
@@ -106,6 +115,8 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
+        /* Create a Badge
+         */
         $this->register(
             self::METHOD_POST,
             '',
@@ -128,8 +139,8 @@ class Module extends BaseModule
     {
         return [
             'badge' => $this->getMapperFactory()
-                            ->get(Mapper::class)
-                            ->findById($params['badgeId']),
+                ->get(Mapper::class)
+                ->findById($params['badgeId']),
         ];
     }
 
