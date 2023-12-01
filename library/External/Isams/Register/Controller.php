@@ -50,8 +50,8 @@ class Controller extends BaseController
      * @throws Error
      * @throws GuzzleException
      * @throws InvalidArgumentException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @since 23.1
-     *
      * @api   GET /modules/isams/register/{register}/student/{studentId}
      */
     public function getStudent(string $registerCode, User $student): void
@@ -77,6 +77,7 @@ class Controller extends BaseController
      * @throws ClientExceptionInterface
      * @throws InvalidArgumentException
      * @throws Error
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @api   GET /modules/isams/register/{register}/parent
      * @since 23.1
      *
@@ -214,6 +215,7 @@ class Controller extends BaseController
      * @throws GuzzleException
      * @throws InvalidArgumentException
      * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     private function getUsersData(Collection|array $users, string $registerCode, string $config)
     {
