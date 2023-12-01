@@ -35,6 +35,12 @@ use Schoolbox\Url\Uri;
 class Controller extends Base
 {
     /**
+     * Session keys in which the OIDC state and nonce are stored.
+     */
+    private const SESSION_STATE_KEY = 'oidcState';
+    private const SESSION_NONCE_KEY = 'oidcNonce';
+
+    /**
      * Constructor
      *
      * @param Client         $httpClient Required for querying discovery URL
@@ -99,6 +105,7 @@ class Controller extends Base
      */
     private function sendAuthorizationRequest(): void
     {
+        $nonce        = Uuid::uuid4()->toString();
         $oauthOptions = [
             // Which scope is used to identify a user?
             // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
@@ -106,7 +113,8 @@ class Controller extends Base
             'scope'         => 'openid',
             'response_type' => 'code token',
             'response_mode' => 'form_post',
-            'state'         => $this->buildState(),
+            'state'         => $this->buildState($nonce),
+            'nonce'         => $nonce,
             'x-client-sku'  => Instance::APPLICATION_NAME . '-' . INSTANCE_ID,
             'x-client-ver'  => $this->getConfigLoader()->get('site_version'),
         ];
@@ -115,8 +123,9 @@ class Controller extends Base
         $oidcProvider     = $this->buildOidcProvider();
         $authorizationUrl = $oidcProvider->getAuthorizationUrl($oauthOptions);
 
-        // Get the state generated for you and store it to the session
-        $this->session->set('oidcState', $oidcProvider->getState());
+        // Get the state and nonce generated for you and store it to the session
+        $this->session->set(self::SESSION_STATE_KEY, $oidcProvider->getState());
+        $this->session->set(self::SESSION_NONCE_KEY, $nonce);
 
         // Redirect the user to the authorization URL
         $this->response = $this->redirectTemporary($authorizationUrl);
@@ -136,12 +145,19 @@ class Controller extends Base
      */
     private function receiveAuthorizationResponse(string $code): void
     {
-        // check oauth2state
+        // check state and nonce
         $requestState = $this->requestQuery->get('state');
-        $sessionState = $this->session->get('oidcState');
+        $requestNonce = $this->requestQuery->get('nonce');
+        $sessionState = $this->session->get(self::SESSION_STATE_KEY);
+        $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
+        $this->session->set(self::SESSION_STATE_KEY, null);
+        $this->session->set(self::SESSION_NONCE_KEY, null);
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
-            $this->session->set('oidcState', null);
             $this->sendError('State sent to and received from OIDC provider do not match');
+            return;
+        }
+        if (!isset($requestNonce, $sessionNonce) || $requestNonce !== $sessionNonce) {
+            $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return;
         }
 
@@ -227,13 +243,14 @@ class Controller extends Base
     /**
      * Build a state value containing a nonce and a path to redirect to.
      *
+     * @param string $nonce
      * @return string
      */
-    private function buildState(): string
+    private function buildState(string $nonce): string
     {
         $payload = [
             'redirect' => $this->requestQuery->get('page') ?? '/',
-            'nonce'    => Uuid::uuid4(),
+            'nonce'    => $nonce,
         ];
         return $this->codec->encode($payload);
     }
