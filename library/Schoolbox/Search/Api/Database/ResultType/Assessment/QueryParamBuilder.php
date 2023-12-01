@@ -71,8 +71,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                  WHERE lesson_plan_field.lesson_plan_id = lesson_plan.id
                  AND lesson_plan_field.deleted_at IS NULL
                  AND (
-                    title LIKE :assessmentKeywordLike$paramKeySuffix OR
-                    body LIKE :assessmentKeywordLike$paramKeySuffix
+                    MATCH(title, body) AGAINST (:assessmentKeyword$paramKeySuffix IN BOOLEAN MODE)
                  )
              )"
         ];
