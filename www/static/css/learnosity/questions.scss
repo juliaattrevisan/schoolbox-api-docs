@@ -1,0 +1,745 @@
+/* avoid the horizontal scroll on the questions container that's somehow being applied */
+.lrn_widget.lrn_mcq .lrn_mcqgroup {
+    overflow-x: visible;
+}
+/* reset the radio and checkboxes to default */
+.lrn_widget input[type="radio"],
+.lrn_widget input[type="checkbox"] {
+    height: auto;
+    min-height: auto;
+    opacity: 1;
+    position: static;
+    width: auto;
+}
+/*the color used to highlight the selceted item  */
+.lrn_widget .lrn_valid,
+.lrn_widget .lrn_selected {
+    background-color: var(--content-ui-selected);
+}
+
+/*the color used to highlight the selceted item in the mutiplechoice-block layout */
+.lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
+    background-color: var(--content-ui-selected);
+}
+/* update border color in the mutiplechoice-block layout */
+.lrn_widget.lrn_mcq
+    .lrn_response
+    .lrn_mcqgroup-block
+    .lrn-mcq-option.lrn_selected:not(.lrn_valid):not(.lrn_correct):not(.lrn_incorrect) {
+    border-left-color: var(--content-ui-foreground);
+}
+/* update the drag item border color to  content-ui-foreground in Cloze with drago & drop */
+.lrn_widget .lrn_btn_drag {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+
+/* update focus color for drag and drop btn  */
+.lrn_widget .lrn_btn_drag:focus,
+.lrn_widget .lrn_btn_drag.lrn_focus,
+.lrn_widget .lrn_btn_sort:focus,
+.lrn_widget .lrn_btn_sort.lrn_focus {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 1px #fff,
+        inset 0 0 0 1px var(--content-ui-foreground);
+}
+
+/* update the hover color for drag and drop */
+.lrn_widget .lrn_btn_drag:hover,
+.lrn_widget .lrn_btn_drag.lrn_hover,
+.lrn_widget .lrn_btn_sort:hover,
+.lrn_widget .lrn_btn_sort.lrn_hover {
+    box-shadow: inset 0 0 0 1px;
+}
+/* update the active color to content-ui-selected for drag and drop */
+.lrn_widget .lrn_btn_drag:active,
+.lrn_widget .lrn_btn_drag.lrn_active,
+.lrn_widget .lrn_btn_sort:active,
+.lrn_widget .lrn_btn_sort.lrn_active {
+    background-color: var(--content-ui-selected);
+    color: var(--content-ui-foreground);
+}
+
+/* update the drag and drop empty state styles  */
+.lrn_widget.lrn_clozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight.lrn_over.lrn-dragdrop-empty:not(.lrn_disabled),
+.lrn_widget.lrn_clozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty),
+.lrn_widget.lrn_imageclozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight.lrn_over.lrn-dragdrop-empty:not(.lrn_disabled),
+.lrn_widget.lrn_imageclozeassociation
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty),
+.lrn_widget.lrn_imageclozeassociationV2
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight.lrn_over.lrn-dragdrop-empty:not(.lrn_disabled),
+.lrn_widget.lrn_imageclozeassociationV2
+    .lrn_response_input
+    .lrn_response_container.lrn_dragdrop.lrn_highlight:not(.lrn_disabled):not(.lrn-dragdrop-empty) {
+    background-color: var(--content-ui-background);
+}
+.lrn .lrn_possibilityList.lrn_over,
+.lrn .lrn_possibilityListContainer.lrn_over {
+    background-color: var(--content-ui-background);
+}
+
+/* update the active border color of the drag and drop to content-ui-selected*/
+.lrn_widget .lrn_btn_drag:focus:active,
+.lrn_widget .lrn_btn_drag.lrn_focus.lrn_active,
+.lrn_widget .lrn_btn_drag.lrn_focus:active,
+.lrn_widget .lrn_btn_drag:focus.lrn_active,
+.lrn_widget .lrn_btn_sort:focus:active,
+.lrn_widget .lrn_btn_sort.lrn_focus.lrn_active,
+.lrn_widget .lrn_btn_sort.lrn_focus:active,
+.lrn_widget .lrn_btn_sort:focus.lrn_active {
+    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 3px #fff;
+}
+
+/* updated the drop down styles*/
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
+    background-color: #fff;
+    border: 1px solid var(--content-ui-foreground);
+    color: var(--content-ui-foreground);
+    margin: 10px 0px;
+    padding: 0px 20px 0px 10px;
+}
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:hover,
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select:focus {
+    background-color: var(--form-bg-hover-color);
+    border-color: hsla(
+        var(--form-border-color-h),
+        var(--form-border-color-s),
+        calc(var(--form-border-color-l) - 15%),
+        var(--form-border-color-a)
+    );
+    color: var(--form-bg-hover-color-contrast);
+    outline: none;
+}
+
+/* update the color , border and margin of textarea */
+.lrn_widget input:not([type="radio"]):not([type="checkbox"]),
+.lrn_widget textarea,
+.lrn_widget .lrn_texteditor_editable {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_cloze .lrn_response_input .lrn_textinput input,
+.lrn_cloze .lrn_response_input .lrn_textinput textarea {
+    color: #000;
+}
+
+/*  update the border color for label image with drag and drop */
+.lrn_widget.lrn_imageclozeassociationV2
+    .lrn_response_input
+    .lrn_dropzones_container
+    .lrn_imagecloze_response
+    .lrn_dropzone_mask {
+    border: 1px dashed var(--content-ui-foreground);
+}
+
+/* update the border color for label image with text*/
+.lrn_widget .lrn_imagecloze_response .lrn_textinput.lrn_response_pointer_right:before {
+    border-left: 1.14285714em solid var(--content-ui-foreground);
+}
+
+/* update the border color for classification */
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
+    border-bottom: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
+    border-top: 1px dashed var(--content-ui-foreground);
+    border-left: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
+    border-right: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_association .lrn_response_container.lrn_dropzone {
+    border-color: var(--content-ui-foreground);
+}
+
+/* update styles for order list*/
+.lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_sort_block {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_button:hover,
+.lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_button.lrn_hover,
+.lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_list:hover,
+.lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_list.lrn_hover {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+
+/* update sortlist border, color and arrow icons styles */
+.lrn_widget.lrn_sortlist .lrn_response .lrn_cell {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget .lrn_btn_drag:focus:hover,
+.lrn_widget .lrn_btn_drag.lrn_focus.lrn_hover,
+.lrn_widget .lrn_btn_drag.lrn_focus:hover,
+.lrn_widget .lrn_btn_drag:focus.lrn_hover,
+.lrn_widget .lrn_btn_sort:focus:hover,
+.lrn_widget .lrn_btn_sort.lrn_focus.lrn_hover,
+.lrn_widget .lrn_btn_sort.lrn_focus:hover,
+.lrn_widget .lrn_btn_sort:focus.lrn_hover {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn .lrn_btn_sort {
+    color: #000;
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_top span {
+    border-bottom: 1em solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_down span {
+    border-top: 1em solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_left span {
+    border-right: 1em solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_sortlist .lrn_arrow_right span {
+    border-left: 1em solid var(--content-ui-foreground);
+}
+
+/* update reachtext styles */
+.lrn_widget.lrn_chemistryessayV2 .lrn_response_input_wrapper,
+.lrn_widget.lrn_formulaessayV2 .lrn_response_input_wrapper,
+.lrn_widget.lrn_longtextV2 .lrn_response_input_wrapper {
+    border-color: var(--content-ui-foreground);
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn-toolbar,
+.lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
+.lrn_widget.lrn_longtextV2 .lrn-toolbar {
+    background: #ffff;
+    border-bottom: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
+.lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
+.lrn_widget.lrn_longtextV2 .lrn-divider:after {
+    border-right: 1px solid var(--content-ui-foreground);
+    transform: translate(0, -50%);
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn-toolbar-footer,
+.lrn_widget.lrn_formulaessayV2 .lrn-toolbar-footer,
+.lrn_widget.lrn_longtextV2 .lrn-toolbar-footer {
+    background: #ffff;
+    border-top: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable:focus,
+.lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable.lrn_active,
+.lrn_widget.lrn_formulaessayV2 .lrn_texteditor_editable:focus,
+.lrn_widget.lrn_formulaessayV2 .lrn_texteditor_editable.lrn_active,
+.lrn_widget.lrn_longtextV2 .lrn_texteditor_editable:focus,
+.lrn_widget.lrn_longtextV2 .lrn_texteditor_editable.lrn_active {
+    box-shadow: 1px 1px 2px #0000001a inset;
+    outline: none;
+}
+.lrn_widget .lrn_texteditor_editable:focus {
+    border: 1px solid var(--content-ui-foreground);
+    box-shadow: 1px 1px 2px #0000001a inset;
+}
+
+/* update shading styles */
+.lrn_widget.lrn_simpleshading .lrn-shading-cell {
+    background-color: #e6f2fc;
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:hover,
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:focus {
+    background-color: var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-background);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-cell.lrn-shading-selected {
+    background-color: var(--content-ui-foreground);
+    border: 1px solid var(--content-ui-background);
+}
+.lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:focus {
+    border: 1px solid var(--content-ui-foreground);
+}
+
+/* update token highlight styles */
+.lrn_widget.lrn_tokenhighlight .lrn_response .lrn_response_input_wrapper {
+    box-shadow: 0 0 0 1px var(--content-ui-foreground);
+}
+
+/* update Math and calculator styles */
+.lrn.lrn_widget .lrn_bordered_mathinput {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget .lrn-formula-keyboard .lrn-formula-keyboard-close {
+    top: -0.5em;
+}
+.lrn_widget .lrn-formula-keyboard-menu-left button,
+.lrn_widget .lrn-formula-keyboard-menu-right button {
+    top: 0.5em;
+}
+/*update the radio and checkbox background color to content-ui-foregroud*/
+input[type="radio"],
+input[type="checkbox"] {
+    accent-color: var(--content-ui-foreground);
+}
+
+/*the hover color of choice matrix-standard radio buttons set to content-ui-selected*/
+.lrn_qr.lrn_choicematrix .lrn_response_input > table td.lrn_option.lrn_enabled.lrn_selected:hover {
+    background-color: var(--content-ui-selected);
+}
+
+/*update the border color of dropzone in Cloze with drag & drop*/
+.lrn_dropzone {
+    border: 1px dashed var(--content-ui-foreground);
+}
+
+/* update the drag items color to content-ui-foreground in Cloze with drago & drop */
+.lrn .lrn_btn_drag {
+    color: var(--content-ui-foreground);
+}
+
+.lrn .lrn_btn_drag:hover,
+.lrn .lrn_btn_drag.lrn_hover,
+.lrn .lrn_btn_drag:active,
+.lrn .lrn_btn_drag.lrn_active,
+.lrn .lrn_btn_drag:focus {
+    color: var(--content-ui-foreground);
+}
+
+/* update border styles for match list */
+.lrn_qr.lrn_association .lrn_response .lrn_assoc_question {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_qr.lrn_association .lrn_response .lrn_arrows .lrn_arrow {
+    border-bottom: 0.36em solid var(--content-ui-foreground);
+}
+.lrn_qr.lrn_association .lrn_response .lrn_arrows .lrn_arrow:after,
+.lrn_qr.lrn_association .lrn_response .lrn_arrows .lrn_arrow:before {
+    border: 0.4em solid var(--content-ui-foreground);
+}
+
+/* plaintext styles*/
+.lrn .lrn_btn {
+    background-color: var(--content-ui-background);
+}
+button.lrn_btn.lrn_start_recording {
+    background-color: #eaeaea;
+}
+.lrn_box_skin_wrapper .lrn_widget_footer .lrn_toolbar_left .lrn_btn {
+    background: #eaeaea;
+}
+button.lrn_btn.lrn_volume-high.lrn_volume_btn {
+    background-color: #eaeaea;
+}
+.lrn_toolbar {
+    background-color: #fff;
+}
+.lrn_texteditor > .lrn_toolbar {
+    border-left: 1px solid var(--content-ui-foreground);
+    border-right: 1px solid var(--content-ui-foreground);
+    border-top: 1px solid var(--content-ui-foreground);
+}
+
+/* update number line with drag and drop styles */
+.lrn .lrn_btn_arrow:after {
+    border-color: var(--content-ui-foreground) transparent transparent;
+}
+.lrn_widget.lrn_numberline .lrn_btn_arrow {
+    border: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):hover,
+.lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):focus {
+    background: var(--content-ui-selected);
+    border-color: var(--content-ui-foreground);
+}
+.lrn .lrn_btn_arrow:active:after,
+.lrn .lrn_btn_arrow.lrn_active:after {
+    border-color: var(--content-ui-foreground) transparent transparent;
+}
+
+/* update number line with plot styles  */
+.lrn_widget.lrn_numberlineplot .lrn_jxg_toolbox li button.lrn_active {
+    background: var(--content-ui-foreground);
+}
+
+/* update file upload styles */
+.lrn_widget.lrn_fileupload .lrn_response_input_wrapper {
+    border-color: var(--content-ui-foreground);
+}
+.lrn_wid .lrn_widget.lrn_fileupload .lrn-toolbar {
+    background: #fff;
+    border-bottom: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_fileupload .lrn-toolbar-footer {
+    background: #fff;
+    border-top: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_fileupload .lrn-toolbar {
+    background: #fff;
+    border-bottom: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
+.lrn_widget .lrn-imageupload-img-wrapper-is-empty {
+    border-bottom: 1px solid var(--content-ui-foreground);
+    border-left: 1px solid var(--content-ui-foreground);
+    border-right: 1px solid var(--content-ui-foreground);
+}
+.lrn_widget.lrn_imageupload .lrn_toolbar {
+    border: 1px solid var(--content-ui-foreground);
+    touch-action: none;
+    -ms-touch-action: none;
+}
+
+/* update rating styles */
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_ratingInfo_icon_wrap {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn .lrn_btn {
+    color: #000;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:hover {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:focus {
+    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 1px #fff, inset 0 0 0 4px #1877b1;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
+    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 3px #fff;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
+    background-color: var(--content-ui-selected);
+    color: var(--content-ui-foreground);
+}
+/* update the border radius to 0px */
+.lrn .lrn_btn {
+    border-radius: 0px;
+}
+.lrn_widget .lrn_response .lrn_response_container {
+    border-radius: 0px;
+}
+.lrn .lrn_btn_drag {
+    border-radius: 0px;
+}
+.lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
+    border-radius: 0px;
+}
+.lrn_cloze .lrn_response_input .lrn_textinput input,
+.lrn_cloze .lrn_response_input .lrn_textinput textarea {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_qr .lrn-clozeformula-input {
+    border-radius: 0px;
+}
+.lrn_response_input_wrapper {
+    border-radius: 0px;
+}
+.lrn.lrn_widget .lrn_bordered_mathinput {
+    border-radius: 0px;
+}
+.lrn .lrn_btn_arrow {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_fileupload .lrn_response_input_wrapper {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
+    border-radius: 0px;
+}
+.lrn_widget.lrn_shorttext .lrn_textinput input {
+    border-radius: 0px;
+}
+/* update the classification drop zone borders */
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
+    border-right: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
+    border-bottom: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
+    border-right: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
+    border-bottom: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
+    border-left: 1px dashed var(--content-ui-foreground);
+    border-top: 1px dashed var(--content-ui-foreground);
+}
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_last.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_last.lrn_over,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr.lrn_last
+    .lrn_response_container.lrn_over,
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr
+    .lrn_response_container.lrn_last.lrn_highlight,
+.lrn_widget.lrn_classification
+    .lrn_response
+    .lrn_response_input_wrapper
+    table
+    tr
+    .lrn_response_container.lrn_last.lrn_over,
+.lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_over {
+    border: 1px var(--content-ui-background) solid;
+}
+
+/* update shortlist icon color */
+.lrn_widget.lrn_sortlist .lrn_response .lrn_btn_sort:active:before,
+.lrn_widget.lrn_sortlist .lrn_response .lrn_btn_sort.lrn_active:before {
+    color: var(--content-ui-foreground);
+}
+/* update graphing border */
+.lrn_widget.lrn_graphplotting .lrn_response_wrapper .lrn_graph_plotter .lrn_toolbar:focus-within {
+    outline: unset;
+}
+
+/* update image upload button box-shadow */
+.lrn_widget.lrn_imageupload .lrn_toolbar .lrn_btn.lrn_active {
+    box-shadow: unset;
+}
+/* upload image button color */
+span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
+    background-color: var(--content-ui-foreground);
+}
+
+/* upload file button color */
+.lrn_widget.lrn_fileupload .lrn-fileupload-btn-upload {
+    background-color: var(--content-ui-foreground);
+}
+.lrn_widget.lrn_imageupload .lrn_toolbar .lrn_btn.lrn_active:focus {
+    box-shadow: unset;
+}
+/* add "Add" before icon for adding question to an item */
+button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-widget-icon.lrn-i-plus:after {
+    content: " Add";
+}
+.lrn .lrn-author-ui .lrn-author-widget-button:hover .lrn-author-widget-icon:before {
+    color: var(--content-ui-foreground);
+    text-shadow: none;
+}
+button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
+    background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
+    text-decoration: none !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
+.lrn-qe .lrn-qe-ui a.lrn-qe-btn:focus {
+    outline: none;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-tile-preview {
+    border-radius: 0px;
+}
+.lrn .lrn-author-ui .lrn-btn,
+.lrn .lrn-author-ui a.lrn-btn {
+    border-radius: 0px;
+}
+.lrn_widget input {
+    border-radius: 0px;
+}
+.lrn-i-trash:before {
+    content: "\e61b";
+    font-family: "schoolbox";
+    vertical-align: middle;
+}
+/* fixed file upload button styles in preview questions */
+.lrn_widget.lrn_fileupload .lrn-fileupload-input-wrapper .lrn-disabled {
+    opacity: unset;
+    z-index: 3;
+}
+.lrn.lrn-assess .app-layout .lrn_btn_blue:after {
+    border-radius: 0px;
+}
+/* remove the relevant disabled styles on a student response elements within horizontal marking */
+.lrn_response_wrapper :disabled,
+.lrn_response_wrapper input[type="checkbox"]:not(.plain):disabled + label,
+.lrn_response_wrapper input[type="radio"]:not(.plain):disabled + label,
+.lrn_response_wrapper input[type="checkbox"][readonly]:not(.plain) + label,
+.lrn_response_wrapper input[type="radio"][readonly]:not(.plain) + label {
+    opacity: 1;
+}
+
+/* remove the relevant disabled styles on a student response elements within horizontal marking */
+.lrn_response_wrapper input:disabled,
+.lrn_response_wrapper input[disabled],
+.lrn_response_wrapper input[readonly],
+.lrn_response_wrapper textarea:disabled,
+.lrn_response_wrapper textarea[disabled],
+.lrn_response_wrapper textarea[readonly],
+.lrn_response_wrapper select:disabled,
+.lrn_response_wrapper select[disabled],
+.lrn_response_wrapper select[readonly] {
+    background-color: transparent;
+    color: #000;
+}
+
+/* remove the relevant disabled styles on a student response elements within horizontal marking */
+.lrn_response_wrapper input:not([type]):disabled,
+.lrn_response_wrapper input[type="text"]:disabled,
+.lrn_response_wrapper input[type="number"]:disabled,
+.lrn_response_wrapper textarea:disabled {
+    background-color: transparent;
+}
+/* update left padding for input */
+.lrn_cloze .lrn_response_input .lrn_textinput input,
+.lrn_cloze .lrn_response_input .lrn_textinput textarea {
+    padding-left: 0.5rem;
+}
+/* fixed calculator drop down */
+.lrn-formula-keyboard-menu-container.lrn-formula-keyboard-menu-groups
+    > .lrn_dropdown.lrn_theme_primary
+    button.lrn_btn.lrn_dropdown_toggle {
+    background: transparent;
+    top: -4px;
+}
+.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:focus,
+.lrn_dropdown.lrn_theme_primary .lrn_dropdown_toggle:hover {
+    background: transparent;
+    border-color: transparent;
+}
+.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle {
+    background: transparent;
+}
+.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:focus,
+.lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:hover {
+    background: transparent;
+}
+/* Check answer button */
+.lds-btn-secondary,
+.lrn .lrn_btn:is(.lds-btn-secondary) {
+    background-color: var(--content-ui-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-foreground);
+    min-height: auto;
+}
+.lds-btn-secondary,
+.lrn .lrn_btn:is(.lds-btn-secondary):hover {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif !important;
+    font-size: 1rem;
+}
+.lds-btn-secondary,
+.lrn .lrn_btn:is(.lds-btn-secondary):focus {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+}
+/* updatle the uploader button */
+.lrn-qe .lrn-qe-ui .lrn-qe-btn-asset-uploader {
+    transform: unset;
+}
+/* Added space to the right of questions in the item authoring */
+.lrn-widget-drag-wrapper {
+    padding-right: 50px;
+}
+/* fixed overlap of the masking  */
+.lrn .lrn-mask {
+    height: 90% !important;
+}
+.lrn button.lrn-mask:hover,
+.lrn button.lrn-mask:focus {
+    outline: unset !important;
+}
+/* Made edit/preview button font sizes consistent */
+.lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control {
+    font-size: 1rem;
+    padding: 0.5rem;
+    line-height: 0;
+}
+
+/* Added border between each question in an item */
+.lrn-author-widget-wrapper.lrn-author-widget-loaded.lrn-author-widget-draggable {
+    border-bottom: 1px solid var(--body-background) !important;
+}
+
+/* Fixed checkbox icon and alignment */
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span:before,
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span:after {
+    width: 1.375rem;
+    height: 1.375rem;
+}
+.lrn-i-tick:before,
+.lrn-i-published:before {
+    content: "\e604";
+    font-family: "schoolbox";
+}
+/* fixed save button hover style*/
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
+.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
+    outline: unset !important;
+}
+
+/* fixed search page checkbox inputs */
+.lrn .lrn-author-ui .lrn-list-view-select-col .lrn-check-box-wrapper .lrn-check-box-span {
+    height: 1.375rem !important;
+    width: 1.375rem !important;
+}
+.lrn .lrn-author-ui .lrn-list-view-col.lrn-list-view-select-col {
+    padding: 2rem;
+}
+/* fixed the correct answers tabs */
+.lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger {
+    font-size: 1rem;
+    font-weight: 400;
+    min-height: 2.5rem !important;
+}
+
+/* fixed the color picker container */
+.lrn-qe .lrn-qe-ui .lrn-qe-color-picker .lrn-color-picker {
+    border: none;
+}
+/* fixed edit/add buttons in the questions to be consistent with other buttons */
+.lrn-qe
+    .lrn-qe-ui
+    .lrn-qe-image-preview-wrapper
+    .lrn-qe-preview-outer
+    .lrn-qe-asset-button-wrapper
+    .lrn-qe-btn-asset-uploader {
+    box-shadow: unset;
+    height: unset;
+    left: 0 !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    top: auto;
+    width: 100% !important;
+}
+.lrn-qe .lrn-qe-ui .lrn-qe-image-preview-wrapper .lrn-qe-preview-outer .lrn-qe-asset-button-wrapper {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+}
+
+/* Hid the border of the place holder for correct answer in the Image annotation upload question */
+.lrn-qe .lrn-qe-ui .lrn-qe-image-validation-areas-no-image .lrn-qe-image-validation-areas-message {
+    border-top: unset;
+    border-right: unset;
+    border-left: unset;
+    border-bottom: 1px solid #ccc;
+}
