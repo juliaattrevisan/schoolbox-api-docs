@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Link;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -18,15 +17,6 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  */
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter $quoter
-     */
-    public function __construct(private IQuoter $quoter)
-    {
-    }
-
     /**
      * Build WHERE params such that
      * * deleted links are never fetched

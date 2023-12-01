@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -23,16 +22,6 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  */
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter $quoter
-     */
-    public function __construct(
-        private IQuoter $quoter
-    ) {
-    }
-
     /**
      * Build the WHERE params such that:
      * * deleted articles are never fetched
