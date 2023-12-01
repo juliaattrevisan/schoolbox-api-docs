@@ -120,7 +120,7 @@ class CacheHelper
      *
      * @param string|null $registerCode if exists only return this register
      * @param array|null  $registersConfig if we are returning only 1 register, then confirm it is in the admin approved list
-     * @return mixed
+     * @return ?array
      * @throws ClientExceptionInterface if something went wrong fetching JWKS
      * @throws GuzzleException
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
@@ -128,7 +128,7 @@ class CacheHelper
      * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function getRegisters(?string $registerCode = null, ?array $registersConfig = null): mixed
+    public function getRegisters(?string $registerCode = null, ?array $registersConfig = null): ?array
     {
         $registers = $this->cache->get(self::REGISTERS_CACHE_KEY);
         if (!isset($registers)) {
