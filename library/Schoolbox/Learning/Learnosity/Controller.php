@@ -383,7 +383,7 @@ class Controller extends Base
         // the quiz page will enable users to bypass permission checks that prevent the 'start quiz' button from displaying.
         // See library/Schoolbox/Learning/Assessment/Quiz/Controller.php (where the same permission checks are used).
         $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now); // Close any expired attempts before checking for in-progress.
+        $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now); // Close any expired attempts before checking for in-progress.
         $actionValidator = new ActionValidator($now, Access::getInstance());
         $canAttempt = (
             $this->getUser()->getId() === $student->getId() && // A user may not attempt a quiz on behalf of another user.

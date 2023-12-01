@@ -193,7 +193,7 @@ class Controller extends Assessment\Controller
         /* Close any expired attempts before checking for in-progress / unfinished attempts
          * Note that this requires $quiz to have its attempts already loaded via loadAttemptsAndAnswers()
          */
-        $numChanged = $this->quizMapper->closeExpiredAttempts($quiz, $now);
+        $numChanged = $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now);
 
         /* Attempts list is hydrated as part of $assessment, but we might have changed that
          * If anyone got their attempt automatically closed, reload with the latest data.
@@ -293,7 +293,7 @@ class Controller extends Assessment\Controller
          * Note that this requires $quiz to have its attempts already loaded via loadAttemptsAndAnswers()
          */
         $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now);
+        $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now);
 
         $attempts = $this->attemptMapper->findByColumnList([
             'assess_id' => $quiz->getId(),
