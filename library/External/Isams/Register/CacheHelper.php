@@ -66,6 +66,8 @@ class CacheHelper
      */
     public const DATASOURCE_FIELDS_CACHE_KEY = 'isams_register_datasource_%s';
 
+    private API $api;
+
     /**
      * Constructor
      *
@@ -76,6 +78,7 @@ class CacheHelper
      */
     public function __construct(private HttpClient $httpClient, private CacheInterface $cache, private IConfigLoader $configLoader, private Uri $apiUrl)
     {
+        $this->api = new API($this->httpClient, $this->apiUrl);
     }
 
 
@@ -94,8 +97,9 @@ class CacheHelper
         // does the cache exist? then lets use it. else generate and request the jwks
         if (!is_array($jwks)) {
             // first, need to exchange client id/secret for an access token
-            $tokenResponse = $this->httpClient->post(
-                $this->apiUrl->withPath('/auth/connect/token'),
+            $jwks = $this->api->request(
+                '/auth/connect/token',
+                'POST',
                 [
                     RequestOptions::FORM_PARAMS => [
                         'client_id'     => $this->configLoader->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_CLIENT_ID),
@@ -105,7 +109,6 @@ class CacheHelper
                     ]
                 ]
             );
-            $jwks = json_decode($tokenResponse->getBody()->getContents(), true);
 
             $this->cache->set(self::JWKS_CACHE_KEY, $jwks, $jwks['expires_in'] ?? self::JWKS_CACHE_DEFAULT_TTL);
         }
@@ -128,15 +131,11 @@ class CacheHelper
         $registers = $this->cache->get(self::REGISTERS_CACHE_KEY);
         if (!isset($registers)) {
             // Request 1: find registers
-            $apiResponse     = $this->httpClient->get(
-                $this->apiUrl->withPath('/Main/api/registers/'),
-                [
-                    RequestOptions::HEADERS => [
-                        'authorization' => 'Bearer ' . $this->getToken(),
-                    ],
-                ],
+            $apiResponseBody = $this->api->request(
+                '/Main/api/registers/',
+                'GET',
+                token: $this->getToken(),
             );
-            $apiResponseBody = json_decode($apiResponse->getBody()->getContents(), true);
             $registers       = $apiResponseBody['registers'];
             $this->cache->set(self::REGISTERS_CACHE_KEY, $registers, self::STORAGE_CACHE_DEFAULT_TTL);
         }
@@ -159,15 +158,11 @@ class CacheHelper
         if (!isset($metadata)) {
             // This ought to be cacheable for a lot longer than student data
             try {
-                $metadataResponse     = $this->httpClient->get(
-                    $this->apiUrl->withPath('/Main/api/registers/' . $registerId . '/metadata'),
-                    [
-                        RequestOptions::HEADERS => [
-                            'authorization' => 'Bearer ' . $this->getToken(),
-                        ],
-                    ],
+                $metadata = $this->api->request(
+                    '/Main/api/registers/' . $registerId . '/metadata',
+                    'GET',
+                    token: $this->getToken(),
                 );
-                $metadata = json_decode($metadataResponse->getBody()->getContents(), true);
                 $this->cache->set(sprintf(self::METADATA_CACHE_KEY, $registerId), $metadata, self::STORAGE_CACHE_DEFAULT_TTL);
             } catch (ClientExceptionInterface $e) {
                 // No metadata exists for this field: that's okay
@@ -194,15 +189,11 @@ class CacheHelper
         if (!isset($dateRanges)) {
             // Request 1.2: find date ranges for student
             try {
-                $dateRangesResponse     = $this->httpClient->get(
-                    $this->apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $externalId . '/dateranges'),
-                    [
-                        RequestOptions::HEADERS => [
-                            'authorization' => 'Bearer ' . $this->getToken(),
-                        ],
-                    ],
+                $dateRanges = $this->api->request(
+                    '/Main/api/registers/' . $registerId . '/students/' . $externalId . '/dateranges',
+                    'GET',
+                    token: $this->getToken(),
                 );
-                $dateRanges = json_decode($dateRangesResponse->getBody()->getContents(), true);
                 $this->cache->set(sprintf(self::STUDENT_DATES_CACHE_KEY, $registerId, $externalId), $dateRanges, self::STUDENT_CACHE_DEFAULT_TTL);
             } catch (ClientExceptionInterface $e) {
                 // No record exists for this student: that's okay
@@ -229,15 +220,11 @@ class CacheHelper
         if (!isset($studentFields)) {
             // Request 1.3: find fields for student
             try {
-                $fieldsResponse     = $this->httpClient->get(
-                    $this->apiUrl->withPath('/Main/api/registers/' . $registerId . '/students/' . $externalId . '/fields'),
-                    [
-                        RequestOptions::HEADERS => [
-                            'authorization' => 'Bearer ' . $this->getToken(),
-                        ],
-                    ],
+                $studentFields = $this->api->request(
+                    '/Main/api/registers/' . $registerId . '/students/' . $externalId . '/fields',
+                    'GET',
+                    token: $this->getToken(),
                 );
-                $studentFields = json_decode($fieldsResponse->getBody()->getContents(), true);
                 $this->cache->set(sprintf(self::STUDENT_FIELDS_CACHE_KEY, $registerId, $externalId), $studentFields, self::STUDENT_CACHE_DEFAULT_TTL);
             } catch (ClientExceptionInterface $e) {
                 // No record exists for this student: that's okay
@@ -263,15 +250,11 @@ class CacheHelper
 
         if (!isset($dataSource)) {
             try {
-                $dataSourceResponse     = $this->httpClient->get(
+                $dataSource = $this->api->request(
                     $dataSourceUrl,
-                    [
-                        RequestOptions::HEADERS => [
-                            'authorization' => 'Bearer ' . $this->getToken(),
-                        ],
-                    ],
+                    'GET',
+                    token: $this->getToken(),
                 );
-                $dataSource = json_decode($dataSourceResponse->getBody()->getContents(), true);
                 $this->cache->set(sprintf(self::DATASOURCE_FIELDS_CACHE_KEY, $dataSourceUrl), $dataSource, self::STORAGE_CACHE_DEFAULT_TTL);
             } catch (ClientExceptionInterface $e) {
                 // No metadata exists for this field: that's okay
