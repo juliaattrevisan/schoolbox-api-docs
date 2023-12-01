@@ -29,7 +29,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             "eventKeyword$paramKeySuffix" => $keyword,
         ];
         $keywordSearchParts = [
-            "MATCH(e.title, e.detail, e.location) AGAINST (:eventKeyword$paramKeySuffix IN BOOLEAN MODE)",
+            "MATCH(e.title, e.detail, e.location) AGAINST (:eventKeyword$paramKeySuffix)",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [

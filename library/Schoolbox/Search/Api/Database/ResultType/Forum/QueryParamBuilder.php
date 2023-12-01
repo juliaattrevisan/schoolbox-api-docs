@@ -43,7 +43,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             "ft.title LIKE :postKeywordLike$paramKeySuffix",
-            "MATCH(fp.body) AGAINST (:postKeyword$paramKeySuffix IN BOOLEAN MODE)",
+            "MATCH(fp.body) AGAINST (:postKeyword$paramKeySuffix)",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params = [

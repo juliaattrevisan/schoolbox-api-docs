@@ -193,7 +193,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 AND tb.deleted_at IS NULL
                 AND fo.deleted_at IS NULL
                 AND (
-                    MATCH(tb.heading, tb.body) AGAINST (:textboxKeyword$paramKeySuffix IN BOOLEAN MODE) OR
+                    MATCH(tb.heading, tb.body) AGAINST (:textboxKeyword$paramKeySuffix) OR
                     EXISTS(
                         SELECT *
                         FROM component_config_instance cci2
@@ -223,7 +223,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     cci2.value = CAST(tb2.textBoxID AS NCHAR)
                 )
                 WHERE tb2.deleted_at IS NULL
-                AND MATCH(tb2.heading, tb2.body) AGAINST (:textboxKeyword$paramKeySuffix IN BOOLEAN MODE)
+                AND MATCH(tb2.heading, tb2.body) AGAINST (:textboxKeyword$paramKeySuffix)
                 AND cci2.id IS NULL
             ) AS dummy";
     }

@@ -60,7 +60,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
              *    @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
              *  - lesson_plan_field.visibility is checked in the Hydrator.
              */
-            "MATCH(assessment.title, assessment.description) AGAINST (:assessmentKeyword$paramKeySuffix IN BOOLEAN MODE)",
+            "MATCH(assessment.title, assessment.description) AGAINST (:assessmentKeyword$paramKeySuffix)",
             "task.link LIKE :assessmentKeywordLike$paramKeySuffix",
             "lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike$paramKeySuffix",
             "lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike$paramKeySuffix",
@@ -71,7 +71,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                  WHERE lesson_plan_field.lesson_plan_id = lesson_plan.id
                  AND lesson_plan_field.deleted_at IS NULL
                  AND (
-                    MATCH(title, body) AGAINST (:assessmentKeyword$paramKeySuffix IN BOOLEAN MODE)
+                    MATCH(title, body) AGAINST (:assessmentKeyword$paramKeySuffix)
                  )
              )"
         ];

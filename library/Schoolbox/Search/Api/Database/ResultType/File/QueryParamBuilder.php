@@ -33,7 +33,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
-            "MATCH(f.realname, f.description, f.comment) AGAINST (:fileKeyword$paramKeySuffix IN BOOLEAN MODE)",
+            "MATCH(f.realname, f.description, f.comment) AGAINST (:fileKeyword$paramKeySuffix)",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [

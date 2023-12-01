@@ -48,7 +48,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
         // Apply keyword
         $keywordSearchParts = [
-            "MATCH(n.title, n.body, n.blurb) AGAINST (:newsKeyword$paramKeySuffix IN BOOLEAN MODE)",
+            "MATCH(n.title, n.body, n.blurb) AGAINST (:newsKeyword$paramKeySuffix)",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [

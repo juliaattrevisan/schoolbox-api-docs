@@ -32,7 +32,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
-            "MATCH(l.url, l.description, l.comment) AGAINST (:linkKeyword$paramKeySuffix IN BOOLEAN MODE)",
+            "MATCH(l.url, l.description, l.comment) AGAINST (:linkKeyword$paramKeySuffix)",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
