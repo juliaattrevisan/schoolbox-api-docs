@@ -58,7 +58,6 @@ class Controller extends BaseController
          *  field2
          * ]
          */
-        $allowedRegisters = [];
         $registersConfig = [];
         /**
          * allowed registers is a multi dimentional csv
@@ -77,7 +76,6 @@ class Controller extends BaseController
                 $tmp = explode(',', $registerConfig);
                 $registerTitle = array_shift($tmp);
                 $registersConfig[$registerTitle] = $tmp;
-                $allowedRegisters[] = $registerTitle;
             }
         }
 
@@ -93,7 +91,7 @@ class Controller extends BaseController
              *
              * we will either only display 1 register, or throw NotFound.
              */
-            if (!in_array(strtolower($register['code']), $allowedRegisters) || strtolower($register['code']) !== strtolower($registerCode)) {
+            if (!isset($registersConfig[strtolower($register['code'])]) || strtolower($register['code']) !== strtolower($registerCode)) {
                 // the requested register Ignoring...
                 continue;
             }
@@ -141,7 +139,6 @@ class Controller extends BaseController
          *  field2
          * ]
          */
-        $allowedRegisters = [];
         $registersConfig = [];
         /**
          * allowed registers is a multi dimentional csv
@@ -160,7 +157,6 @@ class Controller extends BaseController
                 $tmp = explode(',', $registerConfig);
                 $registerTitle = array_shift($tmp);
                 $registersConfig[$registerTitle] = $tmp;
-                $allowedRegisters[] = $registerTitle;
             }
         }
 
@@ -175,7 +171,7 @@ class Controller extends BaseController
              *
              * we will either only display 1 register, or throw NotFound.
              */
-            if (!in_array(strtolower($register['code']), $allowedRegisters) || strtolower($register['code']) !== strtolower($registerCode)) {
+            if (!isset($registersConfig[strtolower($register['code'])]) || strtolower($register['code']) !== strtolower($registerCode)) {
                 // the requested register Ignoring...
                 continue;
             }
