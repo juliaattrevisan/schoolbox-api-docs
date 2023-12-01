@@ -276,6 +276,16 @@ class ConfigMapper extends Mapper
 
 
     /**
+     * Isams specific
+     */
+    public const EXTERNAL_ISAMS_REST_API_HOST = 'external_isams_rest_api_host';
+    public const EXTERNAL_ISAMS_REST_API_CLIENT_ID = 'external_isams_rest_api_client_id';
+    public const EXTERNAL_ISAMS_REST_API_CLIENT_SECRET = 'external_isams_rest_api_client_secret';
+    public const EXTERNAL_ISAMS_STUDENT_REGISTERS = 'external_isams_student_registers';
+    public const EXTERNAL_ISAMS_FINANCIAL_REGISTERS = 'external_isams_financial_registers';
+
+
+    /**
      * Config settings which may affect the behaviour of the router daemon.
      *
      * If any of these settings change: send a reload message to the router
