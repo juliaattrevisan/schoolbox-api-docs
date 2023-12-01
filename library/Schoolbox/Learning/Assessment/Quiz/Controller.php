@@ -162,10 +162,12 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
+     * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
      * @throws DefinitionException
      * @throws Deleted
      * @throws DomainException
+     * @throws Error
      * @throws Exception
      * @throws MapperException
      * @throws PDOException
@@ -173,8 +175,6 @@ class Controller extends Assessment\Controller
      * @throws UnexpectedValueException
      * @throws \InvalidArgumentException
      * @throws \LogicException
-     * @throws Error
-     * @api GET /learning/assessment/:assessmentId/status
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -226,14 +226,23 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @since 165
      *
-     * @param IAssessable|Model $assessment
-     * @param User              $student
-     * @throws Deleted
-     * @throws DomainException
-     * @throws PDOException
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
      * @throws DefinitionException
+     * @throws Deleted
+     * @throws Error
+     * @throws Exception
      * @throws MapperException
+     * @throws PDOException
+     * @throws RouteNotFound
      * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Exception
+     * @throws \CFPropertyList\IOException
+     * @throws \CFPropertyList\PListException
+     * @throws \DOMException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
