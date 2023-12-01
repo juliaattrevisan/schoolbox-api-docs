@@ -95,52 +95,6 @@ class Controller extends BaseController
     }
 
     /**
-     * debug endpoint, can be removed
-     */
-    public function getRegisterList()
-    {
-        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
-
-        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
-
-        $this->response = $this->responseAsJson(
-            [
-                'registers' => $this->cacheHelper->getRegisters(),
-            ]
-        );
-    }
-
-    /**
-     * debug endpoint, can be removed
-     */
-    public function getFieldList(string $registerCode)
-    {
-        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
-
-        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
-
-        $registers       = $this->cacheHelper->getRegisters();
-        foreach ($registers as $register) {
-            if (strtolower($register['code']) !== strtolower($registerCode)) {
-                // the requested register Ignoring...
-                continue;
-            }
-
-            $this->response = $this->responseAsJson(
-                [
-                    'register' => $register,
-                    'fields' => $this->cacheHelper->getMetadataFields($register['id'])
-                ]
-            );
-            return;
-        }
-        /**
-         * Unable to find requested register...
-         */
-        throw new NotFound();
-    }
-
-    /**
      * Fetch data for user from ISAMS Register endpoints
      *
      * @param User $user // the user we want data for
@@ -288,5 +242,90 @@ class Controller extends BaseController
             ];
         }
         return $usersData;
+    }
+
+    /**
+     * *****************************************************************************************************************
+     * debug endpoint
+     */
+
+    /**
+     * get a list of all registers whilst ignoring the admin filters
+     *
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @api   GET /modules/isams/register/{register}/parent
+     * @since 23.1
+     */
+    public function getRegisterList()
+    {
+        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
+
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
+
+        $this->response = $this->responseAsJson(
+            [
+                'registers' => $this->cacheHelper->getRegisters(),
+            ]
+        );
+    }
+
+    /**
+     * get a list of all fields for a specified register whilst ignoring the admin filters
+     *
+     * @param string $registerCode
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @api   GET /modules/isams/register/{register}/parent
+     * @since 23.1
+     */
+    public function getFieldList(string $registerCode)
+    {
+        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
+
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
+
+        $registers       = $this->cacheHelper->getRegisters();
+        foreach ($registers as $register) {
+            if (strtolower($register['code']) !== strtolower($registerCode)) {
+                // the requested register Ignoring...
+                continue;
+            }
+
+            $this->response = $this->responseAsJson(
+                [
+                    'register' => $register,
+                    'fields' => $this->cacheHelper->getMetadataFields($register['id'])
+                ]
+            );
+            return;
+        }
+        /**
+         * Unable to find requested register...
+         */
+        throw new NotFound();
+    }
+
+    public function getAllStudent(User $student)
+    {
+        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
+
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
+        $data = [];
+        foreach ($this->cacheHelper->getRegisters() as $register) {
+            $data[] = [
+                    'register' => $register,
+                    'data'  => $this->cacheHelper->getStudentFields($register['id'], $student->getExternalId())
+                    ];
+        }
+        $this->response = $this->responseAsJson(
+            $data
+        );
     }
 }

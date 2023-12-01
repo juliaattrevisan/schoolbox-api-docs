@@ -82,6 +82,7 @@ class Module extends BaseModule
          */
         $this->register(self::METHOD_GET, '/list', 'getRegisterList', new Rule\IsSchoolboxAdmin());
         $this->register(self::METHOD_GET, '/{registerCode}/getFieldList', 'getFieldList', new Rule\IsSchoolboxAdmin());
+        $this->register(self::METHOD_GET, '/student/{studentId}', 'getAllStudent', new Rule\IsSchoolboxAdmin(), $studentRegisterPreload);
     }
 
     /**
