@@ -708,7 +708,7 @@ class Controller extends Base
             'initOptions' => $this->api->initOptions('reports', $payload),
             'attempt' => $attempt,
             'returnUrl' => (
-                $returnUrlEncoded === null ?
+                empty($returnUrlEncoded) ?
                 "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}" :
                 Redirect::decode($returnUrlEncoded)
             ),

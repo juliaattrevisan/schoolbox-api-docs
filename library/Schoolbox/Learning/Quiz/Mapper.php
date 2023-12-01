@@ -537,14 +537,16 @@ class Mapper extends BaseMapper
 
         $duration = $quiz->getDuration();
 
-        foreach ($quiz->getAttempts() as $attempt) {
-            if (!$attempt->isFinished()) {
-                // Has it passed its duration?
-                $expiry = (clone $attempt->getStart())->addSeconds($duration);
+        if ($quiz->getAttempts()) {
+            foreach ($quiz->getAttempts() as $attempt) {
+                if (!$attempt->isFinished()) {
+                    // Has it passed its duration?
+                    $expiry = (clone $attempt->getStart())->addSeconds($duration);
 
-                if ($expiry->lt($now)) {
-                    $attempt->setFinish($expiry);
-                    $this->getJoinMapper('attempt')->save($attempt);
+                    if ($expiry->lt($now)) {
+                        $attempt->setFinish($expiry);
+                        $this->getJoinMapper('attempt')->save($attempt);
+                    }
                 }
             }
         }
