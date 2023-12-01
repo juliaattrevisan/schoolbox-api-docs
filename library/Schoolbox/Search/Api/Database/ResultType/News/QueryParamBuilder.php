@@ -53,19 +53,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'n.rejected_at IS NULL',
         ];
         $params = [
-            "newsNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "newsKeyword$paramKeySuffix"     => $keyword,
-            "newsKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "newsNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
+            "newsKeyword$paramKeySuffix" => $keyword,
         ];
 
         // Apply keyword
-        // TODO replacing with MATCH may return more accurate results?
-        // (see https://mariadb.com/kb/en/full-text-index-overview/)
-        // This match returns any results within strings, whether or not they
-        // actually match a whole word.
         $keywordSearchParts = [
-            "n.title LIKE :newsKeywordLike$paramKeySuffix",
-            "MATCH(n.body, n.blurb) AGAINST (:newsKeyword$paramKeySuffix IN BOOLEAN MODE)",
+            "MATCH(n.title, n.body, n.blurb) AGAINST (:newsKeyword$paramKeySuffix IN BOOLEAN MODE)",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [

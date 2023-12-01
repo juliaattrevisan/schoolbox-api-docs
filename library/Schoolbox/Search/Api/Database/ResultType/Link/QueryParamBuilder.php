@@ -42,14 +42,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
-            "MATCH(l.description, l.comment) AGAINST (:linkKeyword$paramKeySuffix IN BOOLEAN MODE)",
-            "l.url LIKE :linkKeywordLike$paramKeySuffix",
+            "MATCH(l.url, l.description, l.comment) AGAINST (:linkKeyword$paramKeySuffix IN BOOLEAN MODE)",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
-            "linkNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "linkKeyword$paramKeySuffix"     => $keyword,
-            "linkKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "linkNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
+            "linkKeyword$paramKeySuffix" => $keyword,
         ];
 
         return [
