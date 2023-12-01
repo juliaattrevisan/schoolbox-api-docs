@@ -17,7 +17,7 @@ export type Student = {
     isExpanded?: boolean;
     items: StudentItem[];
     attemptComment: StudentAttemptComment;
-    urls: StudentUrls;
+    urls?: StudentUrls;
     isMarked?: boolean;
     showMarked?: boolean;
 };

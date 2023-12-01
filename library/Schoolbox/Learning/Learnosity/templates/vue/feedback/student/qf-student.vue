@@ -21,19 +21,11 @@ const store = useStore();
 const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
 
 /**
- * Need to prevent moving to another item while the comment is being saved
- */
-function onAttemptCommentUpdating() {
-    store.isProcessing = true;
-}
-
-/**
  * To notify of a change in the comment
  * @param {string} comment - the comment to save
  */
 function onAttemptCommentUpdated(comment: string) {
     useStudentStore().updateAttemptComment(props.student, comment);
-    store.isProcessing = false;
 }
 </script>
 
@@ -44,10 +36,14 @@ function onAttemptCommentUpdated(comment: string) {
             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
             <div :id="props.student.elementId"></div>
         </div>
+        <div v-if="store.isReadOnly" class="l-flex-col l-gap-s">
+            <h2 class="subheader f-no-margins">Summary</h2>
+            <div id="schoolbox-completion-summary"></div>
+        </div>
         <template v-if="props.student.isReportLoaded">
             <div class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Items</h2>
-                <qf-student-show-marked />
+                <qf-student-show-marked v-if="!store.isReadOnly" />
                 <div class="l-flex-col l-gap-l">
                     <qf-student-item
                         v-for="item in props.student.items"
@@ -59,11 +55,11 @@ function onAttemptCommentUpdated(comment: string) {
                     <qf-student-all-marked />
                 </div>
             </div>
-            <div class="l-flex-col l-gap-s">
+            <div v-if="store.isReviewed || !store.isReadOnly" class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
                 <student-attempt-comment
                     :student="props.student"
-                    @updating-comment="onAttemptCommentUpdating"
+                    :is-read-only="store.isReadOnly"
                     @updated-comment="onAttemptCommentUpdated"
                 />
             </div>

@@ -41,20 +41,12 @@ window.Vue.watch(
 );
 
 /**
- * Need to prevent moving to another item while the score or comment is being saved
- */
-function onUpdating() {
-    store.isProcessing = true;
-}
-
-/**
  * To notify of a change in the score
  * @param {StudentItemQuestion} question - the question to update
  * @param {number} score - the score to save
  */
 function onScoreUpdated(question: StudentItemQuestion, score: number) {
     studentStore.updateItemResponseScore(props.item, question, score);
-    store.isProcessing = false;
 }
 
 /**
@@ -63,7 +55,6 @@ function onScoreUpdated(question: StudentItemQuestion, score: number) {
  */
 function onCommentUpdated(comment: string) {
     studentStore.updateItemComment(props.item, props.item.questions[0], comment);
-    store.isProcessing = false;
 }
 </script>
 
@@ -75,7 +66,7 @@ function onCommentUpdated(comment: string) {
             :is-shown="true"
             :show-title="true"
         />
-        <student-no-score-note :item="props.item" />
+        <student-no-score-note v-if="!store.isReadOnly" :item="props.item" />
         <div class="item-questions l-flex-col l-gap-l">
             <student-item-question-display
                 v-for="question in props.item.questions"
@@ -84,14 +75,16 @@ function onCommentUpdated(comment: string) {
                 :item="props.item"
                 :question="question"
                 :container="props.container"
-                @updating-score="onUpdating"
+                :is-read-only="store.isReadOnly"
+                :is-reviewed="store.isReviewed || !store.isReadOnly"
                 @updated-score="onScoreUpdated"
             />
         </div>
         <student-item-comment
+            v-if="store.isReviewed || !store.isReadOnly"
             :student="props.student"
             :item="props.item"
-            @updating-comment="onUpdating"
+            :is-read-only="store.isReadOnly"
             @updated-comment="onCommentUpdated"
         />
     </div>

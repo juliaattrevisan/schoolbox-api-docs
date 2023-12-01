@@ -705,6 +705,74 @@ class Controller extends Base
         ], "Result for {$assessment->getTitle()}");
     }
 
+    /**
+     * The student who did the attempt
+     * @param Model $attempt
+     * @return array
+     */
+    private function getStudentData(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    {
+        return [
+            'id' => $attempt->getUser()->getId(),
+            'name' => $attempt->getUser()->getFullName(),
+            'firstname' => $attempt->getUser()->getFirstname(),
+            'lastname' => $attempt->getUser()->getLastname(),
+            'elementId' => 'schoolbox-student'
+        ];
+    }
+
+    /**
+     * The student who did the attempt
+     * @param Model $attempt
+     * @return array
+     */
+    private function getItemResponses(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    {
+        /* These are the scores they obtained for the one session we chose
+         * (It'll still come to us as an array of sessions though)
+         */
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ])['data'][0]['responses'];
+
+        /* Reforge it into a generic set of tuples
+         * because we need to shank it in via frontend
+         */
+        $scores = [];
+
+        foreach ($responses as $response) {
+            $learnosityReference = $response['response_id'];
+
+            $scores[$learnosityReference] = [
+                'learnosityReference' => $learnosityReference,
+                'score' => $response['score'],
+                'maxScore' => $response['max_score'],
+                'itemReference' => $response['item_reference']
+            ];
+        }
+
+        /* Find all the comments for this attempt
+         */
+        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+
+        return array_values(array_merge_recursive($scores, $responseComments));
+    }
+
+    /**
+     * Retrieve the comment for this attempt
+     * @param Model $attempt
+     * @return array
+     */
+    private function getAttemptComment(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    {
+        return  [
+            'learnosityReference' => $attempt->getLearnosityReference(),
+            'studentId' => $attempt->getUser()->getId(),
+            'comment' => $attempt->getComment()
+        ];
+    }
 
     /**
      * From a student's perspective,
@@ -726,16 +794,33 @@ class Controller extends Base
         /* Common elements to both code paths
          * Completion summary always displays
          */
-        $payload = [
+        $reportPayload = [
             'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
             'reports' => []
+        ];
+
+        /* If a teacher reviewed the attempt, show their feedback information
+         * Otherwise just show what the student did.
+         */
+        $reportPayload['reports'][] = [
+            /* DOM element id, where this goes in
+             *
+             * It's configurable by us, unlike the other anchors for
+             * Author and Items api
+             */
+            'id' => 'schoolbox-student',
+            'type' => 'session-detail-by-item',
+            'session_id' => $attempt->getLearnosityReference(),
+            'questions_api_init_options' => [
+                'showCorrectAnswers' => $attempt->getReviewed() !== null ? true : false,
+            ]
         ];
 
         /* Conditional reports
          *     - If an attempt is finished, provide the completion summary (unsure how people get here, but ok)
          */
         if ($attempt->isFinished()) {
-            $payload['reports'][] = [
+            $reportPayload['reports'][] = [
                 /* DOM element id, where this goes in
                  *
                  * It's configurable by us, unlike the other anchors for
@@ -747,47 +832,6 @@ class Controller extends Base
                     $attempt->getLearnosityReference()
                 ]
             ];
-        }
-
-        /* If a teacher reviewed the attempt, show their feedback information
-         * Otherwise just show what the student did.
-         */
-        if (null !== $attempt->getReviewed()) {
-            $payload['reports'][] = [
-                /* DOM element id, where this goes in
-                 *
-                 * It's configurable by us, unlike the other anchors for
-                 * Author and Items api
-                 */
-                'id' => 'schoolbox-student',
-                'type' => 'session-detail-by-item',
-                'session_id' => $attempt->getLearnosityReference(),
-                'questions_api_init_options' => [
-                    'showCorrectAnswers' => true
-                ]
-            ];
-
-            /* If there's a feedback for this attempt, get it
-             * and show the student. At the moment it's just
-             * commentary.
-             */
-            $comments = $this->feedbackMapper->findForAttempt($attempt->getId());
-        } else {
-            $payload['reports'][] = [
-                /* DOM element id, where this goes in
-                 *
-                 * It's configurable by us, unlike the other anchors for
-                 * Author and Items api
-                 */
-                'id' => 'schoolbox-student',
-                'type' => 'session-detail-by-question',
-                'session_id' => $attempt->getLearnosityReference(),
-                'questions_api_init_options' => [
-                    'showCorrectAnswers' => false
-                ]
-            ];
-
-            $comments = [];
         }
 
         /* Breadcrumbs
@@ -820,15 +864,16 @@ class Controller extends Base
             ]);
 
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
+            'student' => $this->getStudentData($attempt),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
-            'initOptions' => $this->api->initOptions('reports', $payload),
+            'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
-            'comments' => $comments ? base64_encode(json_encode($comments, JSON_THROW_ON_ERROR)) : null,
+            'itemResponses' => $this->getItemResponses($attempt),
+            'attemptComment' => $this->getAttemptComment($attempt),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
         ], "Result for {$assessment->getTitle()}");
     }
-
 
     /**
      * Provide feedback for an attempt
@@ -848,16 +893,6 @@ class Controller extends Base
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
 
-        /* The student who did the attempt
-        */
-        $studentData = [
-            'id' => $attempt->getUser()->getId(),
-            'name' => $attempt->getUser()->getFullName(),
-            'firstname' => $attempt->getUser()->getFirstname(),
-            'lastname' => $attempt->getUser()->getLastname(),
-            'elementId' => 'schoolbox-student'
-        ];
-
         /* This is what the student did
          */
         $reportPayload = [
@@ -873,40 +908,11 @@ class Controller extends Base
                     'type' => 'session-detail-by-item',
                     'session_id' => $attempt->getLearnosityReference(),
                     'questions_api_init_options' => [
-                        'showCorrectAnswers' => false
+                        'showCorrectAnswers' => true
                     ]
                 ]
             ],
         ];
-
-        /* These are the scores they obtained for the one session we chose
-         * (It'll still come to us as an array of sessions though)
-         */
-        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => [
-                $attempt->getLearnosityReference()
-            ]
-        ])['data'][0]['responses'];
-
-        /* Reforge it into a generic set of tuples
-         * because we need to shank it in via frontend
-         */
-        $scores = [];
-
-        foreach ($responses as $response) {
-            $learnosityReference = $response['response_id'];
-
-            $scores[$learnosityReference] = [
-                'learnosityReference' => $learnosityReference,
-                'score' => $response['score'],
-                'maxScore' => $response['max_score'],
-                'itemReference' => $response['item_reference']
-            ];
-        }
-
-        /* Find all the comments for this attempt
-         */
-        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
 
         /* Breadcrumbs
          */
@@ -936,23 +942,14 @@ class Controller extends Base
             'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
         ];
 
-        /* Retrieve the comment for this attempt
-        */
-        $attemptComment = [
-            'learnosityReference' => $attempt->getLearnosityReference(),
-            'studentId' => $attempt->getUser()->getId(),
-            'comment' => $attempt->getComment()
-        ];
-
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
-            'student' => $studentData,
+            'student' => $this->getStudentData($attempt),
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
-            'initOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
-            'itemResponses' => array_values(array_merge_recursive($scores, $responseComments)),
-            'attemptComment' => $attemptComment,
+            'itemResponses' => $this->getItemResponses($attempt),
+            'attemptComment' => $this->getAttemptComment($attempt),
             'urls' => $urls
         ], sprintf(
             'Feedback for %s in %s',
@@ -1783,7 +1780,7 @@ class Controller extends Base
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
-            // including failure
+                // including failure
             default => 400,
         };
         $this->response = $this

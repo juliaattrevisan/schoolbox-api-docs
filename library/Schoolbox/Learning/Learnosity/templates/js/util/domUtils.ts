@@ -19,3 +19,19 @@ export function addTargetsToMarks(reportId: string) {
         (title as HTMLDivElement).dataset.referenceTitle = reportItemResponseIds[index];
     });
 }
+
+/**
+ * We should also set textareas to readonly so that they can't trigger browser save changes
+ * even through they are already set as disabled
+ * @param {string} reportId - the report id
+ */
+export function disableTextAreas(reportId: string) {
+    const report = document.getElementById(reportId);
+    const plainTextAreas = report?.querySelectorAll(".lrn_plaintextarea, .lrn_textinput");
+    plainTextAreas?.forEach((textArea) => {
+        const textInput = textArea.querySelector("textarea, input");
+        if (textInput) {
+            textInput.setAttribute("readonly", "readonly");
+        }
+    });
+}

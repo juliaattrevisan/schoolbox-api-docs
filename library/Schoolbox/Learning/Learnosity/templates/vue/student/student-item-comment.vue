@@ -6,7 +6,7 @@
  * So the first comment is considered the comment for the entire item regardless of how many questions are in the item
  */
 
-import debounce from "lodash/debounce";
+import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
@@ -15,18 +15,20 @@ import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item to display
+    isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
 }
 const props = defineProps<Props>();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
-const comment = useEditor(props.item.questions[0].response?.comment ?? "", editorId, {
-    targetElements: [`#${editorId}`],
-    hasTokens: true,
-}); // Use a ckeditor for the comments field
+const comment = props.isReadOnly
+    ? window.Vue.ref("")
+    : useEditor(props.item.questions[0].response?.comment ?? "", editorId, {
+          targetElements: [`#${editorId}`],
+          hasTokens: true,
+      }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
 const emit = defineEmits<{
-    updatingComment: [];
     updatedComment: [comment: string];
 }>();
 
@@ -65,21 +67,20 @@ function beforeUnloadHandler(event: BeforeUnloadEvent) {
  * Save the comment if it's changed
  */
 async function saveComment() {
-    if (
-        props.item.questions === undefined ||
-        props.item.questions[0].response === undefined ||
-        props.item.questions[0].response.comment === undefined
-    ) {
+    if (props.item.questions[0].response === undefined) {
         return;
     }
     if (isSaving.value) {
         return;
     }
-    if (comment.value === props.item.questions[0].response.comment) {
+    if (comment.value === props.item.questions[0].response?.comment) {
+        return;
+    }
+    if (props.student.urls === undefined) {
         return;
     }
     isSaving.value = true;
-    emit("updatingComment");
+    emit("updatedComment", comment.value);
     window.addEventListener("beforeunload", beforeUnloadHandler);
     const formData = new FormData();
     formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
@@ -88,7 +89,6 @@ async function saveComment() {
         method: "POST",
         body: formData,
     });
-    emit("updatedComment", comment.value);
     window.removeEventListener("beforeunload", beforeUnloadHandler);
     isSavedDelay.value = true;
     isSaving.value = false;
@@ -97,18 +97,15 @@ async function saveComment() {
 }
 
 /**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSave = debounce(() => {
-    void saveComment();
-}, 1000);
-
-/**
  * save the comment when it's changed
  */
-window.Vue.watch(comment, () => {
-    debounceSave();
-});
+watchDebounced(
+    comment,
+    () => {
+        void saveComment();
+    },
+    { debounce: 1000 }
+);
 
 /**
  * Save any unsaved changes
@@ -121,18 +118,32 @@ window.Vue.onUnmounted(async () => {
 <template>
     <div>
         <label>Comment</label>
-        <p class="meta">
-            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
-            on creation.
+        <p
+            v-if="
+                (props.isReadOnly && props.item.questions[0].response?.comment === undefined) ||
+                (props.isReadOnly && props.item.questions[0].response?.comment === '')
+            "
+        >
+            <em>No comment added.</em>
         </p>
-        <textarea :id="editorId"></textarea>
-        <div class="save-container l-grid">
-            <div class="save-container__inner-container">
-                <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
-                    <em>{{ saveText }}</em>
+        <div
+            v-else-if="props.isReadOnly && props.item.questions[0].response?.comment !== ''"
+            v-html="props.item.questions[0].response?.comment"
+        ></div>
+        <template v-else>
+            <p class="meta">
+                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                details on creation.
+            </p>
+            <textarea :id="editorId"></textarea>
+            <div class="save-container l-grid">
+                <div class="save-container__inner-container">
+                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                        <em>{{ saveText }}</em>
+                    </div>
                 </div>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 

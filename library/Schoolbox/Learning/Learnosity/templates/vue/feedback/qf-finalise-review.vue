@@ -12,10 +12,23 @@ const store = useStore();
 const studentStore = useStudentStore();
 const modalEl = window.Vue.ref<typeof RevealModal | null>();
 const isFinalising = window.Vue.ref(false); // to show the finalising text on the button
+
+/**
+ * To notify of the current save status
+ * @returns {string} - the text to display
+ */
 const buttonText = window.Vue.computed(() => {
+    if (store.isReviewed) {
+        return isFinalising.value ? "Updating..." : "Update Review";
+    }
     // to change the button text when finalising
     return isFinalising.value ? "Finalising..." : "Finalise Review";
 });
+
+/**
+ * To notify of the current save status
+ * @returns {string} - the text to display
+ */
 const confirmButtonText = window.Vue.computed(() => {
     // to change the button text when finalising
     return isFinalising.value ? "Finalising..." : "Yes";
@@ -104,7 +117,10 @@ function onCancelSelected() {
     </button>
     <reveal-modal ref="modalEl" :close-on-background-click="false" @closed="onCancelSelected">
         <h2>Unmarked items</h2>
-        <p>There are currently items that have not yet been marked. Are you sure you wish to finalise the review?</p>
+        <p>
+            There are currently items that have not been marked. Are you sure you wish to
+            {{ store.isReviewed ? "update" : "finalise" }} the review?
+        </p>
         <ul class="flex-list">
             <li>
                 <button class="button icon-approve submit" @click.prevent="onConfirmSelected">

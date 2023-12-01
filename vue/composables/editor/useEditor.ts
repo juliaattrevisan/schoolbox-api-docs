@@ -45,11 +45,12 @@ export function useEditor($currentValue: string, ckeditorSelector: string, edito
             const ckeditorElement = document.getElementById(ckeditorSelector) as HTMLElement;
 
             // avoid creating multiple editors for the same selector
-            if (window.sbProps.editors[ckeditorSelector] !== undefined) {
-                const editor = window.sbProps.editors[ckeditorSelector] as ClassicEditor;
-                ckeditorElement.replaceWith(editor.ui.view.element as HTMLElement);
-                return;
-            }
+            // @todo - this currently prevents a watch() from working once it's been unmounted/remounted
+            // if (window.sbProps.editors[ckeditorSelector] !== undefined) {
+            //     const editor = window.sbProps.editors[ckeditorSelector] as ClassicEditor;
+            //     ckeditorElement.replaceWith(editor.ui.view.element as HTMLElement);
+            //     return;
+            // }
 
             ckeditorElement.addEventListener(EditorEvent.EDITOR__CREATED, (event) => {
                 onEditorCreated(event as CustomEvent);

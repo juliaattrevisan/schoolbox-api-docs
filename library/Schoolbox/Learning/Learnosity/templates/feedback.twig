@@ -5,7 +5,6 @@
  # @param string|array $reportInitOptions  Learnosity API initialisation object
  # @param IAssessable $assessment          Our schoolbgox quiz instance
  # @param array $breadcrumbs               A context trail at the top of the screeen
- # @param string|array $initOptions        Learnosity API initialisation object
  # @param IAssessable $assessment          Our schoolbox quiz instance
  # @param Attempt\Model $attempt           The student's attempt from our local db
  # @param string $itemResponses            A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
@@ -24,9 +23,11 @@
     <div id="quiz-feedback-container">
         <quiz-feedback
             :student="{{ student|json_encode }}"
-            :item-responses="{{ itemResponses|json_encode }}"
             :report-init-options="{{ reportInitOptions }}"
+            :item-responses="{{ itemResponses|json_encode }}"
             :attempt-comment="{{ attemptComment|json_encode }}"
+            :is-read-only="false"
+            :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :urls="{{ urls|json_encode }}"
             post-feedback="{{ routeLookupIfAuthorized('learnosity.postFeedback', {assessmentId: assessment.id, studentId: attempt.user.id, learnositySessionReference: attempt.learnosityReference}) }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"

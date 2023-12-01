@@ -5,6 +5,8 @@
 import { defineStore } from "pinia";
 
 export const useStore = defineStore("quizFeedback", () => {
+    const isReadOnly = window.Vue.ref<boolean>(false); // whether is in feedback mode, where the teacher can provide feedback to the student
+    const isReviewed = window.Vue.ref<boolean>(false); // whether the quiz has been reviewed
     const isProcessing = window.Vue.ref<boolean>(false); // to disable various events while processing, like trying to mark the next card before the current one has finished marking
     const isLoaded = window.Vue.ref<boolean>(false); // to show the loading spinner while the reports are loading
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
@@ -13,15 +15,30 @@ export const useStore = defineStore("quizFeedback", () => {
 
     /**
      * store any passed through properties
-     * @param {string} $postFeedback - the feedback url to post to
-     * @param {string} $statusPage - the link to the status page
+     * @param {boolean} $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
+     * @param {boolean} $isReviewed - whether the quiz has been reviewed
+     * @param {string|undefined} $postFeedback - the feedback url to post to
+     * @param {string|undefined} $statusPage - the link to the status page
      */
-    function init($postFeedback: string, $statusPage: string) {
-        postFeedback.value = $postFeedback;
-        statusPage.value = $statusPage;
+    function init(
+        $isReadOnly: boolean,
+        $isReviewed: boolean,
+        $postFeedback: string | undefined,
+        $statusPage: string | undefined
+    ) {
+        isReadOnly.value = $isReadOnly;
+        isReviewed.value = $isReviewed;
+        if ($postFeedback !== undefined) {
+            postFeedback.value = $postFeedback;
+        }
+        if ($statusPage !== undefined) {
+            statusPage.value = $statusPage;
+        }
     }
 
     return {
+        isReadOnly,
+        isReviewed,
         isProcessing,
         isLoaded,
         init,

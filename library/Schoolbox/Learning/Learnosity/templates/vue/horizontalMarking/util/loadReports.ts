@@ -3,7 +3,7 @@
  */
 
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
-import { addTargetsToMarks } from "@schoolboxLearnosity/js/util/domUtils";
+import { addTargetsToMarks, disableTextAreas } from "@schoolboxLearnosity/js/util/domUtils";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
@@ -39,6 +39,7 @@ export function loadReports(reportPayloads: string[]) {
                         });
                         useStudentsStore().addItems(reportId, items);
                         addTargetsToMarks(reportId);
+                        disableTextAreas(reportId);
                         // add the questions to the items, as they aren't included in the initial payload
                         useItemsStore().addQuestions(items, reportsLoaded === reportPayloads.length);
                     });
