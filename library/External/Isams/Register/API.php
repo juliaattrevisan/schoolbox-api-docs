@@ -12,7 +12,6 @@ namespace External\Isams\Register;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Url\Uri;
 use SensitiveParameter;
 
