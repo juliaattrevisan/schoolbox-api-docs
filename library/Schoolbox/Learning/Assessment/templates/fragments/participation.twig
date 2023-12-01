@@ -22,10 +22,11 @@
             <div id="participation-settings">
                 <div class="row">
                     <div class="content small-12">
+                        <p id="customise-dropdown-note" class="l-pad-m--left"><em>Select students first to modify participation for those students</em></p>
                         <nav>
-                            <div class="flex-list buttons l-flex--justify-end">
+                            <div class="flex-list buttons">
                                 <sbx-pop-out id="customise-dropdown" content-id="customise-options" button-text="Modify Participation" disabled is-arrow-icon is-close-on-content-click data-test="sbx-pop-out-customise-options"></sbx-pop-out>
-                                <sbx-pop-out id="plan-dropdown" class="hide" content-id="plan-options" is-close-on-content-click></sbx-pop-out>
+                                <sbx-pop-out id="plan-dropdown" class="hide" content-id="plan-options" button-text="Modify Plans" is-arrow-icon is-close-on-content-click></sbx-pop-out>
                             </div>
                             <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
                                 <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
@@ -38,7 +39,6 @@
                                 <li><a href="#" id="participant-customise">Create new plan...</a></li>
                             </ul>
                             <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
-                                <li class="separator">Modify Plans</li>
                                 {% for plan in assessment.plans | filter(plan => not plan.isDynamic) %}
                                     <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                                 {% endfor %}
