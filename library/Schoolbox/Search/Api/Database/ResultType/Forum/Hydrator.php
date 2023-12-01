@@ -102,6 +102,13 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
+                // Has a post in this thread already been added to results?
+                static $threadsInResults = [];
+                if (isset($threadsInResults[$postThread->getId()])) {
+                    return null;
+                }
+                $threadsInResults[$postThread->getId()] = true;
+
                 $nMatchingPostsInThread = $nMatchingPostsByThreadId[$postThread->getId()] ?? 0;
                 $matchingPostString = $nMatchingPostsInThread > 1 ? "(+$nMatchingPostsInThread more matching posts)" : '';
                 $postBodyTextOnly = $this->htmlToText($post->getBody());
