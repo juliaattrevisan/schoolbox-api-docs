@@ -67,7 +67,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return $this->buildLinearDecayExpression(
             ":postNow$paramKeySuffix",
-            $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix),
+            'modified',
+//            $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix),
             7,
             56,
         );
@@ -118,7 +119,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('postID', $paramKeySuffix);
+        return 'postID';
+//        return $this->getSubqueryForMostRelevantPostInThread('postID', $paramKeySuffix);
     }
 
     /**
@@ -128,7 +130,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix);
+        return 'modified';
+//        return $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix);
     }
 
     /**
@@ -138,7 +141,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('userID', $paramKeySuffix);
+        return 'userID';
+//        return $this->getSubqueryForMostRelevantPostInThread('userID', $paramKeySuffix);
     }
 
     /**
