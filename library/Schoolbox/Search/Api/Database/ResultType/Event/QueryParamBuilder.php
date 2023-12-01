@@ -40,9 +40,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             "e.title LIKE :eventKeywordLike$paramKeySuffix",
-            "e.detail LIKE :eventKeywordLike$paramKeySuffix",
+            "MATCH(e.detail) AGAINST (:eventKeyword$paramKeySuffix IN BOOLEAN MODE)",
             "e.location LIKE :eventKeywordLike$paramKeySuffix",
         ];
+        $params["eventKeyword$paramKeySuffix"]     = $keyword;
         $params["eventKeywordLike$paramKeySuffix"] = '%' . $this->quoter->escapeForLike($keyword) . '%';
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
