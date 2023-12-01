@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Learnosity;
 use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Attempt\Model;
@@ -285,14 +285,14 @@ class Helper
      * Extract the response object which matches `$existingAttempt` out of the
      * student's participation record.
      *
-     * @param QuizDomainObject $assessment
+     * @param QuizDomainModel $assessment
      * @param User $student
      * @param Model $existingAttempt
      * @return QuizResponse|null
      * @throws \UnexpectedValueException
      */
     public function extractExistingResponse(
-        QuizDomainObject $assessment,
+        QuizDomainModel $assessment,
         User $student,
         Model $existingAttempt,
     ): ?QuizResponse {
@@ -308,7 +308,7 @@ class Helper
      * @param Model             $attempt
      * @param QuizResponse      $responseDomainObject The domain-level object corresponding to `$attempt`: required for
      *                                                deriving a human-readable mark.
-     * @param QuizDomainObject  $assessment           The assessment to which `$attempt` belongs: required for deriving
+     * @param QuizDomainModel   $assessment           The assessment to which `$attempt` belongs: required for deriving
      *                                                a human-readable mark.
      * @param float             $mark
      * @param float             $maxMark
@@ -317,7 +317,7 @@ class Helper
     public function assignMarksToAttempt(
         Model $attempt,
         QuizResponse $responseDomainObject,
-        QuizDomainObject $assessment,
+        QuizDomainModel $assessment,
         float $mark,
         float $maxMark
     ): void {
@@ -352,7 +352,7 @@ class Helper
      * learnosityReference should not be easily guessed
      *
      * @param Mapper $attemptMapper
-     * @param QuizDomainObject $assessment
+     * @param QuizDomainModel $assessment
      * @param Model $existingAttempt
      * @return void
      * @throws ApiException
@@ -364,7 +364,7 @@ class Helper
      */
     public function processAttemptCompletion(
         \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
-        QuizDomainObject $assessment,
+        QuizDomainModel $assessment,
         Model $existingAttempt
     ): void {
         $student = $existingAttempt->getUser();
