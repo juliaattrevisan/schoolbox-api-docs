@@ -555,6 +555,7 @@ class Mapper extends BaseMapper
             /* Start preparing a Helper instance; we might have something to do
              */
             $helper = null;
+            $quizAttemptMapper = null;
 
             foreach ($quiz->getAttempts() as $attempt) {
                 if (!$attempt->isFinished()) {
@@ -565,7 +566,7 @@ class Mapper extends BaseMapper
                         /* If a Helper didn't already exist, spawn it with the necessary parts
                          * Otherwise, reuse what we made previously
                          */
-                        if (null === $helper) {
+                        if (null === $helper && null === $quizAttemptMapper) {
                             $api = new Api(
                                 (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
                                 $this->getConfigLoader()->get('learnosity_version'),
