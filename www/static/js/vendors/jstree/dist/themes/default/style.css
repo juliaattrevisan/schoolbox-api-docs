@@ -1104,9 +1104,7 @@
 
 /* Fixed the styles to long folder names not breaking the layout in the change location modal */
 div.jstree-default .jstree-anchor, ul.jstree-default .jstree-anchor {
-    color: var(--content-ui-foreground);
     white-space: normal;
-    margin-right: 3rem;
 }
 div.jstree-default .jstree-wholerow, div.jstree-default .jstree-anchor, div.jstree-default .jstree-default, div.jstree-default .jstree-icon:empty, ul.jstree-default .jstree-wholerow, ul.jstree-default .jstree-anchor, ul.jstree-default .jstree-default, ul.jstree-default .jstree-icon:empty {
     vertical-align: baseline;
