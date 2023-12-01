@@ -46,6 +46,7 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
+use Twig\Error\Error;
 use UnexpectedValueException;
 
 /**
@@ -161,14 +162,45 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
-     * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws DomainException
+     * @throws Exception
+     * @throws MapperException
+     * @throws PDOException
      * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws Error
+     * @api GET /learning/assessment/:assessmentId/status
      */
     public function getStatus(IAssessable $assessment): void
     {
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]);
         $returnUrlSuffix = Redirect::queryString($baseUrl);
+
+        /* Auto-complete naturally expired quizzes
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+        $now = Alaress_Date_Format::now();
+
+        /* Apparently this is a thing
+         */
+        $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz);
+
+        /* Close any expired attempts before checking for in-progress / unfinished attempts
+         * Note that this requires $quiz to have its attempts already loaded via loadAttemptsAndAnswers()
+         */
+        $numChanged = $this->quizMapper->closeExpiredAttempts($quiz, $now);
+
+        /* Attempts list is hydrated as part of $assessment, but we might have changed that
+         * If anyone got their attempt automatically closed, reload with the latest data.
+         */
+        if ($numChanged) {
+            $assessment = $this->getAssessmentMapper()->findByIdForReview($assessment->getId());
+        }
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
@@ -248,6 +280,12 @@ class Controller extends Assessment\Controller
          */
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
 
+        /* Close any expired attempts before checking for in-progress / unfinished attempts
+         * Note that this requires $quiz to have its attempts already loaded via loadAttemptsAndAnswers()
+         */
+        $now = Alaress_Date_Format::now();
+        $this->quizMapper->closeExpiredAttempts($quiz, $now);
+
         $attempts = $this->attemptMapper->findByColumnList([
             'assess_id' => $quiz->getId(),
             'user_id' => $student->getId()
@@ -280,8 +318,6 @@ class Controller extends Assessment\Controller
         // either an enabled 'start quiz' button will lead to a permission error on the quiz page, or directly accessing
         // the quiz page will enable users to bypass permission checks that prevent the 'start quiz' button from displaying.
         // See Learnosity/Controller->getAttempt() (where the same permission checks are used).
-        $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now); // Close any expired attempts before checking for in-progress
         // TODO this should eventually be route permission based
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
         $actionValidator = new ActionValidator($now, $this->getAccess());

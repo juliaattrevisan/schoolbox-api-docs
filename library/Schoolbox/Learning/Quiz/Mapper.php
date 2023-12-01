@@ -23,6 +23,8 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
@@ -521,18 +523,24 @@ class Mapper extends BaseMapper
 
     /**
      * Closes any attempts in $quiz that have expired.
+     * Returns the number of attempts that got updated.
      *
-     * @param Model                $quiz
+     * @param Model $quiz
      * @param \Alaress_Date_Format $now
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
+     * @return int
+     * @throws DefinitionException
+     * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function closeExpiredAttempts(Model $quiz, \Alaress_Date_Format $now): void
+    public function closeExpiredAttempts(Model $quiz, \Alaress_Date_Format $now): int
     {
+        /* The number of attempts we changed in the db due to duration naturally expiring
+         */
+        $numChanged = 0;
+
         if ($quiz->isDurationUnlimited()) {
-            return;
+            return $numChanged;
         }
 
         $duration = $quiz->getDuration();
@@ -546,10 +554,14 @@ class Mapper extends BaseMapper
                     if ($expiry->lt($now)) {
                         $attempt->setFinish($expiry);
                         $this->getJoinMapper('attempt')->save($attempt);
+
+                        $numChanged++;
                     }
                 }
             }
         }
+
+        return $numChanged;
     }
 
 
