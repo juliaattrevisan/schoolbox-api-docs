@@ -151,7 +151,7 @@ class AggregateSource implements ISource
                     id DESC
                 LIMIT :overallLimit$paramKeySuffix
             ";
-            $params["overallLimit$paramKeySuffix"] = $limit * count($this->queryParamBuilders);
+            $params["overallLimit$paramKeySuffix"] = $limit;
         }
 
         return [$queryString, $params];

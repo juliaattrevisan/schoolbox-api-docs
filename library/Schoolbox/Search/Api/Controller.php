@@ -361,11 +361,15 @@ class Controller extends Base
      */
     private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit, ?string $cursorCode): array
     {
+        // Instead of iteratively backfilling the result set with more results
+        // if it hasn't reached the limit:
+        // allow the cursor itself to fetch more results than the limit, and
+        // slice results off of the limit if there's too many.
         $cursor = new Cursor\Cursor(
             $this->source,
             $keyword,
             $filter,
-            $limit,
+            $limit * 10,
         );
 
         // Fetch results from cursor and hydrate, until either:
