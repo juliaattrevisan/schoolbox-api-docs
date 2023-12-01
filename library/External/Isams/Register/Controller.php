@@ -237,6 +237,11 @@ class Controller extends BaseController
         foreach (preg_split('/\R/', strtolower($registerConfig)) as $config) {
             // explode again to extract the registers, and their fields
             // first object entry is the register, later items are the allowed fields
+            /**
+             * this explode on `,` may really break... we haven't seen any codes with comma's in them just yet...
+             * but that doesn't mean they don't exist
+             * we may need a different seperator... ; maybe, or something else???
+             */
             $tmp = explode(',', $config);
             $registerTitle = array_shift($tmp);
             $registersConfig[$registerTitle] = $tmp;
