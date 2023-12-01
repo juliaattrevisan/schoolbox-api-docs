@@ -13,7 +13,10 @@ use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
+use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Attempt\Model;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
@@ -338,5 +341,91 @@ class Helper
             ->setMark($humanReadableMark)
             ->setNormalisedMark($normalisedMark)
             ->setMaxMark($maxMark);
+    }
+
+
+    /**
+     * Process the completion of an attempt by retrieving the score and updating the attempt.
+     *
+     * Uses the (learnosityReference, attemptId) tuple so you can't
+     * randomly shut down some other dude's attempt; knowing their
+     * learnosityReference should not be easily guessed
+     *
+     * @param Mapper $attemptMapper
+     * @param QuizDomainObject $assessment
+     * @param Model $existingAttempt
+     * @return void
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    public function processAttemptCompletion(
+        \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        QuizDomainObject $assessment,
+        Model $existingAttempt
+    ): void {
+        $student = $existingAttempt->getUser();
+
+        // Find out what they scored by the automated system
+        $result = $this->api->dataGetRequest('/sessions/scores', [
+            'session_id' => [
+                $existingAttempt->getLearnosityReference()
+            ]
+        ]);
+
+        /* The learnosityReference posted here doesn't exist
+         * TODO What kind of error should we present to users? It's asynchronous
+         */
+        if (!\count($result['data'])) {
+            throw new \UnexpectedValueException('Empty result payload for attempt.');
+        }
+
+        /* Find out if this attempt was in Incomplete status
+         * Users don't always officially conclude their attempts
+         */
+//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE === $result['data'][0]['status']) {
+//            /* FIXME Need to load their Session, then complete it on their behalf,
+//             *  then reload their $result like we originally tried...but how?
+//             *  There's no endpoint to update a Session's status...
+//             */
+//        }
+
+        /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+         */
+        $resultData = $result['data'][0];
+        $sanitisedScore = (new SanitiseScores())->sanitise($resultData['score'], $resultData['max_score']);
+
+        $mark = $sanitisedScore['score'];
+        $maxMark = $sanitisedScore['max_score'];
+
+        /* Fabricate an IResponse instance for existing mark scheme
+         *
+         * Note that $existingResponse might well be null for broken data somehow,
+         * but we have no means to recover from that...and it shouldn't really
+         * occur naturally
+         */
+        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
+
+        // TODO What kind of error should we present to users? It's asynchronous
+        if (null === $existingResponse) {
+            return;
+        }
+
+        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
+
+        /* The finish time might already have been set if their timer elapsed;
+         * If it did, just use that datetime. Otherwise, you'll be recording
+         * the datetime of when the user clicked past the modal at the end of
+         * every attempt, which can record a later datetime than intended.
+         */
+        if (!$existingAttempt->getFinish()) {
+            $existingAttempt->setFinish(\Alaress_Date_Format::now());
+        }
+
+        $attemptMapper->save($existingAttempt);
     }
 }

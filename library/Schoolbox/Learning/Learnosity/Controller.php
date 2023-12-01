@@ -590,39 +590,7 @@ class Controller extends Base
     public function postCompleteAttempt(QuizDomainObject $assessment, \Schoolbox\User $student): void
     {
         /* Find out what they scored by the automated system
-         */
-        $result = $this->api->dataGetRequest('/sessions/scores', [
-            'session_id' => [
-                $this->requestPost->get('learnosityReference')
-            ]
-        ]);
-
-        /* The learnosityReference posted here doesn't exist
-         * TODO What kind of error should we present to users? It's asynchronous
-         */
-        if (!\count($result['data'])) {
-            throw new \UnexpectedValueException('Empty result payload for attempt.');
-        }
-
-        /* Find out if this attempt was in Incomplete status
-         * Users don't always officially conclude their attempts
-         */
-//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE === $result['data'][0]['status']) {
-//            /* FIXME Need to load their Session, then complete it on their behalf,
-//             *  then reload their $result like we originally tried...but how?
-//             *  There's no endpoint to update a Session's status...
-//             */
-//        }
-
-        /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
-         */
-        $sanitisedScore = (new SanitiseScores())->sanitise($result['data'][0]['score'], $result['data'][0]['max_score']);
-
-        $mark = $sanitisedScore['score'];
-        $maxMark = $sanitisedScore['max_score'];
-
-        /* Record it locally for our own usages
+         * Record it locally for our own usages
          */
         $existingAttempt = $this->attemptMapper->findOneByColumnList([
             'attempt_id'           => $this->requestPost->get('attemptId'),
@@ -630,32 +598,7 @@ class Controller extends Base
             'user_id'              => $student->getId()
         ]);
 
-        /* Fabricate an IResponse instance for existing mark scheme
-         *
-         * Note that $existingResponse might well be null for broken data somehow,
-         * but we have no means to recover from that...and it shouldn't really
-         * occur naturally
-         */
-        $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $existingAttempt);
-
-        /* TODO What kind of error should we present to users? It's asynchronous
-         */
-        if (null === $existingResponse) {
-            return;
-        }
-
-        $this->helper->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
-
-        /* The finish time might already have been set if their timer elapsed;
-         * If it did, just use that datetime. Otherwise, you'll be recording
-         * the datetime of when the user clicked past the modal at the end of
-         * every attempt, which can record a later datetime than intended.
-         */
-        if (!$existingAttempt->getFinish()) {
-            $existingAttempt->setFinish(\Alaress_Date_Format::now());
-        }
-
-        $this->attemptMapper->save($existingAttempt);
+        $this->helper->processAttemptCompletion($this->attemptMapper, $assessment, $existingAttempt);
     }
 
 
@@ -1968,5 +1911,4 @@ class Controller extends Base
             (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
         }
     }
-
 }
