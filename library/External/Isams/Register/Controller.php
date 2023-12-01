@@ -257,7 +257,7 @@ class Controller extends BaseController
      * @throws GuzzleException
      * @throws InvalidArgumentException
      * @throws \JsonException
-     * @api   GET /modules/isams/register/{register}/parent
+     * @api   GET /modules/isams/register/list
      * @since 23.1
      */
     public function getRegisterList()
@@ -282,7 +282,7 @@ class Controller extends BaseController
      * @throws GuzzleException
      * @throws InvalidArgumentException
      * @throws \JsonException
-     * @api   GET /modules/isams/register/{register}/parent
+     * @api   GET /modules/isams/register/{registerCode}/getFieldList
      * @since 23.1
      */
     public function getFieldList(string $registerCode)
@@ -312,6 +312,18 @@ class Controller extends BaseController
         throw new NotFound();
     }
 
+    /**
+     * get all student fields for a specified student
+     *
+     * @param User $student
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @api   GET /modules/isams/register/student/{studentId}
+     * @since 23.1
+     */
     public function getAllStudent(User $student)
     {
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
