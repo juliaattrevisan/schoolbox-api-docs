@@ -384,8 +384,15 @@ class Controller extends Base
             $fullResults    = array_slice($fullResults, 0, $limit);
             $lastFullResult = $fullResults[array_key_last($fullResults)];
             $nextCursor     = $cursor->next(new Collection([$lastFullResult->rawResult]));
-        } else {
-            // Ask the cursor if there's actually any results left?
+        } elseif (isset($nextCursor)) {
+            // Ask the cursor if there's actually any results left:
+            // if there are none, clear the next cursor so that the user is not
+            // prompted for more results when we know there's none
+            $previewCursor  = new Cursor\Cursor($this->source, $keyword, $filter, 1);
+            $previewResults = $previewCursor->retrieveResults($nextCursor);
+            if (count($previewResults) === 0) {
+                $nextCursor = null;
+            }
         }
 
         return ['results' => $fullResults, 'nextCursor' => $nextCursor];
