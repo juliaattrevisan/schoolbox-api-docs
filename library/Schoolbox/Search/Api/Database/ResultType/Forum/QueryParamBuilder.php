@@ -43,12 +43,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             "ft.title LIKE :postKeywordLike$paramKeySuffix",
-            "fp.body LIKE :postKeywordLike$paramKeySuffix",
+            "MATCH(fp.body) AGAINST (:postKeyword$paramKeySuffix IN BOOLEAN MODE)",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params = [
             "postNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "postKeyword$paramKeySuffix"     => $this->quoter->escapeForLike($keyword),
+            "postKeyword$paramKeySuffix"     => $keyword,
             "postKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
