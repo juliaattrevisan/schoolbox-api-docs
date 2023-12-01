@@ -57,7 +57,7 @@ const hasSubResults = window.Vue.computed(() => {
                 <sp-results-result-description v-if="props.result.description" :result="result" />
             </div>
         </div>
-        <sp-results-sub-results v-if="hasSubResults" :result="result" />
+        <sp-results-sub-results v-if="hasSubResults" :result="result" :parent-index="props.index" />
     </div>
 </template>
 
