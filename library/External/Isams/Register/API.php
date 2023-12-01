@@ -54,6 +54,8 @@ class API
     }
 
     /**
+     * actually hit the API and do some basic error checking and return data sanitization
+     *
      * @param string      $path
      * @param string      $method
      * @param array       $options
@@ -62,7 +64,7 @@ class API
      * @throws GuzzleException
      * @throws \JsonException
      */
-    public function request(string $path, string $method, array $options = [], #[SensitiveParameter] ?string $token = null)
+    public function request(string $path, string $method, array $options = [], #[SensitiveParameter] ?string $token = null): mixed
     {
         // if we have a bearer token, then use it.
         if ($token) {

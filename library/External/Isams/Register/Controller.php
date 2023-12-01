@@ -177,7 +177,7 @@ class Controller extends BaseController
     /**
      * Extract common config settings
      *
-     *  Example of multi dimensional csv:
+     *  Assumed structure of multi dimensional csv:
      *  register1,field1,field2,field6
      *  register2,field1
      *  register6,field7,field12
@@ -188,6 +188,12 @@ class Controller extends BaseController
     private function extractRegisterConfig(string $registerConfig): array
     {
         $registersConfig = [];
+        /**
+         * Assumed structure of multi dimensional csv:
+         *   register1,field1,field2,field6
+         *   register2,field1
+         *   register6,field7,field12
+         */
         // explode to find how many registers we will be working with...
         foreach (preg_split('/\R/', strtolower($registerConfig)) as $config) {
             // explode again to extract the registers, and their fields
