@@ -24,7 +24,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
@@ -144,6 +143,14 @@ class Controller extends Base
 
 
     /**
+     * Learnosity Helper, which contains multiple convenience methods
+     *
+     * @var Helper
+     */
+    private Helper $helper;
+
+
+    /**
      * Controller constructor.
      *
      * @param Factory $urlFactory
@@ -184,13 +191,17 @@ class Controller extends Base
          * I want to avoid dumping Yet Another Thing into the kernel
          * I don't have a convenient means to access SERVER_NAME except like this, sadly
          */
+        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
         $this->api = new Api(
             $urlFactory->buildFullyQualified()->getHost(),
             $this->learnosityVersion,
             $this->learnosityConsumerKey,
             $this->learnosityConsumerSecret,
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+            $logger
         );
+
+        $this->helper = new Helper($this->api, $logger);
     }
 
 
@@ -625,7 +636,7 @@ class Controller extends Base
          * but we have no means to recover from that...and it shouldn't really
          * occur naturally
          */
-        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
+        $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $existingAttempt);
 
         /* TODO What kind of error should we present to users? It's asynchronous
          */
@@ -633,7 +644,7 @@ class Controller extends Base
             return;
         }
 
-        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
+        $this->helper->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording
@@ -1026,14 +1037,15 @@ class Controller extends Base
 
         // As with posting a feedback:
         // need the existing response to determine a human-readable mark.
-        $existingResponse = $this->extractExistingResponse($assessment, $student, $attempt);
+        $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);
 
         // TODO as with posting a feedback:
         //      what kind of error should we present to users? It's asynchronous
         if (!$existingResponse) {
             return;
         }
-        $this->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
+
+        $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* Save the comment and new normalised mark
          */
@@ -1450,11 +1462,11 @@ class Controller extends Base
 
         foreach ($attempts as $attempt) {
             // Assign marks to attempt based on results from Learnosity
-            $existingResponse = $this->extractExistingResponse($assessment, $attempt->getUser(), $attempt);
+            $existingResponse = $this->helper->extractExistingResponse($assessment, $attempt->getUser(), $attempt);
             if ($existingResponse) {
                 $result = $groupedResults[$attempt->getLearnosityReference()] ?? null;
                 if ($result) {
-                    $this->assignMarksToAttempt(
+                    $this->helper->assignMarksToAttempt(
                         $attempt,
                         $existingResponse,
                         $assessment,
@@ -1957,62 +1969,4 @@ class Controller extends Base
         }
     }
 
-    /**
-     * Extract the response object which matches `$existingAttempt` out of the
-     * student's participation record.
-     *
-     * @param QuizDomainObject $assessment
-     * @param User             $student
-     * @param Model            $existingAttempt
-     * @return QuizResponse|null
-     */
-    private function extractExistingResponse(
-        QuizDomainObject $assessment,
-        User $student,
-        Model $existingAttempt,
-    ): ?QuizResponse {
-        $response = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
-        return $response instanceof QuizResponse ? $response : null;
-    }
-
-    /**
-     * Assign normalised and human-readable marks to `$attempt`.
-     *
-     * @param Model             $attempt
-     * @param QuizResponse      $responseDomainObject The domain-level object corresponding to `$attempt`: required for
-     *                                                deriving a human-readable mark.
-     * @param QuizDomainObject  $assessment           The assessment to which `$attempt` belongs: required for deriving
-     *                                                a human-readable mark.
-     * @param float             $mark
-     * @param float             $maxMark
-     * @return void
-     */
-    private function assignMarksToAttempt(
-        Model $attempt,
-        QuizResponse $responseDomainObject,
-        QuizDomainObject $assessment,
-        float $mark,
-        float $maxMark
-    ): void {
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
-
-        /* Update the domain object synonymously which will desync from $attempt
-         * so we need to sync them manually...
-         *
-         * This is required for getMarkScheme() to calculate human-readable mark
-         */
-        $responseDomainObject->setNormalisedMark($normalisedMark);
-        $responseDomainObject->setMarksAvailable($maxMark);
-
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
-
-        /* Update the columns with newly-derived values
-         */
-        $attempt
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark);
-    }
 }

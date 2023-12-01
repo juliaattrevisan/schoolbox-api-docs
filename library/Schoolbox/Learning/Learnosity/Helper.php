@@ -11,6 +11,10 @@ namespace Schoolbox\Learning\Learnosity;
 
 use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\Quiz\Attempt\Model;
+use Schoolbox\User;
 
 /**
  * A shortcut to simple operations that involve multiple steps
@@ -87,6 +91,7 @@ class Helper
         ]
     ];
 
+
     /**
      * Constructor.
      *
@@ -97,11 +102,15 @@ class Helper
     {
     }
 
+
     /**
      * Get the number of items (questions) in a particular Learnosity Activity
      *
      * @param string $learnosityReference
      * @return int
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
      */
     public function getActivityItemCount(string $learnosityReference): int
     {
@@ -117,6 +126,7 @@ class Helper
         return count($activities['data'][0]['data']['items'] ?? []);
     }
 
+
     /**
      * Archive (soft-delete) a particular Learnosity Activity
      * Activities must have at least one published item before an activity can be archived
@@ -127,6 +137,7 @@ class Helper
      * @param string $learnosityReference
      * @return void
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function archive(string $learnosityReference): void
@@ -264,5 +275,68 @@ class Helper
                 return;
             }
         }
+    }
+
+
+    /**
+     * Extract the response object which matches `$existingAttempt` out of the
+     * student's participation record.
+     *
+     * @param QuizDomainObject $assessment
+     * @param User $student
+     * @param Model $existingAttempt
+     * @return QuizResponse|null
+     * @throws \UnexpectedValueException
+     */
+    public function extractExistingResponse(
+        QuizDomainObject $assessment,
+        User $student,
+        Model $existingAttempt,
+    ): ?QuizResponse {
+        $response = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
+
+        return $response instanceof QuizResponse ? $response : null;
+    }
+
+
+    /**
+     * Assign normalised and human-readable marks to `$attempt`.
+     *
+     * @param Model             $attempt
+     * @param QuizResponse      $responseDomainObject The domain-level object corresponding to `$attempt`: required for
+     *                                                deriving a human-readable mark.
+     * @param QuizDomainObject  $assessment           The assessment to which `$attempt` belongs: required for deriving
+     *                                                a human-readable mark.
+     * @param float             $mark
+     * @param float             $maxMark
+     * @return void
+     */
+    public function assignMarksToAttempt(
+        Model $attempt,
+        QuizResponse $responseDomainObject,
+        QuizDomainObject $assessment,
+        float $mark,
+        float $maxMark
+    ): void {
+        /* Update normalised and human-readable marks
+         */
+        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
+
+        /* Update the domain object synonymously which will desync from $attempt
+         * so we need to sync them manually...
+         *
+         * This is required for getMarkScheme() to calculate human-readable mark
+         */
+        $responseDomainObject->setNormalisedMark($normalisedMark);
+        $responseDomainObject->setMarksAvailable($maxMark);
+
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
+
+        /* Update the columns with newly-derived values
+         */
+        $attempt
+            ->setMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark)
+            ->setMaxMark($maxMark);
     }
 }
