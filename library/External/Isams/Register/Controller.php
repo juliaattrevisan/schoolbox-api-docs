@@ -12,11 +12,15 @@ namespace External\Isams\Register;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
+use Twig\Error\Error;
 
 /**
  * Controller for the iSams register.
@@ -38,12 +42,16 @@ class Controller extends BaseController
     /**
      * Get the register for a student.
      *
-     * @api GET /modules/isams/register/{register}/student/{studentId}
+     * @param string $registerCode
+     * @param User   $student
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws Error
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
      * @since 23.1
      *
-     * @param string $registerCode
-     * @param User $student
-     * @return void
+     * @api   GET /modules/isams/register/{register}/student/{studentId}
      */
     public function getStudent(string $registerCode, User $student): void
     {
@@ -52,66 +60,27 @@ class Controller extends BaseController
         // first, need to exchange client id/secret for an access token
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
-        /**
-         * register1 => [
-         *  field1
-         *  field2
-         * ]
-         */
-        $registersConfig = [];
-        /**
-         * allowed registers is a multi dimentional csv
-         *
-         * Example:
-         * register1,field1,field2,field6
-         * register2,field1
-         * register6,field7,field12
-         */
         $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '';
-        if ('' !== $config) {
-            // explode to find how many registers we will be working with...
-            foreach (preg_split('/\R/', strtolower($config)) as $registerConfig) {
-                // explode again to extract the registers, and their fields
-                // first object entry is the register, later items are the allowed fields
-                $tmp = explode(',', $registerConfig);
-                $registerTitle = array_shift($tmp);
-                $registersConfig[$registerTitle] = $tmp;
-            }
-        }
 
-        $registers       = $this->cacheHelper->getRegisters();
-        $studentData     = [];
-        foreach ($registers as $register) {
-
+        $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
+        if (null === $register) {
             /**
-             * if the requested register is not in the allowed registers
-             * OR
-             * if the requested register is not in the current register
-             * then continue onto the next register
-             *
-             * we will either only display 1 register, or throw NotFound.
+             * Unable to find requested register...
              */
-            if (!isset($registersConfig[strtolower($register['code'])]) || strtolower($register['code']) !== strtolower($registerCode)) {
-                // the requested register Ignoring...
-                continue;
-            }
-
-            $studentData[] = [
-                'user' => $student,
-                'data' => $this->getDataFromRegister($student, $register, $registersConfig),
-            ];
-            $this->response = $this->responseFromTemplate(
-                '@isamsRegister/student.twig',
-                [
-                    'studentData'   => $studentData, // need an array of students, dummy this here
-                ],
-            );
-            return;
+            throw new NotFound();
         }
-        /**
-         * Unable to find requested register...
-         */
-        throw new NotFound();
+        $studentData     = [];
+
+        $studentData[] = [
+            'user' => $student,
+            'data' => $this->getDataFromRegister($student, $register, $this->extractRegisterConfig($config)),
+        ];
+        $this->response = $this->responseFromTemplate(
+            '@isamsRegister/student.twig',
+            [
+                'studentData'   => $studentData, // need an array of students, dummy this here
+            ],
+        );
     }
 
     /**
@@ -119,11 +88,15 @@ class Controller extends BaseController
      * Only parents can access this
      * it will show their children and the requested 'admin approved' financial register
      *
-     * @api GET /modules/isams/register/{register}/parent
-     * @since 23.1
-     *
      * @param string $registerCode
      * @return void
+     * @throws GuzzleException
+     * @throws ClientExceptionInterface
+     * @throws InvalidArgumentException
+     * @throws Error
+     * @api   GET /modules/isams/register/{register}/parent
+     * @since 23.1
+     *
      */
     public function getParent(string $registerCode)
     {
@@ -133,71 +106,34 @@ class Controller extends BaseController
         // first, need to exchange client id/secret for an access token
         $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
-        /**
-         * register1 => [
-         *  field1
-         *  field2
-         * ]
-         */
-        $registersConfig = [];
-        /**
-         * allowed registers is a multi dimentional csv
-         *
-         * Example:
-         * register1,field1,field2,field6
-         * register2,field1
-         * register6,field7,field12
-         */
+
         $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_FINANCIAL_REGISTERS) ?? '';
-        if ('' !== $config) {
-            // explode to find how many registers we will be working with...
-            foreach (preg_split('/\R/', strtolower($config)) as $registerConfig) {
-                // explode again to extract the registers, and their fields
-                // first object entry is the register, later items are the allowed fields
-                $tmp = explode(',', $registerConfig);
-                $registerTitle = array_shift($tmp);
-                $registersConfig[$registerTitle] = $tmp;
-            }
-        }
 
-        $registers       = $this->cacheHelper->getRegisters();
-        $studentData     = [];
-        foreach ($registers as $register) {
+        $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
+        if (null === $register) {
             /**
-             * if the requested register is not in the allowed registers
-             * OR
-             * if the requested register is not in the current register
-             * then continue onto the next register
-             *
-             * we will either only display 1 register, or throw NotFound.
+             * Unable to find requested register...
              */
-            if (!isset($registersConfig[strtolower($register['code'])]) || strtolower($register['code']) !== strtolower($registerCode)) {
-                // the requested register Ignoring...
-                continue;
-            }
-
-            // Get each student
-            foreach ($this->getUser()->getChildren() as $child) {
-                // for each student get the data from that register
-                $studentData[] = [
-                    'user' => $child,
-                    'data' => $this->getDataFromRegister($child, $register, $registersConfig),
-                ];
-            }
-
-            // display to the parent
-            $this->response = $this->responseFromTemplate(
-                '@isamsRegister/student.twig',
-                [
-                    'studentData'   => $studentData
-                ],
-            );
-            return;
+            throw new NotFound();
         }
-        /**
-         * Unable to find requested register...
-         */
-        throw new NotFound();
+        $studentData     = [];
+
+        // Get each student
+        foreach ($this->getUser()->getChildren() as $child) {
+            // for each student get the data from that register
+            $studentData[] = [
+                'user' => $child,
+                'data' => $this->getDataFromRegister($child, $register, $this->extractRegisterConfig($config)),
+            ];
+        }
+
+        // display to the parent
+        $this->response = $this->responseFromTemplate(
+            '@isamsRegister/student.twig',
+            [
+                'studentData'   => $studentData
+            ],
+        );
     }
 
     /**
@@ -323,5 +259,30 @@ class Controller extends BaseController
             ];
         }
         return $userData;
+    }
+
+    /**
+     * Extract common config settings
+     *
+     *  Example of multi dimensional csv:
+     *  register1,field1,field2,field6
+     *  register2,field1
+     *  register6,field7,field12
+     *
+     * @param string|null $registerConfig a multi dimensional csv
+     * @return array
+     */
+    private function extractRegisterConfig(?string $registerConfig): array
+    {
+        $registersConfig = [];
+        // explode to find how many registers we will be working with...
+        foreach (preg_split('/\R/', strtolower($registerConfig)) as $config) {
+            // explode again to extract the registers, and their fields
+            // first object entry is the register, later items are the allowed fields
+            $tmp = explode(',', $config);
+            $registerTitle = array_shift($tmp);
+            $registersConfig[$registerTitle] = $tmp;
+        }
+        return $registersConfig;
     }
 }

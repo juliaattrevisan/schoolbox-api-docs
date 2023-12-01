@@ -118,15 +118,17 @@ class CacheHelper
     /**
      * Retrieve the Registers from Isams
      *
+     * @param string|null $registerCode if exists only return this register
+     * @param array|null  $registersConfig if we are returning only 1 register, then confirm it is in the admin approved list
      * @return mixed
-     * @throws ClientExceptionInterface
      * @throws ClientExceptionInterface if something went wrong fetching JWKS
+     * @throws GuzzleException
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     * @throws GuzzleException
      */
-    public function getRegisters(): mixed
+    public function getRegisters(?string $registerCode = null, ?array $registersConfig = null): mixed
     {
         $registers = $this->cache->get(self::REGISTERS_CACHE_KEY);
         if (!isset($registers)) {
@@ -139,7 +141,28 @@ class CacheHelper
             $registers       = $apiResponseBody['registers'];
             $this->cache->set(self::REGISTERS_CACHE_KEY, $registers, self::STORAGE_CACHE_DEFAULT_TTL);
         }
-        return $registers;
+        // not fetching a specific register, get everything
+        if (null === $registerCode && null === $registersConfig) {
+            return $registers;
+        }
+
+        // we have some config that we want to limit to, do that
+        foreach ($registers as $register) {
+            /**
+             * if the requested register is not in the allowed registers
+             * OR
+             * if the requested register is not in the current register
+             * then continue onto the next register
+             *
+             * we will either only display 1 register, or return null.
+             */
+            if (!isset($registersConfig[strtolower($register['code'])]) || strtolower($register['code']) !== strtolower($registerCode)) {
+                // the requested register Ignoring...
+                continue;
+            }
+            return $register;
+        }
+        return null;
     }
 
     /**
