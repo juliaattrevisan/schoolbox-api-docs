@@ -5,6 +5,6 @@
 import type { Badge } from "@schoolboxBadge/types/Badge";
 
 export interface BadgeAward extends Badge {
-    expiry: number | null;
+    expiry: number | null; // how many days the award is valid for
     type: "achievement" | "goal";
 }

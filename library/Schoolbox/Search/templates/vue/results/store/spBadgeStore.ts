@@ -6,7 +6,6 @@
 import { defineStore } from "pinia";
 import type { Badge } from "@schoolboxBadge/types/Badge";
 import type { BadgeAward } from "@schoolboxBadge/types/BadgeAward";
-import type { Result } from "../../../js/types/Result";
 
 export const useBadgeStore = defineStore("spBadgeStore", () => {
     const isDetailModalOpen = window.Vue.ref(false); // to display a badges details
@@ -23,21 +22,11 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
     }
 
     /**
-     * Set the selected badge
-     * @param {Result} badge The badge to set
-     * @param {BadgeAward["type"]} awardType The type of award, either "achievement" or "goal"
-     * @param {BadgeAward["expiry"]} awardExpiry The expiry of the award
+     * Set the badge to award
+     * @param {BadgeAward} $badgeAward - the badge to award
      */
-    function setAwardBadge(badge: Result, awardType: BadgeAward["type"], awardExpiry: BadgeAward["expiry"]) {
-        awardBadge.value = {
-            id: badge.id,
-            expiry: awardExpiry,
-            name: badge.title,
-            type: awardType,
-            _links: {
-                icon: badge.image || "",
-            },
-        };
+    function setAwardBadge($badgeAward: BadgeAward) {
+        awardBadge.value = $badgeAward;
     }
 
     /**

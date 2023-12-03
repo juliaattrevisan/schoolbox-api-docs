@@ -46,8 +46,8 @@ export interface Badge {
         id: string;
         name: string;
     };
-    achievementExpiry: string | null;
-    goalExpiry: string | null;
+    achievementExpiry: number | null; // how many days the achievement is valid for
+    goalExpiry: number | null; // how many days the goal is valid for
     curriculumNodes: Node[];
     tags: string | null;
     _links: {

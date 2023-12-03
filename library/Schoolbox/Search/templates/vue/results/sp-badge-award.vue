@@ -11,7 +11,7 @@ const badgeStore = useBadgeStore();
     <sequential-reveal-modal
         size="medium"
         :is-open="badgeStore.awardBadge !== null"
-        @closed="badgeStore.unsetSelectedBadge()"
+        @closed="badgeStore.unsetAwardBadge()"
     >
         <template #sequence-1>
             <template v-if="badgeStore.awardBadge !== null">
@@ -27,8 +27,8 @@ const badgeStore = useBadgeStore();
                     toast-activate-message="Awarding achievement..."
                     toast-success-message="Awarded achievement"
                     toast-failure-message="Awarding achievement failed"
-                    @cancel="badgeStore.unsetSelectedBadge()"
-                    @done="badgeStore.unsetSelectedBadge()"
+                    @cancel="badgeStore.unsetAwardBadge()"
+                    @done="badgeStore.unsetAwardBadge()"
                 >
                     <template #header="slotProps">
                         <h2>
@@ -57,8 +57,8 @@ const badgeStore = useBadgeStore();
                     toast-activate-message="Setting goal..."
                     toast-success-message="Goal set"
                     toast-failure-message="Setting goal failed"
-                    @cancel="badgeStore.unsetSelectedBadge()"
-                    @done="badgeStore.unsetSelectedBadge()"
+                    @cancel="badgeStore.unsetAwardBadge()"
+                    @done="badgeStore.unsetAwardBadge()"
                 >
                     <template #header="slotProps">
                         <h2>
