@@ -4,8 +4,8 @@
  */
 
 import { defineStore } from "pinia";
-import type { Badge } from "@schoolboxBadge/types/Badge";
-import type { BadgeAward } from "@schoolboxBadge/types/BadgeAward";
+import type { Badge } from "@schoolboxBadge/templates/types/Badge";
+import type { BadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
 
 export const useBadgeStore = defineStore("spBadgeStore", () => {
     const isDetailModalOpen = window.Vue.ref(false); // to display a badges details

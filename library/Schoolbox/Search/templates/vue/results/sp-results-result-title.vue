@@ -3,7 +3,7 @@
  * To display the search results title
  */
 
-import type { Badge } from "@schoolboxBadge/types/Badge";
+import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import { addMarks } from "@js/util/domUtils";
 import type { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";

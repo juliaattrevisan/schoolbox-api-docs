@@ -3,7 +3,7 @@
  * To provide access to further actions on a result
  */
 
-import type { Badge } from "@schoolboxBadge/types/Badge";
+import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import type { BadgeAward } from "@schoolboxBadge/types/BadgeAward";
 import { useBadgeStore } from "./store/spBadgeStore";
 import { Result } from "../../js/types/Result";
