@@ -3,6 +3,7 @@
  * To display the search results title
  */
 
+import type { Badge } from "@schoolboxBadge/types/Badge";
 import { addMarks } from "@js/util/domUtils";
 import type { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
@@ -23,8 +24,10 @@ const badgeStore = useBadgeStore();
 /**
  * When a badge is selected, set it in the store
  */
-function onBadgeSelected() {
-    badgeStore.openDetailModal(props.result);
+async function onBadgeSelected() {
+    const getBadge = await fetch(`learning/badge/${props.result.id}`);
+    const badge = (await getBadge.json()) as Badge;
+    badgeStore.openDetailModal(badge);
 }
 </script>
 
