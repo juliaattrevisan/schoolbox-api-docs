@@ -1776,13 +1776,27 @@ class Controller extends Base
                 $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_COMPLETED;
                 $quiz->setLearnosityJobStatus($jobStatus);
                 $this->quizMapper->save($quiz);
+
+                // Whether complete or failed: set the tags
+                $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+                $newTags    = $tagFactory->produceFromAssessment($assessment);
+                $this->api->dataSetRequest(
+                    '/itembank/activities/tags',
+                    [
+                        'activities' => [
+                            [
+                                'reference' => $quiz->getLearnosityReference(),
+                                'tags'      => $newTags,
+                            ],
+                        ],
+                    ],
+                );
             } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
                 $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_FAILED;
                 $quiz->setLearnosityJobStatus($jobStatus);
                 $this->quizMapper->save($quiz);
             }
         }
-
 
         // What's in the response: just a "status" callback,
         // possibly a API problem?
