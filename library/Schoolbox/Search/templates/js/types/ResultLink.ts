@@ -6,9 +6,5 @@ export type ResultLink = {
     url: string;
     title: string;
     icon?: string;
-    action?: string;
-    data?: {
-        achievementExpiry?: number | null;
-        goalExpiry?: number | null;
-    };
+    action?: "awardAchievementModal" | "setGoalModal"; // actions that aren't just a link (for example opening a modal)
 };
