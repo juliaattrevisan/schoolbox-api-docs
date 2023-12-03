@@ -1101,13 +1101,9 @@
   }
 }
 
-
-/* Fixed the styles to long folder names not breaking the layout in the change location modal */
-div.jstree-default .jstree-anchor, ul.jstree-default .jstree-anchor {
+/* Fixed the styles for long folder names not breaking the layout in the change location modal */
+.jstree .jstree-anchor {
+    margin-right: 1.5rem;
+    overflow: hidden;
     white-space: normal;
-}
-div.jstree-default .jstree-wholerow, div.jstree-default .jstree-anchor, div.jstree-default .jstree-default, div.jstree-default .jstree-icon:empty, ul.jstree-default .jstree-wholerow, ul.jstree-default .jstree-anchor, ul.jstree-default .jstree-default, ul.jstree-default .jstree-icon:empty {
-    vertical-align: baseline;
-    line-height: initial;
-    display: inline-flex;
 }
