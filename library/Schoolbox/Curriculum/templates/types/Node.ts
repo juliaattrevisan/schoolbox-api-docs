@@ -22,7 +22,7 @@ export type Node = {
         update: string;
     };
     _usageCounts: {
-        // just the counts for each acitivity type
+        // just the counts for each activity type
         course: number;
         unit: number;
         assessment: number;

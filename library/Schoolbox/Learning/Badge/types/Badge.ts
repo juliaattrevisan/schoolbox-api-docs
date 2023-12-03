@@ -1,8 +1,10 @@
 /**
- * Badge type
+ * A badge that can be assigned to a student as a goal or achievement
  */
 
-export type Badge = {
+import { Node } from "@schoolboxCurriculum/types/Node";
+
+export interface Badge {
     id: number;
     createdAt: string;
     createdBy: {
@@ -46,7 +48,7 @@ export type Badge = {
     };
     achievementExpiry: string | null;
     goalExpiry: string | null;
-    curriculumNodes: [];
+    curriculumNodes: Node[];
     tags: string | null;
     _links: {
         update: string;
@@ -60,4 +62,4 @@ export type Badge = {
         setAsGoal: string;
         setAsGoalForSelf: string | null;
     };
-};
+}
