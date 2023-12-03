@@ -61,10 +61,10 @@ class Module extends BaseModule
         /* Get a Badge
          */
         $this->register(
-            self::METHOD_POST,
+            self::METHOD_GET,
             '/{badgeId}',
             'getBadge',
-            $manageBadgesRule,
+            $viewBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 

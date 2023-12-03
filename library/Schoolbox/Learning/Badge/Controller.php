@@ -202,6 +202,21 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * get a badge.
+     *
+     * @param Model $badge
+     * @throws MapperException
+     * @api   GET /learning/badge/{badgeId}
+     * @since 21.1
+     */
+    public function getBadge(Model $badge): void
+    {
+        $this->response = $this->responseAsJson(
+            $this->buildModelToArrayTranslator()($badge)
+        );
+    }
+
 
     /**
      * View the list of badges as a HTML page.
