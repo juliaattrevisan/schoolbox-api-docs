@@ -28,7 +28,7 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
      * @param {BadgeAward["type"]} awardType The type of award, either "achievement" or "goal"
      * @param {BadgeAward["expiry"]} awardExpiry The expiry of the award
      */
-    function setSelectedBadge(badge: Result, awardType: BadgeAward["type"], awardExpiry: BadgeAward["expiry"]) {
+    function setAwardBadge(badge: Result, awardType: BadgeAward["type"], awardExpiry: BadgeAward["expiry"]) {
         awardBadge.value = {
             id: badge.id,
             expiry: awardExpiry,
@@ -43,7 +43,7 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
     /**
      * Unset the selected badge
      */
-    function unsetSelectedBadge() {
+    function unsetAwardBadge() {
         awardBadge.value = null;
     }
 
@@ -52,7 +52,7 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
         detailBadge,
         openDetailModal,
         awardBadge,
-        setSelectedBadge,
-        unsetSelectedBadge,
+        setAwardBadge,
+        unsetAwardBadge,
     };
 });

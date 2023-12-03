@@ -22,7 +22,7 @@ const badgeStore = useBadgeStore();
                 <a
                     :class="link.icon"
                     @click.prevent="
-                        badgeStore.setSelectedBadge(props.result, 'achievement', link.data!.achievementExpiry!)
+                        badgeStore.setAwardBadge(props.result, 'achievement', link.data!.achievementExpiry!)
                     "
                     >{{ link.title }}</a
                 >
@@ -30,7 +30,7 @@ const badgeStore = useBadgeStore();
             <template v-else-if="link.action === 'setGoalModal'">
                 <a
                     :class="link.icon"
-                    @click.prevent="badgeStore.setSelectedBadge(props.result, 'goal', link.data!.goalExpiry!)"
+                    @click.prevent="badgeStore.setAwardBadge(props.result, 'goal', link.data!.goalExpiry!)"
                     >{{ link.title }}</a
                 >
             </template>
