@@ -11,6 +11,11 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<script>
+    $(function() {
+
+    });
+</script>
 <script src="https://items-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/learnosity/learnosity.css?v={{ config.site_version }}" />
 <div class="row">
@@ -74,6 +79,10 @@
             if (!isNaN(previousLocation)) {
                 itemsApp.items().goto(previousLocation);
             }
+
+            /* Replace video placeholders with actual player when the ui has loaded
+             */
+            $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
 
             /**
              * Listen for hash changes so we can navigate to the correct part of the app
