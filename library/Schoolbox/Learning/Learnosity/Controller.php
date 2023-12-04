@@ -596,12 +596,12 @@ class Controller extends Base
         /* Find out if this attempt was in Incomplete status
          * Users don't always officially conclude their attempts
          */
-        //        if (Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE === $result['data'][0]['status']) {
-        //            /* FIXME Need to load their Session, then complete it on their behalf,
-        //             *  then reload their $result like we originally tried...but how?
-        //             *  There's no endpoint to update a Session's status...
-        //             */
-        //        }
+//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE === $result['data'][0]['status']) {
+//            /* FIXME Need to load their Session, then complete it on their behalf,
+//             *  then reload their $result like we originally tried...but how?
+//             *  There's no endpoint to update a Session's status...
+//             */
+//        }
 
         /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
          * ($mark must never exceed $maxMark) and/or otherwise sanitise data
@@ -1809,7 +1809,7 @@ class Controller extends Base
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
-                // including failure
+            // including failure
             default => 400,
         };
         $this->response = $this
