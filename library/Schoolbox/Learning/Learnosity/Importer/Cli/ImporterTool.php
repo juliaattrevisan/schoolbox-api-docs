@@ -1205,7 +1205,7 @@ HELP;
                      */
                     if ($data['count'] > 0) {
                         try {
-                            $api->dataSetRequest($data['endpoint'], $data['payload']);
+                            $api->dataSetRequestHub($data['endpoint'], $data['payload']);
                         } catch (ApiException $e) {
                             /* Warn us, then keep going
                              */
@@ -1300,7 +1300,7 @@ HELP;
                     /* Capture endpoint-specific durations
                      */
                     $endpointStart = microtime(true);
-                    $api->dataSetRequest($endpoint, $payload);
+                    $api->dataSetRequestHub($endpoint, $payload);
                     $endpointEnd = microtime(true);
 
                     $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;
@@ -1336,7 +1336,7 @@ HELP;
                 /* Capture endpoint-specific durations
                  */
                 $endpointStart = microtime(true);
-                $api->dataSetRequest($endpoint, $payload);
+                $api->dataSetRequestHub($endpoint, $payload);
                 $endpointEnd = microtime(true);
 
                 $this->metrics[$endpoint]['duration'] += $endpointEnd - $endpointStart;

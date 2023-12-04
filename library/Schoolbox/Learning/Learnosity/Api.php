@@ -35,8 +35,15 @@ class Api
      *
      * Learnosity API Endpoints - Version must be specified
      */
+    private const DATA_API_HOST_WRITE_HUB = 'https://data-or.learnosity.com/v%s/';
+
+
+    /**
+     * Read and Write specifically to the place nearest you
+     * TODO Turn into a configuration option one day
+     */
     private const DATA_API_HOST_READ = 'https://data-au.learnosity.com/v%s/';
-    private const DATA_API_HOST_WRITE = 'https://data-or.learnosity.com/v%s/';
+    private const DATA_API_HOST_WRITE = 'https://data-au.learnosity.com/v%s/';
 
 
     /**
@@ -68,8 +75,10 @@ class Api
     /**
      * Endpoints for Learnosity API
      */
-    private string $dataAPIWriteHost;
+    private string $dataAPIWriteHostHub;
     private string $dataAPIReadHost;
+    private string $dataAPIWriteHost;
+
 
     /**
      * Possible job statuses.
@@ -105,8 +114,15 @@ class Api
             throw new \DomainException('Learnosity is not configured; please check settings');
         }
 
-        $this->dataAPIWriteHost = sprintf(self::DATA_API_HOST_WRITE, $this->learnosityVersion);
+        /* Write specifically to Oregon, their data hub
+         * where replication seems to begin
+         */
+        $this->dataAPIWriteHostHub = sprintf(self::DATA_API_HOST_WRITE_HUB, $this->learnosityVersion);
+
+        /* Your region's hub
+         */
         $this->dataAPIReadHost = sprintf(self::DATA_API_HOST_READ, $this->learnosityVersion);
+        $this->dataAPIWriteHost = sprintf(self::DATA_API_HOST_WRITE, $this->learnosityVersion);
     }
 
 
@@ -152,6 +168,30 @@ class Api
         ))->generate();
     }
 
+
+    /* Hub requests to Oregon specifically
+     */
+
+    /**
+     * Alias for ActionType "set" endpoints
+     * Writs specifically to the Oregon hub
+     *
+     * @param string $endpoint
+     * @param array $payload
+     * @return mixed
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function dataSetRequestHub(string $endpoint, array $payload): mixed
+    {
+        return $this->dataRequest($this->dataAPIWriteHostHub, $endpoint, $payload, 'set');
+    }
+
+
+    /* Standard requests to your region's hub
+     * This receives replication from Oregon
+     */
 
     /**
      * Alias for ActionType "get" endpoints
