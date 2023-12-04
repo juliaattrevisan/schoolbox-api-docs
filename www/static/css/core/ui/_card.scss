@@ -92,7 +92,17 @@
         h3,
         p,
         span {
-            background: var(--loading-colour);
+            animation: gradient 2s infinite;
+            animation-fill-mode: forwards;
+            animation-timing-function: linear;
+            background: repeating-linear-gradient(
+                to right,
+                var(--loading-colour) 0%,
+                var(--foreground-colour) 50%,
+                var(--loading-colour) 100%
+            );
+            background-size: 200% auto;
+            background-position: 0 100%;
             margin: 0;
         }
         .img-placeholder {
@@ -116,5 +126,15 @@
 
     &--alt-bkg {
         background-color: var(--alt-foreground-colour);
+    }
+}
+
+/* Added animated gradient for loading card placeholder*/
+@keyframes gradient {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: -200% 0;
     }
 }

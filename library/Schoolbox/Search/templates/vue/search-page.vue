@@ -3,7 +3,7 @@
  * To search Schoolbox
  */
 
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import SpResultsPrompt from "./results/sp-results-prompt.vue";
 import SpResultsError from "./results/sp-results-error.vue";
 import SpResultsNone from "./results/sp-results-none.vue";
@@ -74,7 +74,7 @@ window.Vue.onMounted(async () => {
         <sp-filters class="c-search-page__filters" />
         <div class="c-search-page__results l-flex-col l-gap-m">
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
-            <loading-table v-else-if="searchStore.isSearching" />
+            <loading-cards v-else-if="searchStore.isSearching" />
             <sp-results-error v-else-if="searchStore.hasLoadError" />
             <sp-results-none v-else-if="resultsStore.hasNoResults" />
             <sp-results v-else-if="resultsStore.hasResults" />

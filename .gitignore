@@ -8,6 +8,7 @@ www/test.xml
 Vagrantfile
 www/static/css/core/core.css
 www/static/css/core/schoolbox-ck-content.css
+www/static/css/core/learnosity.css
 *.log
 vendor/
 # Webpack bundle export directory
