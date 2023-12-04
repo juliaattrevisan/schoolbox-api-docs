@@ -26,7 +26,7 @@ $app = new class extends CliTool\App {
                 ['title' => $title]
             );
 
-            while($tourUuid = $query->fetchColumn()) {
+            while ($tourUuid = $query->fetchColumn()) {
                 if (!$tourUuid) {
                     continue;
                 }
