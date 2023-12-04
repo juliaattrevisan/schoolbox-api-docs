@@ -932,3 +932,27 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 button.lrn-h3.lrn-list-view-heading.lrn-ellipses.lrn-author-editable-item {
     color: var(--content-ui-foreground) !important;
 }
+
+/* Updated the save button border color to match with new submit button color */
+.lrn .lrn-author-ui .lrn-btn-success {
+    border: 1px solid var(--content-ui-submit-background);
+}
+
+/* Fixed the preview icon hover color and positions */
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-list-view-item .lrn-btn-default:hover {
+    background: #ccc !important;
+}
+
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-list-view-item .lrn-btn-default.lrn-close-preview {
+    font-size: 1rem;
+}
+.lrn.lrn-author
+    .lrn-item-for-activity-list
+    [data-authorapi-selector="close-item-preview"]
+    [data-authorapi-selector="tooltipped"],
+.lrn.lrn-author
+    .lrn-item-for-activity-list
+    [data-authorapi-selector="open-item-preview"]
+    [data-authorapi-selector="tooltipped"] {
+    padding: unset;
+}
