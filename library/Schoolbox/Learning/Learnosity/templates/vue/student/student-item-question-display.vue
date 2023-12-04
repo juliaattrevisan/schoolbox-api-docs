@@ -126,11 +126,15 @@ watchDebounced(
  */
 window.Vue.onMounted(() => {
     if (props.question.response) {
-        const response = props.container.querySelector(
-            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
-        ) as HTMLDivElement;
+        let selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
+
+        const response = props.container.querySelector(selector) as HTMLDivElement;
         responsesEl.value?.appendChild(response);
         score.value = props.question.response.score?.toString() ?? "";
+
+        /* Replace video placeholders with actual player when the ui has loaded
+         */
+        $.fn.schoolboxResource_ProxyReplacement($(selector));
     }
 });
 
