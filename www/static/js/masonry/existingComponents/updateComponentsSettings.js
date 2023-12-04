@@ -211,7 +211,6 @@ async function updateComponent(component, responseData) {
         duration: ANIMATE_SPEED,
         opacity: 1,
         startAt: { opacity: 0 },
-        s,
     });
     document.dispatchEvent(
         new CustomEvent(UpdateMasonryEvents.COMPONENT_UPDATED, {
