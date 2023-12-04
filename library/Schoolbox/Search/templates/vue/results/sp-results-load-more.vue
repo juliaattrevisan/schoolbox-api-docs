@@ -3,7 +3,7 @@
  * To load more results when available, adding to the existing results
  */
 
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import SpResultsError from "./sp-results-error.vue";
 import { useResultsStore } from "./store/spResultsStore";
 import { useLoadMoreResultsStore } from "./store/spLoadMoreResultsStore";
@@ -31,7 +31,7 @@ async function onLoadMoreSelected() {
 </script>
 
 <template>
-    <loading-table v-if="loadMoreResultsStore.isLoading" :rows="2" />
+    <loading-cards v-if="loadMoreResultsStore.isLoading" :rows="2" />
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
     <button v-else-if="showLoadMore" data-test="sp-results-load-more-button" @click.prevent="onLoadMoreSelected">
         Load more results

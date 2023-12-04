@@ -3,7 +3,7 @@
  * To display all linked sub results within a result
  */
 
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import { useFetch } from "@vueuse/core";
 import { Results } from "../../js/types/Results";
 import { Result } from "../../js/types/Result";
@@ -104,7 +104,7 @@ function isLast(index: number) {
         :is-last="isLast(index)"
         :data-test="`sp-results-sub-results-result-${props.result.id}-${subResult.id}`"
     />
-    <loading-table v-if="isLoading" :rows="2" />
+    <loading-cards v-if="isLoading" :rows="1" />
     <sp-results-error v-else-if="hasLoadError" />
     <button
         v-else-if="showLoadMore"
