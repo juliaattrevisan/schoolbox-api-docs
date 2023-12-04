@@ -12,7 +12,7 @@ ALTER TABLE folder ADD CONSTRAINT fk_folder_deleted_by FOREIGN KEY (deleted_by) 
 ### seed folder table with historic data if it exists
 update folder fd
     left join cmsLog cmsLogCreate on (fd.id = cmsLogCreate.objectId and cmsLogCreate.object = 'folder' and cmsLogCreate.action = 'create')
-set fd.created_at = COALESCE(cmsLogCreate.time, fd.created_at),
+set fd.created_at = cmsLogCreate.time,
     fd.created_by = cmsLogCreate.user
 WHERE fd.id > 0;
 
