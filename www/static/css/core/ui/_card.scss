@@ -118,6 +118,8 @@
         background-color: var(--alt-foreground-colour);
     }
 }
+
+/* Added animated gradient for loading card placeholder*/
 .c-card--loading h3,
 .c-card--loading span {
     animation: gradient 2s infinite;
