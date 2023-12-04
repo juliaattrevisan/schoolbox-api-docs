@@ -17,12 +17,12 @@ set fd.created_at = COALESCE(cmsLogCreate.time, fd.created_at),
 WHERE fd.id > 0;
 
 update folder fd
-    left join cmsLog cmsLogModify on (fd.id = cmsLogModify.objectId and cmsLogModify.object = 'folder' and cmsLogModify.action = 'modify')
-set fd.updated_at = COALESCE(cmsLogModify.time, fd.deleted_at, fd.created_at),
-    fd.updated_by = coalesce(cmsLogModify.user, fd.created_by)
+    left join cmsLog cmsLogDelete on (fd.id = cmsLogDelete.objectId and cmsLogDelete.object = 'folder' and cmsLogDelete.action = 'delete')
+set fd.deleted_by = cmsLogDelete.user
 WHERE fd.id > 0;
 
 update folder fd
-    left join cmsLog cmsLogDelete on (fd.id = cmsLogDelete.objectId and cmsLogDelete.object = 'folder' and cmsLogDelete.action = 'delete')
-set fd.deleted_by = cmsLogDelete.user
+    left join cmsLog cmsLogModify on (fd.id = cmsLogModify.objectId and cmsLogModify.object = 'folder' and cmsLogModify.action = 'modify')
+set fd.updated_at = COALESCE(cmsLogModify.time, fd.deleted_at, fd.created_at),
+    fd.updated_by = coalesce(cmsLogModify.user, fd.deleted_by, fd.created_by)
 WHERE fd.id > 0;
