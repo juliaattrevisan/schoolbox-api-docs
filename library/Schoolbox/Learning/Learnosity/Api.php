@@ -75,9 +75,9 @@ class Api
     /**
      * Endpoints for Learnosity API
      */
+    private string $dataAPIWriteHostHub;
     private string $dataAPIReadHost;
     private string $dataAPIWriteHost;
-    private string $dataAPIWriteHostHub;
 
 
     /**
@@ -114,13 +114,15 @@ class Api
             throw new \DomainException('Learnosity is not configured; please check settings');
         }
 
-        $this->dataAPIReadHost = sprintf(self::DATA_API_HOST_READ, $this->learnosityVersion);
-        $this->dataAPIWriteHost = sprintf(self::DATA_API_HOST_WRITE, $this->learnosityVersion);
-
         /* Write specifically to Oregon, their data hub
          * where replication seems to begin
          */
         $this->dataAPIWriteHostHub = sprintf(self::DATA_API_HOST_WRITE_HUB, $this->learnosityVersion);
+
+        /* Your region's hub
+         */
+        $this->dataAPIReadHost = sprintf(self::DATA_API_HOST_READ, $this->learnosityVersion);
+        $this->dataAPIWriteHost = sprintf(self::DATA_API_HOST_WRITE, $this->learnosityVersion);
     }
 
 
@@ -167,6 +169,30 @@ class Api
     }
 
 
+    /* Hub requests to Oregon specifically
+     */
+
+    /**
+     * Alias for ActionType "set" endpoints
+     * Writs specifically to the Oregon hub
+     *
+     * @param string $endpoint
+     * @param array $payload
+     * @return mixed
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function dataSetRequestHub(string $endpoint, array $payload): mixed
+    {
+        return $this->dataRequest($this->dataAPIWriteHostHub, $endpoint, $payload, 'set');
+    }
+
+
+    /* Standard requests to your region's hub
+     * This receives replication from Oregon
+     */
+
     /**
      * Alias for ActionType "get" endpoints
      *
@@ -212,23 +238,6 @@ class Api
     public function dataUpdateRequest(string $endpoint, array $payload): mixed
     {
         return $this->dataRequest($this->dataAPIWriteHost, $endpoint, $payload, 'update');
-    }
-
-
-    /**
-     * Alias for ActionType "set" endpoints
-     * Writs specifically to the Oregon hub
-     *
-     * @param string $endpoint
-     * @param array $payload
-     * @return mixed
-     * @throws ApiException
-     * @throws ValidationException
-     * @throws \JsonException
-     */
-    public function dataSetRequestHub(string $endpoint, array $payload): mixed
-    {
-        return $this->dataRequest($this->dataAPIWriteHostHub, $endpoint, $payload, 'set');
     }
 
 
