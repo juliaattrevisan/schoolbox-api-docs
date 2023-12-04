@@ -105,13 +105,13 @@ class Module extends BaseModule
 
         $queryParamBuilders = [
             new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
-            new Database\ResultType\News\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\News\QueryParamBuilder(),
             new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\File\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\Event\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\Link\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\File\QueryParamBuilder(),
+            new Database\ResultType\Event\QueryParamBuilder(),
+            new Database\ResultType\Link\QueryParamBuilder(),
             new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\Blog\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Blog\QueryParamBuilder(),
             new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
             new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
         ];
