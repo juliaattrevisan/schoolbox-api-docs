@@ -21,6 +21,7 @@ h3.lrn-report-item-title {
     box-shadow: unset;
     color: var(--content-ui-foreground);
 }
+
 /* update the botton hover and focus styles */
 .lrn .lrn_btn:hover,
 .lrn .lrn_btn.lrn_hover,
@@ -62,6 +63,7 @@ h3.lrn-report-item-title {
 .lrn.lrn-assess {
     z-index: 0;
 }
+
 /* add new question button styles */
 .lrn .lrn-author-ui .lrn-author-widget-button-more .lrn-author-widget-icon:before {
     color: var(--content-ui-foreground);
@@ -108,20 +110,24 @@ h3.lrn-report-item-title {
     vertical-align: middle !important;
     width: 99% !important;
 }
+
 /* replaced trash icon */
 .lrn-qe .lrn-qe-ui .lrn-qe-i-trash:before {
     content: "\e61b";
     font-family: "schoolbox";
 }
+
 /* update the pen icon */
 .lrn-i-edit::before {
     content: "\e645";
     font-family: "schoolbox";
 }
+
 /* Add more padding to the bottom of the Learnosity container */
 #container {
     padding: 1rem 1rem 3rem 1rem;
 }
+
 /* updated icons styles */
 .lrn-i-search::before {
     content: "\e660";

@@ -2,10 +2,12 @@
 .lrn-list-view-meta {
     display: none;
 }
+
 /* Hide the published/archived status  */
 .lrn-list-view-status {
     display: none;
 }
+
 /* Reconfigure column dimensioning lol (rude) */
 .lrn.lrn-author.lrn-sm .lrn-col-sm-9 {
     width: 100%;
@@ -14,6 +16,7 @@
 .lrn.lrn-author.lrn-sm .lrn-col-sm-3 {
     display: none !important;
 }
+
 /* question edit view styles */
 .lrn.lrn-author .lrn-author-region-sidebar,
 .lrn.lrn-author .lrn-author-widget-sidebar {
@@ -34,6 +37,7 @@
     background: var(--content-ui-background);
     color: var(--content-ui-foreground);
 }
+
 /* top bar background color */
 .lrn.lrn-author .lrn-author-item-nav {
     background-color: #fff;
@@ -88,6 +92,7 @@ button.lrn-btn-save-dropdown {
     );
     color: var(--content-ui-submit-foreground);
 }
+
 /* hide tags from questions list */
 
 .lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
@@ -126,6 +131,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     background: var(--content-ui-foreground);
     border-radius: 0px;
 }
+
 /* removed gap from hearder */
 .lrn .lrn-author-ui .lrn-author-item-toolbar-controls,
 .lrn .lrn-author-ui .lrn-author-activity-toolbar-controls {
@@ -165,14 +171,17 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn .lrn-author-ui a.lrn-btn:focus {
     outline: none;
 }
+
 /* Hide the welcome/exit screen ui */
 .lrn-author-activity-intro-outro {
     display: none !important;
 }
+
 /* hide the resources section */
 .lrn-author-activity-resource-item.lrn-col-xs-12.lrn-col-sm-12.lrn-col-md-4 {
     display: none;
 }
+
 /* edit/preview tabs styles */
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
     background-color: var(--content-ui-background);
@@ -240,10 +249,10 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
 }
 
 /* hide player, detauls,tags tabs */
-
 ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
     display: none;
 }
+
 /* hide setting button in questions */
 button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-outline.lrn-btn-icon-left.lrn-btn-responsive.lrn-btn-i-xs.lrn-btn {
     display: none;
@@ -408,6 +417,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     );
     outline: none;
 }
+
 /* more options styles */
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options {
@@ -514,6 +524,7 @@ span.lrn-qe-i-trash {
     border-radius: 0px;
     color: transparent;
 }
+
 /* change checkbox and rows selection background color */
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-input:checked + .lrn-check-box-span {
     color: var(--content-ui-foreground) !important;
@@ -564,6 +575,7 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.l
 span.lrn-author-name-wrapper {
     border: 1px solid var(--form-border-color);
 }
+
 /* questions and features button styles */
 .lrn .lrn-author-ui .lrn-author-btn-outline {
     background-color: var(--content-ui-background);
@@ -588,6 +600,7 @@ span.lrn-author-name-wrapper {
 .lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
     border-radius: 0px;
 }
+
 /* search pages styles */
 li.lrn-list-view-item.lrn-flyout-wrapper {
     background: #fff;
@@ -644,6 +657,7 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 .lrn-i-cross::before {
     color: var(--content-ui-foreground);
 }
+
 /* removed min-height for add question section */
 .lrn.lrn-author {
     min-height: unset !important;
@@ -665,6 +679,7 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     color: var(--content-ui-foreground);
     font-size: 16px;
 }
+
 /* update search form dropdown styles */
 .lrn .lrn-author-ui .lrn-custom-select select {
     border: 1px solid var(--form-border-color);
@@ -696,6 +711,7 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     font-size: 1rem;
     font-weight: 400;
 }
+
 /* update the pagination styles */
 .lrn .lrn-author-ui .lrn-pagination ul {
     background: var(--body-background);
@@ -707,6 +723,7 @@ span.lrn-i-previous,
 span.lrn-i-next {
     color: var(--content-ui-foreground);
 }
+
 /* create empty state */
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list {
     margin-top: 10px;
@@ -736,6 +753,7 @@ span.lrn-list-view-empty-label {
     padding: 2rem !important;
     text-align: center;
 }
+
 /* fixed right alignment */
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-item-for-activity-list,
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list,
@@ -764,6 +782,7 @@ span.lrn-list-view-empty-label {
     content: "\A You have no items yet. An item is a single question or a collection of questions in a quiz.You need items to create a quiz.\A Select Find items or Create item to proceed.";
     white-space: pre;
 }
+
 /* fixed right alignment */
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-item-for-activity-list,
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list,
@@ -780,6 +799,7 @@ span.lrn-list-view-empty-label {
 .lrn-author-widget-wrapper-inner {
     overflow: visible !important;
 }
+
 /* Hide reference from the search options */
 .lrn-itemlist-general-search > div:nth-of-type(2) {
     display: none !important;
@@ -843,6 +863,7 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
 .lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
     width: 17.6666666667%;
 }
+
 /* update Add items button styles */
 .lrn .lrn-author-ui .lrn-btn-primary[disabled],
 .lrn .lrn-author-ui .lrn-btn-primary[disabled]:hover,
@@ -856,6 +877,7 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
     opacity: 0.5;
     font-size: 1rem;
 }
+
 /* horizontally aligned the icon and text In add new item */
 span.lrn-author-widget-icon.lrn-i-plus::before {
     display: none;
@@ -865,6 +887,7 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
     font-family: "schoolbox";
     margin-right: 9px;
 }
+
 /* Updated empty state preview - when there are no items */
 .lrn-empty-activity-wrapper {
     background-color: #ddd;
@@ -885,14 +908,17 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
     content: "\A No items to preview. Select Edit to proceed.";
     white-space: pre;
 }
+
 /* updated notification side panel background colour to white*/
 .action-list {
     background-color: #fff;
 }
+
 /* Change the style for disabled buttons to make it clear to the user the button is disabled */
 .lrn .lrn-author-ui .lrn-pagination-btn[aria-disabled="true"] > span {
     opacity: 0.5;
 }
+
 /* change toggle line height to make it consistent with other buttons */
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part,
 .lrn .lrn-author-ui .lrn-author-activity-button {

@@ -1,5 +1,4 @@
-/* general button,
-like previous question or resume quiz */
+/* general button,like previous question or resume quiz */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
 .lrn.lrn-assess .dialogs .lrn_btn {
     background-color: var(--content-ui-background);
@@ -108,19 +107,23 @@ like previous question or resume quiz */
 .lrn.lrn-assess .app-panel.review-screen .item-card.active:after {
     border-color: transparent transparent transparent var(--content-ui-foreground);
 }
+
 /* update review section styles */
 .lrn.lrn-assess .app-panel.review-screen .item-card[data-attempt_status="partially_attempted"]:not(.active):before,
 .lrn.lrn-assess .app-panel.review-screen .item-card[data-attempt_status="fully_attempted"]:not(.active):before {
     background-color: var(--content-ui-foreground);
 }
+
 /* upadet active menu button style */
 .lrn.lrn-assess .toc .lrn-pager li.pagination-active a {
     background: var(--content-ui-background);
 }
+
 /* add padding to the quiz title in the player view */
 .lrn.lrn-assess .lrn-top-left-region .test_title_element .test-title-text {
     padding: 1rem;
 }
+
 /* Removed the dotted border for review h2 title in the player */
 .lrn.lrn-assess .app-panel.review-screen .panel-header > h2:focus {
     outline: unset;
