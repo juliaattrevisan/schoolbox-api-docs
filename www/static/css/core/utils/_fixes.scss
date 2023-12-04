@@ -41,3 +41,10 @@
     display: flex !important;
     align-items: center !important;
 }
+
+// to add padding on a container element
+// this is done as previously child elements were given padding to add space between elements on the same level,
+// which isn't how padding should be used moving forward. Padding should be used to add space between a container and its children
+.f-container {
+    padding: var(--spacing-m);
+}

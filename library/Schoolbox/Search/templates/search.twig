@@ -7,7 +7,7 @@ Expected data items:
  - filterTypesValues: An array of filter type strings for populating the form.
  #}
 
-<div id="search-page-container">
+<div id="search-page-container" class="f-container">
     <search-page
         endpoint="/api/search"
         :filter-types-available="{{ filterTypes|json_encode }}"
@@ -17,7 +17,3 @@ Expected data items:
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>
-<script>
-// to use the new spacing styles
-document.getElementById("container").classList.add("c-container");
-</script>
