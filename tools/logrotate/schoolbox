@@ -1,4 +1,6 @@
 /var/log/schoolbox/*/sis-scheduler.log
+/var/log/schoolbox/*/canvas-announcements.log
+/var/log/schoolbox/*/canvas-data-sync.log
 /var/log/schoolbox/*/ups.log {
     daily
     missingok
