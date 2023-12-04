@@ -82,4 +82,9 @@ window.Vue.onMounted(async () => {
 .ck.ck-editor {
     margin-bottom: 0 !important;
 }
+
+/* hide the features container */
+.lrn_float_element_container {
+    display: none;
+}
 </style>
