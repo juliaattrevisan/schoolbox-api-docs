@@ -62,7 +62,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '/{badgeId}',
+            '/{badgeId:\d+}',
             'getBadge',
             $viewBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
