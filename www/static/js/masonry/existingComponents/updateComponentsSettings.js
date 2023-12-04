@@ -7,7 +7,7 @@ import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
 import { getLoadedHTML } from "@js/util/domUtils";
 import { getMasonryConfig } from "../masonryConfig";
-import { close as closeRemovePanel } from "./removeComponents";
+import { close as closeRemove, isOpen as isRemoveOpen } from "./removeComponents";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { updateRemovedComponent } from "./removeComponents";
 
@@ -93,7 +93,9 @@ function open(component) {
     animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
-    closeRemovePanel(component);
+    if (isRemoveOpen(component)) {
+        closeRemove(component);
+    }
 }
 
 /**
@@ -209,6 +211,7 @@ async function updateComponent(component, responseData) {
         duration: ANIMATE_SPEED,
         opacity: 1,
         startAt: { opacity: 0 },
+        s,
     });
     document.dispatchEvent(
         new CustomEvent(UpdateMasonryEvents.COMPONENT_UPDATED, {

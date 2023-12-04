@@ -7,7 +7,7 @@ import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
 import { getMasonryConfig } from "../masonryConfig";
 import { getComponentID } from "../masonryFunctions";
-import { close as closeSettingsPanel } from "./updateComponentsSettings";
+import { close as closeSettings, isOpen as isSettingsOpen } from "./updateComponentsSettings";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 
 const ANIMATE_CLOSED_POSITION = 0;
@@ -80,7 +80,9 @@ function open(component) {
     animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
-    closeSettingsPanel(component);
+    if (isSettingsOpen(component)) {
+        closeSettings(component);
+    }
 }
 
 /**
