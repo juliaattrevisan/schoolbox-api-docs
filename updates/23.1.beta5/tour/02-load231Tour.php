@@ -19,7 +19,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $plan = strtolower($this->getConfig()->get('site_plan');
+        $plan = strtolower($this->getConfig()->get('site_plan'));
         if ($plan === 'elite' || $plan === 'pro') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/231tour-lms.yaml', $returnVar);
         }
