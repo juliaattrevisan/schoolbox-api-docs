@@ -36,7 +36,7 @@ export function initRemoveComponents() {
  * @param { Element }
  */
 function init(component) {
-    initToggleButon(component);
+    initToggleButton(component);
     initCancelButton(component);
     initConfirmButton(component);
 }
@@ -47,7 +47,7 @@ function init(component) {
  * @param { Element }
  * @param { Element }
  */
-function initToggleButon(component) {
+function initToggleButton(component) {
     const toggleButtons = component.querySelectorAll(BUTTON_SELECTOR);
     toggleButtons.forEach((toggleButton) => {
         toggleButton.addEventListener("click", (event) => {

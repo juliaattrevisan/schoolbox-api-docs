@@ -22,8 +22,8 @@ const STATE_ATTRIBUTE = "data-state"; //can be 'opened' or 'closed'
 const QUERY_STRING_ATTRIBUTE = "data-query-string"; //to store the current settings to be sent to the DB on update
 
 /**
- * Initiate the setings toggle and form for each component and when a
- * new component is added or udpated
+ * Initiate the settings toggle and form for each component and when a
+ * new component is added or updated
  */
 export function initUpdateComponentsSettings() {
     document
@@ -202,7 +202,7 @@ function getSaveComponentSettingsParams(form) {
  */
 async function updateComponent(component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
-    const newComponent = await getLoadedHTML(updatedComponent.outerHTML); //enure the new html is properly loaded
+    const newComponent = await getLoadedHTML(updatedComponent.outerHTML); //ensure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly updated component
     gsap.to(newComponent, {
         //fade in the updated component
