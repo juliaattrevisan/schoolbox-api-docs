@@ -1,0 +1,26 @@
+tour:
+  title: '23.1 Release'
+  description: 'Introduce staff to the new features of the 23.1 release'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/23_1_release.png' style='width:100%;margin-bottom:16px;'>
+                  <h3>Quiz Questions</h3>
+                  <p>The quiz system has been updated with over 40+ new question types to explore for all schools that use Schoolbox’s LMS component. It now features rich interactive images, maths and scientific formulas, graphing, and drawing.</p>
+                  <h3>Unit Planner</h3>
+                  <p>Each course now has a unit planner view, to give you an overview of the entire course on a single page. It helps you quickly review what each unit of a course covers and how it will be assessed.</p>
+                  <h3>Linking Activities to Lesson Plans<h3>
+                  <p>Lessons can now be linked with other learning activities to help guide students to complete the appropriate activities during or following a lesson.</p>
+                  <h3>Upcoming Lessons for Classes</h3>
+                  <p>A new lesson plan component is now available on your class page to show upcoming lessons. This helps you avoid the clutter of the course outline and displays just the lessons students should be focussed on.</p>
+                  <h3>Advanced Search</h3>
+                  <p>The search feature will now allow you to search for badges and activities. In addition, there are now filters available to help refine your search by date, creator, and type.</p>
+                  <p><a href='/help/sso/send?returnUrl=/homepage/4854'>Find out more via our release notes.</a><br />"
+        class: introjs-newsmodal
