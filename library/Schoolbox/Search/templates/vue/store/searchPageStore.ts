@@ -69,6 +69,7 @@ export const useStore = defineStore("searchPage", () => {
 
     /**
      * To update the url with the current query params
+     * @param {boolean} simulateRedirect - whether to simulate a redirect
      */
     function setQueryParams(simulateRedirect: boolean) {
         if (simulateRedirect) {

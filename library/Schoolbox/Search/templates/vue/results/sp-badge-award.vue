@@ -2,33 +2,33 @@
 import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time.vue";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import BadgeAward from "@schoolboxBadge/Award/vue/badgeAward.vue";
-import { useSPBadgeAwardStore } from "./store/spBadgeAwardStore";
+import { useBadgeStore } from "./store/spBadgeStore";
 
-const badgeAwardStore = useSPBadgeAwardStore();
+const badgeStore = useBadgeStore();
 </script>
 
 <template>
     <sequential-reveal-modal
         size="medium"
-        :is-open="badgeAwardStore.selectedBadge !== null"
-        @closed="badgeAwardStore.unsetSelectedBadge()"
+        :is-open="badgeStore.awardBadge !== null"
+        @closed="badgeStore.unsetAwardBadge()"
     >
         <template #sequence-1>
-            <template v-if="badgeAwardStore.selectedBadge !== null">
+            <template v-if="badgeStore.awardBadge !== null">
                 <badge-award
-                    v-if="badgeAwardStore.selectedBadge.type === 'achievement'"
-                    :key="`awardAchievement-${badgeAwardStore.selectedBadge.id}`"
+                    v-if="badgeStore.awardBadge.type === 'achievement'"
+                    :key="`awardAchievement-${badgeStore.awardBadge.id}`"
                     type="achievement"
-                    :badge="badgeAwardStore.selectedBadge"
-                    :expiry="badgeAwardStore.selectedBadge.expiry"
-                    :endpoint="`/learning/badge/award/${badgeAwardStore.selectedBadge.id}/achievement`"
+                    :badge="badgeStore.awardBadge"
+                    :expiry="badgeStore.awardBadge.expiry"
+                    :endpoint="`/learning/badge/award/${badgeStore.awardBadge.id}/achievement`"
                     :is-modal-open="true"
                     placeholder="Search for users to award achievement to"
                     toast-activate-message="Awarding achievement..."
                     toast-success-message="Awarded achievement"
                     toast-failure-message="Awarding achievement failed"
-                    @cancel="badgeAwardStore.unsetSelectedBadge()"
-                    @done="badgeAwardStore.unsetSelectedBadge()"
+                    @cancel="badgeStore.unsetAwardBadge()"
+                    @done="badgeStore.unsetAwardBadge()"
                 >
                     <template #header="slotProps">
                         <h2>
@@ -46,19 +46,19 @@ const badgeAwardStore = useSPBadgeAwardStore();
                 </badge-award>
 
                 <badge-award
-                    v-else-if="badgeAwardStore.selectedBadge.type === 'goal'"
-                    :key="`setGoal-${badgeAwardStore.selectedBadge.id}`"
+                    v-else-if="badgeStore.awardBadge.type === 'goal'"
+                    :key="`setGoal-${badgeStore.awardBadge.id}`"
                     type="goal"
-                    :badge="badgeAwardStore.selectedBadge"
-                    :expiry="badgeAwardStore.selectedBadge.expiry"
-                    :endpoint="`/learning/badge/award/${badgeAwardStore.selectedBadge.id}/goal`"
+                    :badge="badgeStore.awardBadge"
+                    :expiry="badgeStore.awardBadge.expiry"
+                    :endpoint="`/learning/badge/award/${badgeStore.awardBadge.id}/goal`"
                     :is-modal-open="true"
                     placeholder="Search for users to award achievement to"
                     toast-activate-message="Setting goal..."
                     toast-success-message="Goal set"
                     toast-failure-message="Setting goal failed"
-                    @cancel="badgeAwardStore.unsetSelectedBadge()"
-                    @done="badgeAwardStore.unsetSelectedBadge()"
+                    @cancel="badgeStore.unsetAwardBadge()"
+                    @done="badgeStore.unsetAwardBadge()"
                 >
                     <template #header="slotProps">
                         <h2>

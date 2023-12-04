@@ -4,6 +4,7 @@
  */
 
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
+import BadgeModal from "@schoolboxBadge/vue/badge-modal";
 import SpResultsPrompt from "./results/sp-results-prompt.vue";
 import SpResultsError from "./results/sp-results-error.vue";
 import SpResultsNone from "./results/sp-results-none.vue";
@@ -14,6 +15,7 @@ import type { FilterType } from "./filters/store/spFilterTypesStore";
 import type { FilterDateRange } from "./filters/store/spFilterDateRangeStore";
 import { useSearchStore } from "./store/spSearchStore";
 import { useResultsStore } from "./results/store/spResultsStore";
+import { useBadgeStore } from "./results/store/spBadgeStore";
 import { Creator } from "./filters/store/spFilterCreatorsStore";
 import { SEARCH_PARAM } from "./store/spQueryStore";
 
@@ -37,6 +39,7 @@ store.init(
 
 const searchStore = useSearchStore();
 const resultsStore = useResultsStore();
+const badgeStore = useBadgeStore();
 const searchPageEl = window.Vue.ref<HTMLDivElement>();
 
 /**
@@ -50,6 +53,9 @@ function initResizeObserver() {
     resizeObserver.observe(searchPageEl.value as HTMLDivElement);
 }
 
+/**
+ * When the back button is pressed, reload the page if there's a search query
+ */
 window.onpopstate = () => {
     const searchParams = new URLSearchParams(document.location.search);
     if (searchParams.has(SEARCH_PARAM)) {
@@ -67,10 +73,21 @@ window.Vue.onMounted(async () => {
         await searchStore.search(false);
     }
 });
+
+/**
+ * the badge modal is closed, so we should set the boolean to
+ * false so we can open it again
+ */
+function onBadgeModalClosed() {
+    badgeStore.isDetailModalOpen = false;
+}
 </script>
 
 <template>
-    <div ref="searchPageEl" :class="`c-search-page ${store.isSingleColumn ? 'c-search-page--single-column' : ''}`">
+    <div
+        ref="searchPageEl"
+        :class="`search-page l-grid l-gap-xl ${store.isSingleColumn ? 'search-page--single-column' : ''}`"
+    >
         <sp-filters class="c-search-page__filters" />
         <div class="c-search-page__results l-flex-col l-gap-m">
             <sp-results-prompt v-if="searchStore.hasNotSearched" />
@@ -80,12 +97,11 @@ window.Vue.onMounted(async () => {
             <sp-results v-else-if="resultsStore.hasResults" />
         </div>
     </div>
+    <badge-modal :is-open="badgeStore.isDetailModalOpen" :badge="badgeStore.detailBadge" @closed="onBadgeModalClosed" />
 </template>
 
 <style lang="scss" scoped>
-.c-search-page {
-    display: grid;
-    gap: var(--spacing-xl);
+.search-page {
     grid-template-areas: "filters results";
     grid-template-columns: 400px 1fr;
     grid-template-rows: 1fr auto;
