@@ -1100,3 +1100,10 @@
     margin-right: 0;
   }
 }
+
+/* Fixed the styles for long folder names not breaking the layout in the change location modal */
+.jstree .jstree-anchor {
+    margin-right: 1.5rem;
+    overflow: hidden;
+    white-space: normal;
+}
