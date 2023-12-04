@@ -927,3 +927,8 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-part {
     padding: 0.5rem;
 }
+
+/* Made item titles foreground color to make it more clear it is clickable */
+button.lrn-h3.lrn-list-view-heading.lrn-ellipses.lrn-author-editable-item {
+    color: var(--content-ui-foreground) !important;
+}
