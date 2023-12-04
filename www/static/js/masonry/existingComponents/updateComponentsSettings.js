@@ -7,7 +7,7 @@ import { gsap } from "gsap/all";
 import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
 import { getLoadedHTML } from "@js/util/domUtils";
 import { getMasonryConfig } from "../masonryConfig";
-import { close as closeRemovePanel } from "./removeComponents";
+import { close as closeRemove, isOpen as isRemoveOpen } from "./removeComponents";
 import UpdateMasonryEvents from "../updateMasonryEvents";
 import { updateRemovedComponent } from "./removeComponents";
 
@@ -22,8 +22,8 @@ const STATE_ATTRIBUTE = "data-state"; //can be 'opened' or 'closed'
 const QUERY_STRING_ATTRIBUTE = "data-query-string"; //to store the current settings to be sent to the DB on update
 
 /**
- * Initiate the setings toggle and form for each component and when a
- * new component is added or udpated
+ * Initiate the settings toggle and form for each component and when a
+ * new component is added or updated
  */
 export function initUpdateComponentsSettings() {
     document
@@ -93,7 +93,9 @@ function open(component) {
     animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
-    closeRemovePanel(component);
+    if (isRemoveOpen(component)) {
+        closeRemove(component);
+    }
 }
 
 /**
@@ -202,7 +204,7 @@ function getSaveComponentSettingsParams(form) {
  */
 async function updateComponent(component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
-    const newComponent = await getLoadedHTML(updatedComponent.outerHTML); //enure the new html is properly loaded
+    const newComponent = await getLoadedHTML(updatedComponent.outerHTML); //ensure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly updated component
     gsap.to(newComponent, {
         //fade in the updated component
