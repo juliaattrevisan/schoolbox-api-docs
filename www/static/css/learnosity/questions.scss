@@ -2,6 +2,7 @@
 .lrn_widget.lrn_mcq .lrn_mcqgroup {
     overflow-x: visible;
 }
+
 /* reset the radio and checkboxes to default */
 .lrn_widget input[type="radio"],
 .lrn_widget input[type="checkbox"] {
@@ -11,6 +12,7 @@
     position: static;
     width: auto;
 }
+
 /*the color used to highlight the selceted item  */
 .lrn_widget .lrn_valid,
 .lrn_widget .lrn_selected {
@@ -21,6 +23,7 @@
 .lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
     background-color: var(--content-ui-selected);
 }
+
 /* update border color in the mutiplechoice-block layout */
 .lrn_widget.lrn_mcq
     .lrn_response
@@ -28,6 +31,7 @@
     .lrn-mcq-option.lrn_selected:not(.lrn_valid):not(.lrn_correct):not(.lrn_incorrect) {
     border-left-color: var(--content-ui-foreground);
 }
+
 /* update the drag item border color to  content-ui-foreground in Cloze with drago & drop */
 .lrn_widget .lrn_btn_drag {
     box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
@@ -49,6 +53,7 @@
 .lrn_widget .lrn_btn_sort.lrn_hover {
     box-shadow: inset 0 0 0 1px;
 }
+
 /* update the active color to content-ui-selected for drag and drop */
 .lrn_widget .lrn_btn_drag:active,
 .lrn_widget .lrn_btn_drag.lrn_active,
@@ -274,6 +279,7 @@
 .lrn_widget .lrn-formula-keyboard-menu-right button {
     top: 0.5em;
 }
+
 /*update the radio and checkbox background color to content-ui-foregroud*/
 input[type="radio"],
 input[type="checkbox"] {
@@ -413,6 +419,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     background-color: var(--content-ui-selected);
     color: var(--content-ui-foreground);
 }
+
 /* update the border radius to 0px */
 .lrn .lrn_btn {
     border-radius: 0px;
@@ -451,6 +458,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn_widget.lrn_shorttext .lrn_textinput input {
     border-radius: 0px;
 }
+
 /* update the classification drop zone borders */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
     border-right: 1px dashed var(--content-ui-foreground);
@@ -514,6 +522,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn_widget.lrn_sortlist .lrn_response .lrn_btn_sort.lrn_active:before {
     color: var(--content-ui-foreground);
 }
+
 /* update graphing border */
 .lrn_widget.lrn_graphplotting .lrn_response_wrapper .lrn_graph_plotter .lrn_toolbar:focus-within {
     outline: unset;
@@ -523,6 +532,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 .lrn_widget.lrn_imageupload .lrn_toolbar .lrn_btn.lrn_active {
     box-shadow: unset;
 }
+
 /* upload image button color */
 span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
     background-color: var(--content-ui-foreground);
@@ -535,6 +545,7 @@ span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
 .lrn_widget.lrn_imageupload .lrn_toolbar .lrn_btn.lrn_active:focus {
     box-shadow: unset;
 }
+
 /* add "Add" before icon for adding question to an item */
 button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-widget-icon.lrn-i-plus:after {
     content: " Add";
@@ -567,6 +578,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     font-family: "schoolbox";
     vertical-align: middle;
 }
+
 /* fixed file upload button styles in preview questions */
 .lrn_widget.lrn_fileupload .lrn-fileupload-input-wrapper .lrn-disabled {
     opacity: unset;
@@ -575,6 +587,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn.lrn-assess .app-layout .lrn_btn_blue:after {
     border-radius: 0px;
 }
+
 /* remove the relevant disabled styles on a student response elements within horizontal marking */
 .lrn_response_wrapper :disabled,
 .lrn_response_wrapper input[type="checkbox"]:not(.plain):disabled + label,
@@ -605,11 +618,13 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn_response_wrapper textarea:disabled {
     background-color: transparent;
 }
+
 /* update left padding for input */
 .lrn_cloze .lrn_response_input .lrn_textinput input,
 .lrn_cloze .lrn_response_input .lrn_textinput textarea {
     padding-left: 0.5rem;
 }
+
 /* fixed calculator drop down */
 .lrn-formula-keyboard-menu-container.lrn-formula-keyboard-menu-groups
     > .lrn_dropdown.lrn_theme_primary
@@ -629,6 +644,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn_dropdown.lrn_theme_primary.lrn_open .lrn_dropdown_toggle:hover {
     background: transparent;
 }
+
 /* Check answer button */
 .lds-btn-secondary,
 .lrn .lrn_btn:is(.lds-btn-secondary) {
@@ -651,14 +667,17 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
 }
+
 /* updatle the uploader button */
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-asset-uploader {
     transform: unset;
 }
+
 /* Added space to the right of questions in the item authoring */
 .lrn-widget-drag-wrapper {
     padding-right: 50px;
 }
+
 /* fixed overlap of the masking  */
 .lrn .lrn-mask {
     height: 90% !important;
@@ -667,6 +686,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn button.lrn-mask:focus {
     outline: unset !important;
 }
+
 /* Made edit/preview button font sizes consistent */
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toolbar-control {
     font-size: 1rem;
@@ -690,6 +710,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     content: "\e604";
     font-family: "schoolbox";
 }
+
 /* fixed save button hover style*/
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
 .lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
@@ -704,6 +725,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn .lrn-author-ui .lrn-list-view-col.lrn-list-view-select-col {
     padding: 2rem;
 }
+
 /* fixed the correct answers tabs */
 .lrn-qe .lrn-qe-ui .lrn-qe-tabs .lrn-qe-tab-trigger {
     font-size: 1rem;
@@ -715,6 +737,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lrn-qe .lrn-qe-ui .lrn-qe-color-picker .lrn-color-picker {
     border: none;
 }
+
 /* fixed edit/add buttons in the questions to be consistent with other buttons */
 .lrn-qe
     .lrn-qe-ui
