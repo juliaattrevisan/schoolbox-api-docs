@@ -1772,25 +1772,44 @@ class Controller extends Base
             // Possible statuses: queued, running, halted, completed
             // https://reference.learnosity.com/data-api/endpoints/jobs_endpoints
             $learnosityJobStatus = $learnosityJobResponse['data'][0]['status'] ?? null;
+            $setTags             = false;
             if ($learnosityJobStatus === Api::JOB_STATUS_COMPLETED) {
                 $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_COMPLETED;
+                $setTags   = true;
                 $quiz->setLearnosityJobStatus($jobStatus);
                 $this->quizMapper->save($quiz);
             } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
+                $setTags   = true;
                 $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_FAILED;
                 $quiz->setLearnosityJobStatus($jobStatus);
                 $this->quizMapper->save($quiz);
             }
+
+            // If complete or failed: set the tags
+            if ($setTags) {
+                $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
+                $newTags    = $tagFactory->produceFromAssessment($assessment);
+                $this->api->dataSetRequest(
+                    '/itembank/activities/tags',
+                    [
+                        'activities' => [
+                            [
+                                'reference' => $quiz->getLearnosityReference(),
+                                'tags'      => $newTags,
+                            ],
+                        ],
+                    ],
+                );
+            }
         }
 
-
         // What's in the response: just a "status" callback,
-        // possibly a API problem?
+        // possibly an API problem?
         $jobStatus    = $quiz->getLearnosityJobStatus();
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
-                // including failure
+            // including failure
             default => 400,
         };
         $this->response = $this
