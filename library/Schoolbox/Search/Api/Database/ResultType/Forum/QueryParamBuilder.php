@@ -43,12 +43,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $keywordSearchParts = [
             "ft.title LIKE :postKeywordLike$paramKeySuffix",
-            "fp.body LIKE :postKeywordLike$paramKeySuffix",
+            "MATCH(fp.body) AGAINST (:postKeyword$paramKeySuffix)",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params = [
             "postNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "postKeyword$paramKeySuffix"     => $this->quoter->escapeForLike($keyword),
+            "postKeyword$paramKeySuffix"     => $keyword,
             "postKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
@@ -67,7 +67,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         return $this->buildLinearDecayExpression(
             ":postNow$paramKeySuffix",
-            $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix),
+            'modified',
             7,
             56,
         );
@@ -118,7 +118,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('postID', $paramKeySuffix);
+        return 'postID';
     }
 
     /**
@@ -128,7 +128,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('modified', $paramKeySuffix);
+        return 'modified';
     }
 
     /**
@@ -138,7 +138,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
-        return $this->getSubqueryForMostRelevantPostInThread('userID', $paramKeySuffix);
+        return 'userID';
     }
 
     /**
@@ -171,33 +171,5 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             FROM forumThread ft
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
         ';
-    }
-
-    /**
-     * Note regarding performance
-     * --------------------------
-     * Creating this subquery for each of buildIdExpression(), buildDateExpression(), and buildCreatorExpression() will
-     * result in a near-identical subquery repeated multiple times in the query that is eventually run.
-     * A way to remove the repeated subqueries is demonstrated in https://github.com/alaress/schoolbox/pull/28981.
-     * The current method is good enough for now.
-     *
-     * @param string $columnToSelect
-     * @param string $paramKeySuffix
-     * @return string
-     */
-    private function getSubqueryForMostRelevantPostInThread(string $columnToSelect, string $paramKeySuffix): string
-    {
-        return (
-            // Select from the most recent post in the thread whose body contains the keyword, otherwise the most recent post.
-            '(
-                SELECT ' . $this->quoter->quoteIdentifier($columnToSelect) . "
-                FROM  forumPost AS fp2
-                WHERE fp2.threadID=ft.threadID
-                ORDER BY LOCATE(:postKeyword$paramKeySuffix, fp2.body)>0 DESC, fp2.modified DESC, fp2.postID ASC
-                LIMIT 1
-             )"
-            // NOTE: Order by "fp2.postID ASC" above is necessary so that consistent results are returned each time
-            //       the query runs given that fp2.modified may not be unique.
-        );
     }
 }

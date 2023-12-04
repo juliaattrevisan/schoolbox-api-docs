@@ -60,11 +60,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
              *    @see Assessment\Hydrator->assessmentMatchesKeywordOnlyOnDescription().
              *  - lesson_plan_field.visibility is checked in the Hydrator.
              */
-            "assessment.title LIKE :assessmentKeywordLike$paramKeySuffix",
-            "assessment.description LIKE :assessmentKeywordLike$paramKeySuffix",
+            "MATCH(assessment.title, assessment.description) AGAINST (:assessmentKeyword$paramKeySuffix)",
             "task.link LIKE :assessmentKeywordLike$paramKeySuffix",
-            "assess.title LIKE :assessmentKeywordLike$paramKeySuffix",
-            "assess.description LIKE :assessmentKeywordLike$paramKeySuffix",
             "lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike$paramKeySuffix",
             "lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike$paramKeySuffix",
             "lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike$paramKeySuffix",
@@ -74,14 +71,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                  WHERE lesson_plan_field.lesson_plan_id = lesson_plan.id
                  AND lesson_plan_field.deleted_at IS NULL
                  AND (
-                    title LIKE :assessmentKeywordLike$paramKeySuffix OR
-                    body LIKE :assessmentKeywordLike$paramKeySuffix
+                    MATCH(title, body) AGAINST (:assessmentKeyword$paramKeySuffix)
                  )
              )"
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params       = [
             "assessmentNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "assessmentKeyword$paramKeySuffix"     => $keyword,
             "assessmentKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 

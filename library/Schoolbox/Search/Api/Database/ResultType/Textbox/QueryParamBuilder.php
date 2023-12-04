@@ -44,6 +44,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'where'  => [], // All the where conditions are specified in buildFromStatement().
             'params' => [
                 "textboxNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+                "textboxKeyword$paramKeySuffix"     => $keyword,
                 "textboxKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
             ]
         ];
@@ -192,8 +193,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                 AND tb.deleted_at IS NULL
                 AND fo.deleted_at IS NULL
                 AND (
-                    tb.heading LIKE :textboxKeywordLike$paramKeySuffix OR
-                    tb.body LIKE :textboxKeywordLike$paramKeySuffix OR
+                    MATCH(tb.heading, tb.body) AGAINST (:textboxKeyword$paramKeySuffix) OR
                     EXISTS(
                         SELECT *
                         FROM component_config_instance cci2
@@ -223,10 +223,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
                     cci2.value = CAST(tb2.textBoxID AS NCHAR)
                 )
                 WHERE tb2.deleted_at IS NULL
-                AND (
-                   tb2.heading LIKE :textboxKeywordLike$paramKeySuffix OR
-                   tb2.body LIKE :textboxKeywordLike$paramKeySuffix
-                )
+                AND MATCH(tb2.heading, tb2.body) AGAINST (:textboxKeyword$paramKeySuffix)
                 AND cci2.id IS NULL
             ) AS dummy";
     }

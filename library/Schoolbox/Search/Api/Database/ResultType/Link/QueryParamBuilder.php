@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Link;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -18,15 +17,6 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  */
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter $quoter
-     */
-    public function __construct(private IQuoter $quoter)
-    {
-    }
-
     /**
      * Build WHERE params such that
      * * deleted links are never fetched
@@ -42,14 +32,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
-            "l.description LIKE :linkKeywordLike$paramKeySuffix",
-            "l.comment LIKE :linkKeywordLike$paramKeySuffix",
-            "l.url LIKE :linkKeywordLike$paramKeySuffix",
+            "MATCH(l.url, l.description, l.comment) AGAINST (:linkKeyword$paramKeySuffix)",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
-            "linkNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "linkKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "linkNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
+            "linkKeyword$paramKeySuffix" => $keyword,
         ];
 
         return [

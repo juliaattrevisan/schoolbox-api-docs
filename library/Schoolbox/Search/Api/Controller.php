@@ -361,48 +361,43 @@ class Controller extends Base
      */
     private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit, ?string $cursorCode): array
     {
+        // Instead of iteratively backfilling the result set with more results
+        // if it hasn't reached the limit:
+        // allow the cursor itself to fetch more results than the limit, and
+        // slice results off of the limit if there's too many.
         $cursor = new Cursor\Cursor(
             $this->source,
             $keyword,
             $filter,
-            $limit,
+            $limit * 10,
         );
 
-        // Fetch results from cursor and hydrate, until either:
-        // - limit is reached
-        // - the end of cursor is reached
-        // This ensures there is a consistent number of results returned,
-        // even if the hydrator filters out results.
-        $i             = 0;
-        $fullResults   = [];
-        $nextCursor    = $cursorCode;
-        while (count($fullResults) < $limit && $i++ < 100) {
-            // Get next set of raw results, and the cursor for the next
-            // iteration.
-            $nextRawResults = $cursor->retrieveResults($nextCursor);
-            $nextCursor  = $cursor->next($nextRawResults);
+        // Fetch results from cursor and hydrate
+        $nextRawResults = $cursor->retrieveResults($cursorCode);
+        $nextCursor     = $cursor->next($nextRawResults);
+        $fullResults    = $this->hydrator->hydrate($keyword, $filter, $nextRawResults->getAll(), $this->user);
 
-            // No raw results retrieved and no cursor?
-            // We're at the end of the result set, so break.
-            if (!isset($nextCursor) && count($nextRawResults) === 0) {
-                break;
-            }
-
-            // Otherwise: hydrate raw results into full results,
-            // then add them to the full result set.
-            $fullResults = array_merge(
-                $fullResults,
-                $this->hydrator->hydrate($keyword, $filter, $nextRawResults->getAll(), $this->user)
-            );
-
-            // Too many full results now?
-            // Slice off excess results, get a cursor to the last remaining
-            // full result, then break.
-            if (count($fullResults) > $limit) {
-                $fullResults    = array_slice($fullResults, 0, $limit);
-                $lastFullResult = $fullResults[array_key_last($fullResults)];
-                $nextCursor     = $cursor->next(new Collection([$lastFullResult->rawResult]));
-                break;
+        // Too many full results now?
+        // Slice off excess results, and get a cursor to the last remaining
+        // full result.
+        if (count($fullResults) > $limit) {
+            $fullResults    = array_slice($fullResults, 0, $limit);
+            $lastFullResult = $fullResults[array_key_last($fullResults)];
+            $nextCursor     = $cursor->next(new Collection([$lastFullResult->rawResult]));
+        } elseif (isset($nextCursor)) {
+            // If there's no more than $limit raw results: there can't possibly
+            // be more results left, because hydration can't add results
+            if (count($nextRawResults) <= $limit) {
+                $nextCursor = null;
+            } else {
+                // Ask the cursor if there's actually any results left:
+                // if there are none, clear the next cursor so that the user is
+                // not prompted for more results when we know there's none.
+                $previewCursor  = new Cursor\Cursor($this->source, $keyword, $filter, 1);
+                $previewResults = $previewCursor->retrieveResults($nextCursor);
+                if (count($previewResults) === 0) {
+                    $nextCursor = null;
+                }
             }
         }
 

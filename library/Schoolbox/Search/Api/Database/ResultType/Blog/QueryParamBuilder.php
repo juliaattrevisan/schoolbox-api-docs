@@ -9,22 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Blog;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter $quoter
-     */
-    public function __construct(
-        private IQuoter $quoter
-    ) {
-    }
-
     /**
      * @see \Calendar::getDayEvents
      * @inheritDoc
@@ -36,12 +25,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'f.deleted_at IS NULL',
         ];
         $params = [
-            "blogNow$paramKeySuffix" => Alaress_Date_Format::now()->getDatabase(),
-            "blogKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%'
+            "blogNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
+            "blogKeyword$paramKeySuffix" => $keyword,
         ];
         $keywordSearchParts = [
-            "b.heading LIKE :blogKeywordLike$paramKeySuffix",
-            "b.body LIKE :blogKeywordLike$paramKeySuffix",
+            "MATCH(b.heading, b.body) AGAINST (:blogKeyword$paramKeySuffix)",
         ];
 
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';

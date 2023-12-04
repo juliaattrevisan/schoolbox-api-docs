@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\File;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -18,15 +17,6 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  */
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter $quoter
-     */
-    public function __construct(private IQuoter $quoter)
-    {
-    }
-
     /**
      * Build WHERE params such that
      * * deleted files are never fetched
@@ -43,14 +33,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'fo.deleted_at IS NULL',
         ];
         $keywordSearchParts = [
-            "f.realname LIKE :fileKeywordLike$paramKeySuffix",
-            "f.description LIKE :fileKeywordLike$paramKeySuffix",
-            "f.comment LIKE :fileKeywordLike$paramKeySuffix",
+            "MATCH(f.realname, f.description, f.comment) AGAINST (:fileKeyword$paramKeySuffix)",
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
-            "fileNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "fileKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "fileNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
+            "fileKeyword$paramKeySuffix" => $keyword,
         ];
 
         return [

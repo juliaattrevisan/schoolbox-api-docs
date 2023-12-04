@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\News;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -23,16 +22,6 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  */
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter $quoter
-     */
-    public function __construct(
-        private IQuoter $quoter
-    ) {
-    }
-
     /**
      * Build the WHERE params such that:
      * * deleted articles are never fetched
@@ -53,19 +42,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             'n.rejected_at IS NULL',
         ];
         $params = [
-            "newsNow$paramKeySuffix" => Alaress_Date_Format::now()->getDatabase(),
-            "newsKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%'
+            "newsNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
+            "newsKeyword$paramKeySuffix" => $keyword,
         ];
 
         // Apply keyword
-        // TODO replacing with MATCH may return more accurate results?
-        // (see https://mariadb.com/kb/en/full-text-index-overview/)
-        // This match returns any results within strings, whether or not they
-        // actually match a whole word.
         $keywordSearchParts = [
-            "n.title LIKE :newsKeywordLike$paramKeySuffix",
-            "n.body LIKE :newsKeywordLike$paramKeySuffix",
-            "n.blurb LIKE :newsKeywordLike$paramKeySuffix",
+            "MATCH(n.title, n.body, n.blurb) AGAINST (:newsKeyword$paramKeySuffix)",
         ];
         $whereParts[] = '(' . implode(' OR ', $keywordSearchParts) . ')';
         return [
