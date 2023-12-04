@@ -18,7 +18,7 @@ WHERE fd.id > 0;
 
 update folder fd
     left join cmsLog cmsLogModify on (fd.id = cmsLogModify.objectId and cmsLogModify.object = 'folder' and cmsLogModify.action = 'modify')
-set fd.updated_at = COALESCE(cmsLogModify.time, fd.deleted_at, fd.updated_at),
+set fd.updated_at = COALESCE(cmsLogModify.time, fd.deleted_at, fd.created_at),
     fd.updated_by = coalesce(cmsLogModify.user, fd.created_by)
 WHERE fd.id > 0;
 
