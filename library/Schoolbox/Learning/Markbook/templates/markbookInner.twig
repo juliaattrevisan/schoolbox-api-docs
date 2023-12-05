@@ -157,7 +157,7 @@
             <tr data-student="{{ student.id }}">
                 <th class="fixed-left white profile-cell">
                     <div class="c-card">
-                        <div class="l-flex-row l-gap-m l-pad-m">
+                        <div class="l-flex-row l-gap-m l-pad-s">
                             {% if studentCount < functionDegradeLimit %}
                                 {% include "include/portrait.twig" with {user: student, render: "tiny", roundedCorners: true} only %}
                             {% endif %}
