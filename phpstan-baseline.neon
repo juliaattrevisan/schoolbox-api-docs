@@ -5861,11 +5861,6 @@ parameters:
 			path: tools/pastoral/generateTestData.php
 
 		-
-			message: "#^Variable \\$participantMapper in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: tools/quiz/autoFinish.php
-
-		-
 			message: "#^Comparison operation \"\\>\\=\" between int\\<3, max\\> and 3 is always true\\.$#"
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php

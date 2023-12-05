@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 
 /**
@@ -163,11 +164,16 @@ HELP;
              */
             if ($current !== $lastSeen) {
                 $user = $userMapper->findById($row['user_id']);
+
+                /** @var QuizDomainModel $assessment */;
                 $assessment = $assessmentMapperProxy->findByIdForReview($row['assessment_id'], $user);
 
                 /* We need this $quiz container thing to hold attempts
                  */
                 try {
+                    /* TODO maybe can optimise this by remembering it, since attempts
+                     *  are sequenced by assessment id
+                     */
                     $quiz = $this->getQuizForAssessmentId($assessment->getId());
                 } catch (\RuntimeException $e) {
                     /* This somehow found to be a survey, not a quiz.
