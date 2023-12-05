@@ -4,6 +4,7 @@ namespace Schoolbox\Learning\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 
@@ -76,8 +77,10 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
             $templateHandle,
             '@learning/component/lessonPlanDashboard.twig',
             [
-                'range'       => $this->range,
-                'lessonPlans' => $this->visibleLessonPlans,
+                'returnUrlName'     => Assessment\Redirect::RETURN_URL,
+                'encodedReturnUrl'  => Assessment\Redirect::encode('/'),
+                'range'             => $this->range,
+                'lessonPlans'       => $this->visibleLessonPlans,
             ]
         );
     }
