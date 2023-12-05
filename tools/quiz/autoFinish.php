@@ -150,8 +150,6 @@ HELP;
         $this->getLogger()->info('');
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            print_r($row);
-
             $current = [
                 'assessmentId' => $row['assessment_id'],
                 'userId' => $row['user_id']
