@@ -21,9 +21,13 @@
  */
 
 use Assess\IAutomarkable;
+use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\MapperFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -32,6 +36,12 @@ $app = new class extends CliTool\App
 {
     // --help: print help
     private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * @var \Schoolbox\Learning\Quiz\Mapper
+     */
+    private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
 
 
     /** @inheritdoc */
@@ -78,9 +88,12 @@ HELP;
          */
         $expiry = \Alaress_Date_Format::now();
 
-        /* Mappers we need
+        /* We need these mappers
          */
-        $quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
+        $this->quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
+
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         /* Find the assessments which have attempts that need to be shut
          *     - Only process living attempts (ignore deleted attempts)
@@ -95,7 +108,11 @@ HELP;
          * this would occur only by direct intervention or hideous mistake
          */
         $query = "
-            SELECT assess.assessment_id
+            SELECT 
+                assess_attempt.attempt_id,
+                assess_attempt.user_id,
+                assess.assessment_id,
+                assess.assess_id
             FROM assess_attempt
             INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
             INNER JOIN assessment ON assess.assessment_id = assessment.id
@@ -106,7 +123,7 @@ HELP;
             AND u.deleted_at IS NULL
             AND assess.duration > :unlimitedDuration
             AND TIMESTAMPADD(SECOND, `assess`.`duration`, `assess_attempt`.`start`) < :expiry
-            ORDER BY assess.assessment_id
+            ORDER BY assess.assessment_id, assess_attempt.user_id
         ";
 
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
@@ -115,34 +132,59 @@ HELP;
             'expiry' => $expiry->getDatabase()
         ]);
 
+        /* Process each assessment en masse like we usually do
+         */
+        $lastSeen = [
+            'assessmentId' => null,
+            'userId' => null
+        ];
 
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            print_r($row);
 
-
-        foreach ($expiredAttempts as $attempt) {
-            $log->info(sprintf(
-                'Processing attempt_id %d',
-                $attempt->getId(),
-            ));
-
-            /* Generic debug announcement for those wanting to dive deeper
+            /* If the last (assessment, user_id) tuple is null,
+             * this is our first iteration: hydrate $assessment and $quiz,
+             * then shut this user's attempts en masse
              */
-            $log->debug(sprintf(
-                'attempt_id %d by %s (%s) was in quiz "%s" (%s) and homepage %s',
-                $attempt->getId(),
-                $attempt->getUser()->formatName(),
-                $attempt->getUser()->getId(),
-                $attempt->getQuiz()->getTitle(),
-                $attempt->getQuiz()->getId(),
-                $attempt->getQuiz()->getCategory()->getId()
-            ));
 
-            /* Sometimes an attempt doesn't have a hydrated user
-             * I guess it's broken data somehow
+            /* If the current (assessment, user_id) tuple is different
+             * to the previous $lastSeen tuple, hydrate $assessment and $quiz,
+             * then shut this user's attempts en masse
              */
-            if (!$attempt->getUser()->getId()) {
-                $log->warning('For some reason, this attempt has no owner - skipping');
-                continue;
-            }
+
+            /* If the current (assessment, user_id) tuple is the same
+             * as the previous $lastSeen tuple, we've already done their attempts;
+             * keep going
+             */
+        }
+
+
+
+//        foreach ($expiredAttempts as $attempt) {
+//            $log->info(sprintf(
+//                'Processing attempt_id %d',
+//                $attempt->getId(),
+//            ));
+//
+//            /* Generic debug announcement for those wanting to dive deeper
+//             */
+//            $log->debug(sprintf(
+//                'attempt_id %d by %s (%s) was in quiz "%s" (%s) and homepage %s',
+//                $attempt->getId(),
+//                $attempt->getUser()->formatName(),
+//                $attempt->getUser()->getId(),
+//                $attempt->getQuiz()->getTitle(),
+//                $attempt->getQuiz()->getId(),
+//                $attempt->getQuiz()->getCategory()->getId()
+//            ));
+//
+//            /* Sometimes an attempt doesn't have a hydrated user
+//             * I guess it's broken data somehow
+//             */
+//            if (!$attempt->getUser()->getId()) {
+//                $log->warning('For some reason, this attempt has no owner - skipping');
+//                continue;
+//            }
 
             /* I guess this attempt needs its stuff
              * Shank out an $assessment and extract its quiz, caching it locally for performance
@@ -220,6 +262,29 @@ HELP;
 //            $log->notice(sprintf("Saving %d expired attempts", count($updatedAttempts)));
 //            $attemptMapper->save($updatedAttempts);
 //        }
+//    }
+
+    /**
+     * Converts an assessment_id to a Quiz
+     *
+     * Literally copypasta'd
+     *
+     * @param int $assessmentId
+     * @return Quiz
+     */
+    protected function getQuizForAssessmentId(int $assessmentId): Quiz
+    {
+        /** @var Quiz $quiz */
+        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
+
+        if (Quiz::AVAILABILITY_ASSESS !== $quiz->getAvailability()) {
+            throw new \RuntimeException(sprintf(
+                'Assessment id %s is somehow not associated with a quiz.',
+                $assessmentId
+            ));
+        }
+
+        return $quiz;
     }
 };
 
