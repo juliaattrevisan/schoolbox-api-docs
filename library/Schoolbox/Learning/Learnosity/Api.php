@@ -47,6 +47,12 @@ class Api
 
 
     /**
+     * Learnosity has a default 40sec timeout which isn't long enough sometimes?
+     */
+    private const DATA_API_TIMEOUT = 120;
+
+
+    /**
      * Number of seconds to take a nap before retrying a failed endpoint
      *
      * Sometimes endpoints fail for no obvious reason and trying again seems
@@ -255,6 +261,7 @@ class Api
      * @throws ApiException
      * @throws ValidationException
      * @throws \JsonException
+     * @throws \Exception
      */
     private function dataRequest(string $host, string $endpoint, array $payload, string $actionType): mixed
     {
@@ -270,7 +277,9 @@ class Api
          */
         while ($fails < self::NUM_RETRY) {
             try {
-                $response = (new DataApi())->request(
+                $response = (new DataApi([
+                    'timeout' => self::DATA_API_TIMEOUT
+                ]))->request(
                     $url,
                     [
                         'domain' => $this->serverName,
@@ -299,10 +308,13 @@ class Api
                      * We can't really do much with that
                      */
                     if (is_bool($responseBody)) {
-                        throw new ApiException(sprintf(
-                            "%s %s: boolean returned.\n\nHTTP %s %s",
+                        throw new BooleanException(sprintf(
+                            "%s %s: boolean %s returned. Potential curl failure in sdk: %s %s. \n\nHTTP %s %s",
                             $actionType,
                             $url,
+                            (int)$responseBody,
+                            $response->getError()['code'],
+                            $response->getError()['message'],
                             $response->getStatusCode(),
                             $response->getBody()
                         ));
@@ -332,41 +344,24 @@ class Api
                  */
                 return $json;
             } catch (RateLimitException $e) {
-                $jitter = 0;
-
-                /* If we've failed previously, jitter litter some extra seconds
-                 * to randomise a bit more so we don't all try to start again
-                 * at the same time (always naps 5sec the first time we fail)
-                 */
-                if ($fails) {
-                    $jitter = random_int(self::JITTER_LOWER, self::JITTER_UPPER);
-                }
-
                 /* Rate limit reached; retry after napping
                  */
+                $jitter = $this->calculateJitter($fails);
+
+                $this->induceNap($fails, $jitter, 'Rate limit reached for Data API on request %s: napping for %s seconds');
+
+                continue;
+            } catch (BooleanException $e) {
+                /* Random boolean encountered - curl might have died; retry after napping
+                 */
+                $jitter = $this->calculateJitter($fails);
                 $fails++;
 
-                /* "some random jitter" is randomly between 0 and 3 sec by default
-                 *
-                 * Sleep for 3+2 seconds
-                 * then 3+4 seconds (2^2) + some random jitter,
-                 * then 3+8 seconds (2^3) + some random jitter,
-                 * then 3+16 seconds (2^4) + some random jitter,
-                 * then 3+32 seconds (2^5) + some random jitter...
-                 *
-                 * ...then give up after multiple full rate limited cycles
+                /* Try to diagnose bools further
                  */
-                $napTime = self::NAP_TIMEOUT + pow(2, $fails) + $jitter;
+                $this->logger->warning($e->getMessage());
 
-                $this->logger->debug(sprintf(
-                    'Rate limit reached for Data API on request %s: napping for %s seconds',
-                    $fails,
-                    $napTime
-                ));
-
-                /* Nack to sleep Jeffrey
-                 */
-                sleep($napTime);
+                $this->induceNap($fails, $jitter, 'Attempting retry for potentially transient bool on request %s: napping for %s seconds');
 
                 continue;
             }
@@ -380,5 +375,59 @@ class Api
             $url,
             self::NUM_RETRY
         ));
+    }
+
+
+    /**
+     * Calculate a random amount of jitter to sprinkle on an exponential backoff
+     *
+     * @param int $fails
+     * @return int
+     * @throws \Exception
+     */
+    private function calculateJitter(int $fails): int
+    {
+        /* To ensure the first failure's nap is 5 seconds long,
+         * as per learnosity's default setting/suggestion
+         */
+        $jitter = 1;
+
+        /* If we've failed previously, jitter litter some extra seconds
+         * to randomise a bit more so we don't all try to start again
+         * at the same time (always naps 5sec the first time we fail)
+         */
+        if ($fails) {
+            $jitter = random_int(self::JITTER_LOWER, self::JITTER_UPPER);
+        }
+
+        return $jitter;
+    }
+
+
+    /**
+     * Take a nap for a period of time
+     * "some random jitter" is randomly between 0 and 3 sec by default
+     *
+     * Sleep for 3+2 seconds
+     * then 3+4 seconds (2^2) + some random jitter,
+     * then 3+8 seconds (2^3) + some random jitter,
+     * then 3+16 seconds (2^4) + some random jitter,
+     * then 3+32 seconds (2^5) + some random jitter...
+     *
+     * ...then give up after multiple full rate limited cycles
+     */
+    private function induceNap(int $fails, int $jitter, string $logMessage): void
+    {
+        $napTime = self::NAP_TIMEOUT + pow(2, $fails) + $jitter;
+
+        $this->logger->debug(sprintf(
+            $logMessage,
+            $fails,
+            $napTime
+        ));
+
+        /* Nack to sleep Jeffrey
+         */
+        sleep($napTime);
     }
 }

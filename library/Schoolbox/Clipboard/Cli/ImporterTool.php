@@ -71,7 +71,7 @@ class ImporterTool extends CliTool\App
      * Reserves this amount for every iteration,
      * refreshing at the start of every iteration
      */
-    private const LOCK_TTL = 60;
+    private const LOCK_TTL = 120;
 
     /**
      * max execution time before we consider the import process timed out.
