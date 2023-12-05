@@ -27,39 +27,37 @@ const isImgRounded = window.Vue.computed(() => {
     }
     return false;
 });
+
+/**
+ * Get the image or icon, to avoid repeating in the template
+ * @returns {string} the image or icon as html
+ */
+function getImg() {
+    if (props.result.image) {
+        return `<img
+                    src="${props.result.image}"
+                    :alt="Photo of ${props.result.title}"
+                />`;
+    }
+    return `<div class="icon icon-${props.result.icon as string}"></div>`;
+}
 </script>
 
 <template>
-    <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`">
+    <div
+        v-if="props.result.image || props.result.icon"
+        :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`"
+    >
         <div class="c-img__wrapper">
             <a
                 v-if="props.result.type === ResultTypes.BADGE"
                 href="#open-badge-modal"
                 @click.prevent="emit('badgeSelected', props.result)"
+                v-html="getImg()"
             >
-                <img
-                    v-if="props.result.image"
-                    :src="(props.result.image as string)"
-                    :alt="`Photo of ${props.result.title}`"
-                />
-                <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
             </a>
-            <a v-else-if="props.result.url" :href="props.result.url">
-                <img
-                    v-if="props.result.image"
-                    :src="(props.result.image as string)"
-                    :alt="`Photo of ${props.result.title}`"
-                />
-                <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
-            </a>
-            <template v-else>
-                <img
-                    v-if="props.result.image"
-                    :src="(props.result.image as string)"
-                    :alt="`Photo of ${props.result.title}`"
-                />
-                <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
-            </template>
+            <a v-else-if="props.result.url" :href="props.result.url" v-html="getImg()"> </a>
+            <div v-else v-html="getImg()"></div>
         </div>
     </div>
 </template>
