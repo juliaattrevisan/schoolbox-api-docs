@@ -141,6 +141,13 @@ HELP;
             ];
          */
         $lastSeen = null;
+        $totalChanged = 0;
+
+        /* Log the title first lol
+         */
+        $this->getLogger()->info('');
+        $this->getLogger()->info('Learnosity Attempt Auto-finisher.');
+        $this->getLogger()->info('');
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             print_r($row);
@@ -176,10 +183,14 @@ HELP;
                  */
                 $numChanged = $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $expiry);
 
+                /* Summate
+                 */
+                $totalChanged += $numChanged;
+
                 /* Tell what we did
                  */
                 $this->getLogger()->info(sprintf(
-                    'Closed %s attempts by user %s in assessment %s',
+                    'Finished %s attempts by user %s in assessment %s',
                     $numChanged,
                     $user->getId(),
                     $assessment->getId()
@@ -213,6 +224,11 @@ HELP;
              * an unintentional edge case caused by broken data, not normal usage)
              */
         }
+
+        $this->getLogger()->info(sprintf(
+            'Closed %s attempts.',
+            $totalChanged
+        ));
     }
 
 
