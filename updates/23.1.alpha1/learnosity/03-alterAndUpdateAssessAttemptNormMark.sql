@@ -11,6 +11,7 @@ SET _mark = mark;
 
 -- represent norm_mark for old attempts:
 -- ensure that it's between 0 and 100
+-- Also ensure if max_mark is zero that this isn't updated
 UPDATE assess_attempt
 INNER JOIN assess ON assess_attempt.assess_id = assess.assess_id
 SET norm_mark = FORMAT(
@@ -20,4 +21,4 @@ SET norm_mark = FORMAT(
     ),
     11
 )
-WHERE assess.availability = 'assess';
+WHERE assess.availability = 'assess' AND max_mark > 0;
