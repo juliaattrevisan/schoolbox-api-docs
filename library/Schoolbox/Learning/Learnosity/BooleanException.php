@@ -15,5 +15,4 @@ namespace Schoolbox\Learning\Learnosity;
  */
 class BooleanException extends \UnexpectedValueException
 {
-
 }
