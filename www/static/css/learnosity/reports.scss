@@ -1,0 +1,42 @@
+/* Result page styles update*/
+table.lrn-report-table {
+    border: none !important;
+}
+td.lrn-report-area {
+    font-weight: bold;
+}
+.lrn .table-bordered > thead > tr > th,
+.lrn .table-bordered > thead > tr > td,
+.lrn .table-bordered > tbody > tr > th,
+.lrn .table-bordered > tbody > tr > td,
+.lrn .table-bordered > tfoot > tr > th,
+.lrn .table-bordered > tfoot > tr > td {
+    border-bottom: 1px solid var(--body-background);
+    border-left: 0px;
+    border-right: 0px;
+    border-top: 0px;
+}
+.lrn .table-striped > tbody > tr:nth-child(odd) > td,
+.lrn .table-striped > tbody > tr:nth-child(odd) > th,
+.lrn .table-striped > tbody > tr:nth-child(even) > td,
+.lrn .table-striped > tbody > tr:nth-child(even) > th {
+    background-color: #fff;
+    color: #000000;
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    padding: 0.625rem;
+}
+
+/* shown in horizontal and vertical marking, remove the margins from the item mark */
+h3.lrn-report-item-title {
+    font-size: 1.25rem;
+    margin: 0;
+}
+.learnosity-report .lrn-circle {
+    margin: 0;
+}
+
+/* Change result page table sentence to capitalise first letter */
+td.lrn-report-area::first-letter {
+    text-transform: capitalize !important;
+}

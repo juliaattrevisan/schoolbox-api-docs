@@ -242,6 +242,7 @@ module.exports = {
         //Sass
         core: "./www/static/css/core/core.scss",
         schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
+        learnosity: "./www/static/css/learnosity/learnosity.scss",
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),

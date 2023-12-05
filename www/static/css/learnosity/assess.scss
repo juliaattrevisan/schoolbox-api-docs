@@ -1,0 +1,130 @@
+/* general button,like previous question or resume quiz */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn,
+.lrn.lrn-assess .dialogs .lrn_btn {
+    background-color: var(--content-ui-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-foreground);
+    min-height: auto;
+}
+
+/* general button on disabled */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:disabled:not(.lrn_btn_blue),
+.lrn.lrn-assess .dialogs .lrn_btn:disabled:not(.lrn_btn_blue) {
+    color: var(--content-ui-foreground);
+    opacity: 0.5;
+}
+
+/* general button on hover */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:hover:not(:disabled),
+.lrn.lrn-assess .dialogs .lrn_btn:hover:not(:disabled) {
+    background-color: var(--content-ui-hover);
+    color: var(--content-ui-foreground);
+}
+
+/* general button on focus */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:focus,
+.lrn.lrn-assess .dialogs .lrn_btn:focus {
+    border: none;
+}
+
+/* primary action button, like next question or confirmation  */
+.lrn .lrn_btn_blue,
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue,
+.lrn.lrn-assess .dialogs .lrn_btn_blue {
+    background-color: var(--content-ui-submit-background);
+    border: none;
+    border-radius: 0;
+    color: var(--content-ui-submit-foreground);
+    font-weight: 600;
+}
+
+/* primary action button on hover */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:hover:not(:disabled),
+.lrn.lrn-assess .dialogs .lrn_btn_blue:hover:not(:disabled) {
+    background-color: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
+    color: var(--content-ui-submit-foreground);
+}
+
+/* primary action button on active */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:active,
+.lrn.lrn-assess .dialogs .lrn_btn_blue:active {
+    background-color: var(--content-ui-submit-background);
+    color: var(--content-ui-submit-foreground);
+}
+
+/* primary action button on focus */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:focus,
+.lrn.lrn-assess .dialogs .lrn_btn_blue:focus {
+    background-color: var(--content-ui-submit-background);
+}
+
+/* primary action button on disabled */
+.lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn_blue:disabled,
+.lrn.lrn-assess .dialogs .lrn_btn_blue:disabled {
+    background-color: var(--content-ui-submit-background);
+    border: none;
+}
+
+/* remove the margin so the right-region is inline with the left */
+.lrn.lrn-assess .lrn-bottom-right-region.lrn-align-top {
+    margin-top: 0;
+}
+
+/* to vertically align the timer with other items */
+.lrn.lrn-assess .counter {
+    line-height: 0.8;
+}
+
+/* the progress bar at the top, which moves across with question progress */
+.lrn-assess .items .progress span {
+    background-color: var(--content-ui-foreground);
+    color: var(--content-ui-foreground);
+}
+
+/* the vertical menu running down the right hand side */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .menu-overlay {
+    background-color: var(--content-ui-background);
+}
+
+/* remove the background from the review screen */
+.lrn.lrn-assess .app-panel.review-screen .panel-content,
+.lrn-assess .app-panel .panel-content {
+    background: none;
+}
+
+/* the colour used to highlight the selected item in the review screen */
+.lrn.lrn-assess .app-panel.review-screen .item-card.active:before {
+    background-color: var(--content-ui-foreground);
+}
+
+/* the colour used to highlight the selected item in the review screen (little triangle above) */
+.lrn.lrn-assess .app-panel.review-screen .item-card.active:after {
+    border-color: transparent transparent transparent var(--content-ui-foreground);
+}
+
+/* update review section styles */
+.lrn.lrn-assess .app-panel.review-screen .item-card[data-attempt_status="partially_attempted"]:not(.active):before,
+.lrn.lrn-assess .app-panel.review-screen .item-card[data-attempt_status="fully_attempted"]:not(.active):before {
+    background-color: var(--content-ui-foreground);
+}
+
+/* upadet active menu button style */
+.lrn.lrn-assess .toc .lrn-pager li.pagination-active a {
+    background: var(--content-ui-background);
+}
+
+/* add padding to the quiz title in the player view */
+.lrn.lrn-assess .lrn-top-left-region .test_title_element .test-title-text {
+    padding: 1rem;
+}
+
+/* Removed the dotted border for review h2 title in the player */
+.lrn.lrn-assess .app-panel.review-screen .panel-header > h2:focus {
+    outline: unset;
+}

@@ -1,0 +1,144 @@
+/* use our font everywhere */
+.lrn,
+.lrn-assess,
+h3.lrn-report-item-title {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
+        Arial, sans-serif;
+}
+
+/* bring it back as we negative margin our own */
+.lrn legend {
+    margin-left: 0;
+}
+
+/* update the botton hover and focus styles */
+.lrn .lrn_btn:hover,
+.lrn .lrn_btn.lrn_hover,
+.lrn .lrn_btn:active,
+.lrn .lrn_btn.lrn_active,
+.lrn .lrn_btn:focus {
+    background-color: var(--content-ui-selected);
+    box-shadow: unset;
+    color: var(--content-ui-foreground);
+}
+
+/* update the botton hover and focus styles */
+.lrn .lrn_btn:hover,
+.lrn .lrn_btn.lrn_hover,
+.lrn .lrn_btn:active,
+.lrn .lrn_btn.lrn_active,
+.lrn .lrn_btn:focus {
+    background-color: var(--content-ui-selected);
+    box-shadow: unset;
+    color: var(--content-ui-foreground);
+}
+
+/* bring it back as we negative margin our own */
+.lrn legend {
+    margin-left: 0;
+}
+
+/* button with icon only */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue .btn-label {
+    color: var(--content-ui-foreground);
+}
+
+/* button with icon only on hover */
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn:hover .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover .btn-label,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover:before,
+.lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover .btn-label {
+    color: var(--content-ui-foreground);
+}
+
+/* Set z-index to fix dropdown and side panels open behind the quiz modal */
+.lrn.lrn-author,
+.lrn.lrn-assess {
+    z-index: 0;
+}
+
+/* add new question button styles */
+.lrn .lrn-author-ui .lrn-author-widget-button-more .lrn-author-widget-icon:before {
+    color: var(--content-ui-foreground);
+    font-size: initial;
+}
+.lrn .lrn-author-ui .lrn-author-widget-icon:before {
+    color: var(--content-ui-foreground);
+    font-size: initial;
+}
+[data-authorapi-selector="add-button"] {
+    background-color: var(--content-ui-background) !important;
+    border: 0 !important;
+    color: var(--content-ui-foreground) !important;
+    line-height: inherit !important;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    vertical-align: middle !important;
+    width: 100% !important;
+}
+.lrn .lrn-author-ui .lrn-author-widget-text {
+    bottom: 0px;
+    color: var(--content-ui-foreground);
+    font-size: initial;
+    top: 0px;
+}
+[data-authorapi-selector="show-shared-passages-button"] {
+    display: none !important;
+}
+.lrn.lrn-author .lrn-author-item-content {
+    min-height: auto;
+}
+.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
+    background-color: var(--content-ui-background) !important;
+    color: var(--content-ui-foreground) !important;
+    line-height: inherit !important;
+    margin: auto;
+    min-height: 2.5rem !important;
+    overflow: hidden !important;
+    padding: 0.5rem !important;
+    position: relative !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    width: 99% !important;
+}
+
+/* replaced trash icon */
+.lrn-qe .lrn-qe-ui .lrn-qe-i-trash:before {
+    content: "\e61b";
+    font-family: "schoolbox";
+}
+
+/* update the pen icon */
+.lrn-i-edit::before {
+    content: "\e645";
+    font-family: "schoolbox";
+}
+
+/* Add more padding to the bottom of the Learnosity container */
+#container {
+    padding: 1rem 1rem 3rem 1rem;
+}
+
+/* updated icons styles */
+.lrn-i-search::before {
+    content: "\e660";
+    font-family: "schoolbox";
+    vertical-align: middle;
+}
+.lrn-i-plus-small:before {
+    content: "\e600";
+    font-family: "schoolbox";
+    vertical-align: middle;
+}
+.lrn .lrn-author-ui .lrn-author-activity-button {
+    padding: 0.5rem 1.3rem;
+}
