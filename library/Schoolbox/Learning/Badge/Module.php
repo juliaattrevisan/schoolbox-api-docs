@@ -64,7 +64,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{badgeId:\d+}',
             'getBadge',
-            $viewBadgesRule,
+            new Rule\IsLoggedIn(),
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
