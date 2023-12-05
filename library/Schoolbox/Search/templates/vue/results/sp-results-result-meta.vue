@@ -3,10 +3,8 @@
  * To display the search results title
  */
 
-// import { addMarks } from "@js/util/domUtils";
 import { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
-// import { useQueryStore } from "../store/spQueryStore";
 
 interface Props {
     result: Result; // the result to display
@@ -15,8 +13,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     isSubResult: false,
 });
-
-// const queryStore = useQueryStore();
 
 /**
  * To display the date in format
@@ -45,7 +41,7 @@ function getDateLong() {
         {{ getDateShort() }}</span
     >
     <span v-else-if="props.result.type === ResultTypes.EVENT" class="meta"> {{ getDateLong() }}</span>
-    <span v-else-if="props.result.context.length !== 0 && !props.isSubResult" class="meta"
+    <span v-else-if="props.result.context?.length !== 0 && !props.isSubResult" class="meta"
         ><template v-for="(context, index) in props.result.context" :key="context.id"
             ><a :href="context._links.view">{{ context.title }}</a
             ><template v-if="index < props.result.context.length - 1"> > </template>
