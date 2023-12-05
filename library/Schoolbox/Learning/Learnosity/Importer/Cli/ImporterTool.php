@@ -21,6 +21,8 @@ use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
 class ImporterTool extends CliTool\App
@@ -826,7 +828,7 @@ HELP;
 
                 /* Send it
                  */
-                $this->transmitConsolidated($api, $consolidatedBlueprint);
+                $this->transmitConsolidated($api, $consolidatedBlueprint, $lock);
 
                 /* Make the next $consolidatedBlueprint start with $blueprint
                  * Rinse and repeat until all is done
@@ -845,7 +847,7 @@ HELP;
 
             /* Send it
              */
-            $this->transmitConsolidated($api, $consolidatedBlueprint);
+            $this->transmitConsolidated($api, $consolidatedBlueprint, $lock);
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
@@ -1132,12 +1134,13 @@ HELP;
      *
      * @param Api $api
      * @param array $consolidatedBlueprint
+     * @param LockInterface $lock
      * @return void
+     * @throws LockRefreshException
      * @throws ValidationException
      * @throws \JsonException
-     * @throws \PDOException
      */
-    private function transmitConsolidated(Api $api, array $consolidatedBlueprint): void
+    private function transmitConsolidated(Api $api, array $consolidatedBlueprint, LockInterface $lock): void
     {
         /* Accumulate some basic metrics
          */
@@ -1163,12 +1166,16 @@ HELP;
             $batchStart = microtime(true);
 
             foreach ($consolidatedBlueprint as $endpoint => $data) {
+                $this->refreshLock($lock);
+
                 $endpointStart = microtime(true);
 
                 /* Associate the learnosity reference back to our legacy quiz
                  */
                 if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
                     foreach ($data['payload']['associations'] as $association) {
+                        $this->refreshLock($lock);
+
                         $this->getLogger()->info(sprintf(
                             'Associating quiz (assessment_id: %s, assess_id: %s) with %s...',
                             $association['assessmentId'],
