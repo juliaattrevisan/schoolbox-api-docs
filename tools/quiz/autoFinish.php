@@ -45,18 +45,6 @@ $app = new class extends CliTool\App
     private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
 
 
-    /**
-     * @var \Schoolbox\UserMapper
-     */
-    private \Schoolbox\UserMapper $userMapper;
-
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    private AssessmentMapperProxy $assessmentMapperProxy;
-
-
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -93,10 +81,10 @@ HELP;
         /* We need these mappers
          */
         $this->quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
-        $this->userMapper = \Schoolbox\UserMapper::getInstance();
+        $userMapper = \Schoolbox\UserMapper::getInstance();
 
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $this->assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        $assessmentMapperProxy1 = $this->getDi()->get('assessmentDataSource');
 
         /* Look for quiz attempts that should have expired before this time
          * Potentially parameterise this
@@ -181,8 +169,8 @@ HELP;
              * hydrate $assessment and $quiz, then shut this user's attempts en masse
              */
             if ($current !== $lastSeen) {
-                $user = $this->userMapper->findById($row['user_id']);
-                $assessment = $this->assessmentMapperProxy->findByIdForReview($row['assessment_id'], $user);
+                $user = $userMapper->findById($row['user_id']);
+                $assessment = $assessmentMapperProxy1->findByIdForReview($row['assessment_id'], $user);
 
                 /* We need this $quiz container thing to hold attempts
                  */
