@@ -4,6 +4,7 @@
  */
 
 import { gsap } from "gsap/all";
+import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import { Result } from "../../js/types/Result";
 import SpResultsResultImage from "./sp-results-result-image.vue";
 import SpResultsResultTitle from "./sp-results-result-title.vue";
@@ -11,6 +12,7 @@ import SpResultsResultMeta from "./sp-results-result-meta.vue";
 import SpResultsResultActions from "./sp-results-result-actions.vue";
 import SpResultsResultDescription from "./sp-results-result-description.vue";
 import SpResultsSubResults from "./sp-results-sub-results.vue";
+import { useBadgeStore } from "./store/spBadgeStore";
 
 interface Props {
     result: Result; // the result to display
@@ -19,6 +21,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const resultEl = window.Vue.ref<HTMLDivElement | null>(null);
+const badgeStore = useBadgeStore();
 
 /**
  * To display the result, stagger to fade on each sequentially
@@ -37,6 +40,16 @@ window.Vue.onMounted(() => {
 const hasSubResults = window.Vue.computed(() => {
     return props.result._subResults && props.result._subResults.data.length > 0;
 });
+
+/**
+ * When a badge is selected, set it in the store which will prompt the
+ * badge modal to open
+ */
+async function onBadgeSelected() {
+    const getBadge = await fetch(`learning/badge/${props.result.id}`);
+    const badge = (await getBadge.json()) as Badge;
+    badgeStore.openDetailModal(badge);
+}
 </script>
 
 <template>
@@ -47,9 +60,13 @@ const hasSubResults = window.Vue.computed(() => {
         >
             <div class="l-flex-col l-gap-m l-pad-m">
                 <div class="l-flex-row l-gap-m">
-                    <sp-results-result-image :result="props.result" />
+                    <sp-results-result-image
+                        v-if="props.result.image || props.result.icon"
+                        :result="props.result"
+                        @badge-selected="onBadgeSelected"
+                    />
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
-                        <sp-results-result-title :result="props.result" />
+                        <sp-results-result-title :result="props.result" @badge-selected="onBadgeSelected" />
                         <sp-results-result-meta :result="props.result" />
                     </div>
                     <sp-results-result-actions v-if="props.result._links.length > 0" :result="props.result" />

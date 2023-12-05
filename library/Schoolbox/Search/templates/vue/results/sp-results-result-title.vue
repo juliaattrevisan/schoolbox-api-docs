@@ -3,12 +3,10 @@
  * To display the search results title
  */
 
-import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import { addMarks } from "@js/util/domUtils";
 import type { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
 import { useQueryStore } from "../store/spQueryStore";
-import { useBadgeStore } from "./store/spBadgeStore";
 
 interface Props {
     result: Result; // the result to display
@@ -18,17 +16,11 @@ const props = withDefaults(defineProps<Props>(), {
     isSubResult: false,
 });
 
-const queryStore = useQueryStore();
-const badgeStore = useBadgeStore();
+const emit = defineEmits<{
+    badgeSelected: [value: Result];
+}>();
 
-/**
- * When a badge is selected, set it in the store
- */
-async function onBadgeSelected() {
-    const getBadge = await fetch(`learning/badge/${props.result.id}`);
-    const badge = (await getBadge.json()) as Badge;
-    badgeStore.openDetailModal(badge);
-}
+const queryStore = useQueryStore();
 </script>
 
 <template>
@@ -45,7 +37,7 @@ async function onBadgeSelected() {
             <!-- eslint-disable-next-line vue/no-v-html -->
             <a
                 href="#open-badge-modal"
-                @click.prevent="onBadgeSelected"
+                @click.prevent="emit('badgeSelected', props.result)"
                 v-html="addMarks(props.result.title, queryStore.queryWordList)"
             ></a>
         </h3>
