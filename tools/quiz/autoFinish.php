@@ -44,6 +44,18 @@ $app = new class extends CliTool\App
     private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
 
 
+    /**
+     * @var \Schoolbox\UserMapper
+     */
+    private \Schoolbox\UserMapper $userMapper;
+
+
+    /**
+     * @var AssessmentMapperProxy
+     */
+    private AssessmentMapperProxy $assessmentMapperProxy;
+
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -70,30 +82,18 @@ HELP;
             exit;
         }
 
-        /**
-         * @var MapperFactory      $mapperFactory
-         * @var Participant\Mapper $participantMapper
+        /* We need these mappers
          */
-        $mapperFactory = $this->getDi()->get('mapperFactory');
-        $participantMapper = $mapperFactory->get(Participant\Mapper::class);
-        $log             = $this->getLogger();
-        $attemptMapper   = QuizAttemptMapper::getInstance();
-//        $responseHandler = new Assess_Response();
+        $this->quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
+        $this->userMapper = \Schoolbox\UserMapper::getInstance();
 
-        $expiredAttempts = $attemptMapper->findUnfinishedExpiredAttempts();
-        $updatedAttempts = [];
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $this->assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         /* Look for quiz attempts that should have expired before this time
          * Potentially parameterise this
          */
         $expiry = \Alaress_Date_Format::now();
-
-        /* We need these mappers
-         */
-        $this->quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
-
-        /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         /* Find the assessments which have attempts that need to be shut
          *     - Only process living attempts (ignore deleted attempts)
@@ -103,6 +103,7 @@ HELP;
          *     - ...which can actually expire (ignore quizzes set to Unlimited duration)
          *     - ...which should have already expired, but haven't
          *     - ...which are for Quizzes specifically (ignore survey attempts)
+         *     - ...which are in Learnosity itself
          *
          * This won't take into account quizzes that were reviewed but not finished;
          * this would occur only by direct intervention or hideous mistake
@@ -123,6 +124,7 @@ HELP;
             AND u.deleted_at IS NULL
             AND assess.duration > :unlimitedDuration
             AND TIMESTAMPADD(SECOND, `assess`.`duration`, `assess_attempt`.`start`) < :expiry
+            AND assess_attempt.learnosity_reference IS NOT NULL
             ORDER BY assess.assessment_id, assess_attempt.user_id
         ";
 
@@ -133,136 +135,86 @@ HELP;
         ]);
 
         /* Process each assessment en masse like we usually do
+            $lastSeen = [
+                'assessmentId' => null,
+                'userId' => null
+            ];
          */
-        $lastSeen = [
-            'assessmentId' => null,
-            'userId' => null
-        ];
+        $lastSeen = null;
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             print_r($row);
 
+            $current = [
+                'assessmentId' => $row['assessment_id'],
+                'userId' => $row['user_id']
+            ];
+
             /* If the last (assessment, user_id) tuple is null,
              * this is our first iteration: hydrate $assessment and $quiz,
              * then shut this user's attempts en masse
-             */
-
-            /* If the current (assessment, user_id) tuple is different
-             * to the previous $lastSeen tuple, hydrate $assessment and $quiz,
-             * then shut this user's attempts en masse
-             */
-
-            /* If the current (assessment, user_id) tuple is the same
-             * as the previous $lastSeen tuple, we've already done their attempts;
-             * keep going
-             */
-        }
-
-
-
-//        foreach ($expiredAttempts as $attempt) {
-//            $log->info(sprintf(
-//                'Processing attempt_id %d',
-//                $attempt->getId(),
-//            ));
-//
-//            /* Generic debug announcement for those wanting to dive deeper
-//             */
-//            $log->debug(sprintf(
-//                'attempt_id %d by %s (%s) was in quiz "%s" (%s) and homepage %s',
-//                $attempt->getId(),
-//                $attempt->getUser()->formatName(),
-//                $attempt->getUser()->getId(),
-//                $attempt->getQuiz()->getTitle(),
-//                $attempt->getQuiz()->getId(),
-//                $attempt->getQuiz()->getCategory()->getId()
-//            ));
-//
-//            /* Sometimes an attempt doesn't have a hydrated user
-//             * I guess it's broken data somehow
-//             */
-//            if (!$attempt->getUser()->getId()) {
-//                $log->warning('For some reason, this attempt has no owner - skipping');
-//                continue;
-//            }
-
-            /* I guess this attempt needs its stuff
-             * Shank out an $assessment and extract its quiz, caching it locally for performance
              *
-             * Note:
-             * Quiz mapper's closeExpiredAttempts() method will always spawn a Helper and Learnosity Api
-             * instance(s) but don't worry, their constructors are hollow and virtually insignificant
+             * or...
+             *
+             * If the current (assessment, user_id) tuple is different
+             * to the previous $lastSeen tuple, we're looking at a whole new person
+             * hydrate $assessment and $quiz, then shut this user's attempts en masse
              */
+            if (null === $lastSeen || $current !== $lastSeen) {
+                $user = $this->userMapper->findById($row['user_id']);
+                $assessment = $this->assessmentMapperProxy->findByIdForReview($row['assessment_id'], $user);
 
-            /* First, we need an assessment via findByIdForReview()
-             * This gives us a fully hydrated quiz for a particular user
+                /* We need this $quiz container thing to hold attempts
+                 */
+                $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+                /* Apparently this is a thing
+                 */
+                $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $user);
+
+                /* Shut them all
+                 */
+                $numChanged = $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $expiry);
+
+                /* Tell what we did
+                 */
+                $this->getLogger()->info(sprintf(
+                    'Closed %s attempts by user %s in assessment %s',
+                    $numChanged,
+                    $user->getId(),
+                    $assessment->getId()
+                ));
+
+                /* For diagnostics
+                 */
+                $this->getLogger()->debug(sprintf(
+                    'Artificially finished %s attempts by %s (%s) in assessment %s (%s), assess_id %s',
+                    $numChanged,
+                    $user->formatName(),
+                    $user->getId(),
+                    $assessment->getTitle(),
+                    $assessment->getId(),
+                    $quiz->getId()
+                ));
+
+                /* "Remember us," as simple an order as a king can give
+                 */
+                $lastSeen = [
+                    'assessmentId' => $row['assessment_id'],
+                    'userId' => $row['user_id']
+                ];
+            }
+
+            /* else noop
+             *
+             * If the current (assessment, user_id) tuple is the same
+             * as the previous $lastSeen tuple, we've already done their attempts;
+             * keep going (this happens with multiple unfinished attempts by same user;
+             * an unintentional edge case caused by broken data, not normal usage)
              */
-//            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
-
-            /* Extract the quiz itself, and hydrate it with its attempts and answers
-             * For some reason this is a thing
-             */
-
-
-
-
-//            /* Check for participant exclusion; if excluded, skip this row
-//             */
-//            $participant = $participantMapper->findForAssessmentAndUser(
-//                $attempt->getQuiz()->getAssessmentModel()->getId(),
-//                $attempt->getUser()->getId()
-//            );
-//
-//            if ($participant && $participant->isExcluded()) {
-//                $log->info('Attempt owner is excluded from this assessment - skipping');
-//                continue;
-//            }
-//
-//            // Figure out what the finish date ought to be.
-//            // If it's less than 5 minutes ago, allow some leeway.
-//            $attemptFinishDate = clone $attempt->getStart();
-//            $attemptFinishDate = $attemptFinishDate->addSeconds($attempt->getQuiz()->getDuration());
-//
-//
-//
-//            if (Alaress_Date_Format::now()->diffInSeconds($attemptFinishDate) <= 300) {
-//                $log->warning(
-//                    sprintf(
-//                        "Finish time %s is less than 5 minutes ago - skipping this attempt",
-//                        $attemptFinishDate->getDatabase()
-//                    )
-//                );
-//            } else {
-//                $log->notice(sprintf("Setting finish time to %s", $attemptFinishDate->getDatabase()));
-//                $attempt->setFinish($attemptFinishDate);
-//                $updatedAttempts[] = $attempt;
-//
-//                /* Automark the attempt so its ready for review */
-//                $factory = new Assess_Factory();
-//
-//                $allResponses = $responseHandler->getAutomarkableResponses($attempt->getId());
-//                $markedResponseIDs = array();
-//
-//                if (is_array($allResponses)) {
-//                    $log->notice(sprintf("Automarking attempt #%s", $attempt->getId()));
-//                    foreach ($allResponses as $currentResponse) {
-//                        /** @var IAutomarkable $answerHandler */
-//                        $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
-//
-//                        $answerHandler->mark($currentResponse);
-//
-//                        $markedResponseIDs[] = $currentResponse['response_id'];
-//                    }
-//                    $responseHandler->updatedAutomatedMarks($markedResponseIDs);
-//                }
-//            }
         }
-//
-//        if (count($updatedAttempts) > 0) {
-//            $log->notice(sprintf("Saving %d expired attempts", count($updatedAttempts)));
-//            $attemptMapper->save($updatedAttempts);
-//        }
-//    }
+    }
+
 
     /**
      * Converts an assessment_id to a Quiz
