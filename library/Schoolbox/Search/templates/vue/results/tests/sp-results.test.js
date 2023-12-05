@@ -1,31 +1,35 @@
 import { mount } from "@vue/test-utils";
-import SearchPage from "../../search-page.vue";
+import SpResultsList from "../sp-results-list";
 import { createTestingPinia } from "@pinia/testing";
-import { useSearchStore } from "../../store/spSearchStore";
+import { useResultsStore } from "../../../results/store/spResultsStore";
 
 let wrapper; // so we don't need to pass it into every test
 
 beforeEach(() => {
-    window.schoolboxUser = { id: 0, name: "Test User" };
-    wrapper = mount(SearchPage, {
+    wrapper = mount(SpResultsList, {
         global: {
             plugins: [createTestingPinia()],
-        },
-        props: {
-            endpoint: "",
-            filterTypesAvailable: [],
-            filterTypesSelected: [],
-            filterDateRange: {
-                startDate: "2023-12-31T19:43:20+11:00",
-                endDate: "2023-01-01T19:43:20+11:00",
-            },
-            filterCreator: null,
         },
     });
 });
 
-test("while searching, loading should be displayed", async () => {
-    const store = useSearchStore();
-    await store.$patch({ hasNotSearched: false, isSearching: true });
-    expect(wrapper.get('[data-test="loading-table"]').isVisible()).toBe(true);
+test("if there are no search results, no results should be displayed", async () => {
+    expect(wrapper.find('[data-test^="sp-results-result"]').exists()).toBe(false);
+});
+
+test("if there are search results, results should be displayed", async () => {
+    const resultsStore = useResultsStore();
+    await resultsStore.$patch({ results: [{ id: 1, name: "test", type: "user" }] });
+    expect(wrapper.get('[data-test^="sp-results-result"]').isVisible()).toBe(true);
+});
+
+test("if there are two search results, two results should be shown", async () => {
+    const resultsStore = useResultsStore();
+    await resultsStore.$patch({
+        results: [
+            { id: 1, name: "test", type: "user" },
+            { id: 2, name: "test", type: "user" },
+        ],
+    });
+    expect(wrapper.findAll('[data-test^="sp-results-result"]')).toHaveLength(2);
 });
