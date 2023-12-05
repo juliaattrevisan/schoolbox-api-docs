@@ -42,7 +42,8 @@ const hasSubResults = window.Vue.computed(() => {
 });
 
 /**
- * When a badge is selected, set it in the store
+ * When a badge is selected, set it in the store which will prompt the
+ * badge modal to open
  */
 async function onBadgeSelected() {
     const getBadge = await fetch(`learning/badge/${props.result.id}`);
@@ -59,7 +60,11 @@ async function onBadgeSelected() {
         >
             <div class="l-flex-col l-gap-m l-pad-m">
                 <div class="l-flex-row l-gap-m">
-                    <sp-results-result-image :result="props.result" @badge-selected="onBadgeSelected" />
+                    <sp-results-result-image
+                        v-if="props.result.image || props.result.icon"
+                        :result="props.result"
+                        @badge-selected="onBadgeSelected"
+                    />
                     <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                         <sp-results-result-title :result="props.result" @badge-selected="onBadgeSelected" />
                         <sp-results-result-meta :result="props.result" />

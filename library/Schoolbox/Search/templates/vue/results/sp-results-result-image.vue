@@ -44,10 +44,7 @@ function getImg() {
 </script>
 
 <template>
-    <div
-        v-if="props.result.image || props.result.icon"
-        :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`"
-    >
+    <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`">
         <div class="c-img__wrapper">
             <a
                 v-if="props.result.type === ResultTypes.BADGE"
