@@ -138,7 +138,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
-        return 'userID';
+        return 'fp.userID';
     }
 
     /**
