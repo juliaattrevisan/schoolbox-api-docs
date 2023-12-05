@@ -300,9 +300,12 @@ class Api
                      */
                     if (is_bool($responseBody)) {
                         throw new ApiException(sprintf(
-                            "%s %s: boolean returned.\n\nHTTP %s %s",
+                            "%s %s: boolean %s returned. Potential curl failure in sdk: %s %s. \n\nHTTP %s %s",
                             $actionType,
                             $url,
+                            (int)$responseBody,
+                            $response->getError()['error_code'],
+                            $response->getError()['error_message'],
                             $response->getStatusCode(),
                             $response->getBody()
                         ));
