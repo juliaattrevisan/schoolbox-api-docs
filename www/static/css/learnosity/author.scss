@@ -94,7 +94,6 @@ button.lrn-btn-save-dropdown {
 }
 
 /* hide tags from questions list */
-
 .lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
     display: none;
 }
@@ -132,7 +131,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     border-radius: 0px;
 }
 
-/* removed gap from hearder */
+/* removed gap from header */
 .lrn .lrn-author-ui .lrn-author-item-toolbar-controls,
 .lrn .lrn-author-ui .lrn-author-activity-toolbar-controls {
     min-height: 0px;
@@ -248,7 +247,7 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
     color: var(--content-ui-submit-foreground);
 }
 
-/* hide player, detauls,tags tabs */
+/* hide player, defaults, tags tabs */
 ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
     display: none;
 }
