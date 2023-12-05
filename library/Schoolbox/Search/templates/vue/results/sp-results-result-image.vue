@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display the search results image or icon
+ * To display the search results image or icon, wrapping the image in a link if there is one
  */
 
 import { Result } from "../../js/types/Result";
@@ -14,8 +14,12 @@ const props = withDefaults(defineProps<Props>(), {
     isSubResult: false,
 });
 
+const emit = defineEmits<{
+    badgeSelected: [value: Result];
+}>();
+
 /**
- * Whether to use a rounded image
+ * Whether to use a rounded image, currently only for users
  */
 const isImgRounded = window.Vue.computed(() => {
     if (props.result.type.includes(ResultTypes.USER)) {
@@ -28,12 +32,34 @@ const isImgRounded = window.Vue.computed(() => {
 <template>
     <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`">
         <div class="c-img__wrapper">
-            <img
-                v-if="props.result.image"
-                :src="(props.result.image as string)"
-                :alt="`Photo of ${props.result.title}`"
-            />
-            <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
+            <a
+                v-if="props.result.type === ResultTypes.BADGE"
+                href="#open-badge-modal"
+                @click.prevent="emit('badgeSelected', props.result)"
+            >
+                <img
+                    v-if="props.result.image"
+                    :src="(props.result.image as string)"
+                    :alt="`Photo of ${props.result.title}`"
+                />
+                <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
+            </a>
+            <a v-else-if="props.result.url" :href="props.result.url">
+                <img
+                    v-if="props.result.image"
+                    :src="(props.result.image as string)"
+                    :alt="`Photo of ${props.result.title}`"
+                />
+                <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
+            </a>
+            <template v-else>
+                <img
+                    v-if="props.result.image"
+                    :src="(props.result.image as string)"
+                    :alt="`Photo of ${props.result.title}`"
+                />
+                <div v-else-if="props.result.icon" :class="`icon icon-${props.result.icon}`"></div>
+            </template>
         </div>
     </div>
 </template>
