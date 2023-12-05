@@ -13,7 +13,13 @@ beforeEach(() => {
         },
         props: {
             endpoint: "",
-            filterTypes: [],
+            filterTypesAvailable: [],
+            filterTypesSelected: [],
+            filterDateRange: {
+                startDate: "2023-12-31T19:43:20+11:00",
+                endDate: "2023-01-01T19:43:20+11:00",
+            },
+            filterCreator: null,
         },
     });
 });

@@ -1,6 +1,9 @@
-import "@testing-library/jest-dom"; //so we can use jest-dom in any test file https://github.com/testing-library/jest-dom
+import "@testing-library/jest-dom"; // so we can use jest-dom in any test file https://github.com/testing-library/jest-dom
 
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue"; // as Vue is now stored globally, provide reference to these functions so tests can still run without browser context
+/**
+ * As Vue is now stored globally, provide reference to these functions so tests can still run without browser context
+ */
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
 window.Vue = {};
 window.Vue.ref = ref;
 window.Vue.computed = computed;
@@ -15,7 +18,6 @@ window.Vue.nextTick = nextTick;
  * used within Schoolbox are also added.
  * https://day.js.org/
  */
-
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -36,3 +38,6 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isSameOrAfter);
 
 window.days = dayjs;
+
+// Simulate jQuery's global $ and window.$
+global.$ = global.window.$ = require("jquery");
