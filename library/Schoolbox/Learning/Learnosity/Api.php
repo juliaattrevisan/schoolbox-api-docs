@@ -47,6 +47,12 @@ class Api
 
 
     /**
+     * Learnosity has a default 40sec timeout which isn't long enough sometimes?
+     */
+    private const DATA_API_TIMEOUT = 120;
+
+
+    /**
      * Number of seconds to take a nap before retrying a failed endpoint
      *
      * Sometimes endpoints fail for no obvious reason and trying again seems
@@ -272,7 +278,7 @@ class Api
         while ($fails < self::NUM_RETRY) {
             try {
                 $response = (new DataApi([
-                    'timeout' => 1
+                    'timeout' => self::DATA_API_TIMEOUT
                 ]))->request(
                     $url,
                     [
