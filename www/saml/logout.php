@@ -7,6 +7,7 @@
 
 require 'saml-setup.php';
 
+use Alaress\Lumberjack\Logger;
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -15,7 +16,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 $page = $kernel->get('sitePage');
 $page->initSession();
 
+/** @var array $settingsInfo */
 $auth = new OneLogin\Saml2\Auth($settingsInfo);
+$logger = new Logger(STDOUT, STDOUT, Config::get('saml_debug') ? \Monolog\Logger::DEBUG : \Monolog\Logger::INFO, [], true, 'saml');
 
 $nameId = null;
 $sessionIndex = null;
@@ -31,12 +34,12 @@ if (isset($_SESSION['samlNameIdFormat'])) {
     $nameIdFormat = $_SESSION['samlNameIdFormat'];
 }
 try {
-    SAMLDebugLog("Destroying local session");
+    $logger->debug("Destroying local session");
     session_regenerate_id(true);
     session_destroy();
-    SAMLDebugLog("Attempting SLO: " . json_encode(array('nameId' => $nameId, 'sessionIndex' => $sessionIndex, 'nameIdFormat' => $nameIdFormat)));
+    $logger->debug("Attempting SLO: " . json_encode(array('nameId' => $nameId, 'sessionIndex' => $sessionIndex, 'nameIdFormat' => $nameIdFormat)));
     $auth->logout(null, [], $nameId, $sessionIndex, false, $nameIdFormat);
 } catch (OneLogin\Saml2\Error $e) {
-    SAMLDebugLog("SLO Error: " . $e->getMessage());
+    $logger->error("SLO Error: " . $e->getMessage());
     error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
 }
