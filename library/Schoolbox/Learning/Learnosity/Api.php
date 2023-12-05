@@ -271,7 +271,9 @@ class Api
          */
         while ($fails < self::NUM_RETRY) {
             try {
-                $response = (new DataApi())->request(
+                $response = (new DataApi([
+                    'timeout' => 1
+                ]))->request(
                     $url,
                     [
                         'domain' => $this->serverName,
@@ -305,8 +307,8 @@ class Api
                             $actionType,
                             $url,
                             (int)$responseBody,
-                            $response->getError()['error_code'],
-                            $response->getError()['error_message'],
+                            $response->getError()['code'],
+                            $response->getError()['message'],
                             $response->getStatusCode(),
                             $response->getBody()
                         ));
