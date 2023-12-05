@@ -347,7 +347,6 @@ class Api
                 /* Rate limit reached; retry after napping
                  */
                 $jitter = $this->calculateJitter($fails);
-                $fails++;
 
                 $this->induceNap($fails, $jitter, 'Rate limit reached for Data API on request %s: napping for %s seconds');
 
@@ -388,7 +387,10 @@ class Api
      */
     private function calculateJitter($fails): int
     {
-        $jitter = 0;
+        /* To ensure the first failure's nap is 5 seconds long,
+         * as per learnosity's default setting/suggestion
+         */
+        $jitter = 1;
 
         /* If we've failed previously, jitter litter some extra seconds
          * to randomise a bit more so we don't all try to start again
