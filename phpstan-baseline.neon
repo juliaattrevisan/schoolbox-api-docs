@@ -4586,11 +4586,6 @@ parameters:
 			path: library/Schoolbox/Learning/Moment/Evidence/Translator/ArrayToModel/AllFields.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Mapper\\:\\:findUnfinishedExpiredAttempts\\(\\) should return array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\> but returns Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Mapper\\:\\:getQuizMapper\\(\\) should return Schoolbox\\\\Learning\\\\Quiz\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
