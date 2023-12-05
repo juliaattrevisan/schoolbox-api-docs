@@ -148,12 +148,14 @@ HELP;
         ]);
 
         /* Process each assessment en masse like we usually do
-            $lastSeen = [
-                'assessmentId' => null,
-                'userId' => null
-            ];
          */
-        $lastSeen = null;
+        $lastSeen = [
+            'assessmentId' => null,
+            'userId' => null
+        ];
+
+        /* Total number of attempts we changed
+         */
         $totalChanged = 0;
 
         /* Log the title first lol
@@ -178,7 +180,7 @@ HELP;
              * to the previous $lastSeen tuple, we're looking at a whole new person
              * hydrate $assessment and $quiz, then shut this user's attempts en masse
              */
-            if (null === $lastSeen || $current !== $lastSeen) {
+            if ($current !== $lastSeen) {
                 $user = $this->userMapper->findById($row['user_id']);
                 $assessment = $this->assessmentMapperProxy->findByIdForReview($row['assessment_id'], $user);
 
