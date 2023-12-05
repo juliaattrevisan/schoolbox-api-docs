@@ -16,7 +16,7 @@ beforeEach(() => {
                 depth: 0,
             },
             isDisabled: false,
-            maxNameLength: 50,
+            isLast: false,
         },
     });
 });
@@ -32,7 +32,7 @@ test("link to be hidden when prop isDisabled is true", async () => {
     expect(wrapper.find("span").exists()).toBe(true);
 });
 
-test("name is shortened when exceeds prop maxNameLength", async () => {
+test("name is shortened when exceeds 50 characters", async () => {
     await wrapper.setProps({
         breadcrumb: {
             name: "Phasellus varius est lorem, luctus eleifend turpis volutpat nec. Mauris non enim lectus.",
