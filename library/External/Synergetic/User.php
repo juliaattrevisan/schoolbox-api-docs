@@ -91,13 +91,15 @@ class External_Synergetic_User implements External_UserInterface
 
                 /* Save it into brownhole
                  */
-                $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
+                if (!empty($photo['Photo'])) {
+                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
 
-                /* Update user with latest version
-                 */
-                $user->setPortrait($portrait);
+                    /* Update user with latest version
+                     */
+                    $user->setPortrait($portrait);
 
-                UserMapper::getInstance()->save($user);
+                    UserMapper::getInstance()->save($user);
+                }
             }
 
             /* Then return the latest Storage\Model instance
