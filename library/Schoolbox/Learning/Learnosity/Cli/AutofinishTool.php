@@ -77,7 +77,7 @@ HELP;
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $assessmentMapperProxy1 = $this->getDi()->get('assessmentDataSource');
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         /* Look for quiz attempts that should have expired before this time
          * Potentially parameterise this
@@ -163,7 +163,7 @@ HELP;
              */
             if ($current !== $lastSeen) {
                 $user = $userMapper->findById($row['user_id']);
-                $assessment = $assessmentMapperProxy1->findByIdForReview($row['assessment_id'], $user);
+                $assessment = $assessmentMapperProxy->findByIdForReview($row['assessment_id'], $user);
 
                 /* We need this $quiz container thing to hold attempts
                  */
