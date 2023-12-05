@@ -13,17 +13,20 @@ ALTER TABLE textBox ADD CONSTRAINT fk_textBox_deleted_by FOREIGN KEY (deleted_by
 ### seed textbox table with historic data if it exists
 update textBox tb
     left join cmsLog cmsLogCreate on (tb.textBoxID = cmsLogCreate.objectId and cmsLogCreate.object = 'content' and cmsLogCreate.action = 'create')
+    left join user on cmsLogCreate.user = user.id
 set tb.created_at = COALESCE(cmsLogCreate.time, tb.created_at),
-    tb.created_by = cmsLogCreate.user
+    tb.created_by = user.id
 WHERE tb.textBoxID > 0;
 
 update textBox tb
     left join cmsLog cmsLogDelete on (tb.textBoxID = cmsLogDelete.objectId and cmsLogDelete.object = 'content' and cmsLogDelete.action = 'delete')
-set tb.deleted_by = cmsLogDelete.user
+    left join user on cmsLogDelete.user = user.id
+set tb.deleted_by = user.id
 WHERE tb.textBoxID > 0;
 
 update textBox tb
     left join cmsLog cmsLogModify on (tb.textBoxID = cmsLogModify.objectId and cmsLogModify.object = 'content' and cmsLogModify.action = 'modify')
+    left join user on cmsLogModify.user = user.id
 set tb.updated_at = COALESCE(cmsLogModify.time, tb.created_at),
-    tb.updated_by = coalesce(cmsLogModify.user, tb.created_by)
+    tb.updated_by = coalesce(user.id, tb.created_by)
 WHERE tb.textBoxID > 0;
