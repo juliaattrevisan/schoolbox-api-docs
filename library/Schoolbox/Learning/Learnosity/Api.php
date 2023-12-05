@@ -381,11 +381,11 @@ class Api
     /**
      * Calculate a random amount of jitter to sprinkle on an exponential backoff
      *
-     * @param $fails
+     * @param int $fails
      * @return int
      * @throws \Exception
      */
-    private function calculateJitter($fails): int
+    private function calculateJitter(int $fails): int
     {
         /* To ensure the first failure's nap is 5 seconds long,
          * as per learnosity's default setting/suggestion
