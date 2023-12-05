@@ -20,15 +20,9 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Assess\IAutomarkable;
-use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\MapperFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -36,6 +30,13 @@ $app = new class extends CliTool\App
 {
     // --help: print help
     private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * Give an extra 5 minutes before we shut these attempts
+     * for some historic reason (imho not required)
+     */
+    private const EXPIRY_OFFSET = -5;
 
 
     /**
@@ -64,18 +65,25 @@ $app = new class extends CliTool\App
         ];
     }
 
+
     /** @inheritDoc */
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Auto-completes quiz attempts which have expired; users sometimes forget to officially
+Auto-finishes quiz attempts which have expired; users sometimes forget to officially
 finish their attempts so we do it for them when the quiz expires.
 
-This might have been installed as a cron script so it runs periodically.
+This runs periodically on attempts that exist in Learnosity: these are attempts which
+have an assess_attempt.learnosity_reference value. Any legacy attempts are ignored,
+finished or otherwise.
 
-Usage: autoFinish.php
+Notes:
+* This always mutates data; it's always in Perform mode.
+* The verbose mode will log more diagnostic information but you shouldn't use it in prod.
+
+Usage: autoFinish.php [-vvv]
 
 
 HELP;
@@ -92,8 +100,12 @@ HELP;
 
         /* Look for quiz attempts that should have expired before this time
          * Potentially parameterise this
+         *
+         * If you wanted to have this "leeway" idea, you could subtract 5 minutes
+         * from this $expiry ADF to give network latency time to resolve itself
+         * (I'm not sure what that's about, unfortunately...keeping it for historic reasons)
          */
-        $expiry = \Alaress_Date_Format::now();
+        $expiry = \Alaress_Date_Format::now()->addMinutes(self::EXPIRY_OFFSET);
 
         /* Find the assessments which have attempts that need to be shut
          *     - Only process living attempts (ignore deleted attempts)
@@ -129,6 +141,7 @@ HELP;
         ";
 
         $statement = $this->getDatabaseInternal()->prepareQuery($query);
+
         $statement->execute([
             'unlimitedDuration' => \Schoolbox\Learning\Assessment\Quiz\Model::DURATION_UNLIMITED,
             'expiry' => $expiry->getDatabase()
@@ -181,7 +194,7 @@ HELP;
                  */
                 $numChanged = $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $expiry);
 
-                /* Summate
+                /* Summate overall number of changes everywhere
                  */
                 $totalChanged += $numChanged;
 
@@ -197,7 +210,7 @@ HELP;
                 /* For diagnostics
                  */
                 $this->getLogger()->debug(sprintf(
-                    'Artificially finished %s attempts by %s (%s) in assessment %s (%s), assess_id %s',
+                    'Artificially finished %s attempts by %s (%s) in assessment "%s" (%s), assess_id %s',
                     $numChanged,
                     $user->formatName(),
                     $user->getId(),
@@ -206,7 +219,7 @@ HELP;
                     $quiz->getId()
                 ));
 
-                /* "Remember us," as simple an order as a king can give
+                /* "Remember us." as simple an order as a king can give
                  */
                 $lastSeen = [
                     'assessmentId' => $row['assessment_id'],
