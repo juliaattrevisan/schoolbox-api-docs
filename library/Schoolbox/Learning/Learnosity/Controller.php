@@ -1328,14 +1328,18 @@ class Controller extends Base
             if (is_array($itemReferences[0])) {
                 /* Forcibly mutate this, because learnosity insanity
                  */
-                $itemReferences = array_column($itemReferences, 'id');
+                $itemReferenceList = array_column($itemReferences, 'id');
+            } else {
+                /* Presume it was a list of reference strings already
+                 */
+                $itemReferenceList = $itemReferences;
             }
 
             /* Find a list of Learnosity Items (questions) available in this quiz
              * This includes more info about each item
              */
             $items = $this->api->dataGetRequest('itembank/items', [
-                'references' => $itemReferences
+                'references' => $itemReferenceList
             ])['data'];
 
             /* Consolidate reference and titles into an in-order lookup
