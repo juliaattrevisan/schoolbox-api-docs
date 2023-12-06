@@ -144,7 +144,6 @@ class UnitAssessments
     private function getProgressTick(IAssessable $assessable): ?array
     {
         // just look at the student specified
-        /** @var \Schoolbox\Learning\Assessment\Participant $participant */
         $participant = $assessable->getParticipantIfExtant($this->student);
         if (null === $participant) {
             return null;
@@ -159,16 +158,25 @@ class UnitAssessments
                 'student' => $this->student,
                 'studentId' => $this->student->getId()
             ]);
-        }
-
-        if ($participant->isResponseRequired() && ($assessable->isOpen($this->student) and $assessable->isSelfAssessable()) ) {
-            $progress = 'incomplete';
-        } else if ($participant->isFeedbackRequired()) {
-            $progress = 'pending';
-        } else if ($participant->isResubmissionRequired()) {
-            $progress = 'failed';
-        } else if ($participant->isReviewComplete()) {
-            $progress = 'reviewed';
+            if ($participant->isResponseRequired() && ($assessable->isOpen($this->student) and $assessable->isSelfAssessable())) {
+                $progress = 'incomplete';
+            } else if ($participant->isFeedbackRequired()) {
+                $progress = 'pending';
+            } else if ($participant->isResubmissionRequired()) {
+                $progress = 'failed';
+            } else if ($participant->isReviewComplete()) {
+                $progress = 'reviewed';
+            }
+        } else {
+            if ($participant->isResponseRequired() && $assessable->isOpen($this->student)) {
+                $progress = 'incomplete';
+            } else if ($participant->isFeedbackRequired()) {
+                $progress = 'pending';
+            } else if ($participant->isResubmissionRequired()) {
+                $progress = 'failed';
+            } else if ($participant->isReviewComplete()) {
+                $progress = 'reviewed';
+            }
         }
 
         return [
