@@ -104,16 +104,17 @@ class Module extends BaseModule
         $httpRequest = $this->injector->get('httpRequest');
 
         $queryParamBuilders = [
-            new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
-            new Database\ResultType\News\QueryParamBuilder(),
-            new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\File\QueryParamBuilder(),
-            new Database\ResultType\Event\QueryParamBuilder(),
-            new Database\ResultType\Link\QueryParamBuilder(),
-            new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\Blog\QueryParamBuilder(),
-            new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
+            new Database\Index\QueryParamBuilder($database->getQuoter()),
+//            new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
+//            new Database\ResultType\News\QueryParamBuilder(),
+//            new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
+//            new Database\ResultType\File\QueryParamBuilder(),
+//            new Database\ResultType\Event\QueryParamBuilder(),
+//            new Database\ResultType\Link\QueryParamBuilder(),
+//            new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
+//            new Database\ResultType\Blog\QueryParamBuilder(),
+//            new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
+//            new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
         ];
 
         $hydrators = [
