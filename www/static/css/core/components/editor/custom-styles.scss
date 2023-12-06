@@ -456,3 +456,9 @@ p.sb-ck-code-block {
     // editor.css is loaded in after our file, so we need to use !important...
     border: 1px solid css-darken($form-border-color, 15%) !important;
 }
+
+/* Fixed the 3-dots are not presented in the manage all textboxes in CK editor */
+.information-list.expandable-card ul {
+    list-style: disc !important;
+    margin: 1.25rem !important;
+}
