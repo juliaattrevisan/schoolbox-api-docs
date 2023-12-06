@@ -66,7 +66,7 @@ class Radio extends Base implements IStrategy
 
             /* Remember the correct answer(s)
              */
-            if ($possibleAnswer->correct) {
+            if ($possibleAnswer->correct ?? false) {
                 $correct[] = $value;
             }
         }
