@@ -10,17 +10,23 @@ ALTER TABLE textBox ADD CONSTRAINT fk_textBox_created_by FOREIGN KEY (created_by
 ALTER TABLE textBox ADD CONSTRAINT fk_textBox_updated_by FOREIGN KEY (updated_by) REFERENCES user (id);
 ALTER TABLE textBox ADD CONSTRAINT fk_textBox_deleted_by FOREIGN KEY (deleted_by) REFERENCES user (id);
 
-
 ### seed textbox table with historic data if it exists
 update textBox tb
     left join cmsLog cmsLogCreate on (tb.textBoxID = cmsLogCreate.objectId and cmsLogCreate.object = 'content' and cmsLogCreate.action = 'create')
-    left join cmsLog cmsLogModify on (tb.textBoxID = cmsLogModify.objectId and cmsLogModify.object = 'content' and cmsLogModify.action = 'modify')
-    left join cmsLog cmsLogDelete on (tb.textBoxID = cmsLogDelete.objectId and cmsLogDelete.object = 'content' and cmsLogDelete.action = 'delete')
-set
-    tb.created_at = COALESCE(cmsLogCreate.time, tb.created_at),
-    tb.created_by = cmsLogCreate.user,
-    tb.updated_at = COALESCE(cmsLogModify.time, tb.deleted_at, cmsLogCreate.time, tb.updated_at),
-    tb.updated_by = coalesce(cmsLogModify.user, cmsLogCreate.user),
-    tb.deleted_by = cmsLogDelete.user
+    left join user on cmsLogCreate.user = user.id
+set tb.created_at = COALESCE(cmsLogCreate.time, tb.created_at),
+    tb.created_by = user.id
+WHERE tb.textBoxID > 0;
 
+update textBox tb
+    left join cmsLog cmsLogDelete on (tb.textBoxID = cmsLogDelete.objectId and cmsLogDelete.object = 'content' and cmsLogDelete.action = 'delete')
+    left join user on cmsLogDelete.user = user.id
+set tb.deleted_by = user.id
+WHERE tb.textBoxID > 0;
+
+update textBox tb
+    left join cmsLog cmsLogModify on (tb.textBoxID = cmsLogModify.objectId and cmsLogModify.object = 'content' and cmsLogModify.action = 'modify')
+    left join user on cmsLogModify.user = user.id
+set tb.updated_at = COALESCE(cmsLogModify.time, tb.created_at),
+    tb.updated_by = coalesce(user.id, tb.created_by)
 WHERE tb.textBoxID > 0;
