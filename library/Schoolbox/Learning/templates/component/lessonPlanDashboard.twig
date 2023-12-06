@@ -4,14 +4,14 @@
         <li>
             <div class="card small-12" style="border-left: 6px solid {{ lesson.context.folder.colour ?? 'white' }}">
                 <h3>
-                    <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}">{{ lesson.title }}</a>
+                    <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.id, studentId: USER.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}">{{ lesson.title }}</a>
                 </h3>
                 <p class="meta">
                     {# Same as upcomingAssessments.twig but without assessment type name #}
                     {% if lesson.context is project %}
                         <a href="/homepage/{{ lesson.context.context.folder.id }}">{{ lesson.context.context.folder.title }}</a> >
                         <a href="/homepage/{{ lesson.context.context.folder.id }}">{{ lesson.context.context.title }}</a> >
-                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.context.id, studentId: USER.id}) }}">
+                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: lesson.context.id, studentId: USER.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
                         {{ lesson.context.title }}</a>
                     {% elseif lesson.context is unitImplementation %}
                         <a href="/homepage/{{ lesson.context.folder.id }}">{{ lesson.context.folder.title }}</a> >
