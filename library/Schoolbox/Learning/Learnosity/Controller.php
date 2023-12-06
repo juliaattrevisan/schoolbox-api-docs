@@ -1342,6 +1342,8 @@ class Controller extends Base
              * (because $items is in some non-sequenced order)
              *
              * Forcibly mutate $itemReference yet again >.<
+             * TODO revisit and optimise this some more: n^2 complexity shouldn't be required
+             *  if we hash-lookup by reference instead.
              */
             foreach ($itemReferences as &$itemReference) {
                 /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
