@@ -547,6 +547,7 @@ class Kernel extends WebKernelAbstract
                     '/lti-consumer/*',
                     '/lti-prototype/*',
                     '/lti-platform/*',
+                    '/login/oidc',
                 ]
             )
         ) {
