@@ -1368,6 +1368,12 @@ class Controller extends Base
                     ];
                 }
 
+                /* Set a default title - this should always be overwritten, but I can't assert
+                 * what will happen in the wild with people changing quiz contents before/during/after
+                 * attempts are being made
+                 */
+                $itemReference['title'] = 'Untitled';
+
                 /* Find it in the set of $items
                  */
                 $item = $indexedItems[$itemReference['reference']] ?? null;
