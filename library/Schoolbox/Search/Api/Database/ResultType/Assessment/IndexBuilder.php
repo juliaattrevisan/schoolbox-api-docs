@@ -49,6 +49,36 @@ class IndexBuilder extends BaseBuilder
             JOIN folder ON (
                 mv_assessment_relation.folder_id = folder.id
             )
+            LEFT JOIN course_implementation ON (
+                mv_assessment_relation.course_implementation_id = course_implementation.id
+            )
+            LEFT JOIN course_unit_implementation ON (
+                mv_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
+            )
+            LEFT JOIN course_specification ON (
+                mv_assessment_relation.course_specification_id = course_specification.id
+            )
+            LEFT JOIN course_unit_specification ON (
+                mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
+            )
+            LEFT JOIN project ON (
+                assessment.id=project.assessment_id
+            )
+            LEFT JOIN lti_assessment ON (
+                assessment.id = lti_assessment.assessment_id
+            )
+            LEFT JOIN submission_box ON (
+                assessment.id = submission_box.assessment_id
+            )
+            LEFT JOIN task ON (
+                task.assessment_id = assessment.id
+            )
+            LEFT JOIN assess ON (
+                assess.assessment_id = assessment.id
+            )
+            LEFT JOIN lesson_plan ON (
+                lesson_plan.assessment_id = assessment.id
+            )
             WHERE COALESCE(assessment.due_date, assessment.updated_at) >= :date
         ";
         $params = [
@@ -57,11 +87,11 @@ class IndexBuilder extends BaseBuilder
         ];
         foreach ($this->connector->executeQuery($query, $params) as $row) {
             yield (new Model())
-                ->setIdentifier($row['id'])
+                ->setIdentifier((string)$row['id'])
                 ->setTitle($row['title'])
                 ->setType($row['type'])
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
-                ->setRelevance($row['relevance'])
+                ->setRelevance((float)$row['relevance'])
                 ->setCreatedBy($row['created_by'])
                 ->setFolderId($row['folder_id'])
                 ->setFulltextIndex($row['fulltext_index'])
