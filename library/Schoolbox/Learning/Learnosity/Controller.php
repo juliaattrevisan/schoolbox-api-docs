@@ -1325,7 +1325,7 @@ class Controller extends Base
             /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
              * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
              */
-            if (!is_string($itemReferences[0])) {
+            if (is_array($itemReferences[0])) {
                 /* Forcibly mutate this, because learnosity insanity
                  */
                 $itemReferences = array_column($itemReferences, 'id');
