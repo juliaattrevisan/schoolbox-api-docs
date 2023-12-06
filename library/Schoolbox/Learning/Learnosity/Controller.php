@@ -1322,15 +1322,26 @@ class Controller extends Base
          * everything into learnosity's db
          */
         if (null !== $itemReferences) {
+            /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+             * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+             */
+            if (!is_string($itemReferences[0])) {
+                /* Forcibly mutate this, because learnosity insanity
+                 */
+                $itemReferences = array_column($itemReferences, 'id');
+            }
+
             /* Find a list of Learnosity Items (questions) available in this quiz
              * This includes more info about each item
              */
             $items = $this->api->dataGetRequest('itembank/items', [
-                'references' => array_column($itemReferences, 'id')
+                'references' => $itemReferences
             ])['data'];
 
             /* Consolidate reference and titles into an in-order lookup
              * (because $items is in some non-sequenced order)
+             *
+             * Forcibly mutate $itemReference yet again >.<
              */
             foreach ($itemReferences as &$itemReference) {
                 /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
