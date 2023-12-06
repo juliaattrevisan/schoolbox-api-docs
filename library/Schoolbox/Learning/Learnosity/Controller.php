@@ -136,6 +136,12 @@ class Controller extends Base
 
 
     /**
+     * A default text for items without titles
+     */
+    private const ITEM_TITLE_DEFAULT = 'Untitled';
+
+
+    /**
      * Learnosity API instance is the same for everything afaict
      *
      * @var Api
@@ -1372,14 +1378,14 @@ class Controller extends Base
                  * what will happen in the wild with people changing quiz contents before/during/after
                  * attempts are being made
                  */
-                $itemReference['title'] = 'Untitled';
+                $itemReference['title'] = self::ITEM_TITLE_DEFAULT;
 
                 /* Find it in the set of $items
                  */
                 $item = $indexedItems[$itemReference['reference']] ?? null;
 
                 if ($item) {
-                    $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
+                    $title = '' === trim((string)$item['title']) ? self::ITEM_TITLE_DEFAULT : $item['title'];
                     $itemReference['title'] = $title;
                 }
             }
