@@ -593,6 +593,14 @@ class Controller extends Base\Base
             return;
         }
 
+        // Template
+        try {
+            $template = $this->courseTemplateMapper->findById($post['template']);
+        } catch (Deleted $e) {
+            $this->sendError('It appears this template no longer exists. Please refresh your page to re-select.');
+            return;
+        }
+
         $parentFolderId = (int)trim($post->get('parent'));
         $originalParentFolderId = $courseSpec->getFolder()->getParent()->getId();
 
@@ -671,6 +679,7 @@ class Controller extends Base\Base
             || array_diff($newCurriculumCodes, $currentCurriculumCodes)
             || $originalParentFolderId !== $parentFolderId
             || $courseSpec->getSubjectCode() !== $subjectCode
+            || $courseSpec->getTemplate()->getId() !== $template->getId()
         ) {
             if ($this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) < UserAccess::ACCESS_WRITE) {
                 $this->sendError(new Base\Exception('Cannot update course. ', ["You don't have permission to update {$courseSpecFolder->getName()}."]));
@@ -681,6 +690,7 @@ class Controller extends Base\Base
             $courseSpecFolder->setName($newCourseName);
             $courseSpec->setFolder($courseSpecFolder);
             $courseSpec->setSubjectCode($subjectCode);
+            $courseSpec->setTemplate($template);
 
             // Save the Course
             $this->courseSpecificationMapper->save($courseSpec);
