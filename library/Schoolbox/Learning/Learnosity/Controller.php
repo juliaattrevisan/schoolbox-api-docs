@@ -1342,12 +1342,20 @@ class Controller extends Base
                 'references' => $itemReferenceList
             ])['data'];
 
+            /* Index them by reference, to remove quadratic complexity...
+             * ...because some schools have 900+ items in their quizzes!
+             * 900x900 iterations is far too many for what it accomplishes.
+             */
+            $indexedItems = [];
+
+            foreach ($items as $item) {
+                $indexedItems[$item['reference']] = $item;
+            }
+
             /* Consolidate reference and titles into an in-order lookup
              * (because $items is in some non-sequenced order)
              *
              * Forcibly mutate $itemReference yet again >.<
-             * TODO revisit and optimise this some more: n^2 complexity shouldn't be required
-             *  if we hash-lookup by reference instead.
              */
             foreach ($itemReferences as &$itemReference) {
                 /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
@@ -1360,15 +1368,13 @@ class Controller extends Base
                     ];
                 }
 
-                $reference = $itemReference['reference'];
-
                 /* Find it in the set of $items
                  */
-                foreach ($items as $item) {
-                    if ($reference === $item['reference']) {
-                        $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
-                        $itemReference['title'] = $title;
-                    }
+                $item = $indexedItems[$itemReference['reference']] ?? null;
+
+                if ($item) {
+                    $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
+                    $itemReference['title'] = $title;
                 }
             }
 
