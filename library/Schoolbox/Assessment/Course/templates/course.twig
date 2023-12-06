@@ -354,7 +354,7 @@ Usage:
                         <select name="template" required {% if templates.count == 1%}disabled{% endif %}>
                             {% if templates.count > 1 %}
                                 {% for template in templates %}
-                                    <option value="{{ template.id }}" {% if courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}</option>
+                                    <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}</option>
                                 {% endfor %}
                             {% else %}
                                 <option value="{{ templates.first.id }}" selected>{{ templates.first.name }}</option>
