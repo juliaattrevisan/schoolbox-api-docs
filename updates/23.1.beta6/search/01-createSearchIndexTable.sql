@@ -4,6 +4,7 @@ create table search_index
     result_title          varchar(1000) not null,
     result_type           varchar(32)   not null,
     result_date           datetime      null,
+    result_relevance      float         not null,
     result_created_by     int unsigned  null,
     result_folder_id      int unsigned  null,
     result_fulltext_index mediumtext    not null,
