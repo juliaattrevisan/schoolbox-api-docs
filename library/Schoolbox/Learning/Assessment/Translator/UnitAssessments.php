@@ -99,6 +99,7 @@ class UnitAssessments
             'assessments'       => $assessments?->reindex()->map($this),
             'completionCount'   => $completionCount,
             'studentCount'      => $studentCount,
+            'progressTick'      => $this->getProgressTick($assessment),
         ];
     }
 
@@ -133,5 +134,46 @@ class UnitAssessments
         }
         //no course, return null
         return null;
+    }
+
+    /**
+     * logic from @see library/Schoolbox/Learning/Assessment/templates/fragments/progressTick.twig
+     * @param IAssessable $assessable
+     * @return ?array
+     */
+    private function getProgressTick(IAssessable $assessable): ?array
+    {
+        // just look at the student specified
+        /** @var \Schoolbox\Learning\Assessment\Participant $participant */
+        $participant = $assessable->getParticipantIfExtant($this->student);
+        if (null === $participant) {
+            return null;
+        }
+        // task url allows students to mark their tasks as complete
+        $taskUrl = $progress = null;
+        // only create a url for tasks, and if they are implementations
+        if ($assessable instanceof \Schoolbox\Learning\Assessment\Task\Model && $assessable->isImplementation()) {
+            $taskUrl = $this->routeGenerator->generate('learningAssessment.postCreateResponse', [
+                'assessment' => $assessable,
+                'assessmentId' => $assessable->getId(),
+                'student' => $this->student,
+                'studentId' => $this->student->getId()
+            ]);
+        }
+
+        if ($participant->isResponseRequired() && ($assessable->isOpen($this->student) and $assessable->isSelfAssessable()) ) {
+            $progress = 'incomplete';
+        } else if ($participant->isFeedbackRequired()) {
+            $progress = 'pending';
+        } else if ($participant->isResubmissionRequired()) {
+            $progress = 'failed';
+        } else if ($participant->isReviewComplete()) {
+            $progress = 'reviewed';
+        }
+
+        return [
+            'url'       => $taskUrl,
+            'progress'  => $progress,
+        ];
     }
 }
