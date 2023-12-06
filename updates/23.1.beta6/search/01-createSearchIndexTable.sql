@@ -1,30 +1,30 @@
 create table search_index
 (
-    result_identifier     varchar(64)   not null,
-    result_title          varchar(1000) not null,
-    result_type           varchar(32)   not null,
-    result_date           datetime      null,
-    result_relevance      float         not null,
-    result_created_by     int unsigned  null,
-    result_folder_id      int unsigned  null,
-    result_fulltext_index mediumtext    not null,
-    result_text_index     varchar(250)  null,
+    identifier     varchar(64)   not null,
+    title          varchar(1000) not null,
+    type           varchar(32)   not null,
+    date           datetime      null,
+    relevance      float         not null,
+    created_by     int unsigned  null,
+    folder_id      int unsigned  null,
+    fulltext_index mediumtext    not null,
+    text_index     varchar(250)  not null,
     constraint search_index_pk
-        primary key (result_identifier)
+        primary key (identifier)
 );
 
-create fulltext index search_index_result_fulltext_index_index
-    on search_index (result_fulltext_index);
+create fulltext index search_index_fulltext_index_index
+    on search_index (fulltext_index);
 
-create index search_index_result_text_index_index
-    on search_index (result_text_index);
+create index search_index_text_index_index
+    on search_index (text_index);
 
 alter table search_index
     add constraint search_index_user_id_fk
-        foreign key (result_created_by) references user (id)
+        foreign key (created_by) references user (id)
             on update cascade on delete set null;
 
 alter table search_index
     add constraint search_index_folder_id_fk
-        foreign key (result_folder_id) references folder (id)
+        foreign key (folder_id) references folder (id)
             on update cascade on delete set null;
