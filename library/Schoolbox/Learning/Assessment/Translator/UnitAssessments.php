@@ -67,30 +67,10 @@ class UnitAssessments
          * record / track participation
          * logic clone from Course Outline component view:
          * @see library/Schoolbox/Learning/Assessment/templates/outline/unitAssessments.twig
-         *
-         * {% for linked in assessment.linkedAssessments %}
-         * {% set completionCount    = 0 %}
-         * {% set studentCount       = 0 %}
-         *
-         * {# TODO skip this if not displaying counts, eg to teacher #}
-         * {# count students which have completed this #}
-         * {% for participant in linked.allParticipants|filter(participant => participant.isExcluded == false)  %}
-         * {% if not participant.responseRequired %}
-         * {% set completionCount = completionCount + 1 %}
-         * {% endif %}
-         * {% set studentCount = studentCount + 1 %}
-         * {% endfor %}
-         *
-         * {% if studentCount %}
-         * {% set completionGradient = (completionCount / studentCount) * 100 %}
-         * {% endif %}
-         *
-         * {{ completionCount }}/{{ studentCount }} students completed
-         * {% endfor %}
          */
         // init values
         $completionCount = $studentCount = 0;
-        // count students which have completed this
+        // only look at students who are not excluded
         foreach (
             $assessment->getAllParticipants()->filter(
                 static function (Participant $participant) {
@@ -98,9 +78,11 @@ class UnitAssessments
                 }
             ) as $participant
         ) {
+            // count students which have completed this
             if (!$participant->isResponseRequired()) {
                 $completionCount++;
             }
+            // count al students who are part of this
             $studentCount++;
         }
 
