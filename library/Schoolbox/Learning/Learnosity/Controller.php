@@ -16,6 +16,8 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Http\Discovery\Psr17Factory;
+use Interop\Queue\Exception\InvalidDestinationException;
+use Interop\Queue\Exception\InvalidMessageException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Schoolbox\Application\Exception\Exception;
@@ -132,6 +134,12 @@ class Controller extends Base
             ]
         ]
     ];
+
+
+    /**
+     * A default text for items without titles
+     */
+    private const ITEM_TITLE_DEFAULT = 'Untitled';
 
 
     /**
@@ -669,8 +677,10 @@ class Controller extends Base
         ], "Result for {$assessment->getTitle()}");
     }
 
+
     /**
      * The student who did the attempt
+     *
      * @param Model $attempt
      * @return array
      */
@@ -685,12 +695,17 @@ class Controller extends Base
         ];
     }
 
+
     /**
      * The student who did the attempt
+     *
      * @param Model $attempt
      * @return array
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
      */
-    private function getItemResponses(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    private function getItemResponses(\Schoolbox\Learning\Quiz\Attempt\Model $attempt): array
     {
         /* These are the scores they obtained for the one session we chose
          * (It'll still come to us as an array of sessions though)
@@ -724,12 +739,14 @@ class Controller extends Base
         return array_values(array_merge_recursive($scores, $responseComments));
     }
 
+
     /**
      * Retrieve the comment for this attempt
+     *
      * @param Model $attempt
      * @return array
      */
-    private function getAttemptComment(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    private function getAttemptComment(\Schoolbox\Learning\Quiz\Attempt\Model $attempt): array
     {
         return  [
             'learnosityReference' => $attempt->getLearnosityReference(),
@@ -737,6 +754,7 @@ class Controller extends Base
             'comment' => $attempt->getComment()
         ];
     }
+
 
     /**
      * From a student's perspective,
@@ -746,7 +764,9 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @return void
+     * @throws ApiException
      * @throws Error
+     * @throws RouteNotFound
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -776,7 +796,7 @@ class Controller extends Base
             'type' => 'session-detail-by-item',
             'session_id' => $attempt->getLearnosityReference(),
             'questions_api_init_options' => [
-                'showCorrectAnswers' => $attempt->getReviewed() !== null ? true : false,
+                'showCorrectAnswers' => $attempt->getReviewed() !== null,
             ]
         ];
 
@@ -839,6 +859,7 @@ class Controller extends Base
         ], "Result for {$assessment->getTitle()}");
     }
 
+
     /**
      * Provide feedback for an attempt
      *
@@ -880,14 +901,10 @@ class Controller extends Base
 
         /* Breadcrumbs
          */
-        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-            [
-                $assessment->getTitle(),
-                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
-
-            ]
-        )
-            ->add(['Feedback']);
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+            $assessment->getTitle(),
+            $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+        ])->add(['Feedback']);
 
         /* Pregenerate all the urls for the user, because you can't manufacture them
         * in javascript without risking desync with backend
@@ -1277,15 +1294,40 @@ class Controller extends Base
          * everything into learnosity's db
          */
         if (null !== $itemReferences) {
+            /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+             * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+             */
+            if (is_array($itemReferences[0])) {
+                /* Forcibly mutate this, because learnosity insanity
+                 */
+                $itemReferenceList = array_column($itemReferences, 'id');
+            } else {
+                /* Presume it was a list of reference strings already
+                 */
+                $itemReferenceList = $itemReferences;
+            }
+
             /* Find a list of Learnosity Items (questions) available in this quiz
              * This includes more info about each item
              */
             $items = $this->api->dataGetRequest('itembank/items', [
-                'references' => array_column($itemReferences, 'id')
+                'references' => $itemReferenceList
             ])['data'];
+
+            /* Index them by reference, to remove quadratic complexity...
+             * ...because some schools have 900+ items in their quizzes!
+             * 900x900 iterations is far too many for what it accomplishes.
+             */
+            $indexedItems = [];
+
+            foreach ($items as $item) {
+                $indexedItems[$item['reference']] = $item;
+            }
 
             /* Consolidate reference and titles into an in-order lookup
              * (because $items is in some non-sequenced order)
+             *
+             * Forcibly mutate $itemReference yet again >.<
              */
             foreach ($itemReferences as &$itemReference) {
                 /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
@@ -1298,15 +1340,19 @@ class Controller extends Base
                     ];
                 }
 
-                $reference = $itemReference['reference'];
+                /* Set a default title - this should always be overwritten, but I can't assert
+                 * what will happen in the wild with people changing quiz contents before/during/after
+                 * attempts are being made
+                 */
+                $itemReference['title'] = self::ITEM_TITLE_DEFAULT;
 
                 /* Find it in the set of $items
                  */
-                foreach ($items as $item) {
-                    if ($reference === $item['reference']) {
-                        $title = '' === trim((string)$item['title']) ? 'Untitled' : $item['title'];
-                        $itemReference['title'] = $title;
-                    }
+                $item = $indexedItems[$itemReference['reference']] ?? null;
+
+                if ($item) {
+                    $title = '' === trim((string)$item['title']) ? self::ITEM_TITLE_DEFAULT : $item['title'];
+                    $itemReference['title'] = $title;
                 }
             }
 
@@ -1384,6 +1430,9 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -1646,6 +1695,7 @@ class Controller extends Base
         ], 'Example Activity List');
     }
 
+
     /**
      * Callback for copying a quiz's contents from one quiz to another.
      *
@@ -1658,7 +1708,14 @@ class Controller extends Base
      * @param QuizDomainObject $source
      * @param QuizDomainObject $destination
      * @return void
+     * @throws RouteNotFound
      * @throws ValidationException
+     * @throws \DomainException
+     * @throws \Interop\Queue\Exception
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
