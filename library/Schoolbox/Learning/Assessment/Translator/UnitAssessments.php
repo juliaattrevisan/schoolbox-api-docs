@@ -102,19 +102,23 @@ class UnitAssessments
         }
 
         return [
-            'id'                => $assessment->getId(),
-            'title'             => $assessment->getTitle(),
-            'assessmentType'    => $assessment->getFamilyName(),
-            'course'            => $this->getCourseName($assessment),
-            'unit'              => $assessment->getBaseContext()->getTitle(),
-            'projectName'       => $projectName,
-            'dueAt'             => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
-            'dueAtFormatted'    => $assessment->getDueAt()?->getRelativeDayWithoutMidnight(),
-            '_links'            => $links,
-            'assessments'       => $assessments?->reindex()->map($this),
-            'completionCount'   => $completionCount,
-            'studentCount'      => $studentCount,
-            'progressTick'      => $this->getProgressTick($assessment),
+            'id'                   => $assessment->getId(),
+            'title'                => $assessment->getTitle(),
+            'assessmentType'       => $assessment->getFamilyName(),
+            'course'               => $this->getCourseName($assessment),
+            'unit'                 => $assessment->getBaseContext()->getTitle(),
+            'projectName'          => $projectName,
+            'dueAt'                => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
+            'dueAtFormatted'       => $assessment->getDueAt()?->getRelativeDayWithoutMidnight(),
+            '_links'               => $links,
+            'assessments'          => $assessments?->reindex()->map($this),
+            'completionCount'      => $completionCount,
+            'studentCount'         => $studentCount,
+            'progressTick'         => $this->getProgressTick($assessment),
+            'isSelfAssessableTask' => (
+                $assessment instanceof \Schoolbox\Learning\Assessment\Task\Model &&
+                $assessment->isSelfAssessable()
+            )
         ];
     }
 

@@ -10,6 +10,7 @@ export type Activity = {
     studentCount: number; // total number of students assigned the activity
     dueAt: string | null;
     dueAtFormatted: string | null;
+    isSelfAssessableTask: boolean;
     _links: {
         status: string;
         summary: string;

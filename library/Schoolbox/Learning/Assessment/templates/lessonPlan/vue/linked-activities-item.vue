@@ -107,8 +107,7 @@ function getDataProgressTickStatus(activity: Activity) {
  * @returns { string } A description to be used as mouseover text
  */
 function getDataProgressTickForm(activity: Activity) {
-    // data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
-    return "teacherAssessed"; // TODO: Figure out how to get this.
+    return activity.isSelfAssessableTask ? "selfAssessed" : "teacherAssessed";
 }
 </script>
 
