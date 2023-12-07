@@ -125,17 +125,22 @@ watchDebounced(
  * Move the item response element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
-    if (props.question.response) {
-        let selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
+  if (props.question.response) {
+      const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
+      const response = props.container.querySelector(selector) as HTMLDivElement;
 
-        const response = props.container.querySelector(selector) as HTMLDivElement;
-        responsesEl.value?.appendChild(response);
-        score.value = props.question.response.score?.toString() ?? "";
+      responsesEl.value?.appendChild(response);
+      score.value = props.question.response.score?.toString() ?? "";
 
-        /* Replace video placeholders with actual player when the ui has loaded
-         */
-        $.fn.schoolboxResource_ProxyReplacement($(selector));
-    }
+      /**
+       * Replace video placeholders with actual player when the ui has loaded,
+       * ensuring we only do this on the first mount by checking if the replacement
+       * container is already present
+       */
+      if (!response.querySelector("[data-schoolboxmedia-replacement-container]")) {
+          $.fn.schoolboxResource_ProxyReplacement($(selector));
+      }
+  }
 });
 
 /**
