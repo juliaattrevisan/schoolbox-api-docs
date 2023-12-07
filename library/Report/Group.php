@@ -25,6 +25,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'firstname'           => 'First Name',
         'preferred_name'      => 'Preferred Name',
         'lastname'            => 'Surname',
+        'pronoun'             => 'Pronoun',
         'position_title'      => 'Position Title',
         'role'                => 'Role',
         'campus'              => 'Campus',
@@ -138,12 +139,14 @@ class Report_Group extends Report_Abstract implements Report_IReport
         // bypass handlers because I need access to the mysql pointer resource
         $query = "
             SELECT `u`.*,
+            CONCAT('(',`p`.`subjective`,'/',`p`.objective,')') AS `pronoun`,
             GROUP_CONCAT(DISTINCT `c`.`name` ORDER BY `c`.`name` ASC SEPARATOR ', ') AS `campus`,
             `r`.`name` AS `role`,
             `h`.`house` AS `house`,
             `lyl`.name AS `year`,
             `rh`.`name` AS `res_house`
             FROM `user` `u`
+            LEFT JOIN `pronoun` `p` ON `u`.`pronoun`=`p`.`id`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
             LEFT JOIN `groups` `r` ON `u`.`group_id`=`r`.`id`
