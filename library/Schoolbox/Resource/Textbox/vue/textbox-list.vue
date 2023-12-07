@@ -445,7 +445,7 @@ export default {
         </template>
         <template v-else>
             <section>
-                <ul class="information-list unsortable expandable-card">
+                <ul class="information-list unsortable expandable-card" data-contains-editors>
                     <template v-for="(usage, index) in textboxes">
                         <li v-if="usage.deleted !== true" :id="'textbox-' + usage.textbox.id" :key="index">
                             <div class="actions-small-1">
