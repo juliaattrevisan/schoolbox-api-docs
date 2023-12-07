@@ -394,6 +394,7 @@ $rotate-span-width: 11rem;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 font-weight: normal;
+                will-change: transform;
             }
         }
 
