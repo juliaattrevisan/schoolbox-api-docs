@@ -24,7 +24,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
@@ -144,6 +143,14 @@ class Controller extends Base
 
 
     /**
+     * Learnosity Helper, which contains multiple convenience methods
+     *
+     * @var Helper
+     */
+    private Helper $helper;
+
+
+    /**
      * Controller constructor.
      *
      * @param Factory $urlFactory
@@ -184,13 +191,17 @@ class Controller extends Base
          * I want to avoid dumping Yet Another Thing into the kernel
          * I don't have a convenient means to access SERVER_NAME except like this, sadly
          */
+        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
         $this->api = new Api(
             $urlFactory->buildFullyQualified()->getHost(),
             $this->learnosityVersion,
             $this->learnosityConsumerKey,
             $this->learnosityConsumerSecret,
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+            $logger
         );
+
+        $this->helper = new Helper($this->api, $logger);
     }
 
 
@@ -372,7 +383,7 @@ class Controller extends Base
         // the quiz page will enable users to bypass permission checks that prevent the 'start quiz' button from displaying.
         // See library/Schoolbox/Learning/Assessment/Quiz/Controller.php (where the same permission checks are used).
         $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now); // Close any expired attempts before checking for in-progress.
+        $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now); // Close any expired attempts before checking for in-progress.
         $actionValidator = new ActionValidator($now, Access::getInstance());
         $canAttempt = (
             $this->getUser()->getId() === $student->getId() && // A user may not attempt a quiz on behalf of another user.
@@ -579,39 +590,7 @@ class Controller extends Base
     public function postCompleteAttempt(QuizDomainObject $assessment, \Schoolbox\User $student): void
     {
         /* Find out what they scored by the automated system
-         */
-        $result = $this->api->dataGetRequest('/sessions/scores', [
-            'session_id' => [
-                $this->requestPost->get('learnosityReference')
-            ]
-        ]);
-
-        /* The learnosityReference posted here doesn't exist
-         * TODO What kind of error should we present to users? It's asynchronous
-         */
-        if (!\count($result['data'])) {
-            throw new \UnexpectedValueException('Empty result payload for attempt.');
-        }
-
-        /* Find out if this attempt was in Incomplete status
-         * Users don't always officially conclude their attempts
-         */
-//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE === $result['data'][0]['status']) {
-//            /* FIXME Need to load their Session, then complete it on their behalf,
-//             *  then reload their $result like we originally tried...but how?
-//             *  There's no endpoint to update a Session's status...
-//             */
-//        }
-
-        /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
-         */
-        $sanitisedScore = (new SanitiseScores())->sanitise($result['data'][0]['score'], $result['data'][0]['max_score']);
-
-        $mark = $sanitisedScore['score'];
-        $maxMark = $sanitisedScore['max_score'];
-
-        /* Record it locally for our own usages
+         * Record it locally for our own usages
          */
         $existingAttempt = $this->attemptMapper->findOneByColumnList([
             'attempt_id'           => $this->requestPost->get('attemptId'),
@@ -619,32 +598,7 @@ class Controller extends Base
             'user_id'              => $student->getId()
         ]);
 
-        /* Fabricate an IResponse instance for existing mark scheme
-         *
-         * Note that $existingResponse might well be null for broken data somehow,
-         * but we have no means to recover from that...and it shouldn't really
-         * occur naturally
-         */
-        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
-
-        /* TODO What kind of error should we present to users? It's asynchronous
-         */
-        if (null === $existingResponse) {
-            return;
-        }
-
-        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
-
-        /* The finish time might already have been set if their timer elapsed;
-         * If it did, just use that datetime. Otherwise, you'll be recording
-         * the datetime of when the user clicked past the modal at the end of
-         * every attempt, which can record a later datetime than intended.
-         */
-        if (!$existingAttempt->getFinish()) {
-            $existingAttempt->setFinish(\Alaress_Date_Format::now());
-        }
-
-        $this->attemptMapper->save($existingAttempt);
+        $this->helper->processAttemptCompletion($this->attemptMapper, $assessment, $existingAttempt);
     }
 
 
@@ -1026,14 +980,15 @@ class Controller extends Base
 
         // As with posting a feedback:
         // need the existing response to determine a human-readable mark.
-        $existingResponse = $this->extractExistingResponse($assessment, $student, $attempt);
+        $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);
 
         // TODO as with posting a feedback:
         //      what kind of error should we present to users? It's asynchronous
         if (!$existingResponse) {
             return;
         }
-        $this->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
+
+        $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* Save the comment and new normalised mark
          */
@@ -1450,11 +1405,11 @@ class Controller extends Base
 
         foreach ($attempts as $attempt) {
             // Assign marks to attempt based on results from Learnosity
-            $existingResponse = $this->extractExistingResponse($assessment, $attempt->getUser(), $attempt);
+            $existingResponse = $this->helper->extractExistingResponse($assessment, $attempt->getUser(), $attempt);
             if ($existingResponse) {
                 $result = $groupedResults[$attempt->getLearnosityReference()] ?? null;
                 if ($result) {
-                    $this->assignMarksToAttempt(
+                    $this->helper->assignMarksToAttempt(
                         $attempt,
                         $existingResponse,
                         $assessment,
@@ -1974,64 +1929,5 @@ class Controller extends Base
              */
             (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
         }
-    }
-
-    /**
-     * Extract the response object which matches `$existingAttempt` out of the
-     * student's participation record.
-     *
-     * @param QuizDomainObject $assessment
-     * @param User             $student
-     * @param Model            $existingAttempt
-     * @return QuizResponse|null
-     */
-    private function extractExistingResponse(
-        QuizDomainObject $assessment,
-        User $student,
-        Model $existingAttempt,
-    ): ?QuizResponse {
-        $response = $assessment->getParticipant($student)->getAllResponses()->getBy('id', $existingAttempt->getId());
-        return $response instanceof QuizResponse ? $response : null;
-    }
-
-    /**
-     * Assign normalised and human-readable marks to `$attempt`.
-     *
-     * @param Model             $attempt
-     * @param QuizResponse      $responseDomainObject The domain-level object corresponding to `$attempt`: required for
-     *                                                deriving a human-readable mark.
-     * @param QuizDomainObject  $assessment           The assessment to which `$attempt` belongs: required for deriving
-     *                                                a human-readable mark.
-     * @param float             $mark
-     * @param float             $maxMark
-     * @return void
-     */
-    private function assignMarksToAttempt(
-        Model $attempt,
-        QuizResponse $responseDomainObject,
-        QuizDomainObject $assessment,
-        float $mark,
-        float $maxMark
-    ): void {
-        /* Update normalised and human-readable marks
-         */
-        $normalisedMark = $attempt->calculateNormalisedMark($mark, $maxMark);
-
-        /* Update the domain object synonymously which will desync from $attempt
-         * so we need to sync them manually...
-         *
-         * This is required for getMarkScheme() to calculate human-readable mark
-         */
-        $responseDomainObject->setNormalisedMark($normalisedMark);
-        $responseDomainObject->setMarksAvailable($maxMark);
-
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
-
-        /* Update the columns with newly-derived values
-         */
-        $attempt
-            ->setMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark)
-            ->setMaxMark($maxMark);
     }
 }

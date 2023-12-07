@@ -22,7 +22,10 @@ use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
@@ -521,35 +524,74 @@ class Mapper extends BaseMapper
 
     /**
      * Closes any attempts in $quiz that have expired.
+     * Returns the number of attempts that got updated.
      *
-     * @param Model                $quiz
+     * @param QuizDomainModel $assessment
+     * @param Model $quiz
      * @param \Alaress_Date_Format $now
-     * @throws BaseMapper\DefinitionException
-     * @throws BaseMapper\Exception
+     * @return int
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \DomainException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function closeExpiredAttempts(Model $quiz, \Alaress_Date_Format $now): void
+    public function closeExpiredAttempts(QuizDomainModel $assessment, Model $quiz, \Alaress_Date_Format $now): int
     {
+        /* The number of attempts we changed in the db due to duration naturally expiring
+         */
+        $numChanged = 0;
+
         if ($quiz->isDurationUnlimited()) {
-            return;
+            return $numChanged;
         }
 
         $duration = $quiz->getDuration();
 
         if ($quiz->getAttempts()) {
+            /* Start preparing a Helper instance; we might have something to do
+             */
+            $helper = null;
+            $quizAttemptMapper = null;
+
             foreach ($quiz->getAttempts() as $attempt) {
                 if (!$attempt->isFinished()) {
                     // Has it passed its duration?
                     $expiry = (clone $attempt->getStart())->addSeconds($duration);
 
                     if ($expiry->lt($now)) {
+                        /* If a Helper didn't already exist, spawn it with the necessary parts
+                         * Otherwise, reuse what we made previously
+                         */
+                        if (null === $helper && null === $quizAttemptMapper) {
+                            $api = new Api(
+                                (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
+                                $this->getConfigLoader()->get('learnosity_version'),
+                                $this->getConfigLoader()->get('learnosity_consumer_key'),
+                                $this->getConfigLoader()->get('learnosity_consumer_secret'),
+                                new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
+                            );
+
+                            $helper = new Schoolbox\Learning\Learnosity\Helper($api);
+
+                            /** @var QuizAttemptMapper $quizAttemptMapper */
+                            $quizAttemptMapper = $this->getJoinMapper('attempt');
+                        }
+
                         $attempt->setFinish($expiry);
                         $this->getJoinMapper('attempt')->save($attempt);
+
+                        $helper->processAttemptCompletion($quizAttemptMapper, $assessment, $attempt);
+                        $numChanged++;
                     }
                 }
             }
         }
+
+        return $numChanged;
     }
 
 

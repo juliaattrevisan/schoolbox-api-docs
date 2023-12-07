@@ -10,7 +10,6 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Alaress_Date_Format;
-use Alaress\Lumberjack\Logger;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use External\Canvas\Importer\CanvasDb;
@@ -31,8 +30,6 @@ use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
-use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -49,6 +46,7 @@ use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
+use Twig\Error\Error;
 use UnexpectedValueException;
 
 /**
@@ -166,12 +164,43 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws DomainException
+     * @throws Error
+     * @throws Exception
+     * @throws MapperException
+     * @throws PDOException
      * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     public function getStatus(IAssessable $assessment): void
     {
         $baseUrl = $this->getRouteIfAuthorized('learningAssessment.getStatus', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]);
         $returnUrlSuffix = Redirect::queryString($baseUrl);
+
+        /* Auto-complete naturally expired quizzes
+         */
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+        $now = Alaress_Date_Format::now();
+
+        /* Apparently this is a thing
+         */
+        $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz);
+
+        /* Close any expired attempts before checking for in-progress / unfinished attempts
+         * Note that this requires $quiz to have its attempts already loaded via loadAttemptsAndAnswers()
+         */
+        $numChanged = $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now);
+
+        /* Attempts list is hydrated as part of $assessment, but we might have changed that
+         * If anyone got their attempt automatically closed, reload with the latest data.
+         */
+        if ($numChanged) {
+            $assessment = $this->getAssessmentMapper()->findByIdForReview($assessment->getId());
+        }
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
@@ -197,14 +226,23 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @since 165
      *
-     * @param IAssessable|Model $assessment
-     * @param User              $student
-     * @throws Deleted
-     * @throws DomainException
-     * @throws PDOException
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
      * @throws DefinitionException
+     * @throws Deleted
+     * @throws Error
+     * @throws Exception
      * @throws MapperException
+     * @throws PDOException
+     * @throws RouteNotFound
      * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Exception
+     * @throws \CFPropertyList\IOException
+     * @throws \CFPropertyList\PListException
+     * @throws \DOMException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -251,6 +289,12 @@ class Controller extends Assessment\Controller
          */
         $quiz = $this->quizMapper->loadAttemptsAndAnswers($quiz, $student);
 
+        /* Close any expired attempts before checking for in-progress / unfinished attempts
+         * Note that this requires $quiz to have its attempts already loaded via loadAttemptsAndAnswers()
+         */
+        $now = Alaress_Date_Format::now();
+        $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now);
+
         $attempts = $this->attemptMapper->findByColumnList([
             'assess_id' => $quiz->getId(),
             'user_id' => $student->getId()
@@ -283,8 +327,6 @@ class Controller extends Assessment\Controller
         // either an enabled 'start quiz' button will lead to a permission error on the quiz page, or directly accessing
         // the quiz page will enable users to bypass permission checks that prevent the 'start quiz' button from displaying.
         // See Learnosity/Controller->getAttempt() (where the same permission checks are used).
-        $now = Alaress_Date_Format::now();
-        $this->quizMapper->closeExpiredAttempts($quiz, $now); // Close any expired attempts before checking for in-progress
         // TODO this should eventually be route permission based
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
         $actionValidator = new ActionValidator($now, $this->getAccess());
