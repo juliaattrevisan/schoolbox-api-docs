@@ -14,4 +14,10 @@ export type Activity = {
         summary: string;
         modify: string;
     };
+    completionCount: number | null;
+    studentCount: number | null;
+    progressTick: {
+        url: string | null;
+        progress: string | null;
+    } | null;
 };
