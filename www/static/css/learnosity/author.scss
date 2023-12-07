@@ -960,11 +960,11 @@ button.lrn-h3.lrn-list-view-heading.lrn-ellipses.lrn-author-editable-item {
 /* Fixed the Find items and create item buttons to stay on right hand across all devices */
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary {
     position: absolute;
-    right: 50px;
+    right: 0px;
     top: 65px;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec {
     position: absolute;
-    right: 0;
+    right: 50px;
     top: 65px;
 }
