@@ -210,7 +210,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
 
         /* Unlink from user
          */
-        if(!empty($user->getPortrait())) {
+        if (!empty($user->getPortrait())) {
             $user->setPortrait(null);
             \Schoolbox\UserMapper::getInstance()->save($user);
         }
