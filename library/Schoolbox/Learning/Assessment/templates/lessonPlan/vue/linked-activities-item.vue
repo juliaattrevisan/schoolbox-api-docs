@@ -137,7 +137,7 @@ function getDataProgressTickForm(activity: Activity) {
             </p>
             <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
         </div>
-        <div v-if="activity.progressTick !== null" style="float: right; width: 40px">
+        <div v-if="activity.progressTick !== null" style="float: right; width: 40px; margin-right: 20px">
             <form
                 v-if="activity.progressTick.url !== null"
                 method="post"
