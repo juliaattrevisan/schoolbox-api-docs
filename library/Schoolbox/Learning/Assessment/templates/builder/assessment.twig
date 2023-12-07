@@ -13,6 +13,12 @@ Usage:
         assessmentId: assessment.id,
         assessment: assessment
     }) %}
+{% elseif assessment is project %}
+    {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {
+        assessmentId: assessment.id,
+        assessment: assessment
+    })
+    %}
 {% else %}
     {% set textLinkRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
         assessmentId: assessment.id,
