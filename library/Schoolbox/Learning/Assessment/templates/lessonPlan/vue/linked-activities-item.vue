@@ -130,41 +130,42 @@ function getDataProgressTickForm(activity: Activity) {
                 <span :class="getUrgency()"
                     >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
                 >
-                <span v-else class="title">{{ activity.title }}</span>
-            </h3>
-            <p class="meta">
-                {{ getActivityMeta(activity) }}
-            </p>
-            <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
-        </div>
-        <div v-if="activity.progressTick !== null" style="float: right; width: 40px; margin-right: 20px">
-            <form
-                v-if="activity.progressTick.url !== null"
-                :action="activity.progressTick.url"
-                method="post"
-                class="progress-tick-form"
-                :data-progress-tick-form="getDataProgressTickForm(activity)"
-            >
-                <a
-                    :class="
-                        'no-text progress-tick ' +
-                        (activity.progressTick.progress === 'incomplete' ? '' : activity.progressTick.progress)
-                    "
-                    :data-progress-tick-status="getDataProgressTickStatus(activity)"
-                    :title="getProgressTickMouseoverTitle(activity)"
-                ></a>
-            </form>
+            </template>
+        </p>
+        <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
+    </div>
+    <nav v-if="activity.progressTick !== null" class="progress-tick-container">
+        <form
+            v-if="activity.progressTick.url !== null"
+            :action="activity.progressTick.url"
+            method="post"
+            class="progress-tick-form"
+            :data-progress-tick-form="getDataProgressTickForm(activity)"
+        >
             <a
-                v-else-if="activity._links !== null"
-                :href="activity._links.status"
-                :class="'no-text progress-tick ' + activity.progressTick.progress"
+                :class="
+                    'no-text progress-tick ' +
+                    (activity.progressTick.progress === 'incomplete' ? '' : activity.progressTick.progress)
+                "
+                :data-progress-tick-status="getDataProgressTickStatus(activity)"
                 :title="getProgressTickMouseoverTitle(activity)"
             ></a>
-        </div>
-    </div>
+        </form>
+        <a
+            v-else-if="activity._links !== null"
+            :href="activity._links.status"
+            :class="'no-text progress-tick ' + activity.progressTick.progress"
+            :title="getProgressTickMouseoverTitle(activity)"
+        ></a>
+    </nav>
     <nav v-if="isInstructor">
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
     </nav>
 </template>
 
-<style scoped></style>
+<style scoped>
+nav.progress-tick-container {
+    margin-right: 40px;
+    margin-top: 5px;
+}
+</style>
