@@ -148,9 +148,10 @@ class External_Doublefirst_User implements External_UserInterface
 
         /* Unlink from user
          */
-        $user->setPortrait(null);
-
-        \Schoolbox\UserMapper::getInstance()->save($user);
+        if(!empty($user->getPortrait())) {
+            $user->setPortrait(null);
+            \Schoolbox\UserMapper::getInstance()->save($user);
+        }
 
         return null;
     }
