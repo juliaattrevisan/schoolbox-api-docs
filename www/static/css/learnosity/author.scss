@@ -740,7 +740,9 @@ span.lrn-list-view-empty-label {
 .lrn .lrn-author-ui .lrn-list-view-empty-img::after {
     content: "\e658";
     font-family: "schoolbox";
-    white-space: pre;
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
 }
 .lrn-list-view-empty.lrn-author-ui-no-preview {
     background-color: #ddd;
@@ -779,7 +781,6 @@ span.lrn-list-view-empty-label {
 }
 .lrn-list-view-empty.lrn-author-ui-no-preview::after {
     content: "\A You have no items yet. An item is a single question or a collection of questions in a quiz.You need items to create a quiz.\A Select Find items or Create item to proceed.";
-    white-space: pre;
 }
 
 /* fixed right alignment */
