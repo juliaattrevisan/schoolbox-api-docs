@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Activity } from "../linkedActivitiesTypes";
+import { LessonPlanEvent } from "../../js/event/lessonPlanEvent";
 
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
     const sourceId = window.Vue.ref(0); // The id of the source lesson plan
     const linkedActivities = window.Vue.ref<Activity[]>([]);
     const gradeGradientEnable = window.Vue.ref(false); // Whether the grade gradient is enabled or not
+    const isStudentView = window.Vue.ref(false); // Whether the page is in student view or not
     const selectedActivities = window.Vue.ref<Activity[]>([]); // Current state of the selected activities in the modal
 
     const isSingleUnlinkOpen = window.Vue.ref(false); // Whether the single unlink modal is open or not
@@ -16,6 +18,18 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     const saveInProgress = window.Vue.ref(false);
     const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
+
+    /**
+     * Listen for switches between student and staff view on the page
+     */
+    function addListeners() {
+        document.addEventListener(LessonPlanEvent.TO_STUDENT_VIEW, () => {
+            isStudentView.value = true;
+        });
+        document.addEventListener(LessonPlanEvent.TO_STAFF_VIEW, () => {
+            isStudentView.value = false;
+        });
+    }
 
     /**
      * store any passed through properties
@@ -35,6 +49,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         gradeGradientEnable.value = $gradeGradientEnable;
         selectedActivities.value = [...linkedActivities.value];
         toastEl.value = toastElement.value;
+        addListeners();
     }
 
     /**
@@ -183,6 +198,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         clearChanges,
         linkedActivities,
         gradeGradientEnable,
+        isStudentView,
         selectedActivities,
         addActivity,
         removeActivity,
