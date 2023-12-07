@@ -106,12 +106,15 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     &.expandable,
     &.expandable-card {
         @include list-interaction(expander, pointer);
+        li .expander {
+            flex: 1 2.5rem;
+        }
+    }
+    // avoid modifying CKEditor ul styles when they are within
+    &.expandable-card:not([data-contains-editors]) {
         ul {
             list-style: none;
             margin: 0;
-        }
-        li .expander {
-            flex: 1 2.5rem;
         }
     }
     &.card-selectable {
