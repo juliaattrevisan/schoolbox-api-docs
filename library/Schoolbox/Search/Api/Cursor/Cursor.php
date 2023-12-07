@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\Source\ISource;
+use Schoolbox\User;
 
 /**
  * Cursor for the search API.
@@ -31,12 +32,14 @@ class Cursor implements ICursor
     /**
      * Constructor
      *
-     * @param ISource          $source  A source for search results.
-     * @param string           $keyword A keyword to search for.
-     * @param FilterDataObject $filter  A set of filters to apply to the search.
-     * @param int              $limit   The max number of results to fetch.
+     * @param User             $loggedInUser The logged-in user.
+     * @param ISource          $source       A source for search results.
+     * @param string           $keyword      A keyword to search for.
+     * @param FilterDataObject $filter       A set of filters to apply to the search.
+     * @param int              $limit        The max number of results to fetch.
      */
     public function __construct(
+        private User $loggedInUser,
         private ISource $source,
         private string $keyword,
         private FilterDataObject $filter,
@@ -93,6 +96,7 @@ class Cursor implements ICursor
         return new GenericCollection(
             RawResult::class,
             $this->source->search(
+                $this->loggedInUser,
                 $this->keyword,
                 $this->filter,
                 $cursor,

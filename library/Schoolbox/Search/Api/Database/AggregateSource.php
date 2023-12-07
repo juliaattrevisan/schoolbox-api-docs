@@ -15,6 +15,7 @@ use Schoolbox\Search\Api\Cursor\DataObject as CursorDataObject;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\SearchFilter\DataObject as FilterDataObject;
 use Schoolbox\Search\Api\Source\ISource;
+use Schoolbox\User;
 
 /**
  * Search results source, aggregating results from multiple database search
@@ -41,15 +42,23 @@ class AggregateSource implements ISource
     }
 
     /**
+     * @param User                  $loggedInUser
      * @param string                $keyword
      * @param FilterDataObject      $filter
      * @param CursorDataObject|null $cursor
      * @param int                   $limit
      * @return array<RawResult>
      */
-    public function search(string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): array
+    public function search(User $loggedInUser, string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): array
     {
-        [$queryString, $params] = $this->getQueryStringAndParams($keyword, $filter, $cursor, $limit, 'select');
+        [$queryString, $params] = $this->getQueryStringAndParams(
+            $loggedInUser,
+            $keyword,
+            $filter,
+            $cursor,
+            $limit,
+            'select'
+        );
 
         if ($queryString === '') {
             // This can happen if a filter has been specified that guarantees the query will return no results.
@@ -71,6 +80,7 @@ class AggregateSource implements ISource
     }
 
     /**
+     * @param User                  $loggedInUser
      * @param string                $keyword
      * @param FilterDataObject      $filter
      * @param CursorDataObject|null $cursor
@@ -79,15 +89,25 @@ class AggregateSource implements ISource
      * @return array
      */
     public function getMoreResultsExistQueryAndParams(
+        User $loggedInUser,
         string $keyword,
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         string $paramKeySuffix = ''
     ): array {
-        return $this->getQueryStringAndParams($keyword, $filter, $cursor, null, 'exists', $paramKeySuffix);
+        return $this->getQueryStringAndParams(
+            $loggedInUser,
+            $keyword,
+            $filter,
+            $cursor,
+            null,
+            'exists',
+            $paramKeySuffix
+        );
     }
 
     /**
+     * @param User                  $loggedInUser
      * @param string                $keyword
      * @param FilterDataObject      $filter
      * @param CursorDataObject|null $cursor
@@ -98,6 +118,7 @@ class AggregateSource implements ISource
      * @return array
      */
     private function getQueryStringAndParams(
+        User $loggedInUser,
         string $keyword,
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
@@ -113,6 +134,10 @@ class AggregateSource implements ISource
         $params  = [];
         $limit   ??= 1;
         foreach ($this->queryParamBuilders as $queryParamBuilder) {
+            if (!$queryParamBuilder->isRelevantToUser($loggedInUser)) {
+                continue;
+            }
+
             $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit, $paramKeySuffix);
             if ($queryParams) {
                 $queries[] = $queryParams->query;

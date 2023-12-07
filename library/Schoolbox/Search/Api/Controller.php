@@ -176,7 +176,7 @@ class Controller extends Base
                     } else {
                         // Use the cursor object to build a pointer to the next
                         // result within this page
-                        $cursor ??= new Cursor\Cursor($this->source, $keyword, $filter, $limit);
+                        $cursor ??= new Cursor\Cursor($this->getUser(), $this->source, $keyword, $filter, $limit);
                         $translatedResults[$folderResultKey]['_subResults']['metadata']['cursor']['next'] = $cursor->next(
                             new Collection([$result])
                         );
@@ -328,7 +328,7 @@ class Controller extends Base
             $codec = new Cursor\Codec();
             $cursor = $codec->decode($cursorCode);
 
-            [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($keyword, $filter, $cursor, (string)$n++);
+            [$subquery, $subqueryParams] = $this->source->getMoreResultsExistQueryAndParams($this->getUser(), $keyword, $filter, $cursor, (string)$n++);
 
             $subqueries[] = $subquery . " AS `$resultKey`";
 
@@ -366,6 +366,7 @@ class Controller extends Base
         // allow the cursor itself to fetch more results than the limit, and
         // slice results off of the limit if there's too many.
         $cursor = new Cursor\Cursor(
+            $this->getUser(),
             $this->source,
             $keyword,
             $filter,
@@ -393,7 +394,7 @@ class Controller extends Base
                 // Ask the cursor if there's actually any results left:
                 // if there are none, clear the next cursor so that the user is
                 // not prompted for more results when we know there's none.
-                $previewCursor  = new Cursor\Cursor($this->source, $keyword, $filter, 1);
+                $previewCursor  = new Cursor\Cursor($this->getUser(), $this->source, $keyword, $filter, 1);
                 $previewResults = $previewCursor->retrieveResults($nextCursor);
                 if (count($previewResults) === 0) {
                     $nextCursor = null;

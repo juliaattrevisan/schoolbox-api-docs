@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
+use Schoolbox\User;
 
 /**
  * Query parameter builder for badge searches.
@@ -157,5 +158,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         return '
             FROM badge b
         ';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRelevantToUser(User $user): bool
+    {
+        // Badges are only relevant to student and staff users.
+        $userRole = $user->getRole();
+        return ($userRole->isStudent() || $userRole->isStaff());
     }
 }
