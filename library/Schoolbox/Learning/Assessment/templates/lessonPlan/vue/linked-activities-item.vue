@@ -43,6 +43,73 @@ function getUrgency() {
         ? getGradient(props.activity.completionCount, props.activity.studentCount)
         : "gradient-none";
 }
+
+/**
+ * This is intended to match the behaviour in progressTick.twig.
+ * @param { Activity } activity The activity whose progressTick we want to describe.
+ * @returns { string } A description to be used as mouseover text.
+ */
+function getProgressTickMouseoverTitle(activity: Activity) {
+    const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
+
+    if (progressTick === null) {
+        throw new Error("This function should not have been called.");
+    }
+
+    const progressStatus = progressTick.progress;
+    const postUrlSupplied = progressTick.url !== null;
+
+    switch (progressStatus) {
+        case "incomplete":
+            return "Incomplete";
+        case "pending":
+            return postUrlSupplied ? "Self-assessed" : "Awaiting Feedback";
+        case "failed":
+            return postUrlSupplied ? "N/A" : "Resubmission Required";
+        case "reviewed":
+            return "Completed";
+        default:
+            throw new Error(`Unknown progressStatus '${progressStatus}'`);
+    }
+}
+
+/**
+ * This is intended to match the behaviour in progressTick.twig.
+ * @param { Activity } activity The relevant activity.
+ * @returns { string } A string to be used as the value of the 'data-progress-tick-status' attribute.
+ */
+function getDataProgressTickStatus(activity: Activity) {
+    const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
+
+    if (progressTick === null) {
+        throw new Error("This function should not have been called.");
+    }
+
+    const progressStatus = progressTick.progress;
+
+    switch (progressStatus) {
+        case "incomplete":
+            return "incomplete";
+        case "pending":
+            return "selfAssessed";
+        case "failed":
+            return "failed";
+        case "reviewed":
+            return "teacherAssessed";
+        default:
+            throw new Error(`Unknown progressStatus '${progressStatus}'`);
+    }
+}
+
+/**
+ * This is intended to match the behaviour in progressTick.twig.
+ * @param { Activity } activity The activity whose progressTick we want to describe
+ * @returns { string } A description to be used as mouseover text
+ */
+function getDataProgressTickForm(activity: Activity) {
+    // data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
+    return "teacherAssessed"; // TODO: Figure out how to get this.
+}
 </script>
 
 <template>
@@ -64,9 +131,36 @@ function getUrgency() {
                 <span :class="getUrgency()"
                     >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
                 >
-            </template>
-        </p>
-        <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
+                <span v-else class="title">{{ activity.title }}</span>
+            </h3>
+            <p class="meta">
+                {{ getActivityMeta(activity) }}
+            </p>
+            <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
+        </div>
+        <div v-if="activity.progressTick !== null" style="float: right; width: 40px">
+            <form
+                v-if="activity.progressTick.url !== null"
+                method="post"
+                class="progress-tick-form"
+                @data-progress-tick-form="getDataProgressTickForm(activity)"
+            >
+                <a
+                    :class="
+                        'no-text progress-tick ' +
+                        (activity.progressTick.progress === 'incomplete' ? '' : activity.progressTick.progress)
+                    "
+                    @data-progress-tick-status="getDataProgressTickStatus(activity)"
+                    @title="getProgressTickMouseoverTitle(activity)"
+                ></a>
+            </form>
+            <a
+                v-else
+                :href="activity._links.status"
+                :class="'no-text progress-tick ' + activity.progressTick.progress"
+                @title="getProgressTickMouseoverTitle(activity)"
+            ></a>
+        </div>
     </div>
     <nav v-if="isInstructor">
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>

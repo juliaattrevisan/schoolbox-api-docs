@@ -1,11 +1,14 @@
 {##
  # Student Summary Screen for Lesson Plan
  #
- # @param array $breadcrumbs           A set of nodes to render as breadcrumb elements
- # @param LessonPlan\Model $assesment  A Lesson Plan assessment domain object instance
- # @param \Schoolbox\User $student     A \Schoolbox\User instance
- # @param string $returnUrl            A string for where you go when you hit Return
- # @param bool $isInstructor           A bool for whether currently logged in user is instructor (they see staff-only fields)
+ # @param array             $lastView
+ # @param array             $breadcrumbs        A set of nodes to render as breadcrumb elements
+ # @param LessonPlan\Model  $assesment          A Lesson Plan assessment domain object instance
+ # @param \Schoolbox\User   $student            A \Schoolbox\User instance
+ # @param array             $courseAssessments
+ # @param array             $linkedAssessments
+ # @param string            $returnUrl          A string for where you go when you hit Return
+ # @param bool              $isInstructor       A bool for whether currently logged in user is instructor (they see staff-only fields)
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
