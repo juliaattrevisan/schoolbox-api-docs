@@ -189,6 +189,10 @@ class Controller extends Assessment\Controller
                                 /** @var IAssessable $assessment */
                                                 return !($assessment instanceof Model);
                                             });
+
+                        // hydrate participation
+                        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments);
+
                         $unitImpl->setAssessables($assessments);
                         $courseAssessments['units'][] = [
                             'id'                         => $unitImplId,
