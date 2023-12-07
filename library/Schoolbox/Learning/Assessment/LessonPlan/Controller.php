@@ -249,6 +249,9 @@ class Controller extends Assessment\Controller
             // if staff hydrate participation
             if ($this->getUser()->getRole()->isStaff()) {
                 $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($linkedAssessments);
+            } else {
+                // only hydrate for the user who's lesson plan this is
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($linkedAssessments, $student);
             }
         }
 
