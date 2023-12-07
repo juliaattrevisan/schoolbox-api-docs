@@ -68,10 +68,12 @@ function getUrgency() {
         </h3>
         <p class="meta">
             {{ getActivityMeta(activity) }}
-            |
-            <span :class="getUrgency()"
-                >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
-            >
+            <template v-if="props.isInstructor">
+                |
+                <span :class="getUrgency()"
+                    >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
+                >
+            </template>
         </p>
         <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
     </div>
