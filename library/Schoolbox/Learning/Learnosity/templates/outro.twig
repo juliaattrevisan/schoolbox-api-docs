@@ -48,8 +48,21 @@
 
 {% autoescape 'js' %}
 <script>
+    const reportsAppCallback = {
+        /* Log errors to console and to screen for users
+         */
+        errorListener: function(error) {
+            let errorElement = document.createElement('div');
+            errorElement.innerHTML = '<p>There is no data for this attempt.</p>';
+
+            document.getElementById('schoolbox-result-1').replaceWith(errorElement);
+
+            console.log(error);
+        },
+    }
+
     let reportsApp = LearnosityReports.init(
-        {{ initOptions | raw }}
+        {{ initOptions | raw }}, reportsAppCallback
     );
 </script>
 {% endautoescape %}
