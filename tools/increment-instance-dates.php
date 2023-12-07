@@ -105,7 +105,8 @@ $app = new class extends CliTool\App {
         'submission_return_file'                   => ['created_at', 'updated_at'],
         'task_completion'                          => ['completion_date'],
         'task_file'                                => ['created_at', 'updated_at'],
-        'textBox'                                   => ['created_at', 'updated_at'],
+        'textBox'                                  => ['created_at', 'updated_at'],
+        'user'                                     => ['created_at', 'updated_at'],
     ];
 
     private \Alaress\Database\Connector\IConnector $database;
