@@ -11,5 +11,7 @@ export type Activity = {
     dueAtFormatted: string | null;
     _links: {
         status: string;
+        summary: string;
+        modify: string;
     };
 };

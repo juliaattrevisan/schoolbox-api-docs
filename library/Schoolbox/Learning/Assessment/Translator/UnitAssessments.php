@@ -39,11 +39,19 @@ class UnitAssessments
         $links = null;
         if ($this->routeGenerator) {
             $links = [
-                'status' => $this->routeGenerator->generate('learningAssessment.getSummary', [
+                'summary' => $this->routeGenerator->generate('learningAssessment.getSummary', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'studentId' => $this->student->getId(),
                     'student' => $this->student,
+                ]),
+                'status' => $this->routeGenerator->generate('learningAssessment.getStatus', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]),
+                'modify' => $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
                 ])
             ];
         }
