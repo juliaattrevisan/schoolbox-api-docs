@@ -245,6 +245,11 @@ class Controller extends Assessment\Controller
             $linkedAssessments = $this->getAssessmentMapper()
                                       ->findAllByIds($linkedAssessmentIds, ['cache' => false,])
                                       ->sortByCallback(Closure::fromCallable([$this, 'sortLinkedAssessments']));
+
+            // if staff hydrate participation
+            if ($this->getUser()->getRole()->isStaff()) {
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($linkedAssessments);
+            }
         }
 
         $twigData = [

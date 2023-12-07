@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Translator;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\User;
 
@@ -62,6 +63,29 @@ class UnitAssessments
         if ($assessment->getContext() instanceof Project) {
             $projectName = $assessment->getContext()->getTitle();
         }
+        /**
+         * record / track participation
+         * logic clone from Course Outline component view:
+         * @see library/Schoolbox/Learning/Assessment/templates/outline/unitAssessments.twig
+         */
+        // init values
+        $completionCount = $studentCount = 0;
+        // only look at students who are not excluded
+        foreach (
+            $assessment->getAllParticipants()->filter(
+                static function (Participant $participant) {
+                    return !$participant->isExcluded();
+                }
+            ) as $participant
+        ) {
+            // count students which have completed this
+            if (!$participant->isResponseRequired()) {
+                $completionCount++;
+            }
+            // count al students who are part of this
+            $studentCount++;
+        }
+
         return [
             'id'                => $assessment->getId(),
             'title'             => $assessment->getTitle(),
@@ -73,6 +97,8 @@ class UnitAssessments
             'dueAtFormatted'    => $assessment->getDueAt()?->getRelativeDayWithoutMidnight(),
             '_links'            => $links,
             'assessments'       => $assessments?->reindex()->map($this),
+            'completionCount'   => $completionCount,
+            'studentCount'      => $studentCount,
         ];
     }
 
