@@ -69,7 +69,7 @@ function getProgressTickMouseoverTitle(activity: Activity) {
         case "reviewed":
             return "Completed";
         default:
-            throw new Error(`Unknown progressStatus '${progressStatus}'`);
+            return "";
     }
 }
 
@@ -97,7 +97,7 @@ function getDataProgressTickStatus(activity: Activity) {
         case "reviewed":
             return "teacherAssessed";
         default:
-            throw new Error(`Unknown progressStatus '${progressStatus}'`);
+            return "";
     }
 }
 
@@ -142,22 +142,22 @@ function getDataProgressTickForm(activity: Activity) {
                 v-if="activity.progressTick.url !== null"
                 method="post"
                 class="progress-tick-form"
-                @data-progress-tick-form="getDataProgressTickForm(activity)"
+                :data-progress-tick-form="getDataProgressTickForm(activity)"
             >
                 <a
                     :class="
                         'no-text progress-tick ' +
                         (activity.progressTick.progress === 'incomplete' ? '' : activity.progressTick.progress)
                     "
-                    @data-progress-tick-status="getDataProgressTickStatus(activity)"
-                    @title="getProgressTickMouseoverTitle(activity)"
+                    :data-progress-tick-status="getDataProgressTickStatus(activity)"
+                    :title="getProgressTickMouseoverTitle(activity)"
                 ></a>
             </form>
             <a
                 v-else
                 :href="activity._links.status"
                 :class="'no-text progress-tick ' + activity.progressTick.progress"
-                @title="getProgressTickMouseoverTitle(activity)"
+                :title="getProgressTickMouseoverTitle(activity)"
             ></a>
         </div>
     </div>
