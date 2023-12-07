@@ -48,6 +48,7 @@ class Scanner
      *
      * @param string $filelocation Path to temporary file on disk to be scanned
      * @return void
+     * @throws DaemonException
      * @throws FileException
      */
     public function scan(string $filelocation): void
@@ -57,10 +58,32 @@ class Scanner
 
         exec(sprintf(self::CLAMSCAN_COMMAND . ' ' . self::CLAMSCAN_ARGS, $this->quarantine, $filelocation), $output, $resultCode);
 
-        if ($resultCode === 127) {
-            // Virus scanner not available, just continue without it
+        // Virus scanner not available, just continue without it
+        if (127 === $resultCode) {
             return;
         }
+
+        /* Some random error, but we found that it might be caused by
+         * clamd not currently running. What it should do in this case
+         * is yet to be decided
+         */
+        if (2 === $resultCode) {
+            /* clamd might not be running.
+             *
+             * You can find more info about this here
+             * https://www.linuxquestions.org/questions/linux-server-73/can%27t-connect-to-unix-socket-var-run-clamav-clamd-ctl-connection-refused-856847/
+             *
+             * Tets you see if clamd is running:
+             *     ps -ef|grep clamd
+             *
+             * lets you restart it:
+             *     sudo /etc/init.d/clamav-daemon start
+             *
+             * This error message surfaces on the frontend.
+             */
+            throw new DaemonException('Error in virus detection service.');
+        }
+
         if ($resultCode > 0) {
             throw new FileException('A virus has been detected and this file has been quarantined');
         }
