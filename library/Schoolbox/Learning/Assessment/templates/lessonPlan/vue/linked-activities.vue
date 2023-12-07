@@ -117,11 +117,7 @@ window.Vue.onMounted(() => {
     <h3 v-if="isInstructor || store.linkedActivities.length > 0" class="subheader">Activities</h3>
     <section v-if="store.linkedActivities.length > 0">
         <ul class="information-list">
-            <li
-                v-for="activity in store.linkedActivities"
-                :key="activity.id"
-                :class="{ 'actions-small-1': isInstructor }"
-            >
+            <li v-for="activity in store.linkedActivities" :key="activity.id" class="actions-small-1">
                 <linked-activities-item
                     :activity="activity"
                     :is-instructor="isInstructor"
