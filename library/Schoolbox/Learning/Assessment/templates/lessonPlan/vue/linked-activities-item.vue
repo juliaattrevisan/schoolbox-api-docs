@@ -140,6 +140,7 @@ function getDataProgressTickForm(activity: Activity) {
         <div v-if="activity.progressTick !== null" style="float: right; width: 40px; margin-right: 20px">
             <form
                 v-if="activity.progressTick.url !== null"
+                :action="activity.progressTick.url"
                 method="post"
                 class="progress-tick-form"
                 :data-progress-tick-form="getDataProgressTickForm(activity)"
@@ -154,7 +155,7 @@ function getDataProgressTickForm(activity: Activity) {
                 ></a>
             </form>
             <a
-                v-else
+                v-else-if="activity._links !== null"
                 :href="activity._links.status"
                 :class="'no-text progress-tick ' + activity.progressTick.progress"
                 :title="getProgressTickMouseoverTitle(activity)"
