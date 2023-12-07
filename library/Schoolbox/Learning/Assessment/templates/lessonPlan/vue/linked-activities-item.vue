@@ -34,14 +34,14 @@ function handleUnlinkClick() {
 }
 
 /**
- * Get the urgency class for the activity
+ * Get the colour gradient class for the activity, that helps indicate the
+ * completion status of the current activity
  * @returns {string} The urgency class
  */
 function getUrgency() {
-    if (store.gradeGradientEnable) {
-        return getGradient(props.activity.completionCount, props.activity.studentCount);
-    }
-    return "gradient-none";
+    return store.gradeGradientEnable
+        ? getGradient(props.activity.completionCount, props.activity.studentCount)
+        : "gradient-none";
 }
 </script>
 

@@ -13,7 +13,7 @@ interface Props {
     linkedActivities: Activity[];
     isInstructor: boolean;
     sourceId: number;
-    gradeGradientEnable: boolean; // whether to show the student completion gradient on linked activities
+    gradeGradientEnable: boolean; // whether to show the student completion colour gradient on linked activities
 }
 
 const props = defineProps<Props>();
@@ -32,9 +32,9 @@ function isUnitOpen(unit: Unit): boolean {
 }
 
 /**
- * Check if the unit is open or if there are any selected activites inside the unit
+ * Check if the unit is open or if there are any selected activities inside the unit
  * @param {Unit} unit The unit to check
- * @returns {boolean} True if the unit is open or if there are any selected activites inside the unit
+ * @returns {boolean} True if the unit is open or if there are any selected activities inside the unit
  */
 function isUnitOpenOrHasLinked(unit: Unit): boolean {
     if (isUnitOpen(unit)) {
