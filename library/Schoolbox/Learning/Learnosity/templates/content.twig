@@ -69,6 +69,13 @@
     .island .content{
         padding:0px;
     }
+
+    /* This lets you click on the video player ui
+     * Learnosity forces you to drag'n'drop questions otherwise
+     */
+    .lrn-author-widget-mask {
+        display: none !important;
+    }
 </style>
 
 {% autoescape 'js' %}
@@ -122,6 +129,32 @@
             authorApp.on('render:activity', function(event) {
                 authorApp.setActivityTags({{ tags|raw }});
             });
+
+
+            /* Replace video placeholders with actual player when the ui has loaded
+             */
+            authorApp.on('render:item', function(event) {
+                $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
+            });
+
+            authorApp.on('itemedit:changed', function(event) {
+                /* Remove all replacements first
+                 */
+                $('[data-schoolboxmedia-replacement-container]').remove();
+
+                setTimeout(function() {
+                    {# Reinit them any time something is dragged around (ugh)
+                     # because you don't know what you're dragging
+                     #
+                     # Also this event fires before their javascript has actually
+                     # loaded any content...meaning we can't operate on any of its
+                     # contents. We have to w8 an arbitrary amount of time before
+                     # we can presume to have the dom loaded.
+                     #}
+                    $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
+                }, 1000);
+            });
+
 
             /**
              * When the items list is rendered, including after every search or after sorting

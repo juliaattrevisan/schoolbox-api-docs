@@ -75,6 +75,10 @@
                 itemsApp.items().goto(previousLocation);
             }
 
+            /* Replace video placeholders with actual player when the ui has loaded
+             */
+            $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
+
             /**
              * Listen for hash changes so we can navigate to the correct part of the app
              */
