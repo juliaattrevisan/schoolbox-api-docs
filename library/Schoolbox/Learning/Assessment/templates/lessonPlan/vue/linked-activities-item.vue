@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
+import { getGradient } from "@js/util/cssUtils";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
@@ -37,20 +38,10 @@ function handleUnlinkClick() {
  * @returns {string} The urgency class
  */
 function getUrgency() {
-    let index: string | number = "none";
     if (store.gradeGradientEnable) {
-        const completionGradient = (props.activity.completionCount / props.activity.studentCount) * 100;
-        index = Math.floor(completionGradient / 10);
-        const max = 10;
-        const min = 0;
-        if (index > max) {
-            index = max;
-        }
-        if (index < min) {
-            index = min;
-        }
+        return getGradient(props.activity.completionCount, props.activity.studentCount);
     }
-    return `gradient-${index}`;
+    return "gradient-none";
 }
 </script>
 
