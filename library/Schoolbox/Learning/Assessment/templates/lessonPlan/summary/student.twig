@@ -89,6 +89,7 @@
                     :course-assessments = '{{ courseAssessments |json_encode }}'
                     :linked-activities = '{{ linkedAssessments |json_encode }}'
                     :is-instructor = '{% if isInstructor %}true{% else %}false{% endif %}'
+                    :grade-gradient-enable='{{ config.grade_gradient_enable ? 'true' : 'false' }}'
                 />
             </div>
             <script src="{{ CDN_PREFIX }}/js/bundle/linkedActivities.js?v={{ config.site_version }}"></script>

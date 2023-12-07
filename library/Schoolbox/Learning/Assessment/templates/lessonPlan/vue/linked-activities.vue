@@ -13,6 +13,7 @@ interface Props {
     linkedActivities: Activity[];
     isInstructor: boolean;
     sourceId: number;
+    gradeGradientEnable: boolean; // whether to show the student completion gradient on linked activities
 }
 
 const props = defineProps<Props>();
@@ -107,7 +108,7 @@ const sortedUnitsByDate = window.Vue.computed(() => {
 });
 
 window.Vue.onMounted(() => {
-    useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities, toastEl);
+    useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities, props.gradeGradientEnable, toastEl);
     $("[data-collapser]").collapsable();
 });
 </script>
@@ -192,7 +193,8 @@ window.Vue.onMounted(() => {
                         >
                             <ul class="information-list card-selectable threaded" data-task-list>
                                 <template v-for="activity in unit.assessments" :key="activity.id">
-                                    <li v-if="activity.assessmentType !== 'project'"
+                                    <li
+                                        v-if="activity.assessmentType !== 'project'"
                                         :data-unit-assessment="activity.id"
                                         class="interact child"
                                     >
@@ -201,7 +203,8 @@ window.Vue.onMounted(() => {
                                             :source-id="props.sourceId"
                                         ></linked-activities-modal-item>
                                     </li>
-                                    <li v-else
+                                    <li
+                                        v-else
                                         v-for="subActivity in activity.assessments"
                                         :key="subActivity.id"
                                         :data-unit-assessment="subActivity.id"

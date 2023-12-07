@@ -38,18 +38,18 @@ function handleUnlinkClick() {
  */
 function getUrgency() {
     let index: string | number = "none";
-    // if (config.grade_gradient_enable) {
-    const completionGradient = (props.activity.completionCount / props.activity.studentCount) * 100;
-    index = Math.floor(completionGradient / 10);
-    const max = 10;
-    const min = 0;
-    if (index > max) {
-        index = max;
+    if (store.gradeGradientEnable) {
+        const completionGradient = (props.activity.completionCount / props.activity.studentCount) * 100;
+        index = Math.floor(completionGradient / 10);
+        const max = 10;
+        const min = 0;
+        if (index > max) {
+            index = max;
+        }
+        if (index < min) {
+            index = min;
+        }
     }
-    if (index < min) {
-        index = min;
-    }
-    // }
     return `gradient-${index}`;
 }
 </script>

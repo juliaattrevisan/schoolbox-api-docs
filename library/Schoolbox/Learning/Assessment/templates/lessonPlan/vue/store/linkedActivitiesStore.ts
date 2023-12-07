@@ -5,6 +5,7 @@ import { Activity } from "../linkedActivitiesTypes";
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
     const sourceId = window.Vue.ref(0); // The id of the source lesson plan
     const linkedActivities = window.Vue.ref<Activity[]>([]);
+    const gradeGradientEnable = window.Vue.ref(false); // Whether the grade gradient is enabled or not
     const selectedActivities = window.Vue.ref<Activity[]>([]); // Current state of the selected activities in the modal
 
     const isSingleUnlinkOpen = window.Vue.ref(false); // Whether the single unlink modal is open or not
@@ -20,11 +21,18 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
      * store any passed through properties
      * @param {number} $sourceId - the id of the source lesson plan
      * @param {Activity[]} $linkedActivities - the linked activities
+     * @param {boolean} $gradeGradientEnable - whether the grade gradient is enabled
      * @param {typeof Toast} toastElement - the toast element
      */
-    function init($sourceId: number, $linkedActivities: Activity[], toastElement: typeof Toast) {
+    function init(
+        $sourceId: number,
+        $linkedActivities: Activity[],
+        $gradeGradientEnable: boolean,
+        toastElement: typeof Toast
+    ) {
         sourceId.value = $sourceId;
         linkedActivities.value = $linkedActivities;
+        gradeGradientEnable.value = $gradeGradientEnable;
         selectedActivities.value = [...linkedActivities.value];
         toastEl.value = toastElement.value;
     }
@@ -112,7 +120,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
      */
     function throwErrorOnInvalidResponse(response: Response) {
         if (!response.ok) {
-            throw new Error('Something went wrong (response code: ' + String(response.status) + ')');
+            throw new Error("Something went wrong (response code: " + String(response.status) + ")");
         }
     }
 
@@ -174,6 +182,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         isPreviousSelected,
         clearChanges,
         linkedActivities,
+        gradeGradientEnable,
         selectedActivities,
         addActivity,
         removeActivity,
