@@ -24,6 +24,15 @@ export function removeClassesThatContain(element: HTMLElement, search: string) {
  * @returns {string} - the class name of the gradient
  */
 export function getGradient(currentCount: number, totalCount: number) {
+    if (typeof currentCount !== "number" || typeof totalCount !== "number") {
+        return "gradient-none";
+    }
+    if (currentCount === 0 && totalCount === 0) {
+        return "gradient-none";
+    }
+    if (currentCount > totalCount) {
+        return "gradient-none";
+    }
     const gradient = (currentCount / totalCount) * 100;
     let index = Math.floor(gradient / 10);
     const max = 10;
