@@ -144,8 +144,8 @@ function getDataProgressTickForm(activity: Activity) {
         >
             <a
                 :class="
-                    'no-text progress-tick ' +
-                    (activity.progressTick.progress === 'incomplete' ? '' : activity.progressTick.progress)
+                    'no-text progress-tick' +
+                    (activity.progressTick.progress === 'incomplete' ? '' : ' ' + activity.progressTick.progress)
                 "
                 :data-progress-tick-status="getDataProgressTickStatus(activity)"
                 :title="getProgressTickMouseoverTitle(activity)"
