@@ -33,7 +33,7 @@
             </p>
         </section>
 
-        <section class="content">
+        <section id="schoolbox-result-container" class="content">
             <div id="schoolbox-result-1"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
         </section>
 
@@ -48,8 +48,22 @@
 
 {% autoescape 'js' %}
 <script>
+    const reportsAppCallback = {
+        /* Log errors to console and to screen for users
+         */
+        errorListener: function(error) {
+            let errorElement = document.createElement('div');
+            errorElement.classList.add('alert-box', 'warning');
+            errorElement.innerHTML = '<span>There is no data for this attempt.</span>';
+
+            document.getElementById('schoolbox-result-container').replaceWith(errorElement);
+
+            console.log(error);
+        },
+    }
+
     let reportsApp = LearnosityReports.init(
-        {{ initOptions | raw }}
+        {{ initOptions | raw }}, reportsAppCallback
     );
 </script>
 {% endautoescape %}
