@@ -128,9 +128,7 @@ class Receiver implements IReceiver
         $storage->setPublic($public);
 
         // Run the virus scanner
-
-        $scanner = new Virus\Scanner($this->tempFilesystem);
-        $scanner->scan($tempLocation);
+        (new Virus\Scanner($this->tempFilesystem))->scan($tempLocation);
 
         $helper    = new Sanitizer\Helper($this->sanitizer);
         $sanitized = $helper->sanitize(
