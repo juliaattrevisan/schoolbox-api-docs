@@ -562,13 +562,13 @@ span.lrn-qe-i-trash {
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 150px;
-    top: 70px;
+    top: 65px;
     z-index: 1;
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 0px;
-    top: 70px;
+    top: 65px;
     z-index: 1;
 }
 span.lrn-author-name-wrapper {
@@ -955,4 +955,16 @@ button.lrn-h3.lrn-list-view-heading.lrn-ellipses.lrn-author-editable-item {
     [data-authorapi-selector="open-item-preview"]
     [data-authorapi-selector="tooltipped"] {
     padding: unset;
+}
+
+/* Fixed the Find items and create item buttons to stay on right hand across all devices */
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary {
+    position: absolute;
+    right: 0px;
+    top: 65px;
+}
+button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec {
+    position: absolute;
+    right: 50px;
+    top: 65px;
 }

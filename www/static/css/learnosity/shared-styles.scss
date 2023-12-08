@@ -142,3 +142,11 @@ h3.lrn-report-item-title {
 .lrn .lrn-author-ui .lrn-author-activity-button {
     padding: 0.5rem 1.3rem;
 }
+
+/* Removed left and right paddings on small screens to make it aligned vertically with other elements */
+@media only print, screen and (max-width: 40em) {
+    #content > .row > .small-12 .content {
+        padding-left: 0rem !important;
+        padding-right: 0rem !important;
+    }
+}
