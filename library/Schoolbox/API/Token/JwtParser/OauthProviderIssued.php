@@ -91,7 +91,7 @@ class OauthProviderIssued extends Base
         }
         $claims = $this->decode(
             $jwt,
-            JwtLibrary\JWK::parseKeySet($jwks),
+            JwtLibrary\JWK::parseKeySet($jwks, 'RS256'),
             $sessionLength,
         );
 
