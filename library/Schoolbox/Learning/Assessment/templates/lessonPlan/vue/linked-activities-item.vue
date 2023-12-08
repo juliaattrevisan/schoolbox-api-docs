@@ -134,7 +134,7 @@ function getDataProgressTickForm(activity: Activity) {
         </p>
         <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
     </div>
-    <nav v-if="activity.progressTick !== null" :class="'progress-tick-container' + (isInstructor ? ' instructor' : '')">
+    <nav v-if="activity.progressTick !== null" class="progress-tick-container">
         <form
             v-if="activity.progressTick.url !== null"
             :action="activity.progressTick.url"
@@ -167,10 +167,6 @@ function getDataProgressTickForm(activity: Activity) {
 nav.progress-tick-container {
     margin-right: 5px;
     margin-top: 5px;
-}
-
-nav.progress-tick-container.instructor {
-    margin-right: 40px; /* Move further to the left so as not overlap the 'icon-close' nav. */
 }
 </style>
 9

@@ -163,7 +163,12 @@ class Controller extends Assessment\Controller
          * get list of all activities within this course
          * only for staff
          */
-        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments($this->routeGenerator, $student, hideLessonPlan: true);
+        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments(
+            $this->routeGenerator,
+            $student,
+            $this->getUser(),
+            true
+        );
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
             // if we are inside a project get the projects context
@@ -389,7 +394,13 @@ class Controller extends Assessment\Controller
      */
     public function getActivities(Model $assessment): void
     {
-        $this->response = $this->responseAsJson($assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments($this->routeGenerator, $this->getUser())) : []);
+        $this->response = $this->responseAsJson(
+            $assessment->getLinkedAssessments()
+            ? $assessment->getLinkedAssessments()->reindex()->map(
+                new Assessment\Translator\UnitAssessments($this->routeGenerator, $this->getUser(), $this->getUser())
+            )
+            : []
+        );
     }
 
     /**
@@ -420,7 +431,15 @@ class Controller extends Assessment\Controller
             }
 
             $assessment->getLinkedAssessments()->add($linkedAssessment);
-            $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments($this->routeGenerator, $this->getUser())));
+            $this->response = $this->responseAsJson(
+                $assessment->getLinkedAssessments()->reindex()->map(
+                    new Assessment\Translator\UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getUser(),
+                        $this->getUser()
+                    )
+                )
+            );
         } else {
             $problem = (new ApiProblem('Link already Exists'))
                 ->setStatus(409)

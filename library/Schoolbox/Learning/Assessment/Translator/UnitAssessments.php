@@ -23,10 +23,16 @@ class UnitAssessments
 {
     /**
      * @param Generator|null $routeGenerator
-     * @param User|null      $student
-     * @param bool $hideLessonPlan Should we be removing lesson plans from the output
+     * @param User|null      $student         The student whose lesson plan is being viewed.
+     * @param User|null      $loggedInUser    The logged-in user.
+     * @param bool           $hideLessonPlan  Should we be removing lesson plans from the output.
      */
-    public function __construct(private null|Generator $routeGenerator = null, private null|User $student = null, private bool $hideLessonPlan = false)
+    public function __construct(
+        private null|Generator $routeGenerator = null,
+        private null|User $student = null,
+        private null|User $loggedInUser = null,
+        private bool $hideLessonPlan = false
+    )
     {
     }
 
@@ -162,11 +168,17 @@ class UnitAssessments
      */
     private function getProgressTick(IAssessable $assessable): ?array
     {
-        // just look at the student specified
-        $participant = $assessable->getParticipantIfExtant($this->student);
-        if (null === $participant) {
+        // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
+        if ($this->student->getId() !== $this->loggedInUser->getId()) {
             return null;
         }
+
+        $participant = $assessable->getParticipantIfExtant($this->student);
+
+        if (null === $participant) {
+            throw new \LogicException('If the student is not a participant in the assessment, we should not be here.');
+        }
+
         // task url allows students to mark their tasks as complete
         $taskUrl = $progress = null;
         // only create a url for tasks, and if they are implementations
