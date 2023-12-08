@@ -32,6 +32,12 @@ class OauthProviderIssued extends Base
     private const SESSION_LENGTH_DEFAULT = 1800;
 
     /**
+     * The signing algorithm to assume that the external provider uses, if it is
+     * not provided in the key.
+     */
+    private const DEFAULT_SIGNING_ALGORITHM = 'RS256';
+
+    /**
      * Constructor
      *
      * @param UserMapper     $userMapper Mapper for retrieving users once the user in the JWT is identified.
@@ -91,7 +97,7 @@ class OauthProviderIssued extends Base
         }
         $claims = $this->decode(
             $jwt,
-            JwtLibrary\JWK::parseKeySet($jwks, 'RS256'),
+            JwtLibrary\JWK::parseKeySet($jwks, self::DEFAULT_SIGNING_ALGORITHM),
             $sessionLength,
         );
 
