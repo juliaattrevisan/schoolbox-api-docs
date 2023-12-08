@@ -34,6 +34,12 @@ class InstanceRegistryIssued extends Base
     public const CLAIM_INSTANCE_ID = 'instance_id';
 
     /**
+     * The signing algorithm to assume that the instance registry uses, if it is
+     * not provided in the key.
+     */
+    private const DEFAULT_SIGNING_ALGORITHM = 'RS256';
+
+    /**
      * Constructor
      * @param UserMapper    $userMapper
      * @param IConfigLoader $config
@@ -84,7 +90,7 @@ class InstanceRegistryIssued extends Base
         if (
             $this->decode(
                 $jwt,
-                JWK::parseKeySet($jwk),
+                JWK::parseKeySet($jwk, self::DEFAULT_SIGNING_ALGORITHM),
                 (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
             )
         ) {
