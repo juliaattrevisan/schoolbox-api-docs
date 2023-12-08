@@ -32,8 +32,7 @@ class UnitAssessments
         private null|User $student = null,
         private null|User $loggedInUser = null,
         private bool $hideLessonPlan = false
-    )
-    {
+    ) {
     }
 
     /**
