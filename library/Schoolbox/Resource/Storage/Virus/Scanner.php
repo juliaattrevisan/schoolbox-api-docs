@@ -68,28 +68,9 @@ class Scanner
             return;
         }
 
-        /* Some random error, but we found that it might be caused by
-         * clamd not currently running. What it should do in this case
-         * is yet to be decided
-         */
+        /* clamd not currently running or accessible. Might have died due to OOM or not installed properly  */
         if (2 === $resultCode) {
-            /* clamd might not be running.
-             *
-             * You can find more info about this here
-             * https://www.linuxquestions.org/questions/linux-server-73/can%27t-connect-to-unix-socket-var-run-clamav-clamd-ctl-connection-refused-856847/
-             *
-             * lets you see if clamd is running:
-             *     ps -ef|grep clamd
-             *
-             * lets you restart it:
-             *     sudo /etc/init.d/clamav-daemon start
-             *
-             * lets you stop it, for testing purposes mostly:
-             *     sudo /etc/init.d/clamav-daemon stop
-             *
-             * This error message surfaces on the frontend.
-             */
-            throw new DaemonException('Error in virus detection service.');
+            /* clamd might not be running. skip scan */
         }
 
         if ($resultCode > 0) {
