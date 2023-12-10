@@ -190,10 +190,10 @@ class Controller extends Assessment\Controller
                         $options     = ['order' => ['sequence' => 'ASC']];
                         $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options)
                             // Remove Lesson plans, no linking to other lessons
-                                            ->filter(function ($assessment) {
+                            ->filter(function ($assessment) {
                                 /** @var IAssessable $assessment */
-                                                return !($assessment instanceof Model);
-                                            });
+                                return !($assessment instanceof Model);
+                        });
 
                         // hydrate participation
                         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments);
@@ -252,8 +252,8 @@ class Controller extends Assessment\Controller
         $linkedAssessments   = null;
         if ($linkedAssessmentIds) {
             $linkedAssessments = $this->getAssessmentMapper()
-                                      ->findAllByIds($linkedAssessmentIds, ['cache' => false,])
-                                      ->sortByCallback(Closure::fromCallable([$this, 'sortLinkedAssessments']));
+                ->findAllByIds($linkedAssessmentIds, ['cache' => false,])
+                ->sortByCallback(Closure::fromCallable([$this, 'sortLinkedAssessments']));
 
             // if staff hydrate participation
             if ($this->getUser()->getRole()->isStaff()) {
