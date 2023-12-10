@@ -86,7 +86,7 @@ class OtherInstanceIssued extends Base
             );
         }
 
-        $keySet = JWK::parseKeySet($jwks);
+        $keySet = JWK::parseKeySet($jwks, Jwt::SIGNING_ALGORITHM);
         if (!isset($headers['kid'])) {
             if (count($keySet) !== 1) {
                 throw new Exception\Rejected(
