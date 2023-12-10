@@ -175,7 +175,10 @@ class UnitAssessments
         $participant = $assessable->getParticipantIfExtant($this->student);
 
         if (null === $participant) {
-            throw new \LogicException('If the student is not a participant in the assessment, we should not be here.');
+            // The student ought to be a participant.  The only way this situation could arise is if the student was
+            // excluded from the assessment, or marked as deleted, by another process, since permissions were checked
+            // at the start of this page-load (in Assessment/Module.php).
+            return null;
         }
 
         // task url allows students to mark their tasks as complete
