@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\Index;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -18,17 +17,8 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  *
  * This relies on an index already having been built.
  */
-class QueryParamBuilder extends BaseQueryParamBuilder
+class FulltextQueryParamBuilder extends BaseQueryParamBuilder
 {
-    /**
-     * Constructor
-     *
-     * @param IQuoter $quoter
-     */
-    public function __construct(private IQuoter $quoter)
-    {
-    }
-
     /**
      * @inheritdoc
      */
