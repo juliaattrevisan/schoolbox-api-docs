@@ -1,5 +1,7 @@
 <?php
 
+$this->pageNotFound();
+
 ///**
 // * Attempt creation. When someone makes an Attempt at an Assessment, record the
 // * various details. This is loaded for each Section in the Assessment.

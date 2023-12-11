@@ -1,5 +1,7 @@
 <?php
 
+$this->pageNotFound();
+
 ///**
 // * Saves a Reviewed Response to a Question. This is where the assessor can
 // * change the mark.

@@ -1,5 +1,7 @@
 <?php
-//
+
+$this->pageNotFound();
+
 ///**
 // * Saves a Response to a Question.
 // *

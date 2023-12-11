@@ -1,5 +1,7 @@
 <?php
-//
+
+$this->pageNotFound();
+
 ///**
 // * Review completion. Marks when an assessment review is finished.
 // *

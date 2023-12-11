@@ -1,5 +1,7 @@
 <?php
 
+$this->pageNotFound();
+
 ///**
 // * Assessment Attempt deletion. Responses are all softdeleted if
 // * the Attempt is softdeleted.

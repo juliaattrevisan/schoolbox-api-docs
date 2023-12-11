@@ -1,5 +1,7 @@
 <?php
-//
+
+$this->pageNotFound();
+
 ///**
 // * Assessment export. Uses the handlers to export their question types into a
 // * Moodle format.

@@ -1,5 +1,7 @@
 <?php
-//
+
+$this->pageNotFound();
+
 ///**
 // * Reorder quiz questions if you have access permissions
 // *
