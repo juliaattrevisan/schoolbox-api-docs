@@ -36,7 +36,7 @@ if ((new ValidTeamsMeetingUrl())->isSatisifiedBy($url)) {
     echo "<div id='meetingUrl' style='display:none'>{$urlOutput}</div>";
 } else {
     echo "
-        <p>The meeting url <strong>{$urlOutput}</strong> is not in the expected Microsoft Teams Meeting format.</p>
+        <p>The meeting url is not in the expected Microsoft Teams Meeting format.</p>
         <p>Please contact your system administrator.</p>
     ";
 }
