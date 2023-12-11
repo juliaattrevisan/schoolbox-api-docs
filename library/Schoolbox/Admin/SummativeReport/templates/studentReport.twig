@@ -520,11 +520,12 @@
         {% endif %}
 
         {% for folder in folders %}
-            {# only if there are filtered assessments for this folder #}
-            {% if (summaryAssessments[folder.id] ?? [])| length %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
+            {% set hasAssessments = summaryAssessments[folder.id] ?? [] | length %}
 
+            {# only show the folder if there are filtered assessments or if an overall mark can be shown #}
+            {% if hasAssessments or (showSummaryOverallGrade and weightedMean != '') %}
                 <div class="folder-title">
                     <div class="left">
                         {% block summaryFolderTitle %}
@@ -542,7 +543,7 @@
                 {% endif %}
 
                 {# The class may have a mark but no assessments, ignore this class and move along #}
-                {% if (summaryAssessments[folder.id] ?? [])| length %}
+                {% if hasAssessments %}
                     {% for assessment in summaryAssessments[folder.id] %}
                         {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
                         {% include '@adminSummativeReport/assessmentReport.twig' with
