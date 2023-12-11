@@ -52,6 +52,14 @@ export const useSearchStore = defineStore("spSearch", () => {
         .json();
 
     /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether the search can be performed
+     */
+    const canSearch = window.Vue.computed(() => {
+        return useQueryStore().activeQuery !== useQueryStore().query;
+    });
+
+    /**
      * search for nodes that match
      * @param {boolean} simulateRedirect - whether to simulate a redirect
      */
@@ -85,5 +93,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         search,
         clearFiltersAndSearch,
         searchError,
+        canSearch,
     };
 });
