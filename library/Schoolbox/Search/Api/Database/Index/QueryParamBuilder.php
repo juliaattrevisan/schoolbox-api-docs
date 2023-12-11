@@ -45,6 +45,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
         $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
         $params             = [
+            "indexNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix"     => $keyword,
             "indexKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
@@ -56,32 +57,27 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * Use due_date as the relevancy.
-     * Items due today should appear closer to the top than items due 6 months from now.
-     * Note 'specification' assessments don't have a due_date, so we fall back to updated_at.
-     *
      * @inheritdoc
      */
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
-        return 'relevance';
+        return $this->buildLinearDecayExpression(
+            ":indexNow$paramKeySuffix",
+            'si.date',
+            7,
+            56,
+        );
     }
 
     /**
-     * Use due_date for the date range filter.
-     * Items due within the specified date range should appear regardless of created_at or updated_at.
-     * Note 'specification' assessments don't have a due_date, so we fall back to updated_at.
-     *
      * @inheritdoc
      */
     protected function buildDateExpression(string $paramKeySuffix = ''): string
     {
-        return 'date';
+        return 'si.date';
     }
 
     /**
-     * Links are ordered by relevance, as they have a modified time.
-     *
      * @inheritdoc
      */
     protected function isOrderedByRelevance(): bool
@@ -90,27 +86,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * The title for an assessment depends on its type.
-     *
      * @inheritdoc
      */
     protected function buildTitleExpression(string $paramKeySuffix = ''): string
     {
-        // Note on redundancy of assessment titles:
-        // assess.title, submission_box.title, and lti_assessment.lti_assessment_title should always match assessment.title for linked rows.
-        return "title";
+        return "si.title";
     }
 
     /**
-     * Assessments have creators (except lti_assessments), but they are set on the tables below assessment.
-     * The creator probably should be specified in the `assessment` table, but moving all those fields up one level might be a bit hard.
-     *
      * @inheritdoc
      */
     protected function buildCreatorExpression(string $paramKeySuffix = ''): string
     {
-        // All second-level db tables have a creator field except lti_assessment.
-        return "created_by";
+        return "si.created_by";
     }
 
     /**
@@ -126,7 +114,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTypeExpression(string $paramKeySuffix = ''): string
     {
-        return "type";
+        return "si.type";
     }
 
     /**
@@ -134,7 +122,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildIdExpression(string $paramKeySuffix = ''): string
     {
-        return 'identifier';
+        return 'si.identifier';
     }
 
     /**
@@ -142,7 +130,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
-        return 'folder_id';
+        return 'si.folder_id';
     }
 
     /**
@@ -150,6 +138,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
-        return 'FROM search_index';
+        return '
+            FROM search_index si
+            INNER JOIN search_index_fulltext sif ON si.identifier = sif.identifier
+        ';
     }
 }
