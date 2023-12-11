@@ -42,6 +42,9 @@ readonly PRESERVED_CONFIG=(
   # DR S3 backups
   "aws_s3_dr_backup_enabled" "aws_s3_dr_backup_visibility" "aws_s3_dr_sync_status"
 
+ # Learnosity
+  "learnosity_consumer_key" "learnosity_consumer_secret"
+
   # Others
   "xml_dir" "file_dir"  "api_key"
 );
