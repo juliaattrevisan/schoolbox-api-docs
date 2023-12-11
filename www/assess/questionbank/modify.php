@@ -11,25 +11,51 @@
  * @link        https://schoolbox.com.au/
  */
 
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+/* There's no real allegory to our legacy Question Bank - in learnosity era,
+ * every item is in the itembank already. The only place you access that is
+ * via learnosity quiz content authoring.
+ */
 
-/** @var SitePage $page */
-$page = $kernel->get('sitePage');
-$page->initSession();
+/* Redirection to the new learning/quiz/{id}/content page */
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
-$groupHandler = new Group();
+$assessmentId = null;
 
-if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
-    $categoryHandler = new Assess_Question_Category();
-
-    $newCategory = array(
-        'question_category_id' => $_POST['questionCategoryId'],
-        'name' => $_POST['name'],
-    );
-
-    $categoryHandler->update($newCategory);
-    SitePage::backToTheFuture(1);
-} else {
-    error(126);
+/** @var SitePage $this */
+if (is_numeric($this->arg[0])) {
+    //Is the quiz still there?
+    try {
+        $quiz = QuizMapper::getInstance()->findById($this->arg[0]);
+        $assessmentId = $quiz->getAssessmentModel()->getId();
+    } catch (\Exception $e) {
+        $this->pageNotFound();
+    }
 }
+if ($assessmentId > 0) {
+    $this::localRedir('/learning/quiz/' . $assessmentId . '/content', null, 301);
+} else {
+    $this->pageNotFound();
+}
+
+//require_once __DIR__ . '/../../../conf/core/require.php';
+//$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+//
+///** @var SitePage $page */
+//$page = $kernel->get('sitePage');
+//$page->initSession();
+//
+//$groupHandler = new Group();
+//
+//if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+//    $categoryHandler = new Assess_Question_Category();
+//
+//    $newCategory = array(
+//        'question_category_id' => $_POST['questionCategoryId'],
+//        'name' => $_POST['name'],
+//    );
+//
+//    $categoryHandler->update($newCategory);
+//    SitePage::backToTheFuture(1);
+//} else {
+//    error(126);
+//}
