@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This used to be an async endpoint where you'd Mark All Attempts As Reviewed
+ * from the status screen. It was rebuilt elsewhere in Learnosity v23.1
+ */
+
+$this->pageNotFound();
+
 ///**
 // * Bulk assessment attempt review
 // */

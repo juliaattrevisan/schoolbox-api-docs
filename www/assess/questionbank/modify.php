@@ -11,25 +11,32 @@
  * @link        https://schoolbox.com.au/
  */
 
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+/* There's no real allegory to our legacy Question Bank - in learnosity era,
+ * every item is in the itembank already. The only place you access that is
+ * via learnosity quiz content authoring, but we don't really have the args
+ * to find a particular assessment to which a person might be redirected.
+ */
+$this->pageNotFound();
 
-/** @var SitePage $page */
-$page = $kernel->get('sitePage');
-$page->initSession();
-
-$groupHandler = new Group();
-
-if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
-    $categoryHandler = new Assess_Question_Category();
-
-    $newCategory = array(
-        'question_category_id' => $_POST['questionCategoryId'],
-        'name' => $_POST['name'],
-    );
-
-    $categoryHandler->update($newCategory);
-    SitePage::backToTheFuture(1);
-} else {
-    error(126);
-}
+//require_once __DIR__ . '/../../../conf/core/require.php';
+//$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+//
+///** @var SitePage $page */
+//$page = $kernel->get('sitePage');
+//$page->initSession();
+//
+//$groupHandler = new Group();
+//
+//if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+//    $categoryHandler = new Assess_Question_Category();
+//
+//    $newCategory = array(
+//        'question_category_id' => $_POST['questionCategoryId'],
+//        'name' => $_POST['name'],
+//    );
+//
+//    $categoryHandler->update($newCategory);
+//    SitePage::backToTheFuture(1);
+//} else {
+//    error(126);
+//}
