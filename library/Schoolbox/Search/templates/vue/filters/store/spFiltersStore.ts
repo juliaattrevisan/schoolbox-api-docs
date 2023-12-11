@@ -20,7 +20,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
 
     /**
      * Get the filter data
-     * @returns {FilterData} -
+     * @returns {FilterData} - the filter data
      */
     function getFormData() {
         const filterData = {
@@ -29,6 +29,15 @@ export const useFiltersStore = defineStore("spFilters", () => {
             ...useFilterTypesStore().getFormData(),
         };
         return JSON.stringify(filterData);
+    }
+
+    /**
+     * search has been triggered so set the active filters
+     */
+    function setActive() {
+        useFilterDateRangeStore().setActive();
+        useFilterCreatorsStore().setActive();
+        useFilterTypesStore().setActive();
     }
 
     /**
@@ -43,6 +52,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
     return {
         isActive,
         getFormData,
+        setActive,
         clear,
     };
 });

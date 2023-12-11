@@ -15,6 +15,8 @@ export const INVALID_DATE = "Invalid Date"; // the string dayjs returns when a d
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     const startDate = window.Vue.ref(EMPTY_DATE);
     const endDate = window.Vue.ref(EMPTY_DATE);
+    const activeStartDate = window.Vue.ref(EMPTY_DATE);
+    const activeEndDate = window.Vue.ref(EMPTY_DATE);
 
     /**
      * Is the start date filter set
@@ -59,11 +61,21 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     }
 
     /**
+     * search has been triggered so set the active date range filter
+     */
+    function setActive() {
+        activeStartDate.value = startDate.value;
+        activeEndDate.value = endDate.value;
+    }
+
+    /**
      * clear the date filter
      */
     function clear() {
         startDate.value = EMPTY_DATE;
         endDate.value = EMPTY_DATE;
+        activeStartDate.value = EMPTY_DATE;
+        activeEndDate.value = EMPTY_DATE;
     }
 
     return {
@@ -74,6 +86,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         hasDateRange,
         isActive,
         getFormData,
+        setActive,
         clear,
     };
 });

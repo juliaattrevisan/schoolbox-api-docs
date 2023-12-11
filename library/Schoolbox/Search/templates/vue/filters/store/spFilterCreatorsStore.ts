@@ -13,6 +13,7 @@ export type Creator = {
 
 export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     const creator = window.Vue.ref<Creator[]>([]);
+    const activeCreator = window.Vue.ref<Creator[]>([]);
 
     /**
      * Is the creator filter set
@@ -34,16 +35,25 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     }
 
     /**
+     * search has been triggered so set the active creator filter
+     */
+    function setActive() {
+        activeCreator.value = creator.value;
+    }
+
+    /**
      * clear the creator filter
      */
     function clear() {
         creator.value = [];
+        activeCreator.value = [];
     }
 
     return {
         creator,
         isActive,
         getFormData,
+        setActive,
         clear,
     };
 });
