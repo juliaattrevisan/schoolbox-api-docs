@@ -30,24 +30,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * Build WHERE params such that
-     * * deleted assessments are never fetched
-     * * hidden assessments _are_ fetched (as whether the viewer can view the assessment will be determined in the hydrator)
-     * * assessments whose url or comment or description contain `$keyword` are fetched
-     *
      * @inheritdoc
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
-        $keywordSearchParts = [
-            "MATCH(fulltext_index) AGAINST (:indexKeyword$paramKeySuffix)",
-            "text_index LIKE :indexKeywordLike$paramKeySuffix",
-        ];
-        $whereParts[]       = '(' . implode(' OR ', $keywordSearchParts) . ')';
-        $params             = [
-            "indexNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "indexKeyword$paramKeySuffix"     => $keyword,
-            "indexKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
+        $whereParts[] = "(MATCH(sif.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix))";
+        $params       = [
+            "indexNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
+            "indexKeyword$paramKeySuffix" => $keyword,
         ];
 
         return [
