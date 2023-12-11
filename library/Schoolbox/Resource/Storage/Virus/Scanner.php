@@ -71,6 +71,7 @@ class Scanner
         /* clamd not currently running or accessible. Might have died due to OOM or not installed properly  */
         if (2 === $resultCode) {
             /* clamd might not be running. skip scan */
+            return;
         }
 
         if ($resultCode > 0) {
