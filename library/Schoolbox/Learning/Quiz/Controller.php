@@ -178,24 +178,6 @@ class Controller extends AbstractController
         $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
         $this->response = $this->redirectFound("/assess/attempts/$assessId/$userId");
     }
-    /**
-     * Exports all answers given to the specified quiz
-     *
-     * Format of export derived from GET param ('csv', 'xml', etc)
-     *
-     * @api   GET /learning/quiz/{assessmentId}/attempts/export?format=csv
-     * @since 165
-     * @param int $assessmentId
-     */
-    public function getExportAttempts($assessmentId)
-    {
-        $format = strtolower($this->requestQuery->get('format'));
-        if (!in_array($format, ['csv', 'xml'])) {
-            throw new \InvalidArgumentException("Unsupported export format: $format");
-        }
-        $quiz           = $this->getQuizForAssessmentId($assessmentId);
-        $this->response = $this->redirectFound("/assess/export/$format/{$quiz->getId()}");
-    }
 
 
     /**
