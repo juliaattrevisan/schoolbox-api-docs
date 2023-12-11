@@ -45,7 +45,6 @@ export const useResultsStore = defineStore("spResults", () => {
         hasLoadedAllResults.value = false;
         allResults.value = firstResults.data;
         latestResults.value = firstResults;
-
         // If cursor.next has not been supplied, we have loaded all results.
         if (firstResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
@@ -60,7 +59,6 @@ export const useResultsStore = defineStore("spResults", () => {
         allResults.value = [...allResults.value, ...moreResults.data];
         latestResults.value = moreResults;
         moreResultsCount.value += 1;
-
         // If cursor.next has not been supplied, we have loaded all results.
         if (moreResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
@@ -68,16 +66,16 @@ export const useResultsStore = defineStore("spResults", () => {
     }
 
     /**
-     * Add the loaded sub results into the results
-     * @param {Result[]} moreSubResults - the sub results to set
+     * Add the loaded sub results into the results, also updating
+     * the meta data for future further sub result loads
+     * @param {Results} moreSubResults - the sub results to set
      * @param {number} parentIndex - the index of the parent result
      */
-    function setMoreSubResults(moreSubResults: Result[], parentIndex: number) {
+    function setMoreSubResults(moreSubResults: Results, parentIndex: number) {
         const parentResult = allResults.value[parentIndex] as Result;
-        (parentResult._subResults as Results).data = [
-            ...(parentResult._subResults?.data as Result[]),
-            ...moreSubResults,
-        ];
+        const subResults = parentResult._subResults as Results;
+        subResults.data = [...(parentResult._subResults?.data as Result[]), ...moreSubResults.data];
+        subResults.metadata.cursor = moreSubResults.metadata.cursor; // update the cursor for future sub result loads
     }
 
     /**
