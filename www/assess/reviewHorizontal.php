@@ -14,404 +14,425 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Router\Exception\RouteNotFound as RouteNotFoundAlias;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Breadcrumbs;
-use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Quiz\ActionValidator;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
+/* Redirection to the new learning/assessments/{id}/status page */
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 
-$factory = new Assess_Factory();
-$assessHandler = new Assess_Main();
-$attemptHandler = new Assess_Attempt();
-$responseHandler = new Assess_Response();
-$sectionHandler = new Assess_Section();
-$groupHandler = new Group();
-$userHandler = new User();
-$questionHandler = new Assess_Question();
-$answerHandler = new Assess_Answer();
+$assessmentId = null;
 
-/** @var MapperProxy $assessmentDataSource */
-$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-if (!is_numeric($this->arg[0])) {
-    error(112);
+/** @var SitePage $this */
+if (is_numeric($this->arg[0])) {
+    //Is the quiz still there?
+    try {
+        $quiz = QuizMapper::getInstance()->findById($this->arg[0]);
+        $assessmentId = $quiz->getAssessmentModel()->getId();
+    } catch (\Exception $e) {
+        $this->pageNotFound();
+    }
 }
-
-$assess = $assessHandler->getByID($this->arg[0]);
-
-if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+if ($assessmentId > 0) {
+    $this::localRedir('/learning/assessments/' . $assessmentId . '/status', null, 301);
+} else {
     $this->pageNotFound();
 }
-
-if ($assessHandler->isDeleted($this->arg[0])) {
-    error(112);
-}
-
-if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
-    error(127);
-}
-
-/* Check the folder exists meaningfully
- */
-try {
-    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-} catch (Mapper\Exception $e) {
-    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
-}
-
-$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-$term    = TermMapper::getInstance()->findForDate($dueDate);
-
-/* Index of questions
- */
-if (!isset($this->arg[1])) {
-    /* Set up template
-     */
-    $this->setFile(TEMPLATE_content, 'assess/reviewHorizontalIndex.html');
-    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
-
-    /* Show this Assess' contents
-     */
-    $this->setFile('assessContentsFragment', 'assess/reviewHorizontalContents.html');
-
-    $assessHandler = new Assess_Main();
-    $assessHandler->renderAssessContents($assess['assess_id'], $this);
-
-    $this->setVar(array(
-        'ASSESS_TITLE'         => Scrub::text($assess['title']),
-        'ASSESS_ASSESS_ID'     => $assess['assess_id'],
-        'ASSESS_CATEGORY_ID'   => $folder->getId(),
-        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
-    ));
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
-    $breadcrumbs   = getBreadcrumbsForQuiz($this->getDi(), $assess['assess_id']);
-    $breadcrumbs[] = [
-        'text'  => 'Horizontal Marking',
-        'href'  => '#',
-        'class' => 'active'
-    ];
-
-    /* Render out breadcrumbs
-     */
-    $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $breadcrumbs);
-} elseif ($this->arg[1] === 'finalise') {
-    /* Update the reviewed_at for all the latest attempts for a particular assess :D
-     * How do you like them apples
-     */
-
-    // Retrieve all attempts
-    $attemptMapper = QuizAttemptMapper::getInstance();
-    $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id']);
-    // Review them right now
-    // (Don't update review date of anything already reviewed)
-    $quizzes = [];
-
-    foreach ($attempts as $attemptId) {
-        try {
-            $attempt = $attemptMapper->findById($attemptId);
-            $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
-
-            /* Minimise the number of quizzes spawning
-             */
-            $quizzes[$attempt->getQuiz()->getId()] ??= $assessmentDataSource->findByQuizId($attempt->getQuiz()->getId());
-
-            /* Author nonexistent? skip 'em
-             */
-            try {
-                $user = UserMapper::getInstance()->findById($attempt->getUser()->getId());
-            } catch (Mapper\Exception $e) {
-                continue;
-            }
-
-            /* Update project result cache
-             */
-            (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt->getQuiz()->getId()], $user);
-        } catch (Exception $e) {
-            // noop;
-        }
-    }
-
-    $this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
-} else {
-    /* Reviewing attempts for a question
-     */
-
-    if (!is_numeric($this->arg[1])) {
-        error(119);
-    }
-
-    $question = $questionHandler->getByID($this->arg[1]);
-    $section  = $sectionHandler->getByID($question['section_id']);
-
-    if (!$question) {
-        error(119);
-    }
-
-    /* Set up template
-     */
-    $this->setFile(TEMPLATE_content, 'assess/reviewHorizontal.html');
-    $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
-    $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
-    $this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
-    $this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
-    $this->setBlock(TEMPLATE_content, 'writable_finalise', 'writable_finalise_block');
-    $this->setBlock(TEMPLATE_content, 'writable_finalise_button', 'writable_finalise_button_block');
-    $this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
-    $this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
-    $this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
-    $this->setVar('writable_finalise_block', '');
-    $this->setVar('writable_finalise_button_block', '');
-    $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
-
-    /* Correct answer displayed once, at the top of the page, under the question
-     * Each answer is handled uniquely by each answerHandler
-     */
-    $this->setBlock(TEMPLATE_content, 'answerInputsTop', 'answerInputsTop_block');
-    $this->setFile('answerFormFragmentTop', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/reviewTop.html');
-    $this->setBlock('answerFormFragmentTop', 'answerTop', 'answerTop_block');
-
-    $answerHandler = $factory->createAnswerModel($question['type_id']);
-    $answerHandler->reviewResponseHorizontalAnswerForQuestion($this, $question);
-
-    $this->parse('answerInputsTop_block', 'answerFormFragmentTop', true);
-
-    /* Show current Section's data, and other mandatory tokens needed to complete
-     * the Assessment.
-     */
-    $openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
-    $dueDate  = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-    $this->setVar(array(
-        'ASSESS_ASSESS_ID' => $assess['assess_id'],
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_START' => $openDate->getShort(),
-        'ASSESS_FINISH' => $dueDate->getShort(),
-        'SECTION_TITLE' => Scrub::text($section['title']),
-        'QUESTION_TITLE' => Scrub::html($question['question']),
-        'ASSESS_CATEGORY_ID' => $folder->getId(),
-        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
-        'visible_staff_block'                  => '',
-        'visible_staff_students_block'         => '',
-        'visible_staff_students_parents_block' => '',
-    ));
-
-    // Visibility copypaste
-    switch ($assess['mark_visibility']) {
-        case IAssessable::MARK_VISIBILITY_PRIVATE:
-            $this->parse('visible_staff_block', 'visible_staff');
-            break;
-        case IAssessable::MARK_VISIBILITY_STUDENT:
-            $this->parse('visible_staff_students_block', 'visible_staff_students');
-            break;
-        case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
-            $this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
-            break;
-    }
-
-    $readonly = !$term->isMarkableBy($_SESSION['user']);
-
-    /* Load all the questions for this section.
-     * Note: only show the randomly-selected ones
-     */
-    $allAttempts = $attemptHandler->getAllAttemptsForQuestion($assess['assess_id'], $question['question_id']);
-
-    $this->setVar('attempt_block', '');
-
-    if ($allAttempts) {
-        $j = 0;
-
-        $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
-        $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-
-        foreach ($allAttempts as $currentAttempt) {
-            try {
-                $user = UserMapper::getInstance()->findById($currentAttempt['user_id']);
-            } catch (Mapper\Exception $e) {
-                continue;
-            }
-
-            /* Excluded participants are ignored
-             */
-            if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $assessment)) {
-                continue;
-            }
-
-            /* Load answer template into answerOption block
-             */
-            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentAttempt['type_id']) . '/reviewBottom.html');
-            $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
-
-            $this->setBlock('answerFormFragment', 'writable_comment', 'writable_comment_block');
-            $this->setBlock('answerFormFragment', 'readonly_comment', 'readonly_comment_block');
-
-            $this->setBlock('answerFormFragment', 'writable_mark', 'writable_mark_block');
-            $this->setBlock('answerFormFragment', 'readonly_mark', 'readonly_mark_block');
-
-            /* Reset answer options and marks from previous iteration
-             */
-            $this->setVar('answerOption_block', '');
-            $this->setVar('writable_comment_block', '');
-            $this->setVar('writable_mark_block', '');
-            $this->setVar('readonly_comment_block', '');
-            $this->setVar('readonly_mark_block', '');
-
-            $this->setVar(array(
-                'QUESTION_QUESTION_ID' => $currentAttempt['question_id'],
-                'QUESTION_SEQUENCE' => $currentAttempt['sequence'],
-                'QUESTION_QUESTION' => Scrub::html($currentAttempt['question']),
-                'QUESTION_MARKS' => $currentAttempt['marks'],
-                'QUESTION_PLUGIN' => $answerHandler->getPluginReview(),
-            ));
-
-            /* Load individual answers
-             */
-            $answerHandler->reviewResponseHorizontal($this, $currentAttempt['attempt_id'], $currentAttempt);
-
-            //
-            // Mark and comment blocks must be parsed before the answerInputs block
-            // gets parsed, so that the correct template vars are exposed to these
-            // blocks.
-            if ($readonly) {
-                $this->parse('readonly_comment_block', 'readonly_comment');
-                $this->parse('readonly_mark_block', 'readonly_mark');
-            } else {
-                $this->parse('writable_comment_block', 'writable_comment');
-                $this->parse('writable_mark_block', 'writable_mark');
-            }
-
-            $this->parse('answerInputs_block', 'answerFormFragment', true);
-            $this->parse('attempt_block', 'attempt', true);
-
-            /* Clear child blocks after parsing out the parent
-             */
-            $answerHandler->cleanupParse($this);
-
-            $this->setVar('answerFormFragment', '');
-            $this->setVar('answerInputs_block', '');
-
-            /* increment count of number of attempts
-             * some attempts might have been skipped
-             */
-            $j++;
-        }
-    }
-
-    /* Navigation tools
-     */
-
-    /* Previous question
-     */
-    $previous = $questionHandler->getPreviousQuestion($assess['assess_id'], $question['question_id']);
-
-    if ($previous) {
-        $this->setVar(array(
-            'PREVIOUS_ID' => $previous['question_id']
-        ));
-
-        $this->parse('previous_question_block', 'previous_question');
-    } else {
-        $this->setVar('previous_question_block', '');
-    }
-
-    /* Next question
-     */
-    $next = $questionHandler->getNextQuestion($assess['assess_id'], $question['question_id']);
-
-    if ($next) {
-        $this->setVar(array(
-            'NEXT_ID' => $next['question_id']
-        ));
-
-        $this->parse('next_question_block', 'next_question');
-    } else {
-        /* Finalise all the attempts in a macro-ey way
-         *
-         * This option only exists on the last question so you don't
-         * accidentally finalise everything prematurely
-         */
-        if (!$readonly) {
-            $this->parse('writable_finalise_block', 'writable_finalise');
-            $this->parse('writable_finalise_button_block', 'writable_finalise_button');
-        }
-
-        $this->setVar('next_question_block', '');
-    }
-
-    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-    $term    = TermMapper::getInstance()->findForDate($dueDate);
-
-    $breadcrumbs   = getBreadcrumbsForQuiz($this->getDi(), $assess['assess_id']);
-    $breadcrumbs[] = [
-        'text'  => 'Horizontal Marking',
-        'href'  => "/assess/reviewHorizontal/{$assess['assess_id']}",
-        'class' => ''
-    ];
-    $breadcrumbs[] = [
-        'text'  => Scrub::text($section['title']),
-        'href'  => "#",
-        'class' => 'active'
-    ];
-
-    /* Render out breadcrumbs
-     */
-    $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', $breadcrumbs);
-}
-
-/**
- * @param $di
- * @param $assessId
- * @return array
- * @throws RouteNotFoundAlias
- */
-function getBreadcrumbsForQuiz($di, $assessId): array
-{
-    $authorizer        = $di->get('authorizer');
-    $assessment        = $di->get('assessmentDataSource')->findByQuizId($assessId, null);
-    $breadcrumbFactory = new BreadcrumbFactory($di->get('router.generator'), $authorizer, Access::getInstance());
-    $breadcrumbs       = $breadcrumbFactory->produceFromAssessment($assessment, $_SESSION['user']);
-    $breadcrumbsArray  = [];
-
-    // Convert $breadcrumb collection to format expected by Breadcrumbs->renderIntoSitePage().
-    foreach ($breadcrumbs as $crumb) {
-        $breadcrumbsArray[] = [
-            'text'  => $crumb[0],
-            'href'  => $crumb[1],
-            'class' => ''
-        ];
-    }
-
-    // This is the breadcrumb for the quiz itself.
-    $breadcrumbsArray[] = [
-        'text'  => $assessment->getTitle(),
-        'class' => '',
-        'href'  => (
-            // In some circumstances the user will not be authorised to view the 'status' page.  In that case, show the 'summary' page instead.
-            $authorizer->isPathAuthorizedForUser(
-                'learningAssessment.getStatus',
-                [
-                    'assessment'   => $assessment,
-                    'assessmentId' => $assessment->getId(),
-                    'studentId'    => $_SESSION['user']->getId(),
-                ],
-                $_SESSION['user']
-            ) ?
-            "/learning/assessments/{$assessment->getId()}/status" :
-            "/learning/assessments/{$assessment->getId()}"
-        )
-    ];
-
-    return $breadcrumbsArray;
-}
+//
+//use Aura\Router\Exception\RouteNotFound as RouteNotFoundAlias;
+//use Schoolbox\Assessment\Term\Mapper as TermMapper;
+//use Schoolbox\Breadcrumbs;
+//use Schoolbox\Error;
+//use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+//use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+//use Schoolbox\Learning\Assessment\IAssessable;
+//use Schoolbox\Learning\Assessment\Project;
+//use Schoolbox\Learning\Quiz\ActionValidator;
+//use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+//use Schoolbox\Mapper;
+//use Schoolbox\Permission\Access\Access;
+//use Schoolbox\Permission\Access\UserAccess;
+//use Schoolbox\Resource\Folder;
+//use Schoolbox\UserMapper;
+//
+//$factory = new Assess_Factory();
+//$assessHandler = new Assess_Main();
+//$attemptHandler = new Assess_Attempt();
+//$responseHandler = new Assess_Response();
+//$sectionHandler = new Assess_Section();
+//$groupHandler = new Group();
+//$userHandler = new User();
+//$questionHandler = new Assess_Question();
+//$answerHandler = new Assess_Answer();
+//
+///** @var MapperProxy $assessmentDataSource */
+//$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+//
+//if (!is_numeric($this->arg[0])) {
+//    error(112);
+//}
+//
+//$assess = $assessHandler->getByID($this->arg[0]);
+//
+//if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+//    $this->pageNotFound();
+//}
+//
+//if ($assessHandler->isDeleted($this->arg[0])) {
+//    error(112);
+//}
+//
+//if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
+//    error(127);
+//}
+//
+///* Check the folder exists meaningfully
+// */
+//try {
+//    $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
+//} catch (Mapper\Exception $e) {
+//    error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+//}
+//
+//$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+//$term    = TermMapper::getInstance()->findForDate($dueDate);
+//
+///* Index of questions
+// */
+//if (!isset($this->arg[1])) {
+//    /* Set up template
+//     */
+//    $this->setFile(TEMPLATE_content, 'assess/reviewHorizontalIndex.html');
+//    $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+//
+//    /* Show this Assess' contents
+//     */
+//    $this->setFile('assessContentsFragment', 'assess/reviewHorizontalContents.html');
+//
+//    $assessHandler = new Assess_Main();
+//    $assessHandler->renderAssessContents($assess['assess_id'], $this);
+//
+//    $this->setVar(array(
+//        'ASSESS_TITLE'         => Scrub::text($assess['title']),
+//        'ASSESS_ASSESS_ID'     => $assess['assess_id'],
+//        'ASSESS_CATEGORY_ID'   => $folder->getId(),
+//        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
+//    ));
+//
+//    $this->parse('allQuestions_block', 'assessContentsFragment', true);
+//
+//    $breadcrumbs   = getBreadcrumbsForQuiz($this->getDi(), $assess['assess_id']);
+//    $breadcrumbs[] = [
+//        'text'  => 'Horizontal Marking',
+//        'href'  => '#',
+//        'class' => 'active'
+//    ];
+//
+//    /* Render out breadcrumbs
+//     */
+//    $trail = new Breadcrumbs();
+//    $trail->renderIntoSitePage($this, 'BREADCRUMB', $breadcrumbs);
+//} elseif ($this->arg[1] === 'finalise') {
+//    /* Update the reviewed_at for all the latest attempts for a particular assess :D
+//     * How do you like them apples
+//     */
+//
+//    // Retrieve all attempts
+//    $attemptMapper = QuizAttemptMapper::getInstance();
+//    $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id']);
+//    // Review them right now
+//    // (Don't update review date of anything already reviewed)
+//    $quizzes = [];
+//
+//    foreach ($attempts as $attemptId) {
+//        try {
+//            $attempt = $attemptMapper->findById($attemptId);
+//            $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
+//
+//            /* Minimise the number of quizzes spawning
+//             */
+//            $quizzes[$attempt->getQuiz()->getId()] ??= $assessmentDataSource->findByQuizId($attempt->getQuiz()->getId());
+//
+//            /* Author nonexistent? skip 'em
+//             */
+//            try {
+//                $user = UserMapper::getInstance()->findById($attempt->getUser()->getId());
+//            } catch (Mapper\Exception $e) {
+//                continue;
+//            }
+//
+//            /* Update project result cache
+//             */
+//            (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt->getQuiz()->getId()], $user);
+//        } catch (Exception $e) {
+//            // noop;
+//        }
+//    }
+//
+//    $this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
+//} else {
+//    /* Reviewing attempts for a question
+//     */
+//
+//    if (!is_numeric($this->arg[1])) {
+//        error(119);
+//    }
+//
+//    $question = $questionHandler->getByID($this->arg[1]);
+//    $section  = $sectionHandler->getByID($question['section_id']);
+//
+//    if (!$question) {
+//        error(119);
+//    }
+//
+//    /* Set up template
+//     */
+//    $this->setFile(TEMPLATE_content, 'assess/reviewHorizontal.html');
+//    $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
+//    $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+//    $this->setBlock(TEMPLATE_content, 'next_question', 'next_question_block');
+//    $this->setBlock(TEMPLATE_content, 'previous_question', 'previous_question_block');
+//    $this->setBlock(TEMPLATE_content, 'writable_finalise', 'writable_finalise_block');
+//    $this->setBlock(TEMPLATE_content, 'writable_finalise_button', 'writable_finalise_button_block');
+//    $this->setBlock(TEMPLATE_content, 'visible_staff', 'visible_staff_block');
+//    $this->setBlock(TEMPLATE_content, 'visible_staff_students', 'visible_staff_students_block');
+//    $this->setBlock(TEMPLATE_content, 'visible_staff_students_parents', 'visible_staff_students_parents_block');
+//    $this->setVar('writable_finalise_block', '');
+//    $this->setVar('writable_finalise_button_block', '');
+//    $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
+//
+//    /* Correct answer displayed once, at the top of the page, under the question
+//     * Each answer is handled uniquely by each answerHandler
+//     */
+//    $this->setBlock(TEMPLATE_content, 'answerInputsTop', 'answerInputsTop_block');
+//    $this->setFile('answerFormFragmentTop', 'assess/answer/' . $factory->getQuestionType($question['type_id']) . '/reviewTop.html');
+//    $this->setBlock('answerFormFragmentTop', 'answerTop', 'answerTop_block');
+//
+//    $answerHandler = $factory->createAnswerModel($question['type_id']);
+//    $answerHandler->reviewResponseHorizontalAnswerForQuestion($this, $question);
+//
+//    $this->parse('answerInputsTop_block', 'answerFormFragmentTop', true);
+//
+//    /* Show current Section's data, and other mandatory tokens needed to complete
+//     * the Assessment.
+//     */
+//    $openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
+//    $dueDate  = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+//    $this->setVar(array(
+//        'ASSESS_ASSESS_ID' => $assess['assess_id'],
+//        'ASSESS_TITLE' => Scrub::text($assess['title']),
+//        'ASSESS_START' => $openDate->getShort(),
+//        'ASSESS_FINISH' => $dueDate->getShort(),
+//        'SECTION_TITLE' => Scrub::text($section['title']),
+//        'QUESTION_TITLE' => Scrub::html($question['question']),
+//        'ASSESS_CATEGORY_ID' => $folder->getId(),
+//        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
+//        'visible_staff_block'                  => '',
+//        'visible_staff_students_block'         => '',
+//        'visible_staff_students_parents_block' => '',
+//    ));
+//
+//    // Visibility copypaste
+//    switch ($assess['mark_visibility']) {
+//        case IAssessable::MARK_VISIBILITY_PRIVATE:
+//            $this->parse('visible_staff_block', 'visible_staff');
+//            break;
+//        case IAssessable::MARK_VISIBILITY_STUDENT:
+//            $this->parse('visible_staff_students_block', 'visible_staff_students');
+//            break;
+//        case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
+//            $this->parse('visible_staff_students_parents_block', 'visible_staff_students_parents');
+//            break;
+//    }
+//
+//    $readonly = !$term->isMarkableBy($_SESSION['user']);
+//
+//    /* Load all the questions for this section.
+//     * Note: only show the randomly-selected ones
+//     */
+//    $allAttempts = $attemptHandler->getAllAttemptsForQuestion($assess['assess_id'], $question['question_id']);
+//
+//    $this->setVar('attempt_block', '');
+//
+//    if ($allAttempts) {
+//        $j = 0;
+//
+//        $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+//        $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+//
+//        foreach ($allAttempts as $currentAttempt) {
+//            try {
+//                $user = UserMapper::getInstance()->findById($currentAttempt['user_id']);
+//            } catch (Mapper\Exception $e) {
+//                continue;
+//            }
+//
+//            /* Excluded participants are ignored
+//             */
+//            if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $assessment)) {
+//                continue;
+//            }
+//
+//            /* Load answer template into answerOption block
+//             */
+//            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentAttempt['type_id']) . '/reviewBottom.html');
+//            $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+//
+//            $this->setBlock('answerFormFragment', 'writable_comment', 'writable_comment_block');
+//            $this->setBlock('answerFormFragment', 'readonly_comment', 'readonly_comment_block');
+//
+//            $this->setBlock('answerFormFragment', 'writable_mark', 'writable_mark_block');
+//            $this->setBlock('answerFormFragment', 'readonly_mark', 'readonly_mark_block');
+//
+//            /* Reset answer options and marks from previous iteration
+//             */
+//            $this->setVar('answerOption_block', '');
+//            $this->setVar('writable_comment_block', '');
+//            $this->setVar('writable_mark_block', '');
+//            $this->setVar('readonly_comment_block', '');
+//            $this->setVar('readonly_mark_block', '');
+//
+//            $this->setVar(array(
+//                'QUESTION_QUESTION_ID' => $currentAttempt['question_id'],
+//                'QUESTION_SEQUENCE' => $currentAttempt['sequence'],
+//                'QUESTION_QUESTION' => Scrub::html($currentAttempt['question']),
+//                'QUESTION_MARKS' => $currentAttempt['marks'],
+//                'QUESTION_PLUGIN' => $answerHandler->getPluginReview(),
+//            ));
+//
+//            /* Load individual answers
+//             */
+//            $answerHandler->reviewResponseHorizontal($this, $currentAttempt['attempt_id'], $currentAttempt);
+//
+//            //
+//            // Mark and comment blocks must be parsed before the answerInputs block
+//            // gets parsed, so that the correct template vars are exposed to these
+//            // blocks.
+//            if ($readonly) {
+//                $this->parse('readonly_comment_block', 'readonly_comment');
+//                $this->parse('readonly_mark_block', 'readonly_mark');
+//            } else {
+//                $this->parse('writable_comment_block', 'writable_comment');
+//                $this->parse('writable_mark_block', 'writable_mark');
+//            }
+//
+//            $this->parse('answerInputs_block', 'answerFormFragment', true);
+//            $this->parse('attempt_block', 'attempt', true);
+//
+//            /* Clear child blocks after parsing out the parent
+//             */
+//            $answerHandler->cleanupParse($this);
+//
+//            $this->setVar('answerFormFragment', '');
+//            $this->setVar('answerInputs_block', '');
+//
+//            /* increment count of number of attempts
+//             * some attempts might have been skipped
+//             */
+//            $j++;
+//        }
+//    }
+//
+//    /* Navigation tools
+//     */
+//
+//    /* Previous question
+//     */
+//    $previous = $questionHandler->getPreviousQuestion($assess['assess_id'], $question['question_id']);
+//
+//    if ($previous) {
+//        $this->setVar(array(
+//            'PREVIOUS_ID' => $previous['question_id']
+//        ));
+//
+//        $this->parse('previous_question_block', 'previous_question');
+//    } else {
+//        $this->setVar('previous_question_block', '');
+//    }
+//
+//    /* Next question
+//     */
+//    $next = $questionHandler->getNextQuestion($assess['assess_id'], $question['question_id']);
+//
+//    if ($next) {
+//        $this->setVar(array(
+//            'NEXT_ID' => $next['question_id']
+//        ));
+//
+//        $this->parse('next_question_block', 'next_question');
+//    } else {
+//        /* Finalise all the attempts in a macro-ey way
+//         *
+//         * This option only exists on the last question so you don't
+//         * accidentally finalise everything prematurely
+//         */
+//        if (!$readonly) {
+//            $this->parse('writable_finalise_block', 'writable_finalise');
+//            $this->parse('writable_finalise_button_block', 'writable_finalise_button');
+//        }
+//
+//        $this->setVar('next_question_block', '');
+//    }
+//
+//    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+//    $term    = TermMapper::getInstance()->findForDate($dueDate);
+//
+//    $breadcrumbs   = getBreadcrumbsForQuiz($this->getDi(), $assess['assess_id']);
+//    $breadcrumbs[] = [
+//        'text'  => 'Horizontal Marking',
+//        'href'  => "/assess/reviewHorizontal/{$assess['assess_id']}",
+//        'class' => ''
+//    ];
+//    $breadcrumbs[] = [
+//        'text'  => Scrub::text($section['title']),
+//        'href'  => "#",
+//        'class' => 'active'
+//    ];
+//
+//    /* Render out breadcrumbs
+//     */
+//    $trail = new Breadcrumbs();
+//    $trail->renderIntoSitePage($this, 'BREADCRUMB', $breadcrumbs);
+//}
+//
+///**
+// * @param $di
+// * @param $assessId
+// * @return array
+// * @throws RouteNotFoundAlias
+// */
+//function getBreadcrumbsForQuiz($di, $assessId): array
+//{
+//    $authorizer        = $di->get('authorizer');
+//    $assessment        = $di->get('assessmentDataSource')->findByQuizId($assessId, null);
+//    $breadcrumbFactory = new BreadcrumbFactory($di->get('router.generator'), $authorizer, Access::getInstance());
+//    $breadcrumbs       = $breadcrumbFactory->produceFromAssessment($assessment, $_SESSION['user']);
+//    $breadcrumbsArray  = [];
+//
+//    // Convert $breadcrumb collection to format expected by Breadcrumbs->renderIntoSitePage().
+//    foreach ($breadcrumbs as $crumb) {
+//        $breadcrumbsArray[] = [
+//            'text'  => $crumb[0],
+//            'href'  => $crumb[1],
+//            'class' => ''
+//        ];
+//    }
+//
+//    // This is the breadcrumb for the quiz itself.
+//    $breadcrumbsArray[] = [
+//        'text'  => $assessment->getTitle(),
+//        'class' => '',
+//        'href'  => (
+//            // In some circumstances the user will not be authorised to view the 'status' page.  In that case, show the 'summary' page instead.
+//            $authorizer->isPathAuthorizedForUser(
+//                'learningAssessment.getStatus',
+//                [
+//                    'assessment'   => $assessment,
+//                    'assessmentId' => $assessment->getId(),
+//                    'studentId'    => $_SESSION['user']->getId(),
+//                ],
+//                $_SESSION['user']
+//            ) ?
+//            "/learning/assessments/{$assessment->getId()}/status" :
+//            "/learning/assessments/{$assessment->getId()}"
+//        )
+//    ];
+//
+//    return $breadcrumbsArray;
+//}
