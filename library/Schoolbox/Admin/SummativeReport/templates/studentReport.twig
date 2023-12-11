@@ -520,11 +520,10 @@
         {% endif %}
 
         {% for folder in folders %}
-            {# only if there are filtered assessments for this folder #}
-            {% if (summaryAssessments[folder.id] ?? [])| length %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
-
+            {# only show the folder if there are filtered assessments or if an overall mark can be shown #}
+            {% if ((summaryAssessments[folder.id] ?? [])| length) or (showSummaryOverallGrade and weightedMean != '') %}
                 <div class="folder-title">
                     <div class="left">
                         {% block summaryFolderTitle %}
