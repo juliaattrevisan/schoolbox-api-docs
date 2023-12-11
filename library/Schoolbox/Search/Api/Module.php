@@ -105,6 +105,7 @@ class Module extends BaseModule
 
         $queryParamBuilders = [
             new Database\Index\FulltextQueryParamBuilder(),
+            new Database\Index\TextQueryParamBuilder($database->getQuoter()),
 //            new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
 //            new Database\ResultType\News\QueryParamBuilder(),
 //            new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
