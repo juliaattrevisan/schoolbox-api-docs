@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This used to make a csv export of people's responses - what they actually answered in the quiz.
+ * We weren't really sure what people did with this, or how they used it.
+ *
+ * The feature was removed in Learnosity v23.1
+ */
 $this->pageNotFound();
 
 ///**

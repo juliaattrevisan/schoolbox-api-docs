@@ -1,16 +1,16 @@
 <?php
 
+/**
+ * Saves a Reviewed Response to a Question. This is where the assessor can
+ * change the mark.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 $this->pageNotFound();
 
-///**
-// * Saves a Reviewed Response to a Question. This is where the assessor can
-// * change the mark.
-// *
-// * @author      Steve Chan <steve.chan@alaress.com.au>
-// * @copyright   Copyright 2019, Schoolbox Pty Ltd
-// * @link        https://schoolbox.com.au/
-// */
-//
 //use Schoolbox\Error;
 //use Schoolbox\Learning\Quiz\ActionValidator;
 //use Schoolbox\Mapper;

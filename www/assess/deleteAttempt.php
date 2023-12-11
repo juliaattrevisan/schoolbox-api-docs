@@ -1,16 +1,16 @@
 <?php
 
+/**
+ * Assessment Attempt deletion. Responses are all softdeleted if
+ * the Attempt is softdeleted.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 $this->pageNotFound();
 
-///**
-// * Assessment Attempt deletion. Responses are all softdeleted if
-// * the Attempt is softdeleted.
-// *
-// * @author      Steve Chan <steve.chan@alaress.com.au>
-// * @copyright   Copyright 2019, Schoolbox Pty Ltd
-// * @link        https://schoolbox.com.au/
-// */
-//
 ///* Get a list of questions and answers to softdelete
 // */
 //

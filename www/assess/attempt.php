@@ -1,16 +1,16 @@
 <?php
 
+/**
+ * Attempt creation. When someone makes an Attempt at an Assessment, record the
+ * various details. This is loaded for each Section in the Assessment.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 $this->pageNotFound();
 
-///**
-// * Attempt creation. When someone makes an Attempt at an Assessment, record the
-// * various details. This is loaded for each Section in the Assessment.
-// *
-// * @author      Steve Chan <steve.chan@alaress.com.au>
-// * @copyright   Copyright 2019, Schoolbox Pty Ltd
-// * @link        https://schoolbox.com.au/
-// */
-//
 //use Schoolbox\Error;
 //use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 //use Schoolbox\Learning\Quiz\ActionValidator;

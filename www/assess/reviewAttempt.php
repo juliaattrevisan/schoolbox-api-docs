@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * This used to be an async endpoint where you'd Mark All Attempts As Reviewed
+ * from the status screen. It was rebuilt elsewhere in Learnosity v23.1
+ */
+
 /* Redirection to the new learning/assessments/{id}/status page */
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 

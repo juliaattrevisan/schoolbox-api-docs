@@ -1,15 +1,15 @@
 <?php
 
+/**
+ * Reorder quiz questions if you have access permissions
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 $this->pageNotFound();
 
-///**
-// * Reorder quiz questions if you have access permissions
-// *
-// * @author      Steve Chan <steve.chan@alaress.com.au>
-// * @copyright   Copyright 2019, Schoolbox Pty Ltd
-// * @link        https://schoolbox.com.au/
-// */
-//
 //use Schoolbox\Permission\Access\UserAccess;
 //use Schoolbox\Error\Mapper as ErrorMapper;
 //

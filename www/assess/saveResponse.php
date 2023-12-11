@@ -1,15 +1,18 @@
 <?php
 
+/**
+ * Saves a Response to a Question.
+ *
+ * This was an async endpoint when people were filling out their responses in each
+ * question for a legacy quiz.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 $this->pageNotFound();
 
-///**
-// * Saves a Response to a Question.
-// *
-// * @author      Steve Chan <steve.chan@alaress.com.au>
-// * @copyright   Copyright 2019, Schoolbox Pty Ltd
-// * @link        https://schoolbox.com.au/
-// */
-//
 //use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 //use Schoolbox\Learning\Quiz\ActionValidator;
 //use Schoolbox\Permission\Access\Access;

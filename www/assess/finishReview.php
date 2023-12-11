@@ -1,15 +1,15 @@
 <?php
 
+/**
+ * Review completion. Marks when an assessment review is finished.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 $this->pageNotFound();
 
-///**
-// * Review completion. Marks when an assessment review is finished.
-// *
-// * @author      Steve Chan <steve.chan@alaress.com.au>
-// * @copyright   Copyright 2019, Schoolbox Pty Ltd
-// * @link        https://schoolbox.com.au/
-// */
-//
 //use Schoolbox\Learning\Assessment\Project;
 //use Schoolbox\Learning\Quiz\ActionValidator;
 //use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
