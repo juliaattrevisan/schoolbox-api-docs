@@ -7,17 +7,9 @@ create table search_index
     relevance      float         not null,
     created_by     int unsigned  null,
     folder_id      int unsigned  null,
-    fulltext_index mediumtext    not null,
-    text_index     varchar(250)  not null,
     constraint search_index_pk
         primary key (identifier)
 );
-
-create fulltext index search_index_fulltext_index_index
-    on search_index (fulltext_index);
-
-create index search_index_text_index_index
-    on search_index (text_index);
 
 alter table search_index
     add constraint search_index_user_id_fk
