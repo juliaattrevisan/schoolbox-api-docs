@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Alaress_Date_Format;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
-use Schoolbox\Search\Index\Model;
+use Schoolbox\Search\Index;
 
 /**
  * Index builder for assessments.
@@ -86,16 +87,31 @@ class IndexBuilder extends BaseBuilder
             'date' => $date->getDatabaseDate(),
         ];
         foreach ($this->connector->executeQuery($query, $params) as $row) {
-            yield (new Model())
-                ->setIdentifier((string)$row['id'])
+            $identifier = (string)$row['id'];
+            yield (new Index\Model())
+                ->setIdentifier($identifier)
                 ->setTitle($row['title'])
                 ->setType($row['type'])
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
                 ->setRelevance((float)$row['relevance'])
                 ->setCreatedBy($row['created_by'])
                 ->setFolderId($row['folder_id'])
-                ->setFulltextIndices(strip_tags($row['fulltext_index']))
-                ->setTextIndices($row['text_index']);
+                ->setFulltextIndices(
+                    (new GenericCollection(Index\Fulltext\Model::class))
+                        ->add(
+                            (new Index\Fulltext\Model())
+                                ->setIdentifier($identifier)
+                                ->setFulltextIndex(strip_tags($row['fulltext_index']))
+                        )
+                )
+                ->setTextIndices(
+                    (new GenericCollection(Index\Text\Model::class))
+                        ->add(
+                            (new Index\Text\Model())
+                                ->setIdentifier($identifier)
+                                ->setTextIndex(strip_tags($row['text_index']))
+                        )
+                );
         }
     }
 
