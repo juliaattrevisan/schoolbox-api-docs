@@ -20,11 +20,19 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $mapper       = Index\Mapper::getInstance();
-        $indexBuilder = new IndexBuilder($mapper->getDatabase());
-        $mapper->truncate();
-        foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addMonths(-1)) as $item) {
-            $mapper->save($item);
+        // Build mappers and search classes
+        $indexMapper         = Index\Mapper::getInstance();
+        $indexBuilder        = new IndexBuilder($this->getDatabaseInternal());
+        $indexTextMapper     = Index\Text\Mapper::getInstance();
+        $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
+
+        // Actually create data
+        // TODO the final version won't truncate: instead, it'll override?
+        $indexMapper->truncate();
+        foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-5)) as $item) {
+            $indexMapper->save($item);
+            $indexTextMapper->save($item->getTextIndices());
+            $indexFulltextMapper->save($item->getFulltextIndices());
         }
     }
 };
