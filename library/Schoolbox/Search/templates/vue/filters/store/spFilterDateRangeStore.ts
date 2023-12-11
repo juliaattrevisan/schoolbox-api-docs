@@ -83,8 +83,6 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     function clear() {
         startDate.value = EMPTY_DATE;
         endDate.value = EMPTY_DATE;
-        activeStartDate.value = EMPTY_DATE;
-        activeEndDate.value = EMPTY_DATE;
     }
 
     return {

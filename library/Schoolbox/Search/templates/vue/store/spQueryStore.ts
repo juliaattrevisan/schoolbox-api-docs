@@ -50,7 +50,6 @@ export const useQueryStore = defineStore("spQuery", () => {
      */
     function clear() {
         query.value = "";
-        activeQuery.value = "";
     }
 
     return {

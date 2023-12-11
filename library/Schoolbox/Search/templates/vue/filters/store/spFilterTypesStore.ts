@@ -95,7 +95,6 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function clear() {
         selectedTypes.value = [];
-        activeTypes.value = [];
     }
 
     return {

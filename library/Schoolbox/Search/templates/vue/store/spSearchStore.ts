@@ -56,7 +56,7 @@ export const useSearchStore = defineStore("spSearch", () => {
      * @returns {boolean} - whether a new search can be performed
      */
     const canSearch = window.Vue.computed(() => {
-        return useQueryStore().canSearch && useFiltersStore().canSearch;
+        return useQueryStore().canSearch || useFiltersStore().canSearch;
     });
 
     /**
@@ -65,6 +65,7 @@ export const useSearchStore = defineStore("spSearch", () => {
      */
     async function search(simulateRedirect: boolean) {
         useQueryStore().setActive();
+        useFiltersStore().setActive();
         useResultsStore().clear();
         useStore().setQueryParams(simulateRedirect);
         hasNotSearched.value = false;
