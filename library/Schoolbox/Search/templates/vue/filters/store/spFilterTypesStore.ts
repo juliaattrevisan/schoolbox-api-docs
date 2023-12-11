@@ -79,7 +79,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      * search has been triggered so set the active types filter
      */
     function setActive() {
-        activeTypes.value = selectedTypes.value;
+        activeTypes.value = [...selectedTypes.value];
     }
 
     /**

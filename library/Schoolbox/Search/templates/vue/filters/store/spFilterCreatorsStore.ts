@@ -39,7 +39,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
      * search has been triggered so set the active creator filter
      */
     function setActive() {
-        activeCreator.value = creator.value;
+        activeCreator.value = [...creator.value];
     }
 
     /**
