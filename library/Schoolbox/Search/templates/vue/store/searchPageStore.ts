@@ -53,7 +53,7 @@ export const useStore = defineStore("searchPage", () => {
         filterDateRangeStore.startDate = $selectedFilterDateRange.startDate;
         filterDateRangeStore.endDate = $selectedFilterDateRange.endDate;
         filterTypesStore.allTypes = $filterTypesAvailable;
-        filterTypesStore.activeTypes = $filterTypesSelected;
+        filterTypesStore.selectedTypes = $filterTypesSelected;
     }
 
     /**

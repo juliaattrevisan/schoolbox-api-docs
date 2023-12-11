@@ -12,22 +12,22 @@ export type FilterType = {
 
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     const allTypes = window.Vue.ref<FilterType[]>([]); // all filter types available
-    const activeTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
+    const selectedTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
     const isExpanded = window.Vue.ref<boolean>(false); // to show/hide all the sub types
 
     /**
      * Are there any types selected
      * @returns {boolean}
      */
-    const isActive = window.Vue.computed(() => activeTypes.value.length > 0);
+    const isActive = window.Vue.computed(() => selectedTypes.value.length > 0);
 
     /**
      * Add a parent type to the active types
      * @param {FilterType} type - the parent type
      */
     function addType(type: FilterType) {
-        if (!activeTypes.value.includes(type.value)) {
-            activeTypes.value.push(type.value);
+        if (!selectedTypes.value.includes(type.value)) {
+            selectedTypes.value.push(type.value);
         }
     }
 
@@ -36,8 +36,8 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      * @param {FilterType} type - the parent type
      */
     function removeType(type: FilterType) {
-        if (activeTypes.value.includes(type.value)) {
-            activeTypes.value = activeTypes.value.filter((activeType) => activeType !== type.value);
+        if (selectedTypes.value.includes(type.value)) {
+            selectedTypes.value = selectedTypes.value.filter((activeType) => activeType !== type.value);
         }
     }
 
@@ -47,8 +47,8 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function addSubTypes(type: FilterType) {
         type.subTypes?.forEach((subType) => {
-            if (!activeTypes.value.includes(subType.value)) {
-                activeTypes.value.push(subType.value);
+            if (!selectedTypes.value.includes(subType.value)) {
+                selectedTypes.value.push(subType.value);
             }
         });
     }
@@ -59,7 +59,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function removeSubTypes(type: FilterType) {
         type.subTypes?.forEach((subType) => {
-            activeTypes.value = activeTypes.value.filter((activeType) => activeType !== subType.value);
+            selectedTypes.value = selectedTypes.value.filter((activeType) => activeType !== subType.value);
         });
     }
 
@@ -69,7 +69,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function getFormData() {
         return {
-            types: activeTypes.value,
+            types: selectedTypes.value,
         };
     }
 
@@ -77,12 +77,12 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      * clear the current types
      */
     function clear() {
-        activeTypes.value = [];
+        selectedTypes.value = [];
     }
 
     return {
         allTypes,
-        activeTypes,
+        selectedTypes,
         isExpanded,
         addType,
         removeType,

@@ -43,30 +43,30 @@ const subTypeHeight = window.Vue.computed(() => {
  * And to also add the parent type when all the sub types are selected
  */
 window.Vue.watch(
-    () => filterTypesStore.activeTypes,
-    (newActiveTypes, oldActiveTypes) => {
+    () => filterTypesStore.selectedTypes,
+    (newSelectedTypes, oldSelectedTypes) => {
         if (!props.type.subTypes) {
             return;
         }
         // if the parent type has just been added, add all the sub types
-        if (newActiveTypes.includes(props.type.value) && !oldActiveTypes.includes(props.type.value)) {
+        if (newSelectedTypes.includes(props.type.value) && !oldSelectedTypes.includes(props.type.value)) {
             filterTypesStore.addSubTypes(props.type);
             return;
         }
         // if the parent type has just been removed, remove all the sub types
-        if (!newActiveTypes.includes(props.type.value) && oldActiveTypes.includes(props.type.value)) {
+        if (!newSelectedTypes.includes(props.type.value) && oldSelectedTypes.includes(props.type.value)) {
             filterTypesStore.removeSubTypes(props.type);
             return;
         }
         // if all of the sub types are selected, select the parent type
-        if (props.type.subTypes.every((subType) => newActiveTypes.includes(subType.value))) {
+        if (props.type.subTypes.every((subType) => newSelectedTypes.includes(subType.value))) {
             filterTypesStore.addType(props.type);
             return;
         }
         // if the parent is selected, and none of the sub types are selected, deselect the parent
         if (
-            newActiveTypes.includes(props.type.value) &&
-            props.type.subTypes.every((subType) => !newActiveTypes.includes(subType.value))
+            newSelectedTypes.includes(props.type.value) &&
+            props.type.subTypes.every((subType) => !newSelectedTypes.includes(subType.value))
         ) {
             filterTypesStore.removeType(props.type);
         }
@@ -83,7 +83,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
         return false;
     }
     // return the sub types that are selected
-    const activeSubTypes = filterTypesStore.activeTypes.filter((activeType) => {
+    const activeSubTypes = filterTypesStore.selectedTypes.filter((activeType) => {
         return props.type.subTypes?.some((subType) => activeType === subType.value);
     });
     // if some but not all sub types are selected, return true
@@ -97,7 +97,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
             <div class="l-flex__item--1">
                 <input
                     :id="props.type.value"
-                    v-model="filterTypesStore.activeTypes"
+                    v-model="filterTypesStore.selectedTypes"
                     type="checkbox"
                     :value="props.type.value"
                     :class="{ indeterminate: isSomeSubTypesSelected }"
@@ -122,7 +122,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
                     <div class="l-flex-row l-flex--align-center f-min-btn-height f-no-margins">
                         <input
                             :id="subType.value"
-                            v-model="filterTypesStore.activeTypes"
+                            v-model="filterTypesStore.selectedTypes"
                             type="checkbox"
                             :value="subType.value"
                         />
