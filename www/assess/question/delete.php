@@ -18,7 +18,10 @@ $assessmentId = null;
 if (is_numeric($this->arg[0])) {
     //Is the quiz still there?
     try {
-        $quiz = QuizMapper::getInstance()->findById($this->arg[0]);
+        $sectionHandler = new Assess_Section();
+        $section = $sectionHandler->getByID($this->arg[0]);
+
+        $quiz = QuizMapper::getInstance()->findById($section['assess_id']);
         $assessmentId = $quiz->getAssessmentModel()->getId();
     } catch (\Exception $e) {
         $this->pageNotFound();
