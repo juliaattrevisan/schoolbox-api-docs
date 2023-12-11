@@ -10,8 +10,8 @@ const searchStore = useSearchStore();
 /**
  * Try to search again
  */
-async function onTryAgainSelected() {
-    await searchStore.search();
+function onTryAgainSelected() {
+    void searchStore.search(true);
 }
 </script>
 

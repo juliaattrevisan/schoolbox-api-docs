@@ -59,11 +59,11 @@ function onClearAllSelected() {
 /**
  * apply the selected filters with the current search query
  */
-async function onSearch() {
-    if (searchStore.isSearching) {
+function onSearch() {
+    if (!searchStore.canSearch) {
         return;
     }
-    await searchStore.search(true);
+    void searchStore.search(true);
 }
 
 /**
