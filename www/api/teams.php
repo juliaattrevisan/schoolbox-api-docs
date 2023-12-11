@@ -31,11 +31,12 @@ $url = $_GET['meetingUrl'] ?? '';
  * if Microsoft Teams died, or if they moved their meeting urls off the microsoft domain
  * entirely - both scenarios indicate bigger problems than error styling in this modal?
  */
+$urlOutput = htmlspecialchars($url, ENT_QUOTES);
 if ((new ValidTeamsMeetingUrl())->isSatisifiedBy($url)) {
-    echo "<div id='meetingUrl' style='display:none'>{$url}</div>";
+    echo "<div id='meetingUrl' style='display:none'>{$urlOutput}</div>";
 } else {
     echo "
-        <p>The meeting url <strong>{$url}</strong> is not in the expected Microsoft Teams Meeting format.</p>
+        <p>The meeting url is not in the expected Microsoft Teams Meeting format.</p>
         <p>Please contact your system administrator.</p>
     ";
 }
