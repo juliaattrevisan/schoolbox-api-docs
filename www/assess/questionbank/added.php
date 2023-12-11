@@ -2,30 +2,11 @@
 
 /* There's no real allegory to our legacy Question Bank - in learnosity era,
  * every item is in the itembank already. The only place you access that is
- * via learnosity quiz content authoring.
+ * via learnosity quiz content authoring, but we don't really have the args
+ * to find a particular assessment to which a person might be redirected.
  */
 
-/* Redirection to the new learning/quiz/{id}/content page */
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-
-$assessmentId = null;
-
-/** @var SitePage $this */
-if (is_numeric($this->arg[0])) {
-    //Is the quiz still there?
-    try {
-        $quiz = QuizMapper::getInstance()->findById($this->arg[0]);
-        $assessmentId = $quiz->getAssessmentModel()->getId();
-    } catch (\Exception $e) {
-        $this->pageNotFound();
-    }
-}
-if ($assessmentId > 0) {
-    $this::localRedir('/learning/quiz/' . $assessmentId . '/content', null, 301);
-} else {
-    $this->pageNotFound();
-}
-
+$this->pageNotFound();
 //$this->setAjax();
 //$this->setFile(TEMPLATE_content, 'assess/questionbank/added.html');
 //

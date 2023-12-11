@@ -14,7 +14,7 @@ $assessmentId = null;
 if (is_numeric($this->arg[0])) {
     //Is the quiz still there?
     try {
-        $quiz = QuizMapper::getInstance()->findById($this->arg[0]);
+        $quiz = QuizMapper::getInstance()->findById($this->arg[1]);
         $assessmentId = $quiz->getAssessmentModel()->getId();
     } catch (\Exception $e) {
         $this->pageNotFound();
@@ -25,7 +25,7 @@ if ($assessmentId > 0) {
 } else {
     $this->pageNotFound();
 }
-//
+
 //use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 //use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 //use Schoolbox\Breadcrumbs;
