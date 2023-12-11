@@ -70,6 +70,14 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     }
 
     /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether there's been a change in the date range
+     */
+    const canSearch = window.Vue.computed(() => {
+        return activeStartDate.value !== startDate.value || activeEndDate.value !== endDate.value;
+    });
+
+    /**
      * clear the date filter
      */
     function clear() {
@@ -88,6 +96,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         isActive,
         getFormData,
         setActive,
+        canSearch,
         clear,
     };
 });

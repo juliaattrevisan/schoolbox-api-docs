@@ -53,10 +53,10 @@ export const useSearchStore = defineStore("spSearch", () => {
 
     /**
      * Whether a search can be performed, can be if there's a change of query or filters
-     * @returns {boolean} - whether the search can be performed
+     * @returns {boolean} - whether a new search can be performed
      */
     const canSearch = window.Vue.computed(() => {
-        return useQueryStore().activeQuery !== useQueryStore().query;
+        return useQueryStore().canSearch && useFiltersStore().canSearch;
     });
 
     /**
@@ -69,7 +69,6 @@ export const useSearchStore = defineStore("spSearch", () => {
         useStore().setQueryParams(simulateRedirect);
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
-
         await execute();
         try {
             useResultsStore().setFirstResults(data.value as Results);

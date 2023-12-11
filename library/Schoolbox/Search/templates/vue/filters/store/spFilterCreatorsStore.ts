@@ -43,6 +43,14 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     }
 
     /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether the current ids match
+     */
+    const canSearch = window.Vue.computed(() => {
+        return activeCreator.value[0].id !== creator.value[0].id;
+    });
+
+    /**
      * clear the creator filter
      */
     function clear() {
@@ -55,6 +63,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
         isActive,
         getFormData,
         setActive,
+        canSearch,
         clear,
     };
 });

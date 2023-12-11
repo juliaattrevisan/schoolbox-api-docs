@@ -38,6 +38,14 @@ export const useQueryStore = defineStore("spQuery", () => {
     }
 
     /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether there's been a change in the date range
+     */
+    const canSearch = window.Vue.computed(() => {
+        return activeQuery.value !== query.value;
+    });
+
+    /**
      * clear the current search
      */
     function clear() {
@@ -50,6 +58,7 @@ export const useQueryStore = defineStore("spQuery", () => {
         activeQuery,
         queryWordList,
         setActive,
+        canSearch,
         clear,
     };
 });

@@ -42,6 +42,16 @@ export const useFiltersStore = defineStore("spFilters", () => {
     }
 
     /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether there's been a change in the date range
+     */
+    const canSearch = window.Vue.computed(() => {
+        return (
+            useFilterDateRangeStore().canSearch || useFilterCreatorsStore().canSearch || useFilterTypesStore().canSearch
+        );
+    });
+
+    /**
      * clear all filters
      */
     function clear() {
@@ -54,6 +64,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
         isActive,
         getFormData,
         setActive,
+        canSearch,
         clear,
     };
 });

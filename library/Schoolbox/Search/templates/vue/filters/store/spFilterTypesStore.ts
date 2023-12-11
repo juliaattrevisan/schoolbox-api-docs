@@ -83,6 +83,14 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     }
 
     /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether the two arrays are different
+     */
+    const canSearch = window.Vue.computed(() => {
+        return selectedTypes.value.join("") !== activeTypes.value.join("");
+    });
+
+    /**
      * clear the current types
      */
     function clear() {
@@ -102,6 +110,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
         isActive,
         getFormData,
         setActive,
+        canSearch,
         clear,
     };
 });
