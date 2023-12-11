@@ -8,6 +8,7 @@ import { defineStore } from "pinia";
 import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorsStore } from "./spFilterCreatorsStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export const useFiltersStore = defineStore("spFilters", () => {
     /**
@@ -20,7 +21,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
 
     /**
      * Get the filter data
-     * @returns {FilterData} - the filter data
+     * @returns {FiltersFormData} - the filter data
      */
     function getFormData() {
         const filterData = {

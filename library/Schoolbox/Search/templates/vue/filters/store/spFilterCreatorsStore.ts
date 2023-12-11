@@ -5,6 +5,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export type Creator = {
     id: number;
@@ -23,7 +24,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
 
     /**
      * Get the creator filter data
-     * @returns {object} - the creator filter data
+     * @returns {FiltersFormData["creator"]} - the creator filter data
      */
     function getFormData() {
         // only add creator filter if it is set

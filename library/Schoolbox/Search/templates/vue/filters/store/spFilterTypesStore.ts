@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export type FilterType = {
     title: string;
@@ -66,7 +67,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
 
     /**
      * Get the types filter data
-     * @returns {string} - the filter types
+     * @returns {FiltersFormData["types"]} - the filter types
      */
     function getFormData() {
         return {

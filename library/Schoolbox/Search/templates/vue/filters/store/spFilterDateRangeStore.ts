@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export type FilterDateRange = {
     startDate: string;
@@ -44,7 +45,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
 
     /**
      * Get the date range filter data
-     * @returns {object} - the date range filter data
+     * @returns {FiltersFormData["date"]} - the date range filter data
      */
     function getFormData() {
         // Only add from and to if they are set.
