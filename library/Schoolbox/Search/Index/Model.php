@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Index;
 
 use Alaress_Date_Format;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
 
 /**
@@ -56,20 +57,24 @@ class Model
     private ?int $folderId;
 
     /**
-     * The searchable full-text index for this search index.
+     * The searchable full-text indices for this search index.
      *
      * In practice: this will be long-form content such as a description or
      * article text.
+     *
+     * @var GenericCollection<Fulltext\Model>
      */
-    private string $fulltextIndex;
+    private GenericCollection $fulltextIndices;
 
     /**
-     * The searchable short index for this search index.
+     * The searchable short indices for this search index.
      *
      * In practice: this will be short-form content such as a person's name or
      * title.
+     *
+     * @var GenericCollection<Text\Model>
      */
-    private string $textIndex;
+    private GenericCollection $textIndices;
 
     /**
      * @return string
@@ -180,38 +185,38 @@ class Model
     }
 
     /**
-     * @return string
+     * @return GenericCollection<Fulltext\Model>
      */
-    public function getFulltextIndex(): string
+    public function getFulltextIndices(): GenericCollection
     {
-        return $this->fulltextIndex;
+        return $this->fulltextIndices;
     }
 
     /**
-     * @param string $fulltextIndex
+     * @param GenericCollection<Fulltext\Model> $fulltextIndices
      * @return $this
      */
-    public function setFulltextIndex(string $fulltextIndex): self
+    public function setFulltextIndices(GenericCollection $fulltextIndices): self
     {
-        $this->fulltextIndex = $fulltextIndex;
+        $this->fulltextIndices = $fulltextIndices;
         return $this;
     }
 
     /**
-     * @return string
+     * @return GenericCollection<Text\Model>
      */
-    public function getTextIndex(): string
+    public function getTextIndices(): GenericCollection
     {
-        return $this->textIndex;
+        return $this->textIndices;
     }
 
     /**
-     * @param string $textIndex
+     * @param GenericCollection<Text\Model> $textIndices
      * @return $this
      */
-    public function setTextIndex(string $textIndex): self
+    public function setTextIndices(GenericCollection $textIndices): self
     {
-        $this->textIndex = $textIndex;
+        $this->textIndices = $textIndices;
         return $this;
     }
 }

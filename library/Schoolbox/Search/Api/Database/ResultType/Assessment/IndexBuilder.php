@@ -94,8 +94,8 @@ class IndexBuilder extends BaseBuilder
                 ->setRelevance((float)$row['relevance'])
                 ->setCreatedBy($row['created_by'])
                 ->setFolderId($row['folder_id'])
-                ->setFulltextIndex(strip_tags($row['fulltext_index']))
-                ->setTextIndex($row['text_index']);
+                ->setFulltextIndices(strip_tags($row['fulltext_index']))
+                ->setTextIndices($row['text_index']);
         }
     }
 
