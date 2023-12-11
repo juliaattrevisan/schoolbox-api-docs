@@ -6,6 +6,7 @@
  *
  * The feature was removed in Learnosity v23.1
  */
+
 $this->pageNotFound();
 
 ///**
