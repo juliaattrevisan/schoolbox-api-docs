@@ -63,6 +63,13 @@ class Scanner
             $filelocation
         ), $output, $resultCode);
 
+        // From clamdscan's man page:
+        // RETURN CODES
+        // 0 : No virus found.
+        // 1 : Virus(es) found.
+        // 2 : An error occurred.
+        // (127 is the standard response code for when a command is not found)
+
         // Virus scanner not available, just continue without it
         if (127 === $resultCode) {
             return;
