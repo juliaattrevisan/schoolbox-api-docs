@@ -61,7 +61,6 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
 
     return {
         creator,
-        activeCreator,
         isActive,
         getFormData,
         setActive,
