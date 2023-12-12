@@ -121,7 +121,7 @@ class TextQueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
-        return 'si.folder_id';
+        return 'sifo.folder_id';
     }
 
     /**
