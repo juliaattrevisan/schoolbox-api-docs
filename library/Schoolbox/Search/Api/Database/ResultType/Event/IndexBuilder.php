@@ -56,12 +56,10 @@ class IndexBuilder extends BaseBuilder
                     (new GenericCollection(Index\Fulltext\Model::class))
                         ->add(
                             (new Index\Fulltext\Model())
-                                ->setIdentifier($identifier)
                                 ->setFulltextIndex(strip_tags($row['fulltext_index1']))
                         )
                         ->add(
                             (new Index\Fulltext\Model())
-                                ->setIdentifier($identifier)
                                 ->setFulltextIndex(strip_tags($row['fulltext_index2']))
                         )
                 )
@@ -69,7 +67,6 @@ class IndexBuilder extends BaseBuilder
                     (new GenericCollection(Index\Text\Model::class))
                         ->add(
                             (new Index\Text\Model())
-                                ->setIdentifier($identifier)
                                 ->setTextIndex($row['title'])
                         )
                 );
