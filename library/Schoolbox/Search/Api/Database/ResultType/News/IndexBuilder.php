@@ -36,7 +36,7 @@ class IndexBuilder extends BaseBuilder
             FROM comms_news_article n
             WHERE n.deleted_at IS NULL
             AND n.accepted_at IS NOT NULL
-            AND n.publish_at < :date
+            AND n.publish_at >= :date
             AND n.rejected_at IS NULL
         ");
         $params = [
