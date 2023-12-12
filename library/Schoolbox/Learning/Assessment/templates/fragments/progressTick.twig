@@ -30,7 +30,7 @@
 {% set participant = assessment.participantIfExtant(student) %}
 {% set isOpenForStudent = postRoute and (student.id == USER.id) and assessment.isOpen(USER) %}
 {# Tasks only #}
-{% if postRoute is not null %}
+{% if postRoute is not null and postRoute != '' %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"
@@ -49,7 +49,7 @@
                data-progress-tick-status="teacherAssessed"></a>
         {% endif %}
     </form>
-{% elseif assessment is not task %}
+{% else %}
 
     {# Other assessment types get non-POST behaviour
      # Excluded people and non-participants probably shouldn't even get a link to anything?
