@@ -50,38 +50,18 @@
         {% endif %}
     </form>
 {% else %}
-
-    {# Other assessment types get non-POST behaviour
-     # Excluded people and non-participants probably shouldn't even get a link to anything?
-     # They aren't supposed to do anything with this assessment anyway
-     #}
+    {# Other assessment types just get an icon that does nothing when clicked. #}
     {% if not participant or participant.isExcluded %}
         <!-- deliberately empty  -->
     {% else %}
-
-        {# Otherwise, everyone else is a participant in one way or another
-         # For non-tasks, they get a linked jewellery to the detail screen
-         #}
-        {% set detailRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-            assessment:   assessment,
-            assessmentId: assessment.id,
-            student:      student,
-            studentId:    student.id
-        }) %}
-
-        {# Only provide link if you're allowed to see it
-         # If you can't see this destination, you don't get a link to anything
-         #}
-        {% if detailRoute %}
-            {% if participant.isResponseRequired and isOpenForStudent %}
-                <a href="{{ detailRoute }}" class="no-text progress-tick" title="Incomplete"></a>
-            {% elseif participant.isFeedbackRequired %}
-                <a href="{{ detailRoute }}" class="no-text progress-tick pending" title="Awaiting Feedback"></a>
-            {% elseif participant.isResubmissionRequired %}
-                <a href="{{ detailRoute }}" class="no-text progress-tick failed" title="Resubmission Required"></a>
-            {% elseif participant.isReviewComplete %}
-                <a href="{{ detailRoute }}" class="no-text progress-tick reviewed" title="Completed"></a>
-            {% endif %}
+        {% if participant.isResponseRequired and isOpenForStudent %}
+            <span class="no-text progress-tick" title="Incomplete"></span>
+        {% elseif participant.isFeedbackRequired %}
+            <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
+        {% elseif participant.isResubmissionRequired %}
+            <span class="no-text progress-tick failed" title="Resubmission Required"></span>
+        {% elseif participant.isReviewComplete %}
+            <span class="no-text progress-tick reviewed" title="Completed"></span>
         {% endif %}
     {% endif %}
 {% endif %}
