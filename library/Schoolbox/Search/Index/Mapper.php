@@ -25,6 +25,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('type', self::TYPE_STRING);
         $this->uses('date', self::TYPE_DATETIME);
+        $this->uses('is_relevance_date_affected', self::TYPE_BOOLEAN);
         $this->uses('created_by', self::TYPE_INTEGER);
         $this->uses('folder_id', self::TYPE_INTEGER);
         $this->joinsReverseMulti('identifier', Text\Mapper::class, 'textIndices');

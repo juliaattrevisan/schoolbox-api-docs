@@ -44,6 +44,15 @@ class Model
     private ?Alaress_Date_Format $date;
 
     /**
+     * Is this search index's relevance affected by its date?
+     *
+     * Some types of index (users and folders) are unaffected, and maintain a
+     * constant relevance independent of their date: other types' relevance will
+     * decay the further away their date is from the current date.
+     */
+    private bool $isRelevanceDateAffected;
+
+    /**
      * Which folder (if any) does this search index belong within?
      *
      * (Unmapped: the folder's specifics don't matter, just its existence.)
@@ -139,6 +148,24 @@ class Model
     public function setDate(?Alaress_Date_Format $date): self
     {
         $this->date = $date;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsRelevanceDateAffected(): bool
+    {
+        return $this->isRelevanceDateAffected;
+    }
+
+    /**
+     * @param bool $isRelevanceDateAffected
+     * @return $this
+     */
+    public function setIsRelevanceDateAffected(bool $isRelevanceDateAffected): self
+    {
+        $this->isRelevanceDateAffected = $isRelevanceDateAffected;
         return $this;
     }
 

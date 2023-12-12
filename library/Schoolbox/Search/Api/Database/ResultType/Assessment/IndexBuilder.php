@@ -92,6 +92,7 @@ class IndexBuilder extends BaseBuilder
                 ->setTitle($row['title'])
                 ->setType($row['type'])
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
+                ->setIsRelevanceDateAffected(true)
                 ->setCreatedBy($row['created_by'])
                 ->setFolderId($row['folder_id'])
                 ->setFulltextIndices(
