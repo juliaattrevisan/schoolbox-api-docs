@@ -113,7 +113,7 @@ class Jitter implements IJitter
                 throw $e;
             }
             if ($jitter > 0) {
-                usleep($jitter * 1000);
+                usleep((int)($jitter * 1000));
             }
             try {
                 return $callable();
