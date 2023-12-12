@@ -21,7 +21,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('search_index_text');
         $this->hasModel(Model::class);
-        $this->uses('identifier', self::TYPE_STRING);
+        $this->joins('search_index_id', \Schoolbox\Search\Index\Mapper::class);
         $this->uses('text_index', self::TYPE_STRING);
     }
 }

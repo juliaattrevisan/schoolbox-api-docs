@@ -15,9 +15,9 @@ namespace Schoolbox\Search\Index\Fulltext;
 class Model
 {
     /**
-     * Identifier for this search index.
+     * The index this component belongs to.
      */
-    private string $identifier;
+    private \Schoolbox\Search\Index\Model $searchIndex;
 
     /**
      * Full-text component for this search index.
@@ -25,20 +25,20 @@ class Model
     private string $fulltextIndex;
 
     /**
-     * @return string
+     * @return \Schoolbox\Search\Index\Model
      */
-    public function getIdentifier(): string
+    public function getSearchIndex(): \Schoolbox\Search\Index\Model
     {
-        return $this->identifier;
+        return $this->searchIndex;
     }
 
     /**
-     * @param string $identifier
+     * @param \Schoolbox\Search\Index\Model $searchIndex
      * @return $this
      */
-    public function setIdentifier(string $identifier): self
+    public function setSearchIndex(\Schoolbox\Search\Index\Model $searchIndex): self
     {
-        $this->identifier = $identifier;
+        $this->searchIndex = $searchIndex;
         return $this;
     }
 
