@@ -9,7 +9,6 @@
 use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
@@ -115,11 +114,8 @@ class Bulk_Folder
      *
      * @param bool $perform
      * @return array
-     * @throws DefinitionException
      * @throws InvalidArgumentException
-     * @throws InvalidColumnException
      * @throws MapperException
-     * @throws PDOException
      * @throws UnexpectedValueException
      */
     public function addFolders(bool $perform): array
@@ -150,7 +146,7 @@ class Bulk_Folder
 
         /* Temporarily remove the post-save method for notifications cache refresh
          */
-        $this->folderMapper->unregisterCallback(\Schoolbox\Resource\Folder\Mapper::CALLBACK_POSTSAVE, 'refreshNotificationRedirects');
+        $this->folderMapper->unregisterCallback(\Schoolbox\Mapper::CALLBACK_POSTSAVE, 'refreshNotificationRedirects');
 
         $rowIdx = 2; // We have already processed the header in row 1
         while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
@@ -172,7 +168,7 @@ class Bulk_Folder
 
         /* Restore the post-save method
          */
-        $this->folderMapper->registerCallback(\Schoolbox\Resource\Folder\Mapper::CALLBACK_POSTSAVE, [$this->folderMapper, 'refreshNotificationRedirects']);
+        $this->folderMapper->registerCallback(\Schoolbox\Mapper::CALLBACK_POSTSAVE, [$this->folderMapper, 'refreshNotificationRedirects']);
 
         /* Initiate cache refresh manually; despite taking a folder as a param, it
          * doesn't do anything with this folder specifically - just uses something
