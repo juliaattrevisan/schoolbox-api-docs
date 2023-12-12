@@ -83,6 +83,8 @@ class IndexBuilder extends BaseBuilder
                 lesson_plan.assessment_id = assessment.id
             )
             WHERE COALESCE(assessment.due_date, assessment.updated_at) >= :date
+            AND assessment.deleted_at IS NULL
+            AND type IS NOT NULL
         ");
         $params = [
             'date' => $date->getDatabaseDate(),
@@ -91,6 +93,7 @@ class IndexBuilder extends BaseBuilder
         $this->logger->info(sprintf('Building search indices for %d assessments', $query->rowCount()));
         foreach ($query as $row) {
             $identifier = (string)$row['id'];
+            // Somehow type may not exist?
             yield (new Index\Model())
                 ->setIdentifier($identifier)
                 ->setTitle($row['title'])

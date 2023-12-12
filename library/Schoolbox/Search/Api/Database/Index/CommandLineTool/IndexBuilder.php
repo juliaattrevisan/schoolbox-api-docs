@@ -46,6 +46,9 @@ class IndexBuilder extends App
         $indexTextMapper     = Index\Text\Mapper::getInstance();
         $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
 
+        // Run for as long as you need to?
+        $this->getDatabaseInternal()->execute('SET MAX_STATEMENT_TIME=0');
+
         // Actually create data
         // TODO the final version won't truncate: instead, it'll override?
         $indexMapper->truncate();
