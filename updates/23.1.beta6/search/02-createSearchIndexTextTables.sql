@@ -3,10 +3,10 @@
 # the base index itself.
 create table search_index_text
 (
-    identifier varchar(64)  not null,
+    id         int          not null,
     text_index varchar(250) not null,
-    constraint search_index_text_search_index_identifier_fk
-        foreign key (identifier) references search_index (identifier)
+    constraint search_index_text_search_index_id_fk
+        foreign key (id) references search_index (id)
             on delete cascade on update cascade
 );
 create index search_index_text_text_index_index
@@ -14,10 +14,10 @@ create index search_index_text_text_index_index
 
 create table search_index_fulltext
 (
-    identifier     varchar(64) not null,
+    id             int         not null,
     fulltext_index mediumtext  not null,
-    constraint search_index_fulltext_search_index_identifier_fk
-        foreign key (identifier) references search_index (identifier)
+    constraint search_index_fulltext_search_index_id_fk
+        foreign key (id) references search_index (id)
             on delete cascade on update cascade
 );
 create fulltext index search_index_fulltext_fulltext_index_index
