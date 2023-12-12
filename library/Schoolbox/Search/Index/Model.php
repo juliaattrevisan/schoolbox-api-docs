@@ -44,12 +44,6 @@ class Model
     private ?Alaress_Date_Format $date;
 
     /**
-     * The current relevance of this search index: usually based on date, but
-     * might be able to be cached.
-     */
-    private float $relevance;
-
-    /**
      * Which folder (if any) does this search index belong within?
      *
      * (Unmapped: the folder's specifics don't matter, just its existence.)
@@ -145,24 +139,6 @@ class Model
     public function setDate(?Alaress_Date_Format $date): self
     {
         $this->date = $date;
-        return $this;
-    }
-
-    /**
-     * @return float
-     */
-    public function getRelevance(): float
-    {
-        return $this->relevance;
-    }
-
-    /**
-     * @param float $relevance
-     * @return $this
-     */
-    public function setRelevance(float $relevance): self
-    {
-        $this->relevance = $relevance;
         return $this;
     }
 

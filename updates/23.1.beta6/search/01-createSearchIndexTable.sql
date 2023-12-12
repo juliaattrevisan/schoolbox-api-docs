@@ -4,7 +4,6 @@ create table search_index
     title          varchar(1000) not null,
     type           varchar(32)   not null,
     date           datetime      null,
-    relevance      float         not null,
     created_by     int unsigned  null,
     folder_id      int unsigned  null,
     constraint search_index_pk

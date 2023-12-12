@@ -20,11 +20,11 @@ use Schoolbox\Search\Index;
  */
 class IndexBuilder extends BaseBuilder
 {
+    /**
+     * @inheritdoc
+     */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
-        // Can use query param builder to build the parts?
-        // Would need to add buildFulltextIndexExpression and
-        // buildTextIndexExpression methods to that interface, though
         $query = "SELECT
             assessment.id,
             assessment.title,
@@ -40,7 +40,6 @@ class IndexBuilder extends BaseBuilder
                 )
             ) AS type,
             COALESCE(assessment.due_date, assessment.updated_at) AS date,
-            LEAST(1, GREATEST(-(1 / (56 - 7)) * (ABS(DATEDIFF(COALESCE(assessment.due_date, assessment.updated_at), :now)) - 7) + 1, 0)) AS relevance,
             NULL AS created_by,
             folder.id AS folder_id,
             assessment.description AS fulltext_index,
@@ -93,7 +92,6 @@ class IndexBuilder extends BaseBuilder
                 ->setTitle($row['title'])
                 ->setType($row['type'])
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
-                ->setRelevance((float)$row['relevance'])
                 ->setCreatedBy($row['created_by'])
                 ->setFolderId($row['folder_id'])
                 ->setFulltextIndices(
@@ -115,6 +113,9 @@ class IndexBuilder extends BaseBuilder
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function buildDeletes(Alaress_Date_Format $date): iterable
     {
         // Can use query param builder to build the parts?
