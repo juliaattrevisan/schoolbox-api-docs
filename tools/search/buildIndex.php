@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Search\Api\Database\ResultType\Assessment\IndexBuilder;
+use Schoolbox\Search\Api\Database\ResultType;
 use Schoolbox\Search\Index;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -22,17 +22,22 @@ $app = new class extends CliTool\App {
     {
         // Build mappers and search classes
         $indexMapper         = Index\Mapper::getInstance();
-        $indexBuilder        = new IndexBuilder($this->getDatabaseInternal());
+        $indexBuilders       = [
+            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
+        ];
         $indexTextMapper     = Index\Text\Mapper::getInstance();
         $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
 
         // Actually create data
         // TODO the final version won't truncate: instead, it'll override?
         $indexMapper->truncate();
-        foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-5)) as $item) {
-            $indexMapper->save($item);
-            $indexTextMapper->save($item->getTextIndices());
-            $indexFulltextMapper->save($item->getFulltextIndices());
+        foreach ($indexBuilders as $indexBuilder) {
+            foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-5)) as $item) {
+                $indexMapper->save($item);
+                $indexTextMapper->save($item->getTextIndices());
+                $indexFulltextMapper->save($item->getFulltextIndices());
+            }
         }
     }
 };
