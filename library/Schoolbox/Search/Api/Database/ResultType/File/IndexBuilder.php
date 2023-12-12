@@ -88,10 +88,7 @@ class IndexBuilder extends BaseBuilder
         $query  = "SELECT
             f.id
             FROM file f
-            INNER JOIN folder               fo  ON f.category = fo.id
-            INNER JOIN storage              s   ON f.hash = s.hash
-            INNER JOIN allowedFileExtension afe ON s.ext = afe.extension
-            INNER JOIN allowedFileTypes     aft ON afe.fileTypeID = aft.fileTypeID
+            INNER JOIN folder fo ON f.category = fo.id
             WHERE COALESCE(f.deleted_at, fo.deleted_at) >= :date
         ";
         $params = [
