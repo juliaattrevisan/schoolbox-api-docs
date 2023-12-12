@@ -25,6 +25,7 @@ $app = new class extends CliTool\App {
         $indexBuilders       = [
             new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
             new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal()),
         ];
         $indexTextMapper     = Index\Text\Mapper::getInstance();
         $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
