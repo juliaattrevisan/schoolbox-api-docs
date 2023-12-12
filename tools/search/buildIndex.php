@@ -31,15 +31,15 @@ $app = new class extends CliTool\App {
         // * Tiles
         // * Users
         $indexBuilders       = [
-            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Event\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\File\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Link\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\News\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\Event\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\File\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\Link\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
         $indexTextMapper     = Index\Text\Mapper::getInstance();
         $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
