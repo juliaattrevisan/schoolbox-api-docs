@@ -15,6 +15,49 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 /**
+ * Using the result type, return the type title
+ * @returns {string} the type title
+ */
+const typeTitle = window.Vue.computed(() => {
+    const typeTitleOptions = {
+        assessment: "Assessment",
+        "assessment.dueWork": "Due work",
+        "assessment.lessonPlan": "Lesson plan",
+        "assessment.project": "Project",
+        "assessment.lti": "LTI",
+        "assessment.task": "Task",
+        "assessment.quiz": "Quiz",
+        badge: "Badge",
+        blog: "Blog",
+        event: "Event",
+        file: "File",
+        "file.audio": "Audio",
+        "file.document": "Document",
+        "file.image": "Image",
+        "file.video": "Video",
+        "file.other": "File",
+        forum: "Forum",
+        link: "Link",
+        news: "News",
+        page: "Page",
+        "page.class": "Class",
+        "page.course": "Course",
+        "page.homepage": "Homepage",
+        "page.unit": "Unit",
+        "page.folder": "Folder",
+        "page.group": "Group",
+        textbox: "Textbox",
+        tile: "Tile",
+        user: "User",
+        "user.guest": "Guest",
+        "user.parent": "Parent",
+        "user.staff": "Staff",
+        "user.student": "Student",
+    };
+    return typeTitleOptions[props.result.type] || props.result.type;
+});
+
+/**
  * To display the date in format
  * @returns {string} the formatted date
  */
@@ -33,21 +76,26 @@ function getDateLong() {
 
 <template>
     <span v-if="props.result.type === ResultTypes.NEWS" class="meta"
-        >Posted by <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
+        >{{ typeTitle }} | Posted by
+        <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
         {{ getDateShort() }}</span
     >
     <span v-else-if="props.result.type.includes(ResultTypes.FILE)" class="meta"
-        >Created by <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
+        >{{ typeTitle }} | Created by
+        <a :href="props.result.creator?._links?.profile">{{ props.result.creator?.fullName }}</a> on
         {{ getDateShort() }}</span
     >
-    <span v-else-if="props.result.type === ResultTypes.EVENT" class="meta"> {{ getDateLong() }}</span>
-    <span v-else-if="props.result.context?.length !== 0 && !props.isSubResult" class="meta"
-        ><template v-for="(context, index) in props.result.context" :key="context.id"
+    <span v-else-if="props.result.type === ResultTypes.EVENT" class="meta">{{ typeTitle }} | {{ getDateLong() }}</span>
+    <span v-else-if="props.result.context.length !== 0 && !props.isSubResult" class="meta"
+        >{{ typeTitle }} |
+        <template v-for="(context, index) in props.result.context" :key="context.id"
             ><a :href="context._links.view">{{ context.title }}</a
             ><template v-if="index < props.result.context.length - 1"> > </template>
         </template></span
     >
-    <span v-else class="meta">{{ props.result.meta }}</span>
+    <span v-else class="meta"
+        >{{ typeTitle }}<template v-if="props.result.meta"> | {{ props.result.meta }}</template></span
+    >
 </template>
 
 <style scoped></style>
