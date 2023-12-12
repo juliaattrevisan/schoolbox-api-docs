@@ -148,6 +148,10 @@ class Bulk_Folder
 
         $yearLevels = $this->getAllYearLevels();
 
+        /* Temporarily remove the post-save method for notifications cache refresh
+         */
+        $this->folderMapper->unregisterCallback(\Schoolbox\Resource\Folder\Mapper::CALLBACK_POSTSAVE, 'refreshNotificationRedirects');
+
         $rowIdx = 2; // We have already processed the header in row 1
         while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
             $results[] = $this->processCsvRow(
@@ -165,6 +169,19 @@ class Bulk_Folder
                 $sequenceColumn
             );
         }
+
+        /* Restore the post-save method
+         */
+        $this->folderMapper->registerCallback(\Schoolbox\Resource\Folder\Mapper::CALLBACK_POSTSAVE, [$this->folderMapper, 'refreshNotificationRedirects']);
+
+        /* Initiate cache refresh manually; despite taking a folder as a param, it
+         * doesn't do anything with this folder specifically - just uses something
+         * about it to decide if the notifications cache should refresh or not.
+         */
+        $stub = $this->folderMapper->createModel()
+            ->setInherit(true);
+
+        $this->folderMapper->refreshNotificationRedirects($stub);
 
         return $results;
     }
