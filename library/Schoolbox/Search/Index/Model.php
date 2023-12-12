@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Resource\Folder;
 
 /**
  * Model for a search index.
@@ -59,11 +60,11 @@ class Model
     private bool $isRelevanceDateAffected;
 
     /**
-     * Which folder (if any) does this search index belong within?
+     * Which folders (if any) does this search index belong within?
      *
-     * (Unmapped: the folder's specifics don't matter, just its existence.)
+     * @var GenericCollection<Folder\Model>
      */
-    private ?int $folderId;
+    private GenericCollection $folders;
 
     /**
      * The searchable full-text indices for this search index.
@@ -176,20 +177,20 @@ class Model
     }
 
     /**
-     * @return int|null
+     * @return GenericCollection<Folder\Model>
      */
-    public function getFolderId(): ?int
+    public function getFolders(): GenericCollection
     {
-        return $this->folderId;
+        return $this->folders;
     }
 
     /**
-     * @param int|null $folderId
+     * @param GenericCollection<Folder\Model> $folders
      * @return $this
      */
-    public function setFolderId(?int $folderId): self
+    public function setFolders(GenericCollection $folders): self
     {
-        $this->folderId = $folderId;
+        $this->folders = $folders;
         return $this;
     }
 
