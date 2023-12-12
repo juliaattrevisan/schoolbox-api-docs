@@ -25,20 +25,23 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
-        $query = "SELECT
-            b.id,
-            b.name AS title,
-            b.updated_at AS date,
-            b.created_by,
-            b.body AS fulltext_index
+        $query = $this->connector->prepareQuery("
+            SELECT
+                b.id,
+                b.name AS title,
+                b.updated_at AS date,
+                b.created_by,
+                b.body AS fulltext_index
             FROM badge b
             WHERE b.updated_at >= :date
             AND b.deleted_at IS NULL
-        ";
+        ");
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d badges', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             yield (new Index\Model())
                 ->setIdentifier($identifier)

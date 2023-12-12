@@ -33,21 +33,24 @@ class IndexBuilder extends BaseBuilder
             AND evf.event_id = :eventId
         ");
 
-        $query = "SELECT
-            e.id,
-            e.title,
-            e.start_datetime AS date,
-            e.author_id AS created_by,
-            e.detail AS fulltext_index1,
-            e.location AS fulltext_index2
+        $query = $this->connector->prepareQuery("
+            SELECT
+                e.id,
+                e.title,
+                e.start_datetime AS date,
+                e.author_id AS created_by,
+                e.detail AS fulltext_index1,
+                e.location AS fulltext_index2
             FROM event e
             WHERE e.start_datetime >= :date
             AND e.deleted_at IS NULL
-        ";
+        ");
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d events', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             $folderQuery->execute(['eventId' => $row['id']]);
             $folders   = new GenericCollection(Folder\Model::class);

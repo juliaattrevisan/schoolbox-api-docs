@@ -25,23 +25,26 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
-        $query = "SELECT
-            l.id,
-            l.description AS title,
-            l.modified AS date,
-            l.owner AS created_by,
-            l.category AS folder_id,
-            l.comment AS fulltext_index
+        $query = $this->connector->prepareQuery("
+            SELECT
+                l.id,
+                l.description AS title,
+                l.modified AS date,
+                l.owner AS created_by,
+                l.category AS folder_id,
+                l.comment AS fulltext_index
             FROM link l
             INNER JOIN folder fo ON l.category = fo.id
             WHERE l.modified >= :date
             AND l.deleted_at IS NULL
             AND fo.deleted_at IS NULL
-        ";
+        ");
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d links', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             yield (new Index\Model())
                 ->setIdentifier($identifier)

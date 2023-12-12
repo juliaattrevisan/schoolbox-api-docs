@@ -25,14 +25,15 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
-        $query = "SELECT
-            f.id,
-            f.realname AS title,
-            f.modified AS date,
-            f.owner AS created_by,
-            f.category AS folder_id,
-            f.description AS fulltext_index1,
-            f.comment AS fulltext_index2
+        $query = $this->connector->prepareQuery("
+            SELECT
+                f.id,
+                f.realname AS title,
+                f.modified AS date,
+                f.owner AS created_by,
+                f.category AS folder_id,
+                f.description AS fulltext_index1,
+                f.comment AS fulltext_index2
             FROM file f
             INNER JOIN folder               fo  ON f.category = fo.id
             INNER JOIN storage              s   ON f.hash = s.hash
@@ -41,11 +42,13 @@ class IndexBuilder extends BaseBuilder
             WHERE f.modified >= :date
             AND f.deleted_at IS NULL
             AND fo.deleted_at IS NULL
-        ";
+        ");
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d files', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             yield (new Index\Model())
                 ->setIdentifier($identifier)

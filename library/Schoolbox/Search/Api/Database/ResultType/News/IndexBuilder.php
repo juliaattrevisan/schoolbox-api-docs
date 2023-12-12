@@ -25,23 +25,26 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
-        $query = "SELECT
-            n.id,
-            n.title,
-            n.publish_at AS date,
-            n.author_id AS created_by,
-            n.body AS fulltext_index1,
-            n.blurb AS fulltext_index2
+        $query = $this->connector->prepareQuery("
+            SELECT
+                n.id,
+                n.title,
+                n.publish_at AS date,
+                n.author_id AS created_by,
+                n.body AS fulltext_index1,
+                n.blurb AS fulltext_index2
             FROM comms_news_article n
             WHERE n.deleted_at IS NULL
             AND n.accepted_at IS NOT NULL
             AND n.publish_at < :date
             AND n.rejected_at IS NULL
-        ";
+        ");
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d news articles', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             yield (new Index\Model())
                 ->setIdentifier($identifier)

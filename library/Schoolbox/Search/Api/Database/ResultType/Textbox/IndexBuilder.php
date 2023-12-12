@@ -29,13 +29,14 @@ class IndexBuilder extends BaseBuilder
         // Pass 1: text boxes within a component
         // TODO does this unnecessarily exclude heading from index?
         //      may need to fetch that index separately
-        $query = "SELECT
-            CONCAT(tb.textBoxID, '-', cci.component_instance_id, '-', fo.id) AS id,
-            tb.heading AS title,
-            fo.id AS folder_id,
-            tb.updated_at AS date,
-            tb.created_by AS created_by,
-            tb.body AS fulltext_index
+        $query = $this->connector->prepareQuery("
+            SELECT
+                CONCAT(tb.textBoxID, '-', cci.component_instance_id, '-', fo.id) AS id,
+                tb.heading AS title,
+                fo.id AS folder_id,
+                tb.updated_at AS date,
+                tb.created_by AS created_by,
+                tb.body AS fulltext_index
             FROM component_instance ci
             JOIN component_config_instance cci ON cci.component_instance_id=ci.id
             JOIN component_config_definition ccd ON (
@@ -48,12 +49,14 @@ class IndexBuilder extends BaseBuilder
             AND tb.updated_at >= :date
             AND tb.deleted_at IS NULL
             AND fo.deleted_at IS NULL
-        ";
+        ");
 
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             $model = (new Index\Model())
                 ->setIdentifier($identifier)
@@ -84,13 +87,14 @@ class IndexBuilder extends BaseBuilder
         }
 
         // Pass 2: text boxes without a component
-        $query = "SELECT
-            CONCAT(tb2.textBoxID, '--') AS id,
-            tb2.heading AS title,
-            NULL AS folder_id,
-            tb2.updated_at AS date,
-            tb2.created_by AS created_by,
-            tb2.body AS fulltext_index
+        $query = $this->connector->prepareQuery("
+            SELECT
+                CONCAT(tb2.textBoxID, '--') AS id,
+                tb2.heading AS title,
+                NULL AS folder_id,
+                tb2.updated_at AS date,
+                tb2.created_by AS created_by,
+                tb2.body AS fulltext_index
             FROM textBox tb2
             LEFT JOIN component_config_instance cci2 ON (
                 cci2.component_config_definition_id = (
@@ -103,8 +107,10 @@ class IndexBuilder extends BaseBuilder
             WHERE tb2.deleted_at IS NULL
             AND tb2.updated_at >= :date
             AND cci2.id IS NULL
-        ";
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        ");
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d text boxes (without components)', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             $model = (new Index\Model())
                 ->setIdentifier($identifier)

@@ -27,25 +27,26 @@ class IndexBuilder extends BaseBuilder
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
         // TODO include other indices
-        $query = "SELECT
-            assessment.id,
-            assessment.title,
-            CONCAT(
-                '" . Hydrator::BASE_TYPE . ".',
-                COALESCE(
-                    IF(task.id, '" . AssessmentType::TYPE_TASK . "', NULL),
-                    IF(assess.assessment_id, '" . AssessmentType::TYPE_QUIZ . "', NULL),
-                    IF(lti_assessment.assessment_id, '" . AssessmentType::TYPE_LTI_ASSESSMENT . "', NULL),
-                    IF(submission_box.id, '" . AssessmentType::TYPE_DUE_WORK . "', NULL),
-                    IF(project.id, '" . AssessmentType::TYPE_PROJECT . "', NULL),
-                    IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL)
-                )
-            ) AS type,
-            COALESCE(assessment.due_date, assessment.updated_at) AS date,
-            NULL AS created_by,
-            folder.id AS folder_id,
-            assessment.description AS fulltext_index,
-            assessment.title AS text_index
+        $query = $this->connector->prepareQuery("
+            SELECT
+                assessment.id,
+                assessment.title,
+                CONCAT(
+                    '" . Hydrator::BASE_TYPE . ".',
+                    COALESCE(
+                        IF(task.id, '" . AssessmentType::TYPE_TASK . "', NULL),
+                        IF(assess.assessment_id, '" . AssessmentType::TYPE_QUIZ . "', NULL),
+                        IF(lti_assessment.assessment_id, '" . AssessmentType::TYPE_LTI_ASSESSMENT . "', NULL),
+                        IF(submission_box.id, '" . AssessmentType::TYPE_DUE_WORK . "', NULL),
+                        IF(project.id, '" . AssessmentType::TYPE_PROJECT . "', NULL),
+                        IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL)
+                    )
+                ) AS type,
+                COALESCE(assessment.due_date, assessment.updated_at) AS date,
+                NULL AS created_by,
+                folder.id AS folder_id,
+                assessment.description AS fulltext_index,
+                assessment.title AS text_index
             FROM mv_assessment_relation
             JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
             JOIN folder ON (
@@ -82,11 +83,13 @@ class IndexBuilder extends BaseBuilder
                 lesson_plan.assessment_id = assessment.id
             )
             WHERE COALESCE(assessment.due_date, assessment.updated_at) >= :date
-        ";
+        ");
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d assessments', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             yield (new Index\Model())
                 ->setIdentifier($identifier)

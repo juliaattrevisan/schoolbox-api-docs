@@ -25,23 +25,26 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
-        $query = "SELECT
-            fp.postID as id,
-            ft.title,
-            fp.modified AS date,
-            fp.userID AS created_by,
-            ft.categoryID AS folder_id,
-            fp.body AS fulltext_index
+        $query = $this->connector->prepareQuery("
+            SELECT
+                fp.postID as id,
+                ft.title,
+                fp.modified AS date,
+                fp.userID AS created_by,
+                ft.categoryID AS folder_id,
+                fp.body AS fulltext_index
             FROM forumThread ft
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
             WHERE fp.modified >= :date
             AND fp.deleted = 'false'
             AND ft.deleted = 'false'
-        ";
+        ");
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
-        foreach ($this->connector->executeQuery($query, $params) as $row) {
+        $query->execute($params);
+        $this->logger->notice(sprintf('Building search indices for %d forum posts', $query->rowCount()));
+        foreach ($query as $row) {
             $identifier = (string)$row['id'];
             yield (new Index\Model())
                 ->setIdentifier($identifier)
