@@ -48,6 +48,7 @@ class IndexBuilder extends BaseBuilder
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
+        $this->logger->info('Finding events...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d events', $query->rowCount()));
         foreach ($query as $row) {

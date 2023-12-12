@@ -39,6 +39,7 @@ class IndexBuilder extends BaseBuilder
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
+        $this->logger->info('Finding badges...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d badges', $query->rowCount()));
         foreach ($query as $row) {

@@ -54,6 +54,7 @@ class IndexBuilder extends BaseBuilder
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
+        $this->logger->info('Finding text boxes (with components)...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
         foreach ($query as $row) {
@@ -108,6 +109,7 @@ class IndexBuilder extends BaseBuilder
             AND tb2.updated_at >= :date
             AND cci2.id IS NULL
         ");
+        $this->logger->info('Finding text boxes (without components)...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (without components)', $query->rowCount()));
         foreach ($query as $row) {

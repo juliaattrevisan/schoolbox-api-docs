@@ -42,6 +42,7 @@ class IndexBuilder extends BaseBuilder
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
+        $this->logger->info('Finding forum posts...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d forum posts', $query->rowCount()));
         foreach ($query as $row) {

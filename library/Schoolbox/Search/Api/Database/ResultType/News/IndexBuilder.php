@@ -42,6 +42,7 @@ class IndexBuilder extends BaseBuilder
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
+        $this->logger->info('Finding news articles...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d news articles', $query->rowCount()));
         foreach ($query as $row) {
