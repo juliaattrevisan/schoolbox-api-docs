@@ -106,9 +106,9 @@ class Module extends BaseModule
         $queryParamBuilders = [
             new Database\Index\FulltextQueryParamBuilder(),
             new Database\Index\TextQueryParamBuilder($database->getQuoter()),
-//            new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
+            new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
 //            new Database\ResultType\News\QueryParamBuilder(),
-//            new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
+            new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
 //            new Database\ResultType\File\QueryParamBuilder(),
 //            new Database\ResultType\Event\QueryParamBuilder(),
 //            new Database\ResultType\Link\QueryParamBuilder(),
@@ -181,7 +181,7 @@ class Module extends BaseModule
             // out that the user does not have access to badges.  User permission based checks cannot be done here
             // because the logged-in user object is not available here.
             // @see Search/Api/Controller->pruneDependenciesDueToUserPermissions().
-//            $queryParamBuilders[] = new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter());
+            $queryParamBuilders[] = new Database\ResultType\Badge\QueryParamBuilder($database->getQuoter());
             $hydrators[] = new Database\ResultType\Badge\Hydrator(
                 $mapperFactory->get(BadgeMapper::class),
                 new PrefixGenerator($this->getConfig()),

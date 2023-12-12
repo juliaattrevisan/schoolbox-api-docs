@@ -17,6 +17,8 @@ use Schoolbox\Search\Index;
 
 /**
  * Index builder for pages.
+ *
+ * TODO this might not be used? Pages have no fulltext index
  */
 class IndexBuilder extends BaseBuilder
 {
