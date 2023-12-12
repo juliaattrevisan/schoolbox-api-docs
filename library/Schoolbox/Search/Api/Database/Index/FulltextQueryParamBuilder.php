@@ -111,7 +111,7 @@ class FulltextQueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
-        return 'si.folder_id';
+        return 'sifo.folder_id';
     }
 
     /**
@@ -121,7 +121,8 @@ class FulltextQueryParamBuilder extends BaseQueryParamBuilder
     {
         return '
             FROM search_index si
-            INNER JOIN search_index_fulltext sif ON si.identifier = sif.identifier
+            INNER JOIN search_index_fulltext sif ON si.id = sif.search_index_id
+            LEFT JOIN search_index_folder sifo ON si.id = sifo.search_index_id
         ';
     }
 }

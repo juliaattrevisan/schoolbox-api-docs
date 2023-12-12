@@ -131,7 +131,8 @@ class TextQueryParamBuilder extends BaseQueryParamBuilder
     {
         return '
             FROM search_index si
-            INNER JOIN search_index_text sit ON si.identifier = sit.identifier
+            INNER JOIN search_index_text sit ON si.id = sit.search_index_id
+            LEFT JOIN search_index_folder sifo ON si.id = sifo.search_index_id
         ';
     }
 }
