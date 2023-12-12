@@ -24,16 +24,21 @@ $app = new class extends CliTool\App {
         // Build mappers and search classes
         $indexMapper         = Index\Mapper::getInstance();
         /** @var array<IBuilder> $indexBuilders */
+
+        // There's no point indexing any result type without a search on a text
+        // field. Thus, the following result types are not pre-indexed:
+        // * Pages
+        // * Tiles
+        // * Users
         $indexBuilders       = [
-//            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\Event\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\File\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\Link\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\News\IndexBuilder($this->getDatabaseInternal()),
-//            new ResultType\Page\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Event\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\File\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Link\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\News\IndexBuilder($this->getDatabaseInternal()),
             new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal()),
         ];
         $indexTextMapper     = Index\Text\Mapper::getInstance();
