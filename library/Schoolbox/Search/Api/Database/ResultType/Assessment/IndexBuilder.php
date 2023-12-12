@@ -25,6 +25,7 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
+        // TODO include other indices
         $query = "SELECT
             assessment.id,
             assessment.title,
@@ -107,7 +108,7 @@ class IndexBuilder extends BaseBuilder
                         ->add(
                             (new Index\Text\Model())
                                 ->setIdentifier($identifier)
-                                ->setTextIndex(strip_tags($row['text_index']))
+                                ->setTextIndex($row['text_index'])
                         )
                 );
         }
