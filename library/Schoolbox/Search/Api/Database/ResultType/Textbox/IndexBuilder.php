@@ -126,7 +126,7 @@ class IndexBuilder extends BaseBuilder
                     (new GenericCollection(Index\Fulltext\Model::class))
                         ->add(
                             (new Index\Fulltext\Model())
-                                ->setFulltextIndex(strip_tags($row['fulltext_index']))
+                                ->setFulltextIndex(strip_tags($row['fulltext_index'] ?? ''))
                         )
                 )
                 ->setTextIndices(
