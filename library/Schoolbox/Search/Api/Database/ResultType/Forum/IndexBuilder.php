@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Index;
 
@@ -49,7 +50,10 @@ class IndexBuilder extends BaseBuilder
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
                 ->setIsRelevanceDateAffected(true)
                 ->setCreatedBy($row['created_by'])
-                ->setFolderId($row['folder_id'])
+                ->setFolders(
+                    (new GenericCollection(Folder\Model::class))
+                        ->add((new Folder\Model())->setId($row['folder_id']))
+                )
                 ->setFulltextIndices(
                     (new GenericCollection(Index\Fulltext\Model::class))
                         ->add(

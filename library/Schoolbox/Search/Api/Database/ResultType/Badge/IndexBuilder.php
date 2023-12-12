@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Index;
 
@@ -46,7 +47,9 @@ class IndexBuilder extends BaseBuilder
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
                 ->setIsRelevanceDateAffected(true)
                 ->setCreatedBy($row['created_by'])
-                ->setFolderId(null)
+                ->setFolders(
+                    (new GenericCollection(Folder\Model::class))
+                )
                 ->setFulltextIndices(
                     (new GenericCollection(Index\Fulltext\Model::class))
                         ->add(
