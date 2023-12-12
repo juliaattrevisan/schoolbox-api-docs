@@ -118,9 +118,6 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(Alaress_Date_Format $date): iterable
     {
-        // Can use query param builder to build the parts?
-        // Would need to add buildFulltextIndexExpression and
-        // buildTextIndexExpression methods to that interface, though
         $query = "SELECT
             assessment.id
             FROM mv_assessment_relation
