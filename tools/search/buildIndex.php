@@ -33,7 +33,8 @@ $app = new class extends CliTool\App {
 //            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal()),
 //            new ResultType\Link\IndexBuilder($this->getDatabaseInternal()),
 //            new ResultType\News\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Page\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\Page\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal()),
         ];
         $indexTextMapper     = Index\Text\Mapper::getInstance();
         $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
