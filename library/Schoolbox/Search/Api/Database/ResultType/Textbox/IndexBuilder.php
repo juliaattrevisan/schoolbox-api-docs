@@ -55,7 +55,7 @@ class IndexBuilder extends BaseBuilder
             'date' => $date->getDatabaseDate(),
         ];
         $query->execute($params);
-        $this->logger->notice(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
+        $this->logger->info(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
         foreach ($query as $row) {
             $identifier = (string)$row['id'];
             $model = (new Index\Model())
@@ -109,7 +109,7 @@ class IndexBuilder extends BaseBuilder
             AND cci2.id IS NULL
         ");
         $query->execute($params);
-        $this->logger->notice(sprintf('Building search indices for %d text boxes (without components)', $query->rowCount()));
+        $this->logger->info(sprintf('Building search indices for %d text boxes (without components)', $query->rowCount()));
         foreach ($query as $row) {
             $identifier = (string)$row['id'];
             $model = (new Index\Model())
