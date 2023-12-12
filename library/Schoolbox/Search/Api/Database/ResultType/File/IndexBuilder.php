@@ -26,7 +26,7 @@ class IndexBuilder extends BaseBuilder
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
         $query = $this->connector->prepareQuery("
-            SELECT
+            SET STATEMENT max_statement_time=0 FOR SELECT
                 f.id,
                 f.realname AS title,
                 f.modified AS date,
@@ -35,13 +35,8 @@ class IndexBuilder extends BaseBuilder
                 f.description AS fulltext_index1,
                 f.comment AS fulltext_index2
             FROM file f
-            INNER JOIN folder               fo  ON f.category = fo.id
-            INNER JOIN storage              s   ON f.hash = s.hash
-            INNER JOIN allowedFileExtension afe ON s.ext = afe.extension
-            INNER JOIN allowedFileTypes     aft ON afe.fileTypeID = aft.fileTypeID
             WHERE f.modified >= :date
             AND f.deleted_at IS NULL
-            AND fo.deleted_at IS NULL
         ");
         $params = [
             'date' => $date->getDatabaseDate(),
