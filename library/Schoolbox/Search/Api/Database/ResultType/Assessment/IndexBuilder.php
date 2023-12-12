@@ -82,7 +82,6 @@ class IndexBuilder extends BaseBuilder
             WHERE COALESCE(assessment.due_date, assessment.updated_at) >= :date
         ";
         $params = [
-            'now'  => Alaress_Date_Format::now()->getDatabaseDate(),
             'date' => $date->getDatabaseDate(),
         ];
         foreach ($this->connector->executeQuery($query, $params) as $row) {
