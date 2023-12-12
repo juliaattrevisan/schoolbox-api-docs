@@ -35,8 +35,10 @@ class IndexBuilder extends BaseBuilder
                 f.description AS fulltext_index1,
                 f.comment AS fulltext_index2
             FROM file f
+            INNER JOIN folder fo ON f.category = fo.id
             WHERE f.modified >= :date
             AND f.deleted_at IS NULL
+            AND fo.deleted_at IS NULL
         ");
         $params = [
             'date' => $date->getDatabaseDate(),
