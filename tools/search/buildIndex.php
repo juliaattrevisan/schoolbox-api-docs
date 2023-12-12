@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Search\Api\Database\Index\IBuilder;
 use Schoolbox\Search\Api\Database\ResultType;
 use Schoolbox\Search\Index;
 
@@ -22,6 +23,7 @@ $app = new class extends CliTool\App {
     {
         // Build mappers and search classes
         $indexMapper         = Index\Mapper::getInstance();
+        /** @var array<IBuilder> $indexBuilders */
         $indexBuilders       = [
             new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
             new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
@@ -38,8 +40,10 @@ $app = new class extends CliTool\App {
         foreach ($indexBuilders as $indexBuilder) {
             foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-5)) as $item) {
                 $indexMapper->save($item);
-                $indexTextMapper->save($item->getTextIndices());
-                $indexFulltextMapper->save($item->getFulltextIndices());
+
+                // Propagate item to indices
+                $indexTextMapper->save($item->getTextIndices()->map(fn ($index) => $index->setSearchIndex($item)));
+                $indexFulltextMapper->save($item->getFulltextIndices()->map(fn ($index) => $index->setSearchIndex($item)));
             }
         }
     }
