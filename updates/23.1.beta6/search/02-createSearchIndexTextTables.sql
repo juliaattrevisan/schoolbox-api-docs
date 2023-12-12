@@ -3,22 +3,22 @@
 # the base index itself.
 create table search_index_text
 (
-    id         int          not null,
-    text_index varchar(250) not null,
-    constraint search_index_text_search_index_id_fk
-        foreign key (id) references search_index (id)
+    search_index_id int not null,
+    text_index      varchar(250) not null,
+    constraint search_index_text_search_index_search_index_id_fk
+        foreign key (search_index_id) references search_index (id)
             on delete cascade on update cascade
 );
-create index search_index_text_text_index_index
+create index search_index_text_index
     on search_index_text (text_index);
 
 create table search_index_fulltext
 (
-    id             int         not null,
-    fulltext_index mediumtext  not null,
-    constraint search_index_fulltext_search_index_id_fk
-        foreign key (id) references search_index (id)
+    search_index_id int not null,
+    fulltext_index  mediumtext not null,
+    constraint search_index_fulltext_search_index_search_index_id_fk
+        foreign key (search_index_id) references search_index (id)
             on delete cascade on update cascade
 );
-create fulltext index search_index_fulltext_fulltext_index_index
+create fulltext index search_index_fulltext_index
     on search_index_fulltext (fulltext_index);
