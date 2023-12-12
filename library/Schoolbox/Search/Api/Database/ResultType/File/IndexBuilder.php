@@ -53,7 +53,7 @@ class IndexBuilder extends BaseBuilder
             $identifier = (string)$row['id'];
             yield (new Index\Model())
                 ->setIdentifier($identifier)
-                ->setTitle($row['title'])
+                ->setTitle($row['title'] ?? '')
                 ->setType(Hydrator::BASE_TYPE)
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
                 ->setIsRelevanceDateAffected(true)
@@ -77,7 +77,7 @@ class IndexBuilder extends BaseBuilder
                     (new GenericCollection(Index\Text\Model::class))
                         ->add(
                             (new Index\Text\Model())
-                                ->setTextIndex($row['title'])
+                                ->setTextIndex($row['title'] ?? '')
                         )
                 );
         }
