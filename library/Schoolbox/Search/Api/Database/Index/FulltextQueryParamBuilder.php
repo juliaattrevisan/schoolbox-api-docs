@@ -41,12 +41,13 @@ class FulltextQueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
     {
-        return $this->buildLinearDecayExpression(
+        $relevancePart = $this->buildLinearDecayExpression(
             ":indexNow$paramKeySuffix",
             'si.date',
             7,
             56,
         );
+        return "IF(si.is_relevance_date_affected, $relevancePart, 1)";
     }
 
     /**
