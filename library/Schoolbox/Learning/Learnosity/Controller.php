@@ -1064,8 +1064,6 @@ class Controller extends Base
         $responseData = [];
 
         foreach ($responses as $response) {
-            $itemReference = $response['item_reference'];
-
             $updatedResponse = $response;
 
             /* If $updatedResponse['max_score'] is null...I guess this is unscored/practice
@@ -1078,7 +1076,7 @@ class Controller extends Base
             /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
              * ($mark must never exceed $maxMark) and/or otherwise sanitise data
              */
-            $sanitisedScore = (new SanitiseScores())->sanitise($postData['scores'][$itemReference], $updatedResponse['max_score']);
+            $sanitisedScore = (new SanitiseScores())->sanitise($updatedResponse['score'], $updatedResponse['max_score']);
 
             $mark = $sanitisedScore['score'];
             $maxMark = $sanitisedScore['max_score'];
@@ -1821,7 +1819,7 @@ class Controller extends Base
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
-            // including failure
+                // including failure
             default => 400,
         };
         $this->response = $this
