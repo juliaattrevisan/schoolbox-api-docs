@@ -25,26 +25,35 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(Alaress_Date_Format $date): iterable
     {
+        $folderQuery = $this->connector->prepareQuery("
+            SELECT folder_id
+            FROM event_folder evf
+            INNER JOIN folder f ON evf.folder_id = f.id
+            WHERE f.deleted_at IS NOT NULL
+            AND evf.event_id = :eventId
+        ");
+
         $query = "SELECT
             e.id,
             e.title,
             e.start_datetime AS date,
             e.author_id AS created_by,
-            f.id AS folder_id,
             e.detail AS fulltext_index1,
             e.location AS fulltext_index2
             FROM event e
-            LEFT JOIN event_folder evf ON e.id = evf.event_id
-            LEFT JOIN folder f ON evf.folder_id = f.id
             WHERE e.start_datetime >= :date
             AND e.deleted_at IS NULL
-            AND f.deleted_at IS NULL
         ";
         $params = [
             'date' => $date->getDatabaseDate(),
         ];
         foreach ($this->connector->executeQuery($query, $params) as $row) {
             $identifier = (string)$row['id'];
+            $folderQuery->execute(['eventId' => $row['id']]);
+            $folders   = new GenericCollection(Folder\Model::class);
+            foreach ($folderQuery as $folderRow) {
+                $folders = $folders->add((new Folder\Model())->setId($folderRow['folder_id']));
+            }
             yield (new Index\Model())
                 ->setIdentifier($identifier)
                 ->setTitle($row['title'])
@@ -52,10 +61,7 @@ class IndexBuilder extends BaseBuilder
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
                 ->setIsRelevanceDateAffected(true)
                 ->setCreatedBy($row['created_by'])
-                ->setFolders(
-                    (new GenericCollection(Folder\Model::class))
-                        ->add((new Folder\Model())->setId($row['folder_id']))
-                )
+                ->setFolders($folders)
                 ->setFulltextIndices(
                     (new GenericCollection(Index\Fulltext\Model::class))
                         ->add(
