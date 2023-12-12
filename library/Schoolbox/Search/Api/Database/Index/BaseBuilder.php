@@ -11,8 +11,16 @@ namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress\Database\Connector\IConnector;
 
+/**
+ * Base index builder.
+ */
 abstract class BaseBuilder implements IBuilder
 {
+    /**
+     * Constructor
+     *
+     * @param IConnector $connector Database connection
+     */
     public function __construct(protected IConnector $connector)
     {
     }
