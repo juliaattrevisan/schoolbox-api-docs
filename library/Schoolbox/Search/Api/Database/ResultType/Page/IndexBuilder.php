@@ -72,12 +72,53 @@ class IndexBuilder extends BaseBuilder
         foreach ($this->connector->executeQuery($query, $params) as $row) {
             $identifier = (string)$row['id'];
 
-            // Execute each query in turn above, and set type accordingly
+            // Execute each query above, and set type accordingly
+            $type       = null;
+            $folderCodes = [];
+            $folderParams = ['folderId' => $row['id']];
+
+            $courseSpecQuery->execute($folderParams);
+            if ($courseSpecQuery->rowCount() > 0) {
+                $type = 'course';
+            }
+
+            if (!isset($type)) {
+                $unitSpecQuery->execute($folderParams);
+                if ($unitSpecQuery->rowCount() > 0) {
+                    $type = 'unit';
+                }
+            }
+
+            if (!isset($type)) {
+                $folderCodeQuery->execute($folderParams);
+                if ($folderCodeQuery->rowCount() > 0) {
+                    $type = 'class';
+                    foreach ($folderCodeQuery as $folderCode) {
+                        $folderCodes[] = $folderCode['code'];
+                    }
+                }
+            }
+
+            if (!isset($type)) {
+                $groupQuery->execute($folderParams);
+                if ($groupQuery->rowCount() > 0) {
+                    $type = 'group';
+                }
+            }
+
+            if (!isset($type)) {
+                $homepageQuery->execute($folderParams);
+                if ($homepageQuery->rowCount() > 0) {
+                    $type = 'homepage';
+                }
+            }
+
+            $type ??= 'folder';
 
             yield (new Index\Model())
                 ->setIdentifier($identifier)
                 ->setTitle($row['title'])
-                ->setType($row['type'])
+                ->setType(Hydrator::BASE_TYPE . '.' . $type)
                 ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
                 ->setIsRelevanceDateAffected(false)
                 ->setCreatedBy($row['created_by'])
@@ -95,7 +136,7 @@ class IndexBuilder extends BaseBuilder
                         )
                         ->add(
                             (new Index\Text\Model())
-                                ->setTextIndex($row['codes'])
+                                ->setTextIndex(implode(' ', $folderCodes))
                         )
                 );
         }
