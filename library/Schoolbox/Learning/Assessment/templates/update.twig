@@ -144,10 +144,17 @@
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
+                    const toast = $('#toast');
+                    toast.toastActivate({text: 'Deleting activity...'});
+
                     $.post('{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) }}')
                         .done(function(result) {
                             // Remove from list after AJAX returns
                             window.location.href = result.returnUrl;
+                            toast.toastTimeout({text: 'Activity deleted.', css: 'success'});
+                        })
+                        .fail(function() {
+                            toast.toastTimeout({text: 'Could not delete this activity.', css: 'alert'});
                         });
                 }
             });
@@ -199,6 +206,8 @@
         </form>
     </div>
 </div>
+
+<div id="toast" class="toast"></div>
 
 {# Participation modal w/ form. Must live outside of main form #}
 {% include '@learningAssessment/fragments/participationModal.twig' %}
