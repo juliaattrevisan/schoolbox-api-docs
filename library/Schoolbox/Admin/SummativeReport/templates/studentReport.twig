@@ -473,6 +473,16 @@
             page-break-inside: avoid;
             break-inside: avoid;
         }
+
+        /* Page Breaks in css exhibit a really oddball behaviour where they are affected by a parent
+         * element's display property. Changing this property changes the behaviour of page breaks,
+         * which isn't a very obvious logical leap...but we use inline-table to retain some styling.
+         * display:block causes us to lose padding and other visual niceness.
+         * https://stackoverflow.com/questions/34534231/page-break-insideavoid-not-working
+         */
+        .summative-content table.rb.markable {
+            display: inline-table;
+        }
     }
 
     {{ customReportStyle ?? '' }}
