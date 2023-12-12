@@ -21,7 +21,8 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('search_index');
         $this->hasModel(Model::class);
-        $this->uses('identifier', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('identifier', self::TYPE_STRING);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('type', self::TYPE_STRING);
         $this->uses('date', self::TYPE_DATETIME);

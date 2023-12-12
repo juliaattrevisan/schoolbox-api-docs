@@ -12,12 +12,18 @@ namespace Schoolbox\Search\Index;
 use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * Model for a search index.
  */
 class Model
 {
+    /**
+     * Search indices have a standard ID field.
+     */
+    use Id;
+
     /**
      * Search indices may have been created by a particular user.
      */
