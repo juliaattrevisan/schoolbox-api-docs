@@ -37,10 +37,11 @@
                     opacity: 1;
                 }
             }
+            /* Ensure the rule above does not affect styling of progress ticks. */
             form.progress-tick-form > a {
                 opacity: 1.0;
                 &:hover {
-                    opacity: 0.7;
+                    opacity: 1.0;
                 }
             }
             a[class*="icon-"],

@@ -186,7 +186,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     form {
         margin: 0;
     }
-    nav a:hover {
+    nav a:not(.progress-tick):hover {
         background-color: $row-action-hover-background;
     }
     .card {
