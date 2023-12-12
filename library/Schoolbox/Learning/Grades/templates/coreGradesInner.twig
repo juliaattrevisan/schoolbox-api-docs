@@ -12,8 +12,10 @@
         'returnUrlSuffix'        string
         'conversationsPerFolder' Conversation[]   Conversations of selected folders, indexed by folder.id
         'longitudinalRubric'     array TODO either define array structure, or upgrade to object
+        'transitions'            array            Used by progressTickForm.
 #}
 
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
         $('[data-collapser="true"]').collapsable({
@@ -57,6 +59,18 @@
 {% endif %}
 {% endblock %}
 {% if markbook.assessments | length %}
+<script type="text/javascript">
+    $(function() {
+        // Save form for task completion
+        $('form[data-progress-tick-form]').progressTickForm({
+            transitions: {
+                incomplete:      '{{ transitions['incomplete'] }}',
+                selfAssessed:    '{{ transitions['selfAssessed'] }}',
+                teacherAssessed: '{{ transitions['teacherAssessed'] }}'
+            }
+        });
+    });
+</script>
 <div class="row">
     <div class="small-12 island">
         <section>
