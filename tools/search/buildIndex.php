@@ -25,14 +25,15 @@ $app = new class extends CliTool\App {
         $indexMapper         = Index\Mapper::getInstance();
         /** @var array<IBuilder> $indexBuilders */
         $indexBuilders       = [
-            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Event\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\File\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\Link\IndexBuilder($this->getDatabaseInternal()),
-            new ResultType\News\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\Event\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\File\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\Link\IndexBuilder($this->getDatabaseInternal()),
+//            new ResultType\News\IndexBuilder($this->getDatabaseInternal()),
+            new ResultType\Page\IndexBuilder($this->getDatabaseInternal()),
         ];
         $indexTextMapper     = Index\Text\Mapper::getInstance();
         $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
@@ -41,7 +42,7 @@ $app = new class extends CliTool\App {
         // TODO the final version won't truncate: instead, it'll override?
         $indexMapper->truncate();
         foreach ($indexBuilders as $indexBuilder) {
-            foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-5)) as $item) {
+            foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-10)) as $item) {
                 $indexMapper->save($item);
 
                 // Propagate item to indices
