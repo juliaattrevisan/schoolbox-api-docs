@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export type FilterDateRange = {
     startDate: string;
@@ -15,6 +16,8 @@ export const INVALID_DATE = "Invalid Date"; // the string dayjs returns when a d
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     const startDate = window.Vue.ref(EMPTY_DATE);
     const endDate = window.Vue.ref(EMPTY_DATE);
+    const activeStartDate = window.Vue.ref(EMPTY_DATE);
+    const activeEndDate = window.Vue.ref(EMPTY_DATE);
 
     /**
      * Is the start date filter set
@@ -42,7 +45,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
 
     /**
      * Get the date range filter data
-     * @returns {object} - the date range filter data
+     * @returns {FiltersFormData["date"]} - the date range filter data
      */
     function getFormData() {
         // Only add from and to if they are set.
@@ -57,6 +60,22 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
             },
         };
     }
+
+    /**
+     * search has been triggered so set the active date range filter
+     */
+    function setActive() {
+        activeStartDate.value = startDate.value;
+        activeEndDate.value = endDate.value;
+    }
+
+    /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether there's been a change in the date range
+     */
+    const canSearch = window.Vue.computed(() => {
+        return activeStartDate.value !== startDate.value || activeEndDate.value !== endDate.value;
+    });
 
     /**
      * clear the date filter
@@ -74,6 +93,8 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
         hasDateRange,
         isActive,
         getFormData,
+        setActive,
+        canSearch,
         clear,
     };
 });

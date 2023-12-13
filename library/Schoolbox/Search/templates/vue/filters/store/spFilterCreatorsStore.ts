@@ -5,6 +5,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export type Creator = {
     id: number;
@@ -13,6 +14,7 @@ export type Creator = {
 
 export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     const creator = window.Vue.ref<Creator[]>([]);
+    const activeCreator = window.Vue.ref<Creator[]>([]);
 
     /**
      * Is the creator filter set
@@ -22,7 +24,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
 
     /**
      * Get the creator filter data
-     * @returns {object} - the creator filter data
+     * @returns {FiltersFormData["creator"]} - the creator filter data
      */
     function getFormData() {
         // only add creator filter if it is set
@@ -32,6 +34,23 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
             },
         };
     }
+
+    /**
+     * search has been triggered so set the active creator filter
+     */
+    function setActive() {
+        activeCreator.value = [...creator.value];
+    }
+
+    /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether the current ids match
+     */
+    const canSearch = window.Vue.computed(() => {
+        return (
+            activeCreator.value.length !== creator.value.length || activeCreator.value[0]?.id !== creator.value[0]?.id
+        );
+    });
 
     /**
      * clear the creator filter
@@ -44,6 +63,8 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
         creator,
         isActive,
         getFormData,
+        setActive,
+        canSearch,
         clear,
     };
 });

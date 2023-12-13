@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export type FilterType = {
     title: string;
@@ -12,22 +13,23 @@ export type FilterType = {
 
 export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     const allTypes = window.Vue.ref<FilterType[]>([]); // all filter types available
-    const activeTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
+    const selectedTypes = window.Vue.ref<string[]>([]); // the currently selected filters, just the value list
+    const activeTypes = window.Vue.ref<string[]>([]); // the currently active filters, those selected at the time of the latest search
     const isExpanded = window.Vue.ref<boolean>(false); // to show/hide all the sub types
 
     /**
      * Are there any types selected
      * @returns {boolean}
      */
-    const isActive = window.Vue.computed(() => activeTypes.value.length > 0);
+    const isActive = window.Vue.computed(() => selectedTypes.value.length > 0);
 
     /**
      * Add a parent type to the active types
      * @param {FilterType} type - the parent type
      */
     function addType(type: FilterType) {
-        if (!activeTypes.value.includes(type.value)) {
-            activeTypes.value.push(type.value);
+        if (!selectedTypes.value.includes(type.value)) {
+            selectedTypes.value.push(type.value);
         }
     }
 
@@ -36,8 +38,8 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      * @param {FilterType} type - the parent type
      */
     function removeType(type: FilterType) {
-        if (activeTypes.value.includes(type.value)) {
-            activeTypes.value = activeTypes.value.filter((activeType) => activeType !== type.value);
+        if (selectedTypes.value.includes(type.value)) {
+            selectedTypes.value = selectedTypes.value.filter((activeType) => activeType !== type.value);
         }
     }
 
@@ -47,8 +49,8 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function addSubTypes(type: FilterType) {
         type.subTypes?.forEach((subType) => {
-            if (!activeTypes.value.includes(subType.value)) {
-                activeTypes.value.push(subType.value);
+            if (!selectedTypes.value.includes(subType.value)) {
+                selectedTypes.value.push(subType.value);
             }
         });
     }
@@ -59,29 +61,45 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
      */
     function removeSubTypes(type: FilterType) {
         type.subTypes?.forEach((subType) => {
-            activeTypes.value = activeTypes.value.filter((activeType) => activeType !== subType.value);
+            selectedTypes.value = selectedTypes.value.filter((activeType) => activeType !== subType.value);
         });
     }
 
     /**
      * Get the types filter data
-     * @returns {string} - the filter types
+     * @returns {FiltersFormData["types"]} - the filter types
      */
     function getFormData() {
         return {
-            types: activeTypes.value,
+            types: selectedTypes.value,
         };
     }
+
+    /**
+     * search has been triggered so set the active types filter
+     */
+    function setActive() {
+        activeTypes.value = [...selectedTypes.value];
+    }
+
+    /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether the two arrays are different
+     */
+    const canSearch = window.Vue.computed(() => {
+        return selectedTypes.value.join("") !== activeTypes.value.join("");
+    });
 
     /**
      * clear the current types
      */
     function clear() {
-        activeTypes.value = [];
+        selectedTypes.value = [];
     }
 
     return {
         allTypes,
+        selectedTypes,
         activeTypes,
         isExpanded,
         addType,
@@ -90,6 +108,8 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
         removeSubTypes,
         isActive,
         getFormData,
+        setActive,
+        canSearch,
         clear,
     };
 });

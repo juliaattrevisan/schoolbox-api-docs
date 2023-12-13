@@ -8,6 +8,7 @@ import { defineStore } from "pinia";
 import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorsStore } from "./spFilterCreatorsStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
+import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export const useFiltersStore = defineStore("spFilters", () => {
     /**
@@ -20,7 +21,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
 
     /**
      * Get the filter data
-     * @returns {FilterData} -
+     * @returns {FiltersFormData} - the filter data
      */
     function getFormData() {
         const filterData = {
@@ -30,6 +31,25 @@ export const useFiltersStore = defineStore("spFilters", () => {
         };
         return JSON.stringify(filterData);
     }
+
+    /**
+     * search has been triggered so set the active filters
+     */
+    function setActive() {
+        useFilterDateRangeStore().setActive();
+        useFilterCreatorsStore().setActive();
+        useFilterTypesStore().setActive();
+    }
+
+    /**
+     * Whether a search can be performed, can be if there's a change of query or filters
+     * @returns {boolean} - whether there's been a change in the date range
+     */
+    const canSearch = window.Vue.computed(() => {
+        return (
+            useFilterDateRangeStore().canSearch || useFilterCreatorsStore().canSearch || useFilterTypesStore().canSearch
+        );
+    });
 
     /**
      * clear all filters
@@ -43,6 +63,8 @@ export const useFiltersStore = defineStore("spFilters", () => {
     return {
         isActive,
         getFormData,
+        setActive,
+        canSearch,
         clear,
     };
 });
