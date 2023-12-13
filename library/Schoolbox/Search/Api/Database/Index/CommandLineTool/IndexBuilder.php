@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index\CommandLineTool;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Search\Api\Database\Index\IBuilder;
@@ -24,8 +25,8 @@ class IndexBuilder extends App
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP  = 'help';
 
-    private const OPT_LONG_FROM = 'from';
-    private const OPT_LONG_TO = 'to';
+    private const OPT_LONG_FROM = 'from:';
+    private const OPT_LONG_TO = 'to:';
 
     /**
      * Short options:
@@ -56,6 +57,22 @@ class IndexBuilder extends App
             $this->printHelp();
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
+
+        try {
+            $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
+            $toDate   = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
+        } catch (InvalidArgumentException $e) {
+            $this->getLogger()->error($e->getMessage());
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        $this->getLogger()->info(
+            sprintf(
+                'Building search index from %s to %s',
+                ($fromDate ? $fromDate->getDatabase() : 'earliest result'),
+                ($toDate ? $toDate->getDatabase() : 'most recent result'),
+            ),
+        );
 
         // There's no point indexing any result type without a search on a text
         // field. Thus, the following result types are not pre-indexed:
@@ -145,5 +162,43 @@ OPTIONS
 
 
 HELP;
+    }
+
+    /**
+     * Build a date from the value of a command-line argument; will attempt to
+     * parse according to the following rules:
+     * * as a database date (YYYY-MM-DD HH:MM:SS)
+     * * as a Unix timestamp
+     * * via `strtotime`
+     *
+     * @param string|null $date
+     * @return Alaress_Date_Format|null
+     * @throws InvalidArgumentException if the date could not be parsed
+     */
+    private function buildDate(?string $date): ?Alaress_Date_Format
+    {
+        if (isset($date)) {
+            try {
+                return new Alaress_Date_Format(
+                    $date,
+                    [
+                        Alaress_Date_Format::DATABASE_FORMAT,
+                        Alaress_Date_Format::TIMESTAMP
+                    ]
+                );
+            } catch (InvalidArgumentException) {
+                // Attempt to parse date via strtotime
+                $this->getLogger()->debug(sprintf('Parsing date "%s" using strtotime', $date));
+                $strtotime = strtotime($date);
+                if ($strtotime) {
+                    return new Alaress_Date_Format($strtotime, Alaress_Date_Format::TIMESTAMP);
+                } else {
+                    throw new InvalidArgumentException(
+                        sprintf('Could not parse date "%s" as a database date, timestamp or with strtotime', $date)
+                    );
+                }
+            }
+        }
+        return null;
     }
 }
