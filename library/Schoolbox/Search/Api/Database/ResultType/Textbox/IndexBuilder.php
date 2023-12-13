@@ -58,33 +58,18 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
         foreach ($query as $row) {
-            $identifier = (string)$row['id'];
-            $model = (new Index\Model())
-                ->setIdentifier($identifier)
-                ->setTitle($row['title'])
-                ->setType(Hydrator::BASE_TYPE)
-                ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
-                ->setIsRelevanceDateAffected(true)
-                ->setCreatedBy($row['created_by'])
-                ->setFolders(
-                    (new GenericCollection(Folder\Model::class))
-                        ->add((new Folder\Model())->setId($row['folder_id']))
-                )
-                ->setFulltextIndices(
-                    (new GenericCollection(Index\Fulltext\Model::class))
-                        ->add(
-                            (new Index\Fulltext\Model())
-                                ->setFulltextIndex(strip_tags($row['fulltext_index']))
-                        )
-                )
-                ->setTextIndices(
-                    (new GenericCollection(Index\Text\Model::class))
-                        ->add(
-                            (new Index\Text\Model())
-                                ->setTextIndex($row['title'])
-                        )
-                );
-            yield $model;
+            $index = $this->buildIndex(
+                (string)$row['id'],
+                $row['title'],
+                Hydrator::BASE_TYPE,
+                $row['date'],
+                true,
+                $row['created_by'],
+            );
+            $index = $this->addFolder($index, $row['folder_id']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index']);
+            $index = $this->addTextIndex($index, $row['title']);
+            yield $index;
         }
 
         // Pass 2: text boxes without a component
@@ -113,30 +98,17 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (without components)', $query->rowCount()));
         foreach ($query as $row) {
-            $identifier = (string)$row['id'];
-            $model = (new Index\Model())
-                ->setIdentifier($identifier)
-                ->setTitle($row['title'] ?? '')
-                ->setType(Hydrator::BASE_TYPE)
-                ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
-                ->setIsRelevanceDateAffected(true)
-                ->setCreatedBy($row['created_by'])
-                ->setFolders(new GenericCollection(Folder\Model::class))
-                ->setFulltextIndices(
-                    (new GenericCollection(Index\Fulltext\Model::class))
-                        ->add(
-                            (new Index\Fulltext\Model())
-                                ->setFulltextIndex(strip_tags($row['fulltext_index'] ?? ''))
-                        )
-                )
-                ->setTextIndices(
-                    (new GenericCollection(Index\Text\Model::class))
-                        ->add(
-                            (new Index\Text\Model())
-                                ->setTextIndex($row['title'] ?? '')
-                        )
-                );
-            yield $model;
+            $index = $this->buildIndex(
+                (string)$row['id'],
+                $row['title'],
+                Hydrator::BASE_TYPE,
+                $row['date'],
+                true,
+                $row['created_by'],
+            );
+            $index = $this->addFulltextIndex($index, $row['fulltext_index']);
+            $index = $this->addTextIndex($index, $row['title']);
+            yield $index;
         }
     }
 

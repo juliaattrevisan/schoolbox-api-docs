@@ -46,32 +46,18 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d blog posts', $query->rowCount()));
         foreach ($query as $row) {
-            $identifier = (string)$row['id'];
-            yield (new Index\Model())
-                ->setIdentifier($identifier)
-                ->setTitle($row['title'])
-                ->setType(Hydrator::BASE_TYPE)
-                ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
-                ->setIsRelevanceDateAffected(true)
-                ->setCreatedBy($row['created_by'])
-                ->setFolders(
-                    (new GenericCollection(Folder\Model::class))
-                        ->add((new Folder\Model())->setId($row['folder_id']))
-                )
-                ->setFulltextIndices(
-                    (new GenericCollection(Index\Fulltext\Model::class))
-                        ->add(
-                            (new Index\Fulltext\Model())
-                                ->setFulltextIndex(strip_tags($row['fulltext_index']))
-                        )
-                )
-                ->setTextIndices(
-                    (new GenericCollection(Index\Text\Model::class))
-                        ->add(
-                            (new Index\Text\Model())
-                                ->setTextIndex($row['title'])
-                        )
-                );
+            $index = $this->buildIndex(
+                (string)$row['id'],
+                $row['title'],
+                Hydrator::BASE_TYPE,
+                $row['date'],
+                true,
+                $row['created_by'],
+            );
+            $index = $this->addFolder($index, $row['folder_id']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index']);
+            $index = $this->addTextIndex($index, $row['title']);
+            yield $index;
         }
     }
 

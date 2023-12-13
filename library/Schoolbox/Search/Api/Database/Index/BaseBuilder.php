@@ -41,7 +41,7 @@ abstract class BaseBuilder implements IBuilder
      * Helper function for building an index object.
      *
      * @param string      $identifier
-     * @param string      $title
+     * @param string|null $title
      * @param string      $type
      * @param string|null $dateString
      * @param bool        $isRelevanceDateAffected
@@ -50,7 +50,7 @@ abstract class BaseBuilder implements IBuilder
      */
     protected function buildIndex(
         string $identifier,
-        string $title,
+        ?string $title,
         string $type,
         ?string $dateString,
         bool $isRelevanceDateAffected,
@@ -58,7 +58,7 @@ abstract class BaseBuilder implements IBuilder
     ): Index\Model {
         return (new Index\Model())
             ->setIdentifier($identifier)
-            ->setTitle($title)
+            ->setTitle($title ?? '')
             ->setType($type)
             ->setDate(isset($dateString) ? Alaress_Date_Format::newDatabaseDate($dateString) : null)
             ->setIsRelevanceDateAffected($isRelevanceDateAffected)

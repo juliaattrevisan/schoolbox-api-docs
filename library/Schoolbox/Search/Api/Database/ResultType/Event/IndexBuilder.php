@@ -52,38 +52,26 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d events', $query->rowCount()));
         foreach ($query as $row) {
-            $identifier = (string)$row['id'];
+            $index = $this->buildIndex(
+                (string)$row['id'],
+                $row['title'],
+                Hydrator::BASE_TYPE,
+                $row['date'],
+                true,
+                $row['created_by'],
+            );
+
+            // TODO remove this: events shouldn't be associated with folders
+            //      at all in search results
             $folderQuery->execute(['eventId' => $row['id']]);
-            $folders   = new GenericCollection(Folder\Model::class);
             foreach ($folderQuery as $folderRow) {
-                $folders = $folders->add((new Folder\Model())->setId($folderRow['folder_id']));
+                $index = $this->addFolder($index, $folderRow['folder_id']);
             }
-            yield (new Index\Model())
-                ->setIdentifier($identifier)
-                ->setTitle($row['title'])
-                ->setType(Hydrator::BASE_TYPE)
-                ->setDate(Alaress_Date_Format::newDatabaseDate($row['date']))
-                ->setIsRelevanceDateAffected(true)
-                ->setCreatedBy($row['created_by'])
-                ->setFolders($folders)
-                ->setFulltextIndices(
-                    (new GenericCollection(Index\Fulltext\Model::class))
-                        ->add(
-                            (new Index\Fulltext\Model())
-                                ->setFulltextIndex(strip_tags($row['fulltext_index1']))
-                        )
-                        ->add(
-                            (new Index\Fulltext\Model())
-                                ->setFulltextIndex(strip_tags($row['fulltext_index2']))
-                        )
-                )
-                ->setTextIndices(
-                    (new GenericCollection(Index\Text\Model::class))
-                        ->add(
-                            (new Index\Text\Model())
-                                ->setTextIndex($row['title'])
-                        )
-                );
+
+            $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index2']);
+            $index = $this->addTextIndex($index, $row['title']);
+            yield $index;
         }
     }
 
