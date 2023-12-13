@@ -23,12 +23,13 @@ interface IBuilder
      * This list is intended to override any existing indices with the same
      * identifier.
      *
-     * @param Alaress_Date_Format $date Only fetch indices updated after this
-     *                                  date: this should be the last date on
-     *                                  which the search index was populated.
+     * @param Alaress_Date_Format|null $fromDate If provided, only build indices
+     *                                           updated at or after this date.
+     * @param Alaress_Date_Format|null $toDate   If provided, only build indices
+     *                                           updated at or before this date.
      * @return iterable<Model>
      */
-    public function buildUpdates(Alaress_Date_Format $date): iterable;
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
 
     /**
      * Build a collection of search indices which were deleted after `$date`.

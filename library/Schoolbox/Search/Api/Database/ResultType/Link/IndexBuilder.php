@@ -18,11 +18,12 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildUpdates(Alaress_Date_Format $date): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        $query = $this->connector->prepareQuery("
+        $queryString = "
             SELECT
                 l.id,
                 l.description AS title,
@@ -32,13 +33,19 @@ class IndexBuilder extends BaseBuilder
                 l.comment AS fulltext_index
             FROM link l
             INNER JOIN folder fo ON l.category = fo.id
-            WHERE l.modified >= :date
-            AND l.deleted_at IS NULL
+            WHERE l.deleted_at IS NULL
             AND fo.deleted_at IS NULL
-        ");
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString        .= ' AND l.modified >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND l.modified <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding links...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d links', $query->rowCount()));

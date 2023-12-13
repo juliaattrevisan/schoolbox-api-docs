@@ -18,9 +18,10 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildUpdates(Alaress_Date_Format $date): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
         $folderQuery = $this->connector->prepareQuery("
             SELECT folder_id
@@ -30,7 +31,7 @@ class IndexBuilder extends BaseBuilder
             AND evf.event_id = :eventId
         ");
 
-        $query = $this->connector->prepareQuery("
+        $queryString = "
             SELECT
                 e.id,
                 e.title,
@@ -39,12 +40,18 @@ class IndexBuilder extends BaseBuilder
                 e.detail AS fulltext_index1,
                 e.location AS fulltext_index2
             FROM event e
-            WHERE e.start_datetime >= :date
-            AND e.deleted_at IS NULL
-        ");
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
+            WHERE e.deleted_at IS NULL
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString        .= ' AND e.start_datetime >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND e.start_datetime <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding events...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d events', $query->rowCount()));

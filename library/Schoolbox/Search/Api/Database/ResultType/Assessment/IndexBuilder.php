@@ -19,12 +19,13 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildUpdates(Alaress_Date_Format $date): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        // TODO include other indices
-        $query = $this->connector->prepareQuery("
+        // TODO include other indices (lesson plan, URL)
+        $queryString = "
             SELECT
                 assessment.id,
                 assessment.title,
@@ -79,13 +80,19 @@ class IndexBuilder extends BaseBuilder
             LEFT JOIN lesson_plan ON (
                 lesson_plan.assessment_id = assessment.id
             )
-            WHERE COALESCE(assessment.due_date, assessment.updated_at) >= :date
-            AND assessment.deleted_at IS NULL
+            WHERE assessment.deleted_at IS NULL
             AND type IS NOT NULL
-        ");
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString        .= ' AND COALESCE(assessment.due_date, assessment.updated_at) >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND COALESCE(assessment.due_date, assessment.updated_at) <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding assessments...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d assessments', $query->rowCount()));

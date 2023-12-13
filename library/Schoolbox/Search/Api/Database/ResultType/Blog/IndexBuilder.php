@@ -18,11 +18,12 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildUpdates(Alaress_Date_Format $date): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        $query = $this->connector->prepareQuery("
+        $queryString = "
             SELECT
                 b.id,
                 b.heading AS title,
@@ -32,13 +33,19 @@ class IndexBuilder extends BaseBuilder
                 b.body AS fulltext_index
             FROM blog b
             JOIN folder f ON b.folder_id = f.id
-            WHERE b.created_at >= :date
-            AND b.deleted_at IS NULL
+            WHERE b.deleted_at IS NULL
             AND f.deleted_at IS NULL
-        ");
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString        .= ' AND b.created_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND b.created_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding blog posts...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d blog posts', $query->rowCount()));

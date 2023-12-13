@@ -18,12 +18,13 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildUpdates(Alaress_Date_Format $date): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        $query = $this->connector->prepareQuery("
-            SET STATEMENT max_statement_time=0 FOR SELECT
+        $queryString = "
+            SELECT
                 f.id,
                 f.realname AS title,
                 f.modified AS date,
@@ -33,13 +34,19 @@ class IndexBuilder extends BaseBuilder
                 f.comment AS fulltext_index2
             FROM file f
             INNER JOIN folder fo ON f.category = fo.id
-            WHERE f.modified >= :date
-            AND f.deleted_at IS NULL
+            WHERE f.deleted_at IS NULL
             AND fo.deleted_at IS NULL
-        ");
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString        .= ' AND f.modified >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND f.modified <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding files...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d files', $query->rowCount()));

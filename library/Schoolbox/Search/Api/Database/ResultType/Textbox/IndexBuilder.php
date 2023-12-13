@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
+use Component_Definition;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
@@ -19,14 +20,15 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildUpdates(Alaress_Date_Format $date): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
         // Pass 1: text boxes within a component
         // TODO does this unnecessarily exclude heading from index?
         //      may need to fetch that index separately
-        $query = $this->connector->prepareQuery("
+        $queryString = "
             SELECT
                 CONCAT(tb.textBoxID, '-', cci.component_instance_id, '-', fo.id) AS id,
                 tb.heading AS title,
@@ -42,15 +44,20 @@ class IndexBuilder extends BaseBuilder
             )
             JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
             JOIN folder fo ON fo.id=ci.identifier
-            WHERE ci.module='" . \Component_Definition::MODULE_HOMEPAGE . "'
-            AND tb.updated_at >= :date
+            WHERE ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
             AND tb.deleted_at IS NULL
             AND fo.deleted_at IS NULL
-        ");
-
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString        .= ' AND tb.updated_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND tb.updated_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
@@ -70,7 +77,7 @@ class IndexBuilder extends BaseBuilder
         }
 
         // Pass 2: text boxes without a component
-        $query = $this->connector->prepareQuery("
+        $queryString = "
             SELECT
                 CONCAT(tb2.textBoxID, '--') AS id,
                 tb2.heading AS title,
@@ -88,9 +95,17 @@ class IndexBuilder extends BaseBuilder
                 cci2.value = CAST(tb2.textBoxID AS NCHAR)
             )
             WHERE tb2.deleted_at IS NULL
-            AND tb2.updated_at >= :date
             AND cci2.id IS NULL
-        ");
+        ";
+
+        // Don't need new params for the second pass
+        if ($fromDate) {
+            $queryString .= ' AND tb2.updated_at >= :fromDate';
+        }
+        if ($toDate) {
+            $queryString .= ' AND tb2.updated_at <= :toDate';
+        }
+        $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d text boxes (without components)', $query->rowCount()));

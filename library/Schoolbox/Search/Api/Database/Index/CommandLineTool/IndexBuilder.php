@@ -111,7 +111,7 @@ class IndexBuilder extends App
         }
 
         foreach ($indexBuilders as $indexBuilder) {
-            foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-10)) as $item) {
+            foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $item) {
                 if (!$this->perform()) {
                     continue;
                 }
