@@ -64,6 +64,7 @@
             event.preventDefault();
             var $element = $(this);
             var $assessmentRow = $element.closest("[data-unit-assessment]");
+            var $taskList = $assessmentRow.closest("[data-task-list]");
 
             $element.confirmDialog({
                 header: "Are you sure you wish to delete this activity?",
@@ -88,7 +89,6 @@
 
                                     // When all activities are deleted, show the empty selector
                                     if (settings.emptySelector) {
-                                        var $taskList = $assessmentRow.closest("[data-task-list]");
                                         if ($taskList.find("[data-unit-assessment]").length === 0) {
                                             component.find(settings.emptySelector).removeAttr("hidden");
                                             component.find(settings.contentSelector).attr("hidden", true);
