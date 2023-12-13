@@ -66,7 +66,13 @@ class IndexBuilder extends App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        $this->getLogger()->info(
+        if ($this->perform()) {
+            $this->getLogger()->notice('Running in perform mode: search index will be rebuilt');
+        } else {
+            $this->getLogger()->notice('Running in dry-run mode: provide the `-p` flag to rebuild index');
+        }
+
+        $this->getLogger()->notice(
             sprintf(
                 'Building search index from %s to %s',
                 ($fromDate ? $fromDate->getDatabase() : 'earliest result'),
@@ -100,9 +106,15 @@ class IndexBuilder extends App
 
         // Actually create data
         // TODO the final version won't truncate: instead, it'll override?
-        $indexMapper->truncate();
+        if ($this->perform()) {
+            $indexMapper->truncate();
+        }
+
         foreach ($indexBuilders as $indexBuilder) {
             foreach ($indexBuilder->buildUpdates(Alaress_Date_Format::now()->addYears(-10)) as $item) {
+                if (!$this->perform()) {
+                    continue;
+                }
                 $indexMapper->save($item);
 
                 // Propagate item to indices
