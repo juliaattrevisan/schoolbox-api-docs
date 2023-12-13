@@ -1,10 +1,13 @@
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Activity } from "../linkedActivitiesTypes";
+import { LessonPlanEvent } from "../../js/event/lessonPlanEvent";
 
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
     const sourceId = window.Vue.ref(0); // The id of the source lesson plan
     const linkedActivities = window.Vue.ref<Activity[]>([]);
+    const gradeGradientEnable = window.Vue.ref(false); // Whether the grade gradient is enabled or not
+    const isStudentView = window.Vue.ref(false); // Whether the page is in student view or not
     const selectedActivities = window.Vue.ref<Activity[]>([]); // Current state of the selected activities in the modal
 
     const isSingleUnlinkOpen = window.Vue.ref(false); // Whether the single unlink modal is open or not
@@ -17,16 +20,36 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
     const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
 
     /**
+     * Listen for switches between student and staff view on the page
+     */
+    function addListeners() {
+        document.addEventListener(LessonPlanEvent.TO_STUDENT_VIEW, () => {
+            isStudentView.value = true;
+        });
+        document.addEventListener(LessonPlanEvent.TO_STAFF_VIEW, () => {
+            isStudentView.value = false;
+        });
+    }
+
+    /**
      * store any passed through properties
      * @param {number} $sourceId - the id of the source lesson plan
      * @param {Activity[]} $linkedActivities - the linked activities
+     * @param {boolean} $gradeGradientEnable - whether the grade gradient is enabled
      * @param {typeof Toast} toastElement - the toast element
      */
-    function init($sourceId: number, $linkedActivities: Activity[], toastElement: typeof Toast) {
+    function init(
+        $sourceId: number,
+        $linkedActivities: Activity[],
+        $gradeGradientEnable: boolean,
+        toastElement: typeof Toast
+    ) {
         sourceId.value = $sourceId;
         linkedActivities.value = $linkedActivities;
+        gradeGradientEnable.value = $gradeGradientEnable;
         selectedActivities.value = [...linkedActivities.value];
         toastEl.value = toastElement.value;
+        addListeners();
     }
 
     /**
@@ -112,7 +135,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
      */
     function throwErrorOnInvalidResponse(response: Response) {
         if (!response.ok) {
-            throw new Error('Something went wrong (response code: ' + String(response.status) + ')');
+            throw new Error("Something went wrong (response code: " + String(response.status) + ")");
         }
     }
 
@@ -174,6 +197,8 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         isPreviousSelected,
         clearChanges,
         linkedActivities,
+        gradeGradientEnable,
+        isStudentView,
         selectedActivities,
         addActivity,
         removeActivity,

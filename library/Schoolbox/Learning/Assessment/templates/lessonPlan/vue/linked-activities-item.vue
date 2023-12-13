@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
+import { getGradient } from "@js/util/cssUtils";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
@@ -31,6 +32,17 @@ function handleUnlinkClick() {
     store.removeActivity(props.activity);
     store.isSingleUnlinkOpen = true;
 }
+
+/**
+ * Get the colour gradient class for the activity, that helps indicate the
+ * completion status of the current activity
+ * @returns {string} The urgency class
+ */
+function getUrgency() {
+    return store.gradeGradientEnable
+        ? getGradient(props.activity.completionCount, props.activity.studentCount)
+        : "gradient-none";
+}
 </script>
 
 <template>
@@ -47,6 +59,12 @@ function handleUnlinkClick() {
         </h3>
         <p class="meta">
             {{ getActivityMeta(activity) }}
+            <template v-if="props.isInstructor && !store.isStudentView">
+                |
+                <span :class="getUrgency()"
+                    >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
+                >
+            </template>
         </p>
         <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
     </div>

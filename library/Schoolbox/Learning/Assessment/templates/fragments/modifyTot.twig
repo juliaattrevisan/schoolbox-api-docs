@@ -122,6 +122,7 @@
 
                             $('#lessonPlan-staff').hide();
                             $('#lessonPlan-student').show();
+                            document.dispatchEvent(new CustomEvent("LESSON-PLAN__TO_STUDENT_VIEW"));
                         }
 
 
@@ -142,6 +143,7 @@
 
                             $('#lessonPlan-staff').show();
                             $('#lessonPlan-student').hide();
+                            document.dispatchEvent(new CustomEvent("LESSON-PLAN__TO_STAFF_VIEW"));
                         }
 
                         /* Update the meta only when you're toggling views,
