@@ -10,11 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
-use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
-use Schoolbox\Search\Index;
 
 /**
  * Index builder for text boxes.

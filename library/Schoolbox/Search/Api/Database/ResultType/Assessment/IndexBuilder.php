@@ -10,11 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Alaress_Date_Format;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
-use Schoolbox\Search\Index;
 
 /**
  * Index builder for assessments.
