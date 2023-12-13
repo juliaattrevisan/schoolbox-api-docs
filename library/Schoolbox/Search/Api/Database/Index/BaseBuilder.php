@@ -10,13 +10,23 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Search\Index;
 
 /**
  * Base index builder.
  */
 abstract class BaseBuilder implements IBuilder
 {
+    /**
+     * Regular expression for normalising space characters: sequences of space
+     * characters are replaced with actual spaces.
+     */
+    private const NORMALISE_SPACE_REGEXP = '/\s+/';
+
     /**
      * Constructor
      *
@@ -25,5 +35,113 @@ abstract class BaseBuilder implements IBuilder
      */
     public function __construct(protected IConnector $connector, protected LoggerInterface $logger)
     {
+    }
+
+    /**
+     * Helper function for building an index object.
+     *
+     * @param string      $identifier
+     * @param string      $title
+     * @param string      $type
+     * @param string|null $dateString
+     * @param bool        $isRelevanceDateAffected
+     * @param int|null    $createdBy
+     * @return Index\Model
+     */
+    protected function buildIndex(
+        string $identifier,
+        string $title,
+        string $type,
+        ?string $dateString,
+        bool $isRelevanceDateAffected,
+        ?int $createdBy,
+    ): Index\Model {
+        return (new Index\Model())
+            ->setIdentifier($identifier)
+            ->setTitle($title)
+            ->setType($type)
+            ->setDate(isset($dateString) ? Alaress_Date_Format::newDatabaseDate($dateString) : null)
+            ->setIsRelevanceDateAffected($isRelevanceDateAffected)
+            ->setCreatedBy($createdBy)
+            ->setFolders(new GenericCollection(Folder\Model::class))
+            ->setFulltextIndices((new GenericCollection(Index\Fulltext\Model::class)))
+            ->setTextIndices((new GenericCollection(Index\Text\Model::class)))
+        ;
+    }
+
+    /**
+     * Helper function for adding a folder to the index.
+     *
+     * @param Index\Model $index
+     * @param int|null    $folderId
+     * @return Index\Model
+     */
+    protected function addFolder(Index\Model $index, ?int $folderId): Index\Model
+    {
+        if (!isset($folderId)) {
+            return $index;
+        }
+        return $index->setFolders(
+            $index->getFolders()->add((new Folder\Model())->setId($folderId))
+        );
+    }
+
+    /**
+     * Helper function for adding a fulltext lookup to the index.
+     *
+     * @param Index\Model $index
+     * @param string|null $indexContent
+     * @return Index\Model
+     */
+    protected function addFulltextIndex(Index\Model $index, ?string $indexContent): Index\Model
+    {
+        if (!isset($indexContent)) {
+            return $index;
+        }
+        // Normalise $indexContent before adding it. Possible filters:
+        // trim, strip_tags, HTML special chars decode, space normalisation,
+        // stop-word removal?
+        // TODO does this need to be customised per content type?
+        $normalisedIndexContent = trim(
+            preg_replace(
+                self::NORMALISE_SPACE_REGEXP,
+                ' ',
+                htmlspecialchars_decode(strip_tags($indexContent)),
+            ),
+        );
+        if ($normalisedIndexContent === '') {
+            return $index;
+        }
+        return $index->setFulltextIndices(
+            $index->getFulltextIndices()->add((new Index\Fulltext\Model())->setFulltextIndex($normalisedIndexContent))
+        );
+    }
+
+    /**
+     * Helper function for adding a basic text lookup to the index.
+     *
+     * @param Index\Model $index
+     * @param string|null $indexContent
+     * @return Index\Model
+     */
+    protected function addTextIndex(Index\Model $index, ?string $indexContent): Index\Model
+    {
+        if (!isset($indexContent)) {
+            return $index;
+        }
+        $normalisedIndexContent = trim(
+            preg_replace(
+                self::NORMALISE_SPACE_REGEXP,
+                ' ',
+                $indexContent,
+            ),
+        );
+        if ($normalisedIndexContent === '') {
+            return $index;
+        }
+        $normalisedIndexContent = $indexContent;
+        return $index->setTextIndices(
+            $index->getTextIndices()->add((new Index\Text\Model())->setTextIndex($normalisedIndexContent))
+        );
     }
 }
