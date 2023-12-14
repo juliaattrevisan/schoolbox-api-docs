@@ -120,10 +120,40 @@ class IndexBuilder extends BaseBuilder
     {
         $queryString = "
             SELECT
-                assessment.id
+                assessment.id,
+                CONCAT(
+                    '" . Hydrator::BASE_TYPE . ".',
+                    COALESCE(
+                        IF(task.id, '" . AssessmentType::TYPE_TASK . "', NULL),
+                        IF(assess.assessment_id, '" . AssessmentType::TYPE_QUIZ . "', NULL),
+                        IF(lti_assessment.assessment_id, '" . AssessmentType::TYPE_LTI_ASSESSMENT . "', NULL),
+                        IF(submission_box.id, '" . AssessmentType::TYPE_DUE_WORK . "', NULL),
+                        IF(project.id, '" . AssessmentType::TYPE_PROJECT . "', NULL),
+                        IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL)
+                    )
+                ) AS type
             FROM mv_assessment_relation
             JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
+            LEFT JOIN project ON (
+                assessment.id=project.assessment_id
+            )
+            LEFT JOIN lti_assessment ON (
+                assessment.id = lti_assessment.assessment_id
+            )
+            LEFT JOIN submission_box ON (
+                assessment.id = submission_box.assessment_id
+            )
+            LEFT JOIN task ON (
+                task.assessment_id = assessment.id
+            )
+            LEFT JOIN assess ON (
+                assess.assessment_id = assessment.id
+            )
+            LEFT JOIN lesson_plan ON (
+                lesson_plan.assessment_id = assessment.id
+            )
             WHERE assessment.deleted_at IS NOT NULL
+            AND type IS NOT NULL
         ";
         $params = [];
         if ($fromDate) {
@@ -137,6 +167,15 @@ class IndexBuilder extends BaseBuilder
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
         $this->logger->info(sprintf('Deleting search indices for %d assessments', $query->rowCount()));
-        return $query->fetchColumnArray('id');
+        foreach ($query as $row) {
+            yield $this->buildIndex(
+                (string)$row['id'],
+                null,
+                $row['type'],
+                null,
+                true,
+                null,
+            );
+        }
     }
 }

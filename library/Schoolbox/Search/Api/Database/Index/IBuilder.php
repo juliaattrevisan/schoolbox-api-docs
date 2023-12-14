@@ -28,7 +28,7 @@ interface IBuilder
      *                                           updated at or after this date.
      * @param Alaress_Date_Format|null $toDate   If provided, only build indices
      *                                           updated at or before this date.
-     * @return iterable<Model>
+     * @return iterable<Model> A collection of search indices to create.
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
 
@@ -42,7 +42,7 @@ interface IBuilder
      *                                            updated at or after this date.
      * @param Alaress_Date_Format|null $toDate    If provided, only clear indices
      *                                            updated at or before this date.
-     * @return iterable<string>
+     * @return iterable<Model> A collection of search indices to delete.
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
 }

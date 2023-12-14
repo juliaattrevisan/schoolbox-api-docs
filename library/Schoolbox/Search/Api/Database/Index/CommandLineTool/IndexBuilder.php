@@ -110,25 +110,30 @@ class IndexBuilder extends App
             $indexMapper->truncate();
         }
 
-        $deletedIndexIdentifiers = [];
         foreach ($indexBuilders as $indexBuilder) {
-            foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $index) {
+            foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
                 if (!$this->perform()) {
                     continue;
                 }
-                $indexMapper->save($index);
+                $indexMapper->save($updatedIndex);
 
                 // Propagate item to indices
                 $indexTextMapper->save(
-                    $index->getTextIndices()->map(fn ($textIndex) => $textIndex->setSearchIndex($index)),
+                    $updatedIndex->getTextIndices()->map(fn ($textIndex) => $textIndex->setSearchIndex($updatedIndex)),
                 );
                 $indexFulltextMapper->save(
-                    $index->getFulltextIndices()->map(fn ($fulltextIndex) => $fulltextIndex->setSearchIndex($index)),
+                    $updatedIndex->getFulltextIndices()->map(fn ($fulltextIndex) => $fulltextIndex->setSearchIndex($updatedIndex)),
                 );
             }
 
-            foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $indexIdentifier) {
-                $deletedIndexIdentifiers[] = $indexIdentifier;
+            foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {
+                if (!$this->perform()) {
+                    continue;
+                }
+                $indexMapper->deleteByColumnList([
+                    'identifier' => $deletedIndex->getIdentifier(),
+                    'type'       => $deletedIndex->getType(),
+                ]);
             }
         }
     }

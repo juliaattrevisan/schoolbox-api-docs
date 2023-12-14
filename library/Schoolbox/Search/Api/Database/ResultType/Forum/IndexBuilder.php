@@ -82,6 +82,15 @@ class IndexBuilder extends BaseBuilder
         $query = $this->connector->prepareQuery($queryString);
         $query->execute();
         $this->logger->info(sprintf('Deleting search indices for %d forum posts', $query->rowCount()));
-        return $query->fetchColumnArray('id');
+        foreach ($query as $row) {
+            yield $this->buildIndex(
+                (string)$row['id'],
+                null,
+                Hydrator::BASE_TYPE,
+                null,
+                true,
+                null,
+            );
+        }
     }
 }
