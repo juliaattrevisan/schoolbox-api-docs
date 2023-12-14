@@ -77,23 +77,23 @@ class Controller extends AbstractController
         $this->quizAnswerMapper = $quizAnswerMapper;
     }
 
-    /**
-     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
-     *
-     * GETs the page where a Teacher can review a Student's attempt
-     *
-     * @api   GET /learning/quiz/review/{assessmentId}/{firstSectionId}/{responseId}
-     * @since 165
-     * @param int $assessmentId
-     * @param int $firstSectionId
-     * @param int $responseId
-     * @todo Rebuild with twig
-     */
-    public function getQuizResponseFirstSection($assessmentId, $firstSectionId, $responseId)
-    {
-        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->response = $this->redirectFound("/assess/review/$assessId/$firstSectionId/$responseId");
-    }
+//    /**
+//     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+//     *
+//     * GETs the page where a Teacher can review a Student's attempt
+//     *
+//     * @api   GET /learning/quiz/review/{assessmentId}/{firstSectionId}/{responseId}
+//     * @since 165
+//     * @param int $assessmentId
+//     * @param int $firstSectionId
+//     * @param int $responseId
+//     * @todo Rebuild with twig
+//     */
+//    public function getQuizResponseFirstSection($assessmentId, $firstSectionId, $responseId)
+//    {
+//        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
+//        $this->response = $this->redirectFound("/assess/review/$assessId/$firstSectionId/$responseId");
+//    }
 
     /**
      * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
@@ -110,124 +110,126 @@ class Controller extends AbstractController
         $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
         $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
 
-        $url = $this->router->getGenerator()->generate('learnosity.getContent', ['assessmentId' => $assessmentId]);
+        $url = $this->router->getGenerator()->generate('learnosity.getContent', [
+            'assessmentId' => $assessmentId
+        ]);
 
         $this->response = $this->redirectFound("{$url}{$redirect}");
     }
 
-    /**
-     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
-     *
-     * GETs the page where a Teacher can add Section and Questions to the Quiz
-     *
-     * @api   GET /learning/quiz/summary/{assessmentId}
-     * @since 165
-     * @param int $assessmentId
-     * @todo Rebuild with twig
-     */
-    public function getQuizSectionCreate($assessmentId)
-    {
-        $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
-        $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
-        $this->response = $this->redirectFound("/assess/section/create/$assessId{$redirect}");
-    }
+//    /**
+//     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+//     *
+//     * GETs the page where a Teacher can add Section and Questions to the Quiz
+//     *
+//     * @api   GET /learning/quiz/summary/{assessmentId}
+//     * @since 165
+//     * @param int $assessmentId
+//     * @todo Rebuild with twig
+//     */
+//    public function getQuizSectionCreate($assessmentId)
+//    {
+//        $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
+//        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL);
+//        $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
+//        $this->response = $this->redirectFound("/assess/section/create/$assessId{$redirect}");
+//    }
+//
+//    /**
+//     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+//     *
+//     * GETs the page where a Teacher can add Section and Questions to the Quiz
+//     *
+//     * @api   GET /learning/quiz/review/{assessmentId}/horizontal
+//     * @since 165
+//     * @param int $assessmentId
+//     * @todo Rebuild with twig
+//     */
+//    public function getQuizReviewHorizontal($assessmentId)
+//    {
+//        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
+//        $this->response = $this->redirectFound("/assess/reviewHorizontal/$assessId");
+//    }
+//
+//    /**
+//     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
+//     *
+//     * Enables a Student to begin a Quiz
+//     *
+//     * @api   GET /learning/quiz/intro/{assessmentId}
+//     * @since 165
+//     * @param int $assessmentId
+//     * @todo Rebuild with twig
+//     */
+//    public function getQuizIntro($assessmentId)
+//    {
+//        $returnUrlSuffix = "?returnUrl=" .
+//            ($this->requestQuery->get('returnUrl') ?: Redirect::encode(RequestUriParser::parseUrlPath($this->request->getServerParams())));
+//
+//        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
+//        $this->response = $this->redirectFound("/assess/intro/$assessId" . $returnUrlSuffix);
+//    }
+//
+//    /**
+//     * @api   GET /learning/quiz/{assessmentId}/{userId}/attempts
+//     * @param int $assessmentId
+//     * @param int $userId
+//     */
+//    public function getQuizAttemptsByUser($assessmentId, $userId)
+//    {
+//        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
+//        $this->response = $this->redirectFound("/assess/attempts/$assessId/$userId");
+//    }
+//
+//
+//    /**
+//     * Converts an assessment_id to an assess_id
+//     *
+//     * @param int $assessmentId
+//     * @return Model
+//     */
+//    private function getQuizForAssessmentId($assessmentId)
+//    {
+//        /** @var Model $quiz */
+//        $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
+//
+//        if (!$quiz) {
+//            throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+//        }
+//
+//        if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
+//            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+//        }
+//        return $quiz;
+//    }
 
-    /**
-     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
-     *
-     * GETs the page where a Teacher can add Section and Questions to the Quiz
-     *
-     * @api   GET /learning/quiz/review/{assessmentId}/horizontal
-     * @since 165
-     * @param int $assessmentId
-     * @todo Rebuild with twig
-     */
-    public function getQuizReviewHorizontal($assessmentId)
-    {
-        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->response = $this->redirectFound("/assess/reviewHorizontal/$assessId");
-    }
-
-    /**
-     * Maps a Quiz's AssessmentId onto an equivalent URL using the old assess_id
-     *
-     * Enables a Student to begin a Quiz
-     *
-     * @api   GET /learning/quiz/intro/{assessmentId}
-     * @since 165
-     * @param int $assessmentId
-     * @todo Rebuild with twig
-     */
-    public function getQuizIntro($assessmentId)
-    {
-        $returnUrlSuffix = "?returnUrl=" .
-            ($this->requestQuery->get('returnUrl') ?: Redirect::encode(RequestUriParser::parseUrlPath($this->request->getServerParams())));
-
-        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->response = $this->redirectFound("/assess/intro/$assessId" . $returnUrlSuffix);
-    }
-
-    /**
-     * @api   GET /learning/quiz/{assessmentId}/{userId}/attempts
-     * @param int $assessmentId
-     * @param int $userId
-     */
-    public function getQuizAttemptsByUser($assessmentId, $userId)
-    {
-        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->response = $this->redirectFound("/assess/attempts/$assessId/$userId");
-    }
-
-
-    /**
-     * Converts an assessment_id to an assess_id
-     *
-     * @param int $assessmentId
-     * @return Model
-     */
-    private function getQuizForAssessmentId($assessmentId)
-    {
-        /** @var Model $quiz */
-        $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
-
-        if (!$quiz) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
-        if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-        }
-        return $quiz;
-    }
-
-    /**
-     * Marks an attempt as completed
-     *
-     * @var int    $_POST['attemptId']
-     * @var string $_POST['returnUrl']
-     */
-    public function postQuizSubmit()
-    {
-        $get = $this->requestQuery;
-        $post = $this->requestPost;
-
-        try {
-            $attempt = $this->quizAttemptMapper->findById($post['attemptId']);
-            $attempt->setFinish(\Alaress_Date_Format::now());
-            $this->quizAttemptMapper->save($attempt);
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
-        }
-
-        if ($this->isXhrRequest()) {
-            $this->response = $this->responseAsJson(['status' => 200]);
-        } elseif (isset($get['returnUrl'])) {
-            $this->response = $this->redirectFound(Redirect::decode($get['returnUrl']));
-        } else {
-            $this->response = $this->redirectFound($this->getSession()->getHistory());
-        }
-    }
+//    /**
+//     * Marks an attempt as completed
+//     *
+//     * @var int    $_POST['attemptId']
+//     * @var string $_POST['returnUrl']
+//     */
+//    public function postQuizSubmit()
+//    {
+//        $get = $this->requestQuery;
+//        $post = $this->requestPost;
+//
+//        try {
+//            $attempt = $this->quizAttemptMapper->findById($post['attemptId']);
+//            $attempt->setFinish(\Alaress_Date_Format::now());
+//            $this->quizAttemptMapper->save($attempt);
+//        } catch (MapperException $e) {
+//            throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
+//        }
+//
+//        if ($this->isXhrRequest()) {
+//            $this->response = $this->responseAsJson(['status' => 200]);
+//        } elseif (isset($get['returnUrl'])) {
+//            $this->response = $this->redirectFound(Redirect::decode($get['returnUrl']));
+//        } else {
+//            $this->response = $this->redirectFound($this->getSession()->getHistory());
+//        }
+//    }
 
     /**
      * Populate the Response object with a list of entities:
