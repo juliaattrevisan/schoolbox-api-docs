@@ -54,7 +54,7 @@ class IndexBuilder extends BaseBuilder
                 COALESCE(assessment.due_date, assessment.updated_at) AS date,
                 NULL AS created_by,
                 folder.id AS folder_id,
-                assessment.title AS fulltext_index1
+                assessment.title AS fulltext_index1,
                 assessment.description AS fulltext_index2,
                 task.link AS fulltext_index3,
                 lti_assessment.lti_assessment_url AS fulltext_index4,
@@ -96,7 +96,6 @@ class IndexBuilder extends BaseBuilder
                 lesson_plan.assessment_id = assessment.id
             )
             WHERE assessment.deleted_at IS NULL
-            AND type IS NOT NULL
         ";
         $params = [];
         if ($fromDate) {
@@ -112,6 +111,10 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d assessments', $query->rowCount()));
         foreach ($query as $row) {
+            // Somehow this row has no type?
+            if (!isset($row['type'])) {
+                continue;
+            }
             $index = $this->buildIndex(
                 (string)$row['id'],
                 $row['title'],
@@ -194,6 +197,10 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Deleting search indices for %d assessments', $query->rowCount()));
         foreach ($query as $row) {
+            // Somehow this row has no type?
+            if (!isset($row['type'])) {
+                continue;
+            }
             yield $this->buildIndex(
                 (string)$row['id'],
                 null,
