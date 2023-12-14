@@ -249,7 +249,7 @@ class Module extends BaseModule
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
-                    new Rule\HasRole(Role::STAFF),
+                    $this->buildAuthRuleHasInstructorAccess(),
                     new Rule\All(
                         new Rule\HasRole(Role::STUDENT),
                         new Rule\IsUser('studentId')
