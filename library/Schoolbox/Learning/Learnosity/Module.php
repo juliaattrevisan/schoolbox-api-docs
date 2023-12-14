@@ -63,14 +63,15 @@ class Module extends BaseModule
          */
         $instructorPerms = $this->buildAuthRuleHasInstructorAccess();
 
-        /* The current user must match {studentId} in the routes
-         * ie. you're the owner of something in the url
+        /* Someone who can complete an attempt
          *
-         * (All staff are also allowed here)
+         * The current user must match {studentId} in the routes
+         * ie. you're the owner of something in the url, among other rules
          */
         $learnerIsUserPerms = $this->buildAuthRuleCanSubmit();
 
         /* A special rule about who can finish an attempt
+         * (Staff can arbitrarily finish a student's unfinished attempt)
          */
         $canFinishAttempt = $this->canFinishAttempt();
 
