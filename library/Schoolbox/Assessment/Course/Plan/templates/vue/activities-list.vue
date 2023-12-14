@@ -33,18 +33,10 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
             <li v-for="activity in displayedActivities" :key="activity.id" class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12 compact wrap-down">
-                      <template v-if="activity.assessmentType === 'project'">
-                        <a target="_blank" :href="activity._links.status">
+                        <a :href="activity.assessmentType === 'project' ? activity._links.status : activity._links.summary">
                             <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
                             <p>{{ activity.title }}</p>
                         </a>
-                      </template>
-                      <template v-else>
-                        <a target="_blank" :href="activity._links.summary">
-                          <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
-                          <p>{{ activity.title }}</p>
-                        </a>
-                      </template>
                     </div>
                 </div>
                 <nav>
