@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\Index\CommandLineTool;
 
 use Alaress_Date_Format;
 use InvalidArgumentException;
+use PDOException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -115,7 +116,7 @@ class IndexBuilder extends App
                 // TODO REPLACE instead of failing INSERT and then UPDATE
                 try {
                     $indexMapper->save($updatedIndex);
-                } catch (MapperException) {
+                } catch (MapperException|PDOException) {
                     $existingIndex = $indexMapper->findOneByColumnList([
                         'identifier' => $updatedIndex->getIdentifier(),
                         'type'       => $updatedIndex->getType(),
