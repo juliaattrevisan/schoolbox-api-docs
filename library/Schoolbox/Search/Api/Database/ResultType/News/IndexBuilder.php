@@ -66,22 +66,29 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildDeletes(Alaress_Date_Format $date): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
         // Not sure how news deletions should be handled:
         // IMO articles rejected should be removed from the index,
         // but don't know how to handle that and also deletion.
         // I guess just delete any which are not published, either?
-        $query  = "SELECT
+        $queryString = "SELECT
             n.id
             FROM comms_news_article n
-            WHERE n.deleted_at >= :date
+            WHERE n.deleted_at IS NOT NULL
         ";
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
-        return $this->connector->executeQuery($query, $params)->fetchColumn();
+        $params      = [];
+        if ($fromDate) {
+            $queryString        .= ' AND n.deleted_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND n.deleted_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        return $this->connector->executeQuery($queryString, $params)->fetchColumn();
     }
 }

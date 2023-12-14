@@ -66,19 +66,26 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildDeletes(Alaress_Date_Format $date): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        $query  = "SELECT
+        $queryString = "SELECT
             b.id
             FROM blog b
             JOIN folder f ON b.folder_id = f.id
-            WHERE COALESCE(b.deleted_at, f.deleted_at) >= :date
+            WHERE COALESCE(b.deleted_at, f.deleted_at) IS NOT NULL
         ";
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
-        return $this->connector->executeQuery($query, $params)->fetchColumn();
+        $params      = [];
+        if ($fromDate) {
+            $queryString        .= ' AND COALESCE(b.deleted_at, f.deleted_at) >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND COALESCE(b.deleted_at, f.deleted_at) <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        return $this->connector->executeQuery($queryString, $params)->fetchColumn();
     }
 }

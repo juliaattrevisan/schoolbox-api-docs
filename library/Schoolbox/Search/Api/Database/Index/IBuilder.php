@@ -18,7 +18,8 @@ use Schoolbox\Search\Index\Model;
 interface IBuilder
 {
     /**
-     * Build a collection of search indices which were updated after `$date`.
+     * Build a collection of search indices which were updated between
+     * `$fromDate` and `$toDate`.
      *
      * This list is intended to override any existing indices with the same
      * identifier.
@@ -32,14 +33,16 @@ interface IBuilder
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
 
     /**
-     * Build a collection of search indices which were deleted after `$date`.
+     * Build a collection of search indices which were deleted between
+     * `$fromDate` and `$toDate`.
      *
      * This list is intended to delete any indices which match the identifiers.
      *
-     * @param Alaress_Date_Format $date Only fetch indices updated after this
-     *                                  date: this should be the last date on
-     *                                  which the search index was populated.
+     * @param Alaress_Date_Format|null $fromDate  If provided, only clear indices
+     *                                            updated at or after this date.
+     * @param Alaress_Date_Format|null $toDate    If provided, only clear indices
+     *                                            updated at or before this date.
      * @return iterable<string>
      */
-    public function buildDeletes(Alaress_Date_Format $date): iterable;
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
 }

@@ -125,18 +125,25 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
+     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
-    public function buildDeletes(Alaress_Date_Format $date): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
         // Only fully deleted text boxes count as deleted for the purpose of
         // index building:
         // components are not soft deleted, so I can't tell if an index for
         // those no longer exists.
-        $query  = "SELECT CONCAT(textBoxID, '--') FROM textBox WHERE deleted_at >= :date";
-        $params = [
-            'date' => $date->getDatabaseDate(),
-        ];
-        return $this->connector->executeQuery($query, $params)->fetchColumn();
+        $queryString = "SELECT CONCAT(textBoxID, '--') FROM textBox WHERE deleted_at IS NOT NULL";
+        $params      = [];
+        if ($fromDate) {
+            $queryString        .= ' AND deleted_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString      .= ' AND deleted_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        return $this->connector->executeQuery($queryString, $params)->fetchColumn();
     }
 }

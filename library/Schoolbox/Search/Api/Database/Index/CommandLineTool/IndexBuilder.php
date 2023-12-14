@@ -110,16 +110,17 @@ class IndexBuilder extends App
             $indexMapper->truncate();
         }
 
+        $deletedIndexIds = [];
         foreach ($indexBuilders as $indexBuilder) {
-            foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $item) {
+            foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $index) {
                 if (!$this->perform()) {
                     continue;
                 }
-                $indexMapper->save($item);
+                $indexMapper->save($index);
 
                 // Propagate item to indices
-                $indexTextMapper->save($item->getTextIndices()->map(fn ($index) => $index->setSearchIndex($item)));
-                $indexFulltextMapper->save($item->getFulltextIndices()->map(fn ($index) => $index->setSearchIndex($item)));
+                $indexTextMapper->save($index->getTextIndices()->map(fn ($index) => $index->setSearchIndex($index)));
+                $indexFulltextMapper->save($index->getFulltextIndices()->map(fn ($index) => $index->setSearchIndex($index)));
             }
         }
     }
