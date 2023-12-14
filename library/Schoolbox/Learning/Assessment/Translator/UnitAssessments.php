@@ -54,6 +54,13 @@ class UnitAssessments
                     'assessment' => $assessment,
                 ])
             ];
+            // if quiz we have special links
+            if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+                $links['modifyContent'] = $this->routeGenerator->generate('learnosity.getContent', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]);
+            }
         }
         $assessments = null;
         if ($assessment instanceof Project) {

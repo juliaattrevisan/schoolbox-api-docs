@@ -25,6 +25,17 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
     }
     return props.activities.slice(0, maxUnexpandedActivities);
 });
+
+/**
+ * Get the current url; these redirects are used after backend processing
+ * so you can return to your current location afterwards
+ *
+ * Use the base64encoded version of the url's pathname, so it can work in
+ * conjunection with Class Redirect in the back end
+ */
+const returnUrl = function(url) {
+    return url + "?returnUrl=" + btoa(window.location.pathname);
+}
 </script>
 
 <template>
@@ -44,7 +55,10 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
                 </nav>
                 <ul :id="'dropdown-unitplanner-activity-' + activity.id" class="f-dropdown" data-dropdown-content>
                     <li>
-                        <a target="_blank" :href="activity._links.modify" class="icon-modify">Modify</a>
+                        <a target="_blank" :href="returnUrl(activity._links.modify)" class="icon-modify">{{ activity.assessmentType === 'quiz' ? 'Modify Settings' : 'Modify' }}</a>
+                    </li>
+                    <li v-if="activity.assessmentType === 'quiz'">
+                        <a :href="returnUrl(activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
                     </li>
                 </ul>
             </li>
