@@ -6,21 +6,6 @@
  # * student:     User         - The relevant student
  #}
 
-{# Only set this var if the assessment is a task so participants can create a
- # response asychronously without reloading the page. This only applies to Tasks.
- # Due Work and Quiz require more indepth workflows to submit a Response.
- #}
-{% set postRoute = null %}
-
-{% if assessment is task and assessment.isImplementation %}
-    {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
-        assessment:   assessment,
-        assessmentId: assessment.id,
-        student:      student,
-        studentId:    student.id
-    }) %}
-{% endif %}
-
 {# Find the user's participation record
  #
  # This is used to find out a user's current progress in an assessment,
@@ -30,6 +15,21 @@
 {% set participant = assessment.participantIfExtant(student) %}
 
 {% if participant and not participant.isExcluded %}
+
+    {# Only set this var if the assessment is a task so participants can create a
+     # response asychronously without reloading the page. This only applies to Tasks.
+     # Due Work and Quiz require more indepth workflows to submit a Response.
+    #}
+    {% set postRoute = null %}
+    {% if assessment is task and assessment.isImplementation %}
+        {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
+            assessment:   assessment,
+            assessmentId: assessment.id,
+            student:      student,
+            studentId:    student.id
+        }) %}
+    {% endif %}
+
     {# Tasks only #}
     {% if postRoute is not null and postRoute != '' %}
         <form action="{{ postRoute }}"
