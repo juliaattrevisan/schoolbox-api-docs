@@ -54,7 +54,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
     $configMapper = ConfigMapper::getInstance();
     $allConfigs = $configMapper->findAll();
-    $externalFiletypeBlacklist = $allConfigs->getBy('name', 'external_filetype_blacklist')->getValue();
+    $externalFiletypeBlacklist = $allConfigs->getBy('name', 'external_filetype_blacklist')->getValue() ?? '';
     $externalFiletypeBlacklist = explode(",", $externalFiletypeBlacklist);
 
     // Iterate all file types from the database
