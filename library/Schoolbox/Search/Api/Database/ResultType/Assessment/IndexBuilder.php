@@ -54,12 +54,11 @@ class IndexBuilder extends BaseBuilder
                 COALESCE(assessment.due_date, assessment.updated_at) AS date,
                 NULL AS created_by,
                 folder.id AS folder_id,
-                assessment.title AS fulltext_index1,
-                assessment.description AS fulltext_index2,
-                task.link AS fulltext_index3,
-                lti_assessment.lti_assessment_url AS fulltext_index4,
-                lti_assessment.lti_assessment_title AS fulltext_index5,
-                lti_assessment.lti_assessment_text AS fulltext_index6
+                assessment.description,
+                task.link AS task_link,
+                lti_assessment.lti_assessment_url,
+                lti_assessment.lti_assessment_title,
+                lti_assessment.lti_assessment_text
             FROM mv_assessment_relation
             JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
             JOIN folder ON (
@@ -112,18 +111,18 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 $row['folder_id'],
             );
-            $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index2']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index3']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index4']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index5']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index6']);
+            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['description'], self::INDEX_STRATEGY_HTML);
+            $index = $this->addFulltextIndex($index, $row['task_link'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['lti_assessment_url'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['lti_assessment_title'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['lti_assessment_text'], self::INDEX_STRATEGY_TEXT);
 
             // Build lesson plan indices as well
             $lessonPlanQuery->execute(['assessmentId' => $row['id']]);
             foreach ($lessonPlanQuery as $lessonPlanRow) {
-                $index = $this->addFulltextIndex($index, $lessonPlanRow['title']);
-                $index = $this->addFulltextIndex($index, $lessonPlanRow['body']);
+                $index = $this->addFulltextIndex($index, $lessonPlanRow['title'], self::INDEX_STRATEGY_TEXT);
+                $index = $this->addFulltextIndex($index, $lessonPlanRow['body'], self::INDEX_STRATEGY_HTML);
             }
             yield $index;
         }

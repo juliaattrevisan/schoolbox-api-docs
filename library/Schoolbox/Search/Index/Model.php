@@ -68,7 +68,8 @@ class Model
      * The searchable full-text index for this search index.
      *
      * In practice: this will be long-form content such as a description or
-     * article text.
+     * article text, and will be searched with a
+     * `MATCH (column) AGAINST (:keyword)` query.
      */
     private string $fulltextIndex;
 
@@ -76,7 +77,7 @@ class Model
      * The searchable short index for this search index.
      *
      * In practice: this will be short-form content such as a person's name or
-     * title.
+     * title, and will be searched with a `column LIKE :keyword` query.
      */
     private string $textIndex;
 
