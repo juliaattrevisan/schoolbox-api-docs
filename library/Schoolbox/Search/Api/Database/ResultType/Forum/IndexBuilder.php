@@ -63,8 +63,8 @@ class IndexBuilder extends BaseBuilder
             // In the forum query param builder, this is a text index:
             // it's a fulltext index here, because having title+body as fulltext
             // indices is more in line with other searchables.
-            $index = $this->addFulltextIndex($index, $row['title']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index']);
+            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index'], self::INDEX_STRATEGY_HTML);
             yield $index;
         }
     }

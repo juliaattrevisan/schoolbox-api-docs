@@ -71,8 +71,8 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 $row['folder_id'],
             );
-            $index = $this->addFulltextIndex($index, $row['title']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index']);
+            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index'], self::INDEX_STRATEGY_HTML);
             yield $index;
         }
 
@@ -118,8 +118,8 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 null,
             );
-            $index = $this->addFulltextIndex($index, $row['title']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index']);
+            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index'], self::INDEX_STRATEGY_HTML);
             yield $index;
         }
     }
