@@ -774,6 +774,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Enable and configure API connectivity between your platform and many other integrated services.',
                     ],
+                    '/adminv2/setting/AI' => [
+                        'name'        => 'AI Services',
+                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
+                        'children'    => [],
+                        'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
+                    ],
                     '/adminv2/setting/Debugging'              => [
                         'name'        => 'Debugging',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,

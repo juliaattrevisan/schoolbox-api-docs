@@ -28,6 +28,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 class Controller extends Base
 {
     private const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+    private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%S/chat/completions?api-version=2023-12-01-preview';
+
 
     /**
      * Controller constructor.
@@ -50,7 +52,7 @@ class Controller extends Base
         }
 
         try {
-            $openAiRequest = new Request('POST', self::OPENAI_API_ENDPOINT, [
+            $openAiRequest = new Request('POST', $this->getEndpoint(), [
                 'Authorization' => 'Bearer ' . $openAiKey,
                 'Content-Type'  => 'application/json',
             ], $this->request->getBody()->getContents());
@@ -85,10 +87,32 @@ class Controller extends Base
             );
 
             $promise->wait();
-
         } catch (GuzzleException $e) {
             $this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
         die();
+    }
+
+    /**
+     * Creates an endpoint URL string for the user selected endpoint.  They can choose between OpenAI and Azure.
+     *
+     */
+    private function getEndpoint(): string
+    {
+        switch ($this->getConfigLoader()->get('openai_endpoint')) {
+            case 'OpenAI':
+                return self::OPENAI_API_ENDPOINT;
+            case 'Azure':
+                if (empty($this->getConfigLoader()->get('openai_azure_resource_name')) || empty($this->getConfigLoader()->get('openai_azure_deployment_id'))) {
+                    throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
+                }
+
+                return sprintf(
+                    self::AZURE_API_ENDPOINT,
+                    $this->getConfigLoader()->get('openai_azure_resource_name'),
+                    $this->getConfigLoader()->get('openai_azure_deployment_id')
+                );
+        }
+        throw new \UnexpectedValueException('Endpoint must be configured');
     }
 }
