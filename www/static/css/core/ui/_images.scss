@@ -43,6 +43,7 @@
         overflow: hidden;
         position: relative;
         max-width: var(--image-size-m);
+
         img {
             /*
                 Stretch the image. Using object-fit: cover with min-width and min-height 100% means that the image
@@ -50,9 +51,8 @@
                 rectangular aspect rations in both dimensions (eg 16:9 and 19:6 are handled)
             */
             min-height: 100%;
-            min-width: 100%;
-            object-fit: cover;
             min-width: var(--image-size-m);
+            object-fit: cover;
         }
     }
 
