@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Search\Api\Database\Index\IBuilder;
 use Schoolbox\Search\Api\Database\ResultType;
 use Schoolbox\Search\Index;
@@ -115,7 +116,17 @@ class IndexBuilder extends App
                 if (!$this->perform()) {
                     continue;
                 }
-                $indexMapper->save($updatedIndex);
+
+                // I'd rather REPLACE rather than fail INSERT and then UPDATE
+                try {
+                    $indexMapper->save($updatedIndex);
+                } catch (MapperException) {
+                    $existingIndex = $indexMapper->findOneByColumnList([
+                        'identifier' => $updatedIndex->getIdentifier(),
+                        'type'       => $updatedIndex->getType(),
+                    ]);
+                    $indexMapper->save($updatedIndex->setId($existingIndex->getId()));
+                }
 
                 // Propagate item to indices
                 $indexTextMapper->save(
