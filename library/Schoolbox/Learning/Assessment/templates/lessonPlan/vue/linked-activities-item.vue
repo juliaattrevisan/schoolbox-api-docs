@@ -125,7 +125,7 @@ function getDataProgressTickForm(activity: Activity) {
         </h3>
         <p class="meta">
             {{ getActivityMeta(activity) }}
-            <template v-if="activity.dueAtFormatted && props.isInstructor && !store.isStudentView">
+            <template v-if="props.isInstructor && !store.isStudentView">
                 |
                 <span :class="getUrgency()"
                     >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
