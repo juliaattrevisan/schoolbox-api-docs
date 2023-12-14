@@ -99,9 +99,7 @@ class IndexBuilder extends App
             new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
             new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
-        $indexMapper         = Index\Mapper::getInstance();
-        $indexTextMapper     = Index\Text\Mapper::getInstance();
-        $indexFulltextMapper = Index\Fulltext\Mapper::getInstance();
+        $indexMapper = Index\Mapper::getInstance();
 
         // Run for as long as you need to?
         $this->getDatabaseInternal()->execute('SET MAX_STATEMENT_TIME=0');
@@ -124,14 +122,6 @@ class IndexBuilder extends App
                     ]);
                     $indexMapper->save($updatedIndex->setId($existingIndex->getId()));
                 }
-
-                // Propagate item to indices
-                $indexTextMapper->save(
-                    $updatedIndex->getTextIndices()->map(fn ($textIndex) => $textIndex->setSearchIndex($updatedIndex)),
-                );
-                $indexFulltextMapper->save(
-                    $updatedIndex->getFulltextIndices()->map(fn ($fulltextIndex) => $fulltextIndex->setSearchIndex($updatedIndex)),
-                );
             }
 
             foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {

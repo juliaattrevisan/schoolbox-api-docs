@@ -34,9 +34,11 @@ class TextQueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
-        $whereParts[] = "(sit.text_index LIKE :indexKeywordLike$paramKeySuffix)";
+        $whereParts[] = "(MATCH(si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix))";
+        $whereParts[] = "(si.text_index LIKE :indexKeywordLike$paramKeySuffix)";
         $params       = [
             "indexNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
+            "indexKeyword$paramKeySuffix"     => $keyword,
             "indexKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
@@ -131,7 +133,6 @@ class TextQueryParamBuilder extends BaseQueryParamBuilder
     {
         return '
             FROM search_index si
-            INNER JOIN search_index_text sit ON si.id = sit.search_index_id
             LEFT JOIN search_index_folder sifo ON si.id = sifo.search_index_id
         ';
     }

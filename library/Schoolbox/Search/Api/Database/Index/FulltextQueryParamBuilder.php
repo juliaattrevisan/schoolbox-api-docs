@@ -24,7 +24,7 @@ class FulltextQueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
-        $whereParts[] = "(MATCH(sif.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix))";
+        $whereParts[] = "(MATCH(si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix))";
         $params       = [
             "indexNow$paramKeySuffix"     => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix" => $keyword,
@@ -121,7 +121,6 @@ class FulltextQueryParamBuilder extends BaseQueryParamBuilder
     {
         return '
             FROM search_index si
-            INNER JOIN search_index_fulltext sif ON si.id = sif.search_index_id
             LEFT JOIN search_index_folder sifo ON si.id = sifo.search_index_id
         ';
     }
