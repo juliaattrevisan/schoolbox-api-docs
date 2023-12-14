@@ -54,7 +54,7 @@ class IndexBuilder extends BaseBuilder
                 $row['date'],
                 true,
                 $row['created_by'],
-                $row['folder_id'],
+                null,
             );
             $index = $this->addFulltextIndex($index, $row['fulltext_index']);
             $index = $this->addTextIndex($index, $row['title']);
