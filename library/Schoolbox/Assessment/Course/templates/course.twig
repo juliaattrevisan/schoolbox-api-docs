@@ -268,6 +268,14 @@ Usage:
             }
         });
 
+        // Template input: show a warning if changing the selected option
+        var templateInput = $('[data-template]');
+
+        templateInput.change(function() {
+            $("[data-template-warning]").toggleClass("hide", Number({{ courseSpec.template.id }}) === Number(templateInput.val()));
+        });
+
+
         // Automatically expand the Unit specified in the URL hash
         if (window.location.hash) {
             var unitSpecId = window.location.hash.slice(1);
@@ -351,7 +359,7 @@ Usage:
                         <label class="required" for="template">
                             Course Template
                         </label>
-                        <select name="template" required {% if templates.count == 1%}disabled{% endif %}>
+                        <select data-template name="template" required {% if templates.count == 1%}disabled{% endif %}>
                             {% if templates.count > 1 %}
                                 {% for template in templates %}
                                     <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}</option>
@@ -360,6 +368,9 @@ Usage:
                                 <option value="{{ templates.first.id }}" selected>{{ templates.first.name }}</option>
                             {% endif %}
                         </select>
+                        <div class="alert-box warning hide icon-alert" data-template-warning>
+                            Changing the course template will remove all existing components and content.
+                        </div>
                     </div>
 
                     <div class="small-4 column">

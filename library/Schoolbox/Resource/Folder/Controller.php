@@ -735,7 +735,7 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws RangeException
      */
-    private function buildHomepageTemplate(Model $model, int $templateId): HomepageTemplate|ISoftDeletable
+    public function buildHomepageTemplate(Model $model, int $templateId): HomepageTemplate|ISoftDeletable
     {
         if ($templateId === HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
             return $this->homepageTemplateMapper->getKeepExistingHomepageTemplate();
@@ -769,7 +769,7 @@ class Controller extends BaseController
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function updateHomepageTemplate(Model $folder, HomepageTemplate $homepageTemplate): void
+    public function updateHomepageTemplate(Model $folder, HomepageTemplate $homepageTemplate): void
     {
         if ($homepageTemplate->getId() === HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
             return;

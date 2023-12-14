@@ -15,6 +15,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
+use Schoolbox\Assessment\Course\Template\Model as CourseTemplateModel;
 use Schoolbox\Resource\Folder\Ancestry;
 use UnexpectedValueException;
 use Schoolbox\Application;
@@ -692,6 +693,9 @@ class Controller extends Base\Base
             $courseSpec->setSubjectCode($subjectCode);
             $courseSpec->setTemplate($template);
 
+            // update existing units / course with the new templates
+            $this->updateExistingFolders($courseSpec, $template);
+
             // Save the Course
             $this->courseSpecificationMapper->save($courseSpec);
 
@@ -1169,7 +1173,7 @@ class Controller extends Base\Base
 
         $data = [
             'treedata' => json_encode($treeData),
-            'folderId' => $folderId
+            'folderId' => $folderId,
         ];
 
         $this->response = $this->responseDependentOnRequest('@course/picker.twig', $data, self::TAB);
@@ -1314,5 +1318,32 @@ class Controller extends Base\Base
         $this->response = $this->responseAsJson(
             $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
         );
+    }
+
+    /**
+     * Update Spec Course and Unit homepage templates
+     * This will purge all components from the homepage and re create only the ones from the selected template
+     * @see \Schoolbox\Resource\HomepageConfigMapper::resetToTemplate
+     *
+     * @param CourseSpecification $courseSpec
+     * @param CourseTemplateModel $template
+     * @return void
+     * @throws MapperException
+     */
+    private function updateExistingFolders(CourseSpecification $courseSpec, CourseTemplateModel $template)
+    {
+        /** @var FolderController $folderController */
+        $folderController = $this->getController('folder');
+
+        // update the course homepage template
+        $homepageTemplate = $folderController->buildHomepageTemplate($courseSpec->getFolder(), $template->getCourseTemplate()->getId());
+        $folderController->updateHomepageTemplate($courseSpec->getFolder(), $homepageTemplate);
+
+        // loop through existing units
+        foreach ($courseSpec->getUnits() as $unit) {
+            // update unit homepage templates
+            $homepageTemplate = $folderController->buildHomepageTemplate($unit->getFolder(), $template->getUnitTemplate()->getId());
+            $folderController->updateHomepageTemplate($unit->getFolder(), $homepageTemplate);
+        }
     }
 }
