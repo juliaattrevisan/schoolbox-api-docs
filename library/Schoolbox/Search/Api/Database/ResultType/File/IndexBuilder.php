@@ -60,9 +60,9 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
             );
             $index = $this->addFolder($index, $row['folder_id']);
+            $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index2']);
-            $index = $this->addTextIndex($index, $row['title']);
             yield $index;
         }
     }

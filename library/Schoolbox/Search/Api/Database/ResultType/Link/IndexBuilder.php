@@ -26,6 +26,7 @@ class IndexBuilder extends BaseBuilder
         $queryString = "
             SELECT
                 l.id,
+                l.url,
                 l.description AS title,
                 l.modified AS date,
                 l.owner AS created_by,
@@ -59,8 +60,9 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
             );
             $index = $this->addFolder($index, $row['folder_id']);
+            $index = $this->addFulltextIndex($index, $row['url']);
+            $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index']);
-            $index = $this->addTextIndex($index, $row['title']);
             yield $index;
         }
     }

@@ -58,9 +58,9 @@ class IndexBuilder extends BaseBuilder
                 true,
                 $row['created_by'],
             );
+            $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index2']);
-            $index = $this->addTextIndex($index, $row['title']);
             yield $index;
         }
     }

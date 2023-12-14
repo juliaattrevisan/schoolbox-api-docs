@@ -59,8 +59,12 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
             );
             $index = $this->addFolder($index, $row['folder_id']);
+
+            // In the forum query param builder, this is a text index:
+            // it's a fulltext index here, because having title+body as fulltext
+            // indices is more in line with other searchables.
+            $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index']);
-            $index = $this->addTextIndex($index, $row['title']);
             yield $index;
         }
     }
