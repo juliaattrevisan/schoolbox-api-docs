@@ -89,6 +89,9 @@ class IndexBuilder extends BaseBuilder
             $queryString      .= ' AND n.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
-        return $this->connector->executeQuery($queryString, $params)->fetchColumn();
+        $query = $this->connector->prepareQuery($queryString);
+        $query->execute($params);
+        $this->logger->info(sprintf('Deleting search indices for %d news articles', $query->rowCount()));
+        return $query->fetchColumnArray('id');
     }
 }

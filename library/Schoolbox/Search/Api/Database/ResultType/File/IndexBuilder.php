@@ -88,6 +88,9 @@ class IndexBuilder extends BaseBuilder
             $queryString      .= ' AND COALESCE(f.deleted_at, fo.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
-        return $this->connector->executeQuery($queryString, $params)->fetchColumn();
+        $query = $this->connector->prepareQuery($queryString);
+        $query->execute($params);
+        $this->logger->info(sprintf('Deleting search indices for %d files', $query->rowCount()));
+        return $query->fetchColumnArray('id');
     }
 }

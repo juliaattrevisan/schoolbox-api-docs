@@ -110,7 +110,7 @@ class IndexBuilder extends App
             $indexMapper->truncate();
         }
 
-        $deletedIndexIds = [];
+        $deletedIndexIdentifiers = [];
         foreach ($indexBuilders as $indexBuilder) {
             foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $index) {
                 if (!$this->perform()) {
@@ -119,8 +119,16 @@ class IndexBuilder extends App
                 $indexMapper->save($index);
 
                 // Propagate item to indices
-                $indexTextMapper->save($index->getTextIndices()->map(fn ($index) => $index->setSearchIndex($index)));
-                $indexFulltextMapper->save($index->getFulltextIndices()->map(fn ($index) => $index->setSearchIndex($index)));
+                $indexTextMapper->save(
+                    $index->getTextIndices()->map(fn ($textIndex) => $textIndex->setSearchIndex($index)),
+                );
+                $indexFulltextMapper->save(
+                    $index->getFulltextIndices()->map(fn ($fulltextIndex) => $fulltextIndex->setSearchIndex($index)),
+                );
+            }
+
+            foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $indexIdentifier) {
+                $deletedIndexIdentifiers[] = $indexIdentifier;
             }
         }
     }

@@ -73,12 +73,15 @@ class IndexBuilder extends BaseBuilder
     {
         // Forum posts or threads don't have deletion dates:
         // just delete all indices for deleted records regardless of date
-        $query = "SELECT
+        $queryString = "SELECT
             fp.postID as id
             FROM forumThread ft
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
             WHERE fp.deleted = 'true' OR ft.deleted = 'true'
         ";
-        return $this->connector->executeQuery($query)->fetchColumn();
+        $query = $this->connector->prepareQuery($queryString);
+        $query->execute();
+        $this->logger->info(sprintf('Deleting search indices for %d forum posts', $query->rowCount()));
+        return $query->fetchColumnArray('id');
     }
 }

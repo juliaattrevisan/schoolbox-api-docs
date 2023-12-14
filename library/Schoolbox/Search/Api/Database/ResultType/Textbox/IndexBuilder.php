@@ -134,7 +134,7 @@ class IndexBuilder extends BaseBuilder
         // index building:
         // components are not soft deleted, so I can't tell if an index for
         // those no longer exists.
-        $queryString = "SELECT CONCAT(textBoxID, '--') FROM textBox WHERE deleted_at IS NOT NULL";
+        $queryString = "SELECT CONCAT(textBoxID, '--') AS id FROM textBox WHERE deleted_at IS NOT NULL";
         $params      = [];
         if ($fromDate) {
             $queryString        .= ' AND deleted_at >= :fromDate';
@@ -144,6 +144,9 @@ class IndexBuilder extends BaseBuilder
             $queryString      .= ' AND deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
-        return $this->connector->executeQuery($queryString, $params)->fetchColumn();
+        $query = $this->connector->prepareQuery($queryString);
+        $query->execute($params);
+        $this->logger->info(sprintf('Deleting search indices for %d text boxes', $query->rowCount()));
+        return $query->fetchColumnArray('id');
     }
 }
