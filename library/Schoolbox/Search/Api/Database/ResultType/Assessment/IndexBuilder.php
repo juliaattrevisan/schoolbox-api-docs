@@ -24,7 +24,18 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        // TODO include other indices (lesson plan, URL)
+        // Need to query lesson plans separately
+        $lessonPlanQuery = $this->connector->prepareQuery("
+            SELECT title, body
+            FROM lesson_plan_field
+            INNER JOIN lesson_plan ON lesson_plan_field.lesson_plan_id = lesson_plan.id
+            WHERE lesson_plan.assessment_id = :assessmentId
+            AND lesson_plan_field.deleted_at IS NOT NULL
+        ");
+
+        // Note: task link and LTI assessment URL are in the fulltext index,
+        // because they won't fit in a standard indexed column.
+        // May need to fall back to a non-indexed column?
         $queryString = "
             SELECT
                 assessment.id,
@@ -43,8 +54,12 @@ class IndexBuilder extends BaseBuilder
                 COALESCE(assessment.due_date, assessment.updated_at) AS date,
                 NULL AS created_by,
                 folder.id AS folder_id,
-                assessment.description AS fulltext_index,
-                assessment.title AS text_index
+                assessment.title AS fulltext_index1
+                assessment.description AS fulltext_index2,
+                task.link AS fulltext_index3,
+                lti_assessment.lti_assessment_url AS fulltext_index4,
+                lti_assessment.lti_assessment_title AS fulltext_index5,
+                lti_assessment.lti_assessment_text AS fulltext_index6
             FROM mv_assessment_relation
             JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
             JOIN folder ON (
@@ -106,8 +121,19 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
             );
             $index = $this->addFolder($index, $row['folder_id']);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index']);
-            $index = $this->addTextIndex($index, $row['text_index']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index2']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index3']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index4']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index5']);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index6']);
+
+            // Build lesson plan indices as well
+            $lessonPlanQuery->execute(['assessmentId' => $row['id']]);
+            foreach ($lessonPlanQuery as $lessonPlanRow) {
+                $index = $this->addFulltextIndex($index, $lessonPlanRow['title']);
+                $index = $this->addFulltextIndex($index, $lessonPlanRow['body']);
+            }
             yield $index;
         }
     }
