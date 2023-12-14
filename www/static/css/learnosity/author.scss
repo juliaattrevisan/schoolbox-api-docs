@@ -977,10 +977,9 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec {
     background-color: var(--content-ui-hover) !important;
     text-decoration: none !important;
 }
-.lrn.lrn-author .lrn-row-narrow > [class^="lrn-col-"] {
-    padding-left: 0px !important;
+.lrn .lrn-author-ui .lrn-dl-inline dt {
+    margin-left: 0px;
 }
-
 .lrn.lrn-author.lrn-res .lrn-search-txt {
     display: inline-block !important;
 }
