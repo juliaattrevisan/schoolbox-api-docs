@@ -67,24 +67,20 @@ class Model
     private GenericCollection $folders;
 
     /**
-     * The searchable full-text indices for this search index.
+     * The searchable full-text index for this search index.
      *
      * In practice: this will be long-form content such as a description or
      * article text.
-     *
-     * @var GenericCollection<Fulltext\Model>
      */
-    private GenericCollection $fulltextIndices;
+    private string $fulltextIndex;
 
     /**
-     * The searchable short indices for this search index.
+     * The searchable short index for this search index.
      *
      * In practice: this will be short-form content such as a person's name or
      * title.
-     *
-     * @var GenericCollection<Text\Model>
      */
-    private GenericCollection $textIndices;
+    private string $textIndex;
 
     /**
      * @return string
@@ -195,38 +191,38 @@ class Model
     }
 
     /**
-     * @return GenericCollection<Fulltext\Model>
+     * @return string
      */
-    public function getFulltextIndices(): GenericCollection
+    public function getFulltextIndex(): string
     {
-        return $this->fulltextIndices;
+        return $this->fulltextIndex;
     }
 
     /**
-     * @param GenericCollection<Fulltext\Model> $fulltextIndices
+     * @param string $fulltextIndex
      * @return $this
      */
-    public function setFulltextIndices(GenericCollection $fulltextIndices): self
+    public function setFulltextIndex(string $fulltextIndex): self
     {
-        $this->fulltextIndices = $fulltextIndices;
+        $this->fulltextIndex = $fulltextIndex;
         return $this;
     }
 
     /**
-     * @return GenericCollection<Text\Model>
+     * @return string
      */
-    public function getTextIndices(): GenericCollection
+    public function getTextIndex(): string
     {
-        return $this->textIndices;
+        return $this->textIndex;
     }
 
     /**
-     * @param GenericCollection<Text\Model> $textIndices
+     * @param string $textIndex
      * @return $this
      */
-    public function setTextIndices(GenericCollection $textIndices): self
+    public function setTextIndex(string $textIndex): self
     {
-        $this->textIndices = $textIndices;
+        $this->textIndex = $textIndex;
         return $this;
     }
 }

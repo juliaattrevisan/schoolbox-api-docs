@@ -28,6 +28,12 @@ abstract class BaseBuilder implements IBuilder
     private const NORMALISE_SPACE_REGEXP = '/\s+/';
 
     /**
+     * Attempt to separate indices in their field, so that searching across
+     * multiple conjoined indices does not happen.
+     */
+    private const INDEX_SEPARATOR = ' | ';
+
+    /**
      * Constructor
      *
      * @param IConnector      $connector Database connection
@@ -64,8 +70,10 @@ abstract class BaseBuilder implements IBuilder
             ->setIsRelevanceDateAffected($isRelevanceDateAffected)
             ->setCreatedBy($createdBy)
             ->setFolders(new GenericCollection(Folder\Model::class))
-            ->setFulltextIndices((new GenericCollection(Index\Fulltext\Model::class)))
-            ->setTextIndices((new GenericCollection(Index\Text\Model::class)))
+            ->setFulltextIndex('')
+            ->setTextIndex('');
+//            ->setFulltextIndices((new GenericCollection(Index\Fulltext\Model::class)))
+//            ->setTextIndices((new GenericCollection(Index\Text\Model::class)))
         ;
     }
 
@@ -112,9 +120,13 @@ abstract class BaseBuilder implements IBuilder
         if ($normalisedIndexContent === '') {
             return $index;
         }
-        return $index->setFulltextIndices(
-            $index->getFulltextIndices()->add((new Index\Fulltext\Model())->setFulltextIndex($normalisedIndexContent))
-        );
+
+        $currentIndex = $index->getFulltextIndex();
+        if ($currentIndex === '') {
+            return $index->setFulltextIndex($normalisedIndexContent);
+        } else {
+            return $index->setFulltextIndex(self::INDEX_SEPARATOR . $normalisedIndexContent);
+        }
     }
 
     /**
@@ -139,9 +151,12 @@ abstract class BaseBuilder implements IBuilder
         if ($normalisedIndexContent === '') {
             return $index;
         }
-        $normalisedIndexContent = $indexContent;
-        return $index->setTextIndices(
-            $index->getTextIndices()->add((new Index\Text\Model())->setTextIndex($normalisedIndexContent))
-        );
+
+        $currentIndex = $index->getTextIndex();
+        if ($currentIndex === '') {
+            return $index->setTextIndex($normalisedIndexContent);
+        } else {
+            return $index->setTextIndex(self::INDEX_SEPARATOR . $normalisedIndexContent);
+        }
     }
 }
