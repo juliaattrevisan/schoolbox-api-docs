@@ -126,7 +126,7 @@ abstract class BaseBuilder implements IBuilder
         if ($currentIndex === '') {
             return $index->setFulltextIndex($normalisedIndexContent);
         } else {
-            return $index->setFulltextIndex(self::INDEX_SEPARATOR . $normalisedIndexContent);
+            return $index->setFulltextIndex($currentIndex . self::INDEX_SEPARATOR . $normalisedIndexContent);
         }
     }
 
@@ -157,7 +157,7 @@ abstract class BaseBuilder implements IBuilder
         if ($currentIndex === '') {
             return $index->setTextIndex($normalisedIndexContent);
         } else {
-            return $index->setTextIndex(self::INDEX_SEPARATOR . $normalisedIndexContent);
+            return $index->setTextIndex($currentIndex . self::INDEX_SEPARATOR . $normalisedIndexContent);
         }
     }
 }
