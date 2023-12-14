@@ -28,42 +28,40 @@
  # Feedback status happens to be
  #}
 {% set participant = assessment.participantIfExtant(student) %}
-{# Tasks only #}
-{% if postRoute is not null and postRoute != '' %}
-    <form action="{{ postRoute }}"
-          method="POST"
-          class="progress-tick-form"
-          data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
-        {%
-        if participant
-        and participant.isResponseRequired
-        and (
-            USER.role.isStaff or (
-                student.id == USER.id and
-                assessment.isOpen(USER) and
-                assessment.isSelfAssessable
+
+{% if participant and not participant.isExcluded %}
+    {# Tasks only #}
+    {% if postRoute is not null and postRoute != '' %}
+        <form action="{{ postRoute }}"
+              method="POST"
+              class="progress-tick-form"
+              data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
+            {%
+            if participant.isResponseRequired
+            and (
+                USER.role.isStaff or (
+                    student.id == USER.id and
+                    assessment.isOpen(USER) and
+                    assessment.isSelfAssessable
+                )
             )
-        )
-        %}
-            <a class="no-text progress-tick"
-               title="Incomplete"
-               data-progress-tick-status="incomplete"></a>
-        {% elseif participant and participant.isFeedbackRequired %}
-            <a class="no-text progress-tick pending"
-               title="Self-assessed"
-               data-progress-tick-status="selfAssessed"></a>
-        {% elseif participant and participant.isReviewComplete %}
-            <a class="no-text progress-tick reviewed"
-               title="Completed"
-               data-progress-tick-status="teacherAssessed"></a>
-        {% endif %}
-    </form>
-{% else %}
-    {# Other assessment types just get an icon that does nothing when clicked. #}
-    {% if not participant or participant.isExcluded %}
-        <!-- deliberately empty  -->
+            %}
+                <a class="no-text progress-tick"
+                   title="Incomplete"
+                   data-progress-tick-status="incomplete"></a>
+            {% elseif participant and participant.isFeedbackRequired %}
+                <a class="no-text progress-tick pending"
+                   title="Self-assessed"
+                   data-progress-tick-status="selfAssessed"></a>
+            {% elseif participant and participant.isReviewComplete %}
+                <a class="no-text progress-tick reviewed"
+                   title="Completed"
+                   data-progress-tick-status="teacherAssessed"></a>
+            {% endif %}
+        </form>
     {% else %}
-        {% if participant.isResponseRequired %}
+        {# Other assessment types just get an icon that does nothing when clicked. #}
+        {% if participant.isResponseRequired and student.id == USER.id and assessment.isOpen(USER) %}
             <span class="no-text progress-tick" title="Incomplete"></span>
         {% elseif participant.isFeedbackRequired %}
             <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>

@@ -446,6 +446,18 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Lesson Plans never require responses.
+     *
+     * @param Participant $participant
+     * @return bool
+     */
+    public function isResponseRequired(Participant $participant): bool
+    {
+        return false;
+    }
+
+
+    /**
      * Lesson Plans never have feedback.
      *
      * @param Participant $participant
