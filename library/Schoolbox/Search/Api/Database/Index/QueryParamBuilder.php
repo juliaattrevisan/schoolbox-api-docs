@@ -18,7 +18,7 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  *
  * This relies on an index already having been built.
  */
-class TextQueryParamBuilder extends BaseQueryParamBuilder
+class QueryParamBuilder extends BaseQueryParamBuilder
 {
     /**
      * Constructor

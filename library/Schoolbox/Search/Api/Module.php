@@ -104,7 +104,7 @@ class Module extends BaseModule
         $httpRequest = $this->injector->get('httpRequest');
 
         $queryParamBuilders = [
-            new Database\Index\TextQueryParamBuilder($database->getQuoter()),
+            new Database\Index\QueryParamBuilder($database->getQuoter()),
             new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
 //            new Database\ResultType\News\QueryParamBuilder(),
             new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
