@@ -28,14 +28,23 @@
  # Feedback status happens to be
  #}
 {% set participant = assessment.participantIfExtant(student) %}
-{% set isOpenForStudent = postRoute and (student.id == USER.id) and assessment.isOpen(USER) %}
 {# Tasks only #}
 {% if postRoute is not null and postRoute != '' %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"
           data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
-        {% if participant and participant.isResponseRequired and (USER.role.isStaff or (isOpenForStudent and assessment.isSelfAssessable)) %}
+        {%
+        if participant
+        and participant.isResponseRequired
+        and (
+            USER.role.isStaff or (
+                student.id == USER.id and
+                assessment.isOpen(USER) and
+                assessment.isSelfAssessable
+            )
+        )
+        %}
             <a class="no-text progress-tick"
                title="Incomplete"
                data-progress-tick-status="incomplete"></a>
@@ -54,7 +63,7 @@
     {% if not participant or participant.isExcluded %}
         <!-- deliberately empty  -->
     {% else %}
-        {% if participant.isResponseRequired and isOpenForStudent %}
+        {% if participant.isResponseRequired %}
             <span class="no-text progress-tick" title="Incomplete"></span>
         {% elseif participant.isFeedbackRequired %}
             <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
