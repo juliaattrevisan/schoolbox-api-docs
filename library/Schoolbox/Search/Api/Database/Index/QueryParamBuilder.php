@@ -34,9 +34,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
-        $whereParts[] = "(MATCH(si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix))";
-        $whereParts[] = "(si.text_index LIKE :indexKeywordLike$paramKeySuffix)";
-        $params       = [
+        $keywordSearchParts[] = "(MATCH(si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix))";
+        $keywordSearchParts[] = "(si.text_index LIKE :indexKeywordLike$paramKeySuffix)";
+        $whereParts[]         = '(' . implode(' OR ', $keywordSearchParts) . ')';
+        $params               = [
             "indexNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix"     => $keyword,
             "indexKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
