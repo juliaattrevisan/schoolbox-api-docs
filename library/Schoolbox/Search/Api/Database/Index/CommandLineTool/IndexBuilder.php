@@ -112,7 +112,7 @@ class IndexBuilder extends App
                     continue;
                 }
 
-                // I'd rather REPLACE rather than fail INSERT and then UPDATE
+                // TODO REPLACE instead of failing INSERT and then UPDATE
                 try {
                     $indexMapper->save($updatedIndex);
                 } catch (MapperException) {
