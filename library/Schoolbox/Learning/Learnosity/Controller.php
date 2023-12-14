@@ -39,6 +39,7 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
+use Schoolbox\TokenReplacer;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -1007,9 +1008,13 @@ class Controller extends Base
 
         $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
+        /* Replace tokens in Overall Attempt Comment
+         */
+        $comment = $this->replaceTokens($postData['attempt-comment'], $student);
+
         /* Save the comment and new normalised mark
          */
-        $attempt->setComment(trim($postData['attempt-comment']))
+        $attempt->setComment($comment)
             ->setReviewer($this->getUser())
             ->setReviewed(\Alaress_Date_Format::now());
 
@@ -1034,11 +1039,12 @@ class Controller extends Base
             }
 
             /* Update comment
+             * Replace tokens in individual questions' feedback comment
              *
              * TODO optionally update score, if we want to store that locally
              *  at the risk of desyncing with learnosity
              */
-            $feedback->setComment($comment);
+            $feedback->setComment($this->replaceTokens($comment, $student));
 
             $this->feedbackMapper->save($feedback);
         }
@@ -1591,7 +1597,9 @@ class Controller extends Base
 
         /* Put the new/updated comment in
          */
-        $feedback->setComment($this->requestPost->get('comment'));
+        $comment = $this->replaceTokens($this->requestPost->get('comment'), $student);
+
+        $feedback->setComment($comment);
 
         /* Save it
          */
@@ -1618,7 +1626,9 @@ class Controller extends Base
     ): void {
         /* Put the new/updated comment in
          */
-        $attempt->setComment($this->requestPost->get('comment'));
+        $comment = $this->replaceTokens($this->requestPost->get('comment'), $student);
+
+        $attempt->setComment($comment);
 
         /* Save it
          */
@@ -1984,5 +1994,20 @@ class Controller extends Base
              */
             (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
         }
+    }
+
+
+    /**
+     * Replace tokens in $originalComment for values pertaining to $student
+     * Note that $comment could be anything...
+     *
+     * @param mixed $comment
+     * @param User $student
+     * @return string
+     */
+    private function replaceTokens(mixed $comment, User $student): string
+    {
+        return (new TokenReplacer\Student(new TokenReplacer\Simple()))
+            ->replace(trim((string)($comment ?? '')), $student);
     }
 }
