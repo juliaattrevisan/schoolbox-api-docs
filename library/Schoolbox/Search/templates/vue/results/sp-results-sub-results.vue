@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display all linked sub results within a result
+ * To display all linked sub results within a result and load more when available
  */
 
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
@@ -64,7 +64,7 @@ async function loadMore() {
     if (loadedResults.data.length === 0) {
         hasLoadedAllResults.value = true;
     } else {
-        useResultsStore().setMoreSubResults(loadedResults.data, props.parentIndex);
+        useResultsStore().setMoreSubResults(loadedResults, props.parentIndex);
         moreResultsCount.value += 1;
         // If cursor.next has not been supplied with the sub-results, we have loaded all sub-results.
         if (loadedResults.metadata.cursor.next === null) {
