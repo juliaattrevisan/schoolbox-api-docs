@@ -504,6 +504,13 @@ class Controller extends Base
             }
         }
 
+        $isViewerAnInstructor = $this->access->isInstructor($this->getUser(), $subject);
+        $tickTransitions      = [
+            'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
+            'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
+            'teacherAssessed' => 'incomplete',
+        ];
+
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
@@ -517,6 +524,7 @@ class Controller extends Base
                 'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,
                 'rubricAssessmentList'  => $rubricAssessmentList,
+                'transitions'           => $tickTransitions,
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getBody()->getContents(),
         ]);
