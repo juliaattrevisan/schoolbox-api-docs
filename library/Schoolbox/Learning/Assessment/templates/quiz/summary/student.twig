@@ -156,7 +156,7 @@
                                     <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                                 {% else %}
                                     {% if canReview %}
-                                        <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                                        <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
                                     {% elseif canStudentReview %}
                                         <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
                                     {% endif %}

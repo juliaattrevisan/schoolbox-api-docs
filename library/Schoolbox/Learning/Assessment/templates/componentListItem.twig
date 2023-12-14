@@ -45,7 +45,7 @@
                 {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                 {% if modifyRoute %}
                     {% if assessable is quiz %}
-                        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessable.id}) %}
+                        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessable, assessmentId: assessable.id}) %}
                         <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
                         <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
                     {% else %}
