@@ -249,6 +249,10 @@ class Module extends BaseModule
                  */
                 new Rule\Any(
                     $this->buildAuthRuleHasInstructorAccess(),
+                    /* TODO I think there's a duplication between IsAssessmentOpen() and
+                     *  canLearnerCreateResponse() in Quiz Model; the latter already
+                     *  checks the former.
+                     */
                     new Rule\All(
                         /* You must be the user referenced in the url
                          * You can't sobo a quiz attempt
@@ -267,11 +271,6 @@ class Module extends BaseModule
                          * they can make attempts (this double-checks IsAssesmentOpen again)
                          */
                         new CanRespondToAssessment($this->getAccess()),
-
-                        /* TODO I think there's a duplication between IsAssessmentOpen() and
-                         *  canLearnerCreateResponse() in Quiz Model; the latter already
-                         *  checks the former.
-                         */
                     )
                 )
             );

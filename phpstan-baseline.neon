@@ -4601,16 +4601,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Notifier.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Controller\\:\\:\\$quizAnswerMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Controller.php
