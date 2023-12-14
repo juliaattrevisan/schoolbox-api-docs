@@ -57,6 +57,7 @@ class IndexBuilder extends BaseBuilder
                 $row['date'],
                 true,
                 $row['created_by'],
+                null,
             );
             $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
@@ -99,6 +100,7 @@ class IndexBuilder extends BaseBuilder
                 Hydrator::BASE_TYPE,
                 null,
                 true,
+                null,
                 null,
             );
         }

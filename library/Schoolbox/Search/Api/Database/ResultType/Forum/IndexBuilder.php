@@ -57,8 +57,8 @@ class IndexBuilder extends BaseBuilder
                 $row['date'],
                 true,
                 $row['created_by'],
+                $row['folder_id'],
             );
-            $index = $this->addFolder($index, $row['folder_id']);
 
             // In the forum query param builder, this is a text index:
             // it's a fulltext index here, because having title+body as fulltext
@@ -93,6 +93,7 @@ class IndexBuilder extends BaseBuilder
                 Hydrator::BASE_TYPE,
                 null,
                 true,
+                null,
                 null,
             );
         }

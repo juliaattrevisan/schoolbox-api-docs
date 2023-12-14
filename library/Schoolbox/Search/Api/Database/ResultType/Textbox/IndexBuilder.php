@@ -69,8 +69,8 @@ class IndexBuilder extends BaseBuilder
                 $row['date'],
                 true,
                 $row['created_by'],
+                $row['folder_id'],
             );
-            $index = $this->addFolder($index, $row['folder_id']);
             $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index']);
             yield $index;
@@ -81,7 +81,6 @@ class IndexBuilder extends BaseBuilder
             SELECT
                 CONCAT(tb2.textBoxID, '--') AS id,
                 tb2.heading AS title,
-                NULL AS folder_id,
                 tb2.updated_at AS date,
                 tb2.created_by AS created_by,
                 tb2.body AS fulltext_index
@@ -117,6 +116,7 @@ class IndexBuilder extends BaseBuilder
                 $row['date'],
                 true,
                 $row['created_by'],
+                null,
             );
             $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index']);
@@ -154,6 +154,7 @@ class IndexBuilder extends BaseBuilder
                 Hydrator::BASE_TYPE,
                 null,
                 true,
+                null,
                 null,
             );
         }

@@ -23,14 +23,6 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        $folderQuery = $this->connector->prepareQuery("
-            SELECT folder_id
-            FROM event_folder evf
-            INNER JOIN folder f ON evf.folder_id = f.id
-            WHERE f.deleted_at IS NOT NULL
-            AND evf.event_id = :eventId
-        ");
-
         $queryString = "
             SELECT
                 e.id,
@@ -63,14 +55,8 @@ class IndexBuilder extends BaseBuilder
                 $row['date'],
                 true,
                 $row['created_by'],
+                null,
             );
-
-            // TODO remove this: events shouldn't be associated with folders
-            //      at all in search results
-            $folderQuery->execute(['eventId' => $row['id']]);
-            foreach ($folderQuery as $folderRow) {
-                $index = $this->addFolder($index, $folderRow['folder_id']);
-            }
 
             $index = $this->addFulltextIndex($index, $row['title']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
@@ -111,6 +97,7 @@ class IndexBuilder extends BaseBuilder
                 Hydrator::BASE_TYPE,
                 null,
                 true,
+                null,
                 null,
             );
         }

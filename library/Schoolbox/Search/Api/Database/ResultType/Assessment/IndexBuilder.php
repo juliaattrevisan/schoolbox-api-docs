@@ -110,8 +110,8 @@ class IndexBuilder extends BaseBuilder
                 $row['date'],
                 true,
                 $row['created_by'],
+                $row['folder_id'],
             );
-            $index = $this->addFolder($index, $row['folder_id']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index1']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index2']);
             $index = $this->addFulltextIndex($index, $row['fulltext_index3']);
@@ -195,6 +195,7 @@ class IndexBuilder extends BaseBuilder
                 $row['type'],
                 null,
                 true,
+                null,
                 null,
             );
         }

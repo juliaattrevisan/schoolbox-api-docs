@@ -52,6 +52,7 @@ abstract class BaseBuilder implements IBuilder
      * @param string|null $dateString
      * @param bool        $isRelevanceDateAffected
      * @param int|null    $createdBy
+     * @param int|null    $folderId
      * @return Index\Model
      */
     protected function buildIndex(
@@ -61,6 +62,7 @@ abstract class BaseBuilder implements IBuilder
         ?string $dateString,
         bool $isRelevanceDateAffected,
         ?int $createdBy,
+        ?int $folderId,
     ): Index\Model {
         return (new Index\Model())
             ->setIdentifier($identifier)
@@ -69,29 +71,9 @@ abstract class BaseBuilder implements IBuilder
             ->setDate(isset($dateString) ? Alaress_Date_Format::newDatabaseDate($dateString) : null)
             ->setIsRelevanceDateAffected($isRelevanceDateAffected)
             ->setCreatedBy($createdBy)
-            ->setFolders(new GenericCollection(Folder\Model::class))
+            ->setFolderId($folderId)
             ->setFulltextIndex('')
             ->setTextIndex('');
-//            ->setFulltextIndices((new GenericCollection(Index\Fulltext\Model::class)))
-//            ->setTextIndices((new GenericCollection(Index\Text\Model::class)))
-        ;
-    }
-
-    /**
-     * Helper function for adding a folder to the index.
-     *
-     * @param Index\Model $index
-     * @param int|null    $folderId
-     * @return Index\Model
-     */
-    protected function addFolder(Index\Model $index, ?int $folderId): Index\Model
-    {
-        if (!isset($folderId)) {
-            return $index;
-        }
-        return $index->setFolders(
-            $index->getFolders()->add((new Folder\Model())->setId($folderId))
-        );
     }
 
     /**

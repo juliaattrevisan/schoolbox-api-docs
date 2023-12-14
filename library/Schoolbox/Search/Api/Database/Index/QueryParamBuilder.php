@@ -123,7 +123,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     public function buildFolderExpression(string $paramKeySuffix = ''): string
     {
-        return 'sifo.folder_id';
+        return 'si.folder_id';
     }
 
     /**
@@ -131,9 +131,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
-        return '
-            FROM search_index si
-            LEFT JOIN search_index_folder sifo ON si.id = sifo.search_index_id
-        ';
+        return 'FROM search_index si';
     }
 }
