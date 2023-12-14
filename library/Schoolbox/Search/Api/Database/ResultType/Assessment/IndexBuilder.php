@@ -65,18 +65,6 @@ class IndexBuilder extends BaseBuilder
             JOIN folder ON (
                 mv_assessment_relation.folder_id = folder.id
             )
-            LEFT JOIN course_implementation ON (
-                mv_assessment_relation.course_implementation_id = course_implementation.id
-            )
-            LEFT JOIN course_unit_implementation ON (
-                mv_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
-            )
-            LEFT JOIN course_specification ON (
-                mv_assessment_relation.course_specification_id = course_specification.id
-            )
-            LEFT JOIN course_unit_specification ON (
-                mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
-            )
             LEFT JOIN project ON (
                 assessment.id=project.assessment_id
             )
