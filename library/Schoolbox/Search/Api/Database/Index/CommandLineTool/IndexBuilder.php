@@ -29,6 +29,7 @@ class IndexBuilder extends App
 
     private const OPT_LONG_FROM = 'from:';
     private const OPT_LONG_TO = 'to:';
+    private const OPT_LONG_CLEAR = 'clear';
 
     /**
      * Short options:
@@ -41,13 +42,14 @@ class IndexBuilder extends App
 
     /**
      * Long options:
-     * * --help: help
-     * * --from: from date
-     * * --to:   to date
+     * * --help:  help
+     * * --from:  from date
+     * * --to:    to date
+     * * --clear: clear index completely
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_CLEAR];
     }
 
     /**
@@ -104,6 +106,13 @@ class IndexBuilder extends App
         // Run for as long as you need to?
         $this->getDatabaseInternal()->execute('SET MAX_STATEMENT_TIME=0');
 
+        if ($this->getOpt(self::OPT_LONG_CLEAR)) {
+            $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
+            if ($this->perform()) {
+                $indexMapper->truncate();
+            }
+        }
+
         // Actually create data
         $time = microtime(true);
         foreach ($indexBuilders as $indexBuilder) {
@@ -159,8 +168,7 @@ SYNOPSIS:
 DESCRIPTION
     Builds this Schoolbox instance's search indices.
 
-    This script may build indices for only a given date span: it will leave
-    indices outside this date span untouched.
+    This script may build indices for only a given date span: it will leave indices outside this date span untouched.
 
 OPTIONS
     $yellow-h, --help$white
@@ -171,20 +179,24 @@ OPTIONS
         built.
 
     $yellow--from=FROM_DATE$white
-        If provided, only build indices for results from FROM_DATE onward.
+        If provided, only build indices for results from {$yellow}FROM_DATE{$white} onward.
 
-        FROM_DATE will be parsed according to the following rules:
+        {$yellow}FROM_DATE{$white} will be parsed according to the following rules:
         * as a database date (YYYY-MM-DD HH:MM:SS)
         * as a Unix timestamp
         * via `strtotime`
 
-        This script will fail if FROM_DATE is not parseable.
+        This script will fail if {$yellow}FROM_DATE{$white} is not parseable.
 
     $yellow--to=TO_DATE$white
-        If provided, only build indices for results to TO_DATE and before.
+        If provided, only build indices for results to {$yellow}TO_DATE{$white} and before.
 
-        TO_DATE will be parsed using the same rules as FROM_DATE, and will cause
-        this script to fail for the same reasons.
+        {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
+
+    $yellow--clear$white
+        If provided, clear all existing indices before rebuilding the index.
+
+        Has no effect without the $yellow-p$white or $yellow--perform$white flags.
 
 
 HELP;
