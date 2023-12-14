@@ -30,7 +30,7 @@ class IndexBuilder extends BaseBuilder
             FROM lesson_plan_field
             INNER JOIN lesson_plan ON lesson_plan_field.lesson_plan_id = lesson_plan.id
             WHERE lesson_plan.assessment_id = :assessmentId
-            AND lesson_plan_field.deleted_at IS NOT NULL
+            AND lesson_plan_field.deleted_at IS NULL
         ");
 
         // Note: task link and LTI assessment URL are in the fulltext index,
