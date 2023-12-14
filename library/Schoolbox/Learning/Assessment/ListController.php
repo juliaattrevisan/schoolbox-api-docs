@@ -311,7 +311,10 @@ class ListController extends Web\Controller\Base
                  * Always go to the screen when a quiz has been created,
                  * but send the return url with it
                  */
-                $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', ['assessmentId' => $assessmentInfo['assessment']->getId()]);
+                $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', [
+                    'assessment' => $assessmentInfo['assessment'],
+                    'assessmentId' => $assessmentInfo['assessment']->getId()
+                ]);
 
                 if ($explicitReturnUrl) {
                     $returnUrl .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";

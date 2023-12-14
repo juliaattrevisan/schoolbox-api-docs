@@ -10,30 +10,31 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
-use DomainException;
-use InvalidArgumentException;
-use LogicException;
-use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
-use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\UserMapper;
-use UnexpectedValueException;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use DomainException;
+use InvalidArgumentException;
+use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception as ApplicationException;
+use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 class Module extends BaseModule
 {
@@ -47,12 +48,13 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
-        /* Staff only
+        /* Instructors only
          */
-        $instructorPerms = $this->instructorPerms();
+        $instructorPerms = $this->buildAuthRuleHasInstructorAccess();
 
         /* The current user must match {studentId} in the routes
          * ie. you're the owner of something in the url
@@ -176,19 +178,38 @@ class Module extends BaseModule
 
 
     /**
-     * @return Rule\LazyCallback
+     * Prevent non-instructors from marking or modifying assessments.
+     *
+     * This uses the `IsInstructor` validator, which is the new standard for
+     * checking if a user has instructor permission over a folder.
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException
      */
-    private function instructorPerms(): Rule\LazyCallback
+    private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
     {
-        return new Rule\LazyCallback(function () {
-            return new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF)
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new IsInstructor(
+                    $this->getAccess(),
+                    static function (array $params): FolderModel {
+                        if (isset($params['assessment'])) {
+                            $ctx = $params['assessment']->getContext()->getFolder();
+                        } elseif (isset($params['participant'])) {
+                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                        } elseif (isset($params['context'])) {
+                            $ctx = $params['context']->getFolder();
+                        } else {
+                            throw new NotFound('No assessment or context preloaded');
+                        }
+
+                        return $ctx;
+                    }
                 )
-            );
-        });
+            )
+        );
     }
 
 
@@ -493,5 +514,15 @@ class Module extends BaseModule
     protected function getAssessmentMapperProxy()
     {
         return $this->injector->get('assessmentDataSource');
+    }
+
+    /**
+     * @return Access
+     * @throws InvalidArgumentException
+     */
+    protected function getAccess()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getMapperFactory()->get(Access::class);
     }
 }
