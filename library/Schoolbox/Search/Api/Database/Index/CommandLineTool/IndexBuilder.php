@@ -106,11 +106,6 @@ class IndexBuilder extends App
         $this->getDatabaseInternal()->execute('SET MAX_STATEMENT_TIME=0');
 
         // Actually create data
-        // TODO the final version won't truncate: instead, it'll override?
-        if ($this->perform()) {
-            $indexMapper->truncate();
-        }
-
         foreach ($indexBuilders as $indexBuilder) {
             foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
                 if (!$this->perform()) {
