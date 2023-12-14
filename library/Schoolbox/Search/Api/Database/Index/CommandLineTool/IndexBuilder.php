@@ -101,7 +101,6 @@ class IndexBuilder extends App
             new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
             new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
-        $indexMapper = Index\Mapper::getInstance();
 
         // Run for as long as you need to?
         $this->getDatabaseInternal()->execute('SET MAX_STATEMENT_TIME=0');
@@ -109,11 +108,38 @@ class IndexBuilder extends App
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
             $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
             if ($this->perform()) {
-                $indexMapper->truncate();
+                $this->getDatabaseInternal()->execute('TRUNCATE search_index');
             }
         }
 
         // Actually create data
+        $updateStatement = $this->getDatabaseInternal()->prepareQuery("
+            REPLACE INTO search_index (
+                type,
+                identifier,
+                title,
+                date,
+                is_relevance_date_affected,
+                created_by,
+                folder_id,
+                fulltext_index,
+                text_index
+            ) VALUES (
+                :type,
+                :identifier,
+                :title,
+                :date,
+                :isRelevanceDateAffected,
+                :createdBy,
+                :folderId,
+                :fulltextIndex,
+                :textIndex
+            )
+        ");
+        $deleteStatement = $this->getDatabaseInternal()->prepareQuery("
+            DELETE FROM search_index WHERE type = :type AND identifier = :identifier
+        ");
+
         $time = microtime(true);
         foreach ($indexBuilders as $indexBuilder) {
             foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
@@ -121,23 +147,24 @@ class IndexBuilder extends App
                     continue;
                 }
 
-                // TODO REPLACE instead of failing INSERT and then UPDATE
-                try {
-                    $indexMapper->save($updatedIndex);
-                } catch (MapperException|PDOException) {
-                    $existingIndex = $indexMapper->findOneByColumnList([
-                        'identifier' => $updatedIndex->getIdentifier(),
-                        'type'       => $updatedIndex->getType(),
-                    ]);
-                    $indexMapper->save($updatedIndex->setId($existingIndex->getId()));
-                }
+                $updateStatement->execute([
+                    'type'                    => $updatedIndex->getType(),
+                    'identifier'              => $updatedIndex->getIdentifier(),
+                    'title'                   => $updatedIndex->getTitle(),
+                    'date'                    => $updatedIndex->getDate()->getDatabase(),
+                    'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected(),
+                    'createdBy'               => $updatedIndex->getCreatedBy(),
+                    'folderId'                => $updatedIndex->getFolderId(),
+                    'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
+                    'textIndex'               => $updatedIndex->getTextIndex(),
+                ]);
             }
 
             foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {
                 if (!$this->perform()) {
                     continue;
                 }
-                $indexMapper->deleteByColumnList([
+                $deleteStatement->execute([
                     'identifier' => $deletedIndex->getIdentifier(),
                     'type'       => $deletedIndex->getType(),
                 ]);
