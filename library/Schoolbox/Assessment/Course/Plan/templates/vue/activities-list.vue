@@ -55,7 +55,7 @@ const returnUrl = function(url) {
                 </nav>
                 <ul :id="'dropdown-unitplanner-activity-' + activity.id" class="f-dropdown" data-dropdown-content>
                     <li>
-                        <a target="_blank" :href="returnUrl(activity._links.modify)" class="icon-modify">{{ activity.assessmentType === 'quiz' ? 'Modify Settings' : 'Modify' }}</a>
+                        <a :href="returnUrl(activity._links.modify)" class="icon-modify">{{ activity.assessmentType === 'quiz' ? 'Modify Settings' : 'Modify' }}</a>
                     </li>
                     <li v-if="activity.assessmentType === 'quiz'">
                         <a :href="returnUrl(activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
