@@ -19,13 +19,20 @@ use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
+use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
+use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
+use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\DefinitionException;
@@ -61,7 +68,7 @@ class Module extends BaseModule
          *
          * (All staff are also allowed here)
          */
-        $learnerIsUserPerms = $this->learnerIsUserPerms();
+        $learnerIsUserPerms = $this->buildAuthRuleCanSubmit();
 
         /* A special rule about who can finish an attempt
          */
@@ -214,22 +221,58 @@ class Module extends BaseModule
 
 
     /**
-     * The current user is:
-     *  - the same user that is referenced in the URL (meant to stop any user from accessing another user's URL),
-     *  - and either a student or a staff member.
+     * Rules in order of preference:
+     *     - You must be logged in
+     *     - Assessment must be an implementation, not a specification
+     *     - Instructors can submit if their context allows (staff must have WRITE+ perm to folder)
+     *     - staff/students cannot if due in archived term (ie 'interaction locked')
+     *     - students cannot if not open
+     *     - Students cannot submit if reached response limit
+     *     - students cannot if not participant, or a different student to that indicated in URL
      *
      * @return Rule\LazyCallback
      */
-    private function learnerIsUserPerms(): Rule\LazyCallback
+    private function buildAuthRuleCanSubmit(): Rule\LazyCallback
     {
         return new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Rule\IsUser('studentId'),
+                /* You can create attempts for Implementations only; not Specifications
+                 */
+                new IsImplementation(),
+                /* Assessment must be in a living (unarchived) academic period
+                 */
+                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                /* Otherwise, you have to be an instructor
+                 * or a student that adheres all the non-instructor criteria
+                 */
                 new Rule\Any(
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\HasRole(Role::STUDENT),
-                ),
+                    $this->buildAuthRuleHasInstructorAccess(),
+                    new Rule\All(
+                        /* You must be the user referenced in the url
+                         * You can't sobo a quiz attempt
+                         */
+                        new Rule\IsUser('studentId'),
+                        /* Assessment must be published in the past, closed in the future,
+                         * and you must be a participant (also, non-excluded)
+                         */
+                        new CanViewAssessable(new Visibility($this->getAccess())),
+                        /* Open Date for this particular student's Participation Plan (if extant)
+                         * must have been reached, and not yet be closed; each student can have their
+                         * own versions of Open and Close dates.
+                         */
+                        new IsAssessmentOpen(),
+                        /* Students have a set of criteria to fulfil when we're deciding if
+                         * they can make attempts (this double-checks IsAssesmentOpen again)
+                         */
+                        new CanRespondToAssessment($this->getAccess()),
+
+                        /* TODO I think there's a duplication between IsAssessmentOpen() and
+                         *  canLearnerCreateResponse() in Quiz Model; the latter already
+                         *  checks the former.
+                         */
+                    )
+                )
             );
         });
     }
@@ -263,14 +306,16 @@ class Module extends BaseModule
     /**
      * Convert route params into an assessment object
      *
-     * @param array     $params
+     * @param array $params
      * @param null|User $student If provided, only load this student's participation
      * @return array
-     * @throws ApplicationException\Exception If assessment is not found
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException If a specified join mapper is not found
      * @throws DomainException If user has interaction but not participant record
+     * @throws Exception If assessment is not found
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
-     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws NotFoundExceptionInterface
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
     protected function preloadAssessment(array $params, User $student = null): array
@@ -299,14 +344,16 @@ class Module extends BaseModule
      * Convert route params into an assessment object, and a destination
      * assessment object.
      *
-     * @param array     $params
+     * @param array $params
      * @param User|null $student
      * @return array
-     * @throws ApplicationException\Exception If assessment is not found
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException If a specified join mapper is not found
      * @throws DomainException If user has interaction but not participant record
+     * @throws Exception If assessment is not found
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
-     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws NotFoundExceptionInterface
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
     protected function preloadAssessmentAndDestinationAssessment(array $params, User $student = null): array
@@ -331,12 +378,14 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws ApplicationException\Exception If assessment is not found
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException If a specified join mapper is not found
      * @throws DomainException If user has interaction but not participant record
+     * @throws Exception If assessment is not found
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
-     * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws NotFound
+     * @throws NotFoundExceptionInterface
      */
     protected function preloadAssessmentAndStudent(array $params): array
     {
@@ -364,12 +413,14 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException
      * @throws DomainException
+     * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws DefinitionException
      * @throws NotFound
+     * @throws NotFoundExceptionInterface
      */
     protected function preloadAttempt(array $params): array
     {
@@ -397,12 +448,14 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException
      * @throws DomainException
+     * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws DefinitionException
      * @throws NotFound
+     * @throws NotFoundExceptionInterface
      */
     protected function preloadAttemptForReview(array $params): array
     {
@@ -516,6 +569,7 @@ class Module extends BaseModule
         return $this->injector->get('assessmentDataSource');
     }
 
+
     /**
      * @return Access
      * @throws InvalidArgumentException
@@ -524,5 +578,15 @@ class Module extends BaseModule
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Access::class);
+    }
+
+
+    /**
+     * @return Mapper|TermMapper
+     * @throws InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 }
