@@ -49,12 +49,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         if ($filter->types) {
             $subTypes = array_filter(
                 $filter->types,
-                function (string $type) {
-                    return str_starts_with($type, $this->getType() . '.');
-                }
+                fn ($type) => $this->handlesType($type),
             );
             if (!empty($subTypes)) {
-                $bindings = Builder::getBindings($subTypes, $this->getType());
+                $bindings = Builder::getBindings($subTypes, "filterType$paramKeySuffix");
 
                 // Why introduce a HAVING clause?
                 // ------------------------------
@@ -68,7 +66,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $havingParts[] = "`type` IN ({$bindings->getPlaceholder()})";
 
                 $params = array_merge($params, $bindings->getParams());
-            } elseif (!in_array($this->getType(), $filter->types)) {
+            } else {
                 // there are no relevant types in this filter
                 return null;
             }
@@ -288,6 +286,23 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * @return string
      */
     abstract protected function getType(): string;
+
+    /**
+     * By default, a query+param builder handles a type if either:
+     * * `getType()` equals `$type`
+     * * `$type` starts with `$this->getType()`
+     *
+     * @param string $type
+     * @return bool
+     */
+    protected function handlesType(string $type): bool
+    {
+        $thisType = $this->getType();
+        if ($type === $thisType) {
+            return true;
+        }
+        return str_starts_with($type, $this->getType() . '.');
+    }
 
     /**
      * Build the expression for determining the type for an item in this
