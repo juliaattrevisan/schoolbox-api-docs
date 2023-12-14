@@ -193,7 +193,7 @@ class Controller extends Assessment\Controller
                             ->filter(function ($assessment) {
                                 /** @var IAssessable $assessment */
                                 return !($assessment instanceof Model);
-                        });
+                            });
 
                         // hydrate participation
                         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments);
