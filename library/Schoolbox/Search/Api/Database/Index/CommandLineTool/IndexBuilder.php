@@ -107,6 +107,7 @@ class IndexBuilder extends App
         $this->getDatabaseInternal()->execute('SET MAX_STATEMENT_TIME=0');
 
         // Actually create data
+        $time = microtime(true);
         foreach ($indexBuilders as $indexBuilder) {
             foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
                 if (!$this->perform()) {
@@ -143,6 +144,8 @@ class IndexBuilder extends App
                 ]);
             }
         }
+
+        $this->getLogger()->notice(sprintf("Search indices rebuilt in %0.2fs", microtime(true) - $time));
     }
 
     /**
