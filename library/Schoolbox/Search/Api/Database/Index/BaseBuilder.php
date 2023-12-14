@@ -110,6 +110,7 @@ abstract class BaseBuilder implements IBuilder
         // trim, strip_tags, HTML special chars decode, space normalisation,
         // stop-word removal?
         // TODO does this need to be customised per content type?
+        //      yes it does, as I'm adding different types of content
         $normalisedIndexContent = trim(
             preg_replace(
                 self::NORMALISE_SPACE_REGEXP,
