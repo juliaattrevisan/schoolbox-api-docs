@@ -9,6 +9,10 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
+use Component_Config;
+use Component_ConfigMapper;
+use Component_Instance;
+use Component_InstanceMapper;
 use InvalidArgumentException;
 use PDOException;
 use Psr\Container\ContainerExceptionInterface;
@@ -17,6 +21,9 @@ use RangeException;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\Model as CourseTemplateModel;
 use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Resource\HomepageConfig;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplate;
 use UnexpectedValueException;
 use Schoolbox\Application;
 use Schoolbox\Application\Exception\NotFound;
@@ -1337,13 +1344,130 @@ class Controller extends Base\Base
 
         // update the course homepage template
         $homepageTemplate = $folderController->buildHomepageTemplate($courseSpec->getFolder(), $template->getCourseTemplate()->getId());
-        $folderController->updateHomepageTemplate($courseSpec->getFolder(), $homepageTemplate);
+        $this->updateHomepageTemplate($courseSpec->getFolder(), $homepageTemplate);
 
         // loop through existing units
         foreach ($courseSpec->getUnits() as $unit) {
             // update unit homepage templates
             $homepageTemplate = $folderController->buildHomepageTemplate($unit->getFolder(), $template->getUnitTemplate()->getId());
-            $folderController->updateHomepageTemplate($unit->getFolder(), $homepageTemplate);
+            $this->updateHomepageTemplate($unit->getFolder(), $homepageTemplate);
+        }
+    }
+
+    /**
+     * Will append all 'new' components from the destination component at the end of the columns
+     * Based off:
+     * @param Folder           $folder
+     * @param HomepageTemplate $template
+     * @return void
+     * @throws MapperException
+     *
+     * @see \Schoolbox\Resource\Folder\Controller::updateHomepageTemplate
+     * @see \Schoolbox\Resource\HomepageConfigMapper::resetToTemplate
+     */
+    private function updateHomepageTemplate(Folder $folder, HomepageTemplate $template)
+    {
+        // TODO: remove this spawn
+        $homepageConfigMapper = HomepageConfigMapper::getInstance();
+
+        // update the homepage config to the new template
+        $homepageConfig = $homepageConfigMapper->findById($folder->getId())
+            ->setCategory($folder)
+            ->setTemplate($template);
+        $folder->setHomepage($homepageConfig);
+
+        $homepageConfigMapper->save($homepageConfig);
+
+        /**
+         * now do the merge / append new components
+         * this is a dupe of @see \Schoolbox\Resource\HomepageConfigMapper::resetToTemplate
+         * This will NOT change folder colour, or change the column widths
+         */
+
+        // retrieve, rearrange and reinsert the componentry
+        $cim = Component_InstanceMapper::getInstance();
+        $ccm = Component_ConfigMapper::getInstance();
+        /** @var Component_Instance[] $templateInstances */
+        $templateInstances = $cim->findByContext('homepage_template', $homepageConfig->getTemplate()->getId());
+        $existingInstances = $cim->findByContext('homepage', $folder->getId());
+
+        if (!count($templateInstances)) {
+            return;
+        }
+
+        foreach ($templateInstances as $currentInstance) {
+            /**
+             * check if there is already a component with this definition ID
+             * and if there is, and the definition says multiple false, then ignore this component and move on
+             * there are some components that do not work when there are multiple instances on a page `Course Builder` among others
+             */
+            if ($existingInstances->getBy('definitionId', $currentInstance->getDefinitionId()) && !$currentInstance->getDefinition()->getMultiple()) {
+                continue;
+            }
+            // preserve the config
+            /** @var \Component_ConfigDefinition[] $configs */
+            $configs = $currentInstance->getConfig();
+
+            /* Clone before saving, otherwise it does some magical caching stuff
+             * and tries to re-assign config instances to the wrong component instance
+             * in findByFields:247 (it tries to match the homepage template's configs
+             * to the $inst, which is a misbehaviour that is seemingly rectified by clone)
+             */
+            $inst = clone($currentInstance);
+
+            $inst
+                ->setId(null)
+                ->setConfig(new Collection())
+                ->setModule('homepage')
+                ->setIdentifier($homepageConfig->getCategory()->getId());
+
+            $ids = $cim->save($inst);
+
+            if (!count($configs)) {
+                continue;
+            }
+            $id = $ids[0];
+            foreach ($configs as $c) {
+                if ($c->getId()) {
+                    // Gross special case for tile component:
+                    // copy the homepage template's tile layout
+                    // TODO move this somewhere it actually belongs
+                    $value = $c->getValue();
+                    try {
+                        $src = $currentInstance->getConfigByKey('src');
+                    } catch (\DomainException $e) {
+                        $src = null;
+                    }
+                    if ($c->getKey() === 'layoutId' && (!$src || empty($src->getValue()))) {
+                        $layoutMapper = \Schoolbox\Tile\Layout\Mapper::getInstance();
+                        $tileMapper   = \Schoolbox\Tile\Mapper::getInstance();
+                        try {
+                            $layout = $layoutMapper->findById($c->getValue());
+                            $layout
+                                ->setId(null)
+                                ->setDashboardRole(null)
+                                ->setHomepageTemplate(null)
+                                ->setFolder($homepageConfig->getCategory());
+                            $layoutMapper->save($layout);
+                            $value = $layout->getId();
+                            foreach ($layout->getTileList() as $tile) {
+                                $tile->setId(null)->setTileLayout($layout);
+                            }
+                            $tileMapper->save($layout->getTileList());
+                        } catch (MapperException $e) {
+                            // Don't save anything
+                            continue;
+                        }
+                    }
+
+                    $conf = new Component_Config();
+                    $conf
+                        ->setInstanceId($id)
+                        ->setValue($value)
+                        ->setConfigDefinitionId($c->getId());
+                    $ccm->save($conf);
+                }
+            }
         }
     }
 }
