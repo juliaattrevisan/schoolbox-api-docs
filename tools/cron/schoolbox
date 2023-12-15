@@ -104,4 +104,8 @@ MAILTO="support@schoolbox.com.au"
 # Reload assessment relations - every day, sometime between 23:00 and 23:30?
 0 23 * * * www-data	/usr/local/bin/jitter 1800 php /usr/share/schoolbox/tools/assessment/reload-relations.php -p >> /var/log/schoolbox/reload-relations.log 2>&1
 
+# Rebuild search index: on the hour or thereabouts
+# (Go back 2 hours or so for safety)
+30 * * * * www-data	/usr/local/bin/jitter 1800 php /usr/share/schoolbox/tools/search/rebuild-index.php -p --from="-2 hour" >> /var/log/schoolbox/rebuild-search-index.log 2>&1
+
 # End of file - do not delete
