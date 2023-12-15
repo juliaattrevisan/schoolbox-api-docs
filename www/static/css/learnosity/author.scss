@@ -857,12 +857,6 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
     font-family: "schoolbox";
     margin-right: 0.5em;
 }
-.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-10 {
-    width: 82.3333333333%;
-}
-.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
-    width: 17.6666666667%;
-}
 
 /* update Add items button styles */
 .lrn .lrn-author-ui .lrn-btn-primary[disabled],
@@ -967,4 +961,37 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec {
     position: absolute;
     right: 50px;
     top: 65px;
+}
+
+/* Updated the clear filter buttons */
+.lrn .lrn-author-ui-no-preview .lrn-label-group-btn {
+    background: var(--content-ui-background);
+    border: none;
+    border-radius: 0px !important;
+    color: var(--content-ui-foreground);
+    font-size: 1rem !important;
+    padding: 0.5rem;
+}
+.lrn .lrn-author-ui-no-preview .lrn-label-group-btn:hover {
+    background-color: var(--content-ui-hover) !important;
+    color: var(--content-ui-foreground) !important;
+    text-decoration: none !important;
+}
+.lrn .lrn-author-ui .lrn-dl-inline dt {
+    margin-left: 0px;
+}
+.lrn.lrn-author.lrn-res .lrn-search-txt {
+    display: inline-block !important;
+}
+button.lrn-btn.lrn-btn-sec.lrn-btn-full-width.lrn-btn-lg.lrn-main-search-button,
+button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
+    float: right;
+    margin-bottom: 1rem;
+    width: 230px;
+}
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-10 {
+    width: 100%;
+}
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
+    width: 100%;
 }
