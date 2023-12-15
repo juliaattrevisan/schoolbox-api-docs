@@ -47,7 +47,12 @@ class Controller extends Base
      */
     public function getPlan(CourseSpecification $course): void
     {
-        $unitAssessmentsTranslator = new UnitAssessments($this->routeGenerator, $this->getUser(), $this->getUser());
+        $unitAssessmentsTranslator = new UnitAssessments(
+            $this->routeGenerator,
+            $this->access,
+            $this->getUser(),
+            $this->getUser()
+        );
         $indicatorMap = new IndicatorModelToArray();
         $units = [];
         /**

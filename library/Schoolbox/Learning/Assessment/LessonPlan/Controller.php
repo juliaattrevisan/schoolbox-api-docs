@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Closure;
 use Crell\ApiProblem\ApiProblem;
@@ -51,6 +52,7 @@ class Controller extends Assessment\Controller
         AssessmentMapperProxy $assessmentMapper,
         WorkTypeMapper $workTypeMapper,
         Access $access,
+        Authorizer $authorizer,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
@@ -165,6 +167,7 @@ class Controller extends Assessment\Controller
          */
         $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments(
             $this->routeGenerator,
+            $this->getAuthorizer(),
             $student,
             $this->getUser(),
             true
@@ -397,7 +400,12 @@ class Controller extends Assessment\Controller
         $this->response = $this->responseAsJson(
             $assessment->getLinkedAssessments()
             ? $assessment->getLinkedAssessments()->reindex()->map(
-                new Assessment\Translator\UnitAssessments($this->routeGenerator, $this->getUser(), $this->getUser())
+                new Assessment\Translator\UnitAssessments(
+                    $this->routeGenerator,
+                    $this->getAuthorizer(),
+                    $this->getUser(),
+                    $this->getUser()
+                )
             )
             : []
         );
@@ -435,6 +443,7 @@ class Controller extends Assessment\Controller
                 $assessment->getLinkedAssessments()->reindex()->map(
                     new Assessment\Translator\UnitAssessments(
                         $this->routeGenerator,
+                        $this->getAuthorizer(),
                         $this->getUser(),
                         $this->getUser()
                     )

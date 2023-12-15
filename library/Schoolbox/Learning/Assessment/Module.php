@@ -688,6 +688,7 @@ class Module extends BaseModule
                     $assessmentDataSource,
                     $workTypeMapper,
                     $this->getAccess(),
+                    $this->getAuthorizer(),
                     $transactor,
                     $bakery,
                     $termMapper,

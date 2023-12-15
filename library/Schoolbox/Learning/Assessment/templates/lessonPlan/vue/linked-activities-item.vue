@@ -151,12 +151,11 @@ function getDataProgressTickForm(activity: Activity) {
                 :title="getProgressTickMouseoverTitle(activity)"
             ></a>
         </form>
-        <a
+        <span
             v-else-if="activity._links !== null"
-            :href="activity._links.status"
             :class="'no-text progress-tick ' + activity.progressTick.progress"
             :title="getProgressTickMouseoverTitle(activity)"
-        ></a>
+        ></span>
     </nav>
     <nav v-if="isInstructor">
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
