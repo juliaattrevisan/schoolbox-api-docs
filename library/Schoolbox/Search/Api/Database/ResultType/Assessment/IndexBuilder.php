@@ -86,11 +86,11 @@ class IndexBuilder extends BaseBuilder
         ";
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND COALESCE(assessment.due_date, assessment.updated_at) >= :fromDate';
+            $queryString        .= ' AND assessment.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND COALESCE(assessment.due_date, assessment.updated_at) <= :toDate';
+            $queryString      .= ' AND assessment.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);

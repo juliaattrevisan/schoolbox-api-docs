@@ -35,14 +35,15 @@ class IndexBuilder extends BaseBuilder
             WHERE n.deleted_at IS NULL
             AND n.accepted_at IS NOT NULL
             AND n.rejected_at IS NULL
+            AND n.publish_at IS NOT NULL
         ";
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND n.publish_at >= :fromDate';
+            $queryString        .= ' AND n.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND n.publish_at <= :toDate';
+            $queryString      .= ' AND n.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
