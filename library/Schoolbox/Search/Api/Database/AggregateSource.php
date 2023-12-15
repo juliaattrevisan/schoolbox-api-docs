@@ -157,7 +157,7 @@ class AggregateSource implements ISource
 
         // UNION all queries together.
         $queryString = (
-            ($existsOnly ? 'IF(EXISTS(' : 'SELECT * FROM (') .
+            ($existsOnly ? 'IF(EXISTS(' : 'SELECT DISTINCT * FROM (') .
             '(' . implode(') UNION ALL (', $queries) . ')' .
             ($existsOnly ? '), 1, 0)' : ') AS combined')
         );
