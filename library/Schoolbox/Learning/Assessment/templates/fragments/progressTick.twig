@@ -10,42 +10,42 @@
  #
  # This is used to find out a user's current progress in an assessment,
  # such as whether they need to create a Response or what their latest
- # Feedback status happens to be
+ # Feedback status happens to be.
  #}
 {% set participant = assessment.participantIfExtant(student) %}
 
 {% if participant and not participant.isExcluded %}
 
-    {# Only set this var if the assessment is a task so participants can create a
-     # response asychronously without reloading the page. This only applies to Tasks.
-     # Due Work and Quiz require more indepth workflows to submit a Response.
-    #}
+    {# The purpose of the postRoute is so participants can create a response asychronously without reloading the page. #}
+    {# This only applies to Tasks.  due-work and quiz require more in-depth workflows to submit a response. #}
     {% set postRoute = null %}
-    {% if assessment is task and assessment.isImplementation %}
-        {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
-            assessment:   assessment,
-            assessmentId: assessment.id,
-            student:      student,
-            studentId:    student.id
-        }) %}
-    {% endif %}
+    {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
+        assessment:   assessment,
+        assessmentId: assessment.id,
+        student:      student,
+        studentId:    student.id
+    }) %}
 
-    {# Tasks only #}
-    {% if postRoute is not null and postRoute != '' %}
-        <form action="{{ postRoute }}"
-              method="POST"
-              class="progress-tick-form"
-              data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
-            {%
-            if participant.isResponseRequired
-            and (
-                USER.role.isStaff or (
-                    student.id == USER.id and
-                    assessment.isOpen(USER) and
-                    assessment.isSelfAssessable
-                )
+    {# The 'incomplete' status should only be shown to students for self-assessable tasks.  Always show to staff howver. #}
+    {% set loggedInUserShouldSeeIncompleteStatus = (
+        participant.isResponseRequired and (
+            USER.role.isStaff or (
+            USER.id == student.id and
+                assessment is task and
+                assessment.isOpen(USER) and
+                assessment.isSelfAssessable
             )
-            %}
+        )
+    ) %}
+
+    {% if assessment is task and assessment.isImplementation and postRoute is not null and postRoute != '' %}
+        {# The progress tick is a button for tasks for which the logged-in user is authorized to change the status. #}
+
+        <form action="{{ postRoute }}"
+         method="POST"
+         class="progress-tick-form"
+         data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
+            {% if loggedInUserShouldSeeIncompleteStatus %}
                 <a class="no-text progress-tick" title="Incomplete" data-progress-tick-status="incomplete"></a>
             {% elseif participant.isFeedbackRequired %}
                 <a class="no-text progress-tick pending" title="Self-assessed" data-progress-tick-status="selfAssessed"></a>
@@ -54,15 +54,26 @@
             {% endif %}
         </form>
     {% else %}
-        {# Other assessment types just get an icon that does nothing when clicked. #}
-        {% if participant.isResponseRequired and student.id == USER.id and assessment.isOpen(USER) %}
-            <span class="no-text progress-tick" title="Incomplete"></span>
-        {% elseif participant.isFeedbackRequired %}
-            <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
-        {% elseif participant.isResubmissionRequired %}
-            <span class="no-text progress-tick failed" title="Resubmission Required"></span>
-        {% elseif participant.isReviewComplete %}
-            <span class="no-text progress-tick reviewed" title="Completed"></span>
+        {# The progress tick for non-tasks is just an icon.  Clicking on the icon does nothing. #}
+
+        {# Note the detailRoute is used here for permission purposes only. #}
+        {# If the user has access to the detailRoute, they get to see the progress tick. #}
+        {% set detailRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+            assessment:   assessment,
+            assessmentId: assessment.id,
+            student:      student,
+            studentId:    student.id
+        }) %}
+        {% if detailRoute is not null and detailRoute != '' %}
+            {% if loggedInUserShouldSeeIncompleteStatus %}
+                <span class="no-text progress-tick" title="Incomplete"></span>
+            {% elseif participant.isFeedbackRequired %}
+                <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
+            {% elseif participant.isResubmissionRequired %}
+                <span class="no-text progress-tick failed" title="Resubmission Required"></span>
+            {% elseif participant.isReviewComplete %}
+                <span class="no-text progress-tick reviewed" title="Completed"></span>
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endif %}
