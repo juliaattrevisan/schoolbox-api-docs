@@ -45,16 +45,18 @@ function getImg() {
 
 <template>
     <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`">
-        <div class="c-img__wrapper">
-            <a
-                v-if="props.result.type === ResultTypes.BADGE"
-                href="#open-badge-modal"
-                @click.prevent="emit('badgeSelected', props.result)"
-                v-html="getImg()"
-            >
-            </a>
-            <a v-else-if="props.result.url" :href="props.result.url" v-html="getImg()"> </a>
-            <div v-else v-html="getImg()"></div>
+        <a
+            v-if="props.result.type === ResultTypes.BADGE"
+            href="#open-badge-modal"
+            @click.prevent="emit('badgeSelected', props.result)"
+        >
+            <div class="c-img__wrapper" v-html="getImg()"></div>
+        </a>
+        <a v-else-if="props.result.url" :href="props.result.url">
+            <div class="c-img__wrapper" v-html="getImg()"></div>
+        </a>
+        <div v-else>
+            <div class="c-img__wrapper" v-html="getImg()"></div>
         </div>
     </div>
 </template>
