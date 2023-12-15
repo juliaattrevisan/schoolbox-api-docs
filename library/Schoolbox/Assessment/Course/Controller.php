@@ -1400,9 +1400,22 @@ class Controller extends Base\Base
              * check if there is already a component with this definition ID
              * and if there is, and the definition says multiple false, then ignore this component and move on
              * there are some components that do not work when there are multiple instances on a page `Course Builder` among others
+             *
+             * If there is already a component by the same type and component name on the page then also continue and don't create a dupe.
+             * This will cause issues if there are multiple in the template with the same heading, ie multiple textboxes with the default of 'Text Box',
+             * or multiple blank Tiles components
              */
-            if ($existingInstances->getBy('definitionId', $currentInstance->getDefinitionId()) && !$currentInstance->getDefinition()->getMultiple()) {
-                continue;
+            if ($existingInstances->getBy('definitionId', $currentInstance->getDefinitionId())) {
+                if (!$currentInstance->getDefinition()->getMultiple()) {
+                    continue;
+                }
+                // if the component is going to be a direct dupe of what already exists, then ignore the new one
+                foreach ($existingInstances->filterBy('definitionId', $currentInstance->getDefinitionId()) as $existing) {
+                    if ($existing->getConfigByKey('componentname')->getValue() === $currentInstance->getConfigByKey('componentname')->getValue()) {
+                        // break out of the parent for loop (the dupe / spawn $templateInstances loop)
+                        continue 2;
+                    }
+                }
             }
             // preserve the config
             /** @var \Component_ConfigDefinition[] $configs */
