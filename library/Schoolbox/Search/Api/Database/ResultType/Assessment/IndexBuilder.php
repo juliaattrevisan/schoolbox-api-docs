@@ -169,7 +169,6 @@ class IndexBuilder extends BaseBuilder
                 lesson_plan.assessment_id = assessment.id
             )
             WHERE assessment.deleted_at IS NOT NULL
-            AND type IS NOT NULL
         ";
         $params = [];
         if ($fromDate) {
