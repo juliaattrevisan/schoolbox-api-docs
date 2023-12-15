@@ -24,7 +24,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
         lastname: "",
         name: "",
         elementId: "",
-        hasReport: false,
         isReportLoaded: false,
         isMarked: false,
         items: [],
@@ -62,7 +61,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
         student.value = {
             ...$student,
             isReportLoaded: false,
-            hasReport: false,
             items: [],
             attemptComment: $attemptComment,
             urls: $urls === undefined ? undefined : $urls,
