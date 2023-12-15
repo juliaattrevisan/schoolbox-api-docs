@@ -31,7 +31,7 @@ const maxScore = window.Vue.computed(() => {
 
 /**
  * Get the current tooltip for the item
- * @returns {string} -
+ * @returns {string} - the style to add a background colour that reflects the score
  */
 const statusStyles = window.Vue.computed(() => {
     if (!props.student.isReviewed) {

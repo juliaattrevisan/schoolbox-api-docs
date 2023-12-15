@@ -4,6 +4,7 @@
  */
 
 import { gsap } from "gsap";
+import { getGradient } from "@js/util/cssUtils";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 import { getItemScore, getItemMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
@@ -121,13 +122,24 @@ function updateHiddenElement(statusElement: HTMLDivElement) {
 }
 
 /**
+ * Get the current tooltip for the item
+ * @returns {string} - the style to add a background colour that reflects the score
+ */
+function getStatusStyles() {
+    if (!props.item.isMarked) {
+        return `lrn-circle-${StudentItemMarkTypes.NOT_MARKED}`;
+    }
+    return `${getGradient(totalScore.value, maxScore.value)}-bg`;
+}
+
+/**
  * Update the styles when the score changes
  * @param {HTMLDivElement} statusElement - the element to update
  */
 function updateStyles(statusElement: HTMLDivElement) {
-    const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-")); // find any classes on statusElement that contain 'lrn-circle-*'
+    const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-") || c.includes("-bg")); // find any classes on statusElement that contain 'lrn-circle-*' or '*-bg'
     classes.forEach((c) => statusElement.classList.remove(c)); // remove all classes that contain 'lrn-circle-*'
-    statusElement.classList.add(`lrn-circle-${status.value}`); // add the correct class
+    statusElement.classList.add(getStatusStyles()); // add the correct class
 }
 
 /**
