@@ -106,15 +106,7 @@ class Module extends BaseModule
         $queryParamBuilders = [
             new Database\Index\QueryParamBuilder($database->getQuoter()),
             new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
-//            new Database\ResultType\News\QueryParamBuilder(),
             new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
-//            new Database\ResultType\File\QueryParamBuilder(),
-//            new Database\ResultType\Event\QueryParamBuilder(),
-//            new Database\ResultType\Link\QueryParamBuilder(),
-//            new Database\ResultType\Textbox\QueryParamBuilder($database->getQuoter()),
-//            new Database\ResultType\Blog\QueryParamBuilder(),
-//            new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
-//            new Database\ResultType\Forum\QueryParamBuilder($database->getQuoter()),
         ];
 
         $hydrators = [
@@ -190,7 +182,6 @@ class Module extends BaseModule
         }
 
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
-//            $queryParamBuilders[] = new Database\ResultType\Assessment\QueryParamBuilder($database->getQuoter());
             $hydrators[] = new Database\ResultType\Assessment\Hydrator(
                 $assessmentMapperProxy,
                 $mapperFactory->get(UserMapper::class),
