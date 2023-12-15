@@ -30,6 +30,14 @@ const maxScore = window.Vue.computed(() => {
 });
 
 /**
+ * If the student has no score, we don't want to show any score
+ * @returns {boolean} - whether the student has a score to display
+ */
+const hasScore = window.Vue.computed(() => {
+    return maxScore.value !== 0;
+});
+
+/**
  * Get the current tooltip for the item
  * @returns {string} - the style to add a background colour that reflects the score
  */
@@ -43,7 +51,7 @@ const statusStyles = window.Vue.computed(() => {
 
 <template>
     <!-- this is the matched DOM structure of a Learnosity score -->
-    <div class="lrn learnosity-report session-detail-by-item mark">
+    <div v-if="hasScore" class="lrn learnosity-report session-detail-by-item mark">
         <h3 class="lrn-report-item-title">
             <span class="visually-hidden">{{ totalScore }}/{{ maxScore }}</span>
             <div
