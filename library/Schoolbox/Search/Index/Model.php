@@ -74,14 +74,6 @@ class Model
     private string $fulltextIndex;
 
     /**
-     * The searchable short index for this search index.
-     *
-     * In practice: this will be short-form content such as a person's name or
-     * title, and will be searched with a `column LIKE :keyword` query.
-     */
-    private string $textIndex;
-
-    /**
      * @return string
      */
     public function getIdentifier(): string
