@@ -22,8 +22,7 @@ import { Alignment } from "@ckeditor/ckeditor5-alignment";
 import { FindAndReplace } from "@ckeditor/ckeditor5-find-and-replace";
 import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import { WordCount } from "@ckeditor/ckeditor5-word-count";
-import { AIAssistant } from "@ckeditor/ckeditor5-ai";
-
+import { AIAssistant, OpenAITextAdapter } from "@ckeditor/ckeditor5-ai";
 import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
@@ -78,6 +77,7 @@ export function getConfig(config: EditorConfig) {
             Resource,
             UITweaks,
             AIAssistant,
+            OpenAITextAdapter,
         ],
         extraPlugins: [UploadAdapterPlugin],
         licenseKey: window.sbProps.ckeditor5LicenseKey,
