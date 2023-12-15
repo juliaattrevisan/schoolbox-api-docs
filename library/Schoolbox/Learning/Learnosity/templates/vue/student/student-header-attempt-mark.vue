@@ -3,8 +3,8 @@
  * Display the total mark for a students entire response
  */
 
+import { getGradient } from "@js/util/cssUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
@@ -29,37 +29,11 @@ const maxScore = window.Vue.computed(() => {
 });
 
 /**
- * Get the current status for the item
- * @returns {string} - the status
- */
-const status = window.Vue.computed(() => {
-    if (!props.student.isMarked) {
-        return StudentItemMarkTypes.NOT_MARKED;
-    }
-    if (totalScore.value === maxScore.value) {
-        return StudentItemMarkTypes.CORRECT;
-    }
-    if (totalScore.value === 0) {
-        return StudentItemMarkTypes.INCORRECT;
-    }
-    return StudentItemMarkTypes.PARTIAL;
-});
-
-/**
  * Get the current tooltip for the item
- * @returns {string} - the tooltip
+ * @returns {string} -
  */
-const tooltip = window.Vue.computed(() => {
-    if (status.value === StudentItemMarkTypes.NOT_MARKED) {
-        return "Not fully marked";
-    }
-    if (status.value === StudentItemMarkTypes.CORRECT) {
-        return "Correct";
-    }
-    if (status.value === StudentItemMarkTypes.INCORRECT) {
-        return "Incorrect";
-    }
-    return "Partially correct";
+const gradientClass = window.Vue.computed(() => {
+    return `${getGradient(totalScore.value, maxScore.value)}-bg`;
 });
 </script>
 
@@ -67,14 +41,12 @@ const tooltip = window.Vue.computed(() => {
     <!-- this is the matched DOM structure of a Learnosity score -->
     <div class="lrn learnosity-report session-detail-by-item mark">
         <h3 class="lrn-report-item-title">
-            <span class="visually-hidden"> {{ tooltip }} {{ totalScore }}/{{ maxScore }}</span>
+            <span class="visually-hidden">{{ totalScore }} / {{ maxScore }}</span>
             <div
                 aria-hidden="true"
-                :class="`lrn-circle pull-right lrn-circle-${status}`"
-                :data-status="status"
+                :class="`lrn-circle pull-right ${gradientClass}`"
                 data-toggle="tooltip"
                 data-placement="left"
-                :data-original-title="tooltip"
                 tabindex="0"
             >
                 <canvas width="24" height="24"></canvas>
