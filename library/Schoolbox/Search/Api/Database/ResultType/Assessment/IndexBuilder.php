@@ -19,7 +19,6 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
@@ -129,7 +128,6 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
-     * @param Alaress_Date_Format|null $toDate
      * @inheritdoc
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
