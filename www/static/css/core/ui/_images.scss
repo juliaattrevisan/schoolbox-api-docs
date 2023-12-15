@@ -75,7 +75,7 @@
                 flex: 1 var(--image-size-#{$size});
                 max-height: var(--image-size-#{$size});
                 max-width: var(--image-size-#{$size});
-
+                min-width: var(--image-size-#{$size});
                 /*
                     Icons are weird. Because they rely on font scaling, we have to include that here too,
                     but we never want icons to go full bleed, hence the calc. At current, this makes the
