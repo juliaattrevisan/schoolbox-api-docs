@@ -50,12 +50,14 @@ export const useStudentStore = defineStore("qfStudent", () => {
      * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
      * @param {StudentAttemptComment} $attemptComment - the attempt responses
      * @param {StudentUrls} $urls - the urls
+     * @param {boolean} $isReviewed - whether the attempt has been reviewed
      */
     function init(
         $student: Student,
         $itemResponses: StudentItemQuestionResponse[],
         $attemptComment: StudentAttemptComment,
-        $urls?: StudentUrls
+        $urls?: StudentUrls,
+        $isReviewed?: boolean
     ) {
         student.value = {
             ...$student,
@@ -65,6 +67,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             attemptComment: $attemptComment,
             urls: $urls === undefined ? undefined : $urls,
             showMarked: true,
+            isReviewed: $isReviewed === undefined ? undefined : $isReviewed,
         };
         itemResponses.value = $itemResponses;
     }

@@ -16,7 +16,7 @@ interface Props {
     question: StudentItemQuestion; // the question that's displayed
     container: HTMLElement; // the parent container, to look for the relevant item
     isReadOnly: boolean; // whether the question is readonly
-    isReviewed: boolean; // whether the question has been reviewed
+    showFeedback: boolean; // whether to show the feedback
 }
 const props = defineProps<Props>();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
@@ -125,22 +125,20 @@ watchDebounced(
  * Move the item response element from the entire quiz response into our own container
  */
 window.Vue.onMounted(() => {
-  if (props.question.response) {
-      const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
-      const response = props.container.querySelector(selector) as HTMLDivElement;
-
-      responsesEl.value?.appendChild(response);
-      score.value = props.question.response.score?.toString() ?? "";
-
-      /**
-       * Replace video placeholders with actual player when the ui has loaded,
-       * ensuring we only do this on the first mount by checking if the replacement
-       * container is already present
-       */
-      if (!response.querySelector("[data-schoolboxmedia-replacement-container]")) {
-          $.fn.schoolboxResource_ProxyReplacement($(selector));
-      }
-  }
+    if (props.question.response) {
+        const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
+        const response = props.container.querySelector(selector) as HTMLDivElement;
+        responsesEl.value?.appendChild(response);
+        score.value = props.question.response.score?.toString() ?? "";
+        /**
+         * Replace video placeholders with actual player when the ui has loaded,
+         * ensuring we only do this on the first mount by checking if the replacement
+         * container is already present
+         */
+        if (!response.querySelector("[data-schoolboxmedia-replacement-container]")) {
+            $.fn.schoolboxResource_ProxyReplacement($(selector));
+        }
+    }
 });
 
 /**
@@ -162,7 +160,7 @@ window.Vue.onBeforeUnmount(async () => {
     <div class="l-flex-col l-gap-m l-pad-m--bottom question">
         <template v-if="props.question.response">
             <div ref="responsesEl"></div>
-            <template v-if="props.isReviewed">
+            <template v-if="props.showFeedback">
                 <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
                     <label>Sample answer</label>
                     <p>{{ question.metadata.sample_answer }}</p>

@@ -20,4 +20,5 @@ export type Student = {
     urls?: StudentUrls;
     isMarked?: boolean;
     showMarked?: boolean;
+    isReviewed?: boolean;
 };

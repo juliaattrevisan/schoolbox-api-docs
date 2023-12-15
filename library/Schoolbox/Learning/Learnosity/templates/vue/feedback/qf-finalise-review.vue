@@ -18,7 +18,7 @@ const isFinalising = window.Vue.ref(false); // to show the finalising text on th
  * @returns {string} - the text to display
  */
 const buttonText = window.Vue.computed(() => {
-    if (store.isReviewed) {
+    if (studentStore.student.isReviewed) {
         return isFinalising.value ? "Updating..." : "Update Review";
     }
     // to change the button text when finalising
@@ -119,7 +119,7 @@ function onCancelSelected() {
         <h2>Unmarked items</h2>
         <p>
             There are currently items that have not been marked. Are you sure you wish to
-            {{ store.isReviewed ? "update" : "finalise" }} the review?
+            {{ studentStore.student.isReviewed ? "update" : "finalise" }} the review?
         </p>
         <ul class="flex-list">
             <li>
