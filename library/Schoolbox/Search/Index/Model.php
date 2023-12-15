@@ -206,22 +206,4 @@ class Model
         $this->fulltextIndex = $fulltextIndex;
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getTextIndex(): string
-    {
-        return $this->textIndex;
-    }
-
-    /**
-     * @param string $textIndex
-     * @return $this
-     */
-    public function setTextIndex(string $textIndex): self
-    {
-        $this->textIndex = $textIndex;
-        return $this;
-    }
 }

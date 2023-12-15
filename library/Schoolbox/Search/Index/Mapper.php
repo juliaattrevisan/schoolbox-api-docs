@@ -30,6 +30,5 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_by', self::TYPE_INTEGER);
         $this->uses('folder_id', self::TYPE_INTEGER);
         $this->uses('fulltext_index', self::TYPE_STRING);
-        $this->uses('text_index', self::TYPE_STRING);
     }
 }

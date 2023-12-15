@@ -49,11 +49,6 @@ abstract class BaseBuilder implements IBuilder
     private const MAX_FULLTEXT_BYTE_LENGTH = 2 ** 24;
 
     /**
-     * Maximum character length of the text index.
-     */
-    private const MAX_TEXT_CHARACTER_LENGTH = 2000;
-
-    /**
      * Constructor
      *
      * @param IConnector      $connector Database connection
@@ -92,8 +87,7 @@ abstract class BaseBuilder implements IBuilder
             ->setIsRelevanceDateAffected($isRelevanceDateAffected)
             ->setCreatedBy($createdBy)
             ->setFolderId($folderId)
-            ->setFulltextIndex('')
-            ->setTextIndex('');
+            ->setFulltextIndex('');
     }
 
     /**
@@ -135,46 +129,6 @@ abstract class BaseBuilder implements IBuilder
             return $index;
         }
         return $index->setFulltextIndex($content);
-    }
-
-    /**
-     * Helper function for adding standard text content to the index.
-     *
-     * This content will be searchable with a `column LIKE :keyword` query.
-     *
-     * @param Index\Model            $index    The index to add the content to.
-     * @param string|null            $content  The content to add to the index.
-     * @param self::INDEX_STRATEGY_* $strategy The strategy to normalise
-     *                                         `$content` with.
-     * @return Index\Model
-     */
-    protected function addTextIndex(Index\Model $index, ?string $content, string $strategy): Index\Model
-    {
-        if (!isset($content)) {
-            return $index;
-        }
-        $content = $this->normaliseContent($content, $strategy);
-        if ($content === '') {
-            return $index;
-        }
-
-        $currentContent = $index->getTextIndex();
-        $content        = $currentContent === ''
-            ? $content
-            : ($currentContent . self::INDEX_SEPARATOR . $content);
-
-        if (mb_strlen($content, 'UTF-8') > self::MAX_TEXT_CHARACTER_LENGTH) {
-            $this->logger->notice(
-                sprintf(
-                    'Text index for "%s:%s" would exceed max of %d chars: not adding index',
-                    $index->getType(),
-                    $index->getIdentifier(),
-                    self::MAX_TEXT_CHARACTER_LENGTH,
-                )
-            );
-            return $index;
-        }
-        return $index->setTextIndex($content);
     }
 
     /**

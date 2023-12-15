@@ -120,8 +120,7 @@ class IndexBuilder extends App
                 is_relevance_date_affected,
                 created_by,
                 folder_id,
-                fulltext_index,
-                text_index
+                fulltext_index
             ) VALUES (
                 :type,
                 :identifier,
@@ -130,8 +129,7 @@ class IndexBuilder extends App
                 :isRelevanceDateAffected,
                 :createdBy,
                 :folderId,
-                :fulltextIndex,
-                :textIndex
+                :fulltextIndex
             )
         ");
         $deleteStatement = $this->getDatabaseInternal()->prepareQuery("
@@ -155,7 +153,6 @@ class IndexBuilder extends App
                         'createdBy'               => $updatedIndex->getCreatedBy(),
                         'folderId'                => $updatedIndex->getFolderId(),
                         'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
-                        'textIndex'               => $updatedIndex->getTextIndex(),
                     ]);
                 } catch (Exception $e) {
                     $this->getLogger()->warning(

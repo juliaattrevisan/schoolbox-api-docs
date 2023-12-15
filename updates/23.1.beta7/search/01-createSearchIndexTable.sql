@@ -8,8 +8,7 @@ create table search_index
     is_relevance_date_affected bool          not null,
     created_by                 int unsigned  null,
     folder_id                  int unsigned  null,
-    fulltext_index             mediumtext    not null,
-    text_index                 varchar(2000) not null
+    fulltext_index             mediumtext    not null
 );
 
 alter table search_index
