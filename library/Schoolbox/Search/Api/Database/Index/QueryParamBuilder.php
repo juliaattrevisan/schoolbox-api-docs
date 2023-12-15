@@ -104,14 +104,23 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     }
 
     /**
-     * By default, a query+param builder handles a type if either:
-     * * `getType()` equals `$type`
-     * * `$type` starts with `$this->getType()`
+     * This builder may potentially handle any type or subtype.
      *
      * @param string $type
      * @return bool
      */
     protected function handlesType(string $type): bool
+    {
+        return true;
+    }
+
+    /**
+     * This builder may potentially handle any type or subtype.
+     *
+     * @param string $type
+     * @return bool
+     */
+    protected function handlesSubtype(string $type): bool
     {
         return true;
     }
