@@ -129,6 +129,9 @@ function getStatusStyles() {
     if (!props.item.isMarked) {
         return `lrn-circle-${StudentItemMarkTypes.NOT_MARKED}`;
     }
+    if (props.item.isMarked && noScore.value) {
+        return `lrn-circle-${StudentItemMarkTypes.PARTIAL}`;
+    }
     return `${getGradient(totalScore.value, maxScore.value)}-bg`;
 }
 
