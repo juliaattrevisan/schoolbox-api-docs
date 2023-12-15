@@ -49,7 +49,7 @@ class Controller extends Base
     {
         $unitAssessmentsTranslator = new UnitAssessments(
             $this->routeGenerator,
-            $this->access,
+            $this->getAuthorizer(),
             $this->getUser(),
             $this->getUser()
         );

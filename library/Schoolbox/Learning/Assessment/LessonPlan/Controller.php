@@ -52,7 +52,6 @@ class Controller extends Assessment\Controller
         AssessmentMapperProxy $assessmentMapper,
         WorkTypeMapper $workTypeMapper,
         Access $access,
-        Authorizer $authorizer,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
