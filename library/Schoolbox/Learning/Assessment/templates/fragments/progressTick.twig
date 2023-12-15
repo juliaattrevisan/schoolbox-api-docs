@@ -17,7 +17,7 @@
 {% if participant and not participant.isExcluded %}
 
     {# The purpose of the postRoute is so participants can create a response asychronously without reloading the page. #}
-    {# This only applies to Tasks.  due-work and quiz require more in-depth workflows to submit a response. #}
+    {# This only applies to Tasks.  Due-work and quiz require more in-depth workflows to submit a response. #}
     {% set postRoute = null %}
     {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
         assessment:   assessment,
@@ -26,7 +26,7 @@
         studentId:    student.id
     }) %}
 
-    {# The 'incomplete' status should only be shown to students for self-assessable tasks.  Always show to staff howver. #}
+    {# The 'incomplete' status should only be shown to students for self-assessable tasks.  Always show to staff however. #}
     {% set loggedInUserShouldSeeIncompleteStatus = (
         participant.isResponseRequired and (
             USER.role.isStaff or (
