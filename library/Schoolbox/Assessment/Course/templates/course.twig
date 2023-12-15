@@ -268,12 +268,15 @@ Usage:
             }
         });
 
+        {# only alert on changing templates if we have changed the template #}
+        {% if courseSpec %}
         // Template input: show a warning if changing the selected option
         var templateInput = $('[data-template]');
 
         templateInput.change(function() {
             $("[data-template-warning]").toggleClass("hide", Number({{ courseSpec.template.id }}) === Number(templateInput.val()));
         });
+        {% endif %}
 
 
         // Automatically expand the Unit specified in the URL hash
