@@ -9,15 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\Index\CommandLineTool;
 
+use Alaress\Database\Exception;
 use Alaress_Date_Format;
 use InvalidArgumentException;
-use PDOException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Search\Api\Database\Index\IBuilder;
 use Schoolbox\Search\Api\Database\ResultType;
-use Schoolbox\Search\Index;
 
 /**
  * Command-line tool for rebuilding search indices.
@@ -147,17 +145,29 @@ class IndexBuilder extends App
                     continue;
                 }
 
-                $updateStatement->execute([
-                    'type'                    => $updatedIndex->getType(),
-                    'identifier'              => $updatedIndex->getIdentifier(),
-                    'title'                   => $updatedIndex->getTitle(),
-                    'date'                    => $updatedIndex->getDate()->getDatabase(),
-                    'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected(),
-                    'createdBy'               => $updatedIndex->getCreatedBy(),
-                    'folderId'                => $updatedIndex->getFolderId(),
-                    'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
-                    'textIndex'               => $updatedIndex->getTextIndex(),
-                ]);
+                try {
+                    $updateStatement->execute([
+                        'type'                    => $updatedIndex->getType(),
+                        'identifier'              => $updatedIndex->getIdentifier(),
+                        'title'                   => $updatedIndex->getTitle(),
+                        'date'                    => $updatedIndex->getDate()->getDatabase(),
+                        'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected(),
+                        'createdBy'               => $updatedIndex->getCreatedBy(),
+                        'folderId'                => $updatedIndex->getFolderId(),
+                        'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
+                        'textIndex'               => $updatedIndex->getTextIndex(),
+                    ]);
+                } catch (Exception $e) {
+                    $this->getLogger()->warning(
+                        sprintf(
+                            'Unexpected database error when index for "%s:%s" (%s): ignoring',
+                            $updatedIndex->getType(),
+                            $updatedIndex->getIdentifier(),
+                            $e->getMessage(),
+                        )
+                    );
+                    continue;
+                }
             }
 
             foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {

@@ -11,7 +11,6 @@ namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Search\Index;
 
@@ -33,16 +32,26 @@ abstract class BaseBuilder implements IBuilder
     private const INDEX_SEPARATOR = ' | ';
 
     /**
-     * Strategy for adding an index from HTML content; this involves:
-     * * stripping tags
-     * * decoding HTML special chars
+     * Strategy for adding an index from HTML content.
      */
     protected const INDEX_STRATEGY_HTML = 'html';
 
     /**
-     * Strategy for adding an index from standard text content; this involves:
+     * Strategy for adding an index from standard text content.
      */
     protected const INDEX_STRATEGY_TEXT = 'text';
+
+    /**
+     * Maximum length of the fulltext index.
+     *
+     * Note that text fields store a maximum number of bytes, not characters.
+     */
+    private const MAX_FULLTEXT_BYTE_LENGTH = 2 ** 24;
+
+    /**
+     * Maximum character length of the text index.
+     */
+    private const MAX_TEXT_CHARACTER_LENGTH = 2000;
 
     /**
      * Constructor
@@ -109,12 +118,23 @@ abstract class BaseBuilder implements IBuilder
             return $index;
         }
 
-        $currentIndex = $index->getFulltextIndex();
-        if ($currentIndex === '') {
-            return $index->setFulltextIndex($content);
-        } else {
-            return $index->setFulltextIndex($currentIndex . self::INDEX_SEPARATOR . $content);
+        $currentContent = $index->getFulltextIndex();
+        $content        = $currentContent === ''
+            ? $content
+            : ($currentContent . self::INDEX_SEPARATOR . $content);
+
+        if (strlen($content) > self::MAX_FULLTEXT_BYTE_LENGTH) {
+            $this->logger->notice(
+                sprintf(
+                    'Full text index for "%s:%s" would exceed max of %d bytes: not adding',
+                    $index->getType(),
+                    $index->getIdentifier(),
+                    self::MAX_FULLTEXT_BYTE_LENGTH,
+                )
+            );
+            return $index;
         }
+        return $index->setFulltextIndex($content);
     }
 
     /**
@@ -138,12 +158,23 @@ abstract class BaseBuilder implements IBuilder
             return $index;
         }
 
-        $currentIndex = $index->getTextIndex();
-        if ($currentIndex === '') {
-            return $index->setTextIndex($content);
-        } else {
-            return $index->setTextIndex($currentIndex . self::INDEX_SEPARATOR . $content);
+        $currentContent = $index->getTextIndex();
+        $content        = $currentContent === ''
+            ? $content
+            : ($currentContent . self::INDEX_SEPARATOR . $content);
+
+        if (mb_strlen($content, 'UTF-8') > self::MAX_TEXT_CHARACTER_LENGTH) {
+            $this->logger->notice(
+                sprintf(
+                    'Text index for "%s:%s" would exceed max of %d chars: not adding index',
+                    $index->getType(),
+                    $index->getIdentifier(),
+                    self::MAX_TEXT_CHARACTER_LENGTH,
+                )
+            );
+            return $index;
         }
+        return $index->setTextIndex($content);
     }
 
     /**
