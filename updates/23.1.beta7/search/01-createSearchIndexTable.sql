@@ -9,7 +9,7 @@ create table search_index
     created_by                 int unsigned  null,
     folder_id                  int unsigned  null,
     fulltext_index             mediumtext    not null,
-    text_index                 varchar(250)  not null
+    text_index                 varchar(2000) not null
 );
 
 alter table search_index
@@ -28,6 +28,3 @@ alter table search_index
 
 create fulltext index search_index_fulltext_index_index
     on search_index (fulltext_index);
-
-create index search_index_text_index_index
-    on search_index (text_index);
