@@ -26,7 +26,7 @@ class IndexBuilder extends BaseBuilder
             SELECT
                 b.id,
                 b.heading AS title,
-                b.created_at AS date,
+                b.updated_at AS date,
                 b.owner_id AS created_by,
                 f.id AS folder_id,
                 b.body AS fulltext_index
@@ -37,11 +37,11 @@ class IndexBuilder extends BaseBuilder
         ";
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND b.created_at >= :fromDate';
+            $queryString        .= ' AND b.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND b.created_at <= :toDate';
+            $queryString      .= ' AND b.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
