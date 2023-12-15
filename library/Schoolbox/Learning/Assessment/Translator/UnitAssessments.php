@@ -39,13 +39,28 @@ class UnitAssessments
         $links = null;
         if ($this->routeGenerator) {
             $links = [
-                'status' => $this->routeGenerator->generate('learningAssessment.getSummary', [
+                'summary' => $this->routeGenerator->generate('learningAssessment.getSummary', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'studentId' => $this->student->getId(),
                     'student' => $this->student,
+                ]),
+                'status' => $this->routeGenerator->generate('learningAssessment.getStatus', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]),
+                'modify' => $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
                 ])
             ];
+            // if quiz we have special links
+            if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+                $links['modifyContent'] = $this->routeGenerator->generate('learnosity.getContent', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]);
+            }
         }
         $assessments = null;
         if ($assessment instanceof Project) {

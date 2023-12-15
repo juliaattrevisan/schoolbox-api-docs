@@ -71,7 +71,7 @@ window.Vue.onMounted(() => {
                     :class="{ collapsed: !store.expandedUnits.includes(unit.id) }"
                 >
                     <td>
-                        <a :href="unit.homepage" target="_blank">
+                        <a :href="unit.homepage">
                             <strong>{{ unit.title }}</strong>
                         </a>
                         <p v-if="unit.extraTextboxes > 0" class="meta">
