@@ -43,6 +43,7 @@
         overflow: hidden;
         position: relative;
         max-width: var(--image-size-m);
+        min-width: var(--image-size-m);
 
         img {
             /*
@@ -51,7 +52,7 @@
                 rectangular aspect rations in both dimensions (eg 16:9 and 19:6 are handled)
             */
             min-height: 100%;
-            min-width: var(--image-size-m);
+            min-width: 100%;
             object-fit: cover;
         }
     }
