@@ -5,6 +5,7 @@
 
 import { getGradient } from "@js/util/cssUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
@@ -32,7 +33,10 @@ const maxScore = window.Vue.computed(() => {
  * Get the current tooltip for the item
  * @returns {string} -
  */
-const gradientClass = window.Vue.computed(() => {
+const statusStyles = window.Vue.computed(() => {
+    if (!props.student.isReviewed) {
+        return `lrn-circle-${StudentItemMarkTypes.NOT_MARKED}`;
+    }
     return `${getGradient(totalScore.value, maxScore.value)}-bg`;
 });
 </script>
@@ -41,10 +45,10 @@ const gradientClass = window.Vue.computed(() => {
     <!-- this is the matched DOM structure of a Learnosity score -->
     <div class="lrn learnosity-report session-detail-by-item mark">
         <h3 class="lrn-report-item-title">
-            <span class="visually-hidden">{{ totalScore }} / {{ maxScore }}</span>
+            <span class="visually-hidden">{{ totalScore }}/{{ maxScore }}</span>
             <div
                 aria-hidden="true"
-                :class="`lrn-circle pull-right ${gradientClass}`"
+                :class="`lrn-circle pull-right ${statusStyles}`"
                 data-toggle="tooltip"
                 data-placement="left"
                 tabindex="0"
