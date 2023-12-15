@@ -1369,6 +1369,10 @@ class Controller extends Base\Base
     {
         // TODO: remove this spawn
         $homepageConfigMapper = HomepageConfigMapper::getInstance();
+        $cim = Component_InstanceMapper::getInstance();
+        $ccm = Component_ConfigMapper::getInstance();
+        $layoutMapper = \Schoolbox\Tile\Layout\Mapper::getInstance();
+        $tileMapper   = \Schoolbox\Tile\Mapper::getInstance();
 
         // update the homepage config to the new template
         $homepageConfig = $homepageConfigMapper->findById($folder->getId())
@@ -1385,8 +1389,6 @@ class Controller extends Base\Base
          */
 
         // retrieve, rearrange and reinsert the componentry
-        $cim = Component_InstanceMapper::getInstance();
-        $ccm = Component_ConfigMapper::getInstance();
         /** @var Component_Instance[] $templateInstances */
         $templateInstances = $cim->findByContext('homepage_template', $homepageConfig->getTemplate()->getId());
         $existingInstances = $cim->findByContext('homepage', $folder->getId());
@@ -1452,8 +1454,6 @@ class Controller extends Base\Base
                         $src = null;
                     }
                     if ($c->getKey() === 'layoutId' && (!$src || empty($src->getValue()))) {
-                        $layoutMapper = \Schoolbox\Tile\Layout\Mapper::getInstance();
-                        $tileMapper   = \Schoolbox\Tile\Mapper::getInstance();
                         try {
                             $layout = $layoutMapper->findById($c->getValue());
                             $layout
