@@ -362,7 +362,7 @@ Usage:
                         <label class="required" for="template">
                             Course Template
                         </label>
-                        <select data-template name="template" required {% if templates.count == 1%}disabled{% endif %}>
+                        <select data-template name="template" required>
                             {% if templates.count > 1 %}
                                 {% for template in templates %}
                                     <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}</option>
