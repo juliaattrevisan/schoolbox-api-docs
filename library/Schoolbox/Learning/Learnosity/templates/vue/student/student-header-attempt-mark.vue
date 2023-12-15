@@ -66,7 +66,7 @@ const tooltip = window.Vue.computed(() => {
 <template>
     <!-- this is the matched DOM structure of a Learnosity score -->
     <div class="lrn learnosity-report session-detail-by-item mark">
-        <h3 class="lrn-report-item-title" data-reference-title="c97b309a-a33d-473c-868e-72e5bbd7e2b5">
+        <h3 class="lrn-report-item-title">
             <span class="visually-hidden"> {{ tooltip }} {{ totalScore }}/{{ maxScore }}</span>
             <div
                 aria-hidden="true"
