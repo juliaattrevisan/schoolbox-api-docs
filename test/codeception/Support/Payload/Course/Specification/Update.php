@@ -29,6 +29,7 @@ class Update extends Request
         $this->setFormParam('parent', $courseSpec->getFolder()->getParent()->getId());
         $this->setFormParam('curriculumCodes[0]', '');
         $this->setFormParam('newUnitName', '');
+        $this->setFormParam('template', 1);
         $this->setFormParam('submit', 'Save Course');
     }
 
