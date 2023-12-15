@@ -43,7 +43,7 @@
 /var/log/schoolbox/*/transcode.log
 /var/log/schoolbox/*/image-processor.log
 /var/log/schoolbox/*/reload-relations.log
-/var/log/schoolbox/*/rebuild-search-index.log {
+/var/log/schoolbox/*/search-build-index.log {
     monthly
     missingok
     rotate 6
