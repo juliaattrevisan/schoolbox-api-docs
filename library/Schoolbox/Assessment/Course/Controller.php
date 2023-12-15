@@ -1413,7 +1413,10 @@ class Controller extends Base\Base
                 }
                 // if the component is going to be a direct dupe of what already exists, then ignore the new one
                 foreach ($existingInstances->filterBy('definitionId', $currentInstance->getDefinitionId()) as $existing) {
-                    if ($existing->getConfigByKey('componentname')->getValue() === $currentInstance->getConfigByKey('componentname')->getValue()) {
+                    if (
+                        $existing->getConfigByKey('componentname')->getValue() === $currentInstance->getConfigByKey('componentname')->getValue()
+                        && $existing->getPosition() === $currentInstance->getPosition()
+                    ) {
                         // break out of the parent for loop (the dupe / spawn $templateInstances loop)
                         continue 2;
                     }
