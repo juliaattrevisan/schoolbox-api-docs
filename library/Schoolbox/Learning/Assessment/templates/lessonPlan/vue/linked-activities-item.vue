@@ -56,16 +56,15 @@ function getProgressTickMouseoverTitle(activity: Activity) {
         throw new Error("This function should not have been called.");
     }
 
-    const progressStatus = progressTick.progress;
-    const postUrlSupplied = progressTick.url !== null;
+    const postRouteUrlSupplied = progressTick.postRouteUrl !== "";
 
-    switch (progressStatus) {
+    switch (progressTick.progressClass) {
         case "incomplete":
             return "Incomplete";
         case "pending":
-            return postUrlSupplied ? "Self-assessed" : "Awaiting Feedback";
+            return postRouteUrlSupplied ? "Self-assessed" : "Awaiting Feedback";
         case "failed":
-            return postUrlSupplied ? "N/A" : "Resubmission Required";
+            return postRouteUrlSupplied ? "N/A" : "Resubmission Required";
         case "reviewed":
             return "Completed";
         default:
@@ -85,15 +84,11 @@ function getDataProgressTickStatus(activity: Activity) {
         throw new Error("This function should not have been called.");
     }
 
-    const progressStatus = progressTick.progress;
-
-    switch (progressStatus) {
+    switch (progressTick.progressClass) {
         case "incomplete":
             return "incomplete";
         case "pending":
             return "selfAssessed";
-        case "failed":
-            return "failed";
         case "reviewed":
             return "teacherAssessed";
         default:
@@ -136,24 +131,21 @@ function getDataProgressTickForm(activity: Activity) {
     </div>
     <nav v-if="activity.progressTick !== null" class="progress-tick-container">
         <form
-            v-if="activity.progressTick.url !== null"
-            :action="activity.progressTick.url"
+            v-if="activity.progressTick.postRouteUrl !== ''"
+            :action="activity.progressTick.postRouteUrl"
             method="post"
             class="progress-tick-form"
             :data-progress-tick-form="getDataProgressTickForm(activity)"
         >
             <a
-                :class="
-                    'no-text progress-tick' +
-                    (activity.progressTick.progress === 'incomplete' ? '' : ' ' + activity.progressTick.progress)
-                "
+                :class="'no-text progress-tick ' + activity.progressTick.progressClass"
                 :data-progress-tick-status="getDataProgressTickStatus(activity)"
                 :title="getProgressTickMouseoverTitle(activity)"
             ></a>
         </form>
         <span
-            v-else-if="activity._links !== null"
-            :class="'no-text progress-tick ' + activity.progressTick.progress"
+            v-else-if="activity.progressTick.progressClass !== ''"
+            :class="'no-text progress-tick ' + activity.progressTick.progressClass"
             :title="getProgressTickMouseoverTitle(activity)"
         ></span>
     </nav>

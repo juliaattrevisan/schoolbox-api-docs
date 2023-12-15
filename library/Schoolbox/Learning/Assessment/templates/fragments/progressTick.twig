@@ -48,7 +48,7 @@
          class="progress-tick-form"
          data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
             {% if loggedInUserShouldSeeIncompleteStatus %}
-                <a class="no-text progress-tick" title="Incomplete" data-progress-tick-status="incomplete"></a>
+                <a class="no-text progress-tick incomplete" title="Incomplete" data-progress-tick-status="incomplete"></a>
             {% elseif participant.isFeedbackRequired %}
                 <a class="no-text progress-tick pending" title="Self-assessed" data-progress-tick-status="selfAssessed"></a>
             {% elseif participant.isReviewComplete %}
@@ -68,7 +68,7 @@
         }) %}
         {% if detailRoute is not null and detailRoute != '' %}
             {% if loggedInUserShouldSeeIncompleteStatus %}
-                <span class="no-text progress-tick" title="Incomplete"></span>
+                <span class="no-text progress-tick incomplete" title="Incomplete"></span>
             {% elseif participant.isFeedbackRequired %}
                 <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
             {% elseif participant.isResubmissionRequired %}

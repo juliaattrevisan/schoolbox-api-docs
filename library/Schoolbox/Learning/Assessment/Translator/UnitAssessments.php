@@ -206,9 +206,14 @@ class UnitAssessments
                 $postRouteUrl = $this->routeGenerator->generate($postRouteName, $postRouteParams);
             }
         }
+
+        if ($postRouteUrl === null) {
+            $postRouteUrl = '';
+        }
+
         $progress = '';
 
-        if ($postRouteUrl !== null && $postRouteUrl !== '') {
+        if ($postRouteUrl !== '') {
             if (
                 $participant->isResponseRequired() && (
                     $assessable->isOpen($this->student) &&
@@ -232,13 +237,9 @@ class UnitAssessments
             }
         }
 
-        return (
-            ($postRouteUrl === '' || $progress === '')
-            ? null
-            : [
-                'url'      => $postRouteUrl,
-                'progress' => $progress,
-            ]
-        );
+        return [
+            'postRouteUrl'  => $postRouteUrl,
+            'progressClass' => $progress,
+        ];
     }
 }
