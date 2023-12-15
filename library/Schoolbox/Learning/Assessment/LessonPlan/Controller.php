@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
-use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Closure;
 use Crell\ApiProblem\ApiProblem;
