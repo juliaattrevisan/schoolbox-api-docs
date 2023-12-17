@@ -145,7 +145,7 @@ export function usePopOut(
         // the button will always match the colour of the content when open
         button.value.style.backgroundColor = window.getComputedStyle(content).getPropertyValue("background-color");
         cleanup = autoUpdate(button.value as ReferenceElement, content, updatePosition as () => void);
-        if (isFullWidth) {
+        if (isFullWidth && button.value.offsetWidth > 500) {
             // make the content the same width of the button
             content.style.width = `${button.value.offsetWidth}px`;
         }
