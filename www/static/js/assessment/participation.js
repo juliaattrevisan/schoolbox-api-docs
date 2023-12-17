@@ -62,7 +62,6 @@
          */
         $participants.on("change", "input[data-participant-select]", function () {
             var checkCount = $participants.find(":checked").length;
-            var $customiseDropdownNote = $("#customise-dropdown-note"); // to show/hide note that students have to be selected first before accessing the customise dropdown
             var $customiseDropdown = $("#customise-dropdown");
             var $participantRow = $(this).closest("li[data-participant]");
 
@@ -76,11 +75,9 @@
             displayParticipationOptions();
 
             if (checkCount) {
-                $customiseDropdownNote.css("display", "none");
                 // Enable actions
                 $customiseDropdown.prop("disabled", false);
             } else {
-                $customiseDropdownNote.css("display", "block");
                 // Disable actions
                 $customiseDropdown.prop("disabled", true);
             }
