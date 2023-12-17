@@ -209,9 +209,10 @@ class External_Synergetic_Ths_User extends External_Synergetic_User
 
         /* Unlink from user
          */
-        $user->setPortrait(null);
-
-        \Schoolbox\UserMapper::getInstance()->save($user);
+        if (!empty($user->getPortrait())) {
+            $user->setPortrait(null);
+            \Schoolbox\UserMapper::getInstance()->save($user);
+        }
 
         return null;
     }

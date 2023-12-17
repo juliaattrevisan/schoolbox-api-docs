@@ -110,10 +110,10 @@ class External_Synergetic_User implements External_UserInterface
 
         /* Unlink from user
          */
-        $user->setPortrait(null);
-
-        UserMapper::getInstance()->save($user);
-
+        if (!empty($user->getPortrait())) {
+            $user->setPortrait(null);
+            UserMapper::getInstance()->save($user);
+        }
         return null;
     }
 
