@@ -17,7 +17,7 @@ export type Activity = {
     completionCount: number | null;
     studentCount: number | null;
     progressTick: {
-        url: string | null;
-        progress: string | null;
+        postRouteUrl: string | null;
+        progressClass: string | null;
     } | null;
 };
