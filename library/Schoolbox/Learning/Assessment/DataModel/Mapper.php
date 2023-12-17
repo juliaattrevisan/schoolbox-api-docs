@@ -1190,7 +1190,7 @@ class Mapper extends BaseMapper
                 $contextProjects = $this->findByColumn(
                     'id',
                     $contextProjectIds,
-                    ['deleted' => true],
+                    ['deleted' => true, 'cache' => false,],
                 )->indexBy('id');
             } finally {
                 $this->hydrateProjectSubAssessments = true;
