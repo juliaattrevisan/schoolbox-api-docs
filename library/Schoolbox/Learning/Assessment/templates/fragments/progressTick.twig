@@ -19,12 +19,14 @@
     {# The purpose of the postRoute is so participants can create a response asychronously without reloading the page. #}
     {# This only applies to Tasks.  Due-work and quiz require more in-depth workflows to submit a response. #}
     {% set postRoute = null %}
-    {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
-        assessment:   assessment,
-        assessmentId: assessment.id,
-        student:      student,
-        studentId:    student.id
-    }) %}
+    {% if assessment is task and assessment.isImplementation %}
+        {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
+            assessment:   assessment,
+            assessmentId: assessment.id,
+            student:      student,
+            studentId:    student.id
+        }) %}
+    {% endif %}
 
     {# The 'incomplete' status should only be shown to students for self-assessable tasks.  Always show to staff however. #}
     {% set loggedInUserShouldSeeIncompleteStatus = (
@@ -38,7 +40,7 @@
         )
     ) %}
 
-    {% if assessment is task and assessment.isImplementation and postRoute is not null and postRoute != '' %}
+    {% if postRoute %} {# Note routeLookupIfAuthorized() can return '', so postRoute can be either '' or null. #}
         {# The progress tick is a button for tasks for which the logged-in user is authorized to change the status. #}
 
         <form action="{{ postRoute }}"
