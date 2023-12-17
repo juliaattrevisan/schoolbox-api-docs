@@ -76,12 +76,12 @@ function onCommentUpdated(comment: string) {
                 :question="question"
                 :container="props.container"
                 :is-read-only="store.isReadOnly"
-                :is-reviewed="store.isReviewed || !store.isReadOnly"
+                :show-feedback="props.student.isReviewed || !store.isReadOnly"
                 @updated-score="onScoreUpdated"
             />
         </div>
         <student-item-comment
-            v-if="store.isReviewed || !store.isReadOnly"
+            v-if="props.student.isReviewed || !store.isReadOnly"
             :student="props.student"
             :item="props.item"
             :is-read-only="store.isReadOnly"

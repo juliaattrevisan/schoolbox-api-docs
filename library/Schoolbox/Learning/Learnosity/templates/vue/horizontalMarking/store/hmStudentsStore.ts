@@ -48,7 +48,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 ...student,
                 isReportLoaded: false,
                 isExpanded: false,
-                hasReport: false,
                 items: [],
             });
         });

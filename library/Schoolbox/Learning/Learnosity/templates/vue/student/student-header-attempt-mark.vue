@@ -3,6 +3,7 @@
  * Display the total mark for a students entire response
  */
 
+import { getGradient } from "@js/util/cssUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
@@ -29,52 +30,35 @@ const maxScore = window.Vue.computed(() => {
 });
 
 /**
- * Get the current status for the item
- * @returns {string} - the status
+ * If the student has no score, we don't want to show any score
+ * @returns {boolean} - whether the student has a score to display
  */
-const status = window.Vue.computed(() => {
-    if (!props.student.isMarked) {
-        return StudentItemMarkTypes.NOT_MARKED;
-    }
-    if (totalScore.value === maxScore.value) {
-        return StudentItemMarkTypes.CORRECT;
-    }
-    if (totalScore.value === 0) {
-        return StudentItemMarkTypes.INCORRECT;
-    }
-    return StudentItemMarkTypes.PARTIAL;
+const hasScore = window.Vue.computed(() => {
+    return maxScore.value !== 0;
 });
 
 /**
  * Get the current tooltip for the item
- * @returns {string} - the tooltip
+ * @returns {string} - the style to add a background colour that reflects the score
  */
-const tooltip = window.Vue.computed(() => {
-    if (status.value === StudentItemMarkTypes.NOT_MARKED) {
-        return "Not fully marked";
+const statusStyles = window.Vue.computed(() => {
+    if (!props.student.isReviewed) {
+        return `lrn-circle-${StudentItemMarkTypes.NOT_MARKED}`;
     }
-    if (status.value === StudentItemMarkTypes.CORRECT) {
-        return "Correct";
-    }
-    if (status.value === StudentItemMarkTypes.INCORRECT) {
-        return "Incorrect";
-    }
-    return "Partially correct";
+    return `${getGradient(totalScore.value, maxScore.value)}-bg`;
 });
 </script>
 
 <template>
     <!-- this is the matched DOM structure of a Learnosity score -->
-    <div class="lrn learnosity-report session-detail-by-item mark">
-        <h3 class="lrn-report-item-title" data-reference-title="c97b309a-a33d-473c-868e-72e5bbd7e2b5">
-            <span class="visually-hidden"> {{ tooltip }} {{ totalScore }}/{{ maxScore }}</span>
+    <div v-if="hasScore" class="lrn learnosity-report session-detail-by-item mark">
+        <h3 class="lrn-report-item-title">
+            <span class="visually-hidden">{{ totalScore }}/{{ maxScore }}</span>
             <div
                 aria-hidden="true"
-                :class="`lrn-circle pull-right lrn-circle-${status}`"
-                :data-status="status"
+                :class="`lrn-circle pull-right ${statusStyles}`"
                 data-toggle="tooltip"
                 data-placement="left"
-                :data-original-title="tooltip"
                 tabindex="0"
             >
                 <canvas width="24" height="24"></canvas>

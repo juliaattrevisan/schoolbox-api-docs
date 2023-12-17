@@ -33,8 +33,8 @@ const studentStore = useStudentStore();
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.isReadOnly, props.isReviewed, props.postFeedback, props.statusPage);
-    useStudentStore().init(props.student, props.itemResponses, props.attemptComment, props.urls);
+    store.init(props.isReadOnly, props.postFeedback, props.statusPage);
+    useStudentStore().init(props.student, props.itemResponses, props.attemptComment, props.urls, props.isReviewed);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions);
 });
