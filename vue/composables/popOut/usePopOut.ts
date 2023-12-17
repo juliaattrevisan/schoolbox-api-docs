@@ -25,6 +25,7 @@ import { onClickOutside } from "@vueuse/core";
  * @param {string} contentId - The id of the pop out content
  * @param {string} optimalPlacement - The optimal placement of the pop out content
  * @param {boolean} isFullWidth - whether to display the pop out content has full width
+ * @param {boolean} isCloseOnContentClick - whether to close the pop out content when it's clicked
  * @returns {object} - The isOpen ref
  */
 export function usePopOut(
@@ -32,7 +33,8 @@ export function usePopOut(
     buttonLabel: string,
     contentId: string,
     optimalPlacement = "bottom-end",
-    isFullWidth = false
+    isFullWidth = false,
+    isCloseOnContentClick = false
 ) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     let content: HTMLElement; // The content to display when the button is selected
@@ -175,7 +177,9 @@ export function usePopOut(
         if (content) {
             content.setAttribute("aria-hidden", "true");
             // to close the content when the user clicks outside of it
-            onClickOutside(button, close, { ignore: [`#${content.id}[data-dropdown-content]`] });
+            onClickOutside(button, close, {
+                ignore: isCloseOnContentClick ? [] : [`#${content.id}[data-dropdown-content]`],
+            });
         }
     }
 

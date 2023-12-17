@@ -13,7 +13,8 @@ table.docblock-argstable {
 }
 
 #storybook-docs table thead,
-table.docblock-argstable thead {
+table.docblock-argstable thead,
+table tr:nth-of-type(2n) {
     background: none !important;
 }
 
