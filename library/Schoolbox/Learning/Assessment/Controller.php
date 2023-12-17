@@ -482,7 +482,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * Always go to the screen when a quiz has been created,
              * but send the return url with it
              */
-            $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', ['assessmentId' => $assessment->getId()]);
+            $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId()
+            ]);
 
             if ($postReturnUrl) {
                 $returnUrl .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";

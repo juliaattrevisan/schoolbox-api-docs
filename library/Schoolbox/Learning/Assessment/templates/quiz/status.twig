@@ -20,7 +20,7 @@
     {% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
 
     {% if routeModify %}
-        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessmentId: assessment.id}) %}
+        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
         <li><a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
         <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
     {% endif %}
@@ -208,15 +208,15 @@
                  # We might make a "museum" for these old attempts one day
                  #}
                 {% if latestResponse.learnosityReference ?? null %}
-                    {% if canDelete %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.postDeleteAttempts', {assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
-                    {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" data-interaction-finish-reference="{{ latestResponse.learnosityReference }}" href="{{ routeLookupIfAuthorized('learnosity.postCompleteAttempt', {assessmentId: assessment.id, studentId: latestResponse.submittedBy.id}) }}">Finish Attempt</a>{% endif %}
+                    {% if canDelete %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.postDeleteAttempts', {assessment: assessment, assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
+                    {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" data-interaction-finish-reference="{{ latestResponse.learnosityReference }}" href="{{ routeLookupIfAuthorized('learnosity.postCompleteAttempt', {assessment: assessment, assessmentId: assessment.id, studentId: latestResponse.submittedBy.id}) }}">Finish Attempt</a>{% endif %}
 
                     {% if canPublish or canFinish %}
                         <a
                             {% if not canPublish %}style="display:none"{% endif %}
                             class="button"
                             data-interaction-review="{{ latestResponse.id }}"
-                            href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessmentId: assessment.id, studentId: participant.user.id, learnositySessionReference: latestResponse.learnosityReference}) }}"
+                            href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, studentId: participant.user.id, learnositySessionReference: latestResponse.learnosityReference}) }}"
                         >
                             Review Attempt
                         </a>
