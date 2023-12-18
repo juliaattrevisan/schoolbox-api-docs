@@ -160,4 +160,3 @@ nav.progress-tick-container {
     margin-top: 5px;
 }
 </style>
-9
