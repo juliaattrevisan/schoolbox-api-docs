@@ -52,7 +52,7 @@ function getUrgency() {
             <a
                 v-if="activity._links !== null"
                 class="title"
-                :href="activity._links.status + '?returnUrl=' + returnUrl"
+                :href="(props.isInstructor && !store.isStudentView) ? activity._links.status + '?returnUrl=' + returnUrl : activity._links.summary + '?returnUrl=' + returnUrl"
                 >{{ activity.title }}</a
             >
             <span v-else class="title">{{ activity.title }}</span>
