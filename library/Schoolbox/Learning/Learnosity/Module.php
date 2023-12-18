@@ -37,6 +37,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -164,7 +165,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{sourceId}/copy/{destinationId}',
             'postCopyQuizConstituents',
-            $instructorPerms,
+            $this->buildAuthRuleCanCopy(),
             fn ($params) => $this->preloadAssessmentAndDestinationAssessment($params),
         );
 
@@ -216,6 +217,48 @@ class Module extends BaseModule
                         return $ctx;
                     }
                 )
+            )
+        );
+    }
+
+
+    /**
+     * Auth rule for whether an assessment can be copied from one place to
+     * another.
+     *
+     * The copying user must have read permission on the source, and write
+     * permission on the destination.
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException
+     */
+    private function buildAuthRuleCanCopy(): Rule\IAuthorizationRule
+    {
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_READ,
+                        static function (array $params): int {
+                            if (isset($params['source'])) {
+                                return $params['source']->getContext()->getFolder()->getId();
+                            }
+                            throw new NotFound('No source assessment preloaded');
+                        },
+                        $this->getAccess(),
+                    ),
+                    new IsInstructor(
+                        $this->getAccess(),
+                        static function (array $params): FolderModel {
+                            if (isset($params['destination'])) {
+                                return $params['destination']->getContext()->getFolder();
+                            }
+                            throw new NotFound('No destination assessment preloaded');
+                        }
+                    )
+                ),
             )
         );
     }
