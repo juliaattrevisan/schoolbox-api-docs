@@ -3,7 +3,6 @@
  * Display a single search result
  */
 
-import { gsap } from "gsap/all";
 import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import { Result } from "../../js/types/Result";
 import SpResultsResultImage from "./sp-results-result-image.vue";
@@ -22,17 +21,6 @@ const props = defineProps<Props>();
 
 const resultEl = window.Vue.ref<HTMLDivElement | null>(null);
 const badgeStore = useBadgeStore();
-
-/**
- * To display the result, stagger to fade on each sequentially
- */
-window.Vue.onMounted(() => {
-    gsap.from(resultEl.value, {
-        delay: props.index * 0.02,
-        duration: 0.2,
-        opacity: 0,
-    });
-});
 
 /**
  * Whether the result has sub results
