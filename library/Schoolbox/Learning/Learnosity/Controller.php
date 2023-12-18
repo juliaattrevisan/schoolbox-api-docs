@@ -295,8 +295,11 @@ class Controller extends Base
                  */
                 'item_edit' => [
                     'item' => [
+                        'reference' => [
+                            'show' => true,
+                        ],
                         'title' => [
-                            'show' => true
+                            'show' => true,
                         ]
                     ],
                     /* Tags are only spawned upon clicking Save, not before
@@ -306,6 +309,12 @@ class Controller extends Base
                 /* Show a list of Items, which you can see by clicking Find Items
                  */
                 'item_list' => [
+                    'item' => [
+                        'title' => [
+                            'show' => true,
+                            'show_reference' => true
+                        ]
+                    ],
                     'filter' => [
                         'restricted' => [
                             'tags' => [
