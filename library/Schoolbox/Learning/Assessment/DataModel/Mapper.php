@@ -23,9 +23,7 @@ use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -51,6 +49,16 @@ use UnderflowException;
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * Temporary internal flag for setting whether project sub-assessments are
+     * hydrated.
+     *
+     * This is switched off when loading projects as a context for other
+     * assessments: it's unlikely that an assessment within a project will need
+     * to know directly about its siblings.
+     */
+    private bool $hydrateProjectSubAssessments = true;
+
     /**
      * @inheritdoc
      * @throws BaseMapper\Exception If unable to derive an ID for mapped joins
@@ -767,7 +775,6 @@ class Mapper extends BaseMapper
         /** @var Collection|Model[] $modelList */
         $modelList         = $this->createCollection();
         $dueWorkIds        = [];
-        $quizIds           = [];
         $projectIds        = [];
         $taskIds           = [];
         $contextProjectIds = [];
@@ -941,7 +948,9 @@ class Mapper extends BaseMapper
         // Curriculum Nodes
         $modelList = $this->augmentListWithCurriculumNodes($modelList);
         // Project sub-assessments
-        $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+        if ($this->hydrateProjectSubAssessments) {
+            $modelList = $this->augmentListWithProjectSubAssessments($modelList, array_keys($projectIds));
+        }
         // Lesson Plan Linked Assessments
         $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
         return $modelList;
@@ -1173,7 +1182,19 @@ class Mapper extends BaseMapper
     protected function augmentListWithProjectContexts($modelList, $contextProjectIds)
     {
         if (!empty($contextProjectIds)) {
-            $contextProjects = $this->findByColumn('id', $contextProjectIds, ['deleted' => true])->indexBy('id');
+            // A project loaded as a context should not contain sub-assessments.
+            // It should also not be cached, so if I _do_ need to load the
+            // project with its sub-assessments, I can do so.
+            $this->hydrateProjectSubAssessments = false;
+            try {
+                $contextProjects = $this->findByColumn(
+                    'id',
+                    $contextProjectIds,
+                    ['deleted' => true, 'cache' => false,],
+                )->indexBy('id');
+            } finally {
+                $this->hydrateProjectSubAssessments = true;
+            }
             foreach ($modelList as $model) {
                 // This has to be a project
                 $context = $model->getAssessmentContext();
