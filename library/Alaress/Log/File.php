@@ -30,7 +30,7 @@ class Alaress_Log_File
      * @param mixed $contents
      * @return $this
      */
-    public function log(string $prefix, mixed $contents):self
+    public function log(string $prefix, mixed $contents): self
     {
         $filepointer = fopen($this->path, 'a+');
 
