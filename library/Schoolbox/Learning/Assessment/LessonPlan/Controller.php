@@ -265,20 +265,18 @@ class Controller extends Assessment\Controller
             }
         }
 
-        $linkedAssessmentsForTwig = (
-            $linkedAssessments
-            ? $linkedAssessments->reindex()->map($unitAssessmentsTranslator)
-            : []
-        );
-
         $twigData = [
-            'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
-            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
-            'assessment'   => $assessment,
-            'student'      => $student,
-            'returnUrl'    => $returnUrl,
+            'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'assessment'        => $assessment,
+            'student'           => $student,
+            'returnUrl'         => $returnUrl,
             'courseAssessments' => $courseAssessments,
-            'linkedAssessments' => $linkedAssessmentsForTwig,
+            'linkedAssessments' => (
+                $linkedAssessments
+                ? $linkedAssessments->reindex()->map($unitAssessmentsTranslator)
+                : []
+            ),
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
