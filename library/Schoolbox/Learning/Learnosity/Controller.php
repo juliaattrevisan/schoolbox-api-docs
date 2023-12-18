@@ -1825,13 +1825,6 @@ class Controller extends Base
                  */
                 $newTags[] = $tagFactory->produceImplFlag();
 
-                (new \Alaress_Log_File('/tmp/tags.log'))
-                    ->log('assessment context id', $assessment->getContext()->getId())
-                    ->log('context spec?', (int)$assessment->getContext()->isSpecificationContext())
-                    ->log('assessment id', $assessment->getId())
-                    ->log('new tags', $newTags)
-                ;
-
                 /* Fetch this activity from Learnosity; we need to assign tags to each of its items
                  * because they appear in the global Item Bank. Unless we assign the classCode tag
                  * here, we'll never know if items are for a spec or an impl when users search
@@ -1867,16 +1860,10 @@ class Controller extends Base
                     /* Assign tags to each item
                      */
                     foreach ($itemReferenceList as $item) {
-                        (new \Alaress_Log_File('/tmp/tags.log'))
-                            ->log('item', $item);
-
                         /* Maxed out? Send it.
                          */
                         if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
                             $this->api->dataSetRequest('/itembank/items/tags', $payload);
-
-                            (new \Alaress_Log_File('/tmp/tags.log'))
-                                ->log('payload', $payload);
 
                             /* Reset this for the next cycle
                              */
@@ -1895,9 +1882,6 @@ class Controller extends Base
                      */
                     if (\count($payload['items'])) {
                         $this->api->dataSetRequest('/itembank/items/tags', $payload);
-
-                        (new \Alaress_Log_File('/tmp/tags.log'))
-                            ->log('payload', $payload);
                     }
                 }
 
