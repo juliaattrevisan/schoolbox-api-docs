@@ -21,7 +21,6 @@ use RangeException;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\Model as CourseTemplateModel;
 use Schoolbox\Resource\Folder\Ancestry;
-use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use UnexpectedValueException;
@@ -52,7 +51,6 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
-use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\YearLevel;
 
 /**
@@ -92,6 +90,11 @@ class Controller extends Base\Base
         private AssessmentMapper $assessmentMapper,
         private CurriculumNodeMapper $curriculumNodeMapper,
         private CourseTemplateMapper $courseTemplateMapper,
+        private HomepageConfigMapper $homepageConfigMapper,
+        private Component_InstanceMapper $cim,
+        private Component_ConfigMapper $ccm,
+        private \Schoolbox\Tile\Layout\Mapper $layoutMapper,
+        private \Schoolbox\Tile\Mapper $tileMapper,
     ) {
     }
 
@@ -1367,20 +1370,13 @@ class Controller extends Base\Base
      */
     private function updateHomepageTemplate(Folder $folder, HomepageTemplate $template)
     {
-        // TODO: remove this spawn
-        $homepageConfigMapper = HomepageConfigMapper::getInstance();
-        $cim = Component_InstanceMapper::getInstance();
-        $ccm = Component_ConfigMapper::getInstance();
-        $layoutMapper = \Schoolbox\Tile\Layout\Mapper::getInstance();
-        $tileMapper   = \Schoolbox\Tile\Mapper::getInstance();
-
         // update the homepage config to the new template
-        $homepageConfig = $homepageConfigMapper->findById($folder->getId())
+        $homepageConfig = $this->homepageConfigMapper->findById($folder->getId())
             ->setCategory($folder)
             ->setTemplate($template);
         $folder->setHomepage($homepageConfig);
 
-        $homepageConfigMapper->save($homepageConfig);
+        $this->homepageConfigMapper->save($homepageConfig);
 
         /**
          * now do the merge / append new components
@@ -1390,8 +1386,8 @@ class Controller extends Base\Base
 
         // retrieve, rearrange and reinsert the componentry
         /** @var Component_Instance[] $templateInstances */
-        $templateInstances = $cim->findByContext('homepage_template', $homepageConfig->getTemplate()->getId());
-        $existingInstances = $cim->findByContext('homepage', $folder->getId());
+        $templateInstances = $this->cim->findByContext('homepage_template', $homepageConfig->getTemplate()->getId());
+        $existingInstances = $this->cim->findByContext('homepage', $folder->getId());
 
         if (!count($templateInstances)) {
             return;
@@ -1439,7 +1435,7 @@ class Controller extends Base\Base
                 ->setModule('homepage')
                 ->setIdentifier($homepageConfig->getCategory()->getId());
 
-            $ids = $cim->save($inst);
+            $ids = $this->cim->save($inst);
 
             if (!count($configs)) {
                 continue;
@@ -1458,18 +1454,18 @@ class Controller extends Base\Base
                     }
                     if ($c->getKey() === 'layoutId' && (!$src || empty($src->getValue()))) {
                         try {
-                            $layout = $layoutMapper->findById($c->getValue());
+                            $layout = $this->layoutMapper->findById($c->getValue());
                             $layout
                                 ->setId(null)
                                 ->setDashboardRole(null)
                                 ->setHomepageTemplate(null)
                                 ->setFolder($homepageConfig->getCategory());
-                            $layoutMapper->save($layout);
+                            $this->layoutMapper->save($layout);
                             $value = $layout->getId();
                             foreach ($layout->getTileList() as $tile) {
                                 $tile->setId(null)->setTileLayout($layout);
                             }
-                            $tileMapper->save($layout->getTileList());
+                            $this->tileMapper->save($layout->getTileList());
                         } catch (MapperException $e) {
                             // Don't save anything
                             continue;
@@ -1481,7 +1477,7 @@ class Controller extends Base\Base
                         ->setInstanceId($id)
                         ->setValue($value)
                         ->setConfigDefinitionId($c->getId());
-                    $ccm->save($conf);
+                    $this->ccm->save($conf);
                 }
             }
         }
