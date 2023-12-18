@@ -168,58 +168,34 @@ class Hydrator extends BaseHydrator
      * @param User $viewer
      * @param User $searchResultUser
      * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
-     * @throws RouteNotFound
      */
     private function getSearchResultLinks(User $searchResultUser, User $viewer): array
     {
-        $links = [];
+        $links   = [];
+        $route   = 'adminUser.getModify';
+        $params  = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
+        $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Modify', 'icon-modify');
 
-        $route = 'adminUser.getModify';
-        $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Modify',
-                'icon' => 'icon-modify',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
-        }
-
-        $route = 'user.impersonate';
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Impersonate',
-                'icon' => 'icon-staff-students',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
-        }
+        $route   = 'user.impersonate';
+        $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Impersonate', 'icon-staff-students');
 
 
-        $route = 'calendar.getCalendar';
+        $route  = 'calendar.getCalendar';
         $params = [
             'selectedDate' => date('d-m-Y'),
             'userId' => $searchResultUser->getId(),
             'user' => $searchResultUser
         ];
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Calendar',
-                'icon' => 'icon-calendar',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
-        }
+        $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Calendar', 'icon-calendar');
 
-        $route = 'learningUpcoming.getUpcomingForStudent';
+        $route  = 'learningUpcoming.getUpcomingForStudent';
         $params = [
             'date' => date('d-m-Y'),
             'studentId' => $searchResultUser->getId(),
             'student' => $searchResultUser
         ];
-        if ($searchResultUser->getRole()->isStudent() && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Due Work',
-                'icon' => 'icon-due-work',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
+        if ($searchResultUser->getRole()->isStudent()) {
+            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Due Work', 'icon-due-work');
         }
 
         $authenticator = new Eportfolio_Authenticator($viewer, $searchResultUser, null);
@@ -233,40 +209,60 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-        $route = 'learningGrades.getGrades';
+        $route  = 'learningGrades.getGrades';
         $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
-        if ($searchResultUser->getRole()->isStudent() && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Grades',
-                'icon' => 'icon-approve',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
+        if ($searchResultUser->getRole()->isStudent()) {
+            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Grades', 'icon-approve');
         }
 
-        $route = 'pastoral.getStudent';
+        $route  = 'pastoral.getStudent';
         $params = ['studentId' => $searchResultUser->getId(), 'student' => $searchResultUser];
-        if ($searchResultUser->getRole()->isStudent() && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-            $links[] = [
-                'title' => 'Pastoral Care',
-                'icon' => 'icon-pastoral',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
+        if ($searchResultUser->getRole()->isStudent()) {
+            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Pastoral Care', 'icon-pastoral');
         }
 
-        $route = 'timetable.getTimetableCalendarRedirect';
+        $route  = 'timetable.getTimetableCalendarRedirect';
         $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
         if (
             ($searchResultUser->getRole()->isStudent() || $searchResultUser->getRole()->isStaff())
             && !$searchResultUser->getHideTimetable()
-            && $this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)
         ) {
-            $links[] = [
-                'title' => 'Timetable',
-                'icon' => 'icon-timetable',
-                'url' => $this->routeGenerator->generate($route, $params),
-            ];
+            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Timetable', 'icon-timetable');
         }
 
-        return $links;
+        return array_filter($links);
+    }
+
+    /**
+     * Generate a link, only if its route is authorized.
+     *
+     * @param string $route
+     * @param array  $params
+     * @param User   $viewer
+     * @param string $title
+     * @param string $icon
+     * @return array|null
+     */
+    private function generateLinkIfRouteAuthorized(
+        string $route,
+        array $params,
+        User $viewer,
+        string $title,
+        string $icon,
+    ): ?array {
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            try {
+                return [
+                    'title' => $title,
+                    'icon'  => $icon,
+                    'url'   => $this->routeGenerator->generate($route, $params),
+                ];
+            } catch (RouteNotFound) {
+                // `isPathAuthorizedForUser` doesn't catch or even detect if the
+                // route exists: need to catch when calling `generate`.
+                return null;
+            }
+        }
+        return null;
     }
 }
