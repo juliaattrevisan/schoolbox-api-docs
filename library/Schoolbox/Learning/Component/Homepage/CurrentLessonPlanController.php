@@ -87,8 +87,12 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
             /**
              * Use the courses that exist in this homepage, and overwrite the incomplete course specification from the lesson plan
              */
-            if ($lessonPlan->getContext() instanceof UnitImplementation) {
-                $lessonPlan->getContext()->getSpecification()->setCourse($courses->offsetGet($lessonPlan->getContext()->getSpecification()->getCourse()->getId())->getSpecification());
+            if ($lessonPlan->getBaseContext() instanceof UnitImplementation) {
+                $lessonPlan->getBaseContext()->getSpecification()->setCourse(
+                    $courses->offsetGet(
+                        $lessonPlan->getBaseContext()->getSpecification()->getCourse()->getId()
+                    )->getSpecification()
+                );
             }
         }
 
