@@ -148,7 +148,7 @@ class IndexBuilder extends App
                         'type'                    => $updatedIndex->getType(),
                         'identifier'              => $updatedIndex->getIdentifier(),
                         'title'                   => $updatedIndex->getTitle(),
-                        'date'                    => $updatedIndex->getDate()->getDatabase(),
+                        'date'                    => $updatedIndex->getDate()?->getDatabase(),
                         'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected(),
                         'createdBy'               => $updatedIndex->getCreatedBy(),
                         'folderId'                => $updatedIndex->getFolderId(),
