@@ -15,7 +15,8 @@ const containerHeight = window.Vue.ref("0fr");
 window.Vue.watch(
     () => studentsStore.showReviewedAttempts,
     () => {
-        containerHeight.value = studentsStore.allStudentsMarked && !studentsStore.showReviewedAttempts ? "1fr" : "0fr";
+        containerHeight.value =
+            studentsStore.allStudentsReviewed && !studentsStore.showReviewedAttempts ? "1fr" : "0fr";
     }
 );
 </script>
@@ -25,7 +26,7 @@ window.Vue.watch(
         <div class="all-marked__inner-container">
             <div class="empty-state-flex-centered">
                 <i class="icon-quiz"></i>
-                <p>All students who have submitted an attempt have already been marked.</p>
+                <p>All students who have submitted an attempt have already been reviewed.</p>
             </div>
         </div>
     </div>

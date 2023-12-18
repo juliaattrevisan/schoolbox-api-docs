@@ -28,6 +28,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     const urls = window.Vue.ref<StudentUrls[]>([]); // the urls for each student to save score, comment and attempt comment
     const showReviewedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
     const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
+    const allStudentsReviewed = window.Vue.computed(() => students.value.every((student) => student.isReviewed)); // if true, all students have been reviewed
     const store = useStore();
 
     /**
@@ -205,6 +206,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         isExpanded,
         showReviewedAttempts,
         allStudentsMarked,
+        allStudentsReviewed,
         toggleStudent,
         toggleAllStudents,
         reportLoaded,
