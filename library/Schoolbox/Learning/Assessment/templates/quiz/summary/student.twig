@@ -80,7 +80,7 @@
         {% if existingAttempt %}
             {% set callToAction = 'Resume Quiz' %}
         {% endif %}
-        <a class="button submit" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, studentId: student.id}) }}?{{ returnUrlName }}={{ returnUrlEncoded }}">
+        <a class="button submit" href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}?{{ returnUrlName }}={{ returnUrlEncoded }}">
             {{ callToAction }}
         </a>
     </div>
@@ -153,7 +153,7 @@
                         <nav>
                             {% if attempt.learnosityReference %}
                                 {% if not finished and canAttempt %}
-                                    <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessmentId: assessment.id, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                                    <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                                 {% else %}
                                     {% if canStudentReview %}
                                         <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
