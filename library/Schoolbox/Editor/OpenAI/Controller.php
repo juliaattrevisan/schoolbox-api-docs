@@ -28,7 +28,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 class Controller extends Base
 {
     private const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-    private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%S/chat/completions?api-version=2023-12-01-preview';
+    private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
 
 
     /**
