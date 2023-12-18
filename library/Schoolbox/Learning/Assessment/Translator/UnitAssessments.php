@@ -111,6 +111,8 @@ class UnitAssessments
             $studentCount++;
         }
 
+        $progressTick = $this->getProgressTick($assessment);
+
         return [
             'id'                   => $assessment->getId(),
             'title'                => $assessment->getTitle(),
@@ -124,7 +126,7 @@ class UnitAssessments
             'assessments'          => $assessments?->reindex()->map($this),
             'completionCount'      => $completionCount,
             'studentCount'         => $studentCount,
-            'progressTick'         => $this->getProgressTick($assessment),
+            'progressTick'         => $progressTick,
             'isSelfAssessableTask' => (
                 $assessment instanceof \Schoolbox\Learning\Assessment\Task\Model &&
                 $assessment->isSelfAssessable()
@@ -213,12 +215,19 @@ class UnitAssessments
 
         $progress = '';
 
-        if ($postRouteUrl !== '') {
-            if (
-                $participant->isResponseRequired() && (
+        $loggedInUserShouldSeeIncompleteStatus = (
+            $participant->isResponseRequired() && (
+                $this->loggedInUser->getRole()->isStaff() || (
+                    $assessable instanceof \Schoolbox\Learning\Assessment\Task\Model &&
+                    $assessable->isImplementation() &&
                     $assessable->isOpen($this->student) &&
-                    $assessable->isSelfAssessable())
-                ) {
+                    $assessable->isSelfAssessable()
+                )
+            )
+        );
+
+        if ($postRouteUrl !== '') {
+            if ($loggedInUserShouldSeeIncompleteStatus) {
                 $progress = 'incomplete';
             } elseif ($participant->isFeedbackRequired()) {
                 $progress = 'pending';
@@ -226,7 +235,7 @@ class UnitAssessments
                 $progress = 'reviewed';
             }
         } else {
-            if ($participant->isResponseRequired() && $assessable->isOpen($this->student)) {
+            if ($loggedInUserShouldSeeIncompleteStatus) {
                 $progress = 'incomplete';
             } elseif ($participant->isFeedbackRequired()) {
                 $progress = 'pending';
