@@ -1,6 +1,6 @@
 /* Hide the Tags */
 .lrn-list-view-meta {
-    //display: none;
+    display: none;
 }
 
 /* Hide the published/archived status  */
@@ -14,7 +14,7 @@
 }
 
 .lrn.lrn-author.lrn-sm .lrn-col-sm-3 {
-    //display: none !important;
+    display: none !important;
 }
 
 /* question edit view styles */
@@ -95,10 +95,10 @@ button.lrn-btn-save-dropdown {
 
 /* hide tags from questions list */
 .lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
-    //display: none;
+    display: none;
 }
 .lrn-list-view-alternative-reference.lrn-ellipses {
-    //display: none;
+    display: none;
 }
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-list-details,
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-details,
@@ -249,7 +249,7 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
 
 /* hide player, defaults, tags tabs */
 ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
-    //display: none;
+    display: none;
 }
 
 /* hide setting button in questions */
@@ -612,7 +612,7 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     width: auto;
 }
 [data-authorapi-view="tags-all"] {
-    //display: none !important;
+    display: none !important;
 }
 .lrn.lrn-author .lrn-tool-panel {
     background: transparent;
@@ -802,10 +802,10 @@ span.lrn-list-view-empty-label {
 
 /* Hide reference from the search options */
 .lrn-itemlist-general-search > div:nth-of-type(2) {
-    //display: none !important;
+    display: none !important;
 }
 .lrn-itemlist-general-search > .lrn-form-tags-section {
-    //display: none;
+    display: none;
 }
 
 /* fixed search button in the drop down */

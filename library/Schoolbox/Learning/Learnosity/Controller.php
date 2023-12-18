@@ -297,7 +297,7 @@ class Controller extends Base
                 'item_edit' => [
                     'item' => [
                         'reference' => [
-                            'show' => true,
+                            'show' => false,
                         ],
                         'title' => [
                             'show' => true,
@@ -312,8 +312,8 @@ class Controller extends Base
                 'item_list' => [
                     'item' => [
                         'title' => [
-                            'show' => true,
-                            'show_reference' => true
+                            'show' => false,
+                            'show_reference' => false
                         ]
                     ],
                     'filter' => [
