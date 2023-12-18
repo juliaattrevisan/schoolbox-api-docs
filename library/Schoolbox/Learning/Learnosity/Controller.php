@@ -1818,6 +1818,13 @@ class Controller extends Base
             if ($setTags) {
                 $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
                 $newTags    = $tagFactory->produceFromAssessment($assessment);
+
+                (new \Alaress_Log_File('/tmp/tags.log'))
+                    ->log('assessment context id', $assessment->getContext()->getId())
+                    ->log('context spec?', (int)$assessment->getContext()->isSpecificationContext())
+                    ->log('assessment id', $assessment->getId())
+                    ->log('tags', $newTags);
+
                 $this->api->dataSetRequest(
                     '/itembank/activities/tags',
                     [
