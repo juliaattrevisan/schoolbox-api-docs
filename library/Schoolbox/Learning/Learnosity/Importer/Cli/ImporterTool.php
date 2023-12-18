@@ -90,7 +90,7 @@ class ImporterTool extends CliTool\App
      * Maximum number of things per learnosity payload
      * (50 questions, 50 features, 50 items, 50 activities)
      */
-    private const LEARNOSITY_MAX_PAYLOAD_SIZE = 50;
+    public const LEARNOSITY_MAX_PAYLOAD_SIZE = 50;
 
 
     /**
