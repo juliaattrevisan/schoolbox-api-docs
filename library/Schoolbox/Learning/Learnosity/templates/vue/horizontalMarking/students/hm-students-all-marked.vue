@@ -13,9 +13,9 @@ const containerHeight = window.Vue.ref("0fr");
  * and the option to show marked attempts is unchecked
  */
 window.Vue.watch(
-    () => studentsStore.showMarkedAttempts,
+    () => studentsStore.showReviewedAttempts,
     () => {
-        containerHeight.value = studentsStore.allStudentsMarked && !studentsStore.showMarkedAttempts ? "1fr" : "0fr";
+        containerHeight.value = studentsStore.allStudentsMarked && !studentsStore.showReviewedAttempts ? "1fr" : "0fr";
     }
 );
 </script>

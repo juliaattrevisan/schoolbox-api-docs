@@ -37,11 +37,11 @@ function onToggleSelected() {
  * and the option to show marked attempts is unchecked
  */
 window.Vue.watch(
-    () => studentsStore.showMarkedAttempts,
-    async (showMarkedAttempts) => {
-        if (showMarkedAttempts && props.student.isMarked) {
+    () => studentsStore.showReviewedAttempts,
+    async (showReviewedAttempts) => {
+        if (showReviewedAttempts && props.student.isMarked) {
             await slideDown(studentEl.value as HTMLElement);
-        } else if (!showMarkedAttempts && props.student.isMarked) {
+        } else if (!showReviewedAttempts && props.student.isMarked) {
             await slideUp(studentEl.value as HTMLElement);
         }
     }

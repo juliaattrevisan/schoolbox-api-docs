@@ -16,7 +16,7 @@ const studentsStore = useStudentsStore();
             <li class="f-no-margins">
                 <input
                     id="show-reviewed-attempts"
-                    v-model="studentsStore.showMarkedAttempts"
+                    v-model="studentsStore.showReviewedAttempts"
                     type="checkbox"
                     :disabled="!store.isLoaded"
                 /><label for="show-reviewed-attempts">Show reviewed attempts</label>
