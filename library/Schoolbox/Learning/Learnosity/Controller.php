@@ -324,6 +324,9 @@ class Controller extends Base
                                  */
                                 'all' => [
                                     $tagFactory->produceForSchoolCode()
+                                ],
+                                'none' => [
+                                    $tagFactory->produceImplFlag()
                                 ]
                             ]
                         ]
