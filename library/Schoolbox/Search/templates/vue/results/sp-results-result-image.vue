@@ -61,4 +61,6 @@ function getImg() {
     </div>
 </template>
 
-<style scoped></style>
+<style lang="scss">
+@import "@css/core/base/icon-colours";
+</style>
