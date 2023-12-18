@@ -701,10 +701,13 @@ class Controller extends Base\Base
             $courseSpecFolder->setName($newCourseName);
             $courseSpec->setFolder($courseSpecFolder);
             $courseSpec->setSubjectCode($subjectCode);
-            $courseSpec->setTemplate($template);
 
-            // update existing units / course with the new templates
-            $this->updateExistingFolders($courseSpec, $template);
+            // Only update existing course / unit folders, if we changed the template
+            if ($courseSpec->getTemplate()->getId() !== $template->getId()) {
+                $courseSpec->setTemplate($template);
+                // update existing units / course with the new templates
+                $this->updateExistingFolders($courseSpec, $template);
+            }
 
             // Save the Course
             $this->courseSpecificationMapper->save($courseSpec);
