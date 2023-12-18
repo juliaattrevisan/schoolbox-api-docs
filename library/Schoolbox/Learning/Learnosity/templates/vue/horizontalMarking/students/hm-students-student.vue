@@ -6,7 +6,6 @@
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import StudentAttemptComment from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
-import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentHeader from "./hm-students-student-header.vue";
@@ -21,7 +20,6 @@ const props = defineProps<Props>();
 const studentEl = window.Vue.ref<HTMLElement | null>(null); // the entire student container
 const responseEl = window.Vue.ref<HTMLElement | null>(null); // the response container
 const responseContentEl = window.Vue.ref<HTMLElement | null>(null); // the element to render the report into
-const store = useStore();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
 
@@ -33,15 +31,15 @@ function onToggleSelected() {
 }
 
 /**
- * To show/hide the entire student container, hiding if the student has been marked
- * and the option to show marked attempts is unchecked
+ * To show/hide the entire student container, hiding if the student has been reviewed
+ * and the option to show reviewed attempts is unchecked
  */
 window.Vue.watch(
     () => studentsStore.showReviewedAttempts,
     async (showReviewedAttempts) => {
-        if (showReviewedAttempts && props.student.isMarked) {
+        if (showReviewedAttempts && props.student.isReviewed) {
             await slideDown(studentEl.value as HTMLElement);
-        } else if (!showReviewedAttempts && props.student.isMarked) {
+        } else if (!showReviewedAttempts && props.student.isReviewed) {
             await slideUp(studentEl.value as HTMLElement);
         }
     }
