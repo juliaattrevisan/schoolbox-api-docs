@@ -15,11 +15,11 @@ const studentsStore = useStudentsStore();
         <ul class="option-list l-mar--0">
             <li class="f-no-margins">
                 <input
-                    id="show-marked-attempts"
+                    id="show-reviewed-attempts"
                     v-model="studentsStore.showMarkedAttempts"
                     type="checkbox"
                     :disabled="!store.isLoaded"
-                /><label for="show-marked-attempts">Show marked attempts</label>
+                /><label for="show-reviewed-attempts">Show reviewed attempts</label>
             </li>
         </ul>
     </div>
