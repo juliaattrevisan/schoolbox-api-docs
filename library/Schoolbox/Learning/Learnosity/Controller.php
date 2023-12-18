@@ -1226,7 +1226,8 @@ class Controller extends Base
                     'name' => $attempt->getUser()->getFullName(),
                     'firstname' => $attempt->getUser()->getFirstname(),
                     'lastname' => $attempt->getUser()->getLastname(),
-                    'elementId' => $key
+                    'elementId' => $key,
+                    'reviewed' => $attempt->getReviewed() !== null
                 ];
 
                 /* Collate a report payload for this attempt
