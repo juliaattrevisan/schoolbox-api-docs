@@ -356,9 +356,7 @@ class Module extends BaseModule
                  */
                 new Rule\Any(
                     $this->buildAuthRuleHasInstructorAccess(),
-                    /* TODO If we really wanted parents here;
-                     *  new Rule\IsParentOfUser($this->getExternalUser(), $userMapper, 'studentId'),
-                     */
+                    new Rule\IsParentOfUser($this->getExternalUser(), $this->getMapperFactory()->get(\Schoolbox\UserMapper::class), 'studentId'),
                     new Rule\All(
                         /* You must be the user referenced in the url
                          * You can't sobo a quiz attempt
