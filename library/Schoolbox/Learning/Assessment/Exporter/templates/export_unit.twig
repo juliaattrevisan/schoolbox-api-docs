@@ -48,7 +48,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Import  {{ unitSpec.title }} to classes</h1>
+        <h1>Import {{ unitSpec.title }} into Classes</h1>
     </div>
 </div>
 <div class="row">
@@ -62,7 +62,7 @@
     {% else %}
         <div class="small-12 column">
             <p class="meta">
-                The classes listed here are those that contain an implementation of the '{{ unitSpec.course.title }}' course, but do not contain an implementation of the '{{ unitSpec.title }}' unit.
+                The classes listed here are those that contain the '{{ unitSpec.course.title }}' course, but do not contain the '{{ unitSpec.title }}' unit.
             </p>
         </div>
         <div class="small-12 island">
@@ -99,7 +99,7 @@
                         </ul>
                     </section>
                 {% endif %}
-                <input type="submit" disabled value="Export to selected classes"/>
+                <input type="submit" disabled value="Import to selected classes"/>
             </form>
         </div>
     {% endif %}
