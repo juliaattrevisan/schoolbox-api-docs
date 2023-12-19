@@ -1832,7 +1832,7 @@ class Controller extends Base
                  * because they appear in the global Item Bank. Unless we assign the classCode tag
                  * here, we'll never know if items are for a spec or an impl when users search
                  */
-                $itemReferences = $this->api->dataGetRequest('/itembank/activities',  [
+                $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
                     'references' => [
                         $quiz->getLearnosityReference()
                     ]
