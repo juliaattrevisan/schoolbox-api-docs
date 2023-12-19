@@ -22,6 +22,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -360,7 +361,18 @@ class Module extends BaseModule
                      *   - They are the parent of this particular student (and thus their attempt)
                      *   - restrict_student_submissions config is disabled
                      */
-                    new Rule\IsParentOfUser($this->getExternalUser(), $this->getMapperFactory()->get(\Schoolbox\UserMapper::class), 'studentId'),
+                    new Rule\All(
+                        new Rule\IsParentOfUser($this->getExternalUser(), $this->getMapperFactory()->get(\Schoolbox\UserMapper::class), 'studentId'),
+                        /* Other parts of this auth rule block already took this into account when visiting
+                         * via the quiz summary screen...but we must implement this in case parents access
+                         * the url directly, instead of via the summary screen
+                         */
+                        new Rule\IsConfigSetTo(
+                            ConfigMapper::NAME_RESTRICT_STUDENT_SUBMISSIONS,
+                            false,
+                            $this->getConfig(),
+                        ),
+                    ),
                     new Rule\All(
                         /* You must be the user referenced in the url
                          * You can't sobo a quiz attempt
