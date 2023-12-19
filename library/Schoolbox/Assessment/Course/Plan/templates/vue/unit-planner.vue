@@ -19,7 +19,7 @@ const selectedTab = window.Vue.ref("all");
 const tabs = window.Vue.ref([
     { id: "all", label: "All" },
     { id: "overview", label: "Overview" },
-    { id: "activities", label: "Activities" },
+    { id: "activities", label: "Learning Activities" },
     { id: "rubric-capabilities", label: "Rubric Capabilities" },
     { id: "curriculum-overview", label: "Curriculum Overview" },
 ]);
@@ -59,7 +59,7 @@ window.Vue.onMounted(() => {
                             {{ textboxKey }}
                         </th>
                     </template>
-                    <th v-if="selectedTab === 'all' || selectedTab === 'activities'">Activities</th>
+                    <th v-if="selectedTab === 'all' || selectedTab === 'activities'">Learning Activities</th>
                     <th v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">Rubric Capabilities</th>
                     <th v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'">Curriculum Overview</th>
                 </tr>

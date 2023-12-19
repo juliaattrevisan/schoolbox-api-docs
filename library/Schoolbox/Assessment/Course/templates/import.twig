@@ -234,7 +234,7 @@ Usages:
                     <li data-mage-trainstop="part-2"{% if 2 == initialStage %} class="current-stop"{% endif %}>
                         <a><span class="icon-unit"></span>{{ locale.unit.properPlural }}</a>
                     </li>
-                    <li data-mage-trainstop="part-3"><a><span class="icon-curriculum"></span>Coursework</a></li>
+                    <li data-mage-trainstop="part-3"><a><span class="icon-curriculum"></span>Learning {{ locale.activity.properPlural }}</a></li>
                 </ul>
             </div>
         </div>
@@ -333,7 +333,7 @@ Usages:
                     </div>
                 </fieldset>
                 <fieldset class='content' data-mage="part-3">
-                    <legend>3. Coursework</legend>
+                    <legend>3. Learning {{ locale.activity.properPlural }}</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
                         <div id="import_assessments">{# will be populated by ajax #}</div>
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->

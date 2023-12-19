@@ -112,7 +112,7 @@ class Controller extends BaseController
             $breadcrumbs[] = [$assessment->getContext()->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId' => $assessment->getContext()->getId()])];
         }
         $breadcrumbs[] = [$assessment->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId' => $assessment->getId()])];
-        $breadcrumbs[] = ['Export', '#'];
+        $breadcrumbs[] = ['Import', '#'];
 
         $data = [
             'assessmentSpec'   => $assessment,
@@ -189,8 +189,9 @@ class Controller extends BaseController
             'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
             'breadcrumbs'                       => [
                 ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
+                [$courseSpec->getTitle(), '/homepage/' . $courseSpec->getFolder()->getId()],
                 [$unitSpec->getTitle(), '/homepage/' . $unitSpec->getFolder()->getId()],
-                ['Export', '#']
+                ['Import', '#']
             ]
 
         ];
