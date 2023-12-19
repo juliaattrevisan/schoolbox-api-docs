@@ -1835,7 +1835,9 @@ class Controller extends Base
                 /* Specifically denote this assessment and its contents as implementations
                  * that we can universally distinguish
                  */
-                $newTags[] = $tagFactory->produceImplFlag();
+                if ($assessment->getContext()->isImplementationContext()) {
+                    $newTags[] = $tagFactory->produceImplFlag();
+                }
 
                 /* Fetch this activity from Learnosity; we need to assign tags to each of its items
                  * because they appear in the global Item Bank. Unless we assign the classCode tag
