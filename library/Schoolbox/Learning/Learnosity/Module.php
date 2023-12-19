@@ -356,6 +356,10 @@ class Module extends BaseModule
                  */
                 new Rule\Any(
                     $this->buildAuthRuleHasInstructorAccess(),
+                    /* Parents can view students' attempts if:
+                     *   - They are the parent of this particular student (and thus their attempt)
+                     *   - restrict_student_submissions config is disabled
+                     */
                     new Rule\IsParentOfUser($this->getExternalUser(), $this->getMapperFactory()->get(\Schoolbox\UserMapper::class), 'studentId'),
                     new Rule\All(
                         /* You must be the user referenced in the url
