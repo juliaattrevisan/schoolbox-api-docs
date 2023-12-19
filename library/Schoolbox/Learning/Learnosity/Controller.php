@@ -325,9 +325,18 @@ class Controller extends Base
                                 'all' => [
                                     $tagFactory->produceForSchoolCode()
                                 ],
-                                'none' => [
-                                    $tagFactory->produceImplFlag()
-                                ]
+                                /* Due to an absolutely disgusting series of issues, it turns out
+                                 * that the item list filter also affects your ability to edit the
+                                 * items that were filtered out.
+                                 *
+                                 * https://help.learnosity.com/hc/requests/24009
+                                 *
+                                 * Therefore: temporarily disabled until they fix this somehow.
+                                 * I can't circumvent their implementation.
+                                 */
+//                                 'none' => [
+//                                    $tagFactory->produceImplFlag()
+//                                ]
                             ]
                         ]
                     ]
