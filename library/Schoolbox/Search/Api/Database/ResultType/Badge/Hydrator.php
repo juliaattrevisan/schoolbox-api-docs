@@ -58,6 +58,13 @@ class Hydrator extends BaseHydrator
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
+        // Parents can't see badges:
+        // unfortunately this restriction cannot be realistically applied at the
+        // query building level without a prebuilt index.
+        if ($viewer->getRole()->isParent()) {
+            return [];
+        }
+
         // Find all badges that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
 
