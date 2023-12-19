@@ -101,7 +101,7 @@ class IndexBuilder extends App
         ];
 
         // Run for as long as you need to?
-        $this->getDatabaseInternal()->execute('SET MAX_STATEMENT_TIME=0');
+        $this->getDatabaseInternal()->executeDirectly('SET MAX_STATEMENT_TIME=0');
 
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
             $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
@@ -148,7 +148,7 @@ class IndexBuilder extends App
                         'type'                    => $updatedIndex->getType(),
                         'identifier'              => $updatedIndex->getIdentifier(),
                         'title'                   => $updatedIndex->getTitle(),
-                        'date'                    => $updatedIndex->getDate()->getDatabase(),
+                        'date'                    => $updatedIndex->getDate()?->getDatabase(),
                         'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected(),
                         'createdBy'               => $updatedIndex->getCreatedBy(),
                         'folderId'                => $updatedIndex->getFolderId(),
