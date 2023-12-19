@@ -39,7 +39,7 @@
                     {# If write mode: show tot only if there's at least one action #}
                     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: lesson.id, assessment: lesson}) %}
                     {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: lesson.id, assessment: lesson}) %}
-                    {% set hasAssessmentRoutes = modifyRoute or deleteRoute or similarityReportRoute %}
+                    {% set hasAssessmentRoutes = modifyRoute or deleteRoute %}
 
                     {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
                     {% set specAssessment = lesson.specificationAssessment ?? null %}
