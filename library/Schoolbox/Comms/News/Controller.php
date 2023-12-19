@@ -822,11 +822,7 @@ class Controller extends Base
                 'fullname'
             ],
             'publishAt',
-            'viewedAt' => [
-                'long',
-                'relativeTime',
-                'json',
-            ],
+            'viewedAt',
             'topics' => [
                 'name',
                 'slug',
