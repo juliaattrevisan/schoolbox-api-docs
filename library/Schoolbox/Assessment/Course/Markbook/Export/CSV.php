@@ -241,7 +241,7 @@ class CSV extends AbstractCSV
             }
         }
         if (!isset($mark)) {
-            return [];
+            return $row;
         }
         $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
         $humanReadableMark = $mark['hr'];
