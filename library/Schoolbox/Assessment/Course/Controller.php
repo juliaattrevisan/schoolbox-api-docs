@@ -9,13 +9,20 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
+use Component_Config;
+use Component_ConfigMapper;
+use Component_Instance;
+use Component_InstanceMapper;
 use InvalidArgumentException;
 use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
+use Schoolbox\Assessment\Course\Template\Model as CourseTemplateModel;
 use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplate;
 use UnexpectedValueException;
 use Schoolbox\Application;
 use Schoolbox\Application\Exception\NotFound;
@@ -44,7 +51,6 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
-use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\YearLevel;
 
 /**
@@ -84,6 +90,11 @@ class Controller extends Base\Base
         private AssessmentMapper $assessmentMapper,
         private CurriculumNodeMapper $curriculumNodeMapper,
         private CourseTemplateMapper $courseTemplateMapper,
+        private HomepageConfigMapper $homepageConfigMapper,
+        private Component_InstanceMapper $cim,
+        private Component_ConfigMapper $ccm,
+        private \Schoolbox\Tile\Layout\Mapper $layoutMapper,
+        private \Schoolbox\Tile\Mapper $tileMapper,
     ) {
     }
 
@@ -593,6 +604,14 @@ class Controller extends Base\Base
             return;
         }
 
+        // Template
+        try {
+            $template = $this->courseTemplateMapper->findById($post['template']);
+        } catch (Deleted $e) {
+            $this->sendError('It appears this template no longer exists. Please refresh your page to re-select.');
+            return;
+        }
+
         $parentFolderId = (int)trim($post->get('parent'));
         $originalParentFolderId = $courseSpec->getFolder()->getParent()->getId();
 
@@ -671,6 +690,7 @@ class Controller extends Base\Base
             || array_diff($newCurriculumCodes, $currentCurriculumCodes)
             || $originalParentFolderId !== $parentFolderId
             || $courseSpec->getSubjectCode() !== $subjectCode
+            || $courseSpec->getTemplate()->getId() !== $template->getId()
         ) {
             if ($this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) < UserAccess::ACCESS_WRITE) {
                 $this->sendError(new Base\Exception('Cannot update course. ', ["You don't have permission to update {$courseSpecFolder->getName()}."]));
@@ -681,6 +701,13 @@ class Controller extends Base\Base
             $courseSpecFolder->setName($newCourseName);
             $courseSpec->setFolder($courseSpecFolder);
             $courseSpec->setSubjectCode($subjectCode);
+
+            // Only update existing course / unit folders, if we changed the template
+            if ($courseSpec->getTemplate()->getId() !== $template->getId()) {
+                $courseSpec->setTemplate($template);
+                // update existing units / course with the new templates
+                $this->updateExistingFolders($courseSpec, $template);
+            }
 
             // Save the Course
             $this->courseSpecificationMapper->save($courseSpec);
@@ -1159,7 +1186,7 @@ class Controller extends Base\Base
 
         $data = [
             'treedata' => json_encode($treeData),
-            'folderId' => $folderId
+            'folderId' => $folderId,
         ];
 
         $this->response = $this->responseDependentOnRequest('@course/picker.twig', $data, self::TAB);
@@ -1304,5 +1331,158 @@ class Controller extends Base\Base
         $this->response = $this->responseAsJson(
             $showChildren ? $treeBuilder->buildChildNodes($folderId, [], $mime) : [],
         );
+    }
+
+    /**
+     * Update Spec Course and Unit homepage templates
+     * This will purge all components from the homepage and re create only the ones from the selected template
+     * @see \Schoolbox\Resource\HomepageConfigMapper::resetToTemplate
+     *
+     * @param CourseSpecification $courseSpec
+     * @param CourseTemplateModel $template
+     * @return void
+     * @throws MapperException
+     */
+    private function updateExistingFolders(CourseSpecification $courseSpec, CourseTemplateModel $template)
+    {
+        /** @var FolderController $folderController */
+        $folderController = $this->getController('folder');
+
+        // update the course homepage template
+        $homepageTemplate = $folderController->buildHomepageTemplate($courseSpec->getFolder(), $template->getCourseTemplate()->getId());
+        $this->updateHomepageTemplate($courseSpec->getFolder(), $homepageTemplate);
+
+        // loop through existing units
+        foreach ($courseSpec->getUnits() as $unit) {
+            // update unit homepage templates
+            $homepageTemplate = $folderController->buildHomepageTemplate($unit->getFolder(), $template->getUnitTemplate()->getId());
+            $this->updateHomepageTemplate($unit->getFolder(), $homepageTemplate);
+        }
+    }
+
+    /**
+     * Will append all 'new' components from the destination component at the end of the columns
+     * Based off:
+     * @param Folder           $folder
+     * @param HomepageTemplate $template
+     * @return void
+     * @throws MapperException
+     *
+     * @see \Schoolbox\Resource\Folder\Controller::updateHomepageTemplate
+     * @see \Schoolbox\Resource\HomepageConfigMapper::resetToTemplate
+     */
+    private function updateHomepageTemplate(Folder $folder, HomepageTemplate $template)
+    {
+        // update the homepage config to the new template
+        $homepageConfig = $this->homepageConfigMapper->findById($folder->getId())
+            ->setCategory($folder)
+            ->setTemplate($template);
+        $folder->setHomepage($homepageConfig);
+
+        $this->homepageConfigMapper->save($homepageConfig);
+
+        /**
+         * now do the merge / append new components
+         * this is a dupe of @see \Schoolbox\Resource\HomepageConfigMapper::resetToTemplate
+         * This will NOT change folder colour, or change the column widths
+         */
+
+        // retrieve, rearrange and reinsert the componentry
+        /** @var Component_Instance[] $templateInstances */
+        $templateInstances = $this->cim->findByContext('homepage_template', $homepageConfig->getTemplate()->getId());
+        $existingInstances = $this->cim->findByContext('homepage', $folder->getId());
+
+        if (!count($templateInstances)) {
+            return;
+        }
+
+        foreach ($templateInstances as $currentInstance) {
+            /**
+             * check if there is already a component with this definition ID
+             * and if there is, and the definition says multiple false, then ignore this component and move on
+             * there are some components that do not work when there are multiple instances on a page `Course Builder` among others
+             *
+             * If there is already a component by the same type and component name on the page then also continue and don't create a dupe.
+             * This will cause issues if there are multiple in the template with the same heading, ie multiple textboxes with the default of 'Text Box',
+             * or multiple blank Tiles components
+             */
+            if ($existingInstances->getBy('definitionId', $currentInstance->getDefinitionId())) {
+                if (!$currentInstance->getDefinition()->getMultiple()) {
+                    continue;
+                }
+                // if the component is going to be a direct dupe of what already exists, then ignore the new one
+                foreach ($existingInstances->filterBy('definitionId', $currentInstance->getDefinitionId()) as $existing) {
+                    if (
+                        $existing->getConfigByKey('componentname')->getValue() === $currentInstance->getConfigByKey('componentname')->getValue()
+                        && $existing->getPosition() === $currentInstance->getPosition()
+                    ) {
+                        // break out of the parent for loop (the dupe / spawn $templateInstances loop)
+                        continue 2;
+                    }
+                }
+            }
+            // preserve the config
+            /** @var \Component_ConfigDefinition[] $configs */
+            $configs = $currentInstance->getConfig();
+
+            /* Clone before saving, otherwise it does some magical caching stuff
+             * and tries to re-assign config instances to the wrong component instance
+             * in findByFields:247 (it tries to match the homepage template's configs
+             * to the $inst, which is a misbehaviour that is seemingly rectified by clone)
+             */
+            $inst = clone($currentInstance);
+
+            $inst
+                ->setId(null)
+                ->setConfig(new Collection())
+                ->setModule('homepage')
+                ->setIdentifier($homepageConfig->getCategory()->getId());
+
+            $ids = $this->cim->save($inst);
+
+            if (!count($configs)) {
+                continue;
+            }
+            $id = $ids[0];
+            foreach ($configs as $c) {
+                if ($c->getId()) {
+                    // Gross special case for tile component:
+                    // copy the homepage template's tile layout
+                    // TODO move this somewhere it actually belongs
+                    $value = $c->getValue();
+                    try {
+                        $src = $currentInstance->getConfigByKey('src');
+                    } catch (\DomainException $e) {
+                        $src = null;
+                    }
+                    if ($c->getKey() === 'layoutId' && (!$src || empty($src->getValue()))) {
+                        try {
+                            $layout = $this->layoutMapper->findById($c->getValue());
+                            $layout
+                                ->setId(null)
+                                ->setDashboardRole(null)
+                                ->setHomepageTemplate(null)
+                                ->setFolder($homepageConfig->getCategory());
+                            $this->layoutMapper->save($layout);
+                            $value = $layout->getId();
+                            foreach ($layout->getTileList() as $tile) {
+                                $tile->setId(null)->setTileLayout($layout);
+                            }
+                            $this->tileMapper->save($layout->getTileList());
+                        } catch (MapperException $e) {
+                            // Don't save anything
+                            continue;
+                        }
+                    }
+
+                    $conf = new Component_Config();
+                    $conf
+                        ->setInstanceId($id)
+                        ->setValue($value)
+                        ->setConfigDefinitionId($c->getId());
+                    $this->ccm->save($conf);
+                }
+            }
+        }
     }
 }

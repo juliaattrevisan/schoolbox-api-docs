@@ -12,6 +12,9 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Component_ConfigMapper;
+use Component_InstanceMapper;
+use Schoolbox\Resource\HomepageConfigMapper;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
@@ -168,7 +171,12 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(AssessmentMapper::class),
             $this->getMapperFactory()->get(CurriculumNodeMapper::class),
-            $this->getMapperFactory()->get(CourseTemplateMapper::class)
+            $this->getMapperFactory()->get(CourseTemplateMapper::class),
+            $this->getMapperFactory()->get(HomepageConfigMapper::class),
+            $this->getMapperFactory()->get(Component_InstanceMapper::class),
+            $this->getMapperFactory()->get(Component_ConfigMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Tile\Layout\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Tile\Mapper::class),
         );
     }
 
