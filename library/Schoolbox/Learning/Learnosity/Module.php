@@ -70,15 +70,20 @@ class Module extends BaseModule
          * The current user must match {studentId} in the routes
          * ie. you're the owner of something in the url, among other rules
          */
-        $learnerCanAttempt = $this->buildAuthRuleCanSubmit();
+        $learnerCanAttempt = $this->buildAuthRuleCanAttempt();
 
-        /* Someone who has completed an attempt
+        /* Someone who is completing an attempt
          *
          * This turns out to be a special subset of $learnerCanAttempt which is identical
          * except we remove the check for Attempt counts; it's not needed on the outro screen.
          * It's also not needed when you're trying to review it.
          */
-        $learnerCompletedAttempt = $this->buildAuthRuleCompletion();
+        $learnerCanComplete = $this->buildAuthRuleComplete();
+
+        /* Someone trying to access an attempt to see what a student did
+         * This could be a parent, or the student themselves.
+         */
+        $learnerCanReview = $this->buildAuthRuleReview();
 
         /* A special rule about who can finish an attempt
          * (Staff can arbitrarily finish a student's unfinished attempt)
@@ -111,7 +116,7 @@ class Module extends BaseModule
 
         /* Conclude an attempt
          */
-        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getCompleteAttempt', $learnerCompletedAttempt, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getCompleteAttempt', $learnerCanComplete, $preloadAttempt);
 
         /* Start a new attempt
          */
@@ -132,7 +137,7 @@ class Module extends BaseModule
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
          */
-        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerCompletedAttempt, $preloadAttempt);
+        $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerCanReview, $preloadAttempt);
 
         /* Provide feedback to a student's attempt
          */
@@ -285,7 +290,7 @@ class Module extends BaseModule
      *
      * @return Rule\LazyCallback
      */
-    private function buildAuthRuleCanSubmit(): Rule\LazyCallback
+    private function buildAuthRuleCanAttempt(): Rule\LazyCallback
     {
         return new Rule\LazyCallback(function () {
             return new Rule\All(
@@ -320,7 +325,7 @@ class Module extends BaseModule
                          */
                         new IsAssessmentOpen(),
                         /* Students have a set of criteria to fulfil when we're deciding if
-                         * they can make attempts (this double-checks IsAssesmentOpen again)
+                         * they can make attempts (this double-checks IsAssessmentOpen again)
                          */
                         new CanRespondToAssessment($this->getAccess()),
                     )
@@ -331,6 +336,8 @@ class Module extends BaseModule
 
 
     /**
+     * Decide if someone can complete (finish) an attempt
+     *
      * Rules in order of preference:
      *     - You must be logged in
      *     - Assessment must be an implementation, not a specification
@@ -341,7 +348,63 @@ class Module extends BaseModule
      *
      * @return Rule\LazyCallback
      */
-    private function buildAuthRuleCompletion(): Rule\LazyCallback
+    private function buildAuthRuleComplete(): Rule\LazyCallback
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                /* You can create attempts for Implementations only; not Specifications
+                 */
+                new IsImplementation(),
+                /* Assessment must be in a living (unarchived) academic period
+                 */
+                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                /* Otherwise, you have to be an instructor
+                 * or a student that adheres all the non-instructor criteria
+                 */
+                new Rule\Any(
+                    $this->buildAuthRuleHasInstructorAccess(),
+                    /* TODO I think there's a duplication between IsAssessmentOpen() and
+                     *  canLearnerCreateResponse() in Quiz Model; the latter already
+                     *  checks the former.
+                     */
+                    new Rule\All(
+                        /* You must be the user referenced in the url
+                         * You can't sobo a quiz attempt
+                         */
+                        new Rule\IsUser('studentId'),
+                        /* Assessment must be published in the past, closed in the future,
+                         * and you must be a participant (also, non-excluded)
+                         */
+                        new CanViewAssessable(new Visibility($this->getAccess())),
+                        /* Open Date for this particular student's Participation Plan (if extant)
+                         * must have been reached, and not yet be closed; each student can have their
+                         * own versions of Open and Close dates.
+                         */
+                        new IsAssessmentOpen()
+                    )
+                )
+            );
+        });
+    }
+
+
+    /**
+     * Decide if someone can review an attempt
+     *
+     * This should not have any of the usual date constraints: publish open due close
+     * but is subject to the academic period being archived.
+     *
+     * Rules in order of preference:
+     *     - You must be logged in
+     *     - Assessment must be an implementation, not a specification
+     *     - Instructors see what they did in their own attempt
+     *     - Parents of a student can see that student's attempt
+     *     - The student themselves can see their own attempt
+     *
+     * @return Rule\LazyCallback
+     */
+    private function buildAuthRuleReview(): Rule\LazyCallback
     {
         return new Rule\LazyCallback(function () {
             return new Rule\All(
@@ -377,22 +440,12 @@ class Module extends BaseModule
                         /* You must be the user referenced in the url
                          * You can't sobo a quiz attempt
                          */
-                        new Rule\IsUser('studentId'),
-                        /* Assessment must be published in the past, closed in the future,
-                         * and you must be a participant (also, non-excluded)
-                         */
-                        new CanViewAssessable(new Visibility($this->getAccess())),
-                        /* Open Date for this particular student's Participation Plan (if extant)
-                         * must have been reached, and not yet be closed; each student can have their
-                         * own versions of Open and Close dates.
-                         */
-                        new IsAssessmentOpen()
+                        new Rule\IsUser('studentId')
                     )
                 )
             );
         });
     }
-
 
 
     /**
