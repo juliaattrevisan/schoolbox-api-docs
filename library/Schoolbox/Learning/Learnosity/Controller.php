@@ -30,6 +30,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
+use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -295,8 +296,11 @@ class Controller extends Base
                  */
                 'item_edit' => [
                     'item' => [
+                        'reference' => [
+                            'show' => false,
+                        ],
                         'title' => [
-                            'show' => true
+                            'show' => true,
                         ]
                     ],
                     /* Tags are only spawned upon clicking Save, not before
@@ -306,6 +310,12 @@ class Controller extends Base
                 /* Show a list of Items, which you can see by clicking Find Items
                  */
                 'item_list' => [
+                    'item' => [
+                        'title' => [
+                            'show' => false,
+                            'show_reference' => false
+                        ]
+                    ],
                     'filter' => [
                         'restricted' => [
                             'tags' => [
@@ -314,7 +324,19 @@ class Controller extends Base
                                  */
                                 'all' => [
                                     $tagFactory->produceForSchoolCode()
-                                ]
+                                ],
+                                /* Due to an absolutely disgusting series of issues, it turns out
+                                 * that the item list filter also affects your ability to edit the
+                                 * items that were filtered out.
+                                 *
+                                 * https://help.learnosity.com/hc/requests/24009
+                                 *
+                                 * Therefore: temporarily disabled until they fix this somehow.
+                                 * I can't circumvent their implementation.
+                                 */
+//                                 'none' => [
+//                                    $tagFactory->produceImplFlag()
+//                                ]
                             ]
                         ]
                     ]
@@ -1809,6 +1831,76 @@ class Controller extends Base
             if ($setTags) {
                 $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
                 $newTags    = $tagFactory->produceFromAssessment($assessment);
+
+                /* Specifically denote this assessment and its contents as implementations
+                 * that we can universally distinguish
+                 */
+                if ($assessment->getContext()->isImplementationContext()) {
+                    $newTags[] = $tagFactory->produceImplFlag();
+                }
+
+                /* Fetch this activity from Learnosity; we need to assign tags to each of its items
+                 * because they appear in the global Item Bank. Unless we assign the classCode tag
+                 * here, we'll never know if items are for a spec or an impl when users search
+                 */
+                $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
+                    'references' => [
+                        $quiz->getLearnosityReference()
+                    ]
+                ])['data'][0]['data']['items'] ?? null;
+
+                if (null !== $itemReferences) {
+                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                     */
+                    if (is_array($itemReferences[0])) {
+                        /* Forcibly mutate this, because learnosity insanity
+                         */
+                        $itemReferenceList = array_column($itemReferences, 'id');
+                    } else {
+                        /* Presume it was a list of reference strings already
+                         */
+                        $itemReferenceList = $itemReferences;
+                    }
+
+                    /* Initialise payload container
+                     */
+                    $emptyPayload = [
+                        'items' => []
+                    ];
+
+                    $payload = $emptyPayload;
+
+                    /* Assign tags to each item
+                     */
+                    foreach ($itemReferenceList as $item) {
+                        /* Maxed out? Send it.
+                         */
+                        if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                            $this->api->dataSetRequest('/itembank/items/tags', $payload);
+
+                            /* Reset this for the next cycle
+                             */
+                            $payload = $emptyPayload;
+                        }
+
+                        /* Keep accumulating until we max out
+                         */
+                        $payload['items'][] = [
+                            'reference' => $item,
+                            'tags' => $newTags
+                        ];
+                    }
+
+                    /* Send the last payload if anything is in it
+                     */
+                    if (\count($payload['items'])) {
+                        $this->api->dataSetRequest('/itembank/items/tags', $payload);
+                    }
+                }
+
+                /* Assign tags to the activity itself
+                 */
                 $this->api->dataSetRequest(
                     '/itembank/activities/tags',
                     [

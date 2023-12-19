@@ -208,6 +208,11 @@ class ContextLookup
              * this particular combination of columns
              */
             $tags = $this->tagFactory->produce($courseSpec['uuid'], $courseUnitSpec['uuid'], $folderCodes);
+
+            /* Use this tag so we know it's an impl
+             */
+            $tags[] = $this->tagFactory->produceImplFlag();
+
             $this->lookup[$key] = $tags;
 
             return $this->lookup[$key];
@@ -222,6 +227,11 @@ class ContextLookup
          * this particular combination of columns
          */
         $tags = $this->tagFactory->produce(null, null, $folderCodes);
+
+        /* Use this tag so we know it's an impl
+         */
+        $tags[] = $this->tagFactory->produceImplFlag();
+
         $this->lookup[$key] = $tags;
 
         return $this->lookup[$key];

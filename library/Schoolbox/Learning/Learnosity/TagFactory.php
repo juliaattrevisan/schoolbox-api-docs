@@ -185,6 +185,31 @@ class TagFactory
 
 
     /**
+     * A "boolean" flag that indicates that whatever this tag is assigned to,
+     * is an implementation. It's used to distinguish imported item impls
+     * from their spec counterparts.
+     *
+     * All implementation share the same setup, because of the constraints
+     * imposed here by Learnosity:
+     *
+     * https://reference.learnosity.com/author-api/initialization/config.item_list.filter.restricted.tags.none
+     *
+     * "It can also follow a variation of the said format where the name property
+     * is instead an array of strings which makes it more convenient to specify
+     * multiple tags of the same type."
+     *
+     * @return string[]
+     */
+    public function produceImplFlag(): array
+    {
+        return [
+            'type' => 'isImpl',
+            'name' => '1'
+        ];
+    }
+
+
+    /**
      * Produce a tag for the given Course Specification UUID
      *
      * @param string|null $uuid
