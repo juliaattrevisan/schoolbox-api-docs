@@ -86,7 +86,7 @@ class Controller extends Base
             $textboxesKeys = [];
             $unitTextboxes = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
             foreach ($unitTextboxes as $textboxComponent) {
-                if ('' !== $textboxComponent->getConfigByKey('componentname')->getValue()) {
+                if ('' !== (string)$textboxComponent->getConfigByKey('componentname')->getValue()) {
                     // if there is a value set for the component use that
                     $heading = trim($textboxComponent->getConfigByKey('componentname')->getValue());
                 } elseif ('' !== $textboxComponent->getConfigByKey('componentname')->getDefaultValue()) {
