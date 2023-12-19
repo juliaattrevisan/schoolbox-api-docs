@@ -34,7 +34,7 @@ Usage:
         {% else %}
             <li><a href="/resources/{{ unitSpec.folder.id }}" class="icon-folder">Browse Resources</a></li>
         {% endif %}
-        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForUnit', {unitSpecId: unitSpec.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-import" data-action="import-unit">Import to Classes</a></li>
+        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForUnit', {unitSpecId: unitSpec.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-import" data-action="import-unit">Import into Classes</a></li>
         <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
         {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unitSpec.course, courseSpecId: unitSpec.course.id, unitSpecId: unitSpec.id, folderId: 0}) %}
         {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}

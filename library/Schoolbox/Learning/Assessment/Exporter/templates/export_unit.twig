@@ -48,7 +48,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Export {{ unitSpec.title }}</h1>
+        <h1>Import  {{ unitSpec.title }} to classes</h1>
     </div>
 </div>
 <div class="row">
@@ -56,7 +56,7 @@
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-class-list"></i>
-                <p>There are no open classes that contain an implementation of the '{{ unitSpec.course.title }}' course, but do not contain an implementation of the '{{ unitSpec.title }}' unit.</p>
+                <p>The classes listed below already contain the course '{{ unitSpec.course.title }}', but do not contain the unit '{{ unitSpec.title }}'.</p>
             </div>
         </div>
     {% else %}
