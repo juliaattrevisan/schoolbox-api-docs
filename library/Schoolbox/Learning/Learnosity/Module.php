@@ -136,6 +136,9 @@ class Module extends BaseModule
 
         /* Generic report screen you see after completing an attempt
          * This is a Learnosity redirect upon submit
+         *
+         * People use this url to see what a student did in their attempt.
+         * Applies to student/parent/staff
          */
         $this->register('GET', '/{assessmentId}/review/{studentId}/{learnositySessionReference}', 'getReview', $learnerCanReview, $preloadAttempt);
 
