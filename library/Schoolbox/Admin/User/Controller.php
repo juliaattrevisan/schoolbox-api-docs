@@ -481,7 +481,7 @@ class Controller extends Base
                 'lastname'      => $user->getLastname(),
                 'role'          => $user->getRole()->getName(),
                 'year'          => $user->getYear() ? $user->getYear()->getName() : '',
-                'updated_at'    => $user->getUpdatedAt()->getJson(),
+                'updated_at'    => $user->getUpdatedAt()->toRfc3339String(),
             ];
         }
 
