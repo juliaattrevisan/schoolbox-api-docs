@@ -40,7 +40,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
         },
     });
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
-    const showMarkedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been marked
     const store = useStore();
 
     /**
@@ -156,7 +155,6 @@ export const useStudentStore = defineStore("qfStudent", () => {
         init,
         addItems,
         student,
-        showMarkedAttempts,
         reportLoaded,
         updateItemResponseScore,
         updateItemComment,

@@ -5,8 +5,8 @@
 
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsToggle from "./hm-students-toggle.vue";
-import HmStudentsShowMarkedAttempts from "./hm-students-show-marked-attempts.vue";
-import HmStudentsAllMarked from "./hm-students-all-marked.vue";
+import HmStudentsShowReviewedAttempts from "./hm-students-show-reviewed-attempts.vue";
+import HmStudentsAllReviewed from "./hm-students-all-reviewed.vue";
 import HmStudentsStudent from "./hm-students-student.vue";
 
 const studentsStore = useStudentsStore();
@@ -17,9 +17,9 @@ const studentsStore = useStudentsStore();
         <h2 class="subheader f-no-margins">Students</h2>
         <div class="l-flex-row l-flex--align-center l-gap-m">
             <hm-students-toggle />
-            <hm-students-show-marked-attempts />
+            <hm-students-show-reviewed-attempts />
         </div>
-        <hm-students-all-marked />
+        <hm-students-all-reviewed />
         <div class="l-flex-col l-gap-m">
             <hm-students-student
                 v-for="student in studentsStore.students"
