@@ -1,15 +1,16 @@
 {##
  # Give feedback for an attempt
  #
- # @param object student                   The student's data
- # @param string|array $reportInitOptions  Learnosity API initialisation object
- # @param IAssessable $assessment          Our schoolbgox quiz instance
- # @param array $breadcrumbs               A context trail at the top of the screeen
- # @param IAssessable $assessment          Our schoolbox quiz instance
- # @param Attempt\Model $attempt           The student's attempt from our local db
- # @param string $itemResponses            A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
- # @param string $attemptComment           The overall comment for the attempt
- # @param object $urls                     A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
+ # @param object student                     The student's data
+ # @param string|array   $reportInitOptions  Learnosity API initialisation object
+ # @param IAssessable    $assessment         Our schoolbgox quiz instance
+ # @param array          $breadcrumbs        A context trail at the top of the screeen
+ # @param IAssessable    $assessment         Our schoolbox quiz instance
+ # @param Attempt\Model  $attempt            The student's attempt from our local db
+ # @param string         $itemResponses      A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
+ # @param string         $attemptComment     The overall comment for the attempt
+ # @param bool           $hasMarkVisibility  If true, marks and feedback should be visible to the user
+ # @param object         $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -28,6 +29,7 @@
             :attempt-comment="{{ attemptComment|json_encode }}"
             :is-read-only="false"
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
+            :has-mark-visibility="true"
             :urls="{{ urls|json_encode }}"
             post-feedback="{{ routeLookupIfAuthorized('learnosity.postFeedback', {assessment: assessment, assessmentId: assessment.id, studentId: attempt.user.id, learnositySessionReference: attempt.learnosityReference}) }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"

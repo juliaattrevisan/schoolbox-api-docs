@@ -1,21 +1,22 @@
 {##
  # Introduction screen and list of previous attempts
  #
- # @param IAssessable $assessment              Our schoolbgox quiz instance
- # @param Schoolbox\Learning\Quiz\Model $quiz  The representation of schoolbox.assess row
- # @param User $student                        The guy currently at the intro screen
- # @param Attempt\Model[] $attempts            A list of previous attempts
- # @param Attempt\Model|null $existingattempt  An attempt that hasn't been finished
- # @param array $plan                          A set of dates for custom assessment participation
- # @param array $breadcrumbs                   A trail of breadcrumbs
- # @param bool $canAttempt                     Whether users can start/resume attempts
- # @param bool $canReview                      Whether users can provide feedback on an attempt
- # @param bool $canStudentReview               Whether users can see what they responded with, in their attempt
- # @param string $externalRedirectUrl          A url in a third party system (newington canvas) that is relevant to this quiz
- # @param array $lastViews                     A set of (roletype, info) tuples about when a student/parent visited this page
- # @param Participant $participant             A participant of this assessment, used to figure out exclusions and special CAP stuff
- # @param string $returnUrlName                The name of the url parameter to contain $returnUrlEncoded
- # @param string $returnUrlEncoded             An encoded url to visit when navigating between screens and you finsih a workflow somehwere
+ # @param IAssessable          $assessment           Our schoolbgox quiz instance
+ # @param Learning\Quiz\Model  $quiz                 The representation of schoolbox.assess row
+ # @param User                 $student              The user who attempted all of the quizzes on this page
+ # @param Attempt\Model[]      $attempts             A list of previous attempts
+ # @param Attempt\Model|null   $existingattempt      An attempt that hasn't been finished
+ # @param array                $plan                 A set of dates for custom assessment participation
+ # @param array                $breadcrumbs          A trail of breadcrumbs
+ # @param bool                 $canAttempt           Whether the logged-in user can start/resume attempts
+ # @param bool                 $canGiveFeedback      Whether the logged-in user can provide feedback on an attempt
+ # @param bool                 $canSeeReview         Whether the logged-in user can review the quiz
+ #                                                   (which means see a read-only view of questions/answers and possibly marks/feedback depending on other settings).
+ # @param string               $externalRedirectUrl  A url in a third party system (newington canvas) that is relevant to this quiz
+ # @param array                $lastViews            A set of (roletype, info) tuples about when a student/parent visited this page
+ # @param Participant          $participant          A participant of this assessment, used to figure out exclusions and special CAP stuff
+ # @param string               $returnUrlName        The name of the url parameter to contain $returnUrlEncoded
+ # @param string               $returnUrlEncoded     An encoded url to visit when navigating between screens and you finsih a workflow somehwere
  #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -155,10 +156,10 @@
                                 {% if not finished and canAttempt %}
                                     <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                                 {% else %}
-                                    {% if canStudentReview %}
+                                    {% if canSeeReview %}
                                         <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
                                     {% endif %}
-                                    {% if canReview %}
+                                    {% if canGiveFeedback %}
                                         <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
                                     {% endif %}
                                 {% endif %}

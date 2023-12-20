@@ -178,7 +178,7 @@ class ConfigMapper extends Mapper
     public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
     public const NAME_MOBILE_PUSH_NOTIF_ENABLED = 'push_notifications_enabled';
     public const NAME_LMS_ENABLED = 'lms_enabled';
-
+    public const NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
     public const NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
 
     public const NAME_ASSESSMENT_CALENDAR_ENABLED = 'assessment_calendar_enabled';
