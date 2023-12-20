@@ -1,27 +1,28 @@
 {##
  # Introduction screen and list of previous attempts
  #
- # @param IAssessable $assessment              Our schoolbgox quiz instance
- # @param Schoolbox\Learning\Quiz\Model $quiz  The representation of schoolbox.assess row
- # @param User $student                        The guy currently at the intro screen
- # @param Attempt\Model[] $attempts            A list of previous attempts
- # @param Attempt\Model|null $existingattempt  An attempt that hasn't been finished
- # @param array $plan                          A set of dates for custom assessment participation
- # @param array $breadcrumbs                   A trail of breadcrumbs
- # @param bool $canAttempt                     Whether users can start/resume attempts
- # @param bool $canReview                      Whether users can provide feedback on an attempt
- # @param bool $canStudentReview               Whether users can see what they responded with, in their attempt
- # @param string $externalRedirectUrl          A url in a third party system (newington canvas) that is relevant to this quiz
- # @param array $lastViews                     A set of (roletype, info) tuples about when a student/parent visited this page
- # @param Participant $participant             A participant of this assessment, used to figure out exclusions and special CAP stuff
- # @param string $returnUrlName                The name of the url parameter to contain $returnUrlEncoded
- # @param string $returnUrlEncoded             An encoded url to visit when navigating between screens and you finsih a workflow somehwere
+ # @param IAssessable          $assessment           Our schoolbgox quiz instance
+ # @param Learning\Quiz\Model  $quiz                 The representation of schoolbox.assess row
+ # @param User                 $student              The user who attempted all of the quizzes on this page
+ # @param Attempt\Model[]      $attempts             A list of previous attempts
+ # @param Attempt\Model|null   $existingattempt      An attempt that hasn't been finished
+ # @param array                $plan                 A set of dates for custom assessment participation
+ # @param array                $breadcrumbs          A trail of breadcrumbs
+ # @param bool                 $canAttempt           Whether users can start/resume attempts
+ # @param bool                 $canReview            Whether users can provide feedback on an attempt
+ # @param bool                 $canStudentReview     Whether users can see what they responded with, in their attempt
+ # @param string               $externalRedirectUrl  A url in a third party system (newington canvas) that is relevant to this quiz
+ # @param array                $lastViews            A set of (roletype, info) tuples about when a student/parent visited this page
+ # @param Participant          $participant          A participant of this assessment, used to figure out exclusions and special CAP stuff
+ # @param string               $returnUrlName        The name of the url parameter to contain $returnUrlEncoded
+ # @param string               $returnUrlEncoded     An encoded url to visit when navigating between screens and you finsih a workflow somehwere
  #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
 {% import '@learningAssessment/fragments/macro/markVisible.twig' as markVisible %}
 
+STUDENT_TWIG
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row actions-small-1">
