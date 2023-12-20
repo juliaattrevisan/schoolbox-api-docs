@@ -611,6 +611,7 @@ class Controller extends Base\Base
             /**
              * Catch deleted and use the deleted item, this is still valid here
              */
+            /** @var CourseTemplateModel $template */
             $template = $e->getDeletedObject();
         }
 
