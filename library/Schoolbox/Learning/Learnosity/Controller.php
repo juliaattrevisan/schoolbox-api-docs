@@ -821,11 +821,7 @@ class Controller extends Base
              * @see https://reference.learnosity.com/reports-api/reporttypes#sessionsDetailByItemReport
              */
             'id' => 'schoolbox-student',
-            'type' => (
-                ($hasMarkVisibility)
-                ? 'session-detail-by-item'
-                : 'session-detail-by-question'
-            ),
+            'type' => $hasMarkVisibility ? 'session-detail-by-item' : 'session-detail-by-question',
             'session_id' => $attempt->getLearnosityReference(),
             'questions_api_init_options' => [
                 'showCorrectAnswers' => ($attempt->getReviewed() !== null && $hasMarkVisibility),
@@ -835,7 +831,7 @@ class Controller extends Base
         /* Conditional reports
          *     - If an attempt is finished, provide the completion summary (unsure how people get here, but ok)
          */
-        if ($attempt->isFinished() && $hasMarkVisibility) {
+        if ($hasMarkVisibility && $attempt->isFinished()) {
             $reportPayload['reports'][] = [
                 /* DOM element id, where this goes in
                  *
