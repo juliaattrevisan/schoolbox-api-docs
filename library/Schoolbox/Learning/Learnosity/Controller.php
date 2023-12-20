@@ -821,11 +821,12 @@ class Controller extends Base
              * @see https://reference.learnosity.com/reports-api/reporttypes#sessionsDetailByItemReport
              */
             'id' => 'schoolbox-student',
-            'type' => $hasMarkVisibility ? 'session-detail-by-item' : 'session-detail-by-question',
+            'type' => 'session-detail-by-item',
             'session_id' => $attempt->getLearnosityReference(),
             'questions_api_init_options' => [
                 'showCorrectAnswers' => ($attempt->getReviewed() !== null && $hasMarkVisibility),
-            ]
+            ],
+            'display_scores' => $hasMarkVisibility
         ];
 
         /* Conditional reports

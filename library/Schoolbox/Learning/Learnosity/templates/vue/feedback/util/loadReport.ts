@@ -13,6 +13,8 @@ import { useStudentStore } from "../store/qfStudentStore";
 export function loadReport(initOptions: object) {
     const reportId = initOptions.request.reports[0].id as string; // To link the report to the student
     const reportType = initOptions.request.reports[0].type as string;
+    const displayScores = initOptions.request.reports[0].display_scores as boolean;
+
     let reportCallback = null;
 
     /**
@@ -36,23 +38,24 @@ export function loadReport(initOptions: object) {
                                 items.push(item);
                             });
                             useStudentStore().addItems(items);
-                            addTargetsToMarks(reportId);
-                            disableTextAreas(reportId);
+
+                            if (displayScores) {
+                                addTargetsToMarks(reportId);
+                                disableTextAreas(reportId);
+                            }
                         });
+
+                        /* This is necessary if we skip the methods
+                         * addTargetsToMarks() and disableTextAreas()
+                         */
+                        if (!displayScores) {
+                            // Reveal report.
+                            document.getElementsByClassName("response-content")[0].style.display = "block";
+                        }
+
                         // to notify the report has loaded
                         useStudentStore().reportLoaded();
                     });
-                },
-            };
-            break;
-
-        case "session-detail-by-question":
-            reportCallback = {
-                readyListener: () => {
-                    // Reveal report.
-                    document.getElementsByClassName("response-content")[0].style.display = "block";
-                    // to notify the report has loaded
-                    useStudentStore().reportLoaded();
                 },
             };
             break;
