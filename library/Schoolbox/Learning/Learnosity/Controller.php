@@ -806,6 +806,9 @@ class Controller extends Base
             'reports' => []
         ];
 
+        $loggedInUser = $this->getUser();
+        $hasMarkVisibility = $assessment->isFeedbackVisibleToUser($loggedInUser); // This looks up assess.mark_visible.
+
         /* If a teacher reviewed the attempt, show their feedback information
          * Otherwise just show what the student did.
          */
@@ -814,19 +817,25 @@ class Controller extends Base
              *
              * It's configurable by us, unlike the other anchors for
              * Author and Items api
+             *
+             * @see https://reference.learnosity.com/reports-api/reporttypes#sessionsDetailByItemReport
              */
             'id' => 'schoolbox-student',
-            'type' => 'session-detail-by-item',
+            'type' => (
+                ($hasMarkVisibility)
+                ? 'session-detail-by-item'
+                : 'session-detail-by-question'
+            ),
             'session_id' => $attempt->getLearnosityReference(),
             'questions_api_init_options' => [
-                'showCorrectAnswers' => $attempt->getReviewed() !== null,
+                'showCorrectAnswers' => ($attempt->getReviewed() !== null && $hasMarkVisibility),
             ]
         ];
 
         /* Conditional reports
          *     - If an attempt is finished, provide the completion summary (unsure how people get here, but ok)
          */
-        if ($attempt->isFinished()) {
+        if ($attempt->isFinished() && $hasMarkVisibility) {
             $reportPayload['reports'][] = [
                 /* DOM element id, where this goes in
                  *
@@ -878,7 +887,8 @@ class Controller extends Base
             'attempt' => $attempt,
             'itemResponses' => $this->getItemResponses($attempt),
             'attemptComment' => $this->getAttemptComment($attempt),
-            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}"
+            'returnUrl' => "/homepage/{$assessment->getContext()->getId()}",
+            'hasMarkVisibility' => $hasMarkVisibility,
         ], "Result for {$assessment->getTitle()}");
     }
 

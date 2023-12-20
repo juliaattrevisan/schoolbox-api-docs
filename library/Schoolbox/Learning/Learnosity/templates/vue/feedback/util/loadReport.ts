@@ -11,35 +11,55 @@ import { useStudentStore } from "../store/qfStudentStore";
  * @param {object} initOptions - the report init options
  */
 export function loadReport(initOptions: object) {
-    // To link the report to the student
-    const reportId = initOptions.request.reports[0].id as string;
+    const reportId = initOptions.request.reports[0].id as string; // To link the report to the student
+    const reportType = initOptions.request.reports[0].type as string;
+    let reportCallback = null;
+
     /**
      * Every report gets its own callback; this is because the readyListeners()
      * don't have any idea which report they are in, which means we can't tell
      * when a report has been fully loaded to the point where we can hide all
      * their divs, because we only want to show one div at a time per report.
      */
-    const reportCallback = {
-        readyListener: () => {
-            const attemptReport = reportsApp.getReport(reportId);
-            // itemsApi only spawns if you used session-detail-by-item
-            attemptReport.on("ready:itemsApi", (itemsApp) => {
-                // Load the items for the student
-                itemsApp.getItems(($items: object) => {
-                    const items: StudentItem[] = [];
-                    // grab each item object and push it into the items array
-                    Object.values($items).forEach((item: StudentItem) => {
-                        items.push(item);
+    switch (reportType) {
+        case "session-detail-by-item":
+            reportCallback = {
+                readyListener: () => {
+                    const attemptReport = reportsApp.getReport(reportId);
+                    // itemsApi only spawns if you used session-detail-by-item
+                    attemptReport.on("ready:itemsApi", (itemsApp) => {
+                        // Load the items for the student
+                        itemsApp.getItems(($items: object) => {
+                            const items: StudentItem[] = [];
+                            // grab each item object and push it into the items array
+                            Object.values($items).forEach((item: StudentItem) => {
+                                items.push(item);
+                            });
+                            useStudentStore().addItems(items);
+                            addTargetsToMarks(reportId);
+                            disableTextAreas(reportId);
+                        });
+                        // to notify the report has loaded
+                        useStudentStore().reportLoaded();
                     });
-                    useStudentStore().addItems(items);
-                    addTargetsToMarks(reportId);
-                    disableTextAreas(reportId);
-                });
-                // to notify the report has loaded
-                useStudentStore().reportLoaded();
-            });
-        },
-    };
+                },
+            };
+            break;
+
+        case "session-detail-by-question":
+            reportCallback = {
+                readyListener: () => {
+                    // Reveal report.
+                    document.getElementsByClassName("response-content")[0].style.display = "block";
+                    // to notify the report has loaded
+                    useStudentStore().reportLoaded();
+                },
+            };
+            break;
+
+        default:
+            console.error(`Unknown report type '${reportType}'.`);
+    }
     // Initialise reports for each attempt
     const reportsApp = LearnosityReports.init(initOptions, reportCallback);
 }

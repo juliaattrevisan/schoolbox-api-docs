@@ -5,11 +5,13 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-header-attempt-mark.vue";
+import { useStore } from "../store/quizFeedbackStore";
 
 interface Props {
     student: Student; // the student to display
 }
 const props = defineProps<Props>();
+const store = useStore();
 </script>
 
 <template>
@@ -28,7 +30,7 @@ const props = defineProps<Props>();
                 {{ props.student.name }}
             </h2>
         </div>
-        <div>
+        <div v-if="store.hasMarkVisibility">
             <student-header-attempt-mark v-if="props.student.isReportLoaded" :student="props.student" />
         </div>
     </div>

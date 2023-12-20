@@ -1,14 +1,15 @@
 {##
  # Student reviews their attempt, with teacher feedback if such exists
  #
- # @param object student                   The student's data
- # @param string|array $reportInitOptions  Learnosity API initialisation object
- # @param IAssessable $assessment          Our schoolbgox quiz instance
- # @param array $breadcrumbs               A context trail at the top of the screeen
- # @param Attempt\Model $attempt           The student's attempt from our local db
- # @param string $itemResponses            A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
- # @param string $attemptComment           The overall comment for the attempt
- # @param string $returnUrl                A redirect destination we remembered from some previous place
+ # @param object         $student            The user who attempted the quiz
+ # @param string|array   $reportInitOptions  Learnosity API initialisation object
+ # @param IAssessable    $assessment         Our schoolbgox quiz instance
+ # @param array          $breadcrumbs        A context trail at the top of the screeen
+ # @param Attempt\Model  $attempt            The student's attempt from our local db
+ # @param string         $itemResponses      A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
+ # @param string         $attemptComment     The overall comment for the attempt
+ # @param bool           $hasMarkVisibility  If true, marks and feedback should be visible to the user
+ # @param string         $returnUrl          A redirect destination we remembered from some previous place
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -21,9 +22,14 @@
     {% include '@learnosity/meta.twig' with {
         attempt: attempt,
     } only %}
+    {# If not hasMarkVisibility, the behaviour should be the same as if no review has been done. #}
     {% if attempt.reviewed == false %}
-    <div class="alert-box warning f-no-margins">
-        This attempt has not yet been reviewed by a teacher so the mark is unconfirmed and may change following review.
+        <div class="alert-box warning f-no-margins">
+            {% if hasMarkVisibility %}
+                This attempt has not yet been reviewed by a teacher, so the mark is unconfirmed and may change following review.
+            {% else %}
+                This attempt has not yet been reviewed by a teacher.
+            {% endif %}
     </div>
     {% endif %}
     <div id="quiz-feedback-container">
@@ -34,6 +40,7 @@
             :attempt-comment="{{ attemptComment|json_encode }}"
             :is-read-only="true"
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
+            :has-mark-visibility="{{ hasMarkVisibility ? 'true' : 'false' }}"
         />
     </div>
 </div>

@@ -32,16 +32,16 @@ function onAttemptCommentUpdated(comment: string) {
 <template>
     <div class="l-flex-col l-gap-m">
         <qf-student-header :student="props.student" />
-        <div ref="responseContentEl" class="response-content">
+        <div ref="responseContentEl" class="response-content c-island l-pad-m">
             <!-- this is the div Learnosity looks for to insert the response content into, it will be completely replaced -->
             <div :id="props.student.elementId"></div>
         </div>
-        <div v-if="store.isReadOnly" class="l-flex-col l-gap-s">
+        <div v-if="store.hasMarkVisibility && store.isReadOnly" class="l-flex-col l-gap-s">
             <h2 class="subheader f-no-margins">Summary</h2>
             <div id="schoolbox-completion-summary"></div>
         </div>
         <template v-if="props.student.isReportLoaded">
-            <div class="l-flex-col l-gap-s">
+            <div v-if="store.hasMarkVisibility" class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Items</h2>
                 <qf-student-show-marked v-if="!store.isReadOnly" />
                 <div class="l-flex-col l-gap-l">
@@ -55,7 +55,10 @@ function onAttemptCommentUpdated(comment: string) {
                     <qf-student-all-marked />
                 </div>
             </div>
-            <div v-if="props.student.isReviewed || !store.isReadOnly" class="l-flex-col l-gap-s">
+            <div
+                v-if="store.hasMarkVisibility && (props.student.isReviewed || !store.isReadOnly)"
+                class="l-flex-col l-gap-s"
+            >
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
                 <student-attempt-comment
                     :student="props.student"
