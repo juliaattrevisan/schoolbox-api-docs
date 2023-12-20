@@ -5,10 +5,9 @@ export type Activity = {
     projectName: string;
     assessmentType: string;
     assessments: Activity[] | null;
-    completionCount: number; // number of students who have completed the activity
-    studentCount: number; // total number of students assigned the activity
     dueAt: string | null;
     dueAtFormatted: string | null;
+    isSelfAssessableTask: boolean;
     _links: {
         status: string;
         summary: string;
@@ -18,7 +17,7 @@ export type Activity = {
     completionCount: number | null;
     studentCount: number | null;
     progressTick: {
-        url: string | null;
-        progress: string | null;
+        postRouteUrl: string | null;
+        progressClass: string | null;
     } | null;
 };

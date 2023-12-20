@@ -163,7 +163,13 @@ class Controller extends Assessment\Controller
          * get list of all activities within this course
          * only for staff
          */
-        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments($this->routeGenerator, $student, hideLessonPlan: true);
+        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments(
+            $this->routeGenerator,
+            $this->getAuthorizer(),
+            $student,
+            $this->getUser(),
+            true
+        );
         $courseAssessments = [];
         if ($this->getUser()->getRole()->isStaff()) {
             // if we are inside a project get the projects context
@@ -185,10 +191,10 @@ class Controller extends Assessment\Controller
                         $options     = ['order' => ['sequence' => 'ASC']];
                         $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options)
                             // Remove Lesson plans, no linking to other lessons
-                                            ->filter(function ($assessment) {
+                            ->filter(function ($assessment) {
                                 /** @var IAssessable $assessment */
-                                                return !($assessment instanceof Model);
-                                            });
+                                return !($assessment instanceof Model);
+                            });
 
                         // hydrate participation
                         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments);
@@ -247,8 +253,8 @@ class Controller extends Assessment\Controller
         $linkedAssessments   = null;
         if ($linkedAssessmentIds) {
             $linkedAssessments = $this->getAssessmentMapper()
-                                      ->findAllByIds($linkedAssessmentIds, ['cache' => false,])
-                                      ->sortByCallback(Closure::fromCallable([$this, 'sortLinkedAssessments']));
+                ->findAllByIds($linkedAssessmentIds, ['cache' => false,])
+                ->sortByCallback(Closure::fromCallable([$this, 'sortLinkedAssessments']));
 
             // if staff hydrate participation
             if ($this->getUser()->getRole()->isStaff()) {
@@ -260,15 +266,17 @@ class Controller extends Assessment\Controller
         }
 
         $twigData = [
-            'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
-            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
-            'assessment'   => $assessment,
-            'student'      => $student,
-            'returnUrl'    => $returnUrl,
+            'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'assessment'        => $assessment,
+            'student'           => $student,
+            'returnUrl'         => $returnUrl,
             'courseAssessments' => $courseAssessments,
-            'linkedAssessments' => $linkedAssessments
+            'linkedAssessments' => (
+                $linkedAssessments
                 ? $linkedAssessments->reindex()->map($unitAssessmentsTranslator)
-                : [],
+                : []
+            ),
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
@@ -385,7 +393,18 @@ class Controller extends Assessment\Controller
      */
     public function getActivities(Model $assessment): void
     {
-        $this->response = $this->responseAsJson($assessment->getLinkedAssessments() ? $assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments($this->routeGenerator, $this->getUser())) : []);
+        $this->response = $this->responseAsJson(
+            $assessment->getLinkedAssessments()
+            ? $assessment->getLinkedAssessments()->reindex()->map(
+                new Assessment\Translator\UnitAssessments(
+                    $this->routeGenerator,
+                    $this->getAuthorizer(),
+                    $this->getUser(),
+                    $this->getUser()
+                )
+            )
+            : []
+        );
     }
 
     /**
@@ -416,7 +435,16 @@ class Controller extends Assessment\Controller
             }
 
             $assessment->getLinkedAssessments()->add($linkedAssessment);
-            $this->response = $this->responseAsJson($assessment->getLinkedAssessments()->reindex()->map(new Assessment\Translator\UnitAssessments($this->routeGenerator, $this->getUser())));
+            $this->response = $this->responseAsJson(
+                $assessment->getLinkedAssessments()->reindex()->map(
+                    new Assessment\Translator\UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getAuthorizer(),
+                        $this->getUser(),
+                        $this->getUser()
+                    )
+                )
+            );
         } else {
             $problem = (new ApiProblem('Link already Exists'))
                 ->setStatus(409)

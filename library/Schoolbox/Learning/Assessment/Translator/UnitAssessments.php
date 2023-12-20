@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Translator;
 
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
@@ -22,17 +24,25 @@ use Schoolbox\User;
 class UnitAssessments
 {
     /**
-     * @param Generator|null $routeGenerator
-     * @param User|null      $student
-     * @param bool $hideLessonPlan Should we be removing lesson plans from the output
+     * @param Generator|null  $routeGenerator
+     * @param Authorizer|null $authorizer
+     * @param User|null       $student         The student whose lesson plan is being viewed.
+     * @param User|null       $loggedInUser    The logged-in user.
+     * @param bool            $hideLessonPlan  Should we be removing lesson plans from the output?
      */
-    public function __construct(private null|Generator $routeGenerator = null, private null|User $student = null, private bool $hideLessonPlan = false)
-    {
+    public function __construct(
+        private null|Generator $routeGenerator = null,
+        private null|Authorizer $authorizer = null,
+        private null|User $student = null,
+        private null|User $loggedInUser = null,
+        private bool $hideLessonPlan = false
+    ) {
     }
 
     /**
      * @param IAssessable $assessment
      * @return array
+     * @throws RouteNotFound
      */
     public function __invoke(IAssessable $assessment): array
     {
@@ -101,20 +111,26 @@ class UnitAssessments
             $studentCount++;
         }
 
+        $progressTick = $this->getProgressTick($assessment);
+
         return [
-            'id'                => $assessment->getId(),
-            'title'             => $assessment->getTitle(),
-            'assessmentType'    => $assessment->getFamilyName(),
-            'course'            => $this->getCourseName($assessment),
-            'unit'              => $assessment->getBaseContext()->getTitle(),
-            'projectName'       => $projectName,
-            'dueAt'             => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
-            'dueAtFormatted'    => $assessment->getDueAt()?->getRelativeDayWithoutMidnight(),
-            '_links'            => $links,
-            'assessments'       => $assessments?->reindex()->map($this),
-            'completionCount'   => $completionCount,
-            'studentCount'      => $studentCount,
-            'progressTick'      => $this->getProgressTick($assessment),
+            'id'                   => $assessment->getId(),
+            'title'                => $assessment->getTitle(),
+            'assessmentType'       => $assessment->getFamilyName(),
+            'course'               => $this->getCourseName($assessment),
+            'unit'                 => $assessment->getBaseContext()->getTitle(),
+            'projectName'          => $projectName,
+            'dueAt'                => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
+            'dueAtFormatted'       => $assessment->getDueAt()?->getRelativeDayWithoutMidnight(),
+            '_links'               => $links,
+            'assessments'          => $assessments?->reindex()->map($this),
+            'completionCount'      => $completionCount,
+            'studentCount'         => $studentCount,
+            'progressTick'         => $progressTick,
+            'isSelfAssessableTask' => (
+                $assessment instanceof \Schoolbox\Learning\Assessment\Task\Model &&
+                $assessment->isSelfAssessable()
+            )
         ];
     }
 
@@ -135,7 +151,7 @@ class UnitAssessments
             /**
              * @phpstan-ignore-next-line
              * we aren't always hydrating the course folder when the assessment is inside a project,
-             * so yes, phpstan, `getFolder()` can be null...
+             * so yes, PHPStan, `getFolder()` can be null...
              */
             return $base->getSpecification()->getCourse()->getFolder()?->getTitle();
         } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
@@ -143,7 +159,7 @@ class UnitAssessments
             /**
              * @phpstan-ignore-next-line
              * we aren't always hydrating the course folder when the assessment is inside a project,
-             * so yes, phpstan, `getFolder()` can be null...
+             * so yes, PHPStan, `getFolder()` can be null...
              */
             return $base->getCourse()->getFolder()?->getTitle();
         }
@@ -152,51 +168,87 @@ class UnitAssessments
     }
 
     /**
-     * logic from @see library/Schoolbox/Learning/Assessment/templates/fragments/progressTick.twig
+     * The logic used in this function is intended to match the logic used in progressTick.twig.
+     *
      * @param IAssessable $assessable
      * @return ?array
+     * @throws RouteNotFound
+     * @see library/Schoolbox/Learning/Assessment/templates/fragments/progressTick.twig
      */
     private function getProgressTick(IAssessable $assessable): ?array
     {
-        // just look at the student specified
-        $participant = $assessable->getParticipantIfExtant($this->student);
-        if (null === $participant) {
+        // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
+        if ($this->student->getId() !== $this->loggedInUser->getId()) {
             return null;
         }
-        // task url allows students to mark their tasks as complete
-        $taskUrl = $progress = null;
-        // only create a url for tasks, and if they are implementations
+
+        $participant = $assessable->getParticipantIfExtant($this->student);
+
+        if (null === $participant || $participant->isExcluded()) {
+            // The student ought to be a participant.  The only way this situation could arise is if the student was
+            // excluded from the assessment, or marked as deleted, by another process, since permissions were checked
+            // at the start of this page-load (in Assessment/Module.php).
+            return null;
+        }
+
+        // Only set this var if the assessment is a task so participants can create a
+        // response asynchronously without reloading the page.  This only applies to Tasks.
+        // Due Work and Quiz require more in-depth workflows to submit a response.
+        $postRouteUrl = null;
         if ($assessable instanceof \Schoolbox\Learning\Assessment\Task\Model && $assessable->isImplementation()) {
-            $taskUrl = $this->routeGenerator->generate('learningAssessment.postCreateResponse', [
+            $postRouteName = 'learningAssessment.postCreateResponse';
+            $postRouteParams = [
                 'assessment' => $assessable,
                 'assessmentId' => $assessable->getId(),
                 'student' => $this->student,
                 'studentId' => $this->student->getId()
-            ]);
-            if ($participant->isResponseRequired() && ($assessable->isOpen($this->student) and $assessable->isSelfAssessable())) {
+            ];
+
+            if ($this->authorizer->isPathAuthorizedForUser($postRouteName, $postRouteParams, $this->loggedInUser)) {
+                $postRouteUrl = $this->routeGenerator->generate($postRouteName, $postRouteParams);
+            }
+        }
+
+        if ($postRouteUrl === null) {
+            $postRouteUrl = '';
+        }
+
+        $progress = '';
+
+        $loggedInUserShouldSeeIncompleteStatus = (
+            $participant->isResponseRequired() && (
+                $this->loggedInUser->getRole()->isStaff() || (
+                    $assessable instanceof \Schoolbox\Learning\Assessment\Task\Model &&
+                    $assessable->isImplementation() &&
+                    $assessable->isOpen($this->student) &&
+                    $assessable->isSelfAssessable()
+                )
+            )
+        );
+
+        if ($postRouteUrl !== '') {
+            if ($loggedInUserShouldSeeIncompleteStatus) {
                 $progress = 'incomplete';
-            } else if ($participant->isFeedbackRequired()) {
+            } elseif ($participant->isFeedbackRequired()) {
                 $progress = 'pending';
-            } else if ($participant->isResubmissionRequired()) {
-                $progress = 'failed';
-            } else if ($participant->isReviewComplete()) {
+            } elseif ($participant->isReviewComplete()) {
                 $progress = 'reviewed';
             }
         } else {
-            if ($participant->isResponseRequired() && $assessable->isOpen($this->student)) {
+            if ($loggedInUserShouldSeeIncompleteStatus) {
                 $progress = 'incomplete';
-            } else if ($participant->isFeedbackRequired()) {
+            } elseif ($participant->isFeedbackRequired()) {
                 $progress = 'pending';
-            } else if ($participant->isResubmissionRequired()) {
+            } elseif ($participant->isResubmissionRequired()) {
                 $progress = 'failed';
-            } else if ($participant->isReviewComplete()) {
+            } elseif ($participant->isReviewComplete()) {
                 $progress = 'reviewed';
             }
         }
 
         return [
-            'url'       => $taskUrl,
-            'progress'  => $progress,
+            'postRouteUrl'  => $postRouteUrl,
+            'progressClass' => $progress,
         ];
     }
 }

@@ -43,6 +43,67 @@ function getUrgency() {
         ? getGradient(props.activity.completionCount, props.activity.studentCount)
         : "gradient-none";
 }
+
+/**
+ * This is intended to match the behaviour in progressTick.twig.
+ * @param { Activity } activity The activity whose progressTick we want to describe.
+ * @returns { string } A description to be used as mouseover text.
+ */
+function getProgressTickMouseoverTitle(activity: Activity) {
+    const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
+
+    if (progressTick === null) {
+        throw new Error("This function should not have been called.");
+    }
+
+    const postRouteUrlSupplied = progressTick.postRouteUrl !== "";
+
+    switch (progressTick.progressClass) {
+        case "incomplete":
+            return "Incomplete";
+        case "pending":
+            return postRouteUrlSupplied ? "Self-assessed" : "Awaiting Feedback";
+        case "failed":
+            return postRouteUrlSupplied ? "N/A" : "Resubmission Required";
+        case "reviewed":
+            return "Completed";
+        default:
+            return "";
+    }
+}
+
+/**
+ * This is intended to match the behaviour in progressTick.twig.
+ * @param { Activity } activity The relevant activity.
+ * @returns { string } A string to be used as the value of the 'data-progress-tick-status' attribute.
+ */
+function getDataProgressTickStatus(activity: Activity) {
+    const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
+
+    if (progressTick === null) {
+        throw new Error("This function should not have been called.");
+    }
+
+    switch (progressTick.progressClass) {
+        case "incomplete":
+            return "incomplete";
+        case "pending":
+            return "selfAssessed";
+        case "reviewed":
+            return "teacherAssessed";
+        default:
+            return "";
+    }
+}
+
+/**
+ * This is intended to match the behaviour in progressTick.twig.
+ * @param { Activity } activity The activity whose progressTick we want to describe
+ * @returns { string } A description to be used as mouseover text
+ */
+function getDataProgressTickForm(activity: Activity) {
+    return activity.isSelfAssessableTask ? "selfAssessed" : "teacherAssessed";
+}
 </script>
 
 <template>
@@ -68,9 +129,34 @@ function getUrgency() {
         </p>
         <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
     </div>
+    <nav v-if="activity.progressTick !== null" class="progress-tick-container">
+        <form
+            v-if="activity.progressTick.postRouteUrl !== ''"
+            :action="activity.progressTick.postRouteUrl"
+            method="post"
+            class="progress-tick-form"
+            :data-progress-tick-form="getDataProgressTickForm(activity)"
+        >
+            <a
+                :class="'no-text progress-tick ' + activity.progressTick.progressClass"
+                :data-progress-tick-status="getDataProgressTickStatus(activity)"
+                :title="getProgressTickMouseoverTitle(activity)"
+            ></a>
+        </form>
+        <span
+            v-else-if="activity.progressTick.progressClass !== ''"
+            :class="'no-text progress-tick ' + activity.progressTick.progressClass"
+            :title="getProgressTickMouseoverTitle(activity)"
+        ></span>
+    </nav>
     <nav v-if="isInstructor">
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
     </nav>
 </template>
 
-<style scoped></style>
+<style scoped>
+nav.progress-tick-container {
+    margin-right: 5px;
+    margin-top: 5px;
+}
+</style>
