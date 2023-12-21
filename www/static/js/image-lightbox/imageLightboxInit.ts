@@ -28,10 +28,18 @@ function initLightGallery() {
 
 /**
  * Check if lightGallery is already loaded, if not, load it.
- *
  * @param { Function } initLightGallery - the function to call once lightGallery is loaded
  */
 function checkForLightGallery(initLightGallery: Function) {
+    // We need to ensure that the license key is available before loading the plugin
+    // If it's not, wait for the DOM to load and try again
+    if (!window.sbProps?.imageLightboxLicenseKey) {
+        document.addEventListener("DOMContentLoaded", () => {
+            checkForLightGallery(initLightGallery);
+        });
+        return;
+    }
+
     const imageLightBoxSrc = `${window.cdnPrefix}/js/bundle/imageLightbox.js?v=${window.siteVersion}`;
     if (window.sbProps.lightGallery) {
         // it's already loaded and available on the window object
@@ -46,11 +54,4 @@ function checkForLightGallery(initLightGallery: Function) {
     }
 }
 
-// We need to make sure window.sbProps is available before we can load the lightbox plugin
-if (window.sbProps?.imageLightboxLicenseKey) {
-    checkForLightGallery(initLightGallery);
-} else {
-    document.addEventListener("DOMContentLoaded", () => {
-        checkForLightGallery(initLightGallery);
-    });
-}
+checkForLightGallery(initLightGallery);
