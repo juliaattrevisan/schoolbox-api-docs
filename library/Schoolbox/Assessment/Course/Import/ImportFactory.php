@@ -516,6 +516,9 @@ class ImportFactory
                 sdw.multi_submission  AS 'sdw.multi_submission',
                 sa.id                 AS 'spr.id',
                 sqz.assessment_id     AS 'sqz.id',
+                sqz.learnosity_reference     AS 'sqz.learnosity_reference',
+                sqz.learnosity_job_reference AS 'sqz.learnosity_job_reference',
+                sqz.learnosity_job_status    AS 'sqz.learnosity_job_status',
                 stk.assessment_id     AS 'stk.id',
                 slt.assessment_id     AS 'slt.id',
                 specLessonPlan.assessment_id AS 'specLessonPlan.id'
