@@ -47,6 +47,7 @@ interface IHydrator
      *                                            number of matching posts that occur in each matching forum thread.
      *                                            This requires another database query, and requires the filter info.
      * @param array<int, RawResult>   $matches A set of matches to hydrate.
+     *                                         IMPORTANT: The return array must have the same keys as $matches.
      * @param User                    $viewer  The user viewing the search result.
      * @return array<int, FullResult|null>
      */

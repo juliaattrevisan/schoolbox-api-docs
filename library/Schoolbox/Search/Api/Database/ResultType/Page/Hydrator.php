@@ -77,7 +77,7 @@ class Hydrator extends BaseHydrator
         $folders = $this->folderMapper->findByColumn('id', $folderIds);
         $fullResults = [];
 
-        foreach ($acceptedMatches as $match) {
+        foreach ($acceptedMatches as $key => $match) {
             $folder = $folders->getBy('id', $match->id);
 
             if (!($folder instanceof Folder\Model)) {
@@ -89,7 +89,7 @@ class Hydrator extends BaseHydrator
                 continue;
             }
 
-            $fullResults[] = new FullResult(
+            $fullResults[$key] = new FullResult(
                 $match,
                 $match->id,
                 $folder->getTitle(),

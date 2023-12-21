@@ -75,11 +75,13 @@ class Aggregate implements IHydrator
         foreach ($this->hydrators as $hydrator) {
             $hydratorId = spl_object_id($hydrator);
             if (isset($groupedRawResults[$hydratorId])) {
-                $fullResults = array_merge($fullResults, $hydrator->hydrate($keyword, $filter, $groupedRawResults[$hydratorId], $viewer));
+                // Rely on $hydrator->hydrate() to preserve the keys from $groupedRawResults[$hydratorId].
+                $hydratedResults = $hydrator->hydrate($keyword, $filter, $groupedRawResults[$hydratorId], $viewer);
+                $fullResults = $fullResults + $hydratedResults; // Use union operator so keys are preserved.
             }
         }
 
-        // $fullResults needs to be key-sorted now
+        // Sort $fullResults by key to ensure the order of results is the same as in $matches.
         ksort($fullResults);
 
         // Filter out any results that are null, and flatten

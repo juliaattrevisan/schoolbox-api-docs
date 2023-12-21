@@ -96,7 +96,7 @@ class Hydrator extends BaseHydrator
 
         $fullResults = [];
 
-        foreach ($acceptedMatches as $match) {
+        foreach ($acceptedMatches as $key => $match) {
             [$textboxId, $componentInstanceId, $folderId] = self::explodeTextboxInstanceId($match->id);
 
             $textbox = $textboxes->getBy('id', $textboxId);
@@ -166,7 +166,7 @@ class Hydrator extends BaseHydrator
                 }
 
                 // Create search result with link to the textbox's 'Manage Textboxes' page.
-                $fullResults[] = new FullResult(
+                $fullResults[$key] = new FullResult(
                     $match,
                     $match->id,
                     // No component, so no config, so:
@@ -209,7 +209,7 @@ class Hydrator extends BaseHydrator
             }
 
             // Create search result with link to the homepage on which the textbox has been used.
-            $fullResults[] = new FullResult(
+            $fullResults[$key] = new FullResult(
                 $match,
                 $match->id,
                 (
