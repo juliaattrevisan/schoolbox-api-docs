@@ -107,10 +107,13 @@ class Controller extends Base
     {
         $nonce        = Uuid::uuid4()->toString();
         $oauthOptions = [
-            // Which scope is used to identify a user?
-            // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
-            // Request just openid for now
-            'scope'         => 'openid',
+            // TODO scopes may need to be made configurable?
+            // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes
+            // states that the below are standard, but not all client ID/secret
+            // pairs may allow access to them.
+            // Also: some providers may provide the identifying claim as part of
+            // a non-standard scope?
+            'scope'         => 'openid email profile',
             'response_type' => 'code token',
             'response_mode' => 'form_post',
             'state'         => $this->buildState($nonce),
