@@ -107,10 +107,13 @@ class Controller extends Base
     {
         $nonce        = Uuid::uuid4()->toString();
         $oauthOptions = [
-            // Which scope is used to identify a user?
-            // https://developer.isams.com/isams-developer-documentation/docs/scopes#isams-identity-scopes
-            // Request just openid for now
-            'scope'         => 'openid',
+            // TODO scopes may need to be made configurable?
+            // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes
+            // states that the below are standard, but not all client ID/secret
+            // pairs may allow access to them.
+            // Also: some providers may provide the identifying claim as part of
+            // a non-standard scope?
+            'scope'         => 'openid email profile',
             'response_type' => 'code token',
             'response_mode' => 'form_post',
             'state'         => $this->buildState($nonce),
@@ -145,19 +148,12 @@ class Controller extends Base
      */
     private function receiveAuthorizationResponse(string $code): void
     {
-        // check state and nonce
-        $requestState = $this->requestQuery->get('state');
-        $requestNonce = $this->requestQuery->get('nonce');
+        // check state
+        $requestState = $this->requestPost->get('state') ?? $this->requestQuery->get('state');
         $sessionState = $this->session->get(self::SESSION_STATE_KEY);
-        $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
         $this->session->set(self::SESSION_STATE_KEY, null);
-        $this->session->set(self::SESSION_NONCE_KEY, null);
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
             $this->sendError('State sent to and received from OIDC provider do not match');
-            return;
-        }
-        if (!isset($requestNonce, $sessionNonce) || $requestNonce !== $sessionNonce) {
-            $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return;
         }
 
@@ -166,6 +162,17 @@ class Controller extends Base
             'authorization_code',
             ['code' => $code]
         );
+
+        // check nonce in ID token
+        // TODO this should be done in $loginUri, but that's too disruptive a
+        //      change right now
+        $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
+        $this->session->set(self::SESSION_NONCE_KEY, null);
+        $idTokenNonce = $accessToken->getIdToken()->claims()->get('nonce');
+        if (!isset($idTokenNonce, $sessionNonce) || $idTokenNonce !== $sessionNonce) {
+            $this->sendError('Nonce sent to and received from OIDC provider do not match');
+            return;
+        }
 
         // Init the session from the ID token received from the OIDC provider
         $decodedState = $this->codec->decode($requestState);
