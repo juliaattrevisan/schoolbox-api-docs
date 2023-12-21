@@ -379,7 +379,7 @@ class Controller extends Base\Base
         $this->response = $this->responseDependentOnRequest(
             '@course/course.twig',
             [
-                'templates'         => $this->courseTemplateMapper->findAll(),
+                'templates'         => $this->courseTemplateMapper->findAll(['deleted' => true]),
                 'courseSpec'        => $courseSpec,
                 'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 'folderAccess'      => $folderAccess,
@@ -608,8 +608,11 @@ class Controller extends Base\Base
         try {
             $template = $this->courseTemplateMapper->findById($post['template']);
         } catch (Deleted $e) {
-            $this->sendError('It appears this template no longer exists. Please refresh your page to re-select.');
-            return;
+            /**
+             * Catch deleted and use the deleted item, this is still valid here
+             */
+            /** @var CourseTemplateModel $template */
+            $template = $e->getDeletedObject();
         }
 
         $parentFolderId = (int)trim($post->get('parent'));

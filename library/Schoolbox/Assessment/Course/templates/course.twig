@@ -361,7 +361,10 @@ Usage:
                         <select data-template name="template" required>
                             {% if templates.count > 1 %}
                                 {% for template in templates %}
-                                    <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}</option>
+                                    {# only render the template if it is not deleted or if it is deleted and being used by the spec #}
+                                    {% if not template.isDeleted or courseSpec and courseSpec.template.id == template.id %}
+                                        <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}{% if template.isDeleted %} (Deleted){% endif %}</option>
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
                                 <option value="{{ templates.first.id }}" selected>{{ templates.first.name }}</option>
