@@ -295,7 +295,17 @@ class Profile implements IStrategy
                  */
                 $comments = $this->findComments();
                 $legal    = $this->findLegal($student['extended_details']);
-                $medical  = $this->findMedicalAlert($student['medical_conditions']);
+
+                /*
+                 *  Medical Alert
+                 *  When a school signs up using Wonde they are prompted to allow us to display 'Medical Conditions'
+                 *  if they choose not to provide them we need to catch it.
+                 */
+                $medical  = '';
+                if (isset($student['medical_conditions'])){
+                    $medical  = $this->findMedicalAlert($student['medical_conditions']);
+                }
+
                 $messages = '';
 
                 /* Emergency Contacts
