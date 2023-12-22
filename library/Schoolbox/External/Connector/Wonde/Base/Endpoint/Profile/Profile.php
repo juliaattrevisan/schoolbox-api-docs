@@ -926,7 +926,7 @@ class Profile implements IStrategy
                      * we need to look at each of the things in "groups"
                      * and only remember the ones of type "CAMPUS"
                      */
-                    foreach($staff['groups']['data'] as $group) {
+                    foreach ($staff['groups']['data'] as $group) {
                         if ($group['type'] === 'CAMPUS') {
                             /* Build a csv of those and slap it in to campusName at the end
                              */
