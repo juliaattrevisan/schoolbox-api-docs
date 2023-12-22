@@ -215,6 +215,7 @@ class Profile implements IStrategy
                 'permissions',
                 'sen_needs',
                 'year',
+                'campus'
             ])
         );
 
@@ -225,7 +226,16 @@ class Profile implements IStrategy
                 $externalId     = trim((string)$student['mis_id']);
                 $academicHouse  = trim((string)($student['house']['data']['name'] ?? ''));
                 $boardingStatus = false;
+
+                /*
+                 * Campus
+                 * Not all SIS's operate with campuses, set to empty unless its provided.
+                 * From what is currently seen, students can only have a singular campus unlike staff
+                 */
                 $campusName     = '';
+                if (isset($student['campus']['data']['code'])){
+                    $campusName = trim((string)$student['campus']['data']['description']);
+                }
 
                 /* Dig out a date of birth if it was set properly
                  */
@@ -895,7 +905,37 @@ class Profile implements IStrategy
 
                 $lastname = trim((string)$staff['surname']);
                 $building = '';
+
+                /*
+                 *  Campus
+                 *  Because Staff Campuses are just stored in groups we need to first identify which groups are campuses,
+                 *  we do this by checking the 'type' of the group where it is "CAMPUS".
+                 *
+                 *  We can also receive multiple entries of campuses, so we'll need to collect and comma separate these
+                 *  until SUDS can support multiple campuses.
+                 */
                 $campusName = '';
+
+                /* Every staff member has a campus, but it's defined as a type of "group"
+                 * Each staff member can have multiple "groups" of different types
+                 */
+                if (isset($staff['groups'])) {
+                    $campusCsv = [];
+
+                    /* To find out which campuses someone is in,
+                     * we need to look at each of the things in "groups"
+                     * and only remember the ones of type "CAMPUS"
+                     */
+                    foreach($staff['groups']['data'] as $group) {
+                        if ($group['type'] === 'CAMPUS') {
+                            /* Build a csv of those and slap it in to campusName at the end
+                             */
+                            $campusCsv[] = $group['description'];
+                        }
+                    }
+
+                    $campusName = implode(',', $campusCsv);
+                }
 
                 /* This is a csv of role_codes found in the roles array here
                  * It used to check [current, teaching_staff] nodes to infer
