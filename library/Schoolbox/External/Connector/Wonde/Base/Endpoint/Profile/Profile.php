@@ -233,7 +233,7 @@ class Profile implements IStrategy
                  * From what is currently seen, students can only have a singular campus unlike staff
                  */
                 $campusName     = '';
-                if (isset($student['campus']['data']['code'])){
+                if (isset($student['campus']['data']['code'])) {
                     $campusName = trim((string)$student['campus']['data']['description']);
                 }
 
@@ -312,7 +312,7 @@ class Profile implements IStrategy
                  *  if they choose not to provide them we need to catch it.
                  */
                 $medical  = '';
-                if (isset($student['medical_conditions'])){
+                if (isset($student['medical_conditions'])) {
                     $medical  = $this->findMedicalAlert($student['medical_conditions']);
                 }
 
