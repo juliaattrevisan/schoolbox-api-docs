@@ -302,7 +302,7 @@ class Profile implements IStrategy
                  *  if they choose not to provide them we need to catch it.
                  */
                 $medical  = '';
-                if (isset($student['medical_conditions'])){
+                if (isset($student['medical_conditions'])) {
                     $medical  = $this->findMedicalAlert($student['medical_conditions']);
                 }
 
