@@ -919,7 +919,7 @@ class Profile implements IStrategy
 
                 $positionTitle = trim((string)$staff['employment_details']['data']['role_text']);
                 $room = '';
-                $title = trim((string)$staff['contact_details']['data']['salutation']);
+                $title = trim((string)$staff['title']);
 
                 /* Potentially use a third fallback option:
                  * $staff['employment_details']['data']['staff_code']
