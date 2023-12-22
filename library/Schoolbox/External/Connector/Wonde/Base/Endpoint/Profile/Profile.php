@@ -754,7 +754,7 @@ class Profile implements IStrategy
             $phoneMobile = trim((string)$parent['contact_details']['data']['phones']['mobile']);
             $phoneWork = trim((string)$parent['contact_details']['data']['phones']['work']);
             $relationship = trim((string)$parent['relationship']['relationship']);
-            $title = trim((string)$parent['contact_details']['data']['salutation']);
+            $title = trim((string)$parent['title']);
             $username = $externalId;
 
             /* Parents might inadvertently have the same externalId as someone else's
