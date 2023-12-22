@@ -57,7 +57,7 @@ class Factory
                         BaseAuthorizationFailure::class,
                         SchoolboxException::class
                     ),
-                    new DeprecationFilter(new Registry()),
+                    new DeprecationFilter(),
                 ),
                 'error_types' => self::ERROR_REPORTING,
                 'send_default_pii' => true,
