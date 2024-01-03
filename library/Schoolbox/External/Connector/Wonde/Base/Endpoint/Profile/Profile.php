@@ -754,7 +754,7 @@ class Profile implements IStrategy
             $phoneMobile = trim((string)$parent['contact_details']['data']['phones']['mobile']);
             $phoneWork = trim((string)$parent['contact_details']['data']['phones']['work']);
             $relationship = trim((string)$parent['relationship']['relationship']);
-            $title = trim((string)$parent['contact_details']['data']['salutation']);
+            $title = trim((string)$parent['title']);
             $username = $externalId;
 
             /* Parents might inadvertently have the same externalId as someone else's
@@ -919,7 +919,7 @@ class Profile implements IStrategy
 
                 $positionTitle = trim((string)$staff['employment_details']['data']['role_text']);
                 $room = '';
-                $title = trim((string)$staff['contact_details']['data']['salutation']);
+                $title = trim((string)$staff['title']);
 
                 /* Potentially use a third fallback option:
                  * $staff['employment_details']['data']['staff_code']
