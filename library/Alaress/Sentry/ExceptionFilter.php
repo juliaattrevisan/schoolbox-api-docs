@@ -14,8 +14,11 @@ use Sentry\Event;
 /**
  * Filter for the Sentry client, used for preventing particular classes of
  * exception from being reported to Sentry.
+ *
+ * If the class name of the exception in the event matches an excluded class,
+ * skip sending this event.
  */
-class ExceptionFilter
+class ExceptionFilter implements IFilter
 {
     /**
      * Do not report to Sentry for exceptions that are of these classes or their
@@ -23,8 +26,7 @@ class ExceptionFilter
      *
      * @var array|string[]
      */
-    private $excludedClasses;
-
+    private array $excludedClasses;
 
     /**
      * Constructor
@@ -36,13 +38,8 @@ class ExceptionFilter
         $this->excludedClasses = $excludedClasses;
     }
 
-
     /**
-     * If the exception in $data matches a an excluded exception, don't send to
-     * Sentry.
-     *
-     * @param Event $event
-     * @return Event|null
+     * @inheritdoc
      */
     public function __invoke(Event $event): ?Event
     {

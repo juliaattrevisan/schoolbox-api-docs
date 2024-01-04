@@ -11,6 +11,7 @@ namespace Alaress\Sentry;
 
 use Alaress\Authorizer\Failure\Base as BaseAuthorizationFailure;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Deprecation\Registry;
 use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -49,11 +50,14 @@ class Factory
                 'dsn'         => "https://{$sentryToken}@sentry.io/{$sentryProject}",
                 'environment' => $instance->getType(),
                 'release'     => $applicationName . '@' . $instance->getVersion(),
-                'before_send' => new ExceptionFilter(
-                    Deleted::class,
-                    NotFound::class,
-                    BaseAuthorizationFailure::class,
-                    SchoolboxException::class
+                'before_send' => new CompositeFilter(
+                    new ExceptionFilter(
+                        Deleted::class,
+                        NotFound::class,
+                        BaseAuthorizationFailure::class,
+                        SchoolboxException::class
+                    ),
+                    new DeprecationFilter(),
                 ),
                 'error_types' => self::ERROR_REPORTING,
                 'send_default_pii' => true,
