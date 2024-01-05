@@ -351,6 +351,18 @@
             }
         });
         {% endif %}
+
+        // get virus scanner status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "virus"
+            },
+            success:function(data) {
+                $('[data-light="virus"]').html(data.virus_status).removeClass('neutral').addClass(data.virus_light);
+            }
+        });
     });
 </script>
 
@@ -485,6 +497,25 @@
                                     </div>
                                 </li>
                             {% endif %}
+                            {% if suds_import_data_enabled %}
+                                {% for importLog in suds_import_logs %}
+                                    <li>
+                                        <div class="small-5 columns content">
+                                            {% set route = routeLookup('adminImportIndex.getSchoolDataIndex') %}
+                                            <a href="{{ route }}#previous">{{ importLog.script }}</a>
+                                        </div>
+                                        <div class="small-7 columns content">
+                                            {% if importLog.isComplete %}
+                                                <span class="full-width success label" title="{{ importLog.finishAt.local }}">Complete</span>
+                                            {% elseif importLog.isRunning %}
+                                                <span class="full-width warning label" title="Started at {{ importLog.startAt.local }}">In Progress</span>
+                                            {% elseif importLog.isError %}
+                                                <span class="full-width alert label">Error</span>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
 
                             {# Show SSL cert status if not cloud hosted #}
                             {% if not is_cloud %}
@@ -507,26 +538,6 @@
                                 </li>
                                 {% endif %}
 
-
-                                {% if suds_import_data_enabled %}
-                                    {% for importLog in suds_import_logs %}
-                                        <li>
-                                            <div class="small-5 columns content">
-                                                {% set route = routeLookup('adminImportIndex.getSchoolDataIndex') %}
-                                                <a href="{{ route }}#previous">{{ importLog.script }}</a>
-                                            </div>
-                                            <div class="small-7 columns content">
-                                                {% if importLog.isComplete %}
-                                                    <span class="full-width success label" title="{{ importLog.finishAt.local }}">Complete</span>
-                                                {% elseif importLog.isRunning %}
-                                                    <span class="full-width warning label" title="Started at {{ importLog.startAt.local }}">In Progress</span>
-                                                {% elseif importLog.isError %}
-                                                    <span class="full-width alert label">Error</span>
-                                                {% endif %}
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                {% endif %}
                                 <li>
                                     <div class="small-5 columns content">
                                         NTP Drift
@@ -535,7 +546,8 @@
                                         <span class="full-width neutral label" data-light="ntp">Testing...</span>
                                     </div>
                                 </li>
-                                {% if show_saml_widget %}
+                            {% endif %}
+                            {% if show_saml_widget %}
                                 <li>
                                     <div class="small-5 columns content">
                                         SAML IdP Certificate
@@ -544,8 +556,14 @@
                                         <span class="full-width neutral label" data-light="saml_cert">testing...</span>
                                     </div>
                                 </li>
-                                {% endif %}
                             {% endif %}
+                            <li>
+                                <div class="small-5 columns content">Virus Scanner</div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="virus">Testing...</span>
+                                </div>
+                            </li>
+
                         </ul>
                     </section>
 
