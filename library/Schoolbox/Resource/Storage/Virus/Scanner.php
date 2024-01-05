@@ -102,14 +102,13 @@ class Scanner
         // 2 : An error occurred.
         // (127 is the standard response code for when a command is not found)
 
-        // Virus scanner not available, just continue without it
+        // Virus scanner not available
         if (127 === $resultCode) {
             return 'unavailable';
         }
 
         /* clamd not currently running or accessible. Might have died due to OOM or not installed properly  */
         if (2 === $resultCode) {
-            /* clamd might not be running. skip scan */
             return 'offline';
         }
 
