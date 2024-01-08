@@ -145,17 +145,16 @@ class Hydrator extends BaseHydrator
                 : $componentName ?? trim($textbox->getHeading())
             );
 
-            // Because the textbox body contains HTML, this match might have come about only because the
-            // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-            // Eliminate those kinds of matches.
-            // Also eliminate matches that matched only on textBox.heading, when textBox.heading has been overridden by the component name.
-            $textboxBodyTextOnly = $this->htmlToText($textbox->getBody());
+            // Eliminate matches that matched only on textBox.heading,
+            // when textBox.heading has been overridden by the component name.
+            // This also formerly eliminated matches on invisible HTML tags
+            // (eg. 'style='): now that the search index is prebuilt without
+            // these tags, this is no longer necessary.
             if (mb_stripos($textboxHeading, $keyword, 0, self::ENCODING) === false) {
-                if (mb_stripos($textboxBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
-                    continue;
-                }
+                continue;
             }
 
+            $textboxBodyTextOnly = $this->htmlToText($textbox->getBody());
             if ($componentInstanceId === null) {
                 // This textbox is not used on any page.
 
