@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\LessonPlan\Cli\DupeDetectorTool;
+use Schoolbox\Learning\Assessment\Cli\DupeDetectorTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
