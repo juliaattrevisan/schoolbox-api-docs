@@ -202,8 +202,8 @@ window.Vue.onMounted(() => {
                                         ></linked-activities-modal-item>
                                     </li>
                                     <li
-                                        v-else
                                         v-for="subActivity in activity.assessments"
+                                        v-else
                                         :key="subActivity.id"
                                         :data-unit-assessment="subActivity.id"
                                         class="interact child"
