@@ -81,6 +81,7 @@ HELP;
 
         /* Find and disclose some metadata about assessments that seem brokenly assigned
          */
+        $n = 0;
         $lastSeen = null;
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -117,6 +118,14 @@ HELP;
             }
 
             $lastSeen = (int)$row['assessment_id'];
+            $n++;
+        }
+
+        /* Nice message when you didn't have any broken data
+         */
+        if (!$n) {
+            $this->getLogger()->info('');
+            $this->getLogger()->info('No broken data found.');
         }
 
         $this->getLogger()->info('');
