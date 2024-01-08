@@ -22,6 +22,11 @@ class Scanner
      */
     private const CLAMSCAN_COMMAND = 'clamdscan --fdpass --move=%s %s';
 
+    /**
+     * Ask clamd to scan its own config file as a test
+     */
+    private const TEST_CLAMSCAN_COMMAND = 'clamdscan --fdpass /etc/clamav/clamd.conf';
+
 
     /**
      * This is the quarantine location, it sits under the system temp directory and will be automatically created
@@ -84,5 +89,29 @@ class Scanner
         if ($resultCode > 0) {
             throw new FileException('A virus has been detected and this file has been quarantined.');
         }
+    }
+
+    public function checkExists(): string
+    {
+        exec(self::TEST_CLAMSCAN_COMMAND, $output, $resultCode);
+
+        // From clamdscan's man page:
+        // RETURN CODES
+        // 0 : No virus found.
+        // 1 : Virus(es) found.
+        // 2 : An error occurred.
+        // (127 is the standard response code for when a command is not found)
+
+        // Virus scanner not available
+        if (127 === $resultCode) {
+            return 'unavailable';
+        }
+
+        /* clamd not currently running or accessible. Might have died due to OOM or not installed properly  */
+        if (2 === $resultCode) {
+            return 'offline';
+        }
+
+        return 'online';
     }
 }

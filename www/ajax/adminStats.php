@@ -369,6 +369,23 @@ switch ($_POST['module']) {
             'SAML_MESSAGE' => $samlWidget->getMessage(),
         ];
         break;
+    case 'virus':
+        $virusScanner = new Schoolbox\Resource\Storage\Virus\Scanner($kernel->get('filesystem.temp'));
+        $status = $virusScanner->checkExists();
+
+        $output['virus_status'] = $status;
+
+        switch ($status) {
+            case 'online':
+                $output['virus_light'] = 'success';
+                break;
+            case 'offline':
+                $output['virus_light'] = 'alert';
+                break;
+            case 'unavailable':
+                $output['virus_light'] = 'warning';
+        }
+        break;
     default:
         break;
 }
