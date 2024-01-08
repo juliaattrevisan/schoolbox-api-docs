@@ -6,7 +6,6 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
