@@ -359,7 +359,7 @@ class Factory
      */
     public function spawnForFolder(?Folder $folder, bool $isStaff): IMarkScheme
     {
-        if ($folder && $folder->getYearLevels()->count() > 0) {
+        if ($folder && $folder->getYearLevels() && $folder->getYearLevels()->count() > 0) {
             // Get overall grade settings from year level, when all the settings are the same
             $overAllGrades     = array_unique($folder->getYearLevels()->getPropertyValues('overallGrade'));
             $showOverallGrades = array_unique($folder->getYearLevels()->getPropertyValues('showOverallGrade'));
