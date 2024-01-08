@@ -33,6 +33,18 @@ $app = new class extends CliTool\App
      */
     private const FOLDER_NAME = 'Lost & Found';
 
+    /**
+     * Arbitrary maximum number of iterations the cleanup tool will attempt.
+     */
+    private const MAX_ITERATIONS = 50;
+
+    /**
+     * Arbitrary max number of parents of a folder to process.
+     *
+     * If its ancestry is traceable to greater than this number of parents
+     * without error, assume it has no recursive relations.
+     */
+    private const MAX_FOLDER_ANCESTORS = 50;
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -82,7 +94,14 @@ HELP;
 
         $folderMapper = FolderMapper::getInstance();
 
+        $iterationCount = 0;
         do {
+            if ($iterationCount++ > self::MAX_ITERATIONS) {
+                $logger->warning(
+                    sprintf('Folder cleanup not complete after %d iterations: exiting', self::MAX_ITERATIONS)
+                );
+                break;
+            }
             $errors = 0;
 
             $folders = $folderMapper->findAll();
@@ -95,7 +114,19 @@ HELP;
                 $found = [];
 
                 try {
+                    $ancestorCount = 0;
                     do {
+                        if ($ancestorCount++ > self::MAX_FOLDER_ANCESTORS) {
+                            $logger->warning(
+                                sprintf(
+                                    "folder '%s' (%s) ancestry not complete after %d iterations: skipping",
+                                    $folder->getName(),
+                                    $folder->getId(),
+                                    self::MAX_FOLDER_ANCESTORS,
+                                ),
+                            );
+                            break;
+                        }
                         $found[$folderCurrent->getId()] = 1;
 
                         /** @var FolderModel $folderCurrent */
