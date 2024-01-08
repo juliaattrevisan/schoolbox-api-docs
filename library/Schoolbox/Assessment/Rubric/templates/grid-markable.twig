@@ -580,13 +580,13 @@
 
             if ($groupSummary.length) {
                 $groupSummary.each(function() {
-                    var groupScaledMark = parseFloat($(this).attr('data-scaled-mark'));
+                    var groupScaledMark = $(this).attr('data-scaled-mark');
 
                     if (!isNaN(groupScaledMark)) {
-                        totalMark = (totalMark || 0) + groupScaledMark;
+                        totalMark = (totalMark || 0) + parseFloat(groupScaledMark);
                     }
 
-                    rubricOverallMax += $(this).attr('data-max');
+                    rubricOverallMax += parseFloat($(this).attr('data-max'));
                 });
             } else {
                 var $descriptorCheckboxes = $("[data-rubric-descriptor]");
