@@ -7,11 +7,7 @@ create table courseTemplates
     unitTemplateId   int(11) unsigned not null,
     deleted_at       datetime     null,
     constraint courseTemplates_pk
-        primary key (id),
-    constraint courseTemplates_homepageTemplate_id_fk
-        foreign key (courseTemplateId) references homepageTemplate (id),
-    constraint unitTemplates_homepageTemplate_id_fk2
-        foreign key (unitTemplateId) references homepageTemplate (id)
+        primary key (id)
 );
 
 # allow homepage templates to be deleted and not break the whole system...
