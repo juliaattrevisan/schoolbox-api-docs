@@ -133,7 +133,7 @@ class Controller extends Base
             $statement->execute(['folderId' => $unit->getFolder()->getId()]);
             while ($row = $statement->fetch()) {
                 // match only on the Component Heading
-                $normalisedTitle = strtolower(trim($row['componentHeading']));
+                $normalisedTitle = strtolower(trim((string)$row['componentHeading']));
                 // Check if the textbox should exist in the plan?
                 if (array_key_exists($normalisedTitle, $textboxes)) {
                     // NOTE: This is all based on component titles (which don't need to be unique),
