@@ -91,14 +91,9 @@ class Hydrator extends BaseHydrator
 
                 $badgeBodyTextOnly = $this->htmlToText($badge->getBody());
 
-                // Because the badge body contains HTML, this match might have come about only because the
-                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if (mb_stripos($badge->getName(), $keyword, 0, self::ENCODING) === false) {
-                    if (mb_stripos($badgeBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
-                        return null;
-                    }
-                }
+                // This formerly eliminated matches on invisible HTML tags
+                // (eg. 'style='): now that the search index is prebuilt without
+                // these tags, this is no longer necessary.
 
                 // Work out image path for badge
                 $image = null;

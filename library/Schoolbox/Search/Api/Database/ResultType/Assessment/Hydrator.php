@@ -153,14 +153,9 @@ class Hydrator extends BaseHydrator
                 $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
                 $assessmentContentTextOnly = $this->htmlToText($assessmentContentHtml);
 
-                // Because the assessment content might contain HTML, this match might have come about only because the
-                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if ($this->assessmentMatchesKeywordOnlyOnHtmlContent($assessment, $keyword, $assessmentContentHtml)) {
-                    if (mb_stripos($assessmentContentTextOnly, $keyword, 0, self::ENCODING) === false) {
-                        return null;
-                    }
-                }
+                // This formerly eliminated matches on invisible HTML tags
+                // (eg. 'style='): now that the search index is prebuilt without
+                // these tags, this is no longer necessary.
 
                 if (!($assessment instanceof Assessment\LessonPlan\Model)) {
                     // The content text with HTML tags removed is safe to use as the search result context.
@@ -179,18 +174,9 @@ class Hydrator extends BaseHydrator
                         $searchResultContextHtml = $fieldContentHtmlMatchingKeyword;
                     } else {
                         // The keyword was not found in any field content visible to the user.
-
-                        // If the keyword is found in the lesson plan title, then the match is still good.
-                        if (mb_stripos($assessment->getTitle(), $keyword, 0, self::ENCODING) !== false) {
-                            // Set the search result context to the content of the first field.
-                            $searchResultContextHtml = (
-                                $this->consistentlyFormatLessonPlanFieldContent($assessment->getFields()->first())
-                            );
-                        } else {
-                            // This lesson plan is only here because it matched on content text that is invisible to the
-                            // user.  Therefore, this match should be eliminated.
-                            return null;
-                        }
+                        $searchResultContextHtml = $this->consistentlyFormatLessonPlanFieldContent(
+                            $assessment->getFields()->first(),
+                        );
                     }
 
                     $searchResultContext = $this->htmlToText($searchResultContextHtml);
@@ -277,66 +263,6 @@ class Hydrator extends BaseHydrator
         }
 
         return implode("\n\n", $strings);
-    }
-
-    /**
-     * Return true if the keyword is contained in the $assessment's content (which might contain HTML), but not in any
-     * of the non-HTML strings that could possibly cause matches.
-     *
-     * IMPORTANT: This function checks for case-insensitive matches.  This is to match the behaviour of an SQL 'LIKE' condition.
-     *
-     * The checks used here must match those in Assessment\QueryParamBuilder->buildBaseWhereParams()
-     *
-     * @param IAssessable $assessment
-     * @param string      $keyword
-     * @param string      $assessmentContentHtml
-     * @return bool
-     */
-    private function assessmentMatchesKeywordOnlyOnHtmlContent(
-        IAssessable $assessment,
-        string $keyword,
-        string $assessmentContentHtml
-    ): bool {
-        // SQL match conditions copied from Assessment\QueryParamBuilder->buildBaseWhereParams()
-        // -------------------------------------------------------------------------------------
-        // NOTES:
-        //  * The Search Keyword Match Conditions below must match those used in QueryParamBuilder->buildBaseWhereParams().
-        //  * The concatenation of all the lesson_plan_field titles and bodies is treated as HTML content.
-        //    Also LTI assessment text is treated as HTML content.
-        //    (see $this->getAssessmentHtmlContent())
-        //
-        // Search keyword match condition                                     Relevant field from model                        HtmlContent or Other?
-        // -----------------------------------------------------------------------------------------------------------------------------------------
-        // 'assessment.title LIKE :assessmentKeywordLike',                    // Assessment->getTitle()                              Other
-        // 'assessment.description LIKE :assessmentKeywordLike',              // Assessment->getDescription()                        HtmlContent
-        // 'task.link LIKE :assessmentKeywordLike',                           // Assessment\Task\Model->getUrl()                     Other
-        // 'assess.title LIKE :assessmentKeywordLike',                        // Overrides Assessment->getTitle()                    Other
-        // 'assess.description LIKE :assessmentKeywordLike',                  // Overrides Assessment->getDescription()              HtmlContent
-        // 'lti_assessment.lti_assessment_url LIKE :assessmentKeywordLike',   // Assessment\Lti\Model->getLtiAssessmentUrl()         Other
-        // 'lti_assessment.lti_assessment_title LIKE :assessmentKeywordLike', // Assessment\Lti\Model->getLtiAssessmentTitle()       Other
-        // 'lti_assessment.lti_assessment_text LIKE :assessmentKeywordLike',  // Assessment\Lti\Model->getLtiAssessmentText()        HtmlContent
-        // 'lesson_plan_field.title LIKE :assessmentKeywordLike',             // Assessment\LessonPlan\Model->getField()->getTitle() HtmlContent
-        // 'lesson_plan_field.body LIKE :assessmentKeywordLike'               // Assessment\LessonPlan\Model->getField()->getBody()  HtmlContent
-
-        if (mb_stripos($assessment->getTitle(), $keyword, 0, self::ENCODING) !== false) {
-            return false; // Found match on assessment.title or assess.title.
-        }
-
-        if ($assessment instanceof Assessment\Lti\Model) {
-            if (
-                mb_stripos($assessment->getLtiAssessmentUrl(), $keyword, 0, self::ENCODING) !== false ||
-                mb_stripos($assessment->getLtiAssessmentTitle(), $keyword, 0, self::ENCODING) !== false
-            ) {
-                return false; // Found match on lti_assessment.lti_assessment_url or lti_assessment.lti_assessment_title.
-            }
-        } elseif ($assessment instanceof Assessment\Task\Model) {
-            if (mb_stripos($assessment->getUrl(), $keyword, 0, self::ENCODING) !== false) {
-                return false; // Found match on task.link.
-            }
-        }
-
-        // No other match found, so return true if the keyword matches on the HTML content.
-        return (mb_stripos($assessmentContentHtml, $keyword, 0, self::ENCODING) !== false);
     }
 
     /**

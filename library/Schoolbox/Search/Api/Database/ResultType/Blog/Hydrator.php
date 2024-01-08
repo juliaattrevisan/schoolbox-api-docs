@@ -79,14 +79,9 @@ class Hydrator extends BaseHydrator
 
                 $blogBodyTextOnly = $this->htmlToText($blog->getBody());
 
-                // Because the blog body contains HTML, this match might have come about only because the
-                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if (mb_stripos($blog->getHeading(), $keyword, 0, self::ENCODING) === false) {
-                    if (mb_stripos($blogBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
-                        return null;
-                    }
-                }
+                // This formerly eliminated matches on invisible HTML tags
+                // (eg. 'style='): now that the search index is prebuilt without
+                // these tags, this is no longer necessary.
 
                 return new FullResult(
                     $match,
