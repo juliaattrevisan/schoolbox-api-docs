@@ -60,8 +60,14 @@ HELP;
          * where the same assessment id belongs to multiple lesson plans
          */
         $statement = $this->getDatabaseInternal()->executeQuery("
-            SELECT *
+            SELECT
+                assessment.id AS assessment_id, 
+                assessment.title, 
+                assessment.deleted_at AS assessment_deleted_at,
+                lesson_plan.id AS lesson_plan_id,
+                lesson_plan.deleted_at AS lesson_plan_deleted_at
             FROM lesson_plan
+            INNER JOIN assessment ON lesson_plan.assessment_id = assessment.id
             WHERE assessment_id IN (
                 SELECT assessment_id
                 FROM lesson_plan
