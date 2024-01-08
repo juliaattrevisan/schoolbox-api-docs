@@ -120,7 +120,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
         $denominator = $this->deriveDenominator($response);
 
         // Prevent divide by 0 Errors
-        if (0 === (int)$denominator) {
+        if (0.0 === (float)$denominator) {
             return null;
         }
 
