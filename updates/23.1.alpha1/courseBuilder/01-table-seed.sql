@@ -3,8 +3,8 @@ create table courseTemplates
 (
     id               int(11) unsigned auto_increment,
     name             varchar(250) null,
-    courseTemplateId int(11) unsigned not null,
-    unitTemplateId   int(11) unsigned not null,
+    courseTemplateId int(11) not null,
+    unitTemplateId   int(11) not null,
     deleted_at       datetime     null,
     constraint courseTemplates_pk
         primary key (id)
