@@ -45,11 +45,14 @@ Lesson Plan Dupe Detector
 This detects when a lesson_plan.assessment_id belongs to multiple lesson_plan.id
 and gives you a little summary about them.
 
-This wasn't intended and seems to be some kind of corrupt data. 
+This wasn't intended and seems to be some kind of corrupt data. This doesn't mutate
+any data; it just tells you about dupes. You must decide what happens next and 
+effect any changes manually yourself.
 
-Usage: example.php [--flag] [--input mytest.txt]
-        --flag      Example flag (on/off)
-        --input     Example input value (arg which has user-inputted value)
+(Typically we anticipate you needing to decide which rows to delete from the 
+schoolbox.lesson_plan table, removing dupes)
+
+Usage: lesson-plan-dupe-detector.php
 
 
 HELP;
@@ -78,13 +81,45 @@ HELP;
 
         /* Find and disclose some metadata about assessments that seem brokenly assigned
          */
-        $n = 0;
+        $lastSeen = null;
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            print_r($row);
+            if ($lastSeen !== (int)$row['assessment_id']) {
+                $this->getLogger()->info('');
 
-            $n++;
+                $this->getLogger()->info(sprintf(
+                    '"%s" (assessment_id %s) is assigned to these lesson plans: ',
+                    $row['title'],
+                    $row['assessment_id']
+                ));
+
+                if ($row['assessment_deleted_at']) {
+                    $this->getLogger()->info(sprintf(
+                        'This assessment was deleted on %s',
+                        $row['assessment_deleted_at']
+                    ));
+                }
+            }
+
+            /* Show the lesson plan metadata for this assessment
+             */
+            if ($row['lesson_plan_deleted_at']) {
+                $this->getLogger()->info(sprintf(
+                    '    %s (deleted at: %s)',
+                    $row['lesson_plan_id'],
+                    $row['lesson_plan_deleted_at']
+                ));
+            } else {
+                $this->getLogger()->info(sprintf(
+                    '    %s',
+                    $row['lesson_plan_id'],
+                ));
+            }
+
+            $lastSeen = (int)$row['assessment_id'];
         }
+
+        $this->getLogger()->info('');
     }
 
 
