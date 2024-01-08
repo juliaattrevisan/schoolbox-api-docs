@@ -88,7 +88,7 @@ class HomepageTemplateMapper extends Mapper
     {
         $templateNone = $this->createModel();
         $templateNone->setId(HomepageTemplate::HOMEPAGE_NONE);
-        $templateNone->setName("No Homepage");
+        $templateNone->setName(HomepageTemplate::NONE_STRING);
         return $templateNone;
     }
 
@@ -100,7 +100,7 @@ class HomepageTemplateMapper extends Mapper
     {
         $templateNone = $this->createModel();
         $templateNone->setId(HomepageTemplate::HOMEPAGE_KEEP_EXISTING);
-        $templateNone->setName("Keep Existing");
+        $templateNone->setName(HomepageTemplate::KEEP_EXISTING_STRING);
         return $templateNone;
     }
 

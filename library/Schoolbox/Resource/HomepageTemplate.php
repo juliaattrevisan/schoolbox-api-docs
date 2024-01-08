@@ -28,7 +28,9 @@ class HomepageTemplate implements ISoftDeletable
     public const DEFAULT_RIGHT_COLUMN_WIDTH = 29.5;
 
     public const HOMEPAGE_NONE          = -1;
+    public const NONE_STRING            = "No Homepage";
     public const HOMEPAGE_KEEP_EXISTING = 0;
+    public const KEEP_EXISTING_STRING   = "Keep Existing";
 
 
     /**
