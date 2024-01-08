@@ -113,14 +113,9 @@ class Hydrator extends BaseHydrator
                 $matchingPostString = $nMatchingPostsInThread > 1 ? "(+$nMatchingPostsInThread more matching posts)" : '';
                 $postBodyTextOnly = $this->htmlToText($post->getBody());
 
-                // Because the blog body contains HTML, this match might have come about only because the
-                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if (mb_stripos($postThread->getTitle(), $keyword, 0, self::ENCODING) === false) {
-                    if (mb_stripos($postBodyTextOnly, $keyword, 0, self::ENCODING) === false) {
-                        return null;
-                    }
-                }
+                // This formerly eliminated matches on invisible HTML tags
+                // (eg. 'style='): now that the search index is prebuilt without
+                // these tags, this is no longer necessary.
 
                 return new FullResult(
                     $match,

@@ -121,32 +121,12 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                $bodyTextOnly = $this->htmlToText($article->getBody());
-                $blurbTextOnly = $this->htmlToText($article->getBlurb());
-
-                // Because the article body and blurb can contain HTML, this match might have come about only because
-                // the keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if (mb_stripos($article->getTitle(), $keyword, 0, self::ENCODING) === false) {
-                    if (
-                        mb_stripos($bodyTextOnly, $keyword, 0, self::ENCODING) === false &&
-                        mb_stripos($blurbTextOnly, $keyword, 0, self::ENCODING) === false
-                    ) {
-                        return null;
-                    }
-                }
-
-                // The article may have been found if the keyword matched an
-                // HTML attribute or its value in the blurb or body.
-                // Filter out matches which were found to match the keyword
-                // on the query, but were found to not match either:
-                // * the title
-                // * the generated description
+                // This formerly eliminated matches on invisible HTML tags
+                // (eg. 'style='): now that the search index is prebuilt without
+                // these tags, this is no longer necessary.
+                $bodyTextOnly        = $this->htmlToText($article->getBody());
+                $blurbTextOnly       = $this->htmlToText($article->getBlurb());
                 $descriptionTextOnly = $this->generateDescriptionForArticle($keyword, $blurbTextOnly, $bodyTextOnly);
-                // Check for case-insensitive matches to match the behaviour of an SQL 'LIKE' condition.
-                if (!isset($descriptionTextOnly) && mb_stripos($article->getTitle(), $keyword, 0, self::ENCODING) === false) {
-                    return null;
-                }
 
                 return new FullResult(
                     $match,

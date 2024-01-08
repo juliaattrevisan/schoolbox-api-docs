@@ -153,14 +153,9 @@ class Hydrator extends BaseHydrator
                 $assessmentContentHtml = $this->getAssessmentHtmlContent($assessment);
                 $assessmentContentTextOnly = $this->htmlToText($assessmentContentHtml);
 
-                // Because the assessment content might contain HTML, this match might have come about only because the
-                // keyword was found in HTML code that is invisible to the user (eg. 'style=').
-                // Eliminate those kinds of matches.
-                if ($this->assessmentMatchesKeywordOnlyOnHtmlContent($assessment, $keyword, $assessmentContentHtml)) {
-                    if (mb_stripos($assessmentContentTextOnly, $keyword, 0, self::ENCODING) === false) {
-                        return null;
-                    }
-                }
+                // This formerly eliminated matches on invisible HTML tags
+                // (eg. 'style='): now that the search index is prebuilt without
+                // these tags, this is no longer necessary.
 
                 if (!($assessment instanceof Assessment\LessonPlan\Model)) {
                     // The content text with HTML tags removed is safe to use as the search result context.
@@ -179,18 +174,9 @@ class Hydrator extends BaseHydrator
                         $searchResultContextHtml = $fieldContentHtmlMatchingKeyword;
                     } else {
                         // The keyword was not found in any field content visible to the user.
-
-                        // If the keyword is found in the lesson plan title, then the match is still good.
-                        if (mb_stripos($assessment->getTitle(), $keyword, 0, self::ENCODING) !== false) {
-                            // Set the search result context to the content of the first field.
-                            $searchResultContextHtml = (
-                                $this->consistentlyFormatLessonPlanFieldContent($assessment->getFields()->first())
-                            );
-                        } else {
-                            // This lesson plan is only here because it matched on content text that is invisible to the
-                            // user.  Therefore, this match should be eliminated.
-                            return null;
-                        }
+                        $searchResultContextHtml = $this->consistentlyFormatLessonPlanFieldContent(
+                            $assessment->getFields()->first(),
+                        );
                     }
 
                     $searchResultContext = $this->htmlToText($searchResultContextHtml);
