@@ -59,11 +59,8 @@ HELP;
             exit;
         }
 
-        $db      = $this->getDatabaseInternal();
-        $logger  = $this->getLogger();
-
-        $folderName = $db->getQuoter()->quoteIdentifier(self::FOLDER_NAME);
-
+        $db        = $this->getDatabaseInternal();
+        $logger    = $this->getLogger();
         $lostQuery = $db->prepareQuery('SELECT `id` FROM `folder` WHERE `name` = :folder_name');
         $lostQuery->execute(['folder_name' => self::FOLDER_NAME]);
 
@@ -71,7 +68,10 @@ HELP;
             $row = $lostQuery->fetch();
             $parent_id = $row['id'];
         } else {
-            $db->executeQuery('INSERT INTO `folder` (name, parent, inherit) VALUES (:folder_name, 0, 0)', [ 'folder_name' => $folderName]);
+            $db->executeQuery(
+                'INSERT INTO `folder` (name, parent, inherit) VALUES (:folder_name, 0, 0)',
+                ['folder_name' => self::FOLDER_NAME],
+            );
             $parent_id = $db->lastInsertId();
         }
 
@@ -104,10 +104,11 @@ HELP;
                             // Node has no parent set
 
                             $logger->info(sprintf(
-                                "Orphaned Folder '%s' (%d) moved to {$folderName} (%d)",
+                                "Orphaned Folder '%s' (%d) moved to '%s' (%d)",
                                 $folder->getName(),
                                 $folder->getId(),
-                                $parent_id
+                                self::FOLDER_NAME,
+                                $parent_id,
                             ));
 
                             $moveQuery->execute([
@@ -130,10 +131,11 @@ HELP;
                             $loopString .= $folderCurrent->getId();
 
                             $logger->info(sprintf(
-                                "Looping Folder '%s' (%s) moved to {$folderName} (%d)",
+                                "Looping Folder '%s' (%s) moved to '%s' (%d)",
                                 $folder->getName(),
                                 $loopString,
-                                $parent_id
+                                self::FOLDER_NAME,
+                                $parent_id,
                             ));
 
                             $moveQuery->execute([
@@ -148,11 +150,12 @@ HELP;
                     }
                 } catch (\Exception $e) {
                     $logger->info(sprintf(
-                        "Folder '%s' (%d) missing Parent (%d) moved to {$folderName} (%d)",
+                        "Folder '%s' (%d) missing Parent (%d) moved to '%s' (%d)",
                         $folder->getName(),
                         $folder->getId(),
                         $folder->getParent()->getId(),
-                        $parent_id
+                        self::FOLDER_NAME,
+                        $parent_id,
                     ));
 
                     $moveQuery->execute([
