@@ -2,7 +2,7 @@
  # OLC Superstar Report
  #
  # @param string $title   The official name of this report
- # @param array $results  A set of candidacy outcomes per person, grouped by unit spec id
+ # @param array $stack    A set of candidacy outcomes per person, grouped by unit spec id
  #}
 <div class="row">
     <div class="small-12 columns">
@@ -10,12 +10,41 @@
     </div>
 </div>
 
+{% for unitSpecId, unitSpecData in stack %}
+    {% if unitSpecData.actionables|length %}
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">{{ unitSpecData.title }}</h2>
+                <section class="content">
+                    {% if unitSpecData.actionables.superstar|length %}
+                        <h3>Superstar</h3>
+                        {{ _self.renderActionable(unitSpecData.actionables.superstar) }}
+                    {% endif %}
 
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader"></h2>
-        <section class="content">
-        </section>
-    </div>
-</div>
+                    {% if unitSpecData.actionables.star|length %}
+                        <h3>Star</h3>
+                        {{ _self.renderActionable(unitSpecData.actionables.star) }}
+                    {% endif %}
+                </section>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
 
+{##
+ # Generic renderer for each guy you can award a badge
+ #
+ # @param array $actionables  A list of superstars/stars who can be awarded something
+ #}
+{% macro renderActionable(actionables) %}
+    <ul class="information-list">
+        {% for actionable in actionables %}
+        <li>
+            <a href="/search/user/{{ actionable.id }}">
+                {{ actionable.firstname }} {{ actionable.lastname }}
+            </a>
+            - {{ actionable.school.name }} ({{ actionable.school.code }})
+        </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}

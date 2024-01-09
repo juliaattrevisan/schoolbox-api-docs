@@ -47,12 +47,12 @@ class Controller extends Base
          * unit spec or something like that, for performance reasons...one day
          */
         $stack = (new Payload($this->getDi()->get('databaseInternal')))->generate();
-
+new \Alaress_Probe($stack);
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
                 'title' => self::REPORT_TITLE,
             ],
-            'results' => $stack
+            'stack' => $stack
         ], self::REPORT_TITLE);
     }
 
