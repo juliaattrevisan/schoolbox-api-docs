@@ -58,13 +58,35 @@ class Controller extends Base
          *
          * $stack = [
          *     spec id => [
-         *         unit title => [
-         *
+         *         unit spec title => [
+         *             user id => [
+         *                 firstname => ...
+         *                 lastname => ...
+         *                 candidacy => superstar, or star
+         *             ],
+         *             user id => [
+         *                 firstname => ...
+         *                 lastname => ...
+         *                 candidacy => superstar, or star
+         *             ],
+         *             ...
          *         ],
-         *         unit title => [
+         *         unit spec title => [
+         *             user id => [
+         *                 firstname => ...
+         *                 lastname => ...
+         *                 candidacy => superstar, or star
+         *             ],
+         *             user id => [
+         *                 firstname => ...
+         *                 lastname => ...
+         *                 candidacy => superstar, or star
+         *             ],
+         *             ...
          *         ],
-         *         ....
+         *         ...
          *     ]
+         *     ...
          * ]
          */
         $stack = [];
@@ -98,6 +120,11 @@ class Controller extends Base
      */
     private function generateCandidatesStatement(): \PDOStatement
     {
+        /* TODO Potentially insert a course_unit_specification.id param here,
+         *  to only obtain candidacy for a particular unit - this would be a
+         *  performance workaround that avoids generating the entire data set
+         *  at the very beginning...but it means you gotta click a lot
+         */
         $query = "
             SELECT 
                 cui.course_unit_specification_id AS unit_spec_id,
