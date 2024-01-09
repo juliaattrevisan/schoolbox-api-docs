@@ -140,6 +140,9 @@ class Payload
                  * Everyone else doesn't matter
                  */
                 if (null !== $outcome) {
+                    /* TODO Cross reference if they already received this badge previously
+                     *  We don't need to give them the same badge twice
+                     */
                     $stack[$unitSpecId]['actionables'][$outcome][] = $userData['meta'];
                 }
             }
