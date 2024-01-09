@@ -303,27 +303,6 @@ class ListController extends Web\Controller\Base
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
             }
 
-            /* Quizzes go to the Modify Contents screen in Learnosity when you update
-             * the quiz settings; unlike everything else
-             */
-            if ($assessmentInfo['assessment'] instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-                /**
-                 * Always go to the screen when a quiz has been created,
-                 * but send the return url with it
-                 */
-                $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', [
-                    'assessment' => $assessmentInfo['assessment'],
-                    'assessmentId' => $assessmentInfo['assessment']->getId()
-                ]);
-
-                if ($explicitReturnUrl) {
-                    $returnUrl .= '?' . Redirect::RETURN_URL . "=$explicitReturnUrl";
-                }
-
-                $this->redirect($returnUrl);
-                return;
-            }
-
             $this->redirect($controller->determineRedirect(
                 $assessmentInfo['assessment'],
                 $explicitReturnUrl,
