@@ -106,12 +106,12 @@ class Mapper extends \Schoolbox\Mapper
         $templateList = $this->getJoinMapper('courseTemplate')->findAll()->indexBy('id')->keys();
 
         // test course first
-        if (!(in_array($model->getCourseTemplate()->getId(), $templateList) || -1 === $model->getCourseTemplate()->getId())) {
+        if (!(in_array($model->getCourseTemplate()->getId(), $templateList) || HomepageTemplate::HOMEPAGE_NONE === $model->getCourseTemplate()->getId())) {
             throw new UnexpectedValueException(
                 "Unknown course page template"
             );
         }
-        if (!(in_array($model->getUnitTemplate()->getId(), $templateList) || -1 === $model->getUnitTemplate()->getId())) {
+        if (!(in_array($model->getUnitTemplate()->getId(), $templateList) || HomepageTemplate::HOMEPAGE_NONE === $model->getUnitTemplate()->getId())) {
             throw new UnexpectedValueException(
                 "Unknown unit page template"
             );

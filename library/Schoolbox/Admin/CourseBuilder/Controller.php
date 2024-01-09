@@ -138,7 +138,7 @@ class Controller extends Base
             $template->setName($templateGroup['name']);
 
             // if the courseTemplate was not selected (No Homepage) then use that
-            if (-1 === $templateGroup['courseTemplate']['id']) {
+            if (HomepageTemplate::HOMEPAGE_NONE === $templateGroup['courseTemplate']['id']) {
                 $courseTemplate = $this->homepageTemplateMapper->getNoHomepageTemplate();
             } else {
                 /**
@@ -151,7 +151,7 @@ class Controller extends Base
                 }
             }
             // if the unitTemplate was not selected (No Homepage) then use that
-            if (-1 === $templateGroup['unitTemplate']['id']) {
+            if (HomepageTemplate::HOMEPAGE_NONE === $templateGroup['unitTemplate']['id']) {
                 $unitTemplate = $this->homepageTemplateMapper->getNoHomepageTemplate();
             } else {
                 try {
