@@ -170,6 +170,9 @@ class Payload
          *  performance workaround that avoids generating the entire data set
          *  at the very beginning...but it means you gotta click a lot
          */
+
+        /* TODO deal with soft-deleted users and other soft-deleted data here
+         */
         $query = "
             SELECT 
                 cui.course_unit_specification_id AS unit_spec_id,
