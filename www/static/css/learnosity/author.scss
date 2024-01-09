@@ -995,3 +995,24 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
 .lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
     width: 100%;
 }
+<<<<<<< HEAD
+=======
+
+/* Fixed the mobile version for the search page */
+@media (max-width: 481px) {
+    .lrn .lrn-author-ui .lrn-list-view-col:not(.lrn-list-view-select-col):first-child {
+        padding-left: 0.25rem !important;
+    }
+    .lrn .lrn-author-ui .lrn-list-view-heading-wrapper {
+        margin-right: 3rem !important;
+    }
+
+    /* Fixed the Edit/Preview Button in the item edit page for mobile devices */
+    .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle {
+        min-width: 10em;
+    }
+    .lrn ul {
+        padding-left: 0em;
+    }
+}
+>>>>>>> 3649b3e9af6 (Fixed the Edit/Preview Button in the item edit page for mobile devices[SA-16889])
