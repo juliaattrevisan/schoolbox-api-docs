@@ -23,12 +23,23 @@ alter table course_specification
         foreign key (template_id) references courseTemplates (id);
 
 # copy config to new table
+# if that homepage template doesn't exist (hard deleted), then use No Homepage as a default -1
 INSERT INTO courseTemplates (id, name, courseTemplateId, unitTemplateId) VALUE
 (
     1,
     'Default',
-    (SELECT value FROM config WHERE name='course_builder_default_course_page_template'),
-    (SELECT value FROM config WHERE name='course_builder_default_unit_page_template')
+    (select COALESCE(
+                    (SELECT value FROM config
+                        JOIN homepageTemplate on config.value = homepageTemplate.id
+                        WHERE config.name = 'course_builder_default_course_page_template'),
+                    -1)
+    ),
+    (select COALESCE(
+                    (SELECT value FROM config
+                        JOIN homepageTemplate on config.value = homepageTemplate.id
+                        WHERE config.name = 'course_builder_default_unit_page_template'),
+                    -1)
+    )
 );
 
 # give all the course specs the default template
