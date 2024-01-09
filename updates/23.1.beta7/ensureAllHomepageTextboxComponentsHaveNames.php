@@ -22,21 +22,26 @@ $app = new class extends CliTool\App {
      */
     private const OPT_LONG_HELP = 'help';
 
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
-        echo <<<HELP
-This script adds component names to textbox components that either do not have names,
-or have blank names.
-
-Component names are stored in component_config_instance.value, where the linked
-component_config_definition.key is "componentname".
+            echo <<<HELP
+This script adds component names to each homepage textbox component that either:
+ * does not have a name, OR
+ * has a blank name, while the relevant textbox has a non-blank heading.
 
 The added component name will be:
  * the textBox.heading if that is non-null,
  * otherwise a blank string.
 HELP;
-            echo "\nUsage: php " . __FILE__ . "\n\n";
+            echo "\n\nUsage: php " . __FILE__ . "\n\n";
             exit;
         }
 
