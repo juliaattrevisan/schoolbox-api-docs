@@ -239,7 +239,7 @@ class Controller extends Base
         $now = date('Ymd');
 
         foreach ($this->badgeMapping as $date => &$unitSpecs) {
-            if ($now <= (int)$date) {
+            if ($now < (int)$date) {
                 foreach ($unitSpecs as $unitSpecId => &$actionables) {
                     foreach ($actionables as $type => &$actionable) {
                         $actionable['route'] = $this->routeGenerator->generate('learningBadgeAward.awardAsAchievement', [
