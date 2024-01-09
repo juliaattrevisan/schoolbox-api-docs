@@ -1,8 +1,9 @@
 {##
  # OLC Superstar Report
  #
- # @param string $title   The official name of this report
- # @param array $stack    A set of candidacy outcomes per person, grouped by unit spec id
+ # @param string $title        The official name of this report
+ # @param array $stack         A set of candidacy outcomes per person, grouped by unit spec id
+ # @param array $badgeMapping  A set of (unit spec id, badge urls) as a shortcut to repeated route generation
  #}
 <div class="row">
     <div class="small-12 columns">
@@ -18,12 +19,12 @@
                 <section class="content">
                     {% if unitSpecData.actionables.superstar|length %}
                         <h3>Superstar</h3>
-                        {{ _self.renderActionable(unitSpecData.actionables.superstar) }}
+                        {{ _self.renderActionable('superstar', badgeMapping, unitSpecId, unitSpecData.actionables) }}
                     {% endif %}
 
                     {% if unitSpecData.actionables.star|length %}
                         <h3>Star</h3>
-                        {{ _self.renderActionable(unitSpecData.actionables.star) }}
+                        {{ _self.renderActionable('star', badgeMapping, unitSpecId, unitSpecData.actionables) }}
                     {% endif %}
                 </section>
             </div>
@@ -34,17 +35,21 @@
 {##
  # Generic renderer for each guy you can award a badge
  #
- # @param array $actionables  A list of superstars/stars who can be awarded something
+ # @param array $badgeMapping  A set of (unit spec id, badge urls) as a shortcut to repeated route generation
+ # @param int $unitSpecId      Identifier for a unit spec
+ # @param array $actionables   A list of superstars/stars who can be awarded something
  #}
-{% macro renderActionable(actionables) %}
+{% macro renderActionable(type, badgeMapping, unitSpecId, actionables) %}
     <ul class="information-list">
-        {% for actionable in actionables %}
+        {% for actionable in actionables[type] %}
         <li>
             <a href="/search/user/{{ actionable.id }}">
                 {{ actionable.firstname }} {{ actionable.lastname }}
             </a>
             -
             <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
+
+            <a class='button' href="{{ badgeMapping[unitSpecId][type].route }}">Award</a>
         </li>
         {% endfor %}
     </ul>

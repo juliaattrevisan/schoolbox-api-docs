@@ -33,7 +33,7 @@ class Controller extends Base
         // OLC 23
         '20240122' => [
             // 1. Fundamentals
-            '139' => [
+            '90' => [
                 Candidacy::SUPERSTAR => [
                     'id' => 28,
                     'route' => null
@@ -243,6 +243,8 @@ class Controller extends Base
          */
         $stack = (new Payload($this->getDi()->get('databaseInternal')))->generate();
 
+        new \Alaress_Probe($stack, $this->badgeMapping);
+        
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
                 'title' => self::REPORT_TITLE,
