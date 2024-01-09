@@ -40,16 +40,19 @@
  # @param array $actionables   A list of superstars/stars who can be awarded something
  #}
 {% macro renderActionable(type, badgeMapping, unitSpecId, actionables) %}
-    <ul class="information-list">
+    <ul class="action-list">
         {% for actionable in actionables[type] %}
-        <li>
-            <a href="/search/user/{{ actionable.id }}">
-                {{ actionable.firstname }} {{ actionable.lastname }}
-            </a>
-            -
-            <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
-
-            <a class='button' href="{{ badgeMapping[unitSpecId][type].route }}">Award</a>
+        <li class="actions-small-1">
+            <div class="list-item">
+                <a href="/search/user/{{ actionable.id }}">
+                    {{ actionable.firstname }} {{ actionable.lastname }}
+                </a>
+                -
+                <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
+            </div>
+            <nav>
+                <a class='icon-badge' href="{{ badgeMapping[unitSpecId][type].route }}"></a>
+            </nav>
         </li>
         {% endfor %}
     </ul>
