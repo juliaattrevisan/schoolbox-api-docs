@@ -17,8 +17,8 @@ class Payload
      * We only care about the Unit Specs in this particular course
      * TODO Potentially made configurable in a ui somewhere
      */
-    // private const COURSE_ID = 34;
-    private const COURSE_ID = 27;
+    private const COURSE_ID = 34;
+//    private const COURSE_ID = 27;
 
 
     /**
