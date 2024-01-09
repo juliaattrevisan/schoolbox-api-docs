@@ -307,7 +307,8 @@ class ListController extends Web\Controller\Base
                 $assessmentInfo['assessment'],
                 $explicitReturnUrl,
                 $assessmentInfo[Redirect::RETURN_URL],
-                $assessmentInfo['relocated']
+                $assessmentInfo['relocated'],
+                true
             ));
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());

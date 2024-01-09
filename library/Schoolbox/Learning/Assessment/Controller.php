@@ -474,33 +474,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $postReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
 
-        /* Quizzes go to the Modify Contents screen in Learnosity when you update
-         * the quiz settings; unlike everything else
-         */
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-            /**
-             * Always go to the screen when a quiz has been created,
-             * but send the return url with it
-             */
-            $returnUrl = $this->getRouteIfAuthorized('learnosity.getContent', [
-                'assessment' => $assessment,
-                'assessmentId' => $assessment->getId()
-            ]);
-
-            if ($postReturnUrl) {
-                $returnUrl .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
-            }
-        } else {
-            $returnUrl = $this->determineRedirect(
-                $assessmentInfo['assessment'],
-                $postReturnUrl,
-                $assessmentInfo[Redirect::RETURN_URL],
-                $assessmentInfo['relocated']
-            );
-        }
-
         // we're done here
-        $this->redirect($returnUrl);
+        $this->redirect($this->determineRedirect(
+            $assessmentInfo['assessment'],
+            $postReturnUrl,
+            $assessmentInfo[Redirect::RETURN_URL],
+            $assessmentInfo['relocated']
+        ));
     }
 
 
@@ -772,10 +752,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param string|null $postReturnUrl an encoded URL
      * @param string      $defaultReturnUrl
      * @param bool        $relocated
+     * @param bool        $isCreate
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
     {
         /**
          * First priority is a the post return URL

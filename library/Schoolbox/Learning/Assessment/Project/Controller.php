@@ -173,9 +173,9 @@ class Controller extends Assessment\Controller
             'assessmentStats'  => $assessmentStats,
             'participantStats' => $participantStats,
             'returnUrl'        =>
-                $this->requestQuery->get(Redirect::RETURN_URL)
-                    ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
-                    : $this->getSession()->getHistory(),
+            $this->requestQuery->get(Redirect::RETURN_URL)
+                ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+                : $this->getSession()->getHistory(),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -250,7 +250,7 @@ class Controller extends Assessment\Controller
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
             'lastViews'       => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
-            'breadcrumbs'     => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '' ]),
+            'breadcrumbs'     => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'student'         => $student,
             'assessment'      => $assessment,
             'transitions'     => $tickTransitions,
@@ -271,21 +271,28 @@ class Controller extends Assessment\Controller
      * @param string|null $postReturnUrl
      * @param string      $defaultReturnUrl
      * @param bool        $relocated
+     * @param bool        $isCreate
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
     {
         /**
          * Always go to the status screen when a project has been created,
          * but send the return url with it
+         *
+         * If the project was only updated, use the parent logic to determine the redirect instead
          */
-        $redirect = $this->routeGenerator->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]);
+        if ($isCreate) {
+            $redirect = $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
 
-        if ($postReturnUrl) {
-            $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
+            if ($postReturnUrl) {
+                $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
+            }
+
+            return $redirect;
         }
 
-        return $redirect;
+        return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated);
     }
 }
