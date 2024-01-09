@@ -96,7 +96,7 @@ class Controller extends Base
             INNER JOIN project_result prc ON p.id = prc.project_id
             INNER JOIN `user` u ON prc.user_id = u.id
             WHERE ci.course_specification_id = :courseId
-            ORDER BY unit_title, unit_spec_id, user_lastname
+            ORDER BY unit_spec_id, unit_title, user_lastname
         ";
 
         return $this->getDi()->get('databaseInternal')->prepare($query);
