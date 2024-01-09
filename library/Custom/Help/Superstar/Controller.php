@@ -12,6 +12,7 @@ namespace Custom\Help\Superstar;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use DebugBar\DebugBarException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Twig\Error\Error;
@@ -223,10 +224,11 @@ class Controller extends Base
      * Show a list of people who could potentially be awarded Star or Superstar
      * badges for accomplishing 99% and 100% respectively, in their Units
      *
-     * @throws Error
      * @throws ContainerExceptionInterface
+     * @throws Error
      * @throws NotFoundExceptionInterface
      * @throws RouteNotFound
+     * @throws DebugBarException
      * @throws \PDOException
      */
     public function getCandidates(): void
@@ -244,7 +246,7 @@ class Controller extends Base
         $stack = (new Payload($this->getDi()->get('databaseInternal')))->generate();
 
         new \Alaress_Probe($stack, $this->badgeMapping);
-        
+
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
                 'title' => self::REPORT_TITLE,
