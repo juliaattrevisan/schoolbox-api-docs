@@ -31,7 +31,6 @@ use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Resource\AbstractFolderMapper;
@@ -260,7 +259,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * @param Model $folder
      * @throws UnexpectedValueException if the course folder is within another
      *                                  course folder, or within a unit
-     * @throws Exception                if the folder has a parent, but it
+     * @throws MapperException          if the folder has a parent, but it
      *                                  doesn't exist
      */
     public function validateCourse(Model $folder, ?Model $previous = null): void
@@ -276,7 +275,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
             if ($parent->getId()) {
                 try {
                     $parent = $this->findById($parent->getId());
-                } catch (Exception\Deleted $e) {
+                } catch (MapperException\Deleted $e) {
                     /** @var Model $parent */
                     $parent = $e->getDeletedObject();
                 }
@@ -306,7 +305,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * @param Model $folder
      * @throws UnexpectedValueException if the unit folder is within another
      *                                  unit folder, or has no parent folder.
-     * @throws Exception                if the folder has a parent, but it
+     * @throws MapperException          if the folder has a parent, but it
      *                                  doesn't exist
      */
     public function validateUnit(Model $folder): void
@@ -317,7 +316,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
             if ($parent->getId()) {
                 try {
                     $parent = $this->findById($parent->getId());
-                } catch (Exception\Deleted $e) {
+                } catch (MapperException\Deleted $e) {
                     /** @var Model $parent */
                     $parent = $e->getDeletedObject();
                 }
@@ -649,7 +648,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * @param Model|null $previous
      * @return bool
      * @throws DefinitionException
-     * @throws Exception
+     * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
@@ -1229,7 +1228,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
                 if (strtolower($folderCode) === strtolower($rowFolderCode)) {
                     try {
                         $folder = $this->findById($rowFolderId);
-                    } catch (Exception $e) {
+                    } catch (MapperException $e) {
                         return null;
                     }
                     $folder->setMatchedCode($rowFolderCode);
@@ -1619,6 +1618,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
      *                                 above this category.
      * @param bool $cheaply If true, use the findCheaplyById() for speed
      * @return Collection
+     * @throws \OverflowException if `$category` is its own ancestor somehow
+     * @throws MapperException    if a parent of `$category` is deleted or does
+     *                            not exist
      */
     public function findParents(Model $category, Model $stop_category = null, $cheaply = false)
     {
@@ -1767,9 +1769,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * @param int|string $folderId TODO Upgrade this type-hint to a type-declaration in signature
      * @return Model
      * @throws DefinitionException
-     * @throws Exception
-     * @throws Exception\Deleted
-     * @throws Exception\NotFound
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws MapperException\NotFound
      * @throws InvalidArgumentException
      */
     public function findCheaplyById($folderId): Model
@@ -1800,7 +1802,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
         }
         if ($folder) {
             if ($folder->isDeleted()) {
-                throw (new Exception\Deleted())->setDeletedObject($folder);
+                throw (new MapperException\Deleted())->setDeletedObject($folder);
             }
             return $folder;
         }
@@ -2128,7 +2130,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * @param string $dueWorkFeedbackClause
      * @param array  $whereParams
      * @return GenericCollection
-     * @throws Exception
+     * @throws MapperException
      */
     private function findFoldersWithInteractions(
         $taskClause,
@@ -2334,7 +2336,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      *
      * @param PDOStatement      $statement
      * @return GenericCollection|Model[]
-     * @throws Exception
+     * @throws MapperException
      */
     private function hydrateForInteractionQuery(PDOStatement $statement): GenericCollection
     {
@@ -2430,7 +2432,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
     /**
      * @param Model $folder
      * @return void
-     * @throws Exception
+     * @throws MapperException
      */
     protected function softDeleteFields(Model $folder): void
     {
