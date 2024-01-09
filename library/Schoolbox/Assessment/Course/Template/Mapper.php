@@ -65,7 +65,8 @@ class Mapper extends \Schoolbox\Mapper
 
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
+        /** @var HomepageTemplateMapper $homepageTemplateMapper */
+        $homepageTemplateMapper = $this->getJoinMapper('courseTemplate');
         $templates = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -75,7 +76,7 @@ class Mapper extends \Schoolbox\Mapper
                 /** @var null|HomepageTemplate $courseTemplate */
                 $courseTemplate = $this->hydrateJoin($row, 'courseTemplate', 'courseTemplate');
             } else {
-                $courseTemplate = $this->getJoinMapper('courseTemplate')->getNoHomepageTemplate();
+                $courseTemplate = $homepageTemplateMapper->getNoHomepageTemplate();
             }
             $template->setCourseTemplate($courseTemplate);
             // if unit template is No Homepage, then set that
@@ -83,7 +84,7 @@ class Mapper extends \Schoolbox\Mapper
                 /** @var null|HomepageTemplate $unitTemplate */
                 $unitTemplate = $this->hydrateJoin($row, 'unitTemplate', 'unitTemplate');
             } else {
-                $unitTemplate = $this->getJoinMapper('courseTemplate')->getNoHomepageTemplate();
+                $unitTemplate = $homepageTemplateMapper->getNoHomepageTemplate();
             }
             $template->setUnitTemplate($unitTemplate);
             $templates->add($template);
