@@ -54,12 +54,29 @@ class Controller extends Base
          */
         $statement = $this->generateCandidatesStatement();
 
+        /* A list of tuples:
+         *
+         * $stack = [
+         *     spec id => [
+         *         unit title => [
+         *
+         *         ],
+         *         unit title => [
+         *         ],
+         *         ....
+         *     ]
+         * ]
+         */
+        $stack = [];
+
         /* Start preprocessing each guy in the result set,
          * analysing each row's norm_mark to find out what award should be given
          * (if any) when we're done with each guy's unit.
          *
          * Collate those outcomes into a mega struct for frontend
          */
+
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             new \Alaress_Probe($row);
         }
@@ -84,17 +101,19 @@ class Controller extends Base
         $query = "
             SELECT 
                 cui.course_unit_specification_id AS unit_spec_id,
-                cui.title AS unit_title,
+                f0.`name` AS unit_spec_title,
                 u.id AS user_id,
                 u.firstname AS user_firstname,
                 u.lastname AS user_lastname,
                 f2.id AS folder_id,
-                f2.name AS school_name,
-                fc.code AS school_code,
+                f2.`name` AS school_name,
+                fc.`code` AS school_code,
                 prc.id AS project_id,
                 prc.norm_mark
             FROM course_implementation ci
             INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
+            INNER JOIN course_unit_specification cus ON cui.course_unit_specification_id = cus.id
+            INNER JOIN folder f0 ON cus.folder_id = f0.id
             INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
             INNER JOIN project p ON acui.assessment_id = p.assessment_id
             INNER JOIN project_result prc ON p.id = prc.project_id
@@ -104,7 +123,7 @@ class Controller extends Base
             INNER JOIN folder f2 ON f1.parent = f2.id
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
             WHERE ci.course_specification_id = :courseId
-            ORDER BY unit_spec_id, unit_title, user_lastname
+            ORDER BY unit_spec_id, unit_spec_title, user_lastname
         ";
 
         $statement = $this->getDi()->get('databaseInternal')->prepare($query);
