@@ -123,7 +123,7 @@ class Controller extends Base
             INNER JOIN folder f2 ON f1.parent = f2.id
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
             WHERE ci.course_specification_id = :courseId
-            ORDER BY unit_spec_id, unit_spec_title, user_lastname
+            ORDER BY unit_spec_id, unit_spec_title, user_lastname, user_id
         ";
 
         $statement = $this->getDi()->get('databaseInternal')->prepare($query);
