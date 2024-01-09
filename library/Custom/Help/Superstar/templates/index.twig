@@ -41,20 +41,30 @@
  # @param array $actionables   A list of superstars/stars who can be awarded something
  #}
 {% macro renderActionable(type, previousAwards, badgeMapping, unitSpecId, actionables) %}
-    <ul class="action-list">
-        {% for actionable in actionables[type] %}
-        <li class="actions-small-1">
-            <div class="list-item">
-                <a href="/search/user/{{ actionable.id }}">
-                    {{ actionable.firstname }} {{ actionable.lastname }}
-                </a>
-                -
-                <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
-            </div>
-            <nav>
-                <a class='icon-badge' href="{{ badgeMapping[unitSpecId][type].route }}"></a>
-            </nav>
-        </li>
-        {% endfor %}
-    </ul>
+    {% apply spaceless %}
+        <ul class="action-list">
+            {% for actionable in actionables[type] %}
+                {% set previouslyAwarded = previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] is not null %}
+
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <a href="/search/user/{{ actionable.id }}">
+                            {{ actionable.firstname }} {{ actionable.lastname }}
+                        </a>
+                        -
+                        <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
+
+                        {% if previouslyAwarded %}
+                        <span class="pipe meta">Awarded on {{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] }}</span>
+                        {% endif %}
+                    </div>
+                    <nav>
+                        {% if not previouslyAwarded %}
+                            <a class='icon-badge' href="{{ badgeMapping[unitSpecId][type].route }}"></a>
+                        {% endif %}
+                    </nav>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endapply %}
 {% endmacro %}
