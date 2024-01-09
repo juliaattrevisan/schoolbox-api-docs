@@ -26,7 +26,7 @@ class Controller extends Base
 
     /**
      * We only care about the Unit Specs in this particular course
-     * TODO Potentially made configurable in a ui somehwere
+     * TODO Potentially made configurable in a ui somewhere
      */
     private const COURSE_ID = 34;
 
@@ -82,12 +82,15 @@ class Controller extends Base
     {
         $query = "
             SELECT 
-                cui.course_unit_specification_id unit_spec_id,
+                cui.course_unit_specification_id AS unit_spec_id,
                 cui.title AS unit_title,
                 u.id AS user_id,
                 u.firstname AS user_firstname,
                 u.lastname AS user_lastname,
-                prc.id,
+                f2.id AS folder_id,
+                f2.name AS school_name,
+                fc.code AS school_code,
+                prc.id AS project_id,
                 prc.norm_mark
             FROM course_implementation ci
             INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
@@ -95,8 +98,12 @@ class Controller extends Base
             INNER JOIN project p ON acui.assessment_id = p.assessment_id
             INNER JOIN project_result prc ON p.id = prc.project_id
             INNER JOIN `user` u ON prc.user_id = u.id
-            WHERE ci.course_specification_id = :courseId
-            ORDER BY unit_spec_id, unit_title, user_lastname
+            INNER JOIN mv_assessment_relation mvar ON p.assessment_id = mvar.assessment_id
+            INNER JOIN folder f1 ON mvar.folder_id = f1.id
+            INNER JOIN folder f2 ON f1.parent = f2.id
+            LEFT JOIN folder_code fc ON f2.id = fc.folder_id
+            WHERE ci.course_specification_id = 27
+            ORDER BY unit_title, unit_spec_id, user_lastname
         ";
 
         return $this->getDi()->get('databaseInternal')->prepare($query);
