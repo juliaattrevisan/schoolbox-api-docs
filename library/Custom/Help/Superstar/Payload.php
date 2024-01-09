@@ -94,6 +94,14 @@ class Payload
             if (!isset($stack[$row['unit_spec_id']])) {
                 $stack[$row['unit_spec_id']] = [
                     'title' => $row['unit_spec_title'],
+                    /* These guys can be awarded a badge
+                     */
+                    'actionables' => [
+                        Candidacy::SUPERSTAR => [],
+                        Candidacy::STAR => []
+                    ],
+                    /* Raw data for each user in this unit
+                     */
                     'candidates' => []
                 ];
             }
@@ -102,13 +110,15 @@ class Payload
              */
             if (!isset($stack[$row['unit_spec_id']]['candidates'][$row['user_id']])) {
                 $stack[$row['unit_spec_id']]['candidates'][$row['user_id']] = [
-                    'firstname' => $row['user_firstname'],
-                    'lastname' => $row['user_lastname'],
-                    'school' => [
-                        'name' => $row['school_name'],
-                        'code' => $row['school_code']
+                    'meta' => [
+                        'id' => $row['user_id'],
+                        'firstname' => $row['user_firstname'],
+                        'lastname' => $row['user_lastname'],
+                        'school' => [
+                            'name' => $row['school_name'],
+                            'code' => $row['school_code']
+                        ],
                     ],
-                    'candidacy' => null,
                     'marks' => []
                 ];
             }
@@ -123,18 +133,20 @@ class Payload
         /* Now decide everyone's outcome
          */
         foreach ($stack as $unitSpecId => &$unitSpec) {
-            foreach ($unitSpec['candidates'] as $userId => &$userData) {
+            foreach ($unitSpec['candidates'] as $userId => $userData) {
                 $outcome = $candidacyDecider->decide($userData['marks']);
 
-                /* Null outcome means this guy didn't qualify for anything
-                 * just unset them entirely from the stack
+                /* Only remember people who achieved Superstardom or Stardom
+                 * Everyone else doesn't matter
                  */
-                if (null === $outcome) {
-                    unset($unitSpec['candidates'][$userId]);
-                } else {
-                    $userData['candidacy'] = $outcome;
+                if (null !== $outcome) {
+                    $stack[$unitSpecId]['actionables'][$outcome][] = $userData['meta'];
                 }
             }
+
+            /* We don't need their raw data anymore
+             */
+            unset($unitSpec['candidates']);
         }
 
         return $stack;

@@ -14,8 +14,8 @@ class Candidacy
     /**
      * Strings that denote what someone could be awarded
      */
-    private const SUPERSTAR = 'superstar';
-    private const STAR = 'star';
+    public const SUPERSTAR = 'superstar';
+    public const STAR = 'star';
 
 
     /**
