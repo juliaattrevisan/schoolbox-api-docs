@@ -190,13 +190,30 @@ class Controller extends Base
      */
     public function prepareRoutes(): void
     {
+        /* Do this sharpish by avoiding adf/carbon instantiation
+         * TODO Possibly parameterise this somehow
+         */
+        $now = date('Ymd');
+
         foreach ($this->badgeMapping as $date => &$unitSpecs) {
-            foreach ($unitSpecs as $unitSpecId => &$actionables) {
-                foreach ($actionables as $type => &$actionable) {
-                    $actionable['route'] = $this->routeGenerator->generate('learningBadgeAward.awardAsAchievement', [
-                        'badgeId' => $actionable['id'],
-                    ]);
+            if ($now <= (int)$date) {
+                foreach ($unitSpecs as $unitSpecId => &$actionables) {
+                    foreach ($actionables as $type => &$actionable) {
+                        $actionable['route'] = $this->routeGenerator->generate('learningBadgeAward.awardAsAchievement', [
+                            'badgeId' => $actionable['id'],
+                        ]);
+                    }
+
+                    unset($actionable);
                 }
+
+                unset($actionables);
+
+                /* We only care about this set
+                 */
+                $this->badgeMapping = $unitSpecs;
+
+                return;
             }
         }
     }
