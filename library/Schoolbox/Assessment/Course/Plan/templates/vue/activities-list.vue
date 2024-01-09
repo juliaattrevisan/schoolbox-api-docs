@@ -33,9 +33,9 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
  * Use the base64encoded version of the url's pathname, so it can work in
  * conjunection with Class Redirect in the back end
  */
-const returnUrl = function(url) {
+const returnUrl = function (url) {
     return url + "?returnUrl=" + btoa(window.location.pathname);
-}
+};
 </script>
 
 <template>
@@ -44,7 +44,17 @@ const returnUrl = function(url) {
             <li v-for="activity in displayedActivities" :key="activity.id" class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12 compact wrap-down">
-                        <a :href="returnUrl(activity.assessmentType === 'quiz' ? activity._links.modifyContent : activity.assessmentType === 'project' ? activity._links.status : activity._links.summary)">
+                        <a
+                            :href="
+                                returnUrl(
+                                    activity.assessmentType === 'quiz'
+                                        ? activity._links.modifyContent
+                                        : activity.assessmentType === 'project'
+                                        ? activity._links.status
+                                        : activity._links.summary
+                                )
+                            "
+                        >
                             <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
                             <p>{{ activity.title }}</p>
                         </a>
@@ -55,7 +65,9 @@ const returnUrl = function(url) {
                 </nav>
                 <ul :id="'dropdown-unitplanner-activity-' + activity.id" class="f-dropdown" data-dropdown-content>
                     <li>
-                        <a :href="returnUrl(activity._links.modify)" class="icon-modify">{{ activity.assessmentType === 'quiz' ? 'Modify Settings' : 'Modify' }}</a>
+                        <a :href="returnUrl(activity._links.modify)" class="icon-modify">{{
+                            activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
+                        }}</a>
                     </li>
                     <li v-if="activity.assessmentType === 'quiz'">
                         <a :href="returnUrl(activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
@@ -100,7 +112,7 @@ const returnUrl = function(url) {
 
 .activity-list {
     height: 100%;
-    width: 400px;
+    min-width: 400px;
     padding: 0 0 5px 0;
 }
 
