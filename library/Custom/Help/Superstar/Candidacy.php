@@ -23,7 +23,7 @@ class Candidacy
      * Stardom, and nothing
      */
     private const SUPERSTAR_THRESHOLD = 100.00;
-    private const STAR_THRESHOLD = 90.00;
+    private const STAR_THRESHOLD = 99.00;
 
 
     /**
