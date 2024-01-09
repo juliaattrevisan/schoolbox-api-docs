@@ -52,6 +52,7 @@ HELP;
         $rows = $dbc->executeQuery(
             // The point of the IFNULL(cci2.value, '') in the query below is to differentiate between
             // the cases where 1) the row does not exist, and 2) where the row exists but the value is null.
+            // Differentiation is necessary because case 1 requires an INSERT, while case 2 requires an UPDATE.
             'SELECT
             fo.id as folderId,
             cci.component_instance_id AS componentInstanceId,
@@ -61,7 +62,7 @@ HELP;
                 SELECT IFNULL(cci2.value, "") AS value
                 FROM component_config_instance cci2
                 JOIN component_config_definition ccd2 ON (
-                    ccd2.key = "componentname" AND
+                    ccd2.key = "' . Component_Config_Componentname::KEY . '" AND
                     ccd2.id=cci2.component_config_definition_id
                 )
                 WHERE cci2.component_instance_id=ci.id
