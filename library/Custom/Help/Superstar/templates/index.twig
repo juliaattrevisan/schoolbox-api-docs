@@ -43,7 +43,8 @@
             <a href="/search/user/{{ actionable.id }}">
                 {{ actionable.firstname }} {{ actionable.lastname }}
             </a>
-            - {{ actionable.school.name }} ({{ actionable.school.code }})
+            -
+            <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
         </li>
         {% endfor %}
     </ul>

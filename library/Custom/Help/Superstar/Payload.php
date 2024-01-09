@@ -115,6 +115,7 @@ class Payload
                         'firstname' => $row['user_firstname'],
                         'lastname' => $row['user_lastname'],
                         'school' => [
+                            'folderId' => $row['folder_id'],
                             'name' => $row['school_name'],
                             'code' => $row['school_code']
                         ],
