@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
+use Component_Config_Componentname;
 use Component_Definition;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
@@ -27,10 +28,23 @@ class IndexBuilder extends BaseBuilder
         // Pass 1: text boxes within a component
         // TODO does this unnecessarily exclude heading from index?
         //      may need to fetch that index separately
+        // Note the displayed heading of a textbox component will be the component name if present,
+        // otherwise the textbox heading - hence the need to fetch the component name below.
         $queryString = "
             SELECT
                 CONCAT(tb.textBoxID, '-', cci.component_instance_id, '-', fo.id) AS id,
-                tb.heading AS title,
+                IFNULL(
+                    (
+                        SELECT cci2.value
+                        FROM component_config_instance cci2
+                        JOIN component_config_definition ccd2 ON (
+                            ccd2.key = '" . Component_Config_Componentname::KEY . "' AND
+                            ccd2.id=cci2.component_config_definition_id
+                        )
+                        WHERE cci2.component_instance_id=ci.id
+                    ),
+                    tb.heading
+                ) AS title,
                 fo.id AS folder_id,
                 tb.updated_at AS date,
                 tb.created_by AS created_by,
