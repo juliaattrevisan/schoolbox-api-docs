@@ -72,7 +72,7 @@ class Mapper extends \Schoolbox\Mapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $template = $this->hydrate($row);
             // if course template is No Homepage, then set that
-            if (-1 !== $row['courseTemplateId']) {
+            if (HomepageTemplate::HOMEPAGE_NONE !== $row['courseTemplateId']) {
                 /** @var null|HomepageTemplate $courseTemplate */
                 $courseTemplate = $this->hydrateJoin($row, 'courseTemplate', 'courseTemplate');
             } else {
@@ -80,7 +80,7 @@ class Mapper extends \Schoolbox\Mapper
             }
             $template->setCourseTemplate($courseTemplate);
             // if unit template is No Homepage, then set that
-            if (-1 !== $row['unitTemplateId']) {
+            if (HomepageTemplate::HOMEPAGE_NONE !== $row['unitTemplateId']) {
                 /** @var null|HomepageTemplate $unitTemplate */
                 $unitTemplate = $this->hydrateJoin($row, 'unitTemplate', 'unitTemplate');
             } else {
