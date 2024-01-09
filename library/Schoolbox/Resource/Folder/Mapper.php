@@ -1619,6 +1619,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
      *                                 above this category.
      * @param bool $cheaply If true, use the findCheaplyById() for speed
      * @return Collection
+     * @throws \OverflowException if `$category` is its own ancestor somehow
+     * @throws MapperException    if a parent of `$category` is deleted or does
+     *                            not exist
      */
     public function findParents(Model $category, Model $stop_category = null, $cheaply = false)
     {

@@ -12,7 +12,8 @@ namespace Schoolbox\Search\Api\Database\ResultType\Page;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
-use Schoolbox\Mapper\Exception;
+use OverflowException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -89,6 +90,12 @@ class Hydrator extends BaseHydrator
                 continue;
             }
 
+            // If ancestry can't be found: don't show one at all
+            try {
+                $ancestry = $this->folderMapper->findParents($folder, null, true)->getAll();
+            } catch (MapperException | OverflowException) {
+                $ancestry = [];
+            }
             $fullResults[$key] = new FullResult(
                 $match,
                 $match->id,
@@ -113,7 +120,7 @@ class Hydrator extends BaseHydrator
                 },
                 null,
                 null,
-                $this->folderMapper->findParents($folder, null, true)->getAll(),
+                $ancestry,
                 $this->getSearchResultLinks($folder, $viewer),
             );
         }
@@ -129,7 +136,7 @@ class Hydrator extends BaseHydrator
      * @param User  $viewer
      * @return array array<array{"title": string, "icon": string, "url": string, "action"?: string}>
      * @throws RouteNotFound
-     * @throws Exception
+     * @throws MapperException
      */
     private function getSearchResultLinks(Folder\Model $folder, User $viewer): array
     {
