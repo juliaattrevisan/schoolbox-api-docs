@@ -58,7 +58,8 @@ class Controller extends Base
          *
          * $stack = [
          *     spec id => [
-         *         unit spec title => [
+         *         unit spec title => ...
+         *         candidates => [
          *             user id => [
          *                 firstname => ...
          *                 lastname => ...
@@ -71,7 +72,10 @@ class Controller extends Base
          *             ],
          *             ...
          *         ],
-         *         unit spec title => [
+         *     ],
+         *     spec id => [
+         *         unit spec title => ...
+         *         candidates => [
          *             user id => [
          *                 firstname => ...
          *                 lastname => ...
@@ -97,10 +101,19 @@ class Controller extends Base
          *
          * Collate those outcomes into a mega struct for frontend
          */
-
-
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /* Initialise this unit spec's entry
+             */
+            if (!isset($stack[$row['unit_spec_id']])) {
+                $stack[$row['unit_spec_id']] = [
+                    'title' => $row['unit_spec_title'],
+                    'candidates' => []
+                ];
+            }
+
             new \Alaress_Probe($row);
+
+
         }
 
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
