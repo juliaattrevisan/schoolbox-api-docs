@@ -45,6 +45,16 @@ class Controller extends Base
      */
     public function getCandidates(): void
     {
+        $query = "
+            SELECT * 
+            FROM course_implementation ci
+            INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
+            INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
+            INNER JOIN project p ON acui.assessment_id = p.assessment_id
+            INNER JOIN project_result prc ON p.id = prc.project_id
+            WHERE ci.course_specification_id = 27
+        ";
+
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
                 'title' => self::REPORT_TITLE,
