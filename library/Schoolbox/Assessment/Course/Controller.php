@@ -1376,6 +1376,11 @@ class Controller extends Base\Base
      */
     private function updateHomepageTemplate(Folder $folder, HomepageTemplate $template)
     {
+        // if we are changing to the No Hompage option, clear the homepage and exit.
+        if (HomepageTemplate::HOMEPAGE_NONE === $template->getId()) {
+            $folder->setHomepage(null);
+            return;
+        }
         // update the homepage config to the new template
         $homepageConfig = $this->homepageConfigMapper->findById($folder->getId())
             ->setCategory($folder)
