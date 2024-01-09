@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2032, Schoolbox Pty Ltd
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Template;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use UnexpectedValueException;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 
@@ -44,6 +45,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('courseTemplateId', HomepageTemplateMapper::class, 'id', null, null, 'courseTemplate', 'courseTemplate');
         $this->joins('unitTemplateId', HomepageTemplateMapper::class, 'id', null, null, 'unitTemplate', 'unitTemplate');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyActualTemplate']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
     protected function getSelectString(): string
@@ -54,25 +58,89 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('courseTemplate', 'courseTemplate')},
                 {$this->getJoinColumnString('unitTemplate', 'unitTemplate')}
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('courseTemplate', '', 'courseTemplate', true)}
-            INNER JOIN {$this->getJoinSql('unitTemplate', '', 'unitTemplate', true)}
+            LEFT JOIN {$this->getJoinSql('courseTemplate', '', 'courseTemplate', true)}
+            LEFT JOIN {$this->getJoinSql('unitTemplate', '', 'unitTemplate', true)}
         ";
     }
 
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var HomepageTemplateMapper $homepageTemplateMapper */
+        $homepageTemplateMapper = $this->getJoinMapper('courseTemplate');
         $templates = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $template = $this->hydrate($row);
-            /** @var null|HomepageTemplate $courseTemplate */
-            $courseTemplate = $this->hydrateJoin($row, 'courseTemplate', 'courseTemplate');
+            // if course template is No Homepage, then set that
+            if (HomepageTemplate::HOMEPAGE_NONE !== $row['courseTemplateId']) {
+                /** @var null|HomepageTemplate $courseTemplate */
+                $courseTemplate = $this->hydrateJoin($row, 'courseTemplate', 'courseTemplate');
+            } else {
+                $courseTemplate = $homepageTemplateMapper->getNoHomepageTemplate();
+            }
             $template->setCourseTemplate($courseTemplate);
-            /** @var null|HomepageTemplate $unitTemplate */
-            $unitTemplate = $this->hydrateJoin($row, 'unitTemplate', 'unitTemplate');
+            // if unit template is No Homepage, then set that
+            if (HomepageTemplate::HOMEPAGE_NONE !== $row['unitTemplateId']) {
+                /** @var null|HomepageTemplate $unitTemplate */
+                $unitTemplate = $this->hydrateJoin($row, 'unitTemplate', 'unitTemplate');
+            } else {
+                $unitTemplate = $homepageTemplateMapper->getNoHomepageTemplate();
+            }
             $template->setUnitTemplate($unitTemplate);
             $templates->add($template);
         }
         return $templates;
+    }
+
+    /**
+     * Validates templates selected are real
+     *
+     * Either -1 or one of HomepageTemplateMapper
+     *
+     * @param Model $model
+     * @return bool
+     * @throws UnexpectedValueException
+     */
+    protected function verifyActualTemplate(Model $model): bool
+    {
+        $templateList = $this->getJoinMapper('courseTemplate')->findAll()->indexBy('id')->keys();
+
+        // test course first
+        if (!(in_array($model->getCourseTemplate()->getId(), $templateList) || HomepageTemplate::HOMEPAGE_NONE === $model->getCourseTemplate()->getId())) {
+            throw new UnexpectedValueException(
+                "Unknown course page template"
+            );
+        }
+        if (!(in_array($model->getUnitTemplate()->getId(), $templateList) || HomepageTemplate::HOMEPAGE_NONE === $model->getUnitTemplate()->getId())) {
+            throw new UnexpectedValueException(
+                "Unknown unit page template"
+            );
+        }
+        return true;
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Model $model
+     * @return bool
+     * @throws UnexpectedValueException
+     */
+    protected function validateName(Model $model): bool
+    {
+        if (trim($model->getName()) === '') {
+            throw new UnexpectedValueException("Template name cannot be empty");
+        }
+
+        if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'A template with the name "%s" already exists, you must have a unique name',
+                    $model->getName()
+                )
+            );
+        }
+
+        return true;
     }
 }

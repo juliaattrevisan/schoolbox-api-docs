@@ -21,6 +21,7 @@ use RangeException;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\Model as CourseTemplateModel;
 use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use UnexpectedValueException;
@@ -1376,13 +1377,29 @@ class Controller extends Base\Base
      */
     private function updateHomepageTemplate(Folder $folder, HomepageTemplate $template)
     {
-        // update the homepage config to the new template
-        $homepageConfig = $this->homepageConfigMapper->findById($folder->getId())
-            ->setCategory($folder)
-            ->setTemplate($template);
-        $folder->setHomepage($homepageConfig);
-
-        $this->homepageConfigMapper->save($homepageConfig);
+        // if we are changing to the No Hompage option, clear the homepage and exit.
+        if (HomepageTemplate::HOMEPAGE_NONE === $template->getId()) {
+            $folder->setHomepage(null);
+            return;
+        }
+        // if existing template was No Homepage, we need to build more things...
+        if (null === $folder->getHomepage()) {
+            $homepageConfig = (new HomepageConfig())
+                ->setCategory($folder)
+                ->setTemplate($template);
+            $folder->setHomepage($homepageConfig);
+            $this->homepageConfigMapper->save($homepageConfig);
+            // destructively purge and re build the folder / homepage
+            // this assumes you don't have a homepage at current, and are changing to a homepage template.
+            $this->homepageConfigMapper->resetToTemplate($homepageConfig);
+        } else {
+            // update the homepage config to the new template
+            $homepageConfig = $this->homepageConfigMapper->findById($folder->getId())
+                                                         ->setCategory($folder)
+                                                         ->setTemplate($template);
+            $folder->setHomepage($homepageConfig);
+            $this->homepageConfigMapper->save($homepageConfig);
+        }
 
         /**
          * now do the merge / append new components

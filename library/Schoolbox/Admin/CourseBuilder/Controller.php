@@ -11,11 +11,13 @@
 namespace Schoolbox\Admin\CourseBuilder;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\ModelToArray as ModelToArray;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\RoleMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -61,7 +63,11 @@ class Controller extends Base
             $unitPermissions[$role->getId()] = $unit->getBy('roleId', $role->getId())?->getPermission() ?? -1;
         }
 
-        $templates = [];
+        $templates[] = [
+            'id'        => HomepageTemplate::HOMEPAGE_NONE,
+            'name'      => HomepageTemplate::NONE_STRING,
+            'deleted'   => false,
+        ];
         foreach ($this->homepageTemplateMapper->findAll(['deleted' => true])->sortBy("name", "asc") as $template) {
             $templates[] = [
                 'id'        => $template->getId(),
@@ -130,25 +136,44 @@ class Controller extends Base
             }
             // set the new values
             $template->setName($templateGroup['name']);
-            /**
-             * Catch deleted and use the deleted item, this is still valid here
-             */
-            try {
-                $courseTemplate = $this->homepageTemplateMapper->findById($templateGroup['courseTemplate']['id']);
-            } catch (Exception\Deleted $e) {
-                $courseTemplate = $e->getDeletedObject();
+
+            // if the courseTemplate was not selected (No Homepage) then use that
+            if (HomepageTemplate::HOMEPAGE_NONE === $templateGroup['courseTemplate']['id']) {
+                $courseTemplate = $this->homepageTemplateMapper->getNoHomepageTemplate();
+            } else {
+                /**
+                 * Catch deleted and use the deleted item, this is still valid here
+                 */
+                try {
+                    $courseTemplate = $this->homepageTemplateMapper->findById($templateGroup['courseTemplate']['id']);
+                } catch (Exception\Deleted $e) {
+                    $courseTemplate = $e->getDeletedObject();
+                }
             }
-            try {
-                $unitTemplate = $this->homepageTemplateMapper->findById($templateGroup['unitTemplate']['id']);
-            } catch (Exception\Deleted $e) {
-                $unitTemplate = $e->getDeletedObject();
+            // if the unitTemplate was not selected (No Homepage) then use that
+            if (HomepageTemplate::HOMEPAGE_NONE === $templateGroup['unitTemplate']['id']) {
+                $unitTemplate = $this->homepageTemplateMapper->getNoHomepageTemplate();
+            } else {
+                try {
+                    $unitTemplate = $this->homepageTemplateMapper->findById($templateGroup['unitTemplate']['id']);
+                } catch (Exception\Deleted $e) {
+                    $unitTemplate = $e->getDeletedObject();
+                }
             }
             $template->setCourseTemplate($courseTemplate);
             $template->setUnitTemplate($unitTemplate);
             $templates->add($template);
         }
-        // save the template groups
-        $this->courseTemplateMapper->save($templates);
+        try {
+            // save the template groups
+            $this->courseTemplateMapper->save($templates);
+        } catch (\UnexpectedValueException $e) {
+            // Catching issues in the Mapper PreSave checks
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus(400);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(400);
+            return;
+        }
 
         // Update default inheritance
         $courseTemplate = $this->configMapper->findOneByColumn("name", "course_builder_default_course_page_inherit");

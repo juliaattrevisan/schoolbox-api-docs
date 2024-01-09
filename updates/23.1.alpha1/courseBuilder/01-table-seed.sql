@@ -3,15 +3,11 @@ create table courseTemplates
 (
     id               int(11) unsigned auto_increment,
     name             varchar(250) null,
-    courseTemplateId int(11) unsigned not null,
-    unitTemplateId   int(11) unsigned not null,
+    courseTemplateId int(11) not null,
+    unitTemplateId   int(11) not null,
     deleted_at       datetime     null,
     constraint courseTemplates_pk
-        primary key (id),
-    constraint courseTemplates_homepageTemplate_id_fk
-        foreign key (courseTemplateId) references homepageTemplate (id),
-    constraint unitTemplates_homepageTemplate_id_fk2
-        foreign key (unitTemplateId) references homepageTemplate (id)
+        primary key (id)
 );
 
 # allow homepage templates to be deleted and not break the whole system...
@@ -27,12 +23,23 @@ alter table course_specification
         foreign key (template_id) references courseTemplates (id);
 
 # copy config to new table
+# if that homepage template doesn't exist (hard deleted), then use No Homepage as a default -1
 INSERT INTO courseTemplates (id, name, courseTemplateId, unitTemplateId) VALUE
 (
     1,
     'Default',
-    (SELECT value FROM config WHERE name='course_builder_default_course_page_template'),
-    (SELECT value FROM config WHERE name='course_builder_default_unit_page_template')
+    (select COALESCE(
+                    (SELECT value FROM config
+                        JOIN homepageTemplate on config.value = homepageTemplate.id
+                        WHERE config.name = 'course_builder_default_course_page_template'),
+                    -1)
+    ),
+    (select COALESCE(
+                    (SELECT value FROM config
+                        JOIN homepageTemplate on config.value = homepageTemplate.id
+                        WHERE config.name = 'course_builder_default_unit_page_template'),
+                    -1)
+    )
 );
 
 # give all the course specs the default template
