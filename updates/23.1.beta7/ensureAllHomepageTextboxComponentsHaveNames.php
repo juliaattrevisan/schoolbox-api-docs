@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
@@ -7,7 +8,7 @@ use Component_Config_Componentname;
 use Component_Definition;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use \Monolog;
+use Monolog;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
