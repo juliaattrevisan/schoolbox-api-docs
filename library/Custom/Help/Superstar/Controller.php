@@ -12,7 +12,6 @@ namespace Custom\Help\Superstar;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use DebugBar\DebugBarException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Twig\Error\Error;
@@ -34,7 +33,7 @@ class Controller extends Base
         // OLC 23
         '20240122' => [
             // 1. Fundamentals
-            '90' => [
+            '139' => [
                 Candidacy::SUPERSTAR => [
                     'id' => 28,
                     'route' => null
@@ -188,7 +187,6 @@ class Controller extends Base
      * @throws Error
      * @throws NotFoundExceptionInterface
      * @throws RouteNotFound
-     * @throws DebugBarException
      * @throws \PDOException
      */
     public function getCandidates(): void
@@ -212,8 +210,6 @@ class Controller extends Base
          * unit spec or something like that, for performance reasons...one day
          */
         $stack = (new Payload($database))->generate();
-
-        new \Alaress_Probe($stack, $this->badgeMapping, $previousAwards);
 
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
