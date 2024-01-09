@@ -25,18 +25,10 @@ class Controller extends Base
 
 
     /**
-     * We only care about the Unit Specs in this particular course
-     * TODO Potentially made configurable in a ui somewhere
-     */
-    // private const COURSE_ID = 34;
-    private const COURSE_ID = 27;
-
-
-    /**
      * Controller constructor.
      */
-    public function __construct(
-    ) {
+    public function __construct()
+    {
     }
 
 
@@ -47,13 +39,14 @@ class Controller extends Base
      * @throws Error
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws \PDOException
      */
     public function getCandidates(): void
     {
         /* Get all the data ready; you might want to filter this to a particular
-         * unit spec or something like that, for performance reasons
+         * unit spec or something like that, for performance reasons...one day
          */
-        $stack = (new Payload())->generate($this->generateCandidatesStatement());
+        $stack = (new Payload($this->getDi()->get('databaseInternal')))->generate();
 
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
@@ -61,58 +54,6 @@ class Controller extends Base
             ],
             'results' => $stack
         ], self::REPORT_TITLE);
-    }
-
-
-    /**
-     * Prepare a statement for award candidates
-     *
-     * @return \PDOStatement
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    private function generateCandidatesStatement(): \PDOStatement
-    {
-        /* TODO Potentially insert a course_unit_specification.id param here,
-         *  to only obtain candidacy for a particular unit - this would be a
-         *  performance workaround that avoids generating the entire data set
-         *  at the very beginning...but it means you gotta click a lot
-         */
-        $query = "
-            SELECT 
-                cui.course_unit_specification_id AS unit_spec_id,
-                f0.`name` AS unit_spec_title,
-                u.id AS user_id,
-                u.firstname AS user_firstname,
-                u.lastname AS user_lastname,
-                f2.id AS folder_id,
-                f2.`name` AS school_name,
-                fc.`code` AS school_code,
-                prc.id AS project_id,
-                prc.norm_mark
-            FROM course_implementation ci
-            INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
-            INNER JOIN course_unit_specification cus ON cui.course_unit_specification_id = cus.id
-            INNER JOIN folder f0 ON cus.folder_id = f0.id
-            INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
-            INNER JOIN project p ON acui.assessment_id = p.assessment_id
-            INNER JOIN project_result prc ON p.id = prc.project_id
-            INNER JOIN `user` u ON prc.user_id = u.id
-            INNER JOIN mv_assessment_relation mvar ON p.assessment_id = mvar.assessment_id
-            INNER JOIN folder f1 ON mvar.folder_id = f1.id
-            INNER JOIN folder f2 ON f1.parent = f2.id
-            LEFT JOIN folder_code fc ON f2.id = fc.folder_id
-            WHERE ci.course_specification_id = :courseId
-            ORDER BY unit_spec_id, unit_spec_title, user_lastname, user_id
-        ";
-
-        $statement = $this->getDi()->get('databaseInternal')->prepare($query);
-
-        $statement->execute([
-            'courseId' => self::COURSE_ID
-        ]);
-
-        return $statement;
     }
 
 
