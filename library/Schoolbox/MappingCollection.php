@@ -12,7 +12,7 @@ namespace Schoolbox;
 
 use BadMethodCallException;
 use CallbackFilterIterator;
-use Custom\Help\Example\Mapper;
+
 use function array_key_exists;
 
 /**
