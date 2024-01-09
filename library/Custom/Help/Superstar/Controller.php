@@ -28,7 +28,8 @@ class Controller extends Base
      * We only care about the Unit Specs in this particular course
      * TODO Potentially made configurable in a ui somewhere
      */
-    private const COURSE_ID = 34;
+    // private const COURSE_ID = 34;
+    private const COURSE_ID = 27;
 
 
     /**
@@ -51,9 +52,7 @@ class Controller extends Base
     {
         /* Get all the data ready
          */
-        $statement = $this->generateCandidatesStatement()->execute([
-            'courseId' => self::COURSE_ID
-        ]);
+        $statement = $this->generateCandidatesStatement();
 
         /* Start preprocessing each guy in the result set,
          * analysing each row's norm_mark to find out what award should be given
@@ -61,7 +60,9 @@ class Controller extends Base
          *
          * Collate those outcomes into a mega struct for frontend
          */
-
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            new \Alaress_Probe($row);
+        }
 
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
@@ -102,11 +103,17 @@ class Controller extends Base
             INNER JOIN folder f1 ON mvar.folder_id = f1.id
             INNER JOIN folder f2 ON f1.parent = f2.id
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
-            WHERE ci.course_specification_id = 27
+            WHERE ci.course_specification_id = :courseId
             ORDER BY unit_spec_id, unit_title, user_lastname
         ";
 
-        return $this->getDi()->get('databaseInternal')->prepare($query);
+        $statement = $this->getDi()->get('databaseInternal')->prepare($query);
+
+        $statement->execute([
+            'courseId' => self::COURSE_ID
+        ]);
+
+        return $statement;
     }
 
 
