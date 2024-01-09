@@ -103,7 +103,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function verifyActualTemplate(Model $model): bool
     {
-        $templateList = $this->getJoinMapper('courseTemplate')->findAll(['deleted' => true,])->indexBy('id')->keys();
+        $templateList = $this->getJoinMapper('courseTemplate')->findAll(['deleted' => true, 'cache' => false])->indexBy('id')->keys();
 
         // test course first
         if (!(in_array($model->getCourseTemplate()->getId(), $templateList) || HomepageTemplate::HOMEPAGE_NONE === $model->getCourseTemplate()->getId())) {
