@@ -1,9 +1,10 @@
 {##
  # OLC Superstar Report
  #
- # @param string $report       Metadata about this report, currently containing the official name of this report
- # @param array $stack         A set of candidacy outcomes per person, grouped by unit spec id
- # @param array $badgeMapping  A set of (unit spec id, badge urls) as a shortcut to repeated route generation
+ # @param string $report         Metadata about this report, currently containing the official name of this report
+ # @param array $badgeMapping    A set of (unit spec id, badge urls) as a shortcut to repeated route generation
+ # @param array $previousAwards  A set of (user id, badge id) tuples for guys who got an achievement previously
+ # @param array $stack           A set of candidacy outcomes per person, grouped by unit spec id
  #}
 <div class="row">
     <div class="small-12 columns">
@@ -19,12 +20,12 @@
                 <section class="content">
                     {% if unitSpecData.actionables.superstar|length %}
                         <h3>Superstar</h3>
-                        {{ _self.renderActionable('superstar', badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                        {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
                     {% endif %}
 
                     {% if unitSpecData.actionables.star|length %}
                         <h3>Star</h3>
-                        {{ _self.renderActionable('star', badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                        {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
                     {% endif %}
                 </section>
             </div>
@@ -39,7 +40,7 @@
  # @param int $unitSpecId      Identifier for a unit spec
  # @param array $actionables   A list of superstars/stars who can be awarded something
  #}
-{% macro renderActionable(type, badgeMapping, unitSpecId, actionables) %}
+{% macro renderActionable(type, previousAwards, badgeMapping, unitSpecId, actionables) %}
     <ul class="action-list">
         {% for actionable in actionables[type] %}
         <li class="actions-small-1">

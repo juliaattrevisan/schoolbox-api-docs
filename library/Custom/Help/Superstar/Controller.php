@@ -181,6 +181,48 @@ class Controller extends Base
 
 
     /**
+     * Show a list of people who could potentially be awarded Star or Superstar
+     * badges for accomplishing 99% and 100% respectively, in their Units
+     *
+     * @throws ContainerExceptionInterface
+     * @throws Error
+     * @throws NotFoundExceptionInterface
+     * @throws RouteNotFound
+     * @throws DebugBarException
+     * @throws \PDOException
+     */
+    public function getCandidates(): void
+    {
+        /* Sequential dependency
+         *
+         * Pre-generate urls for each badge because we need to post to them
+         * (Each unit spec has a particular badge to award...)
+         */
+        $this->prepareRoutes();
+
+        /* A list of previously-obtained badges obtained by guys
+         */
+        $previousAwards = $this->previousAwards($this->badgeMapping);
+
+        /* Get all the data ready; you might want to filter this to a particular
+         * unit spec or something like that, for performance reasons...one day
+         */
+        $stack = (new Payload($this->getDi()->get('databaseInternal')))->generate();
+
+        new \Alaress_Probe($stack, $this->badgeMapping, $previousAwards);
+
+        $this->response = $this->responseFromTemplate('@superstar/index.twig', [
+            'report' => [
+                'title' => self::REPORT_TITLE,
+            ],
+            'badgeMapping' => $this->badgeMapping,
+            'previousAwards' => $previousAwards,
+            'stack' => $stack
+        ], self::REPORT_TITLE);
+    }
+
+
+    /**
      * Perform an in-place update of badge mapping routes
      * so we don't need to recalculate the same route repeatedly
      *
@@ -221,39 +263,64 @@ class Controller extends Base
 
 
     /**
-     * Show a list of people who could potentially be awarded Star or Superstar
-     * badges for accomplishing 99% and 100% respectively, in their Units
+     * Find all the previous badges awarded to people as per $badgeMapping set
+     * We don't want to give the same achievement twice and the nuanced logic
+     * makes this a bit harder in native sql megaqueries
      *
+     * Instead we construct a list of previously awarded badges and do the
+     * subtraction at runtime, which also allows us to say when someone actually
+     * got the achievement.
+     *
+     * @param array $badgeMapping
+     * @return array
      * @throws ContainerExceptionInterface
-     * @throws Error
      * @throws NotFoundExceptionInterface
-     * @throws RouteNotFound
-     * @throws DebugBarException
-     * @throws \PDOException
      */
-    public function getCandidates(): void
+    private function previousAwards(array $badgeMapping): array
     {
-        /* Sequential dependency
+        $ids = [];
+
+        foreach ($badgeMapping as $unitSpecId => $mapping) {
+            $ids[] = (int)$mapping[Candidacy::SUPERSTAR]['id'];
+            $ids[] = (int)$mapping[Candidacy::STAR]['id'];
+        }
+
+        /* We're going to inject this straight in to the jugular
+         *   1. It's hardcoded by us, manually, so the usual risk of sql injection avoided
+         *   2. It's always cast to int, not that we'd ever sql inject ourselves unsafely anyway
+         *   3. It's only surfaced in an admin-only report
+         *   4. If you hate it enough you can predicate-builder this, but it goes slower
          *
-         * Pre-generate urls for each badge because we need to post to them
-         * (Each unit spec has a particular badge to award...)
+         * If you have an omega ton of ids you might reach a query limit...but I doubt this will
+         * be a practical concern. The OLC wouldn't be manageable under such circumstances.
          */
-        $this->prepareRoutes();
+        $badgeIds = implode(',', $ids);
 
-        /* Get all the data ready; you might want to filter this to a particular
-         * unit spec or something like that, for performance reasons...one day
+        $query = "
+            SELECT 
+                badge_id, 
+                recipient_id,
+                awarded_at
+            FROM badge_user
+            WHERE badge_id IN ({$badgeIds})
+            AND status = :status
+        ";
+
+        $statement = $this->getDi()->get('databaseInternal')->prepare($query);
+        $statement->execute([
+            'status' => \Schoolbox\Learning\Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT
+        ]);
+
+        /* Remember a list of (user id, badge id) tuples
+         * for a direct lookup via twig ugh
          */
-        $stack = (new Payload($this->getDi()->get('databaseInternal')))->generate();
+        $stack = [];
 
-        new \Alaress_Probe($stack, $this->badgeMapping);
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $stack[$row['recipient_id']][$row['badge_id']] = $row['awarded_at'];
+        }
 
-        $this->response = $this->responseFromTemplate('@superstar/index.twig', [
-            'report' => [
-                'title' => self::REPORT_TITLE,
-            ],
-            'badgeMapping' => $this->badgeMapping,
-            'stack' => $stack
-        ], self::REPORT_TITLE);
+        return $stack;
     }
 
 
