@@ -62,6 +62,7 @@ class PreviousAwards
             FROM badge_user
             WHERE badge_id IN ({$badgeIds})
             AND status = :status
+            AND deleted_at IS NULL
         ";
 
         $statement = $this->database->prepare($query);

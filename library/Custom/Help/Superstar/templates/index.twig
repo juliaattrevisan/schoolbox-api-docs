@@ -44,7 +44,7 @@
     {% apply spaceless %}
         <ul class="action-list">
             {% for actionable in actionables[type] %}
-                {% set previouslyAwarded = previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] is not null %}
+                {% set previouslyAwarded = (previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] ?? null) is not null %}
 
                 <li class="actions-small-1">
                     <div class="list-item">
