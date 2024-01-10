@@ -33,28 +33,36 @@
     }
 </style>
 
-{% for unitSpecId, unitSpecData in stack %}
-    {% if unitSpecData.actionables|length %}
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">{{ unitSpecData.title }}</h2>
-                <section>
-                    {% if unitSpecData.actionables.superstar|length %}
-                        <div class="content">
-                            <h3>Superstar</h3>
-                        </div>
-                        {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
-                    {% endif %}
+{# Sometimes you just...have nothing to do #}
+{% if 0 == stack|length %}
+    <div class="empty-state">
+        <i class="icon-badge"></i>
+        <p>Nobody has obtained Superstar or Star candidacy for OLC {{ report.year }}.</p>
+    </div>
+{% else %}
+    {% for unitSpecId, unitSpecData in stack %}
+        {% if unitSpecData.actionables|length %}
+            <div class="row">
+                <div class="small-12 island">
+                    <h2 class="subheader">{{ unitSpecData.title }}</h2>
+                    <section>
+                        {% if unitSpecData.actionables.superstar|length %}
+                            <div class="content">
+                                <h3>Superstar</h3>
+                            </div>
+                            {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                        {% endif %}
 
-                    {% if unitSpecData.actionables.star|length %}
-                        <h3>Star</h3>
-                        {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
-                    {% endif %}
-                </section>
+                        {% if unitSpecData.actionables.star|length %}
+                            <h3>Star</h3>
+                            {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                        {% endif %}
+                    </section>
+                </div>
             </div>
-        </div>
-    {% endif %}
-{% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 {##
  # Generic renderer for each guy you can award a badge
