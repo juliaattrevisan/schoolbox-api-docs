@@ -35,7 +35,10 @@ class Controller extends Base
      * github if you ever needed that
      */
     private array $badgeMapping = [
-        // OLC 23
+        /* OLC 23
+         * Note that this has a special case implementation for the "6. Superstar" unit,
+         * where there's an assessment outside of a project
+         */
         2023 => [
             // 1. Fundamentals
             // 90 in vagrant; 139 in actual
@@ -215,7 +218,7 @@ class Controller extends Base
         /* Get all the data ready; you might want to filter this to a particular
          * unit spec or something like that, for performance reasons...one day
          */
-        $stack = (new Payload($database))->generate($year);
+        $stack = (new Payload($database, $this->getDi()->get('assessmentDataSource')))->generate($year);
 
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [

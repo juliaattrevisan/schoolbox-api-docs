@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Custom\Help\Superstar;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception\Deleted;
 
 class Payload
 {
@@ -23,8 +26,9 @@ class Payload
 
     /**
      * @param IConnector $database
+     * @param MapperProxy $assessmentMapperProxy
      */
-    public function __construct(private IConnector $database)
+    public function __construct(private IConnector $database, private MapperProxy $assessmentMapperProxy)
     {
     }
 
@@ -34,7 +38,13 @@ class Payload
      *
      * @param int $year
      * @return array
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function generate(int $year): array
     {
@@ -132,19 +142,19 @@ class Payload
             }
         }
 
-        /* TODO Special Case
-         *  There's a random assessment outside of projects so its result won't appear in
-         *  the megaquery above; the results aren't in project_result table. They're elsewhere.
-         *  For OLC 2023 we specifically have to use the swamp or the assess_attempt table
-         *  directly, to obtain these marks for this particular quiz. This precipitates a
-         *  querystring param, ?year=2023, to decide when to look for this rando quiz.
-         *  We can augment $stack here, then subject it to the usual decisionmaking
+        /* Special Case for OLC 2023 incarnation only:
+         * You can remove this augmentation once you're fully done with OLC 2023
          */
         if (2023 === $year) {
-            /* Find this random quiz, based on its spec, and use the mapper proxy to
-             * find all the authoritative feedbacks, get their norm_marks, then shank
-             * those straight into $stack
+            /* 90 in vagrant, 137 in actual
              */
+            $superuserSpecId = '90';
+
+            $augmentation = $this->augment2023SpecialCase();
+
+            foreach ($augmentation as $userId => $userData) {
+                $stack[$superuserSpecId]['candidates'][$userId] = $userData;
+            }
         }
 
         /* Now decide everyone's outcome
@@ -225,5 +235,83 @@ class Payload
         ]);
 
         return $statement;
+    }
+
+
+    /**
+     *  There's a random assessment outside of projects so its result won't appear in
+     *  the megaquery above; the results aren't in project_result table. They're elsewhere.
+     *  For OLC 2023 we specifically have to use the swamp or the assess_attempt table
+     *  directly, to obtain these marks for this particular quiz. This precipitates a
+     *  querystring param, ?year=2023, to decide when to look for this rando quiz.
+     *  We can augment $stack here, then subject it to the usual decisionmaking
+     *
+     * @return array
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws \UnexpectedValueException
+     */
+    private function augment2023SpecialCase(): array
+    {
+        /* Find this random quiz, based on its spec
+         */
+        $assessmentSpecId = 633;
+
+        $query = "
+            SELECT 
+                implementation_assessment_id,
+                f2.id AS folder_id,
+                f2.`name` AS school_name,
+                fc.`code` AS school_code
+            FROM assessment_specification_implementation asi
+            INNER JOIN mv_assessment_relation mvar ON asi.implementation_assessment_id = mvar.assessment_id
+            INNER JOIN folder f1 ON mvar.folder_id = f1.id
+            INNER JOIN folder f2 ON f1.parent = f2.id
+            LEFT JOIN folder_code fc ON fc.folder_id = f2.id
+            WHERE asi.specification_assessment_id = :assessmentSpecId
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute([
+            'assessmentSpecId' => $assessmentSpecId
+        ]);
+
+        /* Fetch feedbacks for each implementation and manually collate it into
+         * a data struct synonymous with $stack's - because it's a special case
+         * we can probably hardcode a bunch of shortcuts
+         */
+        $stack = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $assessment = $this->assessmentMapperProxy->findByIdForReview((int)$row['implementation_assessment_id']);
+
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $normMark = $participant->getNormalisedMark(true);
+
+                if (null !== $normMark) {
+                    /* Assign some metadata about this user
+                     */
+                    $stack[$participant->getUser()->getId()]['meta'] = [
+                        'id' => $participant->getUser()->getId(),
+                        'firstname' => $participant->getUser()->getFirstname(),
+                        'lastname' => $participant->getUser()->getLastname(),
+                        'school' => [
+                            'folderId' => $row['folder_id'],
+                            'name' => $row['school_name'],
+                            'code' => $row['school_code']
+                        ]
+                    ];
+
+                    $stack[$participant->getUser()->getId()]['marks'][] = $normMark;
+                }
+            }
+        }
+
+        return $stack;
     }
 }
