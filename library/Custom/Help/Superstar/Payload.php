@@ -131,6 +131,15 @@ class Payload
             }
         }
 
+        /* TODO Special Case
+         *  There's a random assessment outside of projects so its result won't appear in
+         *  the megaquery above; the results aren't in project_result table. They're elsewhere.
+         *  For OLC 2023 we specifically have to use the swamp or the assess_attempt table
+         *  directly, to obtain these marks for this particular quiz. This precipitates a
+         *  querystring param, ?year=2023, to decide when to look for this rando quiz.
+         *  We can augment $stack here, then subject it to the usual decisionmaking
+         */
+
         /* Now decide everyone's outcome
          */
         foreach ($stack as $unitSpecId => &$unitSpec) {
