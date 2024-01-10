@@ -70,6 +70,36 @@
     {% endfor %}
 {% endif %}
 
+{# Sorry Donny - you can vue-ify this if there is time #}
+<script>
+    $(function() {
+        $('[data-award]').each(function (index, element) {
+            $(element).on('click', function(event) {
+                event.preventDefault();
+
+                let endpoint = $(this).attr('href');
+                let payload = {
+                    users: [
+                        {
+                            'id': parseInt($(this).attr('data-award'))
+                        }
+                    ]
+                };
+
+                $.ajax({
+                    type: 'post',
+                    url: endpoint,
+                    dataType: 'json',
+                    data: payload,
+                    success: function() {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
 {##
  # Generic renderer for each guy you can award a badge
  #
@@ -105,7 +135,7 @@
                         </div>
                         <nav>
                             {% if not previouslyAwarded %}
-                                <a class='icon-badge' href="{{ badgeMapping[unitSpecId][type].route }}"></a>
+                                <a class='icon-badge' href="{{ badgeMapping[unitSpecId][type].route }}" data-award="{{ actionable.id }}"></a>
                             {% endif %}
                         </nav>
                     </li>
