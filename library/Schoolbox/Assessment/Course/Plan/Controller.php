@@ -113,8 +113,8 @@ class Controller extends Base
             $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery(
                 // A similar query exists in library/Schoolbox/Search/Api/Database/ResultType/Textbox/IndexBuilder.php.
                 "SELECT
-                cci_textbox.textBoxID AS textboxID,
                 IFNULL(cci_componentname.value, cci_textbox.heading) AS componentHeading,
+                cci_textbox.textBoxID AS textboxID,
                 cci_textbox.body AS textboxBody ,
                 cci_textbox.updated_at AS updated_at
                 FROM component_definition cd
