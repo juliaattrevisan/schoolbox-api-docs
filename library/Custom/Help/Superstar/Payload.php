@@ -312,6 +312,10 @@ class Payload
             }
         }
 
+        /* I guess we don't need this anymore; it just occupies memory
+         */
+        unset($assessment);
+
         return $stack;
     }
 }
