@@ -38,7 +38,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/candidates/{year}', 'getCandidates', $superuser);
-        $this->register('POST', '/candidates/award', 'postAward', $superuser);
+        $this->register('GET', '/candidates', 'getRedirect', $superuser);
     }
 
 

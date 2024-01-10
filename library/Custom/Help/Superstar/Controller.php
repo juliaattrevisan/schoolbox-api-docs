@@ -191,6 +191,25 @@ class Controller extends Base
 
 
     /**
+     * Redirect you to the first available set of badges you can award.
+     *
+     * @return void
+     * @throws RouteNotFound
+     * @throws \DomainException
+     */
+    public function getRedirect(): void
+    {
+        $year = array_keys($this->badgeMapping)[0] ?? null;
+
+        if (null === $year) {
+            throw new \DomainException('Hardcode (unit spec id, badge id) tuples.');
+        }
+
+        $this->response = $this->redirectFound($this->routeGenerator->generate('superstar.getCandidates', ['year' => $year]));
+    }
+
+
+    /**
      * Show a list of people who could potentially be awarded Star or Superstar
      * badges for accomplishing 99% and 100% respectively, in their Units
      *
