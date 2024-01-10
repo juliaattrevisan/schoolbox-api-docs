@@ -99,7 +99,11 @@ $app = new class extends CliTool\App {
             $paramGroup = [
                 ':componentConfigDefinitionId' => $componentNameCcdId,
                 ':componentInstanceId' => $row['componentInstanceId'],
-                ':value' => $row['textboxHeading'] ?? TextboxComponentController::DEFAULT_COMPONENT_HEADING
+                ':value' => (
+                    ($row['textboxHeading'] === null || trim($row['textboxHeading']) === '')
+                    ? TextboxComponentController::DEFAULT_COMPONENT_HEADING
+                    : trim($row['textboxHeading'])
+                )
             ];
 
             if ($row['componentNameId'] === null) {
