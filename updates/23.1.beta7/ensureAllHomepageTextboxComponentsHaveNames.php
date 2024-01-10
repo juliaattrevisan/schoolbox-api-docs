@@ -8,6 +8,7 @@ use Component_Config_Componentname;
 use Component_Definition;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Monolog;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -33,16 +34,13 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-This script adds component names to each homepage textbox component that either:
- * does not have a name, OR
- * has a blank name, while the relevant textbox has a non-blank heading.
-
-The added component name will be:
- * the textBox.heading if that is non-null,
- * otherwise a blank string.
-HELP;
-            echo "\n\nUsage: php " . __FILE__ . "\n\n";
+            echo "This script adds component names to each homepage textbox component that either:\n";
+            echo " * does not have a name, OR\n";
+            echo " * has a blank name\n\n";
+            echo "The added component name will be:\n";
+            echo " * the textBox.heading if that is non-null,\n";
+            echo " * otherwise the default heading for a textbox component (" . TextboxComponentController::DEFAULT_COMPONENT_HEADING . ")\n\n";
+            echo "Usage: php " . __FILE__ . "\n\n";
             exit;
         }
 
@@ -100,7 +98,7 @@ HELP;
             $paramGroup = [
                 ':componentConfigDefinitionId' => $componentNameCcdId,
                 ':componentInstanceId' => $row['componentInstanceId'],
-                ':value' => $row['textboxHeading'] ?? ''
+                ':value' => $row['textboxHeading'] ?? TextboxComponentController::DEFAULT_COMPONENT_HEADING
             ];
 
             if ($row['componentName'] === null) {
