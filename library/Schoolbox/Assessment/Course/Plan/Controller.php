@@ -11,6 +11,9 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Plan;
 
 use Alaress\Web\Controller\Base;
+use Component_Config_Componentname;
+use Component_Definition;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\ModelToArray as IndicatorModelToArray;
 use Schoolbox\Collection;
@@ -110,9 +113,8 @@ class Controller extends Base
             $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery(
                 // A similar query exists in library/Schoolbox/Search/Api/Database/ResultType/Textbox/IndexBuilder.php.
                 "SELECT
-                cci_componentname.value AS `componentHeading`,
                 t.`textboxID` AS `textboxID`,
-                t.`heading` AS `textboxHeading`,
+                IFNULL(cci_componentname.value, t.heading) AS componentHeading,
                 t.`body` AS `textboxBody`,
                 t.`updated_at` AS `updated_at`
                 FROM component_definition cd
@@ -121,16 +123,16 @@ class Controller extends Base
                 LEFT JOIN component_config_instance cci_textbox ON cci_textbox.component_instance_id = ci.id
                 LEFT JOIN component_config_definition ccd_textbox ON (
                     cci_textbox.component_config_definition_id = ccd_textbox.id AND
-                    ccd_textbox.`key` = 'textbox'
+                    ccd_textbox.`key` = '" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
                 )
                 LEFT JOIN textBox t ON cci.value = t.textBoxID
                 LEFT JOIN component_config_instance cci_componentname ON cci_componentname.component_instance_id = ci.id
                 LEFT JOIN component_config_definition ccd_componentname ON (
                     cci_componentname.component_config_definition_id = ccd_componentname.id AND
-                    ccd_componentname.`key` = 'componentname'
+                    ccd_componentname.`key` = '" . Component_Config_Componentname::KEY . "'
                 )
                 WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
-                AND ci.module = 'homepage'
+                AND ci.module = '" . Component_Definition::MODULE_HOMEPAGE . "'
                 AND f.deleted_at IS NULL
                 AND t.deleted_at IS NULL
                 AND t.categoryID = :folderId
