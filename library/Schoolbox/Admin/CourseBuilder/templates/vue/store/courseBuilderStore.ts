@@ -61,7 +61,15 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
             const response = await fetch(`/adminv2/course-builder/delete/${courseTemplate.id}`, { method: "DELETE" });
 
             if (!response.ok) {
-                const responseText = await response.text();
+                let responseText = await response.text();
+
+                // If the response is JSON, then parse it correctly for the response text
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const responseJSON = (await response.json()) as { title: string; type: string; status: number };
+                    responseText = responseJSON.title;
+                }
+
                 toastEl.value.timeout(responseText, false, 2000);
                 return;
             }
