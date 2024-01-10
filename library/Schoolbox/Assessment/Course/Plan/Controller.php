@@ -124,18 +124,18 @@ class Controller extends Base
                     SELECT cci1.component_instance_id, tb.textBoxID, tb.categoryID, tb.heading, tb.updated_at, tb.deleted_at, tb.body
                     FROM component_config_instance cci1
                     JOIN component_config_definition ccd1 ON (
-                    ccd1.key='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "' AND
-                    ccd1.id=cci1.component_config_definition_id
-                )
+                        ccd1.key='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "' AND
+                        ccd1.id=cci1.component_config_definition_id
+                    )
                     JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci1.value
                 ) AS cci_textbox ON (cci_textbox.component_instance_id=ci.id)
                 LEFT JOIN (
                     SELECT cci2.component_instance_id, cci2.value
                     FROM component_config_instance cci2
                     JOIN component_config_definition ccd2 ON (
-                    ccd2.key = '" . Component_Config_Componentname::KEY . "' AND
-                    ccd2.id=cci2.component_config_definition_id
-                )
+                        ccd2.key = '" . Component_Config_Componentname::KEY . "' AND
+                        ccd2.id=cci2.component_config_definition_id
+                    )
                 ) AS cci_componentname ON (cci_componentname.component_instance_id=ci.id)
                 WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
                 AND ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
