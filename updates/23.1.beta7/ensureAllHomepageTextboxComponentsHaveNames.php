@@ -6,10 +6,11 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Component_Config_Componentname;
 use Component_Definition;
+use Monolog;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
-use Monolog;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -48,34 +49,34 @@ $app = new class extends CliTool\App {
         $logger = $this->getLogger();
 
         $rows = $dbc->executeQuery(
-            // The point of the IFNULL(cci_componentname.value, '') in the query below is to differentiate between
-            // the cases where 1) the row does not exist, and 2) where the row exists but the value is null.
-            // Differentiation is necessary because case 1 requires an INSERT, while case 2 requires an UPDATE.
-            'SELECT
-            fo.id as folderId,
+           'SELECT
+            fo.id AS folderId,
             ci.id AS componentInstanceId,
-            tb.textBoxID AS textboxId,
-            tb.heading AS textboxHeading,
-            (
-                SELECT IFNULL(cci_componentname.value, "") AS value
-                FROM component_config_instance cci_componentname
-                JOIN component_config_definition ccd_componentname ON (
-                    ccd_componentname.key = "' . Component_Config_Componentname::KEY . '" AND
-                    ccd_componentname.id=cci_componentname.component_config_definition_id
-                )
-                WHERE cci_componentname.component_instance_id=ci.id
-            ) AS componentName
+            cci_textbox.textBoxID AS textboxId,
+            cci_textbox.heading AS textboxHeading,
+            cci_componentname.value AS componentName,
+            cci_componentname.component_instance_id AS componentNameId
             FROM component_instance ci
-            JOIN component_config_instance cci ON cci.component_instance_id=ci.id
-            JOIN component_config_definition ccd ON (
-                ccd.key="textbox" AND
-                ccd.id=cci.component_config_definition_id
-            )
-            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
-            WHERE cd.`class` = "Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller"
-            AND ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
-            HAVING componentName IS NULL OR (TRIM(componentName) = "" AND TRIM(textboxHeading) <> "")
-            ORDER BY fo.id ASC, ci.id ASC, tb.textBoxID ASC'
+            JOIN folder fo ON fo.id=ci.identifier
+            JOIN (
+                SELECT cci1.component_instance_id, tb.textBoxID, tb.heading, tb.updated_at, tb.created_by, tb.deleted_at, tb.body
+                FROM component_config_instance cci1
+                JOIN component_config_definition ccd1 ON (
+                    ccd1.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
+                    ccd1.id=cci1.component_config_definition_id
+                )
+                JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci1.value
+            ) AS cci_textbox ON (cci_textbox.component_instance_id=ci.id)
+            LEFT JOIN (
+                SELECT cci2.component_instance_id, cci2.value
+                FROM component_config_instance cci2
+                JOIN component_config_definition ccd2 ON (
+                    ccd2.key = "' . Component_Config_Componentname::KEY . '" AND
+                    ccd2.id=cci2.component_config_definition_id
+                )
+            ) AS cci_componentname ON (cci_componentname.component_instance_id=ci.id)
+            WHERE ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
+            AND (cci_componentname.value IS NULL OR TRIM(cci_componentname.value) = "")'
         )->fetchAll();
 
         if (count($rows) === 0) {
@@ -101,7 +102,7 @@ $app = new class extends CliTool\App {
                 ':value' => $row['textboxHeading'] ?? TextboxComponentController::DEFAULT_COMPONENT_HEADING
             ];
 
-            if ($row['componentName'] === null) {
+            if ($row['componentNameId'] === null) {
                 $insertCommandParamsGroups[] = $paramGroup;
             } else {
                 $updateCommandParamsGroups[] = $paramGroup;
