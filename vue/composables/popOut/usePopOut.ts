@@ -200,5 +200,12 @@ export function usePopOut(
         });
     });
 
+    /**
+     * Before the component is unmounted, close the content if it's open
+     */
+    window.Vue.onBeforeUnmount(() => {
+        close();
+    });
+
     return { currentLabel, isOpen, onButtonSelected, close };
 }
