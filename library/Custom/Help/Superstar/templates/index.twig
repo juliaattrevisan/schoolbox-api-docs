@@ -35,6 +35,10 @@
         padding-top: 0.5rem;
         text-transform: none;
     }
+
+    .content.card {
+        padding-bottom: 0;
+    }
 </style>
 
 {# Sometimes you just...have nothing to do #}
@@ -48,7 +52,6 @@
         {% if unitSpecData.actionables|length %}
             <div class="row">
                 <div class="small-12 island">
-                    {% if unitSpecData.actionables.superstar|length %}
                     <div class="actions-small-1">
                         <div class="list-item">
                             <h2 class="subheader">{{ unitSpecData.title }}</h2>
@@ -58,6 +61,7 @@
                         </nav>
                     </div>
                         <section>
+                        {% if unitSpecData.actionables.superstar|length %}
                             <div class="content">
                                 <h3>Superstar</h3>
                             </div>
