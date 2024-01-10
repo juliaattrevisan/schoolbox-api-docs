@@ -168,6 +168,28 @@ class Payload
         /* Now decide everyone's outcome
          */
         foreach ($stack as $unitSpecId => &$unitSpec) {
+            /* Sort candidates by school code,
+             * then by the guy's lastname
+             */
+            uasort($unitSpec['candidates'], static function ($a, $b) {
+                $schoolA = $a['meta']['school']['code'];
+                $schoolB = $b['meta']['school']['code'];
+                $lastnameA = $a['meta']['lastname'];
+                $lastnameB = $b['meta']['lastname'];
+
+                if ($schoolA === $schoolB) {
+                    if ($lastnameA === $lastnameB) {
+                        return 0;
+                    }
+
+                    return strnatcasecmp($lastnameA, $lastnameB);
+                }
+
+                return strnatcasecmp($schoolA, $schoolB);
+            });
+
+            /* Figure out Superstardom and Stardom candidacy for each guy
+             */
             foreach ($unitSpec['candidates'] as $userId => $userData) {
                 $outcome = $candidacyDecider->decide($userData['marks']);
 
