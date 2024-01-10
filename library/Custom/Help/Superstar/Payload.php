@@ -150,8 +150,16 @@ class Payload
              */
             $superuserSpecId = '90';
 
-            $augmentation = $this->augment2023SpecialCase();
+            /* Find this random quiz, based on its spec id
+             */
+            $assessmentSpecId = 633;
 
+            /* Build this extra dangling data struct lol
+             */
+            $augmentation = $this->augment2023SpecialCase($assessmentSpecId);
+
+            /* Shank it in
+             */
             foreach ($augmentation as $userId => $userData) {
                 $stack[$superuserSpecId]['candidates'][$userId] = $userData;
             }
@@ -246,21 +254,18 @@ class Payload
      *  querystring param, ?year=2023, to decide when to look for this rando quiz.
      *  We can augment $stack here, then subject it to the usual decisionmaking
      *
+     * @param int $assessmentSpecId
      * @return array
+     * @throws DefinitionException
+     * @throws Deleted
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \PDOException
-     * @throws DefinitionException
-     * @throws Deleted
      * @throws \UnexpectedValueException
      */
-    private function augment2023SpecialCase(): array
+    private function augment2023SpecialCase(int $assessmentSpecId): array
     {
-        /* Find this random quiz, based on its spec
-         */
-        $assessmentSpecId = 633;
-
         $query = "
             SELECT 
                 implementation_assessment_id,
