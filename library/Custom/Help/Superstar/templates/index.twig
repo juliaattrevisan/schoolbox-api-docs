@@ -2,14 +2,27 @@
  # OLC Superstar Report
  #
  # @param string $report         Metadata about this report, currently containing the official name of this report
+ # @param array $badgeYears      A set of years that have badge mapping hardcoded by us
  # @param array $badgeMapping    A set of (unit spec id, badge urls) as a shortcut to repeated route generation
  # @param array $previousAwards  A set of (user id, badge id) tuples for guys who got an achievement previously
  # @param array $stack           A set of candidacy outcomes per person, grouped by unit spec id
  #}
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ report.title }} - {{ report.year }}</h1>
+<div class="row actions-small-1">
+    <div class=list-item">
+        <div class="small-12 columns">
+            <h1>{{ report.title }} - {{ report.year }}</h1>
+        </div>
     </div>
+    <nav>
+        <sbx-pop-out content-id="header-options"></sbx-pop-out>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+        {% for year in badgeYears %}
+        <li>
+            <a href="{{ routeLookup('superstar.getCandidates', {'year': year}) }}" class="icon-progress" title="{{ year }}">{{ year }}</a>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 
 {# Weird styling hacks specific to this layout #}

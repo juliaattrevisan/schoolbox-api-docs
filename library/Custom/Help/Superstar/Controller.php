@@ -234,6 +234,7 @@ class Controller extends Base
                 'title' => self::REPORT_TITLE,
                 'year' => $year
             ],
+            'badgeYears' => array_keys($this->badgeMapping),
             'badgeMapping' => $this->badgeMapping[$year],
             'previousAwards' => $previousAwards,
             'stack' => $stack
