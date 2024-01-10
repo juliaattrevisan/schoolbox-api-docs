@@ -37,7 +37,7 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '/candidates', 'getCandidates', $superuser);
+        $this->register('GET', '/candidates/{year}', 'getCandidates', $superuser);
         $this->register('POST', '/candidates/award', 'postAward', $superuser);
     }
 

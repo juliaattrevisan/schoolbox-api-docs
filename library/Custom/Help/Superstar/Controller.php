@@ -190,7 +190,7 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws \PDOException
      */
-    public function getCandidates(): void
+    public function getCandidates(int $year): void
     {
         /* Sequential dependency
          *
@@ -210,11 +210,12 @@ class Controller extends Base
         /* Get all the data ready; you might want to filter this to a particular
          * unit spec or something like that, for performance reasons...one day
          */
-        $stack = (new Payload($database))->generate();
+        $stack = (new Payload($database))->generate($year);
 
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [
                 'title' => self::REPORT_TITLE,
+                'year' => $year
             ],
             'badgeMapping' => $this->badgeMapping,
             'previousAwards' => $previousAwards,

@@ -32,10 +32,11 @@ class Payload
     /**
      * Generate an array of data about everyone's candidacy potential
      *
+     * @param int $year
      * @return array
      * @throws \PDOException
      */
-    public function generate(): array
+    public function generate(int $year): array
     {
         $statement = $this->generateCandidatesStatement();
 
@@ -139,6 +140,12 @@ class Payload
          *  querystring param, ?year=2023, to decide when to look for this rando quiz.
          *  We can augment $stack here, then subject it to the usual decisionmaking
          */
+        if (2023 === $year) {
+            /* Find this random quiz, based on its spec, and use the mapper proxy to
+             * find all the authoritative feedbacks, get their norm_marks, then shank
+             * those straight into $stack
+             */
+        }
 
         /* Now decide everyone's outcome
          */
