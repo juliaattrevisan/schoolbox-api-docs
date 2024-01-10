@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Component_Config_Componentname;
-use Component_Definition;
 use Monolog;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
