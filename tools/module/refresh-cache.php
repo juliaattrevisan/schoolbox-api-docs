@@ -38,6 +38,11 @@ $kernel = new CliTool\Kernel(
                 ->setLogger($this->getLogger())
                 ->rebuild($this->getConfig()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
         }
+
+        public function runAsRoot(): ?bool
+        {
+            return null;
+        }
     },
     [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],
 );

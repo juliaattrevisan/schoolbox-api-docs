@@ -273,4 +273,9 @@ HELP;
         }
         return null;
     }
+
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 }

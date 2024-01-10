@@ -55,6 +55,12 @@ $app = new class extends CliTool\App
         }
         $this->getLogger()->info("Done. Finished migrating " . count($oldInstances) . " Course Outline components");
     }
+
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */

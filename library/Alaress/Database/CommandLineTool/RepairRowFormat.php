@@ -157,4 +157,9 @@ HELP;
         );
         exit($failureCount > 0 ? CliTool\Kernel::EXIT_STATUS_APP_ERROR : CliTool\Kernel::EXIT_STATUS_OK);
     }
+
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 }
