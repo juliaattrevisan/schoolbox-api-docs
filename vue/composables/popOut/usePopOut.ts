@@ -186,14 +186,18 @@ export function usePopOut(
     /**
      * Initialise the display toggle of the content when the button is selected
      */
-    window.Vue.onMounted(() => {
-        getContent();
-        // if it's not already in the DOM, wait for the DOM to be ready to try again
-        if (!content) {
-            window.addEventListener("DOMContentLoaded", () => {
-                getContent();
-            });
-        }
+    window.Vue.onMounted(async () => {
+        // Wait a tick in case this was called after DOM ready, but before the content was in the DOM
+        // e.g. if the component is rendered after a user action
+        await window.Vue.nextTick(() => {
+            getContent();
+            // if it's not already in the DOM, wait for the DOM to be ready to try again
+            if (!content) {
+                window.addEventListener("DOMContentLoaded", () => {
+                    getContent();
+                });
+            }
+        });
     });
 
     return { currentLabel, isOpen, onButtonSelected, close };
