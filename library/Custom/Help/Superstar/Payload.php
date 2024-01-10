@@ -275,9 +275,6 @@ class Payload
          *  performance workaround that avoids generating the entire data set
          *  at the very beginning...but it means you gotta click a lot
          */
-
-        /* TODO deal with soft-deleted users and other soft-deleted data here
-         */
         $query = "
             SELECT 
                 cui.course_unit_specification_id AS unit_spec_id,
@@ -304,6 +301,15 @@ class Payload
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
             WHERE ci.course_specification_id = :courseId
             AND prc.norm_mark IS NOT NULL
+            AND cui.deleted_at IS NULL
+            AND cus.deleted_at IS NULL
+            AND f0.deleted_at IS NULL
+            AND p.deleted_at IS NULL
+            AND prc.deleted_at IS NULL
+            AND u.deleted_at IS NULL
+            AND f1.deleted_at IS NULL
+            AND f2.deleted_at IS NULL
+            AND fc.deleted_at IS NULL
             ORDER BY unit_spec_id, unit_spec_title, user_lastname, user_id
         ";
 
@@ -349,6 +355,9 @@ class Payload
             INNER JOIN folder f2 ON f1.parent = f2.id
             LEFT JOIN folder_code fc ON fc.folder_id = f2.id
             WHERE asi.specification_assessment_id = :assessmentSpecId
+            AND f1.deleted_at IS NULL
+            AND f2.deleted_at IS NULL
+            AND fc.deleted_at IS NULL
         ";
 
         $statement = $this->database->prepare($query);
