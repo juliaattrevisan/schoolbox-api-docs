@@ -28,10 +28,15 @@ class Controller extends Base
     /**
      * An index of (unit spec id, badge id) tuples for awarding stuff
      * obtained via Justin
+     *
+     * You can curate this list over time, removing old entries once you no longer
+     * have a use for them - otherwise this will get hilariously long and hard to manage.
+     * They're all hardcoded assignations anyway and you can restore an old set from
+     * github if you ever needed that
      */
     private array $badgeMapping = [
         // OLC 23
-        '20240122' => [
+        2023 => [
             // 1. Fundamentals
             // 90 in vagrant; 139 in actual
             '90' => [
@@ -101,7 +106,7 @@ class Controller extends Base
             ],
         ],
         // OLC 24
-        '20241231' => [
+        2024 => [
             // 1. Fundamentals
             '139' => [
                 Candidacy::SUPERSTAR => [
@@ -197,7 +202,7 @@ class Controller extends Base
          * Pre-generate urls for each badge because we need to post to them
          * (Each unit spec has a particular badge to award...)
          */
-        $this->prepareRoutes();
+        $this->prepareRoutes($year);
 
         /* An injectable
          */
@@ -205,7 +210,7 @@ class Controller extends Base
 
         /* A list of previously-obtained badges obtained by guys
          */
-        $previousAwards = (new PreviousAwards($database))->generate($this->badgeMapping);
+        $previousAwards = (new PreviousAwards($database))->generate($this->badgeMapping[$year]);
 
         /* Get all the data ready; you might want to filter this to a particular
          * unit spec or something like that, for performance reasons...one day
@@ -217,7 +222,7 @@ class Controller extends Base
                 'title' => self::REPORT_TITLE,
                 'year' => $year
             ],
-            'badgeMapping' => $this->badgeMapping,
+            'badgeMapping' => $this->badgeMapping[$year],
             'previousAwards' => $previousAwards,
             'stack' => $stack
         ], self::REPORT_TITLE);
@@ -230,36 +235,25 @@ class Controller extends Base
      *
      * (each route takes a json payload anyway)
      *
+     * @param int $year
      * @return void
      * @throws RouteNotFound
+     * @throws \DomainException
      */
-    public function prepareRoutes(): void
+    public function prepareRoutes(int $year): void
     {
-        /* Do this sharpish by avoiding adf/carbon instantiation
-         * TODO Possibly parameterise this somehow
-         */
-        $now = date('Ymd');
+        if (!isset($this->badgeMapping[$year])) {
+            throw new \DomainException('Badge mapping for this year is missing.');
+        }
 
-        foreach ($this->badgeMapping as $date => &$unitSpecs) {
-            if ($now < (int)$date) {
-                foreach ($unitSpecs as $unitSpecId => &$actionables) {
-                    foreach ($actionables as $type => &$actionable) {
-                        $actionable['route'] = $this->routeGenerator->generate('learningBadgeAward.awardAsAchievement', [
-                            'badgeId' => $actionable['id'],
-                        ]);
-                    }
-
-                    unset($actionable);
-                }
-
-                unset($actionables);
-
-                /* We only care about this set
-                 */
-                $this->badgeMapping = $unitSpecs;
-
-                return;
+        foreach ($this->badgeMapping[$year] as $unitSpecId => &$actionables) {
+            foreach ($actionables as $type => &$actionable) {
+                $actionable['route'] = $this->routeGenerator->generate('learningBadgeAward.awardAsAchievement', [
+                    'badgeId' => $actionable['id'],
+                ]);
             }
+
+            unset($actionable);
         }
     }
 
