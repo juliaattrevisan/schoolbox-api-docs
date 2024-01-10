@@ -26,8 +26,9 @@ class IndexBuilder extends BaseBuilder
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
         // Pass 1: textboxes within a component
-        // Note the displayed heading of a textbox component will be the component name if present,
-        // otherwise the textbox heading - hence the need to fetch the component name below.
+        //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
+        //  * The displayed heading of a textbox component will be the component name if present,
+        //    otherwise the textbox heading - hence the need to fetch the component name below.
         $queryString = "
             SELECT
             CONCAT(t.textBoxID, '-', ci.id, '-', f.id) AS id,

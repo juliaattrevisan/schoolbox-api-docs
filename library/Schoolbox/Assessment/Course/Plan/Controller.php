@@ -107,29 +107,35 @@ class Controller extends Base
 
             $extraTextboxes = 0;
             // fetch all for the folder
-            $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
-                SELECT
-                    `ccih`.value as `componentHeading`,
-                    `textBox`.`textboxID` as `textboxID`,
-                    `textBox`.`heading` as `textboxHeading`,
-                    `textBox`.`body` as `textboxBody`,
-                    `textBox`.`updated_at` as `updated_at`
+            $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery(
+                // A similar query exists in library/Schoolbox/Search/Api/Database/ResultType/Textbox/IndexBuilder.php.
+                "SELECT
+                cci_componentname.value AS `componentHeading`,
+                t.`textboxID` AS `textboxID`,
+                t.`heading` AS `textboxHeading`,
+                t.`body` AS `textboxBody`,
+                t.`updated_at` AS `updated_at`
                 FROM component_definition cd
-                         INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
-                         INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
-                         LEFT JOIN component_config_instance ccih ON ccih.component_instance_id = ci.id
-                         INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-                         LEFT JOIN component_config_definition ccdh ON  ccih.component_config_definition_id = ccdh.id
-                         INNER JOIN textBox ON cci.value = textBox.textBoxID
-                         INNER JOIN folder f ON ci.identifier = f.id
+                JOIN component_instance ci ON cd.id = ci.component_definition_id
+                JOIN folder f ON ci.identifier = f.id
+                LEFT JOIN component_config_instance cci_textbox ON cci_textbox.component_instance_id = ci.id
+                LEFT JOIN component_config_definition ccd_textbox ON (
+                    cci_textbox.component_config_definition_id = ccd_textbox.id AND
+                    ccd_textbox.`key` = 'textbox'
+                )
+                LEFT JOIN textBox t ON cci.value = t.textBoxID
+                LEFT JOIN component_config_instance cci_componentname ON cci_componentname.component_instance_id = ci.id
+                LEFT JOIN component_config_definition ccd_componentname ON (
+                    cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                    ccd_componentname.`key` = 'componentname'
+                )
                 WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
-                  AND ccd.`key` = 'textbox'
-                  AND ccdh.`key` = 'componentname'
-                  AND textBox.deleted_at IS NULL
-                  AND f.deleted_at IS NULL
-                  AND textBox.categoryID = :folderId
-                ORDER BY textBox.updated_at
-            ");
+                AND ci.module = 'homepage'
+                AND f.deleted_at IS NULL
+                AND t.deleted_at IS NULL
+                AND t.categoryID = :folderId
+                ORDER BY t.updated_at ASC"
+            );
             $statement->execute(['folderId' => $unit->getFolder()->getId()]);
             while ($row = $statement->fetch()) {
                 // match only on the Component Heading
@@ -144,7 +150,7 @@ class Controller extends Base
                     ];
                 } else {
                     // increase the extra textboxes by 1
-                    // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
+                    // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non-standard in the unit.
                     $extraTextboxes++;
                 }
             }
