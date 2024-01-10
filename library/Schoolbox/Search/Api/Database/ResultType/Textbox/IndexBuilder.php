@@ -25,7 +25,7 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        // Pass 1: text boxes within a component
+        // Pass 1: textboxes within a component
         // Note the displayed heading of a textbox component will be the component name if present,
         // otherwise the textbox heading - hence the need to fetch the component name below.
         $queryString = "
@@ -39,14 +39,14 @@ class IndexBuilder extends BaseBuilder
             FROM component_definition cd
             JOIN component_instance ci
             JOIN folder f ON f.id=ci.identifier
-            JOIN component_config_instance cci_textbox ON cci_textbox.component_instance_id = ci.id
-            JOIN component_config_definition ccd_textbox ON (
+            LEFT JOIN component_config_instance cci_textbox ON cci_textbox.component_instance_id = ci.id
+            LEFT JOIN component_config_definition ccd_textbox ON (
                 cci_textbox.component_config_definition_id = ccd_textbox.id AND
                 ccd_textbox.`key`='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
             )
-            JOIN textBox t ON cci_textbox.value = CAST(t.textBoxID AS NCHAR)
-            JOIN component_config_instance cci_componentname ON cci_componentname.component_instance_id = ci.id
-            JOIN component_config_definition ccd_componentname ON (
+            LEFT JOIN textBox t ON cci_textbox.value = CAST(t.textBoxID AS NCHAR)
+            LEFT JOIN component_config_instance cci_componentname ON cci_componentname.component_instance_id = ci.id
+            LEFT JOIN component_config_definition ccd_componentname ON (
                 cci_componentname.component_config_definition_id = ccd_componentname.id AND
                 ccd_componentname.`key` = '" . Component_Config_Componentname::KEY . "'
             )
@@ -83,7 +83,7 @@ class IndexBuilder extends BaseBuilder
             yield $index;
         }
 
-        // Pass 2: text boxes without a component
+        // Pass 2: textboxes without a component
         $queryString = "
             SELECT
                 CONCAT(tb2.textBoxID, '--') AS id,
