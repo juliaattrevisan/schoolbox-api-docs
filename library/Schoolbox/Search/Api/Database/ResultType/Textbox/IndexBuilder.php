@@ -26,48 +26,42 @@ class IndexBuilder extends BaseBuilder
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
         // Pass 1: text boxes within a component
-        // TODO does this unnecessarily exclude heading from index?
-        //      may need to fetch that index separately
         // Note the displayed heading of a textbox component will be the component name if present,
         // otherwise the textbox heading - hence the need to fetch the component name below.
         $queryString = "
             SELECT
-                CONCAT(tb.textBoxID, '-', cci.component_instance_id, '-', fo.id) AS id,
-                IFNULL(
-                    (
-                        SELECT cci2.value
-                        FROM component_config_instance cci2
-                        JOIN component_config_definition ccd2 ON (
-                            ccd2.key = '" . Component_Config_Componentname::KEY . "' AND
-                            ccd2.id=cci2.component_config_definition_id
-                        )
-                        WHERE cci2.component_instance_id=ci.id
-                    ),
-                    tb.heading
-                ) AS title,
-                fo.id AS folder_id,
-                tb.updated_at AS date,
-                tb.created_by AS created_by,
-                tb.body AS fulltext_index
-            FROM component_instance ci
-            JOIN component_config_instance cci ON cci.component_instance_id=ci.id
-            JOIN component_config_definition ccd ON (
-                ccd.key='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "' AND
-                ccd.id=cci.component_config_definition_id
+            CONCAT(t.textBoxID, '-', ci.id, '-', f.id) AS id,
+            f.id AS folder_id,
+            IFNULL(cci_componentname.value, t.heading) AS title,
+            t.updated_at AS date,
+            t.created_by AS created_by,
+            t.body AS fulltext_index
+            FROM component_definition cd
+            JOIN component_instance ci
+            JOIN folder f ON f.id=ci.identifier
+            JOIN component_config_instance cci_textbox ON cci_textbox.component_instance_id = ci.id
+            JOIN component_config_definition ccd_textbox ON (
+                cci_textbox.component_config_definition_id = ccd_textbox.id AND
+                ccd_textbox.`key`='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
             )
-            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
-            JOIN folder fo ON fo.id=ci.identifier
-            WHERE ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
-            AND tb.deleted_at IS NULL
-            AND fo.deleted_at IS NULL
+            JOIN textBox t ON cci_textbox.value = CAST(t.textBoxID AS NCHAR)
+            JOIN component_config_instance cci_componentname ON cci_componentname.component_instance_id = ci.id
+            JOIN component_config_definition ccd_componentname ON (
+                cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                ccd_componentname.`key` = '" . Component_Config_Componentname::KEY . "'
+            )
+            WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+            AND ci.module = '" . Component_Definition::MODULE_HOMEPAGE . "'
+            AND f.deleted_at IS NULL
+            AND t.deleted_at IS NULL;
         ";
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND tb.updated_at >= :fromDate';
+            $queryString .= ' AND tb.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND tb.updated_at <= :toDate';
+            $queryString .= ' AND tb.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
