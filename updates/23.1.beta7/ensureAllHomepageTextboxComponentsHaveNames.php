@@ -48,22 +48,22 @@ $app = new class extends CliTool\App {
         $logger = $this->getLogger();
 
         $rows = $dbc->executeQuery(
-            // The point of the IFNULL(cci2.value, '') in the query below is to differentiate between
+            // The point of the IFNULL(cci_componentname.value, '') in the query below is to differentiate between
             // the cases where 1) the row does not exist, and 2) where the row exists but the value is null.
             // Differentiation is necessary because case 1 requires an INSERT, while case 2 requires an UPDATE.
             'SELECT
             fo.id as folderId,
-            cci.component_instance_id AS componentInstanceId,
+            ci.id AS componentInstanceId,
             tb.textBoxID AS textboxId,
             tb.heading AS textboxHeading,
             (
-                SELECT IFNULL(cci2.value, "") AS value
-                FROM component_config_instance cci2
-                JOIN component_config_definition ccd2 ON (
-                    ccd2.key = "' . Component_Config_Componentname::KEY . '" AND
-                    ccd2.id=cci2.component_config_definition_id
+                SELECT IFNULL(cci_componentname.value, "") AS value
+                FROM component_config_instance cci_componentname
+                JOIN component_config_definition ccd_componentname ON (
+                    ccd_componentname.key = "' . Component_Config_Componentname::KEY . '" AND
+                    ccd_componentname.id=cci_componentname.component_config_definition_id
                 )
-                WHERE cci2.component_instance_id=ci.id
+                WHERE cci_componentname.component_instance_id=ci.id
             ) AS componentName
             FROM component_instance ci
             JOIN component_config_instance cci ON cci.component_instance_id=ci.id
@@ -71,11 +71,11 @@ $app = new class extends CliTool\App {
                 ccd.key="textbox" AND
                 ccd.id=cci.component_config_definition_id
             )
-            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
-            JOIN folder fo ON fo.id=ci.identifier
-            WHERE ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
+            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+            WHERE cd.`class` = "Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller"
+            AND ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
             HAVING componentName IS NULL OR (TRIM(componentName) = "" AND TRIM(textboxHeading) <> "")
-            ORDER BY fo.id ASC, cci.component_instance_id ASC, tb.textBoxID ASC'
+            ORDER BY fo.id ASC, ci.id ASC, tb.textBoxID ASC'
         )->fetchAll();
 
         if (count($rows) === 0) {
