@@ -49,7 +49,7 @@ $app = new class extends CliTool\App {
         $logger = $this->getLogger();
 
         $rows = $dbc->executeQuery(
-           'SELECT
+            'SELECT
             fo.id AS folderId,
             ci.id AS componentInstanceId,
             cci_textbox.textBoxID AS textboxId,
