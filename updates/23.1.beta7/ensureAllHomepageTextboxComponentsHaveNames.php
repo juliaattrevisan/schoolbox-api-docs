@@ -50,34 +50,33 @@ $app = new class extends CliTool\App {
 
         $rows = $dbc->executeQuery(
             'SELECT
-            fo.id AS folderId,
+            f.id AS folderId,
             ci.id AS componentInstanceId,
-            cci_textbox.textBoxID AS textboxId,
-            cci_textbox.heading AS textboxHeading,
+            tb.textBoxID AS textboxId,
+            tb.heading AS textboxHeading,
             cci_componentname.value AS componentName,
             cci_componentname.component_instance_id AS componentNameId
             FROM component_definition cd
             JOIN component_instance ci ON ci.component_definition_id = cd.id
-            JOIN folder fo ON fo.id=ci.identifier
-            JOIN (
-                SELECT cci1.component_instance_id, tb.textBoxID, tb.heading, tb.updated_at, tb.created_by, tb.deleted_at, tb.body
-                FROM component_config_instance cci1
-                JOIN component_config_definition ccd1 ON (
-                    ccd1.key="' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '" AND
-                    ccd1.id=cci1.component_config_definition_id
-                )
-                JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci1.value
-            ) AS cci_textbox ON (cci_textbox.component_instance_id=ci.id)
-            LEFT JOIN (
-                SELECT cci2.component_instance_id, cci2.value
-                FROM component_config_instance cci2
-                JOIN component_config_definition ccd2 ON (
-                    ccd2.key = "' . Component_Config_Componentname::KEY . '" AND
-                    ccd2.id=cci2.component_config_definition_id
-                )
-            ) AS cci_componentname ON (cci_componentname.component_instance_id=ci.id)
+            JOIN folder f ON f.id=ci.identifier
+            JOIN component_config_definition ccd_textbox ON (
+                ccd_textbox.component_definition_id = cd.id AND
+                ccd_textbox.key = "' . TextboxMapper::HOMEPAGE_COMPONENT_KEY . '"
+            )
+            LEFT JOIN component_config_instance cci_textbox ON (
+                cci_textbox.component_config_definition_id = ccd_textbox.id AND
+                cci_textbox.component_instance_id = ci.id
+            )
+            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR) = cci_textbox.value
+            JOIN component_config_definition ccd_componentname ON (
+                ccd_componentname.component_definition_id = cd.id AND
+                ccd_componentname.key = "' . Component_Config_Componentname::KEY . '"
+            )
+            LEFT JOIN component_config_instance cci_componentname ON (
+                cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                cci_componentname.component_instance_id=ci.id
+            )
             WHERE cd.`class` = "Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller"
-            AND ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
             AND (cci_componentname.value IS NULL OR TRIM(cci_componentname.value) = "")'
         )->fetchAll();
 
@@ -87,12 +86,14 @@ $app = new class extends CliTool\App {
         }
 
         $componentNameCcdId = $dbc->executeQuery(
-            'SELECT ccd.id
-            FROM component_config_definition AS ccd
-            JOIN component_definition AS cd ON cd.id = ccd.component_definition_id
-            WHERE cd.module = "' . Component_Definition::MODULE_HOMEPAGE . '"
-            AND cd.name = "Text Box"
-            AND ccd.`key` = "' . Component_Config_Componentname::KEY . '"'
+            'SELECT id
+            FROM component_config_definition
+            WHERE component_definition_id = (
+                SELECT id
+                FROM component_definition
+                WHERE class = "Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller"
+            )
+            AND `key` = "' . Component_Config_Componentname::KEY . '"'
         )->fetchColumn();
 
         $insertCommandParamsGroups = [];
