@@ -33,7 +33,8 @@ class Controller extends Base
         // OLC 23
         '20240122' => [
             // 1. Fundamentals
-            '139' => [
+            // 90 in vagrant; 139 in actual
+            '90' => [
                 Candidacy::SUPERSTAR => [
                     'id' => 28,
                     'route' => null
