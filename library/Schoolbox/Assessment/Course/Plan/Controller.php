@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Course\Plan;
 
 use Alaress\Web\Controller\Base;
 use Component_Config_Componentname;
-use Component_Definition;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\ModelToArray as IndicatorModelToArray;
@@ -113,36 +112,35 @@ class Controller extends Base
             $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery(
                 // A similar query exists in library/Schoolbox/Search/Api/Database/ResultType/Textbox/IndexBuilder.php.
                 "SELECT
-                IFNULL(cci_componentname.value, cci_textbox.heading) AS componentHeading,
-                cci_textbox.textBoxID AS textboxID,
-                cci_textbox.body AS textboxBody ,
-                cci_textbox.updated_at AS updated_at
+                IFNULL(cci_componentname.value, tb.heading) AS componentHeading,
+                tb.textBoxID AS textboxID,
+                tb.body AS textboxBody ,
+                tb.updated_at AS updated_at
                 FROM component_definition cd
                 JOIN component_instance ci ON ci.component_definition_id = cd.id
-                JOIN folder f ON f.id=ci.identifier
-                JOIN (
-                    SELECT cci1.component_instance_id, tb.textBoxID, tb.categoryID, tb.heading, tb.updated_at, tb.deleted_at, tb.body
-                    FROM component_config_instance cci1
-                    JOIN component_config_definition ccd1 ON (
-                        ccd1.key='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "' AND
-                        ccd1.id=cci1.component_config_definition_id
-                    )
-                    JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci1.value
-                ) AS cci_textbox ON (cci_textbox.component_instance_id=ci.id)
-                LEFT JOIN (
-                    SELECT cci2.component_instance_id, cci2.value
-                    FROM component_config_instance cci2
-                    JOIN component_config_definition ccd2 ON (
-                        ccd2.key = '" . Component_Config_Componentname::KEY . "' AND
-                        ccd2.id=cci2.component_config_definition_id
-                    )
-                ) AS cci_componentname ON (cci_componentname.component_instance_id=ci.id)
+                JOIN folder f ON f.id = ci.identifier
+                JOIN component_config_definition ccd_textbox ON (
+                    ccd_textbox.component_definition_id = cd.id AND
+                    ccd_textbox.key = '" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
+                )
+                LEFT JOIN component_config_instance cci_textbox ON (
+                    cci_textbox.component_config_definition_id = ccd_textbox.id AND
+                    cci_textbox.component_instance_id = ci.id
+                )
+                JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+                JOIN component_config_definition ccd_componentname ON (
+                    ccd_componentname.component_definition_id = cd.id AND
+                    ccd_componentname.key = '" . Component_Config_Componentname::KEY . "'
+                )
+                LEFT JOIN component_config_instance cci_componentname ON (
+                    cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                    cci_componentname.component_instance_id = ci.id
+                )
                 WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
-                AND ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
                 AND f.deleted_at IS NULL
-                AND cci_textbox.deleted_at IS NULL
-                AND cci_textbox.categoryID = :folderId
-                ORDER BY cci_textbox.updated_at ASC"
+                AND tb.deleted_at IS NULL
+                AND tb.categoryID = :folderId
+                ORDER BY tb.updated_at ASC"
             );
             $statement->execute(['folderId' => $unit->getFolder()->getId()]);
             while ($row = $statement->fetch()) {
