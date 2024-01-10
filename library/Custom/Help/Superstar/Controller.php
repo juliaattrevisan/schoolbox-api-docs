@@ -272,7 +272,7 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws \DomainException
      */
-    public function prepareRoutes(int $year): void
+    private function prepareRoutes(int $year): void
     {
         if (!isset($this->badgeMapping[$year])) {
             throw new \DomainException('Badge mapping for this year is missing.');
@@ -287,13 +287,5 @@ class Controller extends Base
 
             unset($actionable);
         }
-    }
-
-
-    /**
-     * Award a badge to a particular person
-     */
-    public function postAward(): void
-    {
     }
 }
