@@ -11,7 +11,6 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
 use Component_Config_Componentname;
-use Component_Definition;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
@@ -31,44 +30,43 @@ class IndexBuilder extends BaseBuilder
         //    otherwise the textbox heading - hence the need to fetch the component name below.
         $queryString = "
             SELECT
-            CONCAT(cci_textbox.textBoxID, '-', ci.id, '-', f.id) AS id,
+            CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
             f.id AS folder_id,
-            IFNULL(cci_componentname.value, cci_textbox.heading) AS title,
-            cci_textbox.updated_at AS date,
-            cci_textbox.created_by AS created_by,
-            cci_textbox.body AS fulltext_index
+            IFNULL(cci_componentname.value, tb.heading) AS title,
+            tb.updated_at AS date,
+            tb.created_by AS created_by,
+            tb.body AS fulltext_index
             FROM component_definition cd
             JOIN component_instance ci ON ci.component_definition_id = cd.id
-            JOIN folder f ON f.id=ci.identifier
-            JOIN (
-                SELECT cci1.component_instance_id, tb.textBoxID, tb.heading, tb.updated_at, tb.created_by, tb.deleted_at, tb.body
-                FROM component_config_instance cci1
-                JOIN component_config_definition ccd1 ON (
-                    ccd1.key='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "' AND
-                    ccd1.id=cci1.component_config_definition_id
-                )
-                JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci1.value
-            ) AS cci_textbox ON (cci_textbox.component_instance_id=ci.id)
-            LEFT JOIN (
-                SELECT cci2.component_instance_id, cci2.value
-                FROM component_config_instance cci2
-                JOIN component_config_definition ccd2 ON (
-                    ccd2.key = '" . Component_Config_Componentname::KEY . "' AND
-                    ccd2.id=cci2.component_config_definition_id
-                )
-            ) AS cci_componentname ON (cci_componentname.component_instance_id=ci.id)
+            JOIN folder f ON f.id = ci.identifier
+            JOIN component_config_definition ccd_textbox ON (
+                ccd_textbox.component_definition_id = cd.id AND
+                ccd_textbox.key = '" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
+            )
+            LEFT JOIN component_config_instance cci_textbox ON (
+                cci_textbox.component_config_definition_id = ccd_textbox.id AND
+                cci_textbox.component_instance_id = ci.id
+            )
+            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+            JOIN component_config_definition ccd_componentname ON (
+                ccd_componentname.component_definition_id = cd.id AND
+                ccd_componentname.key = '" . Component_Config_Componentname::KEY . "'
+            )
+            LEFT JOIN component_config_instance cci_componentname ON (
+                cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                cci_componentname.component_instance_id = ci.id
+            )
             WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
-            AND ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
             AND f.deleted_at IS NULL
-            AND cci_textbox.deleted_at IS NULL
+            AND tb.deleted_at IS NULL
         ";
         $params = [];
         if ($fromDate) {
-            $queryString .= ' AND cci_textbox.updated_at >= :fromDate';
+            $queryString .= ' AND tb.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND cci_textbox.updated_at <= :toDate';
+            $queryString .= ' AND tb.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
