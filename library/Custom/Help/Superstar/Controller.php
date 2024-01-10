@@ -14,6 +14,8 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -192,11 +194,18 @@ class Controller extends Base
      * Show a list of people who could potentially be awarded Star or Superstar
      * badges for accomplishing 99% and 100% respectively, in their Units
      *
+     * @param int $year
      * @throws ContainerExceptionInterface
      * @throws Error
      * @throws NotFoundExceptionInterface
      * @throws RouteNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
      * @throws \PDOException
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws \UnexpectedValueException
      */
     public function getCandidates(int $year): void
     {
