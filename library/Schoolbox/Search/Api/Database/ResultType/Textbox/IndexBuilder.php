@@ -64,11 +64,11 @@ class IndexBuilder extends BaseBuilder
         ";
         $params = [];
         if ($fromDate) {
-            $queryString .= ' AND tb.updated_at >= :fromDate';
+            $queryString .= ' AND cci_textbox.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND tb.updated_at <= :toDate';
+            $queryString .= ' AND cci_textbox.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
