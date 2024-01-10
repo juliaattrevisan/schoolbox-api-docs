@@ -56,7 +56,8 @@ $app = new class extends CliTool\App {
             cci_textbox.heading AS textboxHeading,
             cci_componentname.value AS componentName,
             cci_componentname.component_instance_id AS componentNameId
-            FROM component_instance ci
+            FROM component_definition cd
+            JOIN component_instance ci ON ci.component_definition_id = cd.id
             JOIN folder fo ON fo.id=ci.identifier
             JOIN (
                 SELECT cci1.component_instance_id, tb.textBoxID, tb.heading, tb.updated_at, tb.created_by, tb.deleted_at, tb.body
@@ -75,7 +76,8 @@ $app = new class extends CliTool\App {
                     ccd2.id=cci2.component_config_definition_id
                 )
             ) AS cci_componentname ON (cci_componentname.component_instance_id=ci.id)
-            WHERE ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
+            WHERE cd.`class` = "Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller"
+            AND ci.module="' . Component_Definition::MODULE_HOMEPAGE . '"
             AND (cci_componentname.value IS NULL OR TRIM(cci_componentname.value) = "")'
         )->fetchAll();
 

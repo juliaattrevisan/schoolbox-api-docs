@@ -60,7 +60,7 @@ class IndexBuilder extends BaseBuilder
             WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
             AND ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
             AND f.deleted_at IS NULL
-            AND cci_textbox.deleted_at IS NULL;
+            AND cci_textbox.deleted_at IS NULL
         ";
         $params = [];
         if ($fromDate) {
