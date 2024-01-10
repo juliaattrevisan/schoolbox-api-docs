@@ -29,9 +29,8 @@ $app = new class extends CliTool\App
         $this->getLogger()->info("Updating existing Course outline components to contain the new filter config option");
 
         foreach ($oldInstances as $oldInstance) {
-            $this->getLogger()->info("  Updating instance: " . $oldInstance['id'] . "...");
+            $this->getLogger()->debug("  Updating instance: " . $oldInstance['id'] . "...");
             // Create new configs - these were not present in the old image slider
-            $this->getLogger()->info("    - Creating new filter config...");
 
             $dbc->executeQuery(
                 'INSERT INTO component_config_instance (component_config_definition_id, component_instance_id, value)
@@ -51,7 +50,6 @@ $app = new class extends CliTool\App
                     'component_definition_id_new' => $componentDefinitionId
                 ]
             );
-            $this->getLogger()->info(". config added.");
         }
         $this->getLogger()->info("Done. Finished migrating " . count($oldInstances) . " Course Outline components");
     }
