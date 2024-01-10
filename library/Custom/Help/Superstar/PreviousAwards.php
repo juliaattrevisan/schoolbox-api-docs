@@ -32,6 +32,7 @@ class PreviousAwards
      *
      * @param array $badgeMapping
      * @return array
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      */
     public function generate(array $badgeMapping): array
@@ -77,7 +78,7 @@ class PreviousAwards
         $stack = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $stack[$row['recipient_id']][$row['badge_id']] = $row['awarded_at'];
+            $stack[$row['recipient_id']][$row['badge_id']] = new \Alaress_Date_Format($row['awarded_at'], \Alaress_Date_Format::DATABASE_FORMAT);
         }
 
         return $stack;

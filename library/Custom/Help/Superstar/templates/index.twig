@@ -156,7 +156,9 @@
                                 <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
 
                                 {% if previouslyAwarded %}
-                                    <span class="pipe meta">Awarded on {{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] }}</span>
+                                    <span class="pipe meta">Awarded on
+                                        <time title="{{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id].database }}">{{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id].local }}</time>
+                                    </span>
                                 {% endif %}
                             </div>
                         </div>
