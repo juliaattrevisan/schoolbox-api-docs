@@ -58,7 +58,9 @@
                         {% endif %}
 
                         {% if unitSpecData.actionables.star|length %}
-                            <h3>Star</h3>
+                            <div class="content">
+                                <h3>Star</h3>
+                            </div>
                             {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
                         {% endif %}
                     </section>
