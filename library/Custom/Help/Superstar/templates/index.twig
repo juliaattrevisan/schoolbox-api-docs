@@ -12,14 +12,24 @@
     </div>
 </div>
 
+{# Weird styling hacks specific to this layout #}
+<style>
+    h3, div.content {
+        margin-bottom: 0;
+        padding-bottom: 0 !important;
+    }
+</style>
+
 {% for unitSpecId, unitSpecData in stack %}
     {% if unitSpecData.actionables|length %}
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">{{ unitSpecData.title }}</h2>
-                <section class="content">
+                <section>
                     {% if unitSpecData.actionables.superstar|length %}
-                        <h3>Superstar</h3>
+                        <div class="content">
+                            <h3>Superstar</h3>
+                        </div>
                         {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
                     {% endif %}
 
@@ -54,15 +64,17 @@
 
                     <li class="actions-small-1">
                         <div class="list-item">
-                            <a href="/search/user/{{ actionable.id }}">
-                                {{ actionable.firstname }} {{ actionable.lastname }}
-                            </a>
-                            -
-                            <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
+                            <div class="content card">
+                                <a href="/search/user/{{ actionable.id }}">
+                                    {{ actionable.firstname }} {{ actionable.lastname }}
+                                </a>
+                                -
+                                <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
 
-                            {% if previouslyAwarded %}
-                                <span class="pipe meta">Awarded on {{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] }}</span>
-                            {% endif %}
+                                {% if previouslyAwarded %}
+                                    <span class="pipe meta">Awarded on {{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] }}</span>
+                                {% endif %}
+                            </div>
                         </div>
                         <nav>
                             {% if not previouslyAwarded %}
