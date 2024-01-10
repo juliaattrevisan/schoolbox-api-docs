@@ -29,10 +29,10 @@
 <style>
     h3, div.content {
         margin-bottom: 0;
-        padding-bottom: 0 !important;
     }
 
     .subheader {
+        padding-top: 0.5rem;
         text-transform: none;
     }
 </style>
@@ -48,9 +48,16 @@
         {% if unitSpecData.actionables|length %}
             <div class="row">
                 <div class="small-12 island">
-                    <h2 class="subheader">{{ unitSpecData.title }}</h2>
-                    <section>
-                        {% if unitSpecData.actionables.superstar|length %}
+                    {% if unitSpecData.actionables.superstar|length %}
+                    <div class="actions-small-1">
+                        <div class="list-item">
+                            <h2 class="subheader">{{ unitSpecData.title }}</h2>
+                        </div>
+                        <nav>
+                            <a class="icon-eye" title="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"></a>
+                        </nav>
+                    </div>
+                        <section>
                             <div class="content">
                                 <h3>Superstar</h3>
                             </div>
@@ -73,6 +80,21 @@
 {# Sorry Donny - you can vue-ify this if there is time #}
 <script>
     $(function() {
+        {# Show rows where people had received an award previously
+         # They're hidden to minimise ui clutter/length, but available in case
+         # you needed to know this fact
+         #}
+        $('[data-previously-awarded-toggle]').each(function (index, element) {
+            $(element).on('click', function(event) {
+                event.preventDefault();
+
+                let unitSpecId = $(this).attr('data-previously-awarded-toggle');
+
+                $('[data-previously-awarded="' + unitSpecId + '"]').toggle();
+            });
+        });
+
+        {# Award an achievement #}
         $('[data-award]').each(function (index, element) {
             $(element).on('click', function(event) {
                 event.preventDefault();
@@ -119,7 +141,8 @@
                 {% if badgeMapping[unitSpecId][type].id is defined %}
                     {% set previouslyAwarded = (previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] ?? null) is not null %}
 
-                    <li class="actions-small-1">
+                    {# Hide people who previously got this award #}
+                    <li class="actions-small-1" {% if previouslyAwarded %}style="display: none"{% endif %} data-previously-awarded="{{ unitSpecId }}">
                         <div class="list-item">
                             <div class="content card">
                                 <a href="/search/user/{{ actionable.id }}">
