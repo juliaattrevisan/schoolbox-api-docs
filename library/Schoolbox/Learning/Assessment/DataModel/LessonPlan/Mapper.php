@@ -310,10 +310,10 @@ class Mapper extends \Schoolbox\Mapper
      * @param null|\Alaress_Date_Format $startDate
      * @param null|\Alaress_Date_Format $endDate
      * @param null|\Alaress_Date_Format $publishDate
-     * @param bool $allowStudents should we return only student visible plans? or all plans?
+     * @param bool $allowStaffOnly should we return only student visible plans? or all plans?
      * @return array<int> array of the assessment ID's for the lesson plans
      */
-    public function findForFolder(array $folderIDs, ?\Alaress_Date_Format $startDate, ?\Alaress_Date_Format $endDate, ?\Alaress_Date_Format $publishDate, bool $allowStudents = false): array
+    public function findForFolder(array $folderIDs, ?\Alaress_Date_Format $startDate, ?\Alaress_Date_Format $endDate, ?\Alaress_Date_Format $publishDate, bool $allowStaffOnly = false): array
     {
         $pb = $this->getDatabase()
             ->buildPredicateBuilder('')
@@ -321,7 +321,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /**
          * if we have dates then we should use them, if not ignore limiting to dates
-        */
+         */
         if (null !== $startDate && null !== $endDate) {
             $pb->betweenDates('assessment.due_date', $startDate, $endDate);
         } elseif (null !== $endDate) {
@@ -337,7 +337,7 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         // Are we limiting to lesson plans visible to students? or staff only?
-        if ($allowStudents) {
+        if (!$allowStaffOnly) {
             $pb->equals('lesson_plan.visibility', 'student');
         }
 

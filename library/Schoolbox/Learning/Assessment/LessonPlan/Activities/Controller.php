@@ -78,15 +78,15 @@ class Controller extends Base
         }
 
         /**
-         * If user is a student, we have specific logic:
+         * If user isn't a staff member, we have specific logic:
          * Students only see lesson plans that have been published
          * Students should only see lesson plans that have the visibility set for students to view
          */
-        $isStudent = $this->getUser()->getRole()->isStudent();
-        $publishDate = $isStudent ? \Alaress_Date_Format::now() : null;
+        $isStaff = $this->getUser()->getRole()->isStaff();
+        $publishDate = $isStaff ? null : \Alaress_Date_Format::now();
 
         // grab the assessmentID for all lesson plans from the students subject list
-        $assessmentIds = $this->lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStudent);
+        $assessmentIds = $this->lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStaff);
         // hydrate those assessments
         $lessonPlans =  $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
             $this->assessmentMapperProxy->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]),
