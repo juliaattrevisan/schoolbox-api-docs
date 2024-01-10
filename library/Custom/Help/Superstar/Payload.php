@@ -199,6 +199,7 @@ class Payload
             $superuserSpecId = '90';
 
             /* Find this random quiz, based on its spec id
+             * I think it's 81927 in actual
              */
             $assessmentSpecId = 633;
 
