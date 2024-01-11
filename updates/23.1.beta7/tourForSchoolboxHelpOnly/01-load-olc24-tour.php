@@ -2,13 +2,14 @@
 <?php
 
 /**
- * Install the 23.0 tour to advertise new features to staff
+ * Install the OLC 24 tour to advertise new features to staff
  * @copyright Copyright 2023, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -24,7 +25,42 @@ $app = new class extends CliTool\App {
             $siteTitle === '[PRD] [PRD] Schoolbox Help' ||
             $siteTitle === '[STG] [STG] Schoolbox Help'
         ) {
+            $dbc = $this->getDatabaseInternal(); // Database connector.
+            $logger = $this->getLogger();
+
+            $tourTitle = 'OLC 24 Release'; // This must match the 'title' value in olc24-tour.yaml.
+            $logger->info("Site title '$siteTitle' is a Schoolbox Help instance, so installing tour '$tourTitle'.");
+
+            $tourAlreadyExists = $dbc->executeQuery(
+                'SELECT EXISTS(
+                    SELECT *
+                    FROM tour
+                    WHERE title = ?
+                )',
+                [$tourTitle]
+            )->fetchColumn();
+
+            if ($tourAlreadyExists) {
+                $logger->info("Tour '$tourTitle' has already been installed.  Nothing to do.");
+                die;
+            }
+
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/olc24-tour.yaml', $returnVar);
+
+            // Deactivate the tour installed above.
+            try {
+                $stmt = $dbc->executeQuery(
+                    'UPDATE tour
+                    SET active=0
+                    WHERE title = ?',
+                    [$tourTitle]
+                );
+                $logger->info("Deactivated the '$tourTitle' tour so it can be manually activated later.");
+            }
+            catch (Exception $e) {
+                $logger->error("Could not deactivate the '$tourTitle' tour.");
+                throw $e;
+            }
         }
     }
 
@@ -34,4 +70,6 @@ $app = new class extends CliTool\App {
     }
 };
 
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+$options = [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::DEBUG, CliKernelAbstract::OPTION_ERRORS => E_ALL,];
+
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
