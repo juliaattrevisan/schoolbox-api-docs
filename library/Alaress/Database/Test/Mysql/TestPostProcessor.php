@@ -21,19 +21,19 @@ class TestPostProcessor extends TestCase
     /**
      * Test function to trim whitespace from array/value
      *
-     * @param array|string $input
-     * @return array|string $input
+     * @param array|string|null $input
+     * @return array|string|null $input
      */
     public function trimWhitespace($input)
     {
         if (is_array($input)) {
             $output = [];
             foreach ($input as $key => $value) {
-                $output[$key] = trim($value);
+                $output[$key] = trim((string)$value);
             }
             return $output;
         } else {
-            return trim($input);
+            return trim((string)$input);
         }
     }
 
