@@ -21,7 +21,7 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $siteSchoolCode = strtolower($this->getConfig()->get('site_school_code'));
-        if ($siteSchoolCode === 'HELP') {
+        if (strtolower($siteSchoolCode) === 'help') {
             $dbc = $this->getDatabaseInternal(); // Database connector.
             $logger = $this->getLogger();
 
