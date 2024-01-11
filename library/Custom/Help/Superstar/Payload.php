@@ -20,8 +20,27 @@ class Payload
      * We only care about the Unit Specs in this particular course
      * TODO Potentially made configurable in a ui somewhere
      */
-//    private const COURSE_ID = 34;
+    /* These are for a local vagrant emulation
+     */
     private const COURSE_ID = 27;
+
+    /* These are the actual values in help
+     */
+//    private const COURSE_ID = 34;
+
+
+    /**
+     * For a special OLC 2023 edge case
+     */
+    /* These are for a local vagrant emulation
+     */
+    private const SUPERUSER_UNIT_SPEC_ID = '90';
+    private const SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID = 633;
+
+    /* These are the actual values in help
+     */
+//    private const SUPERUSER_UNIT_SPEC_ID = '137';
+//    private const SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID = 81927;
 
 
     /**
@@ -194,23 +213,15 @@ class Payload
          * You can remove this augmentation once you're fully done with OLC 2023
          */
         if (2023 === $year) {
-            /* 90 in vagrant, 137 in actual
-             */
-            $superuserSpecId = '90';
-
             /* Find this random quiz, based on its spec id
-             * I think it's 81927 in actual
+             * Build this extra dangling data struct lol
              */
-            $assessmentSpecId = 633;
-
-            /* Build this extra dangling data struct lol
-             */
-            $augmentation = $this->augment2023SpecialCase($assessmentSpecId);
+            $augmentation = $this->augment2023SpecialCase(self::SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID);
 
             /* Shank it in
              */
             foreach ($augmentation as $userId => $userData) {
-                $stack[$superuserSpecId]['candidates'][$userId] = $userData;
+                $stack[self::SUPERUSER_UNIT_SPEC_ID]['candidates'][$userId] = $userData;
             }
         }
 
