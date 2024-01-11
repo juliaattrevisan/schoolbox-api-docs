@@ -29,10 +29,18 @@
 <style>
     h3, div.content {
         margin-bottom: 0;
+        padding-bottom: 0 !important;
+    }
+
+    section.content {
+        padding-top: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .subheader {
         padding-top: 0.5rem;
+        padding-bottom: 0;
         text-transform: none;
     }
 
@@ -60,18 +68,14 @@
                             <a class="icon-view" title="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"></a>
                         </nav>
                     </div>
-                        <section>
+                    <section class="content">
                         {% if unitSpecData.actionables.superstar|length %}
-                            <div class="content">
-                                <h3>Superstar</h3>
-                            </div>
+                            <h3 class="content">Superstar</h3>
                             {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
                         {% endif %}
 
                         {% if unitSpecData.actionables.star|length %}
-                            <div class="content">
-                                <h3>Star</h3>
-                            </div>
+                            <h3 class="content">Star</h3>
                             {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
                         {% endif %}
                     </section>
