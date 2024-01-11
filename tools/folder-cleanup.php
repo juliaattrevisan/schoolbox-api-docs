@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Alaress\Database\Quoter\Mysql\Quoter;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Application\CliTool;
@@ -32,6 +32,18 @@ $app = new class extends CliTool\App
      */
     private const FOLDER_NAME = 'Lost & Found';
 
+    /**
+     * Arbitrary maximum number of iterations the cleanup tool will attempt.
+     */
+    private const MAX_ITERATIONS = 50;
+
+    /**
+     * Arbitrary max number of parents of a folder to process.
+     *
+     * If its ancestry is traceable to greater than this number of parents
+     * without error, assume it has no recursive relations.
+     */
+    private const MAX_FOLDER_ANCESTORS = 50;
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -59,11 +71,8 @@ HELP;
             exit;
         }
 
-        $db      = $this->getDatabaseInternal();
-        $logger  = $this->getLogger();
-
-        $folderName = $db->getQuoter()->quoteIdentifier(self::FOLDER_NAME);
-
+        $db        = $this->getDatabaseInternal();
+        $logger    = $this->getLogger();
         $lostQuery = $db->prepareQuery('SELECT `id` FROM `folder` WHERE `name` = :folder_name');
         $lostQuery->execute(['folder_name' => self::FOLDER_NAME]);
 
@@ -71,7 +80,10 @@ HELP;
             $row = $lostQuery->fetch();
             $parent_id = $row['id'];
         } else {
-            $db->executeQuery('INSERT INTO `folder` (name, parent, inherit) VALUES (:folder_name, 0, 0)', [ 'folder_name' => $folderName]);
+            $db->executeQuery(
+                'INSERT INTO `folder` (name, parent, inherit) VALUES (:folder_name, 0, 0)',
+                ['folder_name' => self::FOLDER_NAME],
+            );
             $parent_id = $db->lastInsertId();
         }
 
@@ -81,7 +93,14 @@ HELP;
 
         $folderMapper = FolderMapper::getInstance();
 
+        $iterationCount = 0;
         do {
+            if ($iterationCount++ > self::MAX_ITERATIONS) {
+                $logger->warning(
+                    sprintf('Folder cleanup not complete after %d iterations: exiting', self::MAX_ITERATIONS)
+                );
+                break;
+            }
             $errors = 0;
 
             $folders = $folderMapper->findAll();
@@ -94,31 +113,29 @@ HELP;
                 $found = [];
 
                 try {
-                    while ($folderCurrent->getParent()->getId() != 0) {
+                    $ancestorCount = 0;
+                    do {
+                        if ($ancestorCount++ > self::MAX_FOLDER_ANCESTORS) {
+                            $logger->warning(
+                                sprintf(
+                                    "folder '%s' (%s) ancestry not complete after %d iterations: skipping",
+                                    $folder->getName(),
+                                    $folder->getId(),
+                                    self::MAX_FOLDER_ANCESTORS,
+                                ),
+                            );
+                            break;
+                        }
                         $found[$folderCurrent->getId()] = 1;
 
                         /** @var FolderModel $folderCurrent */
                         $folderCurrent = $folderMapper->findCheaplyById($folderCurrent->getParent()->getId());
 
-                        if ($folderCurrent->getParent()->getId() == null) {
-                            // Node has no parent set
-
-                            $logger->info(sprintf(
-                                "Orphaned Folder '%s' (%d) moved to {$folderName} (%d)",
-                                $folder->getName(),
-                                $folder->getId(),
-                                $parent_id
-                            ));
-
-                            $moveQuery->execute([
-                                'parent_id' => $parent_id,
-                                'id' => $folder->getId()
-                            ]);
-
-                            $errors++;
-
-                            break;
-                        } elseif (isset($found[$folderCurrent->getId()])) {
+                        // This used to consider a folder with a parent folder
+                        // == null as an orphan.
+                        // That seems incorrect, because folder id 0 is the root
+                        // folder's ID.
+                        if (isset($found[$folderCurrent->getId()])) {
                             // Found a looping family tree
 
                             $loopString = "";
@@ -130,10 +147,11 @@ HELP;
                             $loopString .= $folderCurrent->getId();
 
                             $logger->info(sprintf(
-                                "Looping Folder '%s' (%s) moved to {$folderName} (%d)",
+                                "Looping Folder '%s' (%s) moved to '%s' (%d)",
                                 $folder->getName(),
                                 $loopString,
-                                $parent_id
+                                self::FOLDER_NAME,
+                                $parent_id,
                             ));
 
                             $moveQuery->execute([
@@ -145,14 +163,15 @@ HELP;
 
                             break;
                         }
-                    }
+                    } while ($folderCurrent->getParent()->getId() !== IFolder::ROOT_PARENT_ID);
                 } catch (\Exception $e) {
                     $logger->info(sprintf(
-                        "Folder '%s' (%d) missing Parent (%d) moved to {$folderName} (%d)",
+                        "Folder '%s' (%d) missing Parent (%d) moved to '%s' (%d)",
                         $folder->getName(),
                         $folder->getId(),
                         $folder->getParent()->getId(),
-                        $parent_id
+                        self::FOLDER_NAME,
+                        $parent_id,
                     ));
 
                     $moveQuery->execute([
