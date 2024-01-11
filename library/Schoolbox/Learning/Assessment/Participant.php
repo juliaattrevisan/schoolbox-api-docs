@@ -422,7 +422,10 @@ class Participant
         if ($publishedOnly && $this->plan->getAssessable() instanceof Project) {
             $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
-            return $cachedProjectMark?->getNormalisedMark();
+            if ($cachedProjectMark) {
+                // if there is a mark read that, else show the 'standard' you haven't completed me, mark
+                return $cachedProjectMark->getNormalisedMark();
+            }
         }
 
         /* Non-projects just derive it the usual way it always did
@@ -448,7 +451,10 @@ class Participant
         if ($publishedOnly && $this->plan->getAssessable() instanceof Project) {
             $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
-            return $cachedProjectMark?->getHumanReadableMark();
+            if ($cachedProjectMark) {
+                // if there is a mark read that, else show the 'standard' you haven't completed me, mark
+                return $cachedProjectMark->getHumanReadableMark();
+            }
         }
 
         /* Non-projects just derive it the usual way it always did
