@@ -22,8 +22,8 @@ $app = new class extends CliTool\App {
     {
         $siteTitle = strtolower($this->getConfig()->get('title'));
         if (
-            $siteTitle === '[PRD] [PRD] Schoolbox Help' ||
-            $siteTitle === '[STG] [STG] Schoolbox Help'
+            trim($siteTitle) === 'Schoolbox Help' ||
+            trim($siteTitle) === '[STG] [STG] Schoolbox Help'
         ) {
             $dbc = $this->getDatabaseInternal(); // Database connector.
             $logger = $this->getLogger();
