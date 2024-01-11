@@ -20,16 +20,13 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $siteTitle = strtolower($this->getConfig()->get('title'));
-        if (
-            trim($siteTitle) === 'Schoolbox Help' ||
-            trim($siteTitle) === '[STG] [STG] Schoolbox Help'
-        ) {
+        $siteSchoolCode = strtolower($this->getConfig()->get('site_school_code'));
+        if ($siteSchoolCode === 'HELP') {
             $dbc = $this->getDatabaseInternal(); // Database connector.
             $logger = $this->getLogger();
 
             $tourTitle = 'OLC 24 Release'; // This must match the 'title' value in olc24-tour.yaml.
-            $logger->info("Site title '$siteTitle' is a Schoolbox Help instance, so installing tour '$tourTitle'.");
+            $logger->info("Site '$siteSchoolCode' is a Schoolbox Help instance, so installing tour '$tourTitle'.");
 
             $tourAlreadyExists = $dbc->executeQuery(
                 'SELECT EXISTS(
