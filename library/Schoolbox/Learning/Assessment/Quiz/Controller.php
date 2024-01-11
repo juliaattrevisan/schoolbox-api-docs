@@ -454,4 +454,39 @@ class Controller extends Assessment\Controller
         }
         return $quiz;
     }
+
+    /**
+     * Decide which URL to send the client back to
+     *
+     * @param IAssessable $assessment
+     * @param string|null $postReturnUrl
+     * @param string      $defaultReturnUrl
+     * @param bool        $relocated
+     * @param bool        $isCreate
+     * @return string
+     * @throws RouteNotFound
+     */
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
+    {
+        /**
+         * Always go to the modify contents screen when a quiz has been created,
+         * but send the return url with it
+         *
+         * If the quiz was only updated, use the parent logic to determine the redirect instead
+         */
+        if ($isCreate) {
+            $redirect = $this->getRouteIfAuthorized('learnosity.getContent', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId()
+            ]);
+
+            if ($postReturnUrl) {
+                $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
+            }
+
+            return $redirect;
+        }
+
+        return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated, $isCreate);
+    }
 }

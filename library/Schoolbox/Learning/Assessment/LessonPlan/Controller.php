@@ -225,11 +225,11 @@ class Controller extends Assessment\Controller
                     $unitSpecId = $unitSpec->getId();
                     $options = ['order' => ['sequence' => 'ASC']];
                     $assessments = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpecId, $options)
-                    // Remove Lesson plans, no linking to other lessons
-                    ->filter(function ($assessment) {
-                        /** @var IAssessable $assessment */
-                        return !($assessment instanceof Model);
-                    });
+                        // Remove Lesson plans, no linking to other lessons
+                        ->filter(function ($assessment) {
+                            /** @var IAssessable $assessment */
+                            return !($assessment instanceof Model);
+                        });
                     $unitSpec->setAssessables($assessments);
                     $courseAssessments['units'][] = [
                         'id' => $unitSpecId,
@@ -395,15 +395,15 @@ class Controller extends Assessment\Controller
     {
         $this->response = $this->responseAsJson(
             $assessment->getLinkedAssessments()
-            ? $assessment->getLinkedAssessments()->reindex()->map(
-                new Assessment\Translator\UnitAssessments(
-                    $this->routeGenerator,
-                    $this->getAuthorizer(),
-                    $this->getUser(),
-                    $this->getUser()
+                ? $assessment->getLinkedAssessments()->reindex()->map(
+                    new Assessment\Translator\UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getAuthorizer(),
+                        $this->getUser(),
+                        $this->getUser()
+                    )
                 )
-            )
-            : []
+                : []
         );
     }
 
@@ -470,5 +470,40 @@ class Controller extends Assessment\Controller
             throw new NotFound();
         }
         $this->response = $this->responseEmpty();
+    }
+
+    /**
+     * Decide which URL to send the client back to
+     *
+     * @param IAssessable $assessment
+     * @param string|null $postReturnUrl
+     * @param string      $defaultReturnUrl
+     * @param bool        $relocated
+     * @param bool        $isCreate
+     * @return string
+     * @throws RouteNotFound
+     */
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
+    {
+        /**
+         * Always go to the summary screen when a lesson plan has been created,
+         * but send the return url with it
+         *
+         * If the lesson plan was only updated, use the parent logic to determine the redirect instead
+         */
+        if ($isCreate) {
+            $redirect = $this->routeGenerator->generate('learningAssessment.getSummary', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $this->getUser()->getId()
+            ]);
+
+            if ($postReturnUrl) {
+                $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
+            }
+
+            return $redirect;
+        }
+
+        return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated, $isCreate);
     }
 }
