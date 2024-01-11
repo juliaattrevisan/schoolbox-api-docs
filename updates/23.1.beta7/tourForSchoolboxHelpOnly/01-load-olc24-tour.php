@@ -56,8 +56,7 @@ $app = new class extends CliTool\App {
                     [$tourTitle]
                 );
                 $logger->info("Deactivated the '$tourTitle' tour so it can be manually activated later.");
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $logger->error("Could not deactivate the '$tourTitle' tour.");
                 throw $e;
             }
