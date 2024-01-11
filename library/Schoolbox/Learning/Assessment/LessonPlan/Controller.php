@@ -504,6 +504,6 @@ class Controller extends Assessment\Controller
             return $redirect;
         }
 
-        return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated);
+        return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated, $isCreate);
     }
 }
