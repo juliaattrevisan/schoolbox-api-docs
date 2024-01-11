@@ -60,7 +60,7 @@ class Sync extends App
             exit();
         }
 
-        $command = sprintf("/home/vagrant/intelliscl/bin/intelliscl sync --deployment %s --secret %s --connString1 '%s' --tempFolder '%s'", escapeshellarg($deploymentId), escapeshellarg($secret), SQL_dsn_read, sys_get_temp_dir());
+        $command = sprintf("intelliscl sync --deployment %s --secret %s --connString1 '%s' --tempFolder '%s'", escapeshellarg($deploymentId), escapeshellarg($secret), SQL_dsn_read, sys_get_temp_dir());
 
         $this->getLogger()->debug($command);
 
