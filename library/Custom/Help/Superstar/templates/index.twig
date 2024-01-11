@@ -57,7 +57,7 @@
                             <h2 class="subheader">{{ unitSpecData.title }}</h2>
                         </div>
                         <nav>
-                            <a class="icon-eye" title="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"></a>
+                            <a class="icon-view" title="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"></a>
                         </nav>
                     </div>
                         <section>
@@ -95,6 +95,14 @@
                 let unitSpecId = $(this).attr('data-previously-awarded-toggle');
 
                 $('[data-previously-awarded="' + unitSpecId + '"]').toggle();
+
+                /* Toggle eyeball icon
+                 */
+                if ('icon-view' === $(this).attr('class')) {
+                    $(this).removeClass('icon-view').addClass('icon-view-hollow');
+                } else {
+                    $(this).removeClass('icon-view-hollow').addClass('icon-view');
+                }
             });
         });
 
