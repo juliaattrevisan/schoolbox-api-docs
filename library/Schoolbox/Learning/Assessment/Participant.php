@@ -422,8 +422,8 @@ class Participant
         if ($publishedOnly && $this->plan->getAssessable() instanceof Project) {
             $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
+            // if there is a mark cached return that. Else calculate the mark using the old manual hydration method
             if ($cachedProjectMark) {
-                // if there is a mark read that, else show the 'standard' you haven't completed me, mark
                 return $cachedProjectMark->getNormalisedMark();
             }
         }
@@ -451,8 +451,8 @@ class Participant
         if ($publishedOnly && $this->plan->getAssessable() instanceof Project) {
             $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
+            // if there is a mark cached return that. Else calculate the mark using the old manual hydration method
             if ($cachedProjectMark) {
-                // if there is a mark read that, else show the 'standard' you haven't completed me, mark
                 return $cachedProjectMark->getHumanReadableMark();
             }
         }
