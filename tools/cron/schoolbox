@@ -108,4 +108,12 @@ MAILTO="support@schoolbox.com.au"
 # (Go back 2 hours to ensure that nothing has been missed as a result of jitter)
 30 * * * * www-data	/usr/local/bin/jitter 1800 php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-2 hour" >> /var/log/schoolbox/search-build-index.log 2>&1
 
+# Intellischool
+# update tool once a day
+36 2 * * *	www-data    intelliscl update >> /var/log/schoolbox/intellischool.log 2>&1
+
+# sync data every 5min
+*/5 * * * *     www-data    php /usr/share/schoolbox/tools/intellischool/intellischoolSync.php >> /var/log/schoolbox/intellischool.log 2>&1
+
+
 # End of file - do not delete
