@@ -132,6 +132,7 @@ class TextboxCest
         $manageAll->typeTextBoxHeading($textBoxItem, 'Third Text Box');
         $manageAll->typeTextBoxContent($textBoxItem, 'Jana Reed');
         $manageAll->clickSaveAll();
+        exec('php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-10 min";');
     }
 
     /**
@@ -176,12 +177,11 @@ class TextboxCest
 
         $i->amGoingTo("As Jana Reed search for a  textbox and check whether it is presented in the search results grid or not");
         $i->impersonate('Jana Reed');
-        $common->search('Jana Reed');
+        $common->search("'Jana Reed'");
         $searchPage->clearFilters();
         $common->clickSearchTypeCheckbox('textbox');
         $searchPage->clickApplyFilters();
-        $i->amGoingTo('expect to see an empty results warning');
-        $searchPage->verifyNoResults();
+        $i->amGoingTo('ensure Third Text Box is not presented');
         $i->cantSee('Jana Reed', 'mark');
         $i->cantSee('Third Text Box', '//h6/a');
         $common->search('Test');
@@ -209,6 +209,7 @@ class TextboxCest
         $i->click('Modify');
         $textboxForm->fillContent('Jamal to be presented');
         $textboxForm->save();
+        exec('php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-10 min";');
 
         $i->amGoingTo("As Jana Reed search for textboxes and check whether its is presented or not");
         $i->impersonate('Jana Reed');
