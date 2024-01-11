@@ -113,7 +113,11 @@ function getDataProgressTickForm(activity: Activity) {
             <a
                 v-if="activity._links !== null"
                 class="title"
-                :href="(props.isInstructor && !store.isStudentView) ? activity._links.status + '?returnUrl=' + returnUrl : activity._links.summary + '?returnUrl=' + returnUrl"
+                :href="
+                    props.isInstructor && !store.isStudentView
+                        ? activity._links.status + '?returnUrl=' + returnUrl
+                        : activity._links.summary + '?returnUrl=' + returnUrl
+                "
                 >{{ activity.title }}</a
             >
             <span v-else class="title">{{ activity.title }}</span>
@@ -132,7 +136,7 @@ function getDataProgressTickForm(activity: Activity) {
     <nav v-if="activity.progressTick !== null" class="progress-tick-container">
         <form
             v-if="activity.progressTick.postRouteUrl !== ''"
-            :action="activity.progressTick.postRouteUrl"
+            :action="activity.progressTick.postRouteUrl || undefined"
             method="post"
             class="progress-tick-form"
             :data-progress-tick-form="getDataProgressTickForm(activity)"

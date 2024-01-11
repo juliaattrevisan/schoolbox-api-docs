@@ -1,14 +1,14 @@
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
-import { Activity } from "../linkedActivitiesTypes";
+import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { LessonPlanEvent } from "../../js/event/lessonPlanEvent";
 
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
     const sourceId = window.Vue.ref(0); // The id of the source lesson plan
-    const linkedActivities = window.Vue.ref<Activity[]>([]);
+    const linkedActivities = window.Vue.ref([] as Activity[]);
     const gradeGradientEnable = window.Vue.ref(false); // Whether the grade gradient is enabled or not
     const isStudentView = window.Vue.ref(false); // Whether the page is in student view or not
-    const selectedActivities = window.Vue.ref<Activity[]>([]); // Current state of the selected activities in the modal
+    const selectedActivities = window.Vue.ref([] as Activity[]); // Current state of the selected activities in the modal
 
     const isSingleUnlinkOpen = window.Vue.ref(false); // Whether the single unlink modal is open or not
 
@@ -77,6 +77,17 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
     }
 
     /**
+     * Raise some sort of error if a request from `fetch` does not return a
+     * success response.
+     * @param {Response} response - the response from `fetch`
+     */
+    function throwErrorOnInvalidResponse(response: Response) {
+        if (!response.ok) {
+            throw new Error(`Something went wrong (response code: ${String(response.status)})`);
+        }
+    }
+
+    /**
      * Save the selected activities
      * @param {boolean} confirmUnlinks - whether the user has confirmed they want to unlink activities
      */
@@ -125,18 +136,6 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         // Close any open modals
         isOpen.value = false;
         isSingleUnlinkOpen.value = false;
-    }
-
-    /**
-     * Raise some sort of error if a request from `fetch` does not return a
-     * success response.
-     *
-     * @param {Response} response
-     */
-    function throwErrorOnInvalidResponse(response: Response) {
-        if (!response.ok) {
-            throw new Error("Something went wrong (response code: " + String(response.status) + ")");
-        }
     }
 
     /**

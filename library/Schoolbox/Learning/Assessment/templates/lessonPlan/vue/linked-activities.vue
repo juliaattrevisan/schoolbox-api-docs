@@ -32,19 +32,21 @@ function isUnitOpen(unit: Unit): boolean {
 }
 
 /**
- * Check if the unit is open or if there are any selected activities inside the unit
+ * Check if the unit is open or if there are any linked activities inside the unit
  * @param {Unit} unit The unit to check
- * @returns {boolean} True if the unit is open or if there are any selected activities inside the unit
+ * @returns {boolean} True if the unit is open or if there are any linked activities inside the unit
  */
 function isUnitOpenOrHasLinked(unit: Unit): boolean {
     if (isUnitOpen(unit)) {
         return true;
     }
 
-    // If any assessment inside the unit is inside store.selectedActivities, then show as open
+    // Check for any linked activities inside the unit
+    // Note: Uses props.linkedActivities instead of latest in store to prevent reactivity issues,
+    //       Hence will always reflect the state of the linked activities from when the page was loaded
     return unit.assessments.some((assessment) => {
-        return store.selectedActivities.some((selectedActivity) => {
-            return selectedActivity.id === assessment.id;
+        return props.linkedActivities.some((linkedActivity) => {
+            return linkedActivity.id === assessment.id;
         });
     });
 }
@@ -200,8 +202,8 @@ window.Vue.onMounted(() => {
                                         ></linked-activities-modal-item>
                                     </li>
                                     <li
-                                        v-else
                                         v-for="subActivity in activity.assessments"
+                                        v-else
                                         :key="subActivity.id"
                                         :data-unit-assessment="subActivity.id"
                                         class="interact child"
@@ -217,6 +219,7 @@ window.Vue.onMounted(() => {
                         </div>
                     </li>
                 </ul>
+                <br />
                 <a
                     href="#"
                     class="button expand icon-link"

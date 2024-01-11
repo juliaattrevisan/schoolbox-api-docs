@@ -19,11 +19,11 @@ export function removeClassesThatContain(element: HTMLElement, search: string) {
 
 /**
  * Return a colour between a gradient of red (0) to green (10) based on the current count and total count
- * @param {number} currentCount - the current count of the total
- * @param {number} totalCount - the total count
+ * @param {number|null} currentCount - the current count of the total
+ * @param {number|null} totalCount - the total count
  * @returns {string} - the class name of the gradient
  */
-export function getGradient(currentCount: number, totalCount: number) {
+export function getGradient(currentCount: number | null, totalCount: number | null) {
     if (typeof currentCount !== "number" || typeof totalCount !== "number") {
         return "gradient-none";
     }
