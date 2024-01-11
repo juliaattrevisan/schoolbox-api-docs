@@ -44,7 +44,7 @@ class Controller extends Base
         2023 => [
             // 1. Fundamentals
             // 90 in vagrant; 139 in actual
-            '90' => [
+            '139' => [
                 Candidacy::SUPERSTAR => [
                     'id' => 28,
                     'route' => null

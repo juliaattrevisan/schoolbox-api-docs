@@ -22,11 +22,11 @@ class Payload
      */
     /* These are for a local vagrant emulation
      */
-    private const COURSE_ID = 27;
+//    private const COURSE_ID = 27;
 
     /* These are the actual values in help
      */
-//    private const COURSE_ID = 34;
+    private const COURSE_ID = 34;
 
 
     /**
@@ -34,13 +34,13 @@ class Payload
      */
     /* These are for a local vagrant emulation
      */
-    private const SUPERUSER_UNIT_SPEC_ID = '90';
-    private const SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID = 633;
+//    private const SUPERUSER_UNIT_SPEC_ID = '90';
+//    private const SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID = 633;
 
     /* These are the actual values in help
      */
-//    private const SUPERUSER_UNIT_SPEC_ID = '137';
-//    private const SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID = 81927;
+    private const SUPERUSER_UNIT_SPEC_ID = '137';
+    private const SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID = 81927;
 
 
     /**
