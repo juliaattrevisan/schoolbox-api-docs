@@ -1,0 +1,54 @@
+tour:
+  title: 'OLC 24 Release'
+  description: 'Introduce users to the new features of the OLC 24 release.'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: Welcome to OLC 24
+        type: modal
+        content: "<p>Welcome to OLC ‘24 - the 2024 version of the Online Learning Course. This release includes updates to a number of projects, videos, and quizzes, as well as some brand new tasks that align with our new and exciting 23.0 and 23.1 Schoolbox features.</p>
+                  <h3>All Units:</h3>
+                  <ul>
+                   <li>New quizzes to align with updates made in 23.0 and 23.1, which utilise Schoolbox’s new modernised quiz application</li>
+                   <li>A new 'Provide Feedback' survey task at the end of each unit</li>
+                  </ul>
+                  <h3>Fundamentals Unit</h3>
+                  <ul>
+                   <li>3 New Tasks</li>
+                   <li>4 Updated Tasks</li>
+                  </ul>
+                  <h3>Teaching and Learning Unit</h3>
+                  <ul>
+                   <li>1 New Project</li>
+                   <li>6 New Tasks</li>
+                   <li>8 Updated Tasks</li>
+                  </ul>
+                  <h3>Marcomms Unit</h3>
+                  <ul>
+                   <li>1 New Project</li>
+                   <li>5 New Tasks</li>
+                   <li>2 New Submissions</li>
+                  </ul>
+                  <h3>Pastoral Care Unit</h3>
+                  <ul>
+                   <li>4 Updated Tasks</li>
+                  </ul>
+                  <h3>Extra-Curricular Unit</h3>
+                  <ul>
+                   <li>4 New Tasks</li>
+                   <li>1 Updated Tasks</li>
+                  </ul>
+                  <h3>Superuser Unit</h3>
+                  <ul>
+                   <li>2 New Projects</li>
+                   <li>2 New Tasks</li>
+                   <li>3 Updated Tasks</li>
+                  </ul>
+                  <p>For a complete outline of the updated content for OLC '24, please visit our <a href='https://help.schoolbox.com.au/homepage/4946'>OLC ‘24 Release Notes</a>.</p>"
+
+        class: introjs-newsmodal
