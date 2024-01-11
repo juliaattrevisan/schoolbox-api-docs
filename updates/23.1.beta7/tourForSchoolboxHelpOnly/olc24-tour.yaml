@@ -11,7 +11,8 @@ tour:
     - step:
         title: Welcome to OLC 24
         type: modal
-        content: "<p>Welcome to OLC ‘24 - the 2024 version of the Online Learning Course. This release includes updates to a number of projects, videos, and quizzes, as well as some brand new tasks that align with our new and exciting 23.0 and 23.1 Schoolbox features.</p>
+        content: "<img src='{CDN_PREFIX}/images/tour/Schoolbox-OLC-2024-Banner-1508x188px.png' style='width:100%;margin-bottom:16px;'>
+                  <p>Welcome to OLC ‘24 - the 2024 version of the Online Learning Course. This release includes updates to a number of projects, videos, and quizzes, as well as some brand new tasks that align with our new and exciting 23.0 and 23.1 Schoolbox features.</p>
                   <h3>All Units:</h3>
                   <ul>
                    <li>New quizzes to align with updates made in 23.0 and 23.1, which utilise Schoolbox’s new modernised quiz application</li>
