@@ -27,15 +27,9 @@
 
 {# Weird styling hacks specific to this layout #}
 <style>
-    h3, div.content {
+    h3.content {
         margin-bottom: 0;
         padding-bottom: 0 !important;
-    }
-
-    section.content {
-        padding-top: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
     }
 
     .subheader {
@@ -68,16 +62,22 @@
                             <a class="icon-view" title="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"></a>
                         </nav>
                     </div>
-                    <section class="content">
+                    <section>
+                        <ul class="information-list">
                         {% if unitSpecData.actionables.superstar|length %}
-                            <h3 class="content">Superstar</h3>
-                            {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                            <li>
+                                <h3 class="content">Superstar</h3>
+                                {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                            </li>
                         {% endif %}
 
                         {% if unitSpecData.actionables.star|length %}
-                            <h3 class="content">Star</h3>
-                            {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                            <li>
+                                <h3 class="content">Star</h3>
+                                {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                            </li>
                         {% endif %}
+                        </ul>
                     </section>
                 </div>
             </div>
