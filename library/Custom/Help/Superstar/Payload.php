@@ -318,7 +318,7 @@ class Payload
             AND f1.deleted_at IS NULL
             AND f2.deleted_at IS NULL
             AND fc.deleted_at IS NULL
-            ORDER BY unit_spec_id, unit_spec_title, user_lastname, user_id
+            ORDER BY unit_spec_title, user_lastname, user_id
         ";
 
         $statement = $this->database->prepare($query);
