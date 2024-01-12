@@ -189,7 +189,7 @@ class Notifier extends ResourceNotifier
         try {
             return $this->access->getFolderAccess($currentUser, $resource->getId()) >= UserAccess::ACCESS_READ;
         } catch (MapperExceptionNotFound) {
-            // The folder no longer exists.
+            // This should never happen, but if it does just treat the folder as inaccessible.
             return false;
         }
     }
