@@ -288,13 +288,13 @@ class Payload
         $query = "
             SELECT
                 cui.course_unit_specification_id AS unit_spec_id,
-                f0.`name` AS unit_spec_title,
+                f0.name AS unit_spec_title,
                 u.id AS user_id,
                 u.firstname AS user_firstname,
                 u.lastname AS user_lastname,
                 f2.id AS folder_id,
-                f2.`name` AS school_name,
-                fc.`code` AS school_code,
+                f2.name AS school_name,
+                fc.code AS school_code,
                 prc.project_id AS project_id,
                 prc.norm_mark
             FROM course_implementation ci
@@ -303,11 +303,10 @@ class Payload
             INNER JOIN folder f0 ON cus.folder_id = f0.id
             INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
             INNER JOIN project p ON acui.assessment_id = p.assessment_id
-            LEFT JOIN project_result prc ON p.id = prc.project_id
-            LEFT JOIN `user` u ON prc.user_id = u.id
-            LEFT JOIN mv_assessment_relation mvar ON p.assessment_id = mvar.assessment_id
-            LEFT JOIN folder f1 ON mvar.folder_id = f1.id
-            LEFT JOIN folder f2 ON f1.parent = f2.id
+            INNER JOIN project_result prc ON p.assessment_id = prc.project_id
+            INNER JOIN `user` u ON prc.user_id = u.id
+            INNER JOIN folder f1 ON ci.folder_id = f1.id
+            INNER JOIN folder f2 ON f1.parent = f2.id
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
             WHERE ci.course_specification_id = :courseId
             AND cui.deleted_at IS NULL
@@ -320,37 +319,6 @@ class Payload
             AND f2.deleted_at IS NULL
             AND fc.deleted_at IS NULL
             ORDER BY unit_spec_id, unit_spec_title, user_lastname, user_id
-        ";
-
-        $query = "
-            SELECT
-                u.id AS user_id,
-                u.firstname AS user_firstname,
-                u.lastname AS user_lastname,
-                prc.project_id AS project_id,
-                prc.norm_mark,
-                f0.id AS f0_id,
-                f0.name AS f0_name,
-                f1.id AS f1_id,
-                f1.name AS f1_name,
-                f2.id AS f2_id,
-                f2.name AS f2_name,
-                ci.folder_id,
-                fc.*
-            FROM course_implementation ci
-            INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
-            INNER JOIN course_unit_specification cus ON cui.course_unit_specification_id = cus.id
-            INNER JOIN folder f0 ON cus.folder_id = f0.id
-            INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
-            INNER JOIN project p ON acui.assessment_id = p.assessment_id
-            INNER JOIN project_result prc ON p.assessment_id = prc.project_id
-            INNER JOIN `user` u ON prc.user_id = u.id
-            INNER JOIN folder f1 ON ci.folder_id = f1.id
-            INNER JOIN folder f2 ON f1.parent = f2.id
-            LEFT JOIN folder_code fc ON f2.id = fc.folder_id
-            WHERE prc.user_id = 40548
-            and ci.folder_id = 3572
-            AND ci.course_specification_id = 34
         ";
 
         $statement = $this->database->prepare($query);
