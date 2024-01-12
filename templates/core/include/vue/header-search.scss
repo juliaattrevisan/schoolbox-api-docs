@@ -50,73 +50,70 @@
     }
 }
 
-// Smallest screen size (both panels are always unpinned)
-@media #{$mediumwide-down} {
-    // Search bar always has right=1 and left-padding=2 while notifications are enabled
-    body:not(.disableNotifications) .c-header-search {
-        right: var(--tabbar-icon-width);
+@mixin header-search-properties($right-multiplier, $padding-left-multiplier) {
+    @if $right-multiplier >= 0 {
+        right: calc(var(--tabbar-icon-width) * #{$right-multiplier});
+    }
 
-        &:hover,
-        &.focus {
-            padding-left: calc(var(--tabbar-icon-width) * 2);
+    &:hover,
+    &.focus {
+        @if $padding-left-multiplier >= 0 {
+            padding-left: calc(var(--tabbar-icon-width) * #{$padding-left-multiplier});
         }
     }
-    // If notifications are disabled, search bar always has right=0 and left-padding=1
-    body.disableNotifications .c-header-search {
-        right: 0;
+}
 
-        &:hover,
-        &.focus {
-            padding-left: calc(var(--tabbar-icon-width) * 1);
+// Smallest screen size (both panels are always unpinned)
+@media #{$mediumwide-down} {
+    body {
+        // Search bar always has right=1 and left-padding=2 while notifications are enabled
+        &:not(.disableNotifications) .c-header-search {
+            @include header-search-properties(1, 2);
+        }
+
+        // If notifications are disabled, search bar always has right=0 and left-padding=1
+        &.disableNotifications .c-header-search {
+            @include header-search-properties(0, 1);
         }
     }
 }
 
 // Browser width is large enough to allow only the menu (left pael) to be pinned/stashed
 @media #{$large-only} {
-    // Prevent specificity issues with the .disableNotifications class
-    body:not(.disableNotifications) {
-        // Search bar always has right=2, left-padding varies
-        .c-header-search {
-            right: calc(var(--tabbar-icon-width) * 2);
-        }
+    body {
+        // Search bar properties when notifications are enabled
+        &:not(.disableNotifications) {
+            // - right is always 2, left-padding varies
+            .c-header-search {
+                @include header-search-properties(2, -1);
+            }
 
-        // When the left sidebar is pinned open, left padding should be 2
-        // When stashed, left padding should be 3
-        .inner-wrap.left-open .c-header-search {
-            &:hover,
-            &.focus {
-                padding-left: calc(var(--tabbar-icon-width) * 2);
+            // When the left sidebar is pinned open, left padding should be 2
+            .inner-wrap.left-open .c-header-search {
+                @include header-search-properties(-1, 2);
+            }
+
+            // When stashed, left padding should be 3
+            .inner-wrap:not(.left-open) .c-header-search {
+                @include header-search-properties(-1, 3);
             }
         }
 
-        .inner-wrap:not(.left-open) .c-header-search {
-            &:hover,
-            &.focus {
-                padding-left: calc(var(--tabbar-icon-width) * 3);
+        // Search bar properties when notifications are disabled
+        &.disableNotifications {
+            // - right is always 1, left-padding varies
+            .c-header-search {
+                @include header-search-properties(1, -1);
             }
-        }
-    }
 
-    body.disableNotifications {
-        // When notifications are disabled in this condition, right is always 1
-        .c-header-search {
-            right: var(--tabbar-icon-width);
-        }
-
-        // When notifications are disabled, and the left sidebar is pinned open, left padding should be 1
-        .inner-wrap.left-open .c-header-search {
-            &:hover,
-            &.focus {
-                padding-left: var(--tabbar-icon-width);
+            // When notifications are disabled, and the left sidebar is pinned open, left padding should be 1
+            .inner-wrap.left-open .c-header-search {
+                @include header-search-properties(-1, 1);
             }
-        }
 
-        // When notifications are disabled, and the left sidebar is stashed, left padding should be 2
-        .inner-wrap:not(.left-open) .c-header-search {
-            &:hover,
-            &.focus {
-                padding-left: calc(var(--tabbar-icon-width) * 2);
+            // When notifications are disabled, and the left sidebar is stashed, left padding should be 2
+            .inner-wrap:not(.left-open) .c-header-search {
+                @include header-search-properties(-1, 2);
             }
         }
     }
@@ -124,68 +121,45 @@
 
 // Browser width is large enough to allow the notifications panel to be pinned/stashed
 @media #{$xlarge-up} {
-    // Prevent specificity issues with the .disableNotifications class
-    body:not(.disableNotifications) {
-        // Panels: LEFT and RIGHT open -> right=1 left-padding=1
-        .inner-wrap.left-open.right-open .c-header-search {
-            right: var(--tabbar-icon-width);
+    body {
+        // Search bar properties when notifications are enabled
+        &:not(.disableNotifications) {
+            // Panels: LEFT and RIGHT open -> right=1 left-padding=1
+            .inner-wrap.left-open.right-open .c-header-search {
+                @include header-search-properties(1, 1);
+            }
 
-            &:hover,
-            &.focus {
-                padding-left: var(--tabbar-icon-width);
+            // Panels: LEFT open, RIGHT closed -> right=2 left-padding=2
+            .inner-wrap.left-open:not(.right-open) .c-header-search {
+                @include header-search-properties(2, 2);
+            }
+
+            // Panels: LEFT closed, RIGHT open -> right=1 left-padding=2
+            .inner-wrap:not(.left-open).right-open .c-header-search {
+                @include header-search-properties(1, 2);
+            }
+
+            // Panels: LEFT and RIGHT closed -> right=2 left-padding=3
+            .inner-wrap:not(.left-open):not(.right-open) .c-header-search {
+                @include header-search-properties(2, 3);
             }
         }
 
-        // Panels: LEFT open, RIGHT closed -> right=2 left-padding=2
-        .inner-wrap.left-open:not(.right-open) .c-header-search {
-            right: calc(var(--tabbar-icon-width) * 2);
-
-            &:hover,
-            &.focus {
-                padding-left: calc(var(--tabbar-icon-width) * 2);
+        // Search bar properties when notifications are disabled
+        &.disableNotifications {
+            // When notifications are disabled in this condition, right is always 1
+            .c-header-search {
+                @include header-search-properties(1, -1);
             }
-        }
 
-        // Panels: LEFT closed, RIGHT open -> right=1 left-padding=2
-        .inner-wrap:not(.left-open).right-open .c-header-search {
-            right: var(--tabbar-icon-width);
-
-            &:hover,
-            &.focus {
-                padding-left: calc(var(--tabbar-icon-width) * 2);
+            // When notifications are disabled, and the left sidebar is pinned open, left padding should be 1
+            .inner-wrap.left-open .c-header-search {
+                @include header-search-properties(-1, 1);
             }
-        }
 
-        // Panels: LEFT and RIGHT closed -> right=2 left-padding=3
-        .inner-wrap:not(.left-open):not(.right-open) .c-header-search {
-            right: calc(var(--tabbar-icon-width) * 2);
-
-            &:hover,
-            &.focus {
-                padding-left: calc(var(--tabbar-icon-width) * 3);
-            }
-        }
-    }
-
-    body.disableNotifications {
-        // When notifications are disabled in this condition, right is always 1
-        .c-header-search {
-            right: var(--tabbar-icon-width);
-        }
-
-        // When notifications are disabled, and the left sidebar is pinned open, left padding should be 1
-        .inner-wrap.left-open .c-header-search {
-            &:hover,
-            &.focus {
-                padding-left: var(--tabbar-icon-width);
-            }
-        }
-
-        // When notifications are disabled, and the left sidebar is stashed, left padding should be 2
-        .inner-wrap:not(.left-open) .c-header-search {
-            &:hover,
-            &.focus {
-                padding-left: calc(var(--tabbar-icon-width) * 2);
+            // When notifications are disabled, and the left sidebar is stashed, left padding should be 2
+            .inner-wrap:not(.left-open) .c-header-search {
+                @include header-search-properties(-1, 2);
             }
         }
     }
