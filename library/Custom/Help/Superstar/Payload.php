@@ -367,6 +367,8 @@ class Payload
                 f2.`name` AS school_name,
                 fc.`code` AS school_code
             FROM assessment_specification_implementation asi
+            INNER JOIN assessment a1 ON asi.implementation_assessment_id = a1.id
+            INNER JOIN assessment a2 ON asi.specification_assessment_id = a2.id
             INNER JOIN mv_assessment_relation mvar ON asi.implementation_assessment_id = mvar.assessment_id
             INNER JOIN folder f1 ON mvar.folder_id = f1.id
             INNER JOIN folder f2 ON f1.parent = f2.id
@@ -375,6 +377,8 @@ class Payload
             AND f1.deleted_at IS NULL
             AND f2.deleted_at IS NULL
             AND fc.deleted_at IS NULL
+            AND a1.deleted_at IS NULL
+            AND a2.deleted_at IS NULL
         ";
 
         $statement = $this->database->prepare($query);
