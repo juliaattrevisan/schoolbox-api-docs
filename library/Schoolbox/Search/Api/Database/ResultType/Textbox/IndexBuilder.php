@@ -26,13 +26,13 @@ class IndexBuilder extends BaseBuilder
     {
         // Pass 1: textboxes within a component
         //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
-        //  * The displayed heading of a textbox component will be the component name if present,
-        //    otherwise the textbox heading - hence the need to fetch the component name below.
+        //  * The displayed heading of a textbox component on a homepage will be the textbox heading if non-blank,
+        //    otherwise the component name.  So that is the heading we must use for the search index.
         $queryString = "
             SELECT
             CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
             f.id AS folder_id,
-            IFNULL(cci_componentname.value, tb.heading) AS title,
+            IF(tb.heading IS NULL OR tb.heading = '', cci_componentname.value, tb.heading) AS title,
             tb.updated_at AS date,
             tb.created_by AS created_by,
             tb.body AS fulltext_index

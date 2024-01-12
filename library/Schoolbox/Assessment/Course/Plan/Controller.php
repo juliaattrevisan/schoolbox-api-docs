@@ -110,9 +110,12 @@ class Controller extends Base
             $extraTextboxes = 0;
             // fetch all for the folder
             $statement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery(
-                // A similar query exists in library/Schoolbox/Search/Api/Database/ResultType/Textbox/IndexBuilder.php.
+                // Notes:
+                //  * A similar query exists in library/Schoolbox/Search/Api/Database/ResultType/Textbox/IndexBuilder.php.
+                //  * The displayed heading of a textbox component on a homepage will be the textbox heading if non-blank,
+                //    otherwise the component name.  So that is what we need to match on for the unit planner.
                 "SELECT
-                IFNULL(cci_componentname.value, tb.heading) AS componentHeading,
+                IF(tb.heading IS NULL OR tb.heading = '', cci_componentname.value, tb.heading) AS componentHeading,
                 tb.textBoxID AS textboxID,
                 tb.body AS textboxBody ,
                 tb.updated_at AS updated_at
