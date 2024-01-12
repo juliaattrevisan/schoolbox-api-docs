@@ -69,6 +69,16 @@ class CandidacyTest extends TestCase
                 null
             ],
 
+            'Nothing 5' => [
+                [100.00, 99.12, 99.34, 99.45, 98.99],
+                null
+            ],
+
+            'Nothing 6' => [
+                [100.00, 99.12, 0.00, 99.34, null, null, 0.00, 99.45, 98.99],
+                null
+            ],
+
             /* Star
              */
             'Star 1' => [
@@ -106,6 +116,11 @@ class CandidacyTest extends TestCase
                 null
             ],
 
+            'Incomplete Star 3' => [
+                [99.00, null, 99.12, null, 99.00, null, 99.76, null, 100.00, null, 100.00, null, 100.00, null],
+                null
+            ],
+
             /* Superstar, but with a new project they haven't done yet
              * They get nothing
              */
@@ -116,6 +131,11 @@ class CandidacyTest extends TestCase
 
             'Incomplete Superstar 2' => [
                 [100.00, 100.00, 100.00, 100.00, 100.00, 100.00, null],
+                null
+            ],
+
+            'Incomplete Superstar 3' => [
+                [100.00, null, 100.00, null, 100.00, null, 100.00, null, 100.00, null, 100.00, null],
                 null
             ],
         ];
