@@ -13,7 +13,7 @@ namespace Schoolbox\Resource\Folder;
 
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\NotFound as MapperExceptionNotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -181,11 +181,16 @@ class Notifier extends ResourceNotifier
         if (!$resource instanceof Folder) {
             return false;
         }
+
+        if ($resource->isDeleted()) {
+            return false;
+        }
+
         try {
             return $this->access->getFolderAccess($currentUser, $resource->getId()) >= UserAccess::ACCESS_READ;
-        } catch (MapperException) {
-            $this->log->warning("Failed to get access for folder:{$resource->getId()} user {$currentUser->getId()}");
+        } catch (MapperExceptionNotFound) {
+            // The folder no longer exists.
+            return false;
         }
-        return false;
     }
 }
