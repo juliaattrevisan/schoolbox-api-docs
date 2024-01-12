@@ -59,8 +59,8 @@ class Sync extends App
             $this->getLogger()->debug("intellischool not setup, exiting...");
             exit();
         }
-
-        $command = sprintf("intelliscl sync --deployment %s --secret %s --connString1 '%s' --tempFolder '%s'", escapeshellarg($deploymentId), escapeshellarg($secret), SQL_dsn_read, sys_get_temp_dir());
+        $sql = sprintf("mysql://%s:%s@%s/%s", SQL_user_read, SQL_passwd_read, SQL_host_read, SQL_db_read);
+        $command = sprintf("/home/vagrant/intelliscl/bin/intelliscl sync --deployment %s --secret %s --connString1 %s --tempFolder '%s'", escapeshellarg($deploymentId), escapeshellarg($secret), escapeshellarg($sql), sys_get_temp_dir());
 
         $this->getLogger()->debug($command);
 
