@@ -230,10 +230,10 @@ class Payload
              * then by the guy's lastname
              */
             uasort($unitSpec['candidates'], static function ($a, $b) {
-                $schoolA = $a['meta']['school']['code'];
-                $schoolB = $b['meta']['school']['code'];
-                $lastnameA = $a['meta']['lastname'];
-                $lastnameB = $b['meta']['lastname'];
+                $schoolA = (string)$a['meta']['school']['code'];
+                $schoolB = (string)$b['meta']['school']['code'];
+                $lastnameA = (string)$a['meta']['lastname'];
+                $lastnameB = (string)$b['meta']['lastname'];
 
                 if ($schoolA === $schoolB) {
                     if ($lastnameA === $lastnameB) {
