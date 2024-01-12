@@ -1,3 +1,6 @@
+@import "www/static/css/core/base/_functions";
+@import "www/static/css/core/base/_settings";
+
 /* Hide the Tags */
 .lrn-list-view-meta {
     display: none;
@@ -997,7 +1000,7 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
 }
 
 /* Fixed the mobile version for the search page */
-@media (max-width: 481px) {
+@media #{$small-only} {
     .lrn .lrn-author-ui .lrn-list-view-col:not(.lrn-list-view-select-col):first-child {
         padding-left: 0.25rem !important;
     }
@@ -1006,10 +1009,27 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
     }
 
     /* Fixed the Edit/Preview Button in the item edit page for mobile devices */
-    .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle {
-        min-width: 10em;
+    .lrn-qe .lrn-qe-ui .lrn-qe-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .lrn-qe .lrn-qe-ui .lrn-qe-toolbar-right {
+        margin-left: 0;
     }
     .lrn ul {
-        padding-left: 0em;
+        padding-left: 0px;
+    }
+    .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-viewstack-item > div {
+        margin-left: 0px;
+    }
+    /* Made sort list question vertically on the small screens */
+    .lrn_widget.lrn_sortlist .lrn_sortlist_column {
+        display: unset;
+    }
+    .lrn_widget.lrn_sortlist .lrn_sortlist_target_trigger button {
+        display: none;
+    }
+    .lrn_widget.lrn_sortlist .lrn_sortlist_soruce_trigger button {
+        display: none;
     }
 }
