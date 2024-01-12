@@ -18,15 +18,18 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  * Set colours to pastoral severity
  */
 $app = new class extends CliTool\App {
+
+    const TOUR_TITLE = 'OLC 24 Release'; // This must match the 'title' value in olc24-tour.yaml.
+
     public function run(): void
     {
         $siteSchoolCode = $this->getConfig()->get('site_school_code');
+
         if (strtolower($siteSchoolCode) === 'help') {
             $dbc = $this->getDatabaseInternal(); // Database connector.
             $logger = $this->getLogger();
 
-            $tourTitle = 'OLC 24 Release'; // This must match the 'title' value in olc24-tour.yaml.
-            $logger->info("Site '$siteSchoolCode' is a Schoolbox Help instance, so installing tour '$tourTitle'.");
+            $logger->info("Site '$siteSchoolCode' is a Schoolbox Help instance, so installing tour '" . self::TOUR_TITLE . "'.");
 
             $tourAlreadyExists = $dbc->executeQuery(
                 'SELECT EXISTS(
@@ -34,11 +37,11 @@ $app = new class extends CliTool\App {
                     FROM tour
                     WHERE title = ?
                 )',
-                [$tourTitle]
+                [self::TOUR_TITLE]
             )->fetchColumn();
 
             if ($tourAlreadyExists) {
-                $logger->info("Tour '$tourTitle' has already been installed.  Nothing to do.");
+                $logger->info("Tour '" . self::TOUR_TITLE . "' has already been installed.  Nothing to do.");
                 die;
             }
 
@@ -50,11 +53,11 @@ $app = new class extends CliTool\App {
                     'UPDATE tour
                     SET active=0
                     WHERE title = ?',
-                    [$tourTitle]
+                    [self::TOUR_TITLE]
                 );
-                $logger->info("Deactivated the '$tourTitle' tour so it can be manually activated later.");
+                $logger->info("Deactivated the '" . self::TOUR_TITLE . "' tour so it can be manually activated later.");
             } catch (Exception $e) {
-                $logger->error("Could not deactivate the '$tourTitle' tour.");
+                $logger->error("Could not deactivate the '" . self::TOUR_TITLE . "' tour.");
                 throw $e;
             }
         }
