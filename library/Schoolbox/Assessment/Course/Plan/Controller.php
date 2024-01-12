@@ -142,7 +142,7 @@ class Controller extends Base
                 WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
                 AND f.deleted_at IS NULL
                 AND tb.deleted_at IS NULL
-                AND tb.categoryID = :folderId
+                AND f.id = :folderId
                 ORDER BY tb.updated_at ASC"
             );
             $statement->execute(['folderId' => $unit->getFolder()->getId()]);
