@@ -8,8 +8,8 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress_Date_Format;
@@ -77,13 +77,17 @@ class Visibility
         }
 
         // Is viewer an instructor?
-        if ($this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
-            if ($this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now)) {
+        try {
+            if ($this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
+                if ($this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now)) {
+                    return true;
+                }
+            } elseif ($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now, $respectSivo)) {
+                // Not an instructor. Can they see due to their participation?
                 return true;
             }
-        } elseif ($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now, $respectSivo)) {
-            // Not an instructor. Can they see due to their participation?
-            return true;
+        } catch (MapperException $e) {
+            // noop
         }
 
         return false;
