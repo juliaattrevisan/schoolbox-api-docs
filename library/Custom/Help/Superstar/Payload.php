@@ -204,9 +204,7 @@ class Payload
 
             /* Accumulate this person's mark
              */
-            if (null !== $row['norm_mark']) {
-                $stack[$row['unit_spec_id']]['candidates'][$row['user_id']]['marks'][] = (float)$row['norm_mark'];
-            }
+            $stack[$row['unit_spec_id']]['candidates'][$row['user_id']]['marks'][] = $row['norm_mark'];
         }
 
         /* Special Case for OLC 2023 incarnation only:
@@ -288,7 +286,7 @@ class Payload
          *  at the very beginning...but it means you gotta click a lot
          */
         $query = "
-            SELECT 
+            SELECT
                 cui.course_unit_specification_id AS unit_spec_id,
                 f0.`name` AS unit_spec_title,
                 u.id AS user_id,
@@ -305,14 +303,13 @@ class Payload
             INNER JOIN folder f0 ON cus.folder_id = f0.id
             INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
             INNER JOIN project p ON acui.assessment_id = p.assessment_id
-            INNER JOIN project_result prc ON p.id = prc.project_id
-            INNER JOIN `user` u ON prc.user_id = u.id
-            INNER JOIN mv_assessment_relation mvar ON p.assessment_id = mvar.assessment_id
-            INNER JOIN folder f1 ON mvar.folder_id = f1.id
-            INNER JOIN folder f2 ON f1.parent = f2.id
+            LEFT JOIN project_result prc ON p.id = prc.project_id
+            LEFT JOIN `user` u ON prc.user_id = u.id
+            LEFT JOIN mv_assessment_relation mvar ON p.assessment_id = mvar.assessment_id
+            LEFT JOIN folder f1 ON mvar.folder_id = f1.id
+            LEFT JOIN folder f2 ON f1.parent = f2.id
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
             WHERE ci.course_specification_id = :courseId
-            AND prc.norm_mark IS NOT NULL
             AND cui.deleted_at IS NULL
             AND cus.deleted_at IS NULL
             AND f0.deleted_at IS NULL
@@ -356,7 +353,7 @@ class Payload
     private function augment2023SpecialCase(int $assessmentSpecId): array
     {
         $query = "
-            SELECT 
+            SELECT
                 implementation_assessment_id,
                 f2.id AS folder_id,
                 f2.`name` AS school_name,
@@ -390,22 +387,20 @@ class Payload
             foreach ($assessment->getAllParticipants() as $participant) {
                 $normMark = $participant->getNormalisedMark(true);
 
-                if (null !== $normMark) {
-                    /* Assign some metadata about this user
-                     */
-                    $stack[$participant->getUser()->getId()]['meta'] = [
-                        'id' => $participant->getUser()->getId(),
-                        'firstname' => $participant->getUser()->getFirstname(),
-                        'lastname' => $participant->getUser()->getLastname(),
-                        'school' => [
-                            'folderId' => $row['folder_id'],
-                            'name' => $row['school_name'],
-                            'code' => $row['school_code']
-                        ]
-                    ];
+                /* Assign some metadata about this user
+                 */
+                $stack[$participant->getUser()->getId()]['meta'] = [
+                    'id' => $participant->getUser()->getId(),
+                    'firstname' => $participant->getUser()->getFirstname(),
+                    'lastname' => $participant->getUser()->getLastname(),
+                    'school' => [
+                        'folderId' => $row['folder_id'],
+                        'name' => $row['school_name'],
+                        'code' => $row['school_code']
+                    ]
+                ];
 
-                    $stack[$participant->getUser()->getId()]['marks'][] = $normMark;
-                }
+                $stack[$participant->getUser()->getId()]['marks'][] = $normMark;
             }
         }
 

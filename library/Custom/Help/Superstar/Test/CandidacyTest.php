@@ -92,6 +92,32 @@ class CandidacyTest extends TestCase
                 [100.00, 100.00, 100.00, 100.00, 100.00, 100.00],
                 Candidacy::SUPERSTAR
             ],
+
+            /* Star, but with a new project they haven't done yet
+             * They get nothing
+             */
+            'Incomplete Star 1' => [
+                [99.00, 100.00, 100.00, 100.00, null],
+                null
+            ],
+
+            'Incomplete Star 2' => [
+                [99.00, 99.12, 99.00, 99.76, 100.00, 100.00, 100.00, null],
+                null
+            ],
+
+            /* Superstar, but with a new project they haven't done yet
+             * They get nothing
+             */
+            'Incomplete Superstar 1' => [
+                [100.00, null],
+                null
+            ],
+
+            'Incomplete Superstar 2' => [
+                [100.00, 100.00, 100.00, 100.00, 100.00, 100.00, null],
+                null
+            ],
         ];
     }
 }
