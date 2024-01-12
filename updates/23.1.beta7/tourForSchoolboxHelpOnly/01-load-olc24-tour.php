@@ -18,7 +18,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  * Set colours to pastoral severity
  */
 $app = new class extends CliTool\App {
-
     const TOUR_TITLE = 'OLC 24 Release'; // This must match the 'title' value in olc24-tour.yaml.
 
     public function run(): void
