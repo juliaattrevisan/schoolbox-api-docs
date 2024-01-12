@@ -20,7 +20,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $siteSchoolCode = strtolower($this->getConfig()->get('site_school_code'));
+        $siteSchoolCode = $this->getConfig()->get('site_school_code');
         if (strtolower($siteSchoolCode) === 'help') {
             $dbc = $this->getDatabaseInternal(); // Database connector.
             $logger = $this->getLogger();
