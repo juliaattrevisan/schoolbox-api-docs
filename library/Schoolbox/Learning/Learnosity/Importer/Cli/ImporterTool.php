@@ -1362,10 +1362,10 @@ HELP;
 
     /**
      * This script must be run as www-data, as it may write files to Schoolbox's
-     * storage.
+     * file system.
      */
     public function getRequiredProcessUser(): ?string
     {
-        return 'www-data';
+        return self::WEB_PROCESS_USER;
     }
 }
