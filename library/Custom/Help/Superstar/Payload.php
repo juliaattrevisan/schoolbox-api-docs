@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\RoleMapper;
 
 class Payload
 {
@@ -44,11 +45,15 @@ class Payload
 
 
     /**
-     * @param IConnector $database
+     * @param IConnector  $database
      * @param MapperProxy $assessmentMapperProxy
+     * @param RoleMapper  $roleMapper
      */
-    public function __construct(private IConnector $database, private MapperProxy $assessmentMapperProxy)
-    {
+    public function __construct(
+        private IConnector $database,
+        private MapperProxy $assessmentMapperProxy,
+        private \Schoolbox\RoleMapper $roleMapper
+    ) {
     }
 
 
@@ -280,6 +285,8 @@ class Payload
      */
     private function generateCandidatesStatement(): \PDOStatement
     {
+        $validGroupTypeIds = implode(',', $this->roleMapper->findByColumn('group_type', \Schoolbox\Role::STUDENT)->indexBy('id')->keys());
+
         /* TODO Potentially insert a course_unit_specification.id param here,
          *  to only obtain candidacy for a particular unit - this would be a
          *  performance workaround that avoids generating the entire data set
@@ -319,6 +326,7 @@ class Payload
             AND f2.deleted_at IS NULL
             AND fc.deleted_at IS NULL
             AND fc.code IS NOT NULL
+            AND u.group_id IN ({$validGroupTypeIds})
             ORDER BY unit_spec_title, user_lastname, user_id
         ";
 

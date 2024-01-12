@@ -185,7 +185,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(private \Schoolbox\RoleMapper $roleMapper)
     {
     }
 
@@ -246,7 +246,7 @@ class Controller extends Base
         /* Get all the data ready; you might want to filter this to a particular
          * unit spec or something like that, for performance reasons...one day
          */
-        $stack = (new Payload($database, $this->getDi()->get('assessmentDataSource')))->generate($year);
+        $stack = (new Payload($database, $this->getDi()->get('assessmentDataSource'), $this->roleMapper))->generate($year);
 
         $this->response = $this->responseFromTemplate('@superstar/index.twig', [
             'report' => [

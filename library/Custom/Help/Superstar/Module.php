@@ -47,7 +47,9 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getMapperFactory()->get(\Schoolbox\RoleMapper::class)
+        );
     }
 
 
