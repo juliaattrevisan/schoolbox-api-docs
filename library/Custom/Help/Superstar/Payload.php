@@ -219,7 +219,7 @@ class Payload
             /* Find this random quiz, based on its spec id
              * Build this extra dangling data struct lol
              */
-            $augmentation = $this->augment2023SpecialCase(self::SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID);
+            $augmentation = $this->augment2023SpecialCase();
 
             /* Shank it in
              */
@@ -348,7 +348,6 @@ class Payload
      *  querystring param, ?year=2023, to decide when to look for this rando quiz.
      *  We can augment $stack here, then subject it to the usual decisionmaking
      *
-     * @param int $assessmentSpecId
      * @return array
      * @throws DefinitionException
      * @throws Deleted
@@ -358,7 +357,7 @@ class Payload
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function augment2023SpecialCase(int $assessmentSpecId): array
+    private function augment2023SpecialCase(): array
     {
         $query = "
             SELECT
@@ -384,7 +383,7 @@ class Payload
         $statement = $this->database->prepare($query);
 
         $statement->execute([
-            'assessmentSpecId' => $assessmentSpecId
+            'assessmentSpecId' => self::SUPERUSER_QUIZ_SPEC_ASSESSMENT_ID
         ]);
 
         /* Fetch feedbacks for each implementation and manually collate it into
