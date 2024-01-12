@@ -318,6 +318,7 @@ class Payload
             AND f1.deleted_at IS NULL
             AND f2.deleted_at IS NULL
             AND fc.deleted_at IS NULL
+            AND fc.code IS NOT NULL
             ORDER BY unit_spec_title, user_lastname, user_id
         ";
 
