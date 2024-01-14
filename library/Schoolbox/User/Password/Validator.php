@@ -6,10 +6,11 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\User\Password;
 
 use Alaress\Password\Service;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
@@ -22,31 +23,13 @@ use SensitiveParameter;
 class Validator
 {
     /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var Service
-     */
-    protected $passwordService;
-
-    /**
-     * @var int
-     */
-    protected $cost;
-
-    /**
      * Constructor
-
      *
-*@param UserMapper    $userMapper
-     * @param Service $passwordService
+     * @param UserMapper $userMapper
+     * @param Service    $passwordService
      */
-    public function __construct(UserMapper $userMapper, Service $passwordService)
+    public function __construct(private UserMapper $userMapper, private Service $passwordService)
     {
-        $this->userMapper      = $userMapper;
-        $this->passwordService = $passwordService;
     }
 
     /**
