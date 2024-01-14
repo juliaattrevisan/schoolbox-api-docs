@@ -149,7 +149,7 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         $result = $this->getConnector()->executeQuery($query, $params)->fetchColumn();
 
-        if (strlen(trim($result)) === 0) {
+        if (strlen(trim($result ?? '')) === 0) {
             return 0;
         }
 
