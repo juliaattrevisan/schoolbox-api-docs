@@ -56,6 +56,11 @@ class Validator
         $enabled = $user->getEnabled();
         $hash    = $user->getPassword();
 
+        // No password? Can't possibly match
+        if (!isset($hash)) {
+            return false;
+        }
+
         // Matches new-style password
         if ($this->passwordService->verify($password, $hash)) {
             // Maybe requires rehash
