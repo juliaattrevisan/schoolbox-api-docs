@@ -587,6 +587,12 @@ class Controller extends BaseController
             $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
         }
 
+        // Does the current user share a campus with the student?
+        // This may matter for multi-school deployments.
+        // Eventually: this will likely be made a config setting with wider
+        // scope (e.g. search results, grades).
+        $sharedCampuses = $this->getUser()->getCampusCollection()->intersect($student->getCampusCollection());
+
         $this->response = $this->responseFromTemplate(
             'user/student.twig',
             [
@@ -620,6 +626,7 @@ class Controller extends BaseController
                 'learningMomentCanComment' => $learningMomentCanComment,
                 'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
                 'canEmailStaff'            => $canEmailStaff,
+                'sharedCampuses'           => $sharedCampuses,
             ]
         );
     }
