@@ -94,889 +94,959 @@
     });
 </script>
 
-{% block profile %}
-    <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
-        <div class="list-item">
-            <div class="small-12 column">
-                {% block profileHeading %}
-                    <h1>{{ user.formatName }}</h1>
-                {% endblock %}
-            </div>
+<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
+    <div class="list-item">
+        <div class="small-12 column">
+            {% block profileHeading %}
+                <h1>{{ user.formatName }}</h1>
+            {% endblock %}
         </div>
-        <nav>
-            {% if routeLookupIfAuthorized('adminUser.getModify') %}
-                <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User"></a>
-            {% endif %}
-        </nav>
     </div>
+    <nav>
+        {% if routeLookupIfAuthorized('adminUser.getModify') %}
+            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User"></a>
+        {% endif %}
+    </nav>
+</div>
 
-    <div class="row">
-        <div class="small-12 island">
-            <section class="no-pad">
-                <div class="profile content">
-                    <div class="row no-margin">
-                        <div class="small-12 medium-2 columns no-pad">
-                            {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
-                        </div>
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="profile content">
+                <div class="row no-margin">
+                    <div class="small-12 medium-2 columns no-pad">
+                        {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
+                    </div>
 
-                        <div class="small-12 medium-10 columns no-pad">
-                            {% block specialAlert %}
-                                {% if externalUser.StudentSpecialNeedsFlag ?? false and showSpecialAlert %}
-                                    <div class="alert-box highlight icon-bell">
-                                        {{ locale.translate('specialNeeds', false, true) }}
-                                    </div>
-                                {% endif %}
-                            {% endblock specialAlert %}
-
-                            {% block englishSecond %}
-                                {% if externalUser.EnglishSecondFlag ?? false and showSpecialAlert  %}
-                                    <div class="alert-box highlight icon-eng-second-lang">
-                                        English as an Additional Language
-                                    </div>
-                                {% endif %}
-                            {% endblock englishSecond %}
-
-                            {% block medicalAlert %}
-                                {% if externalUser.StudentMedicalAlert ?? false and showMedicalAlert %}
-                                    <div class="alert-box alert icon-alert">
-                                        Medical Note: {{ externalUser.StudentMedicalAlert | nl2br }}
-                                    </div>
-                                {% endif %}
-                            {% endblock medicalAlert %}
-
-                            {% if showContactsAlert %}
-                                {% for message in externalUser.AlertMessages ?? [] %}
-                                    {% block contacts_alert %}
-                                        {# Only staff may view contact alerts #}
-                                        <div class="alert-box alert icon-alert">
-                                            {{ message | nl2br }}
-                                        </div>
-                                    {% endblock contacts_alert %}
-                                {% endfor %}
+                    <div class="small-12 medium-10 columns no-pad">
+                        {% block specialAlert %}
+                            {% if externalUser.StudentSpecialNeedsFlag ?? false and showSpecialAlert %}
+                                <div class="alert-box highlight icon-bell">
+                                    {{ locale.translate('specialNeeds', false, true) }}
+                                </div>
                             {% endif %}
+                        {% endblock specialAlert %}
 
-                            {% block individualEducationPlan %}
-                                {% if isStaffWhoCanView and externalUser.countIndividualEducationPlans is defined and externalUser.countIndividualEducationPlans > 0 %}
-                                    <div class="alert-box highlight icon-curriculum">
-                                        Individual Education Plan
+                        {% block englishSecond %}
+                            {% if externalUser.EnglishSecondFlag ?? false and showSpecialAlert  %}
+                                <div class="alert-box highlight icon-eng-second-lang">
+                                    English as an Additional Language
+                                </div>
+                            {% endif %}
+                        {% endblock englishSecond %}
+
+                        {% block medicalAlert %}
+                            {% if externalUser.StudentMedicalAlert ?? false and showMedicalAlert %}
+                                <div class="alert-box alert icon-alert">
+                                    Medical Note: {{ externalUser.StudentMedicalAlert | nl2br }}
+                                </div>
+                            {% endif %}
+                        {% endblock medicalAlert %}
+
+                        {% if showContactsAlert %}
+                            {% for message in externalUser.AlertMessages ?? [] %}
+                                {% block contacts_alert %}
+                                    {# Only staff may view contact alerts #}
+                                    <div class="alert-box alert icon-alert">
+                                        {{ message | nl2br }}
                                     </div>
+                                {% endblock contacts_alert %}
+                            {% endfor %}
+                        {% endif %}
+
+                        {% block individualEducationPlan %}
+                            {% if isStaffWhoCanView and externalUser.countIndividualEducationPlans is defined and externalUser.countIndividualEducationPlans > 0 %}
+                                <div class="alert-box highlight icon-curriculum">
+                                    Individual Education Plan
+                                </div>
+                            {% endif %}
+                        {% endblock individualEducationPlan %}
+
+                        {% block synergeticComments %}
+                            {% if externalUser.Comment ?? false and showComments %}
+                                <div class="alert-box highlight icon-info">
+                                    {{ externalUser.Comment | nl2br }}
+                                </div>
+                            {% endif %}
+                        {% endblock synergeticComments %}
+
+                        {% block details %}
+                            <dl>
+                                {% if showTitle %}
+                                    <dt class="small-4 medium-3 columns">Position Title:</dt>
+                                    <dd class="small-8 medium-9 columns">
+                                        {{ user.positionTitle }}
+                                    </dd>
                                 {% endif %}
-                            {% endblock individualEducationPlan %}
 
-                            {% block synergeticComments %}
-                                {% if externalUser.Comment ?? false and showComments %}
-                                    <div class="alert-box highlight icon-info">
-                                        {{ externalUser.Comment | nl2br }}
-                                    </div>
+                                {% if showEmail %}
+                                    {% block details_email %}
+                                        {% if user.email %}
+                                            <dt class="small-4 medium-3 columns">Email:</dt>
+                                            <dd class="small-8 medium-9 columns">
+                                                <a href="{{ session.mailhandle }}{{ user.email }}">{{ user.email }}</a>
+                                            </dd>
+                                        {% endif %}
+                                    {% endblock details_email %}
                                 {% endif %}
-                            {% endblock synergeticComments %}
 
-                            {% block details %}
-                                <dl>
-                                    {% if showTitle %}
-                                        <dt class="small-4 medium-3 columns">Position Title:</dt>
-                                        <dd class="small-8 medium-9 columns">
-                                            {{ user.positionTitle }}
-                                        </dd>
-                                    {% endif %}
+                                {% if showDetails %}
+                                    {% block details_studentId %}
+                                        <dt class="small-4 medium-3 columns">Student ID:</dt>
+                                        <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
+                                    {% endblock details_studentId %}
 
-                                    {% if showEmail %}
-                                        {% block details_email %}
-                                            {% if user.email %}
-                                                <dt class="small-4 medium-3 columns">Email:</dt>
+                                    {% block details_dob %}
+                                        {% if externalUser.StudentBirthDate is defined and externalUser.StudentBirthDate %}
+                                            <dt class="small-4 medium-3 columns">Date of Birth:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
+                                        {% endif %}
+                                    {% endblock details_dob %}
+
+                                    {% block details_formTeacher %}
+                                        {% if showClasses %}
+                                            {% if formTeacher %}
+                                                <dt class="small-4 medium-3 columns">Class Teacher:</dt>
                                                 <dd class="small-8 medium-9 columns">
-                                                    <a href="{{ session.mailhandle }}{{ user.email }}">{{ user.email }}</a>
+                                                    {% if formTeacher.id %}
+                                                        <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
+                                                    {% else %}
+                                                        {{ formTeacher.formatName }}
+                                                    {% endif %}
                                                 </dd>
                                             {% endif %}
-                                        {% endblock details_email %}
-                                    {% endif %}
+                                        {% endif %}
+                                    {% endblock details_formTeacher %}
 
-                                    {% if showDetails %}
-                                        {% block details_studentId %}
-                                            <dt class="small-4 medium-3 columns">Student ID:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
-                                        {% endblock details_studentId %}
+                                    {% block details_yearLevel %}
+                                        {% if externalUser.StudentYearLevel is defined %}
+                                            <dt class="small-4 medium-3 columns">{{ locale.yearLevel.proper }}:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>
+                                        {% endif %}
+                                    {% endblock details_yearLevel %}
 
-                                        {% block details_dob %}
-                                            {% if externalUser.StudentBirthDate is defined and externalUser.StudentBirthDate %}
-                                                <dt class="small-4 medium-3 columns">Date of Birth:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
+                                    {% block details_tutorTeacher %}
+                                        {% if showClasses %}
+                                            {% if tutorTeacher %}
+                                                <dt class="small-4 medium-3 columns">{{ locale.tutor.proper }}:</dt>
+                                                <dd class="small-8 medium-9 columns">
+                                                    {% if tutorTeacher.id %}
+                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
+                                                    {% else %}
+                                                        {{ tutorTeacher.formatName }}
+                                                    {% endif %}
+                                                </dd>
                                             {% endif %}
-                                        {% endblock details_dob %}
+                                        {% endif %}
+                                    {% endblock details_tutorTeacher %}
 
-                                        {% block details_formTeacher %}
-                                            {% if showClasses %}
-                                                {% if formTeacher %}
-                                                    <dt class="small-4 medium-3 columns">Class Teacher:</dt>
-                                                    <dd class="small-8 medium-9 columns">
-                                                        {% if formTeacher.id %}
-                                                            <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                                                        {% else %}
-                                                            {{ formTeacher.formatName }}
-                                                        {% endif %}
-                                                    </dd>
-                                                {% endif %}
+                                    {% block details_coordTeacher %}
+                                        {% if coordTeacher %}
+                                        <dt class="small-4 medium-3 columns">{{ locale.yearLevelCoordinator.proper }}:</dt>
+                                        <dd class="small-8 medium-9 columns">
+                                        {% if coordTeacher.id %}
+                                        <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
+                                        {% else %}
+                                        {{ coordTeacher.formatName }}
+                                        {% endif %}
+                                        </dd>
+                                        {% endif %}
+                                    {% endblock details_coordTeacher %}
+
+                                    {% block details_house %}
+                                        {% if externalUser.StudentHouseDescription ?? false %}
+                                            <dt class="small-4 medium-3 columns">House:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
+                                        {% endif %}
+                                    {% endblock details_house %}
+
+                                    {% block details_tutorGroup %}
+                                        {% if showClasses %}
+                                            {% if externalUser.StudentTutorDescription ?? false %}
+                                                <dt class="small-4 medium-3 columns">{{ locale.tutorGroup.proper }}:</dt>
+                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
                                             {% endif %}
-                                        {% endblock details_formTeacher %}
+                                        {% endif %}
+                                    {% endblock details_tutorGroup %}
 
-                                        {% block details_yearLevel %}
-                                            {% if externalUser.StudentYearLevel is defined %}
-                                                <dt class="small-4 medium-3 columns">{{ locale.yearLevel.proper }}:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>
+                                    {% block details_hohTeacher %}
+                                        {% if showClasses %}
+                                            {% if hohTeacher %}
+                                                <dt class="small-4 medium-3 columns">{{ locale.headOfHouse.proper }}:</dt>
+                                                <dd class="small-8 medium-9 columns">
+                                                    {% if hohTeacher.id %}
+                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
+                                                    {% else %}
+                                                        {{ hohTeacher.formatName }}
+                                                    {% endif %}
+                                                </dd>
                                             {% endif %}
-                                        {% endblock details_yearLevel %}
+                                        {% endif %}
+                                    {% endblock details_hohTeacher %}
 
-                                        {% block details_tutorTeacher %}
-                                            {% if showClasses %}
-                                                {% if tutorTeacher %}
-                                                    <dt class="small-4 medium-3 columns">{{ locale.tutor.proper }}:</dt>
-                                                    <dd class="small-8 medium-9 columns">
-                                                        {% if tutorTeacher.id %}
-                                                            <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                                                        {% else %}
-                                                            {{ tutorTeacher.formatName }}
-                                                        {% endif %}
-                                                    </dd>
-                                                {% endif %}
+                                    {% block details_studentForm %}
+                                        {% if showClasses %}
+                                            {% if externalUser.StudentForm ?? false %}
+                                                <dt class="small-4 medium-3 columns">Class:</dt>
+                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>
                                             {% endif %}
-                                        {% endblock details_tutorTeacher %}
+                                        {% endif %}
+                                    {% endblock details_studentForm %}
 
-                                        {% block details_coordTeacher %}
-                                            {% if coordTeacher %}
-                                            <dt class="small-4 medium-3 columns">{{ locale.yearLevelCoordinator.proper }}:</dt>
-                                            <dd class="small-8 medium-9 columns">
-                                            {% if coordTeacher.id %}
-                                            <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
-                                            {% else %}
-                                            {{ coordTeacher.formatName }}
-                                            {% endif %}
-                                            </dd>
-                                            {% endif %}
-                                        {% endblock details_coordTeacher %}
+                                    {% block details_studentType %}
+                                        {% if boarderType %}
+                                            <dt class="small-4 medium-3 columns">Student Type:</dt>
+                                            <dd class="small-8 medium-9 columns">{{ boarderType }}</dd>
+                                        {% endif %}
+                                    {% endblock details_studentType %}
 
-                                        {% block details_house %}
-                                            {% if externalUser.StudentHouseDescription ?? false %}
-                                                <dt class="small-4 medium-3 columns">House:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
-                                            {% endif %}
-                                        {% endblock details_house %}
+                                    {% block details_studentDates %}
+                                    {% endblock %}
 
-                                        {% block details_tutorGroup %}
-                                            {% if showClasses %}
-                                                {% if externalUser.StudentTutorDescription ?? false %}
-                                                    <dt class="small-4 medium-3 columns">{{ locale.tutorGroup.proper }}:</dt>
-                                                    <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endblock details_tutorGroup %}
+                                    {% block details_studiesCode %}
+                                        {% if externalUser.StudentStudiesCode ?? false %}
+                                        <dt class="no-margin small-4 medium-3">{{ locale.studies_code.proper }}:</dt>
+                                        <dd class="no-margin small-8 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
+                                        {% endif %}
+                                    {% endblock details_studiesCode %}
 
-                                        {% block details_hohTeacher %}
-                                            {% if showClasses %}
-                                                {% if hohTeacher %}
-                                                    <dt class="small-4 medium-3 columns">{{ locale.headOfHouse.proper }}:</dt>
-                                                    <dd class="small-8 medium-9 columns">
-                                                        {% if hohTeacher.id %}
-                                                            <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-                                                        {% else %}
-                                                            {{ hohTeacher.formatName }}
-                                                        {% endif %}
-                                                    </dd>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endblock details_hohTeacher %}
+                                    {% block details_gender %}
+                                        {#<dt class="small-4 medium-3 columns">Gender:</dt>
+                                        <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>#}
+                                    {% endblock details_gender %}
 
-                                        {% block details_studentForm %}
-                                            {% if showClasses %}
-                                                {% if externalUser.StudentForm ?? false %}
-                                                    <dt class="small-4 medium-3 columns">Class:</dt>
-                                                    <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endblock details_studentForm %}
+                                    {% block details_coach %}
+                                    {% endblock details_coach %}
+                                {% endif %}
 
-                                        {% block details_studentType %}
-                                            {% if boarderType %}
-                                                <dt class="small-4 medium-3 columns">Student Type:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ boarderType }}</dd>
-                                            {% endif %}
-                                        {% endblock details_studentType %}
-
-                                        {% block details_studentDates %}
-                                        {% endblock %}
-
-                                        {% block details_studiesCode %}
-                                            {% if externalUser.StudentStudiesCode ?? false %}
-                                            <dt class="no-margin small-4 medium-3">{{ locale.studies_code.proper }}:</dt>
-                                            <dd class="no-margin small-8 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
-                                            {% endif %}
-                                        {% endblock details_studiesCode %}
-
-                                        {% block details_gender %}
-                                            {#<dt class="small-4 medium-3 columns">Gender:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>#}
-                                        {% endblock details_gender %}
-
-                                        {% block details_coach %}
-                                        {% endblock details_coach %}
-                                    {% endif %}
-
-                                    {% block extraDetails %}
-                                        {# Schools can insert extra details here #}
-                                    {% endblock extraDetails %}
-                                </dl>
-                            {% endblock details %}
-                            {% if showPastoral and pastoralCounts|length > 0 %}
-                                <div class="pastoral-flags">
-                                        {% for pastoralCount in pastoralCounts %}
-                                            <a href="{{ pastoralCount.destinationUrl }}">
-                                            <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
-                                                  data-tooltip title="{{ pastoralCount.title }}"
-                                                  style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
-                                            >{{ pastoralCount.count }}</span></a>
-                                        {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
+                                {% block extraDetails %}
+                                    {# Schools can insert extra details here #}
+                                {% endblock extraDetails %}
+                            </dl>
+                        {% endblock details %}
+                        {% if showPastoral and pastoralCounts|length > 0 %}
+                            <div class="pastoral-flags">
+                                    {% for pastoralCount in pastoralCounts %}
+                                        <a href="{{ pastoralCount.destinationUrl }}">
+                                        <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
+                                              data-tooltip title="{{ pastoralCount.title }}"
+                                              style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
+                                        >{{ pastoralCount.count }}</span></a>
+                                    {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
+            </div>
 
-                {% block buttons_island %}
-                    <ul class='flex-list flex-wrap buttons'>
-                        {% block buttons %}
+            {% block buttons_island %}
+                <ul class='flex-list flex-wrap buttons'>
+                    {% block buttons %}
 
-                            {% if eportfolioAuth %}
-                                {% block buttons_eportfolio %}
-                                    <li>
-                                        <a href="/eportfolio/{{ user.id }}/profile"
-                                           class="icon-eportfolio">ePortfolio</a>
-                                    </li>
-                                {% endblock buttons_eportfolio %}
-                            {% endif %}
-
-                            {% if showButtons %}
-                                {% block buttons_dueWork %}
-                                    {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
-                                    {% if route %}
-                                        <li>
-                                            <a href="{{ route }}" class="icon-due-work">{{ locale.dueWork.proper }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endblock buttons_dueWork %}
-
-                                {% block buttons_grades %}
-                                    {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
-                                    {% if route %}
-                                        <li>
-                                            <a href="{{ route }}" class="icon-tick">{{ locale.grades.properPlural }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endblock buttons_grades %}
-
-
-
-                                {% if showPastoral and pastoralUrl %}
-                                    <li>
-                                        <a href="{{ pastoralUrl }}"
-                                           class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
-                                    </li>
-                                {% endif %}
-
-                                {% set calendarUrl = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user})  %}
-                                {% if calendarUrl %}
-                                {% block buttons_calendar %}
-                                    <li>
-                                        <a href='{{ calendarUrl }}'
-                                           class="icon-calendar">{{ locale.calendar.proper }}</a>
-                                    </li>
-                                {% endblock buttons_calendar %}
-                                {% endif %}
-
-                                {% if showClasses %}
-                                    {% block buttons_timetable %}
-                                        <li>
-                                            <a href="/timetable/{{ user.id }}"
-                                               class="icon-timetable">Timetable</a>
-                                        </li>
-                                    {% endblock buttons_timetable %}
-                                {% endif %}
-
-                                {% block buttons_pastoralCare %}
-                                    {% if isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal %}
-                                        <li>
-                                            <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.externalId }}"
-                                               class="icon-synergetic"
-                                               target="_blank">Synweb</a>
-                                        </li>
-                                    {% endif %}
-                                {% endblock buttons_pastoralCare %}
-
-                                {% block buttons_documents %}
-                                    {% if config.external_document_report_enabled and config.external_document_button_enable %}
-                                        {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
-                                        {% if routeAcademicReports %}
-                                            <li>
-                                                <a href="{{ routeAcademicReports }}" class="icon-document">{{ locale.reports.properPlural }}</a>
-                                            </li>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endblock buttons_documents %}
-
-                                {% block buttons_email_all_staff %}
-                                    {% if config.mail_enable and isStaffWhoCanView and config.email_all_staff and session.user.email %}
-                                        <li>
-                                            <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
-                                            <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
-                                                <input name="userIds" value="{{ allTeacherIds }}" type="hidden">
-                                                <input name="target" value="cc" type="hidden">
-                                                <input name="title" value="Email All Teachers" type="hidden">
-                                                <input name="studentId" value="{{ user.id }}" type="hidden">
-                                            </form>
-                                        </li>
-                                    {% endif %}
-                                {% endblock  buttons_email_all_staff  %}
-
-                                {% block buttons_email_parents %}
-                                    {% if config.mail_enable and isStaffWhoCanView and config.email_all_parents and session.user.email and not hideContacts %}
-                                        <li>
-                                            <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
-                                            <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
-                                                <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
-                                                <input type="hidden" name="selectedGroups" value="parents_of"/>
-                                                <input name="studentId" value="{{ user.id }}" type="hidden">
-                                                <input name="title" value="Email Parents" type="hidden">
-                                            </form>
-                                        </li>
-                                    {% endif %}
-                                {% endblock buttons_email_parents %}
-
-                                {% block buttons_geosnapshots %}
-                                    {% if isGeosnapshotAvailable %}
-                                        {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id})  %}
-
-                                        {% if route %}
-                                            <li>
-                                                <a class="icon-geosnapshot" href="/geosnapshot/user/{{ user.id }}">View Photos</a>
-                                            </li>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endblock %}
-
-                                {% block buttons_miscellaneous %}
-                                {% endblock buttons_miscellaneous %}
-
-                                {% for button in customButtons %}
-                                    <li>
-                                        <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
-                                    </li>
-                                {% endfor %}
-                            {% endif %}
-                        {% endblock buttons %}
-                    </ul>
-                {% endblock buttons_island %}
-
-                {% block travel_logs %}
-                {% endblock travel_logs %}
-            </section>
-        </div>
-    </div>
-
-
-    {# Tabs #}
-    <div class="row">
-        <div class="small-12 island">
-            {# Programmatically detect the anchor value and select that tab via foundation
-             # This allows you to link /search/user/...#classes to open the Classes tab initially
-             # upon visiting that url
-             #}
-            <script>
-                $(function() {
-                    switch (window.location.hash) {
-                        case '#activity':
-                        case '#achievements':
-                        case '#goals':
-                        case '#classes':
-                        case '#groups':
-                        case '#contacts':
-                            $.fn.scrollToTop({
-                                scrollOnInit: true,
-                                scrollTo: '[data-tab]',
-                                velocity: 250
-                            });
-
-                            $('[data-tab] a[href="#tab-'+window.location.hash.substring(1)+'"]').trigger('click');
-                            break;
-
-                        {# If you visit this url directly without a hash, just do default behaviour
-                         # Don't try to preselect any tabs, because you might not be here for the tabs
-                         #}
-                        default:
-                            $('[data-tab] a').first().trigger('click');
-                            break;
-                    }
-                });
-            </script>
-
-            {# These are all the possible tab buttons that could exist
-             # and the booleans which determine if they're currently available
-             #
-             # The first button in the list is always selected by default
-             # activeTab setting will override it later if appropriate to do so
-             # based on the anchor in the url via javascript
-             #}
-            {% set possibleTabs = [
-                {
-                    label: 'Activity Feed',
-                    anchor: 'tab-activity',
-                    visible: showActivityFeed
-                },
-                {
-                    label: 'Goals',
-                    anchor: 'tab-goals',
-                    visible: showAchievementsTab
-                },
-                {
-                    label: achievementsTabLabel | default('Achievements'),
-                    anchor: 'tab-achievements',
-                    visible: showAchievementsTab
-                },
-                {
-                    label: 'Classes',
-                    anchor: 'tab-classes',
-                    visible: showClasses and showSubjects
-                },
-                {
-                    label: 'Groups',
-                    anchor: 'tab-groups',
-                    visible: showGroups
-                },
-                {
-                    label: 'Contacts',
-                    anchor: 'tab-contacts',
-                    visible: showContactsTab
-                }
-            ] %}
-
-            {# Out of all the tabs that could possibly exist here, figure out
-             # which one is currently active by default and remember it
-             #}
-            {% set activeTab = null %}
-
-            {% for data in possibleTabs %}
-                {% if data.visible and not activeTab %}
-                    {% set activeTab = data.anchor %}
-                {% endif %}
-            {%  endfor %}
-
-            {# If activeTab was set, then at least one of the tabs was available
-             # and we can show the whole island. We can also preselect a default
-             # tab so it appears active, which will happen when you visit a profile
-             # screen via /search/user/...
-             #
-             # Visiting that url with a hash /search/user/...#classes for example,
-             # will cause a javascript to run and switch the foundation tabs to the
-             # one represented by the hash (in this case, #classes)
-             #}
-            {% if activeTab %}
-                <dl class="tabs" data-tab>
-
-                    {# First visible tab is active by default #}
-                    {% set defaultCss = 'active' %}
-
-                    {% for tab in possibleTabs %}
-                        {% if tab.visible %}
-                            <dd class="{{ defaultCss }}"><a href="#{{ tab.anchor }}">{{ tab.label }}</a></dd>
-
-                            {# All subsequent tabs are not active by default #}
-                            {% set defaultCss = '' %}
+                        {% if eportfolioAuth %}
+                            {% block buttons_eportfolio %}
+                                <li>
+                                    <a href="/eportfolio/{{ user.id }}/profile"
+                                       class="icon-eportfolio">ePortfolio</a>
+                                </li>
+                            {% endblock buttons_eportfolio %}
                         {% endif %}
-                    {% endfor %}
-                </dl>
+
+                        {% if showButtons %}
+                            {% block buttons_dueWork %}
+                                {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
+                                {% if route %}
+                                    <li>
+                                        <a href="{{ route }}" class="icon-due-work">{{ locale.dueWork.proper }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endblock buttons_dueWork %}
+
+                            {% block buttons_grades %}
+                                {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
+                                {% if route %}
+                                    <li>
+                                        <a href="{{ route }}" class="icon-tick">{{ locale.grades.properPlural }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endblock buttons_grades %}
+
+
+
+                            {% if showPastoral and pastoralUrl %}
+                                <li>
+                                    <a href="{{ pastoralUrl }}"
+                                       class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
+                                </li>
+                            {% endif %}
+
+                            {% set calendarUrl = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user})  %}
+                            {% if calendarUrl %}
+                            {% block buttons_calendar %}
+                                <li>
+                                    <a href='{{ calendarUrl }}'
+                                       class="icon-calendar">{{ locale.calendar.proper }}</a>
+                                </li>
+                            {% endblock buttons_calendar %}
+                            {% endif %}
+
+                            {% if showClasses %}
+                                {% block buttons_timetable %}
+                                    <li>
+                                        <a href="/timetable/{{ user.id }}"
+                                           class="icon-timetable">Timetable</a>
+                                    </li>
+                                {% endblock buttons_timetable %}
+                            {% endif %}
+
+                            {% block buttons_pastoralCare %}
+                                {% if isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal %}
+                                    <li>
+                                        <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.externalId }}"
+                                           class="icon-synergetic"
+                                           target="_blank">Synweb</a>
+                                    </li>
+                                {% endif %}
+                            {% endblock buttons_pastoralCare %}
+
+                            {% block buttons_documents %}
+                                {% if config.external_document_report_enabled and config.external_document_button_enable %}
+                                    {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
+                                    {% if routeAcademicReports %}
+                                        <li>
+                                            <a href="{{ routeAcademicReports }}" class="icon-document">{{ locale.reports.properPlural }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endblock buttons_documents %}
+
+                            {% block buttons_email_all_staff %}
+                                {% if config.mail_enable and isStaffWhoCanView and config.email_all_staff and session.user.email %}
+                                    <li>
+                                        <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
+                                        <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
+                                            <input name="userIds" value="{{ allTeacherIds }}" type="hidden">
+                                            <input name="target" value="cc" type="hidden">
+                                            <input name="title" value="Email All Teachers" type="hidden">
+                                            <input name="studentId" value="{{ user.id }}" type="hidden">
+                                        </form>
+                                    </li>
+                                {% endif %}
+                            {% endblock  buttons_email_all_staff  %}
+
+                            {% block buttons_email_parents %}
+                                {% if config.mail_enable and isStaffWhoCanView and config.email_all_parents and session.user.email and not hideContacts %}
+                                    <li>
+                                        <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
+                                        <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
+                                            <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
+                                            <input type="hidden" name="selectedGroups" value="parents_of"/>
+                                            <input name="studentId" value="{{ user.id }}" type="hidden">
+                                            <input name="title" value="Email Parents" type="hidden">
+                                        </form>
+                                    </li>
+                                {% endif %}
+                            {% endblock buttons_email_parents %}
+
+                            {% block buttons_geosnapshots %}
+                                {% if isGeosnapshotAvailable %}
+                                    {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id})  %}
+
+                                    {% if route %}
+                                        <li>
+                                            <a class="icon-geosnapshot" href="/geosnapshot/user/{{ user.id }}">View Photos</a>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endblock %}
+
+                            {% block buttons_miscellaneous %}
+                            {% endblock buttons_miscellaneous %}
+
+                            {% for button in customButtons %}
+                                <li>
+                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endblock buttons %}
+                </ul>
+            {% endblock buttons_island %}
+
+            {% block travel_logs %}
+            {% endblock travel_logs %}
+        </section>
+    </div>
+</div>
+
+
+{# Tabs #}
+<div class="row">
+    <div class="small-12 island">
+        {# Programmatically detect the anchor value and select that tab via foundation
+         # This allows you to link /search/user/...#classes to open the Classes tab initially
+         # upon visiting that url
+         #}
+        <script>
+            $(function() {
+                switch (window.location.hash) {
+                    case '#activity':
+                    case '#achievements':
+                    case '#goals':
+                    case '#classes':
+                    case '#groups':
+                    case '#contacts':
+                        $.fn.scrollToTop({
+                            scrollOnInit: true,
+                            scrollTo: '[data-tab]',
+                            velocity: 250
+                        });
+
+                        $('[data-tab] a[href="#tab-'+window.location.hash.substring(1)+'"]').trigger('click');
+                        break;
+
+                    {# If you visit this url directly without a hash, just do default behaviour
+                     # Don't try to preselect any tabs, because you might not be here for the tabs
+                     #}
+                    default:
+                        $('[data-tab] a').first().trigger('click');
+                        break;
+                }
+            });
+        </script>
+
+        {# These are all the possible tab buttons that could exist
+         # and the booleans which determine if they're currently available
+         #
+         # The first button in the list is always selected by default
+         # activeTab setting will override it later if appropriate to do so
+         # based on the anchor in the url via javascript
+         #}
+        {% set possibleTabs = [
+            {
+                label: 'Activity Feed',
+                anchor: 'tab-activity',
+                visible: showActivityFeed
+            },
+            {
+                label: 'Goals',
+                anchor: 'tab-goals',
+                visible: showAchievementsTab
+            },
+            {
+                label: achievementsTabLabel | default('Achievements'),
+                anchor: 'tab-achievements',
+                visible: showAchievementsTab
+            },
+            {
+                label: 'Classes',
+                anchor: 'tab-classes',
+                visible: showClasses and showSubjects
+            },
+            {
+                label: 'Groups',
+                anchor: 'tab-groups',
+                visible: showGroups
+            },
+            {
+                label: 'Contacts',
+                anchor: 'tab-contacts',
+                visible: showContactsTab
+            }
+        ] %}
+
+        {# Out of all the tabs that could possibly exist here, figure out
+         # which one is currently active by default and remember it
+         #}
+        {% set activeTab = null %}
+
+        {% for data in possibleTabs %}
+            {% if data.visible and not activeTab %}
+                {% set activeTab = data.anchor %}
+            {% endif %}
+        {%  endfor %}
+
+        {# If activeTab was set, then at least one of the tabs was available
+         # and we can show the whole island. We can also preselect a default
+         # tab so it appears active, which will happen when you visit a profile
+         # screen via /search/user/...
+         #
+         # Visiting that url with a hash /search/user/...#classes for example,
+         # will cause a javascript to run and switch the foundation tabs to the
+         # one represented by the hash (in this case, #classes)
+         #}
+        {% if activeTab %}
+            <dl class="tabs" data-tab>
+
+                {# First visible tab is active by default #}
+                {% set defaultCss = 'active' %}
+
+                {% for tab in possibleTabs %}
+                    {% if tab.visible %}
+                        <dd class="{{ defaultCss }}"><a href="#{{ tab.anchor }}">{{ tab.label }}</a></dd>
+
+                        {# All subsequent tabs are not active by default #}
+                        {% set defaultCss = '' %}
+                    {% endif %}
+                {% endfor %}
+            </dl>
+        {% endif %}
+
+        <div class="profile-tabs tabs-content">
+            {% if showActivityFeed %}
+            <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
+                <div id="activity-feed">
+                    <activity-feed
+                        cdn-prefix="{{ CDN_PREFIX }}"
+                        site-version="{{ config.site_version }}"
+                        :config-grade-gradient-enabled={{ config.grade_gradient_enable == 1 ? 'true' : 'false' }}
+                    />
+                </div>
+            </div>
             {% endif %}
 
-            <div class="profile-tabs tabs-content">
-                {% if showActivityFeed %}
-                <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
-                    <div id="activity-feed">
-                        <activity-feed
-                            cdn-prefix="{{ CDN_PREFIX }}"
-                            site-version="{{ config.site_version }}"
-                            :config-grade-gradient-enabled={{ config.grade_gradient_enable == 1 ? 'true' : 'false' }}
-                        />
-                    </div>
+            {% if showAchievementsTab %}
+            <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
+                <div id="goal-feed" class="goals-achievements">
+                    <goal-feed
+                        cdn-prefix="{{ CDN_PREFIX }}"
+                        site-version="{{ config.site_version }}"
+                    />
                 </div>
-                {% endif %}
+            </div>
 
-                {% if showAchievementsTab %}
-                <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
-                    <div id="goal-feed" class="goals-achievements">
-                        <goal-feed
-                            cdn-prefix="{{ CDN_PREFIX }}"
-                            site-version="{{ config.site_version }}"
-                        />
-                    </div>
+            <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
+                <div id="achievement-feed" class="goals-achievements">
+                    <achievement-feed
+                        cdn-prefix="{{ CDN_PREFIX }}"
+                        site-version="{{ config.site_version }}"
+                    />
                 </div>
+            </div>
+            {% endif %}
 
-                <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
-                    <div id="achievement-feed" class="goals-achievements">
-                        <achievement-feed
-                            cdn-prefix="{{ CDN_PREFIX }}"
-                            site-version="{{ config.site_version }}"
-                        />
-                    </div>
-                </div>
-                {% endif %}
+            {% autoescape 'js' %}
+                {# Configuration for various Vue components #}
+                <script type="text/javascript">
+                    let baseConfig = {
+                        currentUser: {{ USER | json_encode | raw }},
+                        student: {{ user | json_encode | raw }},
+                        routes: {
+                            getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
+                                'learningMomentEvidence.getCreateForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                            getSetAsGoalForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getSetAsGoalForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                            getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getSetAsGoalForSelfForm'
+                            ) }}',
+                            getAwardAsAchievementForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getAwardAsAchievementForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                        },
+                        returnUrl: {
+                            name: '{{ RETURN_URL.name }}',
+                            current: '{{ RETURN_URL.current }}',
+                        },
+                    };
+                    window.learningEvidenceFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningEvidenceFeedConfig.routes.getFeed = '{{ routeLookupIfAuthorized(
+                        'learningMomentFeed.getFeedForUser',
+                        {user: user, userId: user.id}
+                    ) }}';
+                    window.learningEvidenceFeedConfig.canComment = Boolean('{{ learningMomentCanComment }}');
 
-                {% autoescape 'js' %}
-                    {# Configuration for various Vue components #}
-                    <script type="text/javascript">
-                        let baseConfig = {
-                            currentUser: {{ USER | json_encode | raw }},
-                            student: {{ user | json_encode | raw }},
-                            routes: {
-                                getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
-                                    'learningMomentEvidence.getCreateForm',
-                                    {users: [user], userIds: user.id}
-                                ) }}',
-                                getSetAsGoalForm: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getSetAsGoalForm',
-                                    {users: [user], userIds: user.id}
-                                ) }}',
-                                getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getSetAsGoalForSelfForm'
-                                ) }}',
-                                getAwardAsAchievementForm: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getAwardAsAchievementForm',
-                                    {users: [user], userIds: user.id}
-                                ) }}',
-                            },
-                            returnUrl: {
-                                name: '{{ RETURN_URL.name }}',
-                                current: '{{ RETURN_URL.current }}',
-                            },
-                        };
-                        window.learningEvidenceFeedConfig = $.extend(true, {}, baseConfig);
-                        window.learningEvidenceFeedConfig.routes.getFeed = '{{ routeLookupIfAuthorized(
-                            'learningMomentFeed.getFeedForUser',
-                            {user: user, userId: user.id}
-                        ) }}';
-                        window.learningEvidenceFeedConfig.canComment = Boolean('{{ learningMomentCanComment }}');
+                    window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
+                        'learningBadgeAward.getAwardedBadges',
+                        {user: user, userId: user.id, awardStatus: 'goal'}
+                    ) }}';
 
-                        window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
-                        window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
-                            'learningBadgeAward.getAwardedBadges',
-                            {user: user, userId: user.id, awardStatus: 'goal'}
-                        ) }}';
+                    window.learningBadgeAchievementFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningBadgeAchievementFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
+                        'learningBadgeAward.getAwardedBadges',
+                        {user: user, userId: user.id, awardStatus: 'achievement'}
+                    ) }}';
+                </script>
+            {% endautoescape %}
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
 
-                        window.learningBadgeAchievementFeedConfig = $.extend(true, {}, baseConfig);
-                        window.learningBadgeAchievementFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
-                            'learningBadgeAward.getAwardedBadges',
-                            {user: user, userId: user.id, awardStatus: 'achievement'}
-                        ) }}';
-                    </script>
-                {% endautoescape %}
-                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
+            {% if showClasses and showSubjects %}
+            <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
+                <section>
 
-                {% if showClasses and showSubjects %}
-                <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
-                    <section>
+                    {% for group, subjectGroup in subjects %}
 
-                        {% for group, subjectGroup in subjects %}
+                        {# Suffix all iterated identifiers
+                         # Tot menus and so on start exhiting interrelated behaviour when they share the same id
+                         # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                         # taking advantage of a twig construct
+                         #}
+                        {% set groupIdentifier = loop.index %}
 
-                            {# Suffix all iterated identifiers
-                             # Tot menus and so on start exhiting interrelated behaviour when they share the same id
-                             # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
-                             # taking advantage of a twig construct
-                             #}
-                            {% set groupIdentifier = loop.index %}
-
-                            {# Keep a running total of all teachers emails in this group #}
-                            {% set teacherIdsToEmail = [] %}
-                            <div class="actions-small-1 content">
-                                <div class="list-item">
-                                    <div>
-                                        <h2 class="subheader">{{ group }}</h2>
-                                    </div>
+                        {# Keep a running total of all teachers emails in this group #}
+                        {% set teacherIdsToEmail = [] %}
+                        <div class="actions-small-1 content">
+                            <div class="list-item">
+                                <div>
+                                    <h2 class="subheader">{{ group }}</h2>
                                 </div>
-                                {% if isStaffWhoCanView and config.email_all_staff and config.mail_enable %}
-                                    {% for subject in subjectGroup %}
-                                        {% for teacher in subject.teachers %}
-                                            {% if not teacher.email is empty and teacher.id not in teacherIdsToEmail %}
-                                                {% set teacherIdsToEmail = teacherIdsToEmail|merge([teacher.id]) %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                    {% if teacherIdsToEmail|length > 0 %}
-                                    <nav>
-                                        <sbx-pop-out content-id="email-teachers-{{ groupIdentifier }}"></sbx-pop-out>
-                                    </nav>
-                                    <ul class="f-dropdown" data-dropdown-content id="email-teachers-{{ groupIdentifier }}">
-                                        <li>
-                                            <a id="email-all-{{ groupIdentifier }}" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
-                                        </li>
-                                    </ul>
-                                    <form id="email-all-form-{{ groupIdentifier }}" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post">
-                                        <input type="hidden" name="userIds" value="{{ teacherIdsToEmail|join(',') }}"/>
-                                        <input name="target" value="cc" type="hidden">
-                                        <input name="title" value="Email all {{ group }} teachers" type="hidden">
-                                        <input name="studentId" value="{{ user.id }}" type="hidden">
-                                    </form>
-                                    {% autoescape 'js' %}
-                                        <script type="text/javascript">
-                                            $('#email-all-{{ groupIdentifier }}').on('click',function(){
-                                                $('#email-all-form-{{ groupIdentifier }}').submit();
-                                            });
-                                        </script>
-                                    {% endautoescape %}
-                                    {% endif %}
-                                {% endif %}
                             </div>
-                            <section class="v-card-list classes-groups content">
-                                {% for subjectKey, subject in subjectGroup %}
-
-                                    {# Suffix all iterated identifiers
-                                     # Tot menus and so on start exhibiting interrelated behaviour when they share the same id
-                                     # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
-                                     # taking advantage of a twig construct
-                                     #
-                                     # You have multiple subjects per subject group so you need further uniquification
-                                     #}
-                                    {% set subjectIdentifier = loop.index %}
-
-                                    <div class="v-card">
-
-                                        {% if subject.linkedToFolder %}
-                                         <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url') }}">
+                            {% if isStaffWhoCanView and config.email_all_staff and config.mail_enable %}
+                                {% for subject in subjectGroup %}
+                                    {% for teacher in subject.teachers %}
+                                        {% if not teacher.email is empty and teacher.id not in teacherIdsToEmail %}
+                                            {% set teacherIdsToEmail = teacherIdsToEmail|merge([teacher.id]) %}
                                         {% endif %}
-                                            <div class="card-class-image"
-                                                 style="border-bottom-width: 10px;
-                                                        border-bottom-style: solid;
-                                                        {% if subject.folder is defined and subject.folder.colour %}
-                                                        background-color:{{ subject.folder.colour }};
-                                                        border-bottom-color: {{ subject.folder.colour }};
-                                                        {% endif %}
-                                                        {% if subject.folder is defined and subject.folder.coverImage %}
-                                                        background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
-                                                        background-size: cover;
-                                                        background-repeat: no-repeat;
-                                                        background-position: center;
-                                                        {% endif %}"
-                                            >
-                                                <div class="related">
-                                                    {# A card can't fit more than 5 subject teachers comfortably, so four are displayed,
-                                                        with the remaining counted, and displayed in tool tip #}
-                                                    {% set maxTeachersToShowCount = 4 %}
-                                                    {% set teachersHead = subject.teachers[:maxTeachersToShowCount] %}
-                                                    {% for teacher in teachersHead %}
-                                                        {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullName} only %}
-                                                    {% endfor %}
-                                                    {% set teachersTail = subject.teachers[maxTeachersToShowCount:] %}
-                                                    {% if teachersTail|length %}
-                                                        {% set subjectTeacherNames = '' %}
-                                                        {% for teacher in teachersTail %}
-                                                            {% if loop.index == teachersTail|length %}
-                                                                {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName %}
-                                                            {% else %}
-                                                                {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName ~ '<br/>' %}
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                        {% set remainingSubjectTeachersCount = subject.teachers|length - maxTeachersToShowCount  %}
-                                                        <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ subjectTeacherNames }}">+{{ remainingSubjectTeachersCount }}</div>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% if subject.linkedToFolder %}
-                                        </a>
-                                        {% endif %}
-
-                                        {% set hasTeachersWithEmail = false %}
-                                        {% if canEmailStaff  %}
-                                            {% for teacher in subject.teachers %}
-                                                {% if not teacher.email is empty %}
-                                                    {% set hasTeachersWithEmail = true %}
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
-                                            <div class="list-item">
-                                                {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
-
-                                                {% if subject.linkedToFolder %}
-                                                    <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url') }}">
-                                                        <h3>{{ subject.name }}</h3>
-                                                        {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
-                                                    </a>
-                                                {% else %}
-                                                    <h3>{{ subject.name }}</h3>
-                                                    {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
-                                                {% endif %}
-                                            </div>
-                                            {% block folderListItemActions %}
-                                            {% if hasTeachersWithEmail and canEmailStaff %}
-                                                <nav>
-                                                    <sbx-pop-out content-id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}"></sbx-pop-out>
-                                                </nav>
-                                                <ul id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" class="f-dropdown" data-dropdown-content>
-                                                    {% for teacher in subject.teachers %}
-                                                        {% if not teacher.email is empty %}
-                                                            <li>
-                                                                {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
-                                                            </li>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                            {% endblock %}
-                                        </div>
-                                     </div>
+                                    {% endfor %}
                                 {% endfor %}
-                            </section>
-                        {% endfor %}
-                    </section>
-                </div>
-                {% endif %}
-
-                {% if showGroups %}
-                <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
-                    <section>
-                        <h2 class="subheader content">Groups</h2>
+                                {% if teacherIdsToEmail|length > 0 %}
+                                <nav>
+                                    <sbx-pop-out content-id="email-teachers-{{ groupIdentifier }}"></sbx-pop-out>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content id="email-teachers-{{ groupIdentifier }}">
+                                    <li>
+                                        <a id="email-all-{{ groupIdentifier }}" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
+                                    </li>
+                                </ul>
+                                <form id="email-all-form-{{ groupIdentifier }}" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post">
+                                    <input type="hidden" name="userIds" value="{{ teacherIdsToEmail|join(',') }}"/>
+                                    <input name="target" value="cc" type="hidden">
+                                    <input name="title" value="Email all {{ group }} teachers" type="hidden">
+                                    <input name="studentId" value="{{ user.id }}" type="hidden">
+                                </form>
+                                {% autoescape 'js' %}
+                                    <script type="text/javascript">
+                                        $('#email-all-{{ groupIdentifier }}').on('click',function(){
+                                            $('#email-all-form-{{ groupIdentifier }}').submit();
+                                        });
+                                    </script>
+                                {% endautoescape %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
                         <section class="v-card-list classes-groups content">
-                            {% for groupKey, group in groups %}
+                            {% for subjectKey, subject in subjectGroup %}
+
+                                {# Suffix all iterated identifiers
+                                 # Tot menus and so on start exhibiting interrelated behaviour when they share the same id
+                                 # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                                 # taking advantage of a twig construct
+                                 #
+                                 # You have multiple subjects per subject group so you need further uniquification
+                                 #}
+                                {% set subjectIdentifier = loop.index %}
+
                                 <div class="v-card">
-                                    {% if group.linkedToFolder %}
-                                    <a href="/homepage/{{ group.id }}">
+
+                                    {% if subject.linkedToFolder %}
+                                     <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url') }}">
                                     {% endif %}
                                         <div class="card-class-image"
                                              style="border-bottom-width: 10px;
                                                     border-bottom-style: solid;
-                                                    {% if group.folder is defined and group.folder.colour %}
-                                                    background-color:{{ group.folder.colour }};
-                                                    border-bottom-color: {{ group.folder.colour }};
+                                                    {% if subject.folder is defined and subject.folder.colour %}
+                                                    background-color:{{ subject.folder.colour }};
+                                                    border-bottom-color: {{ subject.folder.colour }};
                                                     {% endif %}
-                                                    {% if group.folder is defined and group.folder.coverImage %}
-                                                    background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
+                                                    {% if subject.folder is defined and subject.folder.coverImage %}
+                                                    background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
                                                     background-size: cover;
                                                     background-repeat: no-repeat;
                                                     background-position: center;
                                                     {% endif %}"
                                         >
-                                            {% if group.owners is defined %}
-                                                <div class="related groups">
-                                                {# A card can't fit more than 5 group owners comfortably, so four are displayed,
+                                            <div class="related">
+                                                {# A card can't fit more than 5 subject teachers comfortably, so four are displayed,
                                                     with the remaining counted, and displayed in tool tip #}
-                                                {% set maxOwnersToShowCount = 4 %}
-                                                {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
-                                                {% for owner in ownersHead %}
-                                                    {% include 'include/portrait.twig' with {user: owner, description: owner.fullName} only %}
+                                                {% set maxTeachersToShowCount = 4 %}
+                                                {% set teachersHead = subject.teachers[:maxTeachersToShowCount] %}
+                                                {% for teacher in teachersHead %}
+                                                    {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullName} only %}
                                                 {% endfor %}
-                                                {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
-                                                {% if ownersTail|length %}
-                                                    {% set groupOwnersNames = '' %}
-                                                    {% for owner in ownersTail %}
-                                                        {% if loop.index == ownersTail|length %}
-                                                            {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
+                                                {% set teachersTail = subject.teachers[maxTeachersToShowCount:] %}
+                                                {% if teachersTail|length %}
+                                                    {% set subjectTeacherNames = '' %}
+                                                    {% for teacher in teachersTail %}
+                                                        {% if loop.index == teachersTail|length %}
+                                                            {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName %}
                                                         {% else %}
-                                                            {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ '<br/>' %}
+                                                            {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName ~ '<br/>' %}
                                                         {% endif %}
                                                     {% endfor %}
-                                                    {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
-                                                    <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ groupOwnersNames }}">+{{ remainingGroupOwnersCount }}</div>
+                                                    {% set remainingSubjectTeachersCount = subject.teachers|length - maxTeachersToShowCount  %}
+                                                    <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ subjectTeacherNames }}">+{{ remainingSubjectTeachersCount }}</div>
                                                 {% endif %}
-                                                </div>
-                                            {% endif %}
+                                            </div>
                                         </div>
-                                    {% if group.linkedToFolder %}
+                                    {% if subject.linkedToFolder %}
                                     </a>
                                     {% endif %}
 
-                                    {% set hasOwnersWithEmail = false %}
-                                    {% if group.owners is defined and canEmailStaff %}
-                                        {% for owner in group.owners %}
-                                            {% if not owner.email is empty %}
-                                                {% set hasOwnersWithEmail = true %}
+                                    {% set hasTeachersWithEmail = false %}
+                                    {% if canEmailStaff  %}
+                                        {% for teacher in subject.teachers %}
+                                            {% if not teacher.email is empty %}
+                                                {% set hasTeachersWithEmail = true %}
                                             {% endif %}
                                         {% endfor %}
                                     {% endif %}
-                                    <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
+                                    <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
                                         <div class="list-item">
-                                            {% if group.linkedToFolder %}
-                                                <a href="/homepage/{{ group.id }}">
-                                                    <h3>{{ group.name }}</h3>
+                                            {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
+
+                                            {% if subject.linkedToFolder %}
+                                                <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url') }}">
+                                                    <h3>{{ subject.name }}</h3>
+                                                    {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
                                                 </a>
                                             {% else %}
-                                                <h3>{{ group.name }}</h3>
+                                                <h3>{{ subject.name }}</h3>
+                                                {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
                                             {% endif %}
                                         </div>
-                                        {% if hasOwnersWithEmail and canEmailStaff %}
+                                        {% block folderListItemActions %}
+                                        {% if hasTeachersWithEmail and canEmailStaff %}
                                             <nav>
-                                                <sbx-pop-out content-id="group-options-{{ groupKey }}"></sbx-pop-out>
+                                                <sbx-pop-out content-id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}"></sbx-pop-out>
                                             </nav>
-                                            <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
-                                                {% for owner in group.owners %}
-                                                    {% if not owner.email is empty %}
-                                                    <li>
-                                                        {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ owner.formatName }}</a>
-                                                    </li>
+                                            <ul id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" class="f-dropdown" data-dropdown-content>
+                                                {% for teacher in subject.teachers %}
+                                                    {% if not teacher.email is empty %}
+                                                        <li>
+                                                            {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
+                                                        </li>
                                                     {% endif %}
                                                 {% endfor %}
                                             </ul>
                                         {% endif %}
+                                        {% endblock %}
                                     </div>
-                                </div>
+                                 </div>
                             {% endfor %}
                         </section>
-                    </section>
-                </div>
-                {% endif %}
+                    {% endfor %}
+                </section>
+            </div>
+            {% endif %}
 
-                {% if showContactsTab %}
-                <div class="content no-pad {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
-
-                    <section class="content">
-                        {% block contacts_island %}
-                            {% block contacts %}
-                                <h2 class="subheader">Contact Information</h2>
-                                {% if showContactsAlert %}
-                                    {% if externalUser.ParentsSeparatedFlag ?? false %}
-                                        {% block parents_separated %}
-                                    <div class="alert-box highlight icon-info">Parents Separated</div>
-                                        {% endblock parents_separated %}
-                                    {% endif %}
+            {% if showGroups %}
+            <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
+                <section>
+                    <h2 class="subheader content">Groups</h2>
+                    <section class="v-card-list classes-groups content">
+                        {% for groupKey, group in groups %}
+                            <div class="v-card">
+                                {% if group.linkedToFolder %}
+                                <a href="/homepage/{{ group.id }}">
+                                {% endif %}
+                                    <div class="card-class-image"
+                                         style="border-bottom-width: 10px;
+                                                border-bottom-style: solid;
+                                                {% if group.folder is defined and group.folder.colour %}
+                                                background-color:{{ group.folder.colour }};
+                                                border-bottom-color: {{ group.folder.colour }};
+                                                {% endif %}
+                                                {% if group.folder is defined and group.folder.coverImage %}
+                                                background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
+                                                background-size: cover;
+                                                background-repeat: no-repeat;
+                                                background-position: center;
+                                                {% endif %}"
+                                    >
+                                        {% if group.owners is defined %}
+                                            <div class="related groups">
+                                            {# A card can't fit more than 5 group owners comfortably, so four are displayed,
+                                                with the remaining counted, and displayed in tool tip #}
+                                            {% set maxOwnersToShowCount = 4 %}
+                                            {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
+                                            {% for owner in ownersHead %}
+                                                {% include 'include/portrait.twig' with {user: owner, description: owner.fullName} only %}
+                                            {% endfor %}
+                                            {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
+                                            {% if ownersTail|length %}
+                                                {% set groupOwnersNames = '' %}
+                                                {% for owner in ownersTail %}
+                                                    {% if loop.index == ownersTail|length %}
+                                                        {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
+                                                    {% else %}
+                                                        {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ '<br/>' %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
+                                                <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ groupOwnersNames }}">+{{ remainingGroupOwnersCount }}</div>
+                                            {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% if group.linkedToFolder %}
+                                </a>
                                 {% endif %}
 
-                                {% if showContacts %}
-                                <section>
-                                    <ul class="information-list expandable-card">
-                                        {% for contact in contacts %}
-                                            {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
+                                {% set hasOwnersWithEmail = false %}
+                                {% if group.owners is defined and canEmailStaff %}
+                                    {% for owner in group.owners %}
+                                        {% if not owner.email is empty %}
+                                            {% set hasOwnersWithEmail = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
+                                    <div class="list-item">
+                                        {% if group.linkedToFolder %}
+                                            <a href="/homepage/{{ group.id }}">
+                                                <h3>{{ group.name }}</h3>
+                                            </a>
+                                        {% else %}
+                                            <h3>{{ group.name }}</h3>
+                                        {% endif %}
+                                    </div>
+                                    {% if hasOwnersWithEmail and canEmailStaff %}
+                                        <nav>
+                                            <sbx-pop-out content-id="group-options-{{ groupKey }}"></sbx-pop-out>
+                                        </nav>
+                                        <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
+                                            {% for owner in group.owners %}
+                                                {% if not owner.email is empty %}
+                                                <li>
+                                                    {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ owner.formatName }}</a>
+                                                </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </section>
+                </section>
+            </div>
+            {% endif %}
+
+            {% if showContactsTab %}
+            <div class="content no-pad {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
+
+                <section class="content">
+                    {% block contacts_island %}
+                        {% block contacts %}
+                            <h2 class="subheader">Contact Information</h2>
+                            {% if showContactsAlert %}
+                                {% if externalUser.ParentsSeparatedFlag ?? false %}
+                                    {% block parents_separated %}
+                                <div class="alert-box highlight icon-info">Parents Separated</div>
+                                    {% endblock parents_separated %}
+                                {% endif %}
+                            {% endif %}
+
+                            {% if showContacts %}
+                            <section>
+                                <ul class="information-list expandable-card">
+                                    {% for contact in contacts %}
+                                        {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
+                                            <li class="small-12">
+
+                                                <!-- Expander -->
+                                                <div class="list-item">
+                                                    <div class="expander" data-collapser="collap-contact-{{ loop.index }}"></div>
+                                                    <div class="compact card small-12">
+                                                        {% if contact.main %}
+                                                            <a href="/search/user/{{ contact.main.id }}">
+                                                                {% include 'include/portrait.twig' with {user: contact.main} only %}
+                                                                <p>
+                                                                    {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                                                    <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
+                                                                </p>
+                                                            </a>
+                                                        {% else %}
+                                                            {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} only %}
+                                                            <p>
+                                                                {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                                                <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
+                                                            </p>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+
+                                                <!-- Collapsable content -->
+                                                {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
+                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                        <div class="list-item">
+                                                            <div class="small-12">
+
+                                                                {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                                {% if contact.StudentContactMobilePhone %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                                {% if contact.StudentContactOccupPhone %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                                {% if contact.StudentContactDefaultEmail %}
+                                                                    <div class="row">
+                                                                        <div class="column small-12 medium-5"><strong>Email: </strong></div>
+                                                                        <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                        <div class="empty-state small-12">
+                                                            <p>No contact details found.</p>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </li>
+
+                                            {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
                                                 <li class="small-12">
 
                                                     <!-- Expander -->
                                                     <div class="list-item">
-                                                        <div class="expander" data-collapser="collap-contact-{{ loop.index }}"></div>
+                                                        <div class="expander" data-collapser="collap-spouse-{{ loop.index }}"></div>
                                                         <div class="compact card small-12">
-                                                            {% if contact.main %}
-                                                                <a href="/search/user/{{ contact.main.id }}">
-                                                                    {% include 'include/portrait.twig' with {user: contact.main} only %}
+                                                            {# need to know user's schoolbox info here #}
+                                                            {% if contact.spouse %}
+                                                                <a href="/search/user/{{ contact.spouse.id }}">
+                                                                    {% include 'include/portrait.twig' with {user: contact.spouse} only %}
                                                                     <p>
-                                                                        {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
-                                                                        <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
+                                                                        {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                                                        <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
                                                                     </p>
                                                                 </a>
                                                             {% else %}
-                                                                {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} only %}
+                                                                {% include 'include/portrait.twig' with {externalId: contact.StudentContactSpouseID} only %}
                                                                 <p>
-                                                                    {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
-                                                                    <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
+                                                                    {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                                                    <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
                                                                 </p>
                                                             {% endif %}
                                                         </div>
                                                     </div>
 
-                                                    <!-- Collapsable content -->
-                                                    {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
-                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                    {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
+                                                        <!-- Collapsable content -->
+                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
                                                             <div class="list-item">
                                                                 <div class="small-12">
 
@@ -987,200 +1057,128 @@
                                                                         </div>
                                                                     {% endif %}
 
-                                                                    {% if contact.StudentContactMobilePhone %}
+                                                                    {% if contact.StudentContactSpouseMobilePhone %}
                                                                         <div class="row">
                                                                             <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
+                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
                                                                         </div>
                                                                     {% endif %}
 
-                                                                    {% if contact.StudentContactOccupPhone %}
+                                                                    {% if contact.StudentContactSpouseOccupPhone %}
                                                                         <div class="row">
                                                                             <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
+                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
                                                                         </div>
                                                                     {% endif %}
 
-                                                                    {% if contact.StudentContactDefaultEmail %}
+                                                                    {% if contact.StudentContactSpouseDefaultEmail %}
                                                                         <div class="row">
                                                                             <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                                            <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
+                                                                            <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
                                                                         </div>
                                                                     {% endif %}
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     {% else %}
-                                                        <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
+                                                        <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
                                                             <div class="empty-state small-12">
                                                                 <p>No contact details found.</p>
                                                             </div>
                                                         </div>
                                                     {% endif %}
                                                 </li>
-
-                                                {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
-                                                    <li class="small-12">
-
-                                                        <!-- Expander -->
-                                                        <div class="list-item">
-                                                            <div class="expander" data-collapser="collap-spouse-{{ loop.index }}"></div>
-                                                            <div class="compact card small-12">
-                                                                {# need to know user's schoolbox info here #}
-                                                                {% if contact.spouse %}
-                                                                    <a href="/search/user/{{ contact.spouse.id }}">
-                                                                        {% include 'include/portrait.twig' with {user: contact.spouse} only %}
-                                                                        <p>
-                                                                            {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
-                                                                            <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
-                                                                        </p>
-                                                                    </a>
-                                                                {% else %}
-                                                                    {% include 'include/portrait.twig' with {externalId: contact.StudentContactSpouseID} only %}
-                                                                    <p>
-                                                                        {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
-                                                                        <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
-                                                                    </p>
-                                                                {% endif %}
-                                                            </div>
-                                                        </div>
-
-                                                        {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
-                                                            <!-- Collapsable content -->
-                                                            <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
-                                                                <div class="list-item">
-                                                                    <div class="small-12">
-
-                                                                        {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
-                                                                            <div class="row">
-                                                                                <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
-                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
-                                                                            </div>
-                                                                        {% endif %}
-
-                                                                        {% if contact.StudentContactSpouseMobilePhone %}
-                                                                            <div class="row">
-                                                                                <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
-                                                                            </div>
-                                                                        {% endif %}
-
-                                                                        {% if contact.StudentContactSpouseOccupPhone %}
-                                                                            <div class="row">
-                                                                                <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
-                                                                            </div>
-                                                                        {% endif %}
-
-                                                                        {% if contact.StudentContactSpouseDefaultEmail %}
-                                                                            <div class="row">
-                                                                                <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                                                <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
-                                                                            </div>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        {% else %}
-                                                            <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
-                                                                <div class="empty-state small-12">
-                                                                    <p>No contact details found.</p>
-                                                                </div>
-                                                            </div>
-                                                        {% endif %}
-                                                    </li>
-                                                {% endif %}
                                             {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </section>
-                                {% endif %}
-                            {% endblock contacts %}
-                        {% endblock contacts_island %}
-
-                        {% block emergencyContacts_island %}
-                        {% block emergencyContacts %}
-                            {# up to 3 emergency contact blocks
-                             # show no header if no emergencies
-                            #}
-                            {% if showEmergencyContacts %}
-                                <h2 class="subheader">Emergency Contact Information</h2>
-                                <section>
-                                    <ul class="information-list expandable-card">
-                                        {% for i in 1..3 %}
-                                            {% set index = (i == 1 ? '' : i) %}
-                                            {% if externalUser["StudentEmergency#{index}Name"] %}
-                                                <li>
-                                                    <!-- Expander -->
-                                                    <div>
-                                                        <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
-                                                        <div class="content small-12">
-                                                            {{ externalUser["StudentEmergency#{index}Name"] }}
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Collapseable content -->
-                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
-                                                        <div class="row">
-                                                            <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
-                                                            <div class="column small-12 medium-7">
-                                                                <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
-                                                                    {{ externalUser["StudentEmergency#{index}Phone"] }}
-                                                                </a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row">
-                                                            <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
-                                                            <div class="column small-12 medium-7">
-                                                                <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
-                                                                    {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </section>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </section>
                             {% endif %}
-                        {% endblock emergencyContacts %}
-                        {% endblock emergencyContacts_island %}
-                    </section>
-                </div>
-                {% endif %}
+                        {% endblock contacts %}
+                    {% endblock contacts_island %}
+
+                    {% block emergencyContacts_island %}
+                    {% block emergencyContacts %}
+                        {# up to 3 emergency contact blocks
+                         # show no header if no emergencies
+                        #}
+                        {% if showEmergencyContacts %}
+                            <h2 class="subheader">Emergency Contact Information</h2>
+                            <section>
+                                <ul class="information-list expandable-card">
+                                    {% for i in 1..3 %}
+                                        {% set index = (i == 1 ? '' : i) %}
+                                        {% if externalUser["StudentEmergency#{index}Name"] %}
+                                            <li>
+                                                <!-- Expander -->
+                                                <div>
+                                                    <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
+                                                    <div class="content small-12">
+                                                        {{ externalUser["StudentEmergency#{index}Name"] }}
+                                                    </div>
+                                                </div>
+
+                                                <!-- Collapseable content -->
+                                                <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
+                                                    <div class="row">
+                                                        <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
+                                                        <div class="column small-12 medium-7">
+                                                            <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
+                                                                {{ externalUser["StudentEmergency#{index}Phone"] }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
+                                                        <div class="column small-12 medium-7">
+                                                            <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+                                                                {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </section>
+                        {% endif %}
+                    {% endblock emergencyContacts %}
+                    {% endblock emergencyContacts_island %}
+                </section>
             </div>
+            {% endif %}
         </div>
     </div>
+</div>
 
 
-    {% block pd %}
-    {% endblock pd %}
+{% block pd %}
+{% endblock pd %}
 
-    {# TODO: Where to pus this?
-     # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
-     # https://foundation.zurb.com/forum/posts/22995-empty-column
-     #}
-    <style type="text/css">
-        .columns, .column {
-            min-height: 1px;
-        }
-    </style>
+{# TODO: Where to pus this?
+ # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
+ # https://foundation.zurb.com/forum/posts/22995-empty-column
+ #}
+<style type="text/css">
+    .columns, .column {
+        min-height: 1px;
+    }
+</style>
 
 
-    {##
-     # Modal for sharing a learning moment
-     #
-     # Only show "sharing on behalf of" if you're not viewing your own profile
-     #}
-    {% if shareLearningMomentUrl %}
-        {% include '@learningMomentEvidence/shareModal.twig' with {
-            id:      "shareLearningMoment",
-            baseUrl: shareLearningMomentUrl,
-            user:    isCurrentUser ? null : user,
-        } only %}
-    {% endif %}
+{##
+ # Modal for sharing a learning moment
+ #
+ # Only show "sharing on behalf of" if you're not viewing your own profile
+ #}
+{% if shareLearningMomentUrl %}
+    {% include '@learningMomentEvidence/shareModal.twig' with {
+        id:      "shareLearningMoment",
+        baseUrl: shareLearningMomentUrl,
+        user:    isCurrentUser ? null : user,
+    } only %}
+{% endif %}
 
-    <div data-toast class="toast"></div>
-{% endblock profile %}
+<div data-toast class="toast"></div>

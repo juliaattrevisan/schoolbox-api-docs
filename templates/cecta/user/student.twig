@@ -1,12 +1,8 @@
-{% extends '@core/user/student.twig' %}
-
-{% block profile %}
-    {% if not USER.superuser and sharedCampuses is empty %}
-        <div class="empty-state">
-            <i class="icon-locked"></i>
-            <p>You do not have permission to view this student&rsquo;s profile.</p>
-        </div>
-    {% else %}
-        {{ parent() }}
-    {% endif %}
-{% endblock profile %}
+{% if not USER.superuser and sharedCampuses is empty %}
+    <div class="empty-state">
+        <i class="icon-locked"></i>
+        <p>You do not have permission to view this student&rsquo;s profile.</p>
+    </div>
+{% else %}
+    {% include '@core/user/student.twig' %}
+{% endif %}
