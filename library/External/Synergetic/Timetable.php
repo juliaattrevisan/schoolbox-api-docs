@@ -256,8 +256,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             );
 
             $timetableDef['desc'][$index]     = $period['Description'];
-            $timetableDef['start'][$index]    = date("g:ia", strtotime($period['TimeFrom']));
-            $timetableDef['end'][$index]      = date("g:ia", strtotime($period['TimeTo']));
+            // No time from/to? Null-coalesce I suppose?
+            // Should probably be skipped, but null-coalesce preserves previous
+            // behavior (which puts the start and end at 12am)
+            $timetableDef['start'][$index]    = date("g:ia", strtotime($period['TimeFrom'] ?? ''));
+            $timetableDef['end'][$index]      = date("g:ia", strtotime($period['TimeTo'] ?? ''));
             $timetableDef['number'][$index]   = $period['PeriodNumber'];
             $timetableDef['sequence'][$index] = $period['PeriodNumberSeq'];
         }
