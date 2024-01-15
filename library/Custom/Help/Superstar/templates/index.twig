@@ -1,0 +1,187 @@
+{##
+ # OLC Superstar Report
+ #
+ # @param string $report         Metadata about this report, currently containing the official name of this report
+ # @param array $badgeYears      A set of years that have badge mapping hardcoded by us
+ # @param array $badgeMapping    A set of (unit spec id, badge urls) as a shortcut to repeated route generation
+ # @param array $previousAwards  A set of (user id, badge id) tuples for guys who got an achievement previously
+ # @param array $stack           A set of candidacy outcomes per person, grouped by unit spec id
+ #}
+<div class="row actions-small-1">
+    <div class=list-item">
+        <div class="small-12 columns">
+            <h1>{{ report.title }} - {{ report.year }}</h1>
+        </div>
+    </div>
+    <nav>
+        <sbx-pop-out content-id="header-options"></sbx-pop-out>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+        {% for year in badgeYears %}
+        <li>
+            <a href="{{ routeLookup('superstar.getCandidates', {'year': year}) }}" class="icon-progress" title="{{ year }}">{{ year }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{# Weird styling hacks specific to this layout #}
+<style>
+    h3.content {
+        margin-bottom: 0;
+        padding-bottom: 0 !important;
+    }
+
+    .subheader {
+        padding-top: 0.5rem;
+        padding-bottom: 0;
+        text-transform: none;
+    }
+
+    .content.card {
+        padding-bottom: 0;
+    }
+</style>
+
+{# Sometimes you just...have nothing to do #}
+{% if 0 == stack|length %}
+    <div class="empty-state">
+        <i class="icon-badge"></i>
+        <p>Nobody has obtained Superstar or Star candidacy for OLC {{ report.year }}.</p>
+    </div>
+{% else %}
+    {% for unitSpecId, unitSpecData in stack %}
+        {% if unitSpecData.actionables|length %}
+            <div class="row">
+                <div class="small-12 island">
+                    <div class="actions-small-1">
+                        <div class="list-item">
+                            <h2 class="subheader">{{ unitSpecData.title }}</h2>
+                        </div>
+                        <nav>
+                            <a class="icon-view" title="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"></a>
+                        </nav>
+                    </div>
+                    <section>
+                        <ul class="information-list">
+                        {% if unitSpecData.actionables.superstar|length %}
+                            <li>
+                                <h3 class="content">Superstar</h3>
+                                {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                            </li>
+                        {% endif %}
+
+                        {% if unitSpecData.actionables.star|length %}
+                            <li>
+                                <h3 class="content">Star</h3>
+                                {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                            </li>
+                        {% endif %}
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# Sorry Donny - you can vue-ify this if there is time #}
+<script>
+    $(function() {
+        {# Show rows where people had received an award previously
+         # They're hidden to minimise ui clutter/length, but available in case
+         # you needed to know this fact
+         #}
+        $('[data-previously-awarded-toggle]').each(function (index, element) {
+            $(element).on('click', function(event) {
+                event.preventDefault();
+
+                let unitSpecId = $(this).attr('data-previously-awarded-toggle');
+
+                $('[data-previously-awarded="' + unitSpecId + '"]').toggle();
+
+                /* Toggle eyeball icon
+                 */
+                if ('icon-view' === $(this).attr('class')) {
+                    $(this).removeClass('icon-view').addClass('icon-view-hollow');
+                } else {
+                    $(this).removeClass('icon-view-hollow').addClass('icon-view');
+                }
+            });
+        });
+
+        {# Award an achievement #}
+        $('[data-award]').each(function (index, element) {
+            $(element).on('click', function(event) {
+                event.preventDefault();
+
+                let endpoint = $(this).attr('href');
+                let payload = {
+                    users: [
+                        {
+                            'id': parseInt($(this).attr('data-award'))
+                        }
+                    ]
+                };
+
+                $.ajax({
+                    type: 'post',
+                    url: endpoint,
+                    dataType: 'json',
+                    data: payload,
+                    success: function() {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+{##
+ # Generic renderer for each guy you can award a badge
+ #
+ # @param array $badgeMapping  A set of (unit spec id, badge urls) as a shortcut to repeated route generation
+ # @param int $unitSpecId      Identifier for a unit spec
+ # @param array $actionables   A list of superstars/stars who can be awarded something
+ #}
+{% macro renderActionable(type, previousAwards, badgeMapping, unitSpecId, actionables) %}
+    {% apply spaceless %}
+        <ul class="action-list">
+            {% for actionable in actionables[type] %}
+                {# It's possible that you don't have any badges defined for unitSpecId
+                 # if you're developing locally in your vagrant and you fool around with
+                 # the badgeMapping index, deviating from what Help currently does. Your
+                 # twig dies in such circumstances, so this check simply avoids a death.
+                 #}
+                {% if badgeMapping[unitSpecId][type].id is defined %}
+                    {% set previouslyAwarded = (previousAwards[actionable.id][badgeMapping[unitSpecId][type].id] ?? null) is not null %}
+
+                    {# Hide people who previously got this award #}
+                    <li class="actions-small-1" {% if previouslyAwarded %}style="display: none"{% endif %} data-previously-awarded="{{ unitSpecId }}">
+                        <div class="list-item">
+                            <div class="content card">
+                                <a href="/search/user/{{ actionable.id }}">
+                                    {{ actionable.firstname }} {{ actionable.lastname }}
+                                </a>
+                                -
+                                <a href="/homepage/{{ actionable.school.folderId }}">{{ actionable.school.name }} ({{ actionable.school.code }})</a>
+
+                                {% if previouslyAwarded %}
+                                    <span class="pipe meta">Awarded on
+                                        <time title="{{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id].database }}">{{ previousAwards[actionable.id][badgeMapping[unitSpecId][type].id].local }}</time>
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <nav>
+                            {% if not previouslyAwarded %}
+                                <a class='icon-badge' href="{{ badgeMapping[unitSpecId][type].route }}" data-award="{{ actionable.id }}"></a>
+                            {% endif %}
+                        </nav>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endapply %}
+{% endmacro %}

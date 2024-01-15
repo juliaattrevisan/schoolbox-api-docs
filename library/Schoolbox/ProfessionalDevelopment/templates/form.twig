@@ -21,7 +21,7 @@
         <section class="content">
             <div class="small-12 medium-8 columns">
                 <label>Professional Development Number</label>
-                <input type="text" name="pdNumber" value="{{ pd.number }}" />
+                <input type="text" name="pdNumber" value="{{ pd.number ?? null }}" />
             </div>
             <div class="small-12 medium-4 columns">
                 <label>Registration State</label>
@@ -29,7 +29,7 @@
                     <option value="" disabled="disabled">Please Select</option>
 
                     {% for state in pdStates %}
-                        {% if state == pd.registrationState %}
+                        {% if pd and state == pd.registrationState %}
                             {% set selected = ' selected="selected"' %}
                         {% else %}
                             {% set selected = '' %}
