@@ -82,11 +82,13 @@ class Client
      */
     public function buildHtmlToPdfConverter(?string $sessionHash): Chromium
     {
-        $params = [];
+        $params    = [];
+        $converter = new Chromium($this->apiHost);
         if (isset($sessionHash)) {
             $params['Cookie'] = sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash);
+            return $converter->extraHttpHeaders($params);
         }
-        return (new Chromium($this->apiHost))->extraHttpHeaders($params);
+        return $converter;
     }
 
     /**
