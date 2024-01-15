@@ -9,7 +9,6 @@
  # @param array                $plan                 A set of dates for custom assessment participation
  # @param array                $breadcrumbs          A trail of breadcrumbs
  # @param bool                 $canAttempt           Whether the logged-in user can start/resume attempts
- # @param bool                 $canGiveFeedback      Whether the logged-in user can provide feedback on an attempt
  # @param string               $externalRedirectUrl  A url in a third party system (newington canvas) that is relevant to this quiz
  # @param array                $lastViews            A set of (roletype, info) tuples about when a student/parent visited this page
  # @param Participant          $participant          A participant of this assessment, used to figure out exclusions and special CAP stuff
@@ -159,8 +158,9 @@
                                         <a href="{{ canSeeReview }}" class="icon-view" title="Review"></a>
                                     {% endif %}
 
+                                    {% set canGiveFeedback = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
                                     {% if canGiveFeedback %}
-                                        <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
+                                        <a href="{{ canGiveFeedback }}" class="icon-staff" title="Feedback"></a>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}

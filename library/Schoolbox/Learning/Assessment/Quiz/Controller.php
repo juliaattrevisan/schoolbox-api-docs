@@ -367,7 +367,6 @@ class Controller extends Assessment\Controller
              */
             // User may only attempt quiz from here if viewing own summary
             'canAttempt' => $canAttempt,
-            'canGiveFeedback' => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
             /* External Url for third party apps which might have generated this assessment
              */
             'externalRedirectUrl' => $externalRedirectUrl,
