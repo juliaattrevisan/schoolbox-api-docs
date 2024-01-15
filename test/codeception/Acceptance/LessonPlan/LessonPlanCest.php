@@ -96,7 +96,7 @@ class LessonPlanCest
             $i->wait(3);
         }
         $i->amGoingTo('check if the lesson plan is presented');
-        $i->canSee('Modify Course');
+        $i->canSee('link existing activities');
         $i->canSee($lessonPlanName);
     }
 
