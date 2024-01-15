@@ -116,8 +116,9 @@ class Homepage
      * Also soft-deletes homepage content where applicable
      *
      * @return void
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function emptyHomepage()
+    public function emptyHomepage(): void
     {
         /** @var \Schoolbox\IHomepageCleanable[] $homepageCleanables */
         $homepageCleanables = [
@@ -142,13 +143,19 @@ class Homepage
             $homepageCleanable->homepageClean($this->cid);
         }
 
-        // reset the homepage
-        $categoryMapper = Resource\Folder\Mapper::getInstance();
-
+        // reset the homepage if one exists
         try {
-            $category = $categoryMapper->findById($this->cid);
-            $this->resetHomepageToTemplate($category->getHomepage()->getTemplate()->getId());
-        } catch (\Exception $e) {
+            $category = Resource\Folder\Mapper::getInstance()->findById($this->cid);
+
+            /* Only reset folder's homepage templates if one was selected and in existence
+             * All this does is reset the components on the homepage to whatever is specified
+             * in the template itself. "No Homepage" folders have nothing to reset.
+             */
+            if ($category->getHomepage() && $category->getHomepage()->getTemplate()) {
+                $this->resetHomepageToTemplate($category->getHomepage()->getTemplate()->getId());
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
         }
     }
 
