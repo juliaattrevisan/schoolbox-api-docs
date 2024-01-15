@@ -10,8 +10,6 @@
  # @param array                $breadcrumbs          A trail of breadcrumbs
  # @param bool                 $canAttempt           Whether the logged-in user can start/resume attempts
  # @param bool                 $canGiveFeedback      Whether the logged-in user can provide feedback on an attempt
- # @param bool                 $canSeeReview         Whether the logged-in user can review the quiz
- #                                                   (which means see a read-only view of questions/answers and possibly marks/feedback depending on other settings).
  # @param string               $externalRedirectUrl  A url in a third party system (newington canvas) that is relevant to this quiz
  # @param array                $lastViews            A set of (roletype, info) tuples about when a student/parent visited this page
  # @param Participant          $participant          A participant of this assessment, used to figure out exclusions and special CAP stuff
@@ -156,9 +154,11 @@
                                 {% if not finished and canAttempt %}
                                     <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                                 {% else %}
+                                    {% set canSeeReview = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
                                     {% if canSeeReview %}
-                                        <a href="{{ routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-view" title="Review"></a>
+                                        <a href="{{ canSeeReview }}" class="icon-view" title="Review"></a>
                                     {% endif %}
+
                                     {% if canGiveFeedback %}
                                         <a href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) }}" class="icon-staff" title="Feedback"></a>
                                     {% endif %}
