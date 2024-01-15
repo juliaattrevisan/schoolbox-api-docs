@@ -27,7 +27,8 @@
 /var/log/schoolbox/*/audit.log
 /var/log/schoolbox/*/clipboard-importer.log
 /var/log/schoolbox/*/expired-storage-removal.log
-/var/log/schoolbox/*/storage-usageCache.log {
+/var/log/schoolbox/*/storage-usageCache.log
+/var/log/schoolbox/*/intellischool.log {
     weekly
     missingok
     rotate 4
