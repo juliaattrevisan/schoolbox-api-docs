@@ -58,7 +58,7 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         $publishDate = \Alaress_Date_Format::now();
 
         // grab the assessmentID for all lesson plans from the students subject list
-        $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $publishDate, $student->getRole()->isStudent());
+        $assessmentIds = $lessonPlanMapper->findForFolder($student->getSubjectCollection()->getIds(), $dateStart, $dateEnd, $publishDate, $student->getRole()->isStaff());
         // hydrate those assessments
         $this->visibleLessonPlans = $assessmentDataSource->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'ASC']]);
 
