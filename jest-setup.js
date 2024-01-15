@@ -3,13 +3,14 @@ import "@testing-library/jest-dom"; // so we can use jest-dom in any test file h
 /**
  * As Vue is now stored globally, provide reference to these functions so tests can still run without browser context
  */
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick } from "vue";
 window.Vue = {};
 window.Vue.ref = ref;
 window.Vue.computed = computed;
 window.Vue.watch = watch;
 window.Vue.onMounted = onMounted;
 window.Vue.onUnmounted = onUnmounted;
+window.Vue.onBeforeUnmount = onBeforeUnmount;
 window.Vue.nextTick = nextTick;
 
 /**
