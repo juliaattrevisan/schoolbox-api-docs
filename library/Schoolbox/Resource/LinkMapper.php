@@ -189,7 +189,7 @@ class LinkMapper extends Mapper implements ILocator
             $sort = 'description';
         }
 
-        $sortDir = strtoupper($options['sortdir'] ?? null) === 'DESC' ? 'DESC' : 'ASC';
+        $sortDir = strtoupper($options['sortdir'] ?? '') === 'DESC' ? 'DESC' : 'ASC';
 
         $limit = $options['size'] ?? null;
 
