@@ -40,8 +40,9 @@ export function loadReport(initOptions: object) {
                             useStudentStore().addItems(items);
 
                             if (displayScores) {
-                                disableTextAreas(reportId);
+                                addTargetsToMarks(reportId);
                             }
+                            disableTextAreas(reportId);
                         });
 
                         // to notify the report has loaded
