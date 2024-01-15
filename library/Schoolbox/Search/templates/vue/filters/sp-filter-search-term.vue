@@ -152,7 +152,7 @@ function onMouseOut(event: MouseEvent) {
     grid-template-columns: 1fr var(--tabbar-height);
 
     input[type="text"].c-filter-search-term__field {
-        border: 2px solid var(--navigation-background);
+        border: 1px solid var(--form-border-color);
         background-color: var(--foreground-colour);
         color: var(--primary-text-colour);
         font-size: var(--base-font-size);
