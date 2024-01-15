@@ -1,0 +1,59 @@
+tour:
+  title: 'OLC 24 Release'
+  description: 'Introduce users to the new features of the OLC 24 release.'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: Welcome to OLC 24
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/Schoolbox-OLC-2024-Banner-1508x188px.png' style='width:100%;margin-bottom:16px;'>
+                  <p>Welcome to <strong>OLC ‘24</strong> - the 2024 version of the Online Learning Course. This release includes updates to a number of projects, videos, and quizzes, as well as some brand new tasks that align with our new and exciting 23.0 and 23.1 Schoolbox features.</p>
+                  <p>The following updates have been made in this release:</p>
+                  <h3>All Units:</h3>
+                  <ul>
+                   <li>All quizzes have been revised to align with updates made in 23.0 and 23.1, and now also utilise Schoolbox’s new modernised quiz application</li>
+                   <li>A new 'Provide Feedback' survey task has been added to each unit</li>
+                   <li>Badges and certificates are now available to those who attain Schoolbox Star and Schoolbox Superstar status in each unit</li>
+                  </ul>
+                  <h3>Fundamentals Unit</h3>
+                  <ul>
+                   <li>2 new projects have been added to this unit</li>
+                   <li>2 new tasks within existing projects have been added to this unit</li>
+                   <li>4 existing tasks have been updated to reflect 23.0 and 23.1 Schoolbox features</li>
+                  </ul>
+                  <h3>Teaching and Learning Unit</h3>
+                  <ul>
+                   <li>2 new projects have been added to this unit</li>
+                   <li>6 new tasks within existing projects have been added to this unit</li>
+                   <li>8 existing tasks have been updated to reflect 23.0 and 23.1 Schoolbox features</li>
+                  </ul>
+                  <h3>Marcomms Unit</h3>
+                  <ul>
+                   <li>2 new projects have been added to this unit</li>
+                   <li>5 new tasks within existing projects have been added to this unit</li>
+                   <li>2 new submissions have been created to assess your knowledge of 23.0 and 23.1 features</li>
+                  </ul>
+                  <h3>Pastoral Care Unit</h3>
+                  <ul>
+                   <li>1 new project has been added to this unit</li>
+                   <li>4 existing tasks have been updated to reflect 23.0 and 23.1 Schoolbox features</li>
+                  </ul>
+                  <h3>Extra-Curricular Unit</h3>
+                  <ul>
+                   <li>2 new projects have been added to this unit</li>
+                   <li>5 new tasks within existing projects have been added to this unit</li>
+                   <li>1 existing task has been updated to reflect 23.0 and 23.1 Schoolbox features</li>
+                  </ul>
+                  <h3>Superuser Unit</h3>
+                  <ul>
+                   <li>3 new projects have been added to this unit</li>
+                   <li>2 new tasks within existing projects have been added to this unit</li>
+                   <li>3 existing tasks have been updated to reflect 23.0 and 23.1 Schoolbox features</li>
+                  </ul>
+                  <p>For a complete outline of the updated content for OLC '24, please visit our <a href='homepage/4946'>OLC ‘24 Release Notes</a>.</p>"
+        class: introjs-newsmodal
