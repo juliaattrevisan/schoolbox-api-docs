@@ -179,7 +179,7 @@
             {% if assessment is quiz %}
                 {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
                 <li>
-                    <a href="{{ modifyContentsRoute }}" class="icon-modify" title="Modify Contents">Modify Contents</a>
+                    <a href="{{ modifyContentsRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Modify Contents">Modify Contents</a>
                 </li>
             {% endif %}
             <li>
