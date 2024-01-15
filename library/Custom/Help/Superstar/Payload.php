@@ -308,13 +308,13 @@ class Payload
             INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
             INNER JOIN course_unit_specification cus ON cui.course_unit_specification_id = cus.id
             INNER JOIN folder f0 ON cus.folder_id = f0.id
-            INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
-            INNER JOIN project p ON acui.assessment_id = p.assessment_id
-            INNER JOIN project_result prc ON p.assessment_id = prc.project_id
-            INNER JOIN `user` u ON prc.user_id = u.id
             INNER JOIN folder f1 ON ci.folder_id = f1.id
             INNER JOIN folder f2 ON f1.parent = f2.id
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
+            INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
+            INNER JOIN project p ON acui.assessment_id = p.assessment_id
+            LEFT JOIN project_result prc ON p.assessment_id = prc.project_id
+            LEFT JOIN `user` u ON prc.user_id = u.id           
             WHERE ci.course_specification_id = :courseId
             AND cui.deleted_at IS NULL
             AND cus.deleted_at IS NULL
