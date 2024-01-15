@@ -153,14 +153,14 @@
                                 {% if not finished and canAttempt %}
                                     <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
                                 {% else %}
-                                    {% set canSeeReview = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
-                                    {% if canSeeReview %}
-                                        <a href="{{ canSeeReview }}" class="icon-view" title="Review"></a>
+                                    {% set reviewRoute = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
+                                    {% if reviewRoute %}
+                                        <a href="{{ reviewRoute }}" class="icon-view" title="Review"></a>
                                     {% endif %}
 
-                                    {% set canGiveFeedback = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
-                                    {% if canGiveFeedback %}
-                                        <a href="{{ canGiveFeedback }}" class="icon-staff" title="Feedback"></a>
+                                    {% set feedbackRoute = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
+                                    {% if feedbackRoute %}
+                                        <a href="{{ feedbackRoute }}" class="icon-staff" title="Feedback"></a>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
