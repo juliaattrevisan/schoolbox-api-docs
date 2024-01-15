@@ -40,18 +40,9 @@ export function loadReport(initOptions: object) {
                             useStudentStore().addItems(items);
 
                             if (displayScores) {
-                                addTargetsToMarks(reportId);
                                 disableTextAreas(reportId);
                             }
                         });
-
-                        /* This is necessary if we skip the methods
-                         * addTargetsToMarks() and disableTextAreas()
-                         */
-                        if (!displayScores) {
-                            // Reveal report.
-                            document.getElementsByClassName("response-content")[0].style.display = "block";
-                        }
 
                         // to notify the report has loaded
                         useStudentStore().reportLoaded();
