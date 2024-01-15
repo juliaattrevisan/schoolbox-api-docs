@@ -151,7 +151,7 @@ class ResourceBookingCest
      *
      * @param IntegrationTester $i
      */
-    public function createBookingRequest(IntegrationTester $i)
+    public function createBookingRequest(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp  = time();
@@ -170,8 +170,16 @@ class ResourceBookingCest
         $bookItemPayload = new Payload\ResourceBooking\Resource\BookItem($newItem, $booking_name);
         $i->sendRequest($bookItemPayload);
 
-        #THEN
+        #THEN check response code and the booking status
         $i->seeResponseCodeIs(200);
+
+
+        $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $booking = $BookingMapper->findOneByColumn('name', $booking_name);
+        $bookingId = $booking->getId();
+
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus,'1');
     }
 
     /**
@@ -182,7 +190,7 @@ class ResourceBookingCest
      *
      * @param IntegrationTester $i
      */
-    public function createBookingRequestWithSubResource(IntegrationTester $i)
+    public function createBookingRequestWithSubResource(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp  = time();
@@ -203,6 +211,8 @@ class ResourceBookingCest
 
         $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
         $newItem = $ItemMapper->findOneByColumn('name', $resource_title);
+        $itemId = $newItem->getId();
+
 
         $booking_name = 'Book session at ' . $timestamp;
 
@@ -213,6 +223,8 @@ class ResourceBookingCest
 
         #THEN
         $i->seeResponseCodeIs(200);
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $itemId]);
+        $i->assertEquals($bookingStatus,'1');
     }
 
     /**
@@ -259,7 +271,7 @@ class ResourceBookingCest
      *
      * @param IntegrationTester $i
      */
-    public function approveBookingRequest(IntegrationTester $i)
+    public function approveBookingRequest(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp  = time();
@@ -278,6 +290,7 @@ class ResourceBookingCest
 
         $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
         $booking = $BookingMapper->findOneByColumn('name', $booking_name);
+        $bookingId = $booking->getId();
 
         $approvePayload = new Payload\ResourceBooking\Resource\ModerateBooking(
             $booking,
@@ -288,6 +301,9 @@ class ResourceBookingCest
         #THEN
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
+
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus,'2');
     }
 
     /**
