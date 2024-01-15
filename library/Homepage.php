@@ -155,7 +155,7 @@ class Homepage
                 $this->resetHomepageToTemplate($category->getHomepage()->getTemplate()->getId());
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
+            // noop - no template exists for this folder, no components to reset
         }
     }
 
