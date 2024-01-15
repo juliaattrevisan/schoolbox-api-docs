@@ -6,6 +6,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Password;
 
 use SensitiveParameter;
@@ -18,29 +20,13 @@ use SensitiveParameter;
 class Service
 {
     /**
-     * The hashing algorithm to use.
-     *
-     * This is one of the `PASSWORD_*` constants.
-     *
-     * @var string
-     */
-    protected $algorithm;
-
-    /**
-     * @var int
-     */
-    protected $cost;
-
-    /**
      * Constructor
      *
-     * @param string $algorithm One of the PASSWORD_* constants
+     * @param string $algorithm The hashing algorithm to use: one of the PASSWORD_* constants
      * @param int    $cost      The algorithmic cost to use
      */
-    public function __construct($algorithm = PASSWORD_DEFAULT, $cost = 10)
+    public function __construct(private string $algorithm = PASSWORD_DEFAULT, private int $cost = 10)
     {
-        $this->algorithm = $algorithm;
-        $this->cost      = $cost;
     }
 
     /**
@@ -72,9 +58,9 @@ class Service
      * it needs to be regenerated.
      *
      * @param  string $hash
-     * @return string
+     * @return bool
      */
-    public function needsRehash($hash)
+    public function needsRehash(string $hash): bool
     {
         return password_needs_rehash($hash, $this->algorithm, ['cost' => $this->cost]);
     }
