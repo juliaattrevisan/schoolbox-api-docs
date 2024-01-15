@@ -59,7 +59,7 @@ class Sync extends App
             $this->getLogger()->debug("intellischool not setup, exiting...");
             exit();
         }
-        $sql = sprintf("mysql://%s:%s@%s/%s", SQL_user_read, SQL_passwd_read, SQL_host_read, SQL_db_read);
+        $sql = sprintf('jdbc:mysql://%s:3306/%s?user=%s&password="%s"', SQL_host_read, SQL_db_read, urlencode(SQL_user_read), urlencode(SQL_passwd_read));
         $command = sprintf("intelliscl sync --deployment %s --secret %s --connString1 %s --tempFolder '%s'", escapeshellarg($deploymentId), escapeshellarg($secret), escapeshellarg($sql), sys_get_temp_dir());
 
         $this->getLogger()->debug($command);
