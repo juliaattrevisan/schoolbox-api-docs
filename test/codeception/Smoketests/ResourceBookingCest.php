@@ -211,7 +211,6 @@ class ResourceBookingCest
 
         $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
         $newItem = $ItemMapper->findOneByColumn('name', $resource_title);
-        $itemId = $newItem->getId();
 
 
         $booking_name = 'Book session at ' . $timestamp;
@@ -221,9 +220,13 @@ class ResourceBookingCest
         $bookItemPayload->addRelatedResource($newSubresource->getId(), 'A sub resource notes');
         $i->sendRequest($bookItemPayload);
 
-        #THEN
+        $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $booking = $BookingMapper->findOneByColumn('name', $booking_name);
+        $bookingId = $booking->getId();
+
+        #THEN check response code and the booking status
         $i->seeResponseCodeIs(200);
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $itemId]);
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
         $i->assertEquals($bookingStatus,'1');
     }
 
@@ -234,7 +237,7 @@ class ResourceBookingCest
      *
      * @param IntegrationTester $i
      */
-    public function updateBookingRequest(IntegrationTester $i)
+    public function updateBookingRequest(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp  = time();
@@ -253,14 +256,17 @@ class ResourceBookingCest
 
         $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
         $booking = $BookingMapper->findOneByColumn('name', $booking_name);
+        $bookingId = $booking->getId();
 
-        #WHEN
+        #WHEN check response code and the booking status
         $booking_name = 'Book session Updated at ' . $timestamp;
         $bookItemUpdate = new Payload\ResourceBooking\Resource\UpdateBooking($booking, $booking_name);
         $i->sendRequest($bookItemUpdate);
 
-        #THEN
+        #THEN check response code and the booking status
         $i->seeResponseCodeIs(200);
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus,'1');
     }
 
 
@@ -298,7 +304,7 @@ class ResourceBookingCest
         );
         $i->sendRequest($approvePayload);
 
-        #THEN
+        #THEN check response code and the booking status
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
 
@@ -313,7 +319,7 @@ class ResourceBookingCest
      *
      * @param IntegrationTester $i
      */
-    public function rejectBookingRequest(IntegrationTester $i)
+    public function rejectBookingRequest(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp  = time();
@@ -332,6 +338,7 @@ class ResourceBookingCest
 
         $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
         $booking = $BookingMapper->findOneByColumn('name', $booking_name);
+        $bookingId = $booking->getId();
 
         $rejectPayload = new Payload\ResourceBooking\Resource\ModerateBooking(
             $booking,
@@ -340,9 +347,12 @@ class ResourceBookingCest
         $rejectPayload->setFormParam('efficacy', 'false');
         $i->sendRequest($rejectPayload);
 
-        #THEN
+        #THEN check response code and the booking status
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
+
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus,'3');
     }
 
     /**
@@ -352,7 +362,7 @@ class ResourceBookingCest
      *
      * @param IntegrationTester $i
      */
-    public function cancelBookingRequest(IntegrationTester $i)
+    public function cancelBookingRequest(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp  = time();
