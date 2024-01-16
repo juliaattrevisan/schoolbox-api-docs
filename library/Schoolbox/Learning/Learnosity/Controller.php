@@ -861,12 +861,16 @@ class Controller extends Base
              */
             $assessmentNode = [
                 $assessment->getTitle(),
-                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+                $assessment->isImplementation()
+                ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+                : null
             ];
         } else {
             $assessmentNode = [
                 $assessment->getTitle(),
-                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]) : null
+                $assessment->isImplementation()
+                ? $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $student->getId()])
+                : null
             ];
         }
 
