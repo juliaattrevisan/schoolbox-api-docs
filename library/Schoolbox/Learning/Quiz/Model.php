@@ -219,6 +219,12 @@ class Model implements ISoftDeletable, IAssessableDataModel
 
 
     /**
+     * The ID of the source quiz which is being copied into this quiz.
+     */
+    private ?int $learnositySourceAssessId = null;
+
+
+    /**
      * Indexed by section.id
      * @var QuizSection[]|GenericCollection<QuizSection>
      */
@@ -861,6 +867,26 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function setLearnosityJobStatus(?string $learnosityJobStatus): self
     {
         $this->learnosityJobStatus = $learnosityJobStatus;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getLearnositySourceAssessId(): ?int
+    {
+        return $this->learnositySourceAssessId;
+    }
+
+
+    /**
+     * @param int|null $learnositySourceAssessId
+     * @return $this
+     */
+    public function setLearnositySourceAssessId(?int $learnositySourceAssessId): self
+    {
+        $this->learnositySourceAssessId = $learnositySourceAssessId;
         return $this;
     }
 

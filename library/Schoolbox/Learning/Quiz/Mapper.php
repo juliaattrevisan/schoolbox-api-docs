@@ -99,6 +99,9 @@ class Mapper extends BaseMapper
                 Model::LEARNOSITY_JOB_STATUS_FAILED,
             ],
         );
+        // This column has an FK onto `assess_id`,
+        // but there's no need to map that
+        $this->uses('learnosity_source_assess_id', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
