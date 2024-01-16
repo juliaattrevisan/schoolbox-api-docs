@@ -66,7 +66,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                 // If the response is JSON, then parse it correctly for the response text
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") !== -1) {
-                    const responseJSON = (await response.json()) as { title: string; type: string; status: number };
+                    const responseJSON = JSON.parse(responseText) as { title: string; type: string; status: number };
                     responseText = responseJSON.title;
                 }
 
