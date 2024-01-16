@@ -43,6 +43,11 @@ class SearchPageCest
         $searchPage->verifySearchError();
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @throws Exception
+     */
     public function searchValidKeyword(AcceptanceTester $i)
     {
         $searchPage = new SearchPage($i);
@@ -62,34 +67,28 @@ class SearchPageCest
      * @param AcceptanceTester $i
      * @return void
      * @throws Exception
-     * @depends searchValidKeyword
      */
     public function searchNoFiltersAndCheckSubResults(AcceptanceTester $i)
     {
         $searchPage = new SearchPage($i);
 
-        $i->amGoingTo('input a valid keyword and clear all filters');
-        $searchPage->inputKeyword('vce');
+        $i->amGoingTo('input a valid keyword, clear all filters and search');
+        $searchPage->inputKeyword('help');
         $searchPage->clearFilters();
+        $searchPage->clickSearchButton();
 
-        $i->amGoingTo('click the apply filters button and expect to see 10 results');
-        $searchPage->clickApplyFilters();
-        $searchPage->verifyResultsCount(10);
+        $i->amGoingTo('I expected to see 14 results');
+        $searchPage->verifyResultsCount(14);
 
-        $i->amGoingTo('load more results and expect to see the "all results loaded" element');
-        $searchPage->clickLoadMoreResults();
-        $searchPage->verifyAllResultsLoaded();
-
-        $i->amGoingTo('load more sub results under Senior Campus and expect to see 10 sub results');
-        $searchPage->clickLoadMoreSubResults(64);
-        $searchPage->verifySubResultsCount(64, 10);
+        $i->amGoingTo('load more sub results under Admin Help and expect to see 6 sub results');
+        $searchPage->clickLoadMoreSubResults(168);
+        $searchPage->verifySubResultsCount(168, 6);
     }
 
     /**
      * @param AcceptanceTester $i
      * @return void
      * @throws Exception
-     * @depends searchValidKeyword
      */
     public function searchFilterTypeNews(AcceptanceTester $i)
     {
@@ -109,7 +108,6 @@ class SearchPageCest
      * @param AcceptanceTester $i
      * @return void
      * @throws Exception
-     * @depends searchValidKeyword
      */
     public function searchFilterCreator(AcceptanceTester $i)
     {
@@ -134,7 +132,6 @@ class SearchPageCest
      * @param AcceptanceTester $i
      * @return void
      * @throws Exception
-     * @depends searchValidKeyword
      */
     public function searchFilterEndDate(AcceptanceTester $i)
     {
