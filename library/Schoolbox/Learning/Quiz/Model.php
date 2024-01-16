@@ -219,9 +219,9 @@ class Model implements ISoftDeletable, IAssessableDataModel
 
 
     /**
-     * The ID of the source quiz which is being copied into this quiz.
+     * The assessment ID of the source quiz being copied into this quiz.
      */
-    private ?int $learnositySourceAssessId = null;
+    private ?int $learnositySourceAssessmentId = null;
 
 
     /**
@@ -874,19 +874,19 @@ class Model implements ISoftDeletable, IAssessableDataModel
     /**
      * @return int|null
      */
-    public function getLearnositySourceAssessId(): ?int
+    public function getLearnositySourceAssessmentId(): ?int
     {
-        return $this->learnositySourceAssessId;
+        return $this->learnositySourceAssessmentId;
     }
 
 
     /**
-     * @param int|null $learnositySourceAssessId
+     * @param int|null $learnositySourceAssessmentId
      * @return $this
      */
-    public function setLearnositySourceAssessId(?int $learnositySourceAssessId): self
+    public function setLearnositySourceAssessmentId(?int $learnositySourceAssessmentId): self
     {
-        $this->learnositySourceAssessId = $learnositySourceAssessId;
+        $this->learnositySourceAssessmentId = $learnositySourceAssessmentId;
         return $this;
     }
 

@@ -99,9 +99,9 @@ class Mapper extends BaseMapper
                 Model::LEARNOSITY_JOB_STATUS_FAILED,
             ],
         );
-        // This column has an FK onto `assess_id`,
+        // This column has an FK onto `assessment.id`,
         // but there's no need to map that
-        $this->uses('learnosity_source_assess_id', self::TYPE_INTEGER);
+        $this->uses('learnosity_source_assessment_id', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
@@ -320,13 +320,15 @@ class Mapper extends BaseMapper
                         UPDATE {$this->database->getQuoter()->quoteIdentifier($this->table)}
                         SET learnosity_reference = ?,
                             learnosity_job_reference = ?,
-                            learnosity_job_status = ?
+                            learnosity_job_status = ?,
+                            learnosity_source_assessment_id = ?
                         WHERE assessment_id = ?
                     ",
                     [
                         $newLearnosityReference,
                         $learnosityJobReference,
                         Model::LEARNOSITY_JOB_STATUS_PROCESSING,
+                        $source->getId(),
                         $destination->getId(),
                     ],
                 )->execute();
