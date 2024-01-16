@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import { useFetch } from "@vueuse/core";
 import { useStore } from "./searchPageStore";
 import { useQueryStore } from "./spQueryStore";
 import { useResultsStore } from "../results/store/spResultsStore";
@@ -22,34 +21,10 @@ export type SearchError = {
 export const useSearchStore = defineStore("spSearch", () => {
     const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
     const url = window.Vue.ref("");
+    const isSearching = window.Vue.ref(false);
+    const hasLoadError = window.Vue.ref(false);
     const searchError = window.Vue.ref<SearchError | null>(null);
-    const {
-        execute,
-        data,
-        isFetching: isSearching, // to notify of searching
-        error: hasLoadError, // to notify of a search error
-    } = useFetch(
-        url,
-        { headers: { Accept: "application/json" } },
-        {
-            immediate: false,
-            onFetchError(ctx) {
-                // we catch the Search error to display the error message
-                if (ctx.data === null) {
-                    searchError.value = {
-                        title: "Unexpected response from server",
-                        type: "Unexpected response from server",
-                        status: 500,
-                    } as SearchError;
-                } else if ((ctx.data as SearchError).status) {
-                    searchError.value = ctx.data as SearchError;
-                }
-                return ctx;
-            },
-        }
-    )
-        .get()
-        .json();
+    let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
      * Whether a search can be performed, can be if there's a change of query or filters
@@ -70,11 +45,35 @@ export const useSearchStore = defineStore("spSearch", () => {
         useStore().setQueryParams(simulateRedirect);
         hasNotSearched.value = false;
         url.value = useStore().getEndpointWithParams();
-        await execute();
+        // abort the previous search if it's still running
+        if (isSearching.value) {
+            controller.abort();
+        }
         try {
-            useResultsStore().setFirstResults(data.value as Results);
-        } catch (e) {
-            hasLoadError.value = true;
+            isSearching.value = true;
+            hasLoadError.value = false;
+            controller = new AbortController();
+            const response = await fetch(url.value, {
+                method: "GET",
+                signal: controller.signal,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            const responseJson = (await response.json()) as Results | SearchError;
+            // if there's a status, it's an error
+            if ((responseJson as SearchError).status) {
+                hasLoadError.value = true;
+                searchError.value = responseJson as SearchError;
+            } else {
+                useResultsStore().setFirstResults(responseJson as Results);
+            }
+            isSearching.value = false;
+        } catch (error) {
+            // if the error is a DOMException, it's because the search has been aborted to start a new one
+            if (typeof error === "string" && !error.includes("DOMException")) {
+                hasLoadError.value = true;
+            }
         }
     }
 
