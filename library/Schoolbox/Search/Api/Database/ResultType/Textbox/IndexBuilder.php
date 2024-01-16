@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
-use Component_Config_Componentname;
+use Component_Definition;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
@@ -24,49 +24,36 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        // Pass 1: textboxes within a component
-        //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
-        //  * The displayed heading of a textbox component on a homepage will be the textbox heading if non-blank,
-        //    otherwise the component name.  So that is the heading we must use for the search index.
+        // Pass 1: text boxes within a component
+        // TODO does this unnecessarily exclude heading from index?
+        //      may need to fetch that index separately
         $queryString = "
             SELECT
-            CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
-            f.id AS folder_id,
-            IF(tb.heading IS NULL OR tb.heading = '', cci_componentname.value, tb.heading) AS title,
-            tb.updated_at AS date,
-            tb.created_by AS created_by,
-            tb.body AS fulltext_index
-            FROM component_definition cd
-            JOIN component_instance ci ON ci.component_definition_id = cd.id
-            JOIN folder f ON f.id = ci.identifier
-            JOIN component_config_definition ccd_textbox ON (
-                ccd_textbox.component_definition_id = cd.id AND
-                ccd_textbox.key = '" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
+                CONCAT(tb.textBoxID, '-', cci.component_instance_id, '-', fo.id) AS id,
+                tb.heading AS title,
+                fo.id AS folder_id,
+                tb.updated_at AS date,
+                tb.created_by AS created_by,
+                tb.body AS fulltext_index
+            FROM component_instance ci
+            JOIN component_config_instance cci ON cci.component_instance_id=ci.id
+            JOIN component_config_definition ccd ON (
+                ccd.key='" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "' AND
+                ccd.id=cci.component_config_definition_id
             )
-            LEFT JOIN component_config_instance cci_textbox ON (
-                cci_textbox.component_config_definition_id = ccd_textbox.id AND
-                cci_textbox.component_instance_id = ci.id
-            )
-            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
-            JOIN component_config_definition ccd_componentname ON (
-                ccd_componentname.component_definition_id = cd.id AND
-                ccd_componentname.key = '" . Component_Config_Componentname::KEY . "'
-            )
-            LEFT JOIN component_config_instance cci_componentname ON (
-                cci_componentname.component_config_definition_id = ccd_componentname.id AND
-                cci_componentname.component_instance_id = ci.id
-            )
-            WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
-            AND f.deleted_at IS NULL
+            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci.value
+            JOIN folder fo ON fo.id=ci.identifier
+            WHERE ci.module='" . Component_Definition::MODULE_HOMEPAGE . "'
             AND tb.deleted_at IS NULL
+            AND fo.deleted_at IS NULL
         ";
         $params = [];
         if ($fromDate) {
-            $queryString .= ' AND tb.updated_at >= :fromDate';
+            $queryString        .= ' AND tb.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND tb.updated_at <= :toDate';
+            $queryString      .= ' AND tb.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -88,7 +75,7 @@ class IndexBuilder extends BaseBuilder
             yield $index;
         }
 
-        // Pass 2: textboxes without a component
+        // Pass 2: text boxes without a component
         $queryString = "
             SELECT
                 CONCAT(tb2.textBoxID, '--') AS id,
