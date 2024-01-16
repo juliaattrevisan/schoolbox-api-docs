@@ -1761,7 +1761,10 @@ class Controller extends Base
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
-        $jobId = $this->quizMapper->copyQuizConstituents($source, $destination);
+        $jobId = $this->quizMapper->copyQuizConstituents(
+            $this->quizMapper->findOneByColumn('assessment_id', $source->getId()),
+            $this->quizMapper->findOneByColumn('assessment_id', $destination->getId()),
+        );
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
 
         // Start polling status of duplication

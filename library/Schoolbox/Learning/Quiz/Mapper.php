@@ -243,14 +243,14 @@ class Mapper extends BaseMapper
      *
      * For now, this call will throw an exception if the destination Quiz already has Sections.
      *
-     * @param QuizDomainModel $source
-     * @param QuizDomainModel $destination
+     * @param Model $source
+     * @param Model $destination
      * @return string|null The Learnosity job ID for duplicating activities
      * @throws \DomainException
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
+    public function copyQuizConstituents(Model $source, Model $destination): ?string
     {
         $learnosityVersion = $this->getConfigLoader()->get('learnosity_version');
         $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
@@ -314,7 +314,7 @@ class Mapper extends BaseMapper
              */
             $destination->setLearnosityReference($newLearnosityReference);
             $destination->setLearnosityJobReference($learnosityJobReference);
-            if ($destination->getId()) {
+            if ($destination->getAssessmentModel()?->getId()) {
                 $this->database->prepareQuery(
                     "
                         UPDATE {$this->database->getQuoter()->quoteIdentifier($this->table)}
@@ -329,7 +329,7 @@ class Mapper extends BaseMapper
                         $learnosityJobReference,
                         Model::LEARNOSITY_JOB_STATUS_PROCESSING,
                         $source->getId(),
-                        $destination->getId(),
+                        $destination->getAssessmentModel()->getId(),
                     ],
                 )->execute();
             }
