@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\MapperFactory;
 
@@ -22,12 +23,11 @@ class RestartPendingTool extends CliTool\App
 {
     public function run(): void
     {
+        // Find pending quizzes
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
             "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
         );
         $quizQuery->execute(['status' => Quiz\Model::LEARNOSITY_JOB_STATUS_PENDING]);
-        $pendingQuizzes = $quizQuery->fetchColumnArray('assessment_id');
-
 
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
@@ -36,23 +36,115 @@ class RestartPendingTool extends CliTool\App
         /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
-        $pendingQuizzes = $assessmentDataSource->findAllByIds($pendingQuizzes);
+        /** @var Quiz\Model[] $pendingQuizzes */
+        $pendingQuizzes = $quizMapper->findByColumn(
+            'learnosity_job_status',
+            Quiz\Model::LEARNOSITY_JOB_STATUS_PENDING,
+        );
+        $this->getLogger()->info(sprintf('Found %d quizzes currently pending copy', count($pendingQuizzes)));
         foreach ($pendingQuizzes as $pendingQuiz) {
-            // Is this quiz an implementation?
-            // Find its spec, and copy its constituents
-            if ($pendingQuiz->isImplementation()) {
-                $specQuiz = $pendingQuiz->getSpecificationAssessment();
-                $quizMapper->copyQuizConstituents(
-                    $quizMapper->findOneByColumn('assessment_id', $specQuiz->getId()),
-                    $quizMapper->findOneByColumn('assessment_id', $pendingQuiz->getId()),
+            // Does this quiz have a source quiz? If so use it
+            $this->getLogger()->info(
+                sprintf(
+                    'Force-copying quiz "%s" (assessment #%d)',
+                    $pendingQuiz->getTitle(),
+                    $pendingQuiz->getAssessmentModel()->getId(),
+                )
+            );
+            if ($pendingQuiz->getLearnositySourceAssessmentId()) {
+                $this->getLogger()->debug(
+                    sprintf(
+                        'Assessment #%d has source assessment #%d: copying from that assessment',
+                        $pendingQuiz->getAssessmentModel()->getId(),
+                        $pendingQuiz->getLearnositySourceAssessmentId(),
+                    )
                 );
+                $quizMapper->copyQuizConstituents(
+                    $quizMapper->findById($pendingQuiz->getLearnositySourceAssessmentId()),
+                    $pendingQuiz,
+                );
+                continue;
+            }
+
+            // Otherwise, is this quiz an implementation?
+            // Find its spec, and copy its constituents
+            $this->getLogger()->debug(
+                sprintf(
+                    'Assessment #%d has no source assessment: deriving source from relations',
+                    $pendingQuiz->getAssessmentModel()->getId(),
+                )
+            );
+            $pendingQuizDomainModel = $assessmentDataSource->findById($pendingQuiz->getAssessmentModel()->getId());
+            if ($pendingQuizDomainModel->isImplementation()) {
+                $this->getLogger()->debug(
+                    sprintf(
+                        'Assessment #%d is an implementation: source is specification',
+                        $pendingQuiz->getAssessmentModel()->getId(),
+                    )
+                );
+                $specQuiz = $pendingQuizDomainModel->getSpecificationAssessment();
+                if ($specQuiz) {
+                    $this->getLogger()->debug(
+                        sprintf(
+                            'Assessment #%d has spec assessment #%d: copying from that assessment',
+                            $pendingQuiz->getAssessmentModel()->getId(),
+                            $specQuiz->getId(),
+                        )
+                    );
+                    $quizMapper->copyQuizConstituents(
+                        $quizMapper->findOneByColumn('assessment_id', $specQuiz->getId()),
+                        $pendingQuiz,
+                    );
+                } else {
+                    $this->getLogger()->info(
+                        sprintf(
+                            'Assessment #%d is an implementation with no spec assessment: cannot copy',
+                            $pendingQuiz->getAssessmentModel()->getId(),
+                        )
+                    );
+                }
+                continue;
             }
 
             // Is this quiz a spec?
             // It was copied from an implementation, but which one?
-            // I cannot tell from the quiz itself: I'll need to store the source
-            // assessment ID somehow, or even a separate learnosity_import_log:
-            // from, to, reference, job_status, job_reference
+            // If there's only one, I can use that; otherwise I cannot tell from
+            // the quiz itself.
+            if ($pendingQuizDomainModel->isSpecification()) {
+                $this->getLogger()->debug(
+                    sprintf(
+                        'Assessment #%d is an specification: source is an implementation',
+                        $pendingQuiz->getAssessmentModel()->getId(),
+                    )
+                );
+                $implementations = $assessmentDataSource->findAllImplementationsBySpecificationId(
+                    $pendingQuizDomainModel->getId(),
+                );
+                $implementationsCount = count($implementations);
+                if ($implementationsCount === 1) {
+                    /** @var IAssessable $implQuiz */
+                    $implQuiz = $implementations->first();
+                    $this->getLogger()->debug(
+                        sprintf(
+                            'Assessment #%d has singular implementation assessment #%d: copying from that assessment',
+                            $pendingQuiz->getAssessmentModel()->getId(),
+                            $implQuiz->getId(),
+                        )
+                    );
+                    $quizMapper->copyQuizConstituents(
+                        $quizMapper->findOneByColumn('assessment_id', $implQuiz),
+                        $pendingQuiz,
+                    );
+                } else {
+                    $this->getLogger()->info(
+                        sprintf(
+                            'Assessment #%d is a spec with %s implementations: cannot copy',
+                            ($implementationsCount === 0 ? 'no' : 'multiple'),
+                            $pendingQuiz->getAssessmentModel()->getId(),
+                        )
+                    );
+                }
+            }
         }
     }
 }
