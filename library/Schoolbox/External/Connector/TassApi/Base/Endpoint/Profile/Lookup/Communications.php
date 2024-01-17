@@ -25,6 +25,17 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 class Communications
 {
     /**
+     * This add_num is always used in a pseudo-mandatory way across the fleet.
+     * As far as I can tell this is consistently used as a global catch-all
+     * for communications across the tass platform
+     *
+     * Every other address block other than 1 is configurable by the school
+     * in whatever haphazard manner tass allows
+     */
+    private const ADDNUM_CORRESPONDENCE = 1;
+
+
+    /**
      * Phone constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
@@ -68,12 +79,19 @@ class Communications
          */
         foreach ($addresses['commrules'] as $commRule) {
             /* Filter out address blocks we don't care about:
-             *    * we need address block 1
-             *    * we need addnum_mother
-             *    * we need addnum_father
+             *    * we need address block 1 (as per the presumed const, ADDNUM_CORRESPONDENCE)
+             *    * we need addnum_father (as configured by schoolbox config)
+             *    * we need addnum_mother (as configured by schoolbox config)
              */
-            $addressBlocks = array_filter($commRule['addresses'], static function ($a) {
-                return \in_array((int)$a['add_num'], [1, 4, 5], true);
+            $addnumFather = $this->addnumFather;
+            $addnumMother = $this->addnumMother;
+
+            $addressBlocks = array_filter($commRule['addresses'], static function ($a) use ($addnumFather, $addnumMother) {
+                return \in_array((int)$a['add_num'], [
+                    self::ADDNUM_CORRESPONDENCE,
+                    $addnumFather,
+                    $addnumMother
+                ], true);
             });
 
             /* Pre-sort by add_num, which is the address block number
