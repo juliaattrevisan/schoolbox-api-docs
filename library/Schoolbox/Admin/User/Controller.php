@@ -608,7 +608,7 @@ class Controller extends Base
             }
         }
 
-        $user->setLinkedUser($linkedUserList);
+        $user->setLinkedUsers($linkedUserList);
 
         $this->userMapper->save($user);
 

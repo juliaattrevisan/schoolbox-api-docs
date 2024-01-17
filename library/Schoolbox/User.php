@@ -1179,7 +1179,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * @param Collection|self[] $linkedUsers
      * @return $this
      */
-    public function setLinkedUser($linkedUsers): self
+    public function setLinkedUsers($linkedUsers): self
     {
         $this->linkedUsers = $linkedUsers;
         return $this;

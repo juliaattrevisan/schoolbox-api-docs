@@ -419,7 +419,7 @@ class UserMapper extends Mapper
                                        ->setRole($role)
                                        ->setYear($year)
                                        ->setSchoolHouse($schoolHouse)
-                                       ->setLinkedUser($this->createCollection())
+                                       ->setLinkedUsers($this->createCollection())
                                        ->setPronoun($pronoun)
                                        ->setCampusCollection($campusMapper->createCollection());
             }
