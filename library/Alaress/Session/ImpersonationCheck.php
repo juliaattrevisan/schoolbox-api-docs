@@ -16,7 +16,6 @@ use Schoolbox\User;
  */
 class ImpersonationCheck
 {
-
     /**
      * Returns whether the current session is an impersonation of another user.
      *
