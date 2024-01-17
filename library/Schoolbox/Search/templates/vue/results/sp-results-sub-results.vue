@@ -4,7 +4,6 @@
  */
 
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
-import { useFetch } from "@vueuse/core";
 import { Results } from "../../js/types/Results";
 import { Result } from "../../js/types/Result";
 import { useStore } from "../store/searchPageStore";
@@ -22,12 +21,8 @@ const props = defineProps<Props>();
 const moreResultsCount = window.Vue.ref(0); // number of subsequent result sets that have been loaded
 const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all results have been loaded
 const url = window.Vue.ref("");
-const {
-    execute,
-    data,
-    isFetching: isLoading, // to notify of loading
-    error: hasLoadError, // to notify of a search error
-} = useFetch(url, { immediate: false }).get().json();
+const isLoading = window.Vue.ref(false);
+const hasLoadError = window.Vue.ref(false);
 
 /**
  * To show that there are more results that can be loaded
@@ -59,17 +54,30 @@ function getEndpointWithParams() {
  */
 async function loadMore() {
     url.value = getEndpointWithParams();
-    await execute();
-    const loadedResults = data.value as Results;
-    if (loadedResults.data.length === 0) {
-        hasLoadedAllResults.value = true;
-    } else {
-        useResultsStore().setMoreSubResults(loadedResults, props.parentIndex);
-        moreResultsCount.value += 1;
-        // If cursor.next has not been supplied with the sub-results, we have loaded all sub-results.
-        if (loadedResults.metadata.cursor.next === null) {
+    try {
+        isLoading.value = true;
+        hasLoadError.value = false;
+        const response = await fetch(url.value, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const loadedResults = (await response.json()) as Results;
+        if (loadedResults.data.length === 0) {
             hasLoadedAllResults.value = true;
+        } else {
+            useResultsStore().setMoreSubResults(loadedResults, props.parentIndex);
+            moreResultsCount.value += 1;
+            // If cursor.next has not been supplied with the sub-results, we have loaded all sub-results.
+            if (loadedResults.metadata.cursor.next === null) {
+                hasLoadedAllResults.value = true;
+            }
         }
+    } catch (error) {
+        hasLoadError.value = true;
+    } finally {
+        isLoading.value = false;
     }
 }
 
