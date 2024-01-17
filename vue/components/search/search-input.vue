@@ -155,7 +155,7 @@ function onMouseOut(event: MouseEvent) {
     grid-template-columns: 1fr 5rem;
 
     input[type="text"].c-search-input__field {
-        border: 2px solid var(--navigation-background);
+        border: 2px solid var(--form-border-color);
         background-color: var(--foreground-colour);
         color: var(--primary-text-colour);
         font-size: var(--base-font-size);
@@ -175,7 +175,7 @@ function onMouseOut(event: MouseEvent) {
         padding: 0;
         &:before {
             transition: all 0.2s ease-in;
-            color: var(--content-ui-submit-foreground);
+            color: var(--navigation-foreground);
         }
         &:hover {
             background-color: rgba(
