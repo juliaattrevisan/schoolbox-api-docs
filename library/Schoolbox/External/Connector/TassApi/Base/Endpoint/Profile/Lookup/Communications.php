@@ -44,7 +44,7 @@ class Communications
      * @param int $addnumFather          The add_num field in the getCommunicationRulesDetails payload
      *                                   that refers to a father specifically, as determined by schools' instances
      * @param int $addnumMother          The add_num field in the getCommunicationRulesDetails payload
-             *                           that refers to a mother specifically, as determined by schools' instances
+     *                                   that refers to a mother specifically, as determined by schools' instances
      * @param string $communicationTypes TASS communication rules type codes (in comma separated format) for all guardian relationships
      *                                   that can be associated with students
      */
@@ -131,33 +131,40 @@ class Communications
                  * f_ are fields about the father, specifically
                  *
                  * The third data set doesn't have prefixes. These are fields that correspond to
-                 * the person designated by address_description: this field will tell you whether
+                 * the person designated by add_num: this field will tell you whether
                  * it's for the mother or father, but a school can configure its value to whatever
                  * they want; that means we need a config var so the school can tell us which data
-                 * set corresponds to each address_description.
+                 * set corresponds to each add_num.
                  *
-                 * When address_description doesn't match one of the schoolbox-configured values
-                 * it conveys a special meaning. A school might map this setup:
+                 * When add_num is 1, it conveys a special meaning. Mothers and fathers are usually
+                 * assigned to add_nums 4 and 5 but a school can choose whichever ones they want.
                  *
-                 * address_description   meaning   schoolbox config var
+                 * A school might map this setup:
+                 *
+                 * add_num         meaning           schoolbox config var
                  * ---------------------------------------------------------------
-                 * "big mama"            Mother    tass_mother_address_description
-                 * "papa joel"           Father    tass_father_address_description
-                 * "Value X"             --        --
+                 *  1              Correspondence
+                 *  4              Mother            external_tass_addnum_mother
+                 *  5              Father            external_tass_addnum_father
+                 * "Value X"       --                --
                  *
                  * "Value X"
-                 * When the address_description is not one of the configured values, then assume
-                 * it's for a nuclear family and it should apply to both in the same way it has
-                 * always done (mobile_phone_1 for mother, mobile_phone_2 for father, etc.) using that
-                 * numeric suffix assumption.
+                 * When the add_num is not one of the configured values, or specifically 1,
+                 * then disregard it. These usually contain things like Emergency Contacts,
+                 * Grandmothers, random associates and other non-parent information. These
+                 * will have already been filtered out by the time you get here so you don't
+                 * have to worry too much about it.
                  *
+                 * For add_num 1, we use it for a nuclear family and it should apply in the same way
+                 * it has always done (mobile_phone_1 for mother, mobile_phone_2 for father, etc.)
+                 * using that numeric suffix assumption.
                  *
                  * Comm Rules
                  * -----------
                  * When this occurs for a split family, assume that the fields
                  * [mobile_phone_1, mobile_phone_2, email_1, email_2]
                  * actually belong to one person (e.g. a guy has two phone numbers/two email addresses)
-                 * and should be assigned to the guy specified by address_description
+                 * and should be assigned to the guy specified by add_num
                  *
                  * For a nuclear family,
                  * [mobile_phone_1, mobile_phone_2, email_1, email_2]
@@ -234,7 +241,7 @@ class Communications
                         'relationship' => $relationshipF,
                         'validCommRule' => true
                     ];
-                } else {
+                } elseif ((int)$address['add_num'] === self::ADDNUM_CORRESPONDENCE) {
                     /* Nukular family: fields are distributed among the guys in the fam
                      */
                     $firstname = trim((string)$address['m_first_name']);
@@ -271,6 +278,10 @@ class Communications
                         'validCommRule' => true
                     ];
                 }
+
+                /* Some other addnum that wasn't filtered out;
+                 * ignore it and continue onwards
+                 */
             }
         }
 
