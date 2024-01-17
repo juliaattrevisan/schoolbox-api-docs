@@ -54,7 +54,7 @@ class ModelToArray
             'guardians'        => $user->getParents(),
             'students'         => $user->getChildren(),
 
-            'impersonableUser' => $user->getLinkedUser(),
+            'impersonableUsers' => $user->getLinkedUsers(),
 
             'email'          => $user->getEmail(),
             '_links'         => $this->deriveLinks($user),

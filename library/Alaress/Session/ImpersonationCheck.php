@@ -35,7 +35,7 @@ class ImpersonationCheck
         /** @var User $previousUser */
         $previousUser = $previous['user'];
 
-        foreach ($previousUser->getLinkedUser() as $linkedUser) {
+        foreach ($previousUser->getLinkedUsers() as $linkedUser) {
             if ((int)$linkedUser->getId() === (int)$currentUser->getId()) {
                 // User has merely switched to a linked account, this does not constitute 'impersonation'
                 return false;

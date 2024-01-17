@@ -548,7 +548,7 @@ class Controller extends Base
             foreach ($post['linkUser'] as $userId) {
                 try {
                     $linkedUser = $this->userMapper->findById($userId);
-                    $user->getLinkedUser()->add($linkedUser);
+                    $user->getLinkedUsers()->add($linkedUser);
                 } catch (MapperException $e) {
                 }
             }
@@ -602,7 +602,7 @@ class Controller extends Base
     {
         $linkedUserList = new Collection();
 
-        foreach ($user->getLinkedUser() as $linkedUser) {
+        foreach ($user->getLinkedUsers() as $linkedUser) {
             if ($linkedUser->getId() != $linked->getId()) {
                 $linkedUserList->add($linkedUser);
             }

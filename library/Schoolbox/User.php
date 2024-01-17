@@ -115,7 +115,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private $residentialHouse;
 
     /** @var Collection|self[] */
-    private $linkedUser;
+    private $linkedUsers;
 
     /**
      * The hash value is actually a digest key and it will change
@@ -1176,21 +1176,21 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
 
     /**
-     * @param Collection|self[] $linkedUser
+     * @param Collection|self[] $linkedUsers
      * @return $this
      */
-    public function setLinkedUser($linkedUser): self
+    public function setLinkedUser($linkedUsers): self
     {
-        $this->linkedUser = $linkedUser;
+        $this->linkedUsers = $linkedUsers;
         return $this;
     }
 
     /**
      * @return Collection|self[]
      */
-    public function getLinkedUser()
+    public function getLinkedUsers()
     {
-        return $this->linkedUser;
+        return $this->linkedUsers;
     }
 
     /**

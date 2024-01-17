@@ -110,7 +110,7 @@ class Module extends BaseModule
                     new Rule\Callback(
                         function ($params, User $user) {
                             // Do not allow unlinked users to switch
-                            foreach ($user->getLinkedUser() as $linkedUser) {
+                            foreach ($user->getLinkedUsers() as $linkedUser) {
                                 if ($params['userId'] == $linkedUser->getId()) {
                                     return true;
                                 }

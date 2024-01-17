@@ -441,7 +441,7 @@ class UserMapper extends Mapper
             if ($linkedUser) {
                 // Don't double add
                 $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
-                $users[$userId]->getLinkedUser()->setOffset($linkedUser->getId(), $linkedUser);
+                $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
             }
 
             /* Portrait Image
