@@ -184,12 +184,16 @@ class Classes implements IStrategy
                 'per_page=%s',
                 'has_students=%s',
                 'has_lessons=%s',
-                'include=%s'
+                'lessons_start_after=%s',
+                'lessons_start_before=%s',
+                'include=%s',
             ]),
             1,
             self::NUM_PER_PAGE,
             true,
             true,
+            $this->fromDate->getDatabaseDate(),
+            $this->toDate->getDatabaseDate(),
             implode(',', [
                 'employees',
                 'lessons',
