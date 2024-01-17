@@ -39,7 +39,7 @@ class IndexBuilder extends BaseBuilder
             f.id AS folder_id,
             COALESCE(
                 IF(TRIM(cci_componentname.value) = '', NULL, cci_componentname.value),
-                IF(TRIM(tb.heading = '') = '', NULL, tb.heading),
+                IF(TRIM(tb.heading) = '', NULL, tb.heading),
                 '" . ComponentHomepageController::DEFAULT_COMPONENT_HEADING . "'
             ) AS title,
             tb.updated_at AS date,
