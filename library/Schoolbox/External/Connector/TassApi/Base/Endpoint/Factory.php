@@ -121,24 +121,6 @@ class Factory
 
 
     /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a father specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $fatherAddressDescription;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a mother specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $motherAddressDescription;
-
-
-    /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
      *
@@ -230,8 +212,6 @@ class Factory
      * @param array                                      $watchlist
      * @param int                                        $addnumFather
      * @param int                                        $addnumMother
-     * @param string                                     $fatherAddressDescription
-     * @param string                                     $motherAddressDescription
      * @param string                                     $dateLocalFormat
      * @param bool                                       $includePhoto
      * @param string                                     $spousePrefix
@@ -258,8 +238,6 @@ class Factory
         array $watchlist,
         int $addnumFather,
         int $addnumMother,
-        string $fatherAddressDescription,
-        string $motherAddressDescription,
         string $dateLocalFormat,
         bool $includePhoto,
         string $spousePrefix,
@@ -287,8 +265,6 @@ class Factory
         $this->watchlist = $watchlist;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
-        $this->fatherAddressDescription = $fatherAddressDescription;
-        $this->motherAddressDescription = $motherAddressDescription;
         $this->dateLocalFormat = $dateLocalFormat;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
@@ -370,8 +346,6 @@ class Factory
                     $this->watchlist,
                     $this->addnumFather,
                     $this->addnumMother,
-                    $this->fatherAddressDescription,
-                    $this->motherAddressDescription,
                     $this->includePhoto,
                     $this->spousePrefix,
                     $this->communicationTypes,

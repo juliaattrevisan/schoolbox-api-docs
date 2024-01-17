@@ -25,56 +25,24 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 class Communications
 {
     /**
-     * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
-     *
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a father specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $fatherAddressDescription;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a mother specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $motherAddressDescription;
-
-
-    /**
-     * TASS communication rules type codes (in comma separated format) for all guardian relationships
-     * that can be associated with students
-     *
-     * @var string
-     */
-    private string $communicationTypes;
-
-
-    /**
      * Phone constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
      *
-     * @param IApi   $api
-     * @param string $fatherAddressDescription
-     * @param string $motherAddressDescription
-     * @param string $communicationTypes
+     * @param IApi $api                  $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
+     * @param int $addnumFather          The add_num field in the getCommunicationRulesDetails payload
+     *                                   that refers to a father specifically, as determined by schools' instances
+     * @param int $addnumMother          The add_num field in the getCommunicationRulesDetails payload
+             *                           that refers to a mother specifically, as determined by schools' instances
+     * @param string $communicationTypes TASS communication rules type codes (in comma separated format) for all guardian relationships
+     *                                   that can be associated with students
      */
-    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription, string $communicationTypes)
-    {
-        $this->api = $api;
-        $this->fatherAddressDescription = $fatherAddressDescription;
-        $this->motherAddressDescription = $motherAddressDescription;
-        $this->communicationTypes = $communicationTypes;
+    public function __construct(
+        private IApi $api,
+        private int $addnumFather,
+        private int $addnumMother,
+        private string $communicationTypes
+    ) {
     }
 
 
@@ -214,7 +182,7 @@ class Communications
 
                 /* Split fam: non-prefixed fields are for a specific guy
                  */
-                if ($address['address_description'] === $this->motherAddressDescription) {
+                if ((int)$address['add_num'] === $this->addnumMother) {
                     $firstname = trim((string)$address['m_first_name']);
 
                     $stack[$address['parent_code']][Family::MOTHER_NODE] = [
@@ -231,7 +199,7 @@ class Communications
                         'relationship' => $relationshipM,
                         'validCommRule' => true
                     ];
-                } elseif ($address['address_description'] === $this->fatherAddressDescription) {
+                } elseif ((int)$address['add_num'] === $this->addnumFather) {
                     $firstname = trim((string)$address['f_first_name']);
 
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
