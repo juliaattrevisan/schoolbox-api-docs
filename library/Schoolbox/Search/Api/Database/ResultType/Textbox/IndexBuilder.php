@@ -128,11 +128,20 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
+        // Search for indices which match a given pattern
+        $searchIndexQuery = $this->connector->prepareQuery("
+            SELECT identifier
+            FROM search_index
+            WHERE type = :type
+            AND   identifier LIKE :identifierPattern
+        ");
+
+        // Pass 1: delete indices for deleted text boxes
         // Only fully deleted text boxes count as deleted for the purpose of
         // index building:
         // components are not soft deleted, so I can't tell if an index for
         // those no longer exists.
-        $queryString = "SELECT CONCAT(textBoxID, '--') AS id FROM textBox WHERE deleted_at IS NOT NULL";
+        $queryString = "SELECT textBoxID AS id FROM textBox WHERE deleted_at IS NOT NULL";
         $params      = [];
         if ($fromDate) {
             $queryString        .= ' AND deleted_at >= :fromDate';
@@ -144,17 +153,23 @@ class IndexBuilder extends BaseBuilder
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
-        $this->logger->info(sprintf('Deleting search indices for %d text boxes', $query->rowCount()));
+        $this->logger->info(sprintf('Deleting search indices for %d deleted text boxes', $query->rowCount()));
         foreach ($query as $row) {
-            yield $this->buildIndex(
-                (string)$row['id'],
-                null,
-                Hydrator::BASE_TYPE,
-                null,
-                true,
-                null,
-                null,
-            );
+            $searchIndexQuery->execute([
+                'type'              => Hydrator::BASE_TYPE,
+                'identifierPattern' => $row['id'] . '-%',
+            ]);
+            foreach ($searchIndexQuery as $searchIndex) {
+                yield $this->buildIndex(
+                    (string)$searchIndex['identifier'],
+                    null,
+                    Hydrator::BASE_TYPE,
+                    null,
+                    true,
+                    null,
+                    null,
+                );
+            }
         }
     }
 }
