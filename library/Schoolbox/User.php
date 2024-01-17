@@ -1354,10 +1354,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function setPastoralGroupIds(array $pastoralGroupIds): self
     {
-        if (!$this->pastoralGroupIds) {
-            $this->pastoralGroupIds = [];
-        }
-
         $this->pastoralGroupIds = $pastoralGroupIds;
         return $this;
     }
