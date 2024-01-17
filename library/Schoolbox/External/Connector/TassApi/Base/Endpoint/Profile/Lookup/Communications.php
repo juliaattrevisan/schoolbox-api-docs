@@ -99,7 +99,35 @@ class Communications
          * might end up sharing phone numbers because tass
          */
         foreach ($addresses['commrules'] as $commRule) {
-            foreach ($commRule['addresses'] as $address) {
+            /* Filter out address blocks we don't care about:
+             *    * we need address block 1
+             *    * we need addnum_mother
+             *    * we need addnum_father
+             */
+            $addressBlocks = array_filter($commRule['addresses'], static function ($a) {
+                return \in_array((int)$a['add_num'], [1, 4, 5], true);
+            });
+
+            /* Pre-sort by add_num, which is the address block number
+             */
+            usort($addressBlocks, static function ($a, $b) {
+                $addnumA = (int)$a['add_num'];
+                $addnumB = (int)$b['add_num'];
+
+                if ($addnumA > $addnumB) {
+                    return 1;
+                }
+
+                if ($addnumA < $addnumB) {
+                    return -1;
+                }
+
+                return 0;
+            });
+
+            /* Now figure out how all these address blocks come together
+             */
+            foreach ($addressBlocks as $address) {
                 /* Phone numbers could exist in one or more of the following fields
                  * mobile_phone_1, mobile_phone_2, business_phone, home_phone
                  *
