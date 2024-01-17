@@ -78,7 +78,7 @@ class Controller extends Base
         /* Only prepare the rubric statement once
          */
         $this->rubricStatement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
-            SELECT 
+            SELECT
                 rc.id AS capability_id,
                 rc.name AS capability_name,
                 ri.id AS indicator_id,
