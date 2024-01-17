@@ -286,4 +286,72 @@ class CacheHelper
         }
         return $dataSource['items'];
     }
+
+    /****
+     * debug options
+     */
+
+    /**
+     *
+     *
+     * @param int $registerId
+     * @return array|mixed
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     */
+    public function getRecordCollections(int $registerId)
+    {
+        $recordCollections = $this->cache->get(sprintf("isams_register_%s_recordCollections", $registerId));
+
+        if (!isset($recordCollections)) {
+            // This ought to be cacheable for a lot longer than student data
+            try {
+                $recordCollections = $this->api->request(
+                    '/Main/api/registers/' . $registerId . '/recordCollections',
+                    'GET',
+                    token: $this->getToken(),
+                );
+                $this->cache->set(sprintf("isams_register_%s_recordCollections", $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+            } catch (ClientExceptionInterface $e) {
+                // No metadata exists for this field: that's okay
+                return  [];
+            }
+        }
+        return $recordCollections['recordCollections'];
+    }
+
+
+    /**
+     *
+     *
+     * @param int    $registerId
+     * @param string $externalId
+     * @param int    $collectionId
+     * @return array|mixed
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     */
+    public function getRecordCollectionsRecords(int $registerId, string $externalId, int $collectionId)
+    {
+        $recordCollections = $this->cache->get(sprintf("isams_register_%s_collection_%s_student_%s", $registerId, $collectionId, $externalId));
+
+        if (!isset($recordCollections)) {
+            // This ought to be cacheable for a lot longer than student data
+            try {
+                $recordCollections = $this->api->request(
+                    sprintf("/Main/api/registers/%s/students/%s/recordcollections/%s/records", $registerId, $externalId, $collectionId),
+                    'GET',
+                    token: $this->getToken(),
+                );
+                $this->cache->set(sprintf("isams_register_%s_collection_%s_student_%s", $registerId, $collectionId, $externalId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+            } catch (ClientExceptionInterface $e) {
+                // No metadata exists for this field: that's okay
+                return  [];
+            }
+        }
+        return $recordCollections['records'];
+    }
 }
