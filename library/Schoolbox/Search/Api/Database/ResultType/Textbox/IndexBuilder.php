@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
 use Component_Config_Componentname;
+use Schoolbox\Resource\Textbox\Component\Homepage\Controller as ComponentHomepageController;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
@@ -26,13 +27,21 @@ class IndexBuilder extends BaseBuilder
     {
         // Pass 1: textboxes within a component
         //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
-        //  * The displayed heading of a textbox component on a homepage will be the textbox heading if non-blank,
-        //    otherwise the component name.  So that is the heading we must use for the search index.
+        //  * The displayed heading of a textbox component on a homepage will be:
+        //     * The component name if non-blank,
+        //     * otherwise the textbox heading if non-blank,
+        //     * otherwise Component_Homepage_Controller::DEFAULT_COMPONENT_HEADING.
+        //    (see library/Schoolbox/Resource/Textbox/Component/Homepage/Controller.php)
+        //    So that is the heading we must use for the search index.
         $queryString = "
             SELECT
             CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
             f.id AS folder_id,
-            IF(tb.heading IS NULL OR tb.heading = '', cci_componentname.value, tb.heading) AS title,
+            COALESCE(
+                IF(TRIM(cci_componentname.value) = '', NULL, cci_componentname.value),
+                IF(TRIM(tb.heading = '') = '', NULL, tb.heading),
+                '" . ComponentHomepageController::DEFAULT_COMPONENT_HEADING . "'
+            ) AS title,
             tb.updated_at AS date,
             tb.created_by AS created_by,
             tb.body AS fulltext_index

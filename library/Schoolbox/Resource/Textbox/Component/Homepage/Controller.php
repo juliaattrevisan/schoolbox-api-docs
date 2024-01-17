@@ -75,7 +75,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             self::DEFAULT_COMPONENT_HEADING,
         ];
         foreach ($headingCandidates as $candidate) {
-            if (isset($candidate) && $candidate !== '') {
+            if (isset($candidate) && trim($candidate) !== '') {
                 $this->setComponentName($candidate);
                 break;
             }
