@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
 use Component_Definition;
+use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
@@ -169,6 +170,78 @@ class IndexBuilder extends BaseBuilder
                     null,
                     null,
                 );
+            }
+        }
+
+        // Pass 2: delete obsolete textbox indices
+        // Find every textbox and every component
+        $textboxQueryString = "SELECT textBoxID AS id FROM textBox WHERE deleted_at IS NULL";
+        $textboxQuery       = $this->connector->prepareQuery($textboxQueryString);
+        $textboxQuery->execute();
+        $textboxIds = $textboxQuery->fetchColumnArray('id');
+
+        $componentQueryString = "
+            SELECT cd.id, tb.textBoxID
+            FROM component_definition cd
+            INNER JOIN component_instance          ci  ON cd.id = ci.component_definition_id
+            INNER JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
+            INNER JOIN component_config_instance   cci ON ccd.id = cci.component_config_definition_id
+            INNER JOIN textBox                     tb  ON cci.value = tb.textBoxID
+            WHERE ccd.key   = :key
+            AND   ci.module = :module
+            AND   cd.class  = :class
+        ";
+        $componentQuery = $this->connector->prepareQuery($componentQueryString);
+        $componentQuery->execute([
+            'key'    => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+            'module' => Component_Definition::MODULE_HOMEPAGE,
+            'class'  => ltrim(Controller::class, '\\'),
+        ]);
+
+        $componentsGroupedByTextbox = [];
+        foreach ($componentQuery->fetchAll() as $row) {
+            $componentsGroupedByTextbox[$row['textBoxID']][] = $row['id'];
+        }
+
+
+        $this->logger->info(sprintf('Cleaning up search indices for %d text boxes', count($textboxIds)));
+
+        foreach ($textboxIds as $textboxId) {
+            // All components for this textbox
+            $componentsForTextbox = $componentsGroupedByTextbox[$textboxId] ?? [];
+
+            // All search indices for this textbox
+            $searchIndexQuery->execute([
+                'type'              => Hydrator::BASE_TYPE,
+                'identifierPattern' => $textboxId . '-%',
+            ]);
+            foreach ($searchIndexQuery as $searchIndex) {
+                [, $indexComponentId] = explode('-', $searchIndex);
+                if ($indexComponentId === '') {
+                    // This is the index for if there are no components.
+                    // Delete it if there is at least one component.
+                    if (!empty($componentsForTextbox)) {
+                        yield $this->buildIndex(
+                            (string)$searchIndex,
+                            null,
+                            Hydrator::BASE_TYPE,
+                            null,
+                            true,
+                            null,
+                            null,
+                        );
+                    }
+                } elseif (!in_array((int)$indexComponentId, $componentsForTextbox, true)) {
+                    yield $this->buildIndex(
+                        (string)$searchIndex,
+                        null,
+                        Hydrator::BASE_TYPE,
+                        null,
+                        true,
+                        null,
+                        null,
+                    );
+                }
             }
         }
     }
