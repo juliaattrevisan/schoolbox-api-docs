@@ -225,6 +225,11 @@ class Controller extends BaseController
      */
     private function getUsersData(Collection|array $users, string $registerCode, string $config)
     {
+        //tmpDebug options
+        $registerCode = "MCTS";
+        $collectionCode = "CoreAssignmentData";
+        $studentExternalId = "152840864613";
+
         // check if we have a valid register code
         // Hit the iSams API:
         $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
@@ -239,17 +244,73 @@ class Controller extends BaseController
              */
             throw new NotFound();
         }
-        $usersData = [];
 
-        // Get each student
-        foreach ($users as $user) {
-            // for each student get the data from that register
-            $usersData[] = [
-                'user' => $user,
-                'data' => $this->getDataFromRegister($user, $register, $this->extractRegisterConfig($config)),
-            ];
+        // we now have the correct register we are after
+        $recordCollections = $this->cacheHelper->getRecordCollections($register['id']);
+
+        $recordCollection = null;
+        foreach ($recordCollections as $collection) {
+            if (strtolower($collection['reportingKey']) !== strtolower($collectionCode)) {
+                // the requested register Ignoring...
+                continue;
+            }
+            $recordCollection = $collection;
+            break;
         }
-        return $usersData;
+        if (null === $recordCollection) {
+            /**
+             * Unable to find the specified Record Collections...
+             */
+            throw new NotFound();
+        }
+
+        // we now have the correct record collection id
+
+        // fetch user data
+        $userRecords = $this->cacheHelper->getRecordCollectionsRecords($register['id'], $studentExternalId, $recordCollection['id']);
+
+        // fetch the field metadata to join and clean the data
+        $fieldMetadata = $this->cacheHelper->getMetadataFields($register['id']);
+
+        $out = [];
+        $knownFields = [];
+        // loop through each record
+        foreach ($userRecords as $record) {
+            $fields = [];
+            //in each record, loop through the metadata fields
+            foreach ($fieldMetadata as $metadata) {
+                //if the field exists then build it, else just continue
+                if (!isset($record['fields'][lcfirst($metadata['key'])])) {
+                    continue;
+                }
+                $knownFields[$metadata['key']] = $metadata['name'];
+                // join the record field to the metadata field and append to a new array
+                $fields[$metadata['key']] = [
+                    'type' => $metadata['type'],
+                    'value' => $record['fields'][lcfirst($metadata['key'])]
+                ];
+            }
+            $out[] = $fields;
+        }
+
+        return [
+            'register' => $register,
+            'recordCollection' => $recordCollection,
+            'knownFields' => $knownFields,
+            'userRecords'   => $out
+        ];
+
+//        $usersData = [];
+//
+//        // Get each student
+//        foreach ($users as $user) {
+//            // for each student get the data from that register
+//            $usersData[] = [
+//                'user' => $user,
+//                'data' => $this->getDataFromRegister($user, $register, $this->extractRegisterConfig($config)),
+//            ];
+//        }
+//        return $usersData;
     }
 
     /**
