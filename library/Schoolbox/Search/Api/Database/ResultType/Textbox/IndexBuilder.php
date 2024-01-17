@@ -160,9 +160,9 @@ class IndexBuilder extends BaseBuilder
                 'type'              => Hydrator::BASE_TYPE,
                 'identifierPattern' => $row['id'] . '-%',
             ]);
-            foreach ($searchIndexQuery as $searchIndex) {
+            foreach ($searchIndexQuery->fetchColumnArray('identifier') as $searchIndex) {
                 yield $this->buildIndex(
-                    (string)$searchIndex['identifier'],
+                    (string)$searchIndex,
                     null,
                     Hydrator::BASE_TYPE,
                     null,
@@ -181,7 +181,7 @@ class IndexBuilder extends BaseBuilder
         $textboxIds = $textboxQuery->fetchColumnArray('id');
 
         $componentQueryString = "
-            SELECT cd.id, tb.textBoxID
+            SELECT ci.id, tb.textBoxID
             FROM component_definition cd
             INNER JOIN component_instance          ci  ON cd.id = ci.component_definition_id
             INNER JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -215,7 +215,7 @@ class IndexBuilder extends BaseBuilder
                 'type'              => Hydrator::BASE_TYPE,
                 'identifierPattern' => $textboxId . '-%',
             ]);
-            foreach ($searchIndexQuery as $searchIndex) {
+            foreach ($searchIndexQuery->fetchColumnArray('identifier') as $searchIndex) {
                 [, $indexComponentId] = explode('-', $searchIndex);
                 if ($indexComponentId === '') {
                     // This is the index for if there are no components.
