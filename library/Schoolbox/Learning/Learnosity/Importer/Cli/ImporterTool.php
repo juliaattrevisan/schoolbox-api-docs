@@ -21,10 +21,11 @@ use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
+/**
+ * Tool for importing Schoolbox quiz data into Learnosity.
+ */
 class ImporterTool extends CliTool\App
 {
     /**
@@ -1359,17 +1360,12 @@ HELP;
         ]);
     }
 
-
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
-     *
-     * @return bool|null
+     * This script must be run as www-data, as it may write files to Schoolbox's
+     * file system.
      */
-    public function runAsRoot(): ?bool
+    public function getRequiredProcessUser(): ?string
     {
-        return null;
+        return self::WEB_PROCESS_USER;
     }
 }

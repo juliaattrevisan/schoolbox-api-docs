@@ -43,6 +43,18 @@ abstract class App
      */
     public const LOCK_NAME = null;
 
+    /**
+     * Web process user.
+     *
+     * This should be used as the process user for any scripts which need to
+     * write to the file system which Schoolbox is stored upon, so that web
+     * processes may update and create folders within any folder this process
+     * creates.
+     *
+     * @see getRequiredProcessUser
+     */
+    public const WEB_PROCESS_USER = 'www-data';
+
     protected const COLOUR_GREEN = "\033[0;32m";
     protected const COLOUR_RED = "\033[0;31m";
     protected const COLOUR_GREY = "\033[0;37m";
