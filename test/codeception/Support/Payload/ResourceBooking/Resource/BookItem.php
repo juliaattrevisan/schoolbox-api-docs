@@ -43,6 +43,14 @@ class BookItem extends Payload\Request
         $this->setFormParam('notes', '<p>These are some notes</p>');
         $this->setFormParam('callbackUrl', '');
     }
+    public function constructWithDate(\Schoolbox\ResourceBooking\Item\Model $Item, string $title, string $startDate, string $endDate): BookItem
+    {
+        $obj = new Payload\ResourceBooking\Resource\BookItem($Item, $title);
+        $obj->setStartDate($startDate);
+        $obj->setEndDate($endDate);
+        return $obj;
+
+    }
 
     public function setName(string $name)
     {
@@ -52,6 +60,16 @@ class BookItem extends Payload\Request
     public function setEfficacy(string $efficacy)
     {
         $this->setFormParam('efficacy', $efficacy);
+    }
+
+    public function setStartDate(string $startDate)
+    {
+            $this->setFormParam('startDate', $startDate);
+    }
+
+    public function setEndDate(string $endDate): void
+    {
+            $this->setFormParam('endDate', $endDate);
     }
 
     public function addRelatedResource($resource_id, $resource_notes)
