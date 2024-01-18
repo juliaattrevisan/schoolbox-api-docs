@@ -154,7 +154,7 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
         var source = params["source"];
         var fullwidth = params["fullwidth"];
         var type = params["type"];
-        var maxwidth = width + "px;";
+        var maxwidth = width + "px";
 
         if (fullwidth === "true") {
             maxwidth = "100%";
@@ -167,7 +167,7 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
 
         let mediaContainer = document.createElement("div");
         mediaContainer.setAttribute("data-schoolboxmedia-replacement-container", "");
-        mediaContainer.style.maxWidth = maxwidth + style;
+        mediaContainer.style.maxWidth = maxwidth;
 
         if (type === "video") {
             let mediaElement = document.createElement("video");
