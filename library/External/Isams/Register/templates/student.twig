@@ -1,19 +1,46 @@
-{{ studentData.register.name }} ({{ studentData.recordCollection.name }})
-            <table>
-                <thead>
-                <tr>
-                    {% for key,name in (studentData.knownFields ?? []) %}
-                    <th data-field="{{ key }}">{{ name }}</th>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody>
-                    {% for record in (studentData.userRecords ?? []) %}
-                    <tr>
-                        {% for field in record %}
-                            <td>{{ field.value }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="small-12 island">
+    <h2 class="subheader">{{ register.name }} ({{ recordCollection.name }})</h2>
+        <div class="l-flex-col l-gap-m l-pad-m">
+            {% for child in studentData %}
+                <div class="l-flex-col">
+                    <div class="c-card">
+                        <div class="l-flex-row l-gap-m l-pad-m">
+                            <div class="c-img c-img--round">
+                                <div class="c-img__wrapper">
+                                    <img
+                                        src="/portrait.php?id={{ child.user.id }}&amp;size=square64"
+                                        alt="Photo of {{ child.user.formatName }}"
+                                    />
+                                </div>
+                            </div>
+                            <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                                <h3>{{ child.user.formatName }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-island l-pad-m--horiz">
+                        {% if child.data.userRecords is defined %}
+                            <table>
+                                <thead>
+                                {% for key,name in (child.data.knownFields ?? []) %}
+                                    <th data-field="{{ key }}">{{ name }}</th>
+                                {% endfor %}
+                                </thead>
+                                <tbody>
+                                {% for record in (child.data.userRecords ?? []) %}
+                                    <tr>
+                                        {% for field in record %}
+                                            <td>{{ field.value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p><em>No data available.</em></p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+</div>
