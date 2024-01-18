@@ -125,8 +125,11 @@ class Controller extends Base
             $textboxData = $this->findTextboxes($course->getTemplate()?->getUnitTemplate()->getId(), $unit->getFolder()->getId());
 
             // Learning Activities
-            $options = ['order' => ['sequence' => 'ASC']];
-            $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), $options);
+            $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
+                'order' => [
+                    'sequence' => 'ASC'
+                ]
+            ]);
 
             /* Get a set of rubrics that were used among all the assessment specs
              * This also comes with all the cap ids and indicator ids
@@ -136,7 +139,7 @@ class Controller extends Base
             /* TODO Later on we can provide a list of rubrics that exist in the whole course
              *  and diff them in some way so users can see what they haven't planned properly
              */
-            $rubricCapabilities = ['used'];
+            $rubricCapabilities = $rubricData['used'];
 
             /* Curriculum nodes
              *     - Find all the capability nodes and indicator nodes
