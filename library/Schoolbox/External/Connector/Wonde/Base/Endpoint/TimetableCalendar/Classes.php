@@ -234,8 +234,17 @@ class Classes implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $class)
+    private function processClass(array $class): void
     {
+        /* $class might actually have a null $class['code'], for wonde reasons
+         *
+         * For pcschools/pilot school, we need to derive a class code from other fields;
+         * se the first non-null of $class['code'] and $class['mis_id']
+         *
+         * Every other school should presume usage of $class['code']
+         */
+        $class['code'] = $class['code'] ?? $class['mis_id'];
+
         foreach ($class['lessons']['data'] as $lesson) {
             /* Decide if we need to process this lesson
              * Outside the window? Skip it
