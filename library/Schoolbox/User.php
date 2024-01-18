@@ -114,7 +114,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var null|HouseResidential */
     private $residentialHouse;
 
-    /** @var Collection|null */
+    /** @var null|Collection|self[] */
     private ?Collection $linkedUsers = null;
 
     /**
@@ -1176,7 +1176,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
 
     /**
-     * @param Collection $linkedUsers
+     * @param Collection|self[] $linkedUsers
      * @return $this
      */
     public function setLinkedUsers(Collection $linkedUsers): self
@@ -1186,7 +1186,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return Collection|null
+     * @return null|Collection|self[]
      */
     public function getLinkedUsers(): ?Collection
     {
