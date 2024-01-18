@@ -44,13 +44,15 @@ class BookItem extends Payload\Request
         $this->setFormParam('notes', '<p>These are some notes</p>');
         $this->setFormParam('callbackUrl', '');
     }
+    /*
+     * Hit /resource-booking/category url with POST to create a category by passing start and end dates
+     */
     public function constructWithDate(Model $Item, string $title, string $startDate, string $endDate): BookItem
     {
         $obj = new Payload\ResourceBooking\Resource\BookItem($Item, $title);
         $obj->setStartDate($startDate);
         $obj->setEndDate($endDate);
         return $obj;
-
     }
 
     public function setName(string $name): void

@@ -178,8 +178,8 @@ class ResourceBookingCest
         $booking = $BookingMapper->findOneByColumn('name', $booking_name);
         $bookingId = $booking->getId();
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'1');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '1');
     }
 
     /**
@@ -226,8 +226,8 @@ class ResourceBookingCest
 
         #THEN check response code and the booking status
         $i->seeResponseCodeIs(200);
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'1');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', ['id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '1');
     }
 
     /**
@@ -265,8 +265,8 @@ class ResourceBookingCest
 
         #THEN check response code and the booking status
         $i->seeResponseCodeIs(200);
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'1');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '1');
     }
 
 
@@ -308,8 +308,8 @@ class ResourceBookingCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'2');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '2');
     }
 
     /**
@@ -351,8 +351,8 @@ class ResourceBookingCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'3');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '3');
     }
 
     /**
@@ -427,8 +427,8 @@ class ResourceBookingCest
         $booking = $BookingMapper->findOneByColumn('name', $booking_name);
         $bookingId = $booking->getId();
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'1');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '1');
 
         $i->amGoingTo('approve the booking');
         $approvePayload = new Payload\ResourceBooking\Resource\ModerateBooking(
@@ -442,8 +442,8 @@ class ResourceBookingCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'2');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '2');
 
         #WHEN
         $i->amGoingTo('the moderator Jack Coles creates a booking to be moderated');
@@ -466,8 +466,8 @@ class ResourceBookingCest
         $i->amGoingTo('check the response is 200 and booking status is approved');
         $i->seeResponseCodeIs(200);
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'2');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '2');
     }
 
     /**
@@ -505,8 +505,8 @@ class ResourceBookingCest
         $booking = $BookingMapper->findOneByColumn('name', $booking_name);
         $bookingId = $booking->getId();
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'1');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', ['id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '1');
 
         $i->amGoingTo('approve the booking');
         $approvePayload = new Payload\ResourceBooking\Resource\ModerateBooking(
@@ -520,8 +520,8 @@ class ResourceBookingCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
 
-        $bookingStatusReviewed = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'name' => $booking_name]);
-        $i->assertEquals($bookingStatusReviewed,'2');
+        $bookingStatusReviewed = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', ['name' => $booking_name]);
+        $i->assertEquals($bookingStatusReviewed, '2');
 
         #WHEN
         $i->amGoingTo('the moderator Jack Coles creates a booking to be moderated');
@@ -544,8 +544,8 @@ class ResourceBookingCest
         $i->amGoingTo('check the response is 200 and booking status is approved');
         $i->seeResponseCodeIs(200);
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'2');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '2');
     }
 
     /**
@@ -600,8 +600,8 @@ class ResourceBookingCest
         $i->amGoingTo('check the response is 200 and booking status is pending');
         $i->seeResponseCodeIs(200);
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'1');
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '1');
 
         #WHEN
         $i->amGoingTo('the alaress admin creates a booking with moderation open and that has a related managed resource');
@@ -621,11 +621,7 @@ class ResourceBookingCest
         $i->amGoingTo('check the response is 200 and booking status is approved');
         $i->seeResponseCodeIs(200);
 
-        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
-        $i->assertEquals($bookingStatus,'2');
-
-
+        $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus, '2');
     }
-
-
-    }
+}
