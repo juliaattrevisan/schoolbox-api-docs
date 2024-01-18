@@ -78,6 +78,8 @@
                             </li>
                         {% endif %}
                         </ul>
+
+                        {{ _self.renderRawData(unitSpecData) }}
                     </section>
                 </div>
             </div>
@@ -184,4 +186,22 @@
             {% endfor %}
         </ul>
     {% endapply %}
+{% endmacro %}
+
+{##
+ # Because it hurts trying to inspect raw data without logging into help directly
+ #
+ # @param array unitSpecData  A set of (user id, user data) tuples containing raw marks
+ #}
+{% macro renderRawData(unitSpecData) %}
+    {% for userId, userData in unitSpecData.candidates %}
+        <div data-user-meta="{{ userId }} {{ userData.meta.firstname }} {{ userData.meta.lastname }}" style="display:none">
+            <p>{{ userId }} {{ userData.meta.firstname }} {{ userData.meta.lastname }}</p>
+            <ol>
+                {% for mark in userData.marks %}
+                    <li>{{ mark ?? 'null' }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    {% endfor %}
 {% endmacro %}
