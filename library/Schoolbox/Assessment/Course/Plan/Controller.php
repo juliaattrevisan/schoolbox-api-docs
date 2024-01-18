@@ -16,11 +16,13 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Scrub;
 use Twig\Error\Error;
@@ -342,11 +344,11 @@ class Controller extends Base
      * do those separately, but you can mine out the ones from Folders
      * and Assessments - those should already exist.
      *
-     * @param \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit
+     * @param Model $unit
      * @param Collection $assessments
      * @param array $rubricData
-     * @return \Schoolbox\GenericCollection
-     * @throws \UnexpectedValueException
+     * @return GenericCollection
+     * @throws \PDOException
      */
     private function findCurriculumNodes(
         \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit,
@@ -366,11 +368,47 @@ class Controller extends Base
         }
 
         /* Nodes from the capabilities and indicators needs their own prehydration
+         * Capabilities might not exist; indicators might not exist.
          */
-        $curriculumNodes = $curriculumNodes->merge($this->nodeMapper->findByColumnList([
-            'id' => array_merge($rubricData['capabilityIds'], $rubricData['indicatorIds']),
-            'enabled' => 1
-        ]));
+        $query = [];
+
+        if (\count($rubricData['capabilityIds'])) {
+            $capabilityIds = implode(',', $rubricData['capabilityIds']);
+
+            $query[] = "
+                SELECT curriculum_node_id
+                FROM curriculum_node_for_rubric_capability
+                WHERE rubric_capability_id IN ({$capabilityIds})
+            ";
+        }
+
+        if (\count($rubricData['indicatorIds'])) {
+            $indicatorIds = implode(',', $rubricData['indicatorIds']);
+
+            $query[] = "
+                SELECT curriculum_node_id
+                FROM curriculum_node_for_rubric_indicator
+                WHERE rubric_indicator_id IN ({$indicatorIds})
+            ";
+        }
+
+        if (\count($query)) {
+            $statement = $this->nodeMapper->getDatabase()->prepare(implode(' UNION ', $query));
+            $statement->execute();
+
+            $nodeIds = [];
+
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $nodeIds[$row['curriculum_node_id']] = $row['curriculum_node_id'];
+            }
+
+            if (\count($nodeIds)) {
+                $curriculumNodes = $curriculumNodes->merge($this->nodeMapper->findByColumnList([
+                    'id' => array_values($nodeIds),
+                    'enabled' => 1
+                ]));
+            }
+        }
 
         /* Unique this set
          */
