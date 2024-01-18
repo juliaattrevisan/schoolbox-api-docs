@@ -341,7 +341,7 @@ class HomepageConfig
     }
 
     /**
-     * @return HomepageTemplate
+     * @return HomepageTemplate|null
      */
     public function getTemplate()
     {
