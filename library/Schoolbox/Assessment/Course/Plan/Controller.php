@@ -383,9 +383,10 @@ class Controller extends Base
         foreach ($curriculumNodes as $nodeId => $node) {
             if (!$node->getEnabled() || '' === $node->getCode()) {
                 /* Did we really need these right now?
+                 * Temporarily disabled for speed; re-enable when you actually need it
                  */
-                $this->nodeMapper->loadAncestors($node);
-                $this->nodeMapper->loadDescendants($node);
+//                $this->nodeMapper->loadAncestors($node);
+//                $this->nodeMapper->loadDescendants($node);
 
                 $ancestorIds = $this->getAllAncestorIds($node);
                 $diff = array_diff($ancestorIds, $curriculumNodes->keys());
