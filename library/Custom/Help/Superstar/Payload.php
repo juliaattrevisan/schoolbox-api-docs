@@ -281,6 +281,17 @@ class Payload
     /**
      * Prepare a statement for award candidates
      *
+     * This takes significant advantage over how "people involved in an assessment" is
+     * determined. In Help, the following axioms apply:
+     *     - you need to know about people who didn't get assessment results, But Should Have,
+     *       in order to determine celebrity status; trying to decide celebrity status based
+     *       only on the results they obtained is not correct
+     *     - sis_class_user is empty so you can't cheat with that
+     *     - you are forced to use circumstantial read-access via userAccess table
+     *       Hence, all the userAccess joins
+     *     - once you know about the users who are supposed to have resuls, you can then
+     *       manifest null columns via project_result like we originally tried
+     *
      * @return \PDOStatement
      * @throws \PDOException
      */
