@@ -14,16 +14,12 @@ use Alaress\Database\Exception;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\ModelToArray as IndicatorModelToArray;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as RubricIndicatorModel;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Scrub;
@@ -76,6 +72,8 @@ class Controller extends Base
             ORDER BY textBox.updated_at
         ");
 
+        /* Only prepare the rubric statement once
+         */
         $this->rubricStatement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
             SELECT 
                 rc.id AS 'capability_id',
@@ -101,12 +99,9 @@ class Controller extends Base
      *
      * @param CourseSpecification $course
      * @throws Error
-     * @throws MapperException
-     * @throws SchoolboxException
      * @throws Exception
      * @throws InvalidColumnException
      * @throws \DomainException
-     * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
