@@ -9,11 +9,11 @@ import { useStudentStore } from "../store/qfStudentStore";
 /**
  * To load the reports data and pass it to the other stores
  * @param {object} initOptions - the report init options
+ * @param {boolean} hasMarkVisibility - whether the report has mark visibility
  */
-export function loadReport(initOptions: object) {
+export function loadReport(initOptions: object, hasMarkVisibility: boolean) {
     const reportId = initOptions.request.reports[0].id as string; // To link the report to the student
     const reportType = initOptions.request.reports[0].type as string;
-    const displayScores = initOptions.request.reports[0].display_scores as boolean;
 
     let reportCallback = null;
 
@@ -39,7 +39,7 @@ export function loadReport(initOptions: object) {
                             });
                             useStudentStore().addItems(items);
 
-                            if (displayScores) {
+                            if (hasMarkVisibility) {
                                 addTargetsToMarks(reportId);
                             }
                             disableTextAreas(reportId);

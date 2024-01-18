@@ -77,6 +77,7 @@ function onCommentUpdated(comment: string) {
                 :container="props.container"
                 :is-read-only="store.isReadOnly"
                 :show-feedback="props.student.isReviewed || !store.isReadOnly"
+                :has-mark-visibility="store.hasMarkVisibility"
                 @updated-score="onScoreUpdated"
             />
         </div>

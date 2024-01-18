@@ -38,7 +38,7 @@ window.Vue.onMounted(async () => {
     store.init(props.isReadOnly, props.hasMarkVisibility, props.postFeedback, props.statusPage);
     useStudentStore().init(props.student, props.itemResponses, props.attemptComment, props.urls, props.isReviewed);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
-    loadReport(props.reportInitOptions);
+    loadReport(props.reportInitOptions, props.hasMarkVisibility);
 });
 </script>
 
