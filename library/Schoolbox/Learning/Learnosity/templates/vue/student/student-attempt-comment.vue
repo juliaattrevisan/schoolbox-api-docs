@@ -109,7 +109,6 @@ window.Vue.onUnmounted(async () => {
 <template>
     <div class="c-island l-flex-col l-gap-m l-pad-m">
         <div>
-            <label>Comment</label>
             <p
                 v-if="
                     (props.isReadOnly && props.student.attemptComment.comment === null) ||

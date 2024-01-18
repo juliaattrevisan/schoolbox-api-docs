@@ -116,35 +116,23 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div>
+    <div v-if="props.isReadOnly && props.item.questions[0].response?.comment !== undefined && props.item.questions[0].response?.comment !== ''">
         <label>Comment</label>
-        <p
-            v-if="
-                (props.isReadOnly && props.item.questions[0].response?.comment === undefined) ||
-                (props.isReadOnly && props.item.questions[0].response?.comment === '')
-            "
-        >
-            <em>No comment added.</em>
+        <div v-html="props.item.questions[0].response.comment"></div>
+    </div>
+    <template v-else-if="!props.isReadOnly">
+        <p class="meta">
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
         </p>
-        <div
-            v-else-if="props.isReadOnly && props.item.questions[0].response?.comment !== ''"
-            v-html="props.item.questions[0].response?.comment"
-        ></div>
-        <template v-else>
-            <p class="meta">
-                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
-                details on creation.
-            </p>
-            <textarea :id="editorId"></textarea>
-            <div class="save-container l-grid">
-                <div class="save-container__inner-container">
-                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
-                        <em>{{ saveText }}</em>
-                    </div>
+        <textarea :id="editorId"></textarea>
+        <div class="save-container l-grid">
+            <div class="save-container__inner-container">
+                <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                    <em>{{ saveText }}</em>
                 </div>
             </div>
-        </template>
-    </div>
+        </div>
+    </template>
 </template>
 
 <style lang="scss" scoped>
