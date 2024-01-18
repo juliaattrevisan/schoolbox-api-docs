@@ -92,6 +92,12 @@ class Create extends Payload\Request
         $this->setFormParam('resource_moderation_type_id', $resource_moderation_type_id);
     }
 
+    public function setModerator(string $resource_moderator_id): void
+    {
+        $moderator_id_field = 'moderator_id[]';
+        $this->setFormParam($moderator_id_field, $resource_moderator_id);
+    }
+
     public function setMinLeadTime(string $minute, string $hour = null, string $day = null)
     {
         $this->setTime('min_lead_time', $minute, $hour, $day);
