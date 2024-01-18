@@ -201,6 +201,19 @@ class Controller extends Base
 //            Node\Mapper::sortNodes($curriculumNodes, 0);
 
 //            $nodes = $curriculumNodes->getUnique('id');
+
+            /* Find all the unique curriculum nodes used in:
+             *     - folders
+             *     - assessments
+             *     - capabilities
+             *     - indicators
+             *
+             * Capabilities' and Indicators' curriculum nodes won't be hydrated;
+             * do those separately, but you can mine out the ones from Folders
+             * and Assessments - those should already exist.
+             */
+
+
             /* Aggregated data for each unit appears as a row in the Unit Planner
              * on the front end - this is basically the contract between back- and
              * front-end implementations and the basis of an api-first philosophy
