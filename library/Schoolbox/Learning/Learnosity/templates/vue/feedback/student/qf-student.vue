@@ -41,7 +41,7 @@ function onAttemptCommentUpdated(comment: string) {
             <div id="schoolbox-completion-summary"></div>
         </div>
         <template v-if="props.student.isReportLoaded">
-            <div v-if="store.hasMarkVisibility" class="l-flex-col l-gap-s">
+            <div class="l-flex-col l-gap-s">
                 <h2 class="subheader f-no-margins">Items</h2>
                 <qf-student-show-marked v-if="!store.isReadOnly" />
                 <div class="l-flex-col l-gap-l">

@@ -5,6 +5,7 @@
 
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
+import { removeClasses } from "@js/util/cssUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
@@ -17,6 +18,7 @@ interface Props {
     container: HTMLElement; // the parent container, to look for the relevant item
     isReadOnly: boolean; // whether the question is readonly
     showFeedback: boolean; // whether to show the feedback
+    hasMarkVisibility: boolean; // whether marks and feedback are visible to the user
 }
 const props = defineProps<Props>();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
@@ -129,6 +131,10 @@ window.Vue.onMounted(() => {
         const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
         const response = props.container.querySelector(selector) as HTMLDivElement;
         responsesEl.value?.appendChild(response);
+        // hide any incorrect/correct styling if we're not showing feedback
+        if (response && !props.hasMarkVisibility) {
+            removeClasses(response, ["lrn_incorrect", "lrn_correct"]);
+        }
         score.value = props.question.response.score?.toString() ?? "";
         /**
          * Replace video placeholders with actual player when the ui has loaded,

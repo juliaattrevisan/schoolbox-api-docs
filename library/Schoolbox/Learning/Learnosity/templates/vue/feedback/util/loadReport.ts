@@ -9,10 +9,12 @@ import { useStudentStore } from "../store/qfStudentStore";
 /**
  * To load the reports data and pass it to the other stores
  * @param {object} initOptions - the report init options
+ * @param {boolean} hasMarkVisibility - whether the report has mark visibility
  */
-export function loadReport(initOptions: object) {
+export function loadReport(initOptions: object, hasMarkVisibility: boolean) {
     const reportId = initOptions.request.reports[0].id as string; // To link the report to the student
     const reportType = initOptions.request.reports[0].type as string;
+
     let reportCallback = null;
 
     /**
@@ -36,23 +38,16 @@ export function loadReport(initOptions: object) {
                                 items.push(item);
                             });
                             useStudentStore().addItems(items);
-                            addTargetsToMarks(reportId);
+
+                            if (hasMarkVisibility) {
+                                addTargetsToMarks(reportId);
+                            }
                             disableTextAreas(reportId);
                         });
+
                         // to notify the report has loaded
                         useStudentStore().reportLoaded();
                     });
-                },
-            };
-            break;
-
-        case "session-detail-by-question":
-            reportCallback = {
-                readyListener: () => {
-                    // Reveal report.
-                    document.getElementsByClassName("response-content")[0].style.display = "block";
-                    // to notify the report has loaded
-                    useStudentStore().reportLoaded();
                 },
             };
             break;
