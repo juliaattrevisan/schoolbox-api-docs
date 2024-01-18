@@ -1,25 +1,35 @@
 import { mount } from "@vue/test-utils";
-import SearchPage from "../../search-page.vue";
+import SpResults from "../sp-results.vue";
 import { createTestingPinia } from "@pinia/testing";
-import { useSearchStore } from "../../store/spSearchStore";
+import { useResultsStore } from "../store/spResultsStore";
 
 let wrapper; // so we don't need to pass it into every test
 
 beforeEach(() => {
-    window.schoolboxUser = { id: 0, name: "Test User" };
-    wrapper = mount(SearchPage, {
+    wrapper = mount(SpResults, {
         global: {
             plugins: [createTestingPinia()],
-        },
-        props: {
-            endpoint: "",
-            filterTypes: [],
         },
     });
 });
 
-test("while searching, loading should be displayed", async () => {
-    const store = useSearchStore();
-    await store.$patch({ hasNotSearched: false, isSearching: true });
-    expect(wrapper.get('[data-test="loading-table"]').isVisible()).toBe(true);
+test("if there are no search results, no results should be displayed", async () => {
+    expect(wrapper.find('[data-test^="sp-results-result"]').exists()).toBe(false);
+});
+
+test("if there are search results, results should be displayed", async () => {
+    const resultsStore = useResultsStore();
+    await resultsStore.$patch({ allResults: [{ id: 1, name: "test", type: "user", _links: [], _context: [] }] });
+    expect(wrapper.get('[data-test^="sp-results-result"]').isVisible()).toBe(true);
+});
+
+test("if there are two search results, two results should be shown", async () => {
+    const resultsStore = useResultsStore();
+    await resultsStore.$patch({
+        allResults: [
+            { id: 1, name: "test", type: "user", _links: [], _context: [] },
+            { id: 2, name: "test", type: "user", _links: [], _context: [] },
+        ],
+    });
+    expect(wrapper.findAll('[data-test^="sp-results-result"]')).toHaveLength(2);
 });

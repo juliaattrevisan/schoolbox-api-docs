@@ -65,9 +65,9 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         @click.prevent="onButtonSelected"
     >
         <!-- when an alternative icon should be used -->
-        <span v-if="buttonText">{{ buttonText }}</span>
+        <span v-if="props.buttonText">{{ props.buttonText }}</span>
         <!-- To use the arrow icon -->
-        <template v-if="isArrowIcon">
+        <template v-if="props.isArrowIcon">
             <svg
                 version="1.2"
                 xmlns="http://www.w3.org/2000/svg"

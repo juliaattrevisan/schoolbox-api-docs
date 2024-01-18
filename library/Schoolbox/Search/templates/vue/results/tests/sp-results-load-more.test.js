@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import SpResultsListLoadMore from "../sp-results-list-load-more.vue";
+import SpResultsLoadMore from "../sp-results-load-more.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { useResultsStore } from "../store/spResultsStore";
 
@@ -8,7 +8,7 @@ import { useResultsStore } from "../store/spResultsStore";
 let wrapper; // so we don't need to pass it into every test
 
 beforeEach(() => {
-    wrapper = mount(SpResultsListLoadMore, {
+    wrapper = mount(SpResultsLoadMore, {
         global: {
             plugins: [createTestingPinia()],
         },
@@ -17,19 +17,13 @@ beforeEach(() => {
 
 test("do not show load more button when no more results to load", async () => {
     const resultsStore = useResultsStore();
-    await resultsStore.$patch({ results: [{ id: 1, name: "test" }] });
+    await resultsStore.$patch({ hasLoadedAllResults: true });
     expect(wrapper.find('[data-test="sp-results-load-more-button"]').exists()).toBe(false);
 });
 
 test("show load more button when more results to load", async () => {
     const resultsStore = useResultsStore();
-    const results = [];
-    // push to the result limit to suggest there could be more results to load
-    const RESULT_LIMIT = 5;
-    for (let i = 0; i < RESULT_LIMIT; i++) {
-        results.push({ id: i, name: "test" });
-    }
-    await resultsStore.$patch({ results: results });
+    await resultsStore.$patch({ hasMoreResults: true });
     expect(wrapper.find('[data-test="sp-results-load-more-button"]').exists()).toBe(true);
 });
 
