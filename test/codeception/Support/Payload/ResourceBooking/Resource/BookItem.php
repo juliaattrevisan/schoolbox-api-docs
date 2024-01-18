@@ -7,6 +7,7 @@
 
 namespace Tests\Support\Payload\ResourceBooking\Resource;
 
+use Schoolbox\ResourceBooking\Item\Model;
 use Tests\Support\Payload;
 use Tests\Support\Payload\PostTrait;
 
@@ -19,10 +20,10 @@ class BookItem extends Payload\Request
     /**
      * Hit /resource-booking/category url with POST to create a category.
      *
-     * @param \Schoolbox\ResourceBooking\Item\Model $Item
+     * @param Model $Item
      * @param string $title
      */
-    public function __construct(\Schoolbox\ResourceBooking\Item\Model $Item, string $title)
+    public function __construct(Model $Item, string $title)
     {
         $this->ItemID = $Item->getId();
         $this->setHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
@@ -43,7 +44,7 @@ class BookItem extends Payload\Request
         $this->setFormParam('notes', '<p>These are some notes</p>');
         $this->setFormParam('callbackUrl', '');
     }
-    public function constructWithDate(\Schoolbox\ResourceBooking\Item\Model $Item, string $title, string $startDate, string $endDate): BookItem
+    public function constructWithDate(Model $Item, string $title, string $startDate, string $endDate): BookItem
     {
         $obj = new Payload\ResourceBooking\Resource\BookItem($Item, $title);
         $obj->setStartDate($startDate);
@@ -52,17 +53,17 @@ class BookItem extends Payload\Request
 
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->setFormParam('name', $name);
     }
 
-    public function setEfficacy(string $efficacy)
+    public function setEfficacy(string $efficacy): void
     {
         $this->setFormParam('efficacy', $efficacy);
     }
 
-    public function setStartDate(string $startDate)
+    public function setStartDate(string $startDate): void
     {
             $this->setFormParam('startDate', $startDate);
     }
@@ -72,7 +73,10 @@ class BookItem extends Payload\Request
             $this->setFormParam('endDate', $endDate);
     }
 
-    public function addRelatedResource($resource_id, $resource_notes)
+    /*
+     * adds a related resource by passing resource id and resource notes
+     */
+    public function addRelatedResource($resource_id, $resource_notes): void
     {
         $this->setFormParam('related_item[' . $resource_id . '][resource_id]', $resource_id);
         $this->setFormParam('related_item[' . $resource_id . '][notes]', $resource_notes);

@@ -522,6 +522,110 @@ class ResourceBookingCest
 
         $bookingStatusReviewed = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'name' => $booking_name]);
         $i->assertEquals($bookingStatusReviewed,'2');
+
+        #WHEN
+        $i->amGoingTo('the moderator Jack Coles creates a booking to be moderated');
+        $i->impersonateUser(22);
+        $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+
+        $newItem = $ItemMapper->findOneByColumn('name', $resource_title);
+        $booking_title = 'Managed book session to be auto approved ' . $timestamp;
+        $startDate = date('d/m/Y g:ia', strtotime('+ 5 days'));
+        $endDate = date('d/m/Y g:ia', strtotime('+ 5 days + 1 hour'));
+        $bookItemPayload = $bookItemPayload->constructWithDate($newItem, $booking_title, $startDate, $endDate);
+        $i->sendRequest($bookItemPayload);
+
+        $i->amGoingTo('check the booking status is approved');
+        $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $booking = $BookingMapper->findOneByColumn('name', $booking_title);
+        $bookingId = $booking->getId();
+
+        #THEN
+        $i->amGoingTo('check the response is 200 and booking status is approved');
+        $i->seeResponseCodeIs(200);
+
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus,'2');
     }
 
-}
+    /**
+     *  Hit /resource-booking/booking/<ID>/approve with POST to approve booking request.
+     *
+     *  The test create a new booking resource item wih moderation Managed and an item
+     *
+     * @param IntegrationTester $i
+     */
+    public function bookingRequestRelatedResources(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+
+        $i->amGoingTo('add a Resource with Jack Coles as a moderator');
+        $testResource   = new Payload\ResourceBooking\Resource\Create();
+        $resource_title_moderated = 'Test related resource with moderation managed ' . $timestamp;
+        $testResource->setResourceName($resource_title_moderated);
+        $moderationType = \Schoolbox\ResourceBooking\Item\ModerationType\Model::TYPE_MANAGED;
+        $testResource->setModerationTypeId((string)$moderationType);
+        $userId = '22';
+        $testResource->setModerator($userId);
+        $i->sendRequest($testResource);
+        $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+        $newSubresource = $ItemMapper->findOneByColumn('name', $resource_title_moderated);
+
+
+        $i->amGoingTo('add an item with a related resource');
+        $testResourceRelated   = new Payload\ResourceBooking\Resource\Create();
+        $resource_title = 'Test resource with a related resource ' . $timestamp;
+        $testResourceRelated->setResourceName($resource_title);
+        $moderationType = \Schoolbox\ResourceBooking\Item\ModerationType\Model::TYPE_OPEN;
+        $testResourceRelated->setModerationTypeId((string)$moderationType);
+        $testResourceRelated->addRelatedResource($newSubresource);
+        $i->sendRequest($testResourceRelated);
+
+        #WHEN
+        $i->amGoingTo('the alaress admin creates a booking that has Jack Coles as moderator');
+        $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+
+        $newItem = $ItemMapper->findOneByColumn('name', $resource_title_moderated);
+        $booking_title = 'Managed book session to be pending ' . $timestamp;
+        $bookItemPayload = new Payload\ResourceBooking\Resource\BookItem($newItem, $booking_title);
+        $i->sendRequest($bookItemPayload);
+
+        $i->amGoingTo('check the booking status is pending');
+        $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $booking = $BookingMapper->findOneByColumn('name', $booking_title);
+        $bookingId = $booking->getId();
+
+        #THEN
+        $i->amGoingTo('check the response is 200 and booking status is pending');
+        $i->seeResponseCodeIs(200);
+
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus,'1');
+
+        #WHEN
+        $i->amGoingTo('the alaress admin creates a booking with moderation open and that has a related managed resource');
+        $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+
+        $newItem = $ItemMapper->findOneByColumn('name', $resource_title);
+        $booking_title = 'Managed book session to be auto approved ' . $timestamp;
+        $bookItemPayload = new Payload\ResourceBooking\Resource\BookItem($newItem, $booking_title);
+        $i->sendRequest($bookItemPayload);
+
+        $i->amGoingTo('check the booking status is approved');
+        $BookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $booking = $BookingMapper->findOneByColumn('name', $booking_title);
+        $bookingId = $booking->getId();
+
+        #THEN
+        $i->amGoingTo('check the response is 200 and booking status is approved');
+        $i->seeResponseCodeIs(200);
+
+        $bookingStatus = $i->grabFromDatabase('resource_booking','resource_booking_status_id',[ 'id' => $bookingId]);
+        $i->assertEquals($bookingStatus,'2');
+
+
+    }
+
+
+    }
