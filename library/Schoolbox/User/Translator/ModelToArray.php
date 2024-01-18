@@ -37,10 +37,14 @@ class ModelToArray
      */
     public function __invoke(User $user, $groups = null): array
     {
-        $linkedUsersConverted = [];
+        $linkedUsers = $user->getLinkedUsers();
+        $linkedUsersConverted = null;
 
-        foreach ($user->getLinkedUsers() as $linkedUser) {
-            $linkedUsersConverted[] = $this->convertLinkedUser($linkedUser);
+        if ($linkedUsers !== null) {
+            $linkedUsersConverted = [];
+            foreach ($linkedUsers as $linkedUser) {
+                $linkedUsersConverted[] = $this->convertLinkedUser($linkedUser);
+            }
         }
 
         return [
