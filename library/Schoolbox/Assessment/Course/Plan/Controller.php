@@ -113,6 +113,10 @@ class Controller extends Base
 
         /**
          * for each unit, generate the data...
+         *
+         * Maybe one day we can separate textboxData, assessments, rubricData, etc.
+         * into separate payloads to be accessed asynchronously via frontend and
+         * improve object cohesion somewhat, but this will suffice for now
          */
         foreach ($course->getUnits() as $unit) {
             /* Gather up the textboxes and extraTextboxes meta
