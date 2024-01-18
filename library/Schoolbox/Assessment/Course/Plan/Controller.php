@@ -369,18 +369,13 @@ class Controller extends Base
         /* Nodes from the capabilities and indicators needs their own prehydration
          */
         $curriculumNodes = $curriculumNodes->merge($this->nodeMapper->findByColumnList([
-            'id' => $rubricData['capabilityIds'],
-            'enabled' => 1
-        ]));
-
-        $curriculumNodes = $curriculumNodes->merge($this->nodeMapper->findByColumnList([
-            'id' => $rubricData['indicatorIds'],
+            'id' => array_merge($rubricData['capabilityIds'], $rubricData['indicatorIds']),
             'enabled' => 1
         ]));
 
         /* Unique this set
          */
-        $curriculumNodes = $curriculumNodes->getUnique('id')->indexBy('id');
+        $curriculumNodes = $curriculumNodes->indexBy('id');
 
         /* Remove any curriculum nodes that aren't enabled
          * Remove any curriculum nodes that have a meaningless code
