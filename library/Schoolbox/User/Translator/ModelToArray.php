@@ -177,8 +177,8 @@ class ModelToArray
             'lastName' => $linkedUser->getLastname(),
             'fullName' => $linkedUser->getFullName(),
             'role' => [
-                'id' => $role?->getId(),
-                'name' => $role?->getName()
+                'id' => $role->getId(),
+                'name' => $role->getName()
             ],
             'yearLevel' => [
                 'id' => $year?->getId(),
