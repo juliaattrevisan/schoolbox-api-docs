@@ -63,8 +63,8 @@ class Controller extends BaseController
     public function getStudent(string $registerCode, User $student): void
     {
         //tmpDebug options
-        $registerCode = "MCTS";
-        $collectionCode = "CoreAssignmentData";
+//        $registerCode = "MCTS";
+//        $collectionCode = "CoreAssignmentData";
 
         $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
 
@@ -81,7 +81,7 @@ class Controller extends BaseController
         }
 
         // we now have the correct register we are after
-        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $collectionCode);
+        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
         if (null === $recordCollection) {
             /**
              * Unable to find the specified Record Collections...
@@ -218,9 +218,9 @@ class Controller extends BaseController
      * Extract common config settings
      *
      *  Assumed structure of multi dimensional csv:
-     *  register1,field1,field2,field6
-     *  register2,field1
-     *  register6,field7,field12
+     *  register1,recordCollection3,field1,field2,field6
+     *  register2,recordCollection99,field1
+     *  register6,recordCollection2,field7,field12
      *
      * @param string $registerConfig a multi dimensional csv
      * @return array
@@ -230,12 +230,12 @@ class Controller extends BaseController
         $registersConfig = [];
         /**
          * Assumed structure of multi dimensional csv:
-         *   register1,field1,field2,field6
-         *   register2,field1
-         *   register6,field7,field12
+         *   register1,recordCollection3,field1,field2,field6
+         *   register2,recordCollection99,field1
+         *   register6,recordCollection2,field7,field12
          */
         // explode to find how many registers we will be working with...
-        foreach (preg_split('/\R/', strtolower($registerConfig)) as $config) {
+        foreach (preg_split('/\R/', $registerConfig) as $config) {
             // explode again to extract the registers, and their fields
             // first object entry is the register, later items are the allowed fields
             /**
@@ -244,8 +244,13 @@ class Controller extends BaseController
              * we may need a different seperator... ; maybe, or something else???
              */
             $tmp = explode(',', $config);
-            $registerTitle = array_shift($tmp);
-            $registersConfig[$registerTitle] = $tmp;
+            $registerCode = array_shift($tmp);
+            $registerCollection = array_shift($tmp);
+            $registersConfig[strtolower($registerCode)] = [
+                'register'          => $registerCode,
+                'recordCollection'  => $registerCollection,
+                'fields'            => $tmp
+            ];
         }
         return $registersConfig;
     }
@@ -284,6 +289,10 @@ class Controller extends BaseController
             foreach ($fieldMetadata as $metadata) {
                 //if the field exists then build it, else just continue
                 if (!isset($record['fields'][lcfirst($metadata['key'])])) {
+                    continue;
+                }
+                // if the field is not in the approved list, then build it, else continue
+                if (!in_array(lcfirst($metadata['key']), $config['fields'])) {
                     continue;
                 }
                 $knownFields[$metadata['key']] = $metadata['name'];
