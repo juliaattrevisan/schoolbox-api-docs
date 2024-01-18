@@ -162,31 +162,29 @@ class ModelToArray
      * @param User $linkedUser
      * @return array
      */
-    private function convertLinkedUser(User $linkedUser): ?array
+    private function convertLinkedUser(User $linkedUser): array
     {
         $role = $linkedUser->getRole();
         $year = $linkedUser->getYear();
 
-        return $linkedUser
-            ? [
-                'id' => $linkedUser->getId(),
-                'externalId' => $linkedUser->getId(),
-                'title' => $linkedUser->getTitle(),
-                'firstName' => $linkedUser->getFirstname(),
-                'preferredName' => $linkedUser->getPreferredName(),
-                'givenName' => $linkedUser->getGivenName(),
-                'lastName' => $linkedUser->getLastname(),
-                'fullName' => $linkedUser->getFullName(),
-                'role' => [
-                    'id' => $role?->getId(),
-                    'name' => $role?->getName()
-                ],
-                'yearLevel' => [
-                    'id' => $year?->getId(),
-                    'name' => $year?->getName()
-                ]
+        return [
+            'id' => $linkedUser->getId(),
+            'externalId' => $linkedUser->getId(),
+            'title' => $linkedUser->getTitle(),
+            'firstName' => $linkedUser->getFirstname(),
+            'preferredName' => $linkedUser->getPreferredName(),
+            'givenName' => $linkedUser->getGivenName(),
+            'lastName' => $linkedUser->getLastname(),
+            'fullName' => $linkedUser->getFullName(),
+            'role' => [
+                'id' => $role?->getId(),
+                'name' => $role?->getName()
+            ],
+            'yearLevel' => [
+                'id' => $year?->getId(),
+                'name' => $year?->getName()
             ]
-            : null;
+        ];
     }
 
     /**
