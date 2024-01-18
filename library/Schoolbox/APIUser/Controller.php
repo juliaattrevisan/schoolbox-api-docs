@@ -336,10 +336,10 @@ class Controller extends Base
         /**
          * impersonatable users
          */
-        if (array_key_exists('impersonableUser', $data)) {
-            $impersonate = $data['impersonableUser'];
+        if (array_key_exists('impersonableUsers', $data)) {
+            $impersonate = $data['impersonableUsers'];
             if (!is_array($impersonate)) {
-                throw new SchoolboxException("impersonableUser must be an array");
+                throw new SchoolboxException("impersonableUsers must be an array");
             }
             $impersonateCollection = new GenericCollection(User::class);
             foreach ($impersonate as $userEntry) {
@@ -355,8 +355,8 @@ class Controller extends Base
                     throw new SchoolboxException("Impersonate User '$userId' Not Found or has been Deleted");
                 }
             }
-            $data['linkedUser'] = $impersonateCollection;
-            unset($data['impersonableUser']);
+            $data['linkedUsers'] = $impersonateCollection;
+            unset($data['impersonableUsers']);
         }
 
         /**

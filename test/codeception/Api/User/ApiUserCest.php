@@ -164,7 +164,7 @@ class ApiUserCest
             'yearLevel'        => [
                 'id' => 1,
             ],
-            'impersonableUser' => [
+            'impersonableUsers' => [
                 [
                     'id' => 22,
                 ],

@@ -54,7 +54,7 @@ class ModelToArrayTest extends TestCase
             'schoolHouse'      => null,
             'guardians'        => null,
             'students'         => null,
-            'impersonableUser' => null,
+            'impersonableUsers' => null,
             'email'            => null,
             '_links'           => [],
             'externalId'       => null,
@@ -155,7 +155,7 @@ class ModelToArrayTest extends TestCase
                 ],
                 'guardians'        => null,
                 'students'         => null,
-                'impersonableUser' => null,
+                'impersonableUsers' => null,
                 'email'            => 'mrjohndoe@mail.com',
                 '_links'           => [
                     'profile' => '/search/user/1',
