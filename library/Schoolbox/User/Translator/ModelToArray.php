@@ -37,6 +37,12 @@ class ModelToArray
      */
     public function __invoke(User $user, $groups = null): array
     {
+        $linkedUsersConverted = [];
+
+        foreach ($user->getLinkedUsers() as $linkedUser) {
+            $linkedUsersConverted[] = $this->convertLinkedUser($linkedUser);
+        }
+
         return [
             'id'     => $user->getId(),
             'campus' => $user->getCampusCollection()
@@ -54,12 +60,7 @@ class ModelToArray
             'guardians'        => $user->getParents(),
             'students'         => $user->getChildren(),
 
-            // Call reindex() to convert from Collection to Array, and drop keys.  Keys are dropped because the key data
-            // is also contained in the array elements, and to ensure that the JSON container will be an array instead of
-            // an object.
-            // E.g. We want    JSON like this: [{id: 123, ...}, {id: 456, ...}]
-            //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
-            'impersonableUsers' => $user->getLinkedUsers()?->reindex(),
+            'impersonableUsers' => $linkedUsersConverted,
 
             'email'          => $user->getEmail(),
             '_links'         => $this->deriveLinks($user),
@@ -90,7 +91,6 @@ class ModelToArray
         ];
     }
 
-
     /**
      * Helper for converting a campus into an array.
      *
@@ -106,7 +106,6 @@ class ModelToArray
             'days' => $campus->getTimetableDay(),
         ];
     }
-
 
     /**
      * Helper for converting a role into an array.
@@ -124,7 +123,6 @@ class ModelToArray
             ]
             : null;
     }
-
 
     /**
      * Helper for converting a school house into an array.
@@ -158,6 +156,38 @@ class ModelToArray
             : null;
     }
 
+    /**
+     * Helper for converting a linked user into an array.
+     *
+     * @param User $linkedUser
+     * @return array
+     */
+    private function convertLinkedUser(User $linkedUser): ?array
+    {
+        $role = $linkedUser->getRole();
+        $year = $linkedUser->getYear();
+
+        return $linkedUser
+            ? [
+                'id' => $linkedUser->getId(),
+                'externalId' => $linkedUser->getId(),
+                'title' => $linkedUser->getTitle(),
+                'firstName' => $linkedUser->getFirstname(),
+                'preferredName' => $linkedUser->getPreferredName(),
+                'givenName' => $linkedUser->getGivenName(),
+                'lastName' => $linkedUser->getLastname(),
+                'fullName' => $linkedUser->getFullName(),
+                'role' => [
+                    'id' => $role?->getId(),
+                    'name' => $role?->getName()
+                ],
+                'yearLevel' => [
+                    'id' => $year?->getId(),
+                    'name' => $year?->getName()
+                ]
+            ]
+            : null;
+    }
 
     /**
      * Derive links for this user.
