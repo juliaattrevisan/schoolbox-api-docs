@@ -1,8 +1,11 @@
 {% set createRoute -%}
     {{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: context.id, contextType: contextType, context: context }) -}}
 {%- endset %}
+
 {% if createRoute and assessmentType  %}
-    {% set createRouteType = createRoute ~ '?type=' ~ assessmentType -%}
+    {%- set createRouteType -%}
+        {{ createRoute }}?type={{ assessmentType }}&{{ RETURN_URL.name }}={{ RETURN_URL.current }}
+    {%- endset -%}
 {% endif %}
 
 <div id="assessment-empty-state-{{ component_id }}" class="empty-state {% if assessables is not empty %}hide{% endif %}">
