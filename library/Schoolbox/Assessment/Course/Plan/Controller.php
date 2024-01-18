@@ -143,10 +143,8 @@ class Controller extends Base
             $rubricCapabilities = $rubricData['used']['capabilities'];
 
             /* Curriculum nodes
-             *     - Find all the capability nodes and indicator nodes
-             *     - Find all the assessment nodes
-             *     - Merge them together
-             *     _ Unique that list
+             * A unique set of curricluum nodes collated from various places:
+             * folders, assessments, capabilities and indicators
              */
             $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
 
