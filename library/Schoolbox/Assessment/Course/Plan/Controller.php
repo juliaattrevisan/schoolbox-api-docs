@@ -34,10 +34,10 @@ class Controller extends Base
     /**
      * A repeatable query used for every Unit in the Unit Planner
      *
-     * @var IQuery
+     * @var \Alaress\Database\Statement\Query\Base|IQuery
      */
-    private IQuery $textboxStatement;
-    private IQuery $rubricStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $textboxStatement;
+    private \Alaress\Database\Statement\Query\Base|IQuery $rubricStatement;
 
 
     /**
@@ -138,6 +138,16 @@ class Controller extends Base
              */
             $rubricCapabilities = ['used'];
 
+            /* Curriculum nodes
+             *     - Find all the capability nodes and indicator nodes
+             *     - Find all the assessment nodes
+             *     - Merge them together
+             *     _ Unique that list
+             */
+            foreach ($rubricData['capabilityIds'] as $nodeId) {
+//                $this->nodeMapper->loadAncestors()
+            }
+
 //            $rubricCapabilities = [];
 //
 //            $rubrics = $this->rubricIndicatorMapper->findForFolder($unit->getFolder()->getId());
@@ -168,25 +178,26 @@ class Controller extends Base
 //            foreach ($assessments as $assessment) {
 //                $this->extractCurricNodes($curriculumNodes, $assessment);
 //            }
+//
+//            /**
+//             * Duped code from library/Schoolbox/Curriculum/Component/CurriculumOverviewController.php
+//             * as we are needing the same tree format as that component.
+//             */
+//            // make sure that the node or node's ancestors do not already in the list
+//            // to avoid same hierarchy appears twice in the component
+//            $selectedNodeIds = $curriculumNodes->getPropertyValues('id');
+//            foreach ($curriculumNodes as $offset => $node) {
+//                $this->nodeMapper->loadAncestors($node);
+//                $ancestorIds = $this->getAllAncestorIds($node);
+//                $diff        = array_diff($ancestorIds, $selectedNodeIds);
+//                if (count($diff) !== count($ancestorIds)) {
+//                    $curriculumNodes->offsetUnset($offset);
+//                }
+//            }
+//
+//            Node\Mapper::sortNodes($curriculumNodes, 0);
 
-            /**
-             * Duped code from library/Schoolbox/Curriculum/Component/CurriculumOverviewController.php
-             * as we are needing the same tree format as that component.
-             */
-            // make sure that the node or node's ancestors do not already in the list
-            // to avoid same hierarchy appears twice in the component
-            $selectedNodeIds = $curriculumNodes->getPropertyValues('id');
-            foreach ($curriculumNodes as $offset => $node) {
-                $this->nodeMapper->loadAncestors($node);
-                $ancestorIds = $this->getAllAncestorIds($node);
-                $diff        = array_diff($ancestorIds, $selectedNodeIds);
-                if (count($diff) !== count($ancestorIds)) {
-                    $curriculumNodes->offsetUnset($offset);
-                }
-            }
-
-            Node\Mapper::sortNodes($curriculumNodes, 0);
-
+//            $nodes = $curriculumNodes->getUnique('id');
             /* Aggregated data for each unit appears as a row in the Unit Planner
              * on the front end - this is basically the contract between back- and
              * front-end implementations and the basis of an api-first philosophy
@@ -216,7 +227,7 @@ class Controller extends Base
                 /* All the unique curriculum nodes that are in use by all the assessment specs
                  * in this unit
                  */
-                'curriculumCodes' => $curriculumNodes->getUnique('id')
+                'curriculumCodes' => new Collection()
             ];
 
             // add this units data to the whole course units collection.
