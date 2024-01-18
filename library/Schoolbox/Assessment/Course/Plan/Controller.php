@@ -78,10 +78,10 @@ class Controller extends Base
          */
         $this->rubricStatement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
             SELECT 
-                rc.id AS 'capability_id',
-                rc.name AS 'capability_name',
-                ri.id AS 'indicator_id',
-                ri.name AS 'indicator_name'
+                rc.id AS capability_id,
+                rc.name AS capability_name,
+                ri.id AS indicator_id,
+                ri.name AS indicator_name
             FROM course_unit_specification cus
             INNER JOIN assessment_course_unit_specification acus ON cus.id = acus.course_unit_specification_id
             INNER JOIN submission_box sb ON acus.assessment_id = sb.assessment_id
@@ -105,7 +105,7 @@ class Controller extends Base
      * @throws InvalidColumnException
      * @throws \DomainException
      * @throws \LogicException
-     * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function getPlan(CourseSpecification $course): void
     {
