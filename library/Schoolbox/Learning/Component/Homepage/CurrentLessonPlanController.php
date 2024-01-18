@@ -15,15 +15,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 
 class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
 {
-    // Should match the DB value
-    private const RANGE_DEFAULT = 0;
-    private const RANGE_WEEK = 4;
-    private const RANGE_MONTH = 5;
-
-    private const N_DAYS_IN_ONE_WEEK = 7;
-
     /**
-     * The number of days to find lesson plans either side of today
+     * The value of the selected option from the date range selector in the component config UI.
      *
      * @var int
      */
@@ -76,28 +69,7 @@ class CurrentLessonPlanController extends Component_Homepage_ControllerAbstract
         // Record if we have courses, for use later
         $this->hasCourses = $courses->count() >= 1;
 
-        $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
-
-        $now = \Alaress_Date_Format::now();
-
-        switch ($this->range) {
-            case self::RANGE_WEEK:
-                // The date range is defined as within the current week (with start day defined as config->calendar_start_day).
-                $weekStartDayOfWeek = $this->getConfigLoader()->get('calendar_start_day');
-                $dateStart = ($now->getWeekDayNumber() === $weekStartDayOfWeek) ? $now->startOfDay() : $now->previous((int)$weekStartDayOfWeek);
-                $dateEnd = new \Alaress_Date_Format($dateStart->getDatabaseDate(), \Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                $dateEnd->addDays(self::N_DAYS_IN_ONE_WEEK - 1);
-                break;
-            case self::RANGE_MONTH:
-                // The date range is defined as within the current month.
-                $dateStart = $now->startOfMonth();
-                $dateEnd = $now->endOfMonth();
-                break;
-            default:
-                // The date range is defined as $this->range days either side of the current date inclusive.
-                $dateStart = $now->startOfDay()->addDays(-$this->range);
-                $dateEnd = $now->endOfDay()->addDays($this->range);
-        }
+        [$this->range, $dateStart, $dateEnd] = $this->getDateStartAndEndFromRangeOptionValue($this->getConfig('range'));
 
         $publishDate = \Alaress_Date_Format::now();
 
