@@ -271,7 +271,7 @@ class Payload
 
             /* We don't need their raw data anymore
              */
-            unset($unitSpec['candidates']);
+            // unset($unitSpec['candidates']);
         }
 
         return $stack;
