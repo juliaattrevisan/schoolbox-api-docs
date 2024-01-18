@@ -143,7 +143,7 @@ class Controller extends Base
             $rubricCapabilities = $rubricData['used']['capabilities'];
 
             /* Curriculum nodes
-             * A unique set of curricluum nodes collated from various places:
+             * A unique set of curriculum nodes collated from various places:
              * folders, assessments, capabilities and indicators
              */
             $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
@@ -155,7 +155,7 @@ class Controller extends Base
             $unitOut = [
                 'id' => $unit->getId(),
                 'title' => $unit->getTitle(),
-                'homepage' => "/homepage/" . $unit->getFolder()->getId(),
+                'homepage' => "/homepage/{$unit->getFolder()->getId()}",
                 /* Textboxes in the Unit that circumstantially match ones in the Template
                  */
                 'textboxes' => $textboxData['textboxes'],
