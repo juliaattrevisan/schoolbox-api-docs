@@ -59,7 +59,7 @@ class ModelToArray
             // an object.
             // E.g. We want    JSON like this: [{id: 123, ...}, {id: 456, ...}]
             //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
-            'impersonableUsers' => $user->getLinkedUsers()->reindex(),
+            'impersonableUsers' => $user->getLinkedUsers()?->reindex(),
 
             'email'          => $user->getEmail(),
             '_links'         => $this->deriveLinks($user),
