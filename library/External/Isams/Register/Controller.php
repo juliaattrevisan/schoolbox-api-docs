@@ -19,6 +19,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Twig\Error\Error;
@@ -36,8 +37,13 @@ class Controller extends BaseController
      * @param HttpClient $httpClient for querying iSams
      * @param CacheInterface $cache for caching the api response
      */
-    public function __construct(private HttpClient $httpClient, private CacheInterface $cache)
+    public function __construct(private HttpClient $httpClient, private CacheInterface $cache, IConfigLoader $configLoader)
     {
+        // check if we have a valid register code
+        // Hit the iSams API:
+        $apiUrl = new Uri($configLoader->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
+        // first, need to exchange client id/secret for an access token
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $configLoader, $apiUrl);
     }
 
     /**
@@ -59,12 +65,6 @@ class Controller extends BaseController
         //tmpDebug options
         $registerCode = "MCTS";
         $collectionCode = "CoreAssignmentData";
-
-        // check if we have a valid register code
-        // Hit the iSams API:
-        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
-        // first, need to exchange client id/secret for an access token
-        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
 
         $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '';
 
@@ -251,13 +251,6 @@ class Controller extends BaseController
         $registerCode = "MCTS";
         $collectionCode = "CoreAssignmentData";
         $studentExternalId = "152840864613";
-
-        // check if we have a valid register code
-        // Hit the iSams API:
-        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
-        // first, need to exchange client id/secret for an access token
-        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
-
 
         $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
         if (null === $register) {
