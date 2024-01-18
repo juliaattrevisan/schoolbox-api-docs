@@ -5,6 +5,7 @@
 
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
+import { removeClasses } from "@js/util/domUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
@@ -129,6 +130,10 @@ window.Vue.onMounted(() => {
         const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
         const response = props.container.querySelector(selector) as HTMLDivElement;
         responsesEl.value?.appendChild(response);
+        // hide any incorrect/correct styling if we're not showing feedback
+        if (!props.showFeedback) {
+            removeClasses(response, ["lrn_incorrect", "lrn_correct"]);
+        }
         score.value = props.question.response.score?.toString() ?? "";
         /**
          * Replace video placeholders with actual player when the ui has loaded,
