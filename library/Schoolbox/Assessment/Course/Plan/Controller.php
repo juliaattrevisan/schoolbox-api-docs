@@ -140,7 +140,7 @@ class Controller extends Base
             /* TODO Later on we can provide a list of rubrics that exist in the whole course
              *  and diff them in some way so users can see what they haven't planned properly
              */
-            $rubricCapabilities = $rubricData['used'];
+            $rubricCapabilities = $rubricData['used']['capabilities'];
 
             /* Curriculum nodes
              *     - Find all the capability nodes and indicator nodes
@@ -290,12 +290,20 @@ class Controller extends Base
          *  so users can compare it against the ones that *were* fulfilled (a diff between them)
          */
         $rubrics = [
-            'available' => [],
-            'used' => [],
-            /* Cross-referencing for fetching curriculum nodes separately
-             */
-            'capabilityIds' => [],
-            'indicatorIds' => []
+            'available' => [
+                'capabilities' => [],
+                /* Cross-referencing for fetching curriculum nodes separately
+                 */
+                'capabilityIds' => [],
+                'indicatorIds' => []
+            ],
+            'used' => [
+                'capabilities' => [],
+                /* Cross-referencing for fetching curriculum nodes separately
+                 */
+                'capabilityIds' => [],
+                'indicatorIds' => []
+            ],
         ];
 
         $this->rubricStatement->execute([
@@ -312,19 +320,19 @@ class Controller extends Base
 
             /* Cross-referencing for fetching curriculum nodes separately
              */
-            $rubrics['capabilityIds'][$capabilityId] = $capabilityId;
-            $rubrics['indicatorIds'][$indicatorId] = $indicatorId;
+            $rubrics['used']['capabilityIds'][$capabilityId] = $capabilityId;
+            $rubrics['used']['indicatorIds'][$indicatorId] = $indicatorId;
 
             /* Initialise it, if it hasn't already existed
              */
-            if (!isset($rubrics['used'][$capabilityId])) {
-                $rubrics['used'][$capabilityId] = [
+            if (!isset($rubrics['used']['capabilities'][$capabilityId])) {
+                $rubrics['used']['capabilities'][$capabilityId] = [
                     'name' => Scrub::markdown($row['capability_name']),
                     'indicators' => []
                 ];
             }
 
-            $rubrics['used'][$capabilityId]['indicators'][$indicatorId] = [
+            $rubrics['used']['capabilities'][$capabilityId]['indicators'][$indicatorId] = [
                 'name' => Scrub::markdown($row['indicator_name'])
             ];
         }
@@ -372,8 +380,8 @@ class Controller extends Base
          */
         $query = [];
 
-        if (\count($rubricData['capabilityIds'])) {
-            $capabilityIds = implode(',', $rubricData['capabilityIds']);
+        if (\count($rubricData['used']['capabilityIds'])) {
+            $capabilityIds = implode(',', $rubricData['used']['capabilityIds']);
 
             $query[] = "
                 SELECT curriculum_node_id
@@ -382,8 +390,8 @@ class Controller extends Base
             ";
         }
 
-        if (\count($rubricData['indicatorIds'])) {
-            $indicatorIds = implode(',', $rubricData['indicatorIds']);
+        if (\count($rubricData['used']['indicatorIds'])) {
+            $indicatorIds = implode(',', $rubricData['used']['indicatorIds']);
 
             $query[] = "
                 SELECT curriculum_node_id
