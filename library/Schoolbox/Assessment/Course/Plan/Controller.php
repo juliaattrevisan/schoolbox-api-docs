@@ -37,6 +37,7 @@ class Controller extends Base
      * @var IQuery
      */
     private IQuery $textboxStatement;
+    private IQuery $rubricStatement;
 
 
     /**
@@ -74,6 +75,24 @@ class Controller extends Base
             AND textBox.categoryID = :folderId
             ORDER BY textBox.updated_at
         ");
+
+        $this->rubricStatement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("
+            SELECT 
+                rc.id AS 'capability_id',
+                rc.name AS 'capability_name',
+                ri.id AS 'indicator_id',
+                ri.name AS 'indicator_name'
+            FROM course_unit_specification cus
+            INNER JOIN assessment_course_unit_specification acus ON cus.id = acus.course_unit_specification_id
+            INNER JOIN submission_box sb ON acus.assessment_id = sb.assessment_id
+            INNER JOIN rubric_indicator_usage riu ON sb.id = riu.submission_box_id
+            INNER JOIN rubric_indicator ri ON riu.rubric_indicator_id = ri.id
+            INNER JOIN rubric_capability rc ON ri.rubric_capability_id = rc.id
+            WHERE cus.folder_id = :unitFolderId
+            AND rc.deleted_at IS NULL
+            AND ri.deleted_at IS NULL
+            ORDER BY rc.id, riu.sequence, ri.name
+        ");
     }
 
 
@@ -110,36 +129,38 @@ class Controller extends Base
             $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), $options);
 
             // grab rubric info
-            $rubricCapabilities = [];
+            $rubricCapabilities = $this->findRubrics($unit->getFolder()->getId());
 
-            $rubrics = $this->rubricIndicatorMapper->findForFolder($unit->getFolder()->getId());
-            $rubric = $rubrics->groupByCallback(function (RubricIndicatorModel $rubric) {
-                return $rubric->getCapability()->getName();
-            });
+//            $rubricCapabilities = [];
+//
+//            $rubrics = $this->rubricIndicatorMapper->findForFolder($unit->getFolder()->getId());
+//            $rubric = $rubrics->groupByCallback(function (RubricIndicatorModel $rubric) {
+//                return $rubric->getCapability()->getName();
+//            });
+//
+//            // parse each rubric group and jsonify each of them
+//            foreach ($rubric as $group => $indicators) {
+//                $rubricCapabilities[] = [
+//                    'id' => $indicators->first()->getCapability()->getId(),
+//                    'name' => Scrub::markdown($indicators->first()->getCapability()->getName()),
+//                    'indicators' => $indicators->map(new IndicatorModelToArray())
+//                ];
+//            }
 
-            // parse each rubric group and jsonify each of them
-            foreach ($rubric as $group => $indicators) {
-                $rubricCapabilities[] = [
-                    'id' => $indicators->first()->getCapability()->getId(),
-                    'name' => Scrub::markdown($indicators->first()->getCapability()->getName()),
-                    'indicators' => $indicators->map(new IndicatorModelToArray())
-                ];
-            }
-
-            // Curriculum Overview
-            // collate curriculum data
-            $curriculumNodes = $this->nodeMapper->createCollection();
-            $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
-
-            foreach ($rubrics as $rubric) {
-                $this->extractCurricNodes($curriculumNodes, $rubric);
-                // extract for the parent rubricCapabilities also.
-                $this->extractCurricNodes($curriculumNodes, $rubric->getCapability());
-            }
-
-            foreach ($assessments as $assessment) {
-                $this->extractCurricNodes($curriculumNodes, $assessment);
-            }
+//            // Curriculum Overview
+//            // collate curriculum data
+//            $curriculumNodes = $this->nodeMapper->createCollection();
+//            $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
+//
+//            foreach ($rubrics as $rubric) {
+//                $this->extractCurricNodes($curriculumNodes, $rubric);
+//                // extract for the parent rubricCapabilities also.
+//                $this->extractCurricNodes($curriculumNodes, $rubric->getCapability());
+//            }
+//
+//            foreach ($assessments as $assessment) {
+//                $this->extractCurricNodes($curriculumNodes, $assessment);
+//            }
 
             /**
              * Duped code from library/Schoolbox/Curriculum/Component/CurriculumOverviewController.php
@@ -280,16 +301,42 @@ class Controller extends Base
      * Later on we can augment this with all the unique rubric capabilities and
      * indicators that exist in a course; not just the ones in use.
      *
+     * @param int $unitFolderId
      * @return array
+     * @throws Exception
      */
-
-    private function findRubrics(): array
+    private function findRubrics(int $unitFolderId): array
     {
         $rubrics = [
             'available' => [],
             'used' => []
         ];
 
+        $this->rubricStatement->execute([
+            'unitFolderId' => $unitFolderId
+        ]);
+
+        /* Accumulate a unique set of capabilities and indicators
+         *
+         * Note that capabilities/indicators can be markdown stuff
+         */
+        while ($row = $this->rubricStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $capabilityId = $row['capability_id'];
+            $indicatorId = $row['indicator_id'];
+
+            /* Initialise it, if it hasn't already existed
+             */
+            if (!isset($stack[$capabilityId])) {
+                $stack[$capabilityId] = [
+                    'name' => Scrub::markdown($row['capability_name']),
+                    'indicators' => []
+                ];
+            }
+
+            $stack[$capabilityId]['indicators'][$indicatorId] = [
+                'name' => Scrub::markdown($row['indicator_name'])
+            ];
+        }
 
         return $rubrics;
     }
