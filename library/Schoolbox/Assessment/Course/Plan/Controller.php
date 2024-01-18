@@ -128,8 +128,15 @@ class Controller extends Base
             $options = ['order' => ['sequence' => 'ASC']];
             $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), $options);
 
-            // grab rubric info
-            $rubricCapabilities = $this->findRubrics($unit->getFolder()->getId());
+            /* Get a set of rubrics that were used among all the assessment specs
+             * This also comes with all the cap ids and indicator ids
+             */
+            $rubricData = $this->findRubrics($unit->getFolder()->getId());
+
+            /* TODO Later on we can provide a list of rubrics that exist in the whole course
+             *  and diff them in some way so users can see what they haven't planned properly
+             */
+            $rubricCapabilities = ['used'];
 
 //            $rubricCapabilities = [];
 //
@@ -316,9 +323,16 @@ class Controller extends Base
      */
     private function findRubrics(int $unitFolderId): array
     {
+        /* TODO Add a list of all the rubric caps and inds that *should* have been fulfilled
+         *  so users can compare it against the ones that *were* fulfilled (a diff between them)
+         */
         $rubrics = [
             'available' => [],
-            'used' => []
+            'used' => [],
+            /* Cross-referencing for fetching curriculum nodes separately
+             */
+            'capabilityIds' => [],
+            'indicatorIds' => []
         ];
 
         $this->rubricStatement->execute([
@@ -333,16 +347,21 @@ class Controller extends Base
             $capabilityId = $row['capability_id'];
             $indicatorId = $row['indicator_id'];
 
+            /* Cross-referencing for fetching curriculum nodes separately
+             */
+            $rubrics['capabilityIds'][] = $capabilityId;
+            $rubrics['indicatorIds'][] = $indicatorId;
+
             /* Initialise it, if it hasn't already existed
              */
-            if (!isset($stack[$capabilityId])) {
-                $stack[$capabilityId] = [
+            if (!isset($rubrics['used'][$capabilityId])) {
+                $rubrics['used'][$capabilityId] = [
                     'name' => Scrub::markdown($row['capability_name']),
                     'indicators' => []
                 ];
             }
 
-            $stack[$capabilityId]['indicators'][$indicatorId] = [
+            $rubrics['used'][$capabilityId]['indicators'][$indicatorId] = [
                 'name' => Scrub::markdown($row['indicator_name'])
             ];
         }
