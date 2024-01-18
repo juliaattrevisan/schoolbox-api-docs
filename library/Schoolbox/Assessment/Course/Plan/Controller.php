@@ -122,7 +122,7 @@ class Controller extends Base
         foreach ($course->getUnits() as $unit) {
             /* Gather up the textboxes and extraTextboxes meta
              */
-            $textboxData = $this->findTextboxes($course->getTemplate()->getUnitTemplate()->getId(), $unit->getFolder()->getId());
+            $textboxData = $this->findTextboxes($course->getTemplate()?->getUnitTemplate()->getId(), $unit->getFolder()->getId());
 
             // Learning Activities
             $options = ['order' => ['sequence' => 'ASC']];
@@ -226,14 +226,23 @@ class Controller extends Base
      * (A count of extraneous textboxes outside of the ones specified by $unitTemplateId
      * is thrown into extraTextboxes)
      *
-     * @param int $unitTemplateId
+     * @param int|null $unitTemplateId|null
      * @param int $unitFolderId
      * @return array
      * @throws Exception
      * @throws \DomainException
      */
-    private function findTextboxes(int $unitTemplateId, int $unitFolderId): array
+    private function findTextboxes(?int $unitTemplateId, int $unitFolderId): array
     {
+        /* In case the course wasn't hydrated with all the parts
+         */
+        if (null === $unitTemplateId) {
+            return [
+                'textboxes' => [],
+                'extraTextboxes' => 0
+            ];
+        }
+
         /**
          * Grab the list of textboxes from the Unit Template
          */
