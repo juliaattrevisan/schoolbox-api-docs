@@ -4,7 +4,7 @@
 
 {% if createRoute and assessmentType  %}
     {%- set createRouteType -%}
-        {{ createRoute }}?type={{ assessmentType }}&{{ RETURN_URL.name }}={{ RETURN_URL.current }}
+        {{ createRoute }}?type={{ assessmentType }}{% if returnUrl %}&{{ RETURN_URL.name }}={{ returnUrl }}{% endif %}
     {%- endset -%}
 {% endif %}
 
