@@ -4,6 +4,28 @@
  */
 
 /**
+ * Remove classes from the target element and any descendants
+ * @param {HTMLElement} element - the target element
+ * @param {string[]} classNames - the classes to remove
+ */
+export function removeClasses(element: HTMLElement, classNames: string[]) {
+    // Remove classes from the target element
+    classNames.forEach((className) => {
+        if (element.classList.contains(className)) {
+            element.classList.remove(className);
+        }
+    });
+    // Remove classes from all descendants
+    element.querySelectorAll("*").forEach((descendant) => {
+        classNames.forEach((className) => {
+            if (descendant.classList.contains(className)) {
+                descendant.classList.remove(className);
+            }
+        });
+    });
+}
+
+/**
  * Search an elements classList and remove any classes that contain the search reference
  * @param {HTMLElement} element - the DOM element to apply the removals to
  * @param {string} search - the string to search for
