@@ -184,7 +184,10 @@ class Controller extends Base
             $units[] = $unitOut;
         }
 
-        $this->response = $this->responseFromTemplate('@coursePlan/index.twig', ['course' => $course, 'units' => $units], 'Unit Planner');
+        $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
+            'course' => $course,
+            'units' => $units
+        ], "Unit Planner - {$course->getTitle()}");
     }
 
 
