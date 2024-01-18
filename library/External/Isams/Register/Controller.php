@@ -20,6 +20,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception as SchoolboxException;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Twig\Error\Error;
@@ -218,21 +219,22 @@ class Controller extends BaseController
      * Extract common config settings
      *
      *  Assumed structure of multi dimensional csv:
-     *  register1,recordCollection3,field1,field2,field6
-     *  register2,recordCollection99,field1
-     *  register6,recordCollection2,field7,field12
+     *  register1;recordCollection3;field1,field2,field6
+     *  register2;recordCollection99;field1
+     *  register6;recordCollection2;field7,field12
      *
      * @param string $registerConfig a multi dimensional csv
      * @return array
+     * @throws SchoolboxException
      */
     private function extractRegisterConfig(string $registerConfig): array
     {
         $registersConfig = [];
         /**
          * Assumed structure of multi dimensional csv:
-         *   register1,recordCollection3,field1,field2,field6
-         *   register2,recordCollection99,field1
-         *   register6,recordCollection2,field7,field12
+         *   register1;recordCollection3;field1,field2,field6
+         *   register2;recordCollection99;field1
+         *   register6;recordCollection2;field7,field12
          */
         // explode to find how many registers we will be working with...
         foreach (preg_split('/\R/', $registerConfig) as $config) {
@@ -241,15 +243,19 @@ class Controller extends BaseController
             /**
              * this explode on `,` may really break... we haven't seen any codes with comma's in them just yet...
              * but that doesn't mean they don't exist
-             * we may need a different seperator... ; maybe, or something else???
+             * we may need to go to a dns and suds like config page
              */
-            $tmp = explode(',', $config);
-            $registerCode = array_shift($tmp);
-            $registerCollection = array_shift($tmp);
+            $tmp = explode(';', $config);
+            //if we dont have 3 and exactly 3 items in this config, exit and error.
+            if (3 !== count($tmp)) {
+                throw new SchoolboxException("iSAMAS Register Config Invalid");
+            }
+            $registerCode = $tmp[0];
+            $registerCollection = $tmp[1];
             $registersConfig[strtolower($registerCode)] = [
                 'register'          => $registerCode,
                 'recordCollection'  => $registerCollection,
-                'fields'            => $tmp
+                'fields'            => explode(',', $tmp[2])
             ];
         }
         return $registersConfig;
