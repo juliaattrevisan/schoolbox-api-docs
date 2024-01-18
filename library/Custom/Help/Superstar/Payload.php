@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 
 class Payload
@@ -316,7 +317,7 @@ class Payload
             INNER JOIN userAccess ua ON f1.id = ua.sid
             INNER JOIN `user` u ON ua.uid = u.id
             LEFT JOIN project_result prc ON p.assessment_id = prc.project_id AND uid = prc.user_id 
-            WHERE ci.course_specification_id = 34
+            WHERE ci.course_specification_id = :courseId
             AND cui.deleted_at IS NULL
             AND cus.deleted_at IS NULL
             AND f0.deleted_at IS NULL
@@ -328,17 +329,17 @@ class Payload
             AND fc.deleted_at IS NULL
             AND fc.code IS NOT NULL
             AND u.group_id IN ({$validGroupTypeIds})
-            AND ua.service = 1
-            AND ua.type = 1
-            AND p.assessment_id > 116060
-            AND p.assessment_id < 116140
+            AND ua.service = :service
+            AND ua.type = :accessLevel
             ORDER BY unit_spec_title, user_lastname, user_id
         ";
 
         $statement = $this->database->prepare($query);
 
         $statement->execute([
-            'courseId' => self::COURSE_ID
+            'courseId' => self::COURSE_ID,
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            'accessLevel' => UserAccess::ACCESS_READ
         ]);
 
         return $statement;
