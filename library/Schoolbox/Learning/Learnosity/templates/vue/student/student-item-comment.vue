@@ -116,13 +116,20 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div v-if="props.isReadOnly && props.item.questions[0].response?.comment !== undefined && props.item.questions[0].response?.comment !== ''">
+    <div
+        v-if="
+            props.isReadOnly &&
+            props.item.questions[0].response?.comment !== undefined &&
+            props.item.questions[0].response?.comment !== ''
+        "
+    >
         <label>Comment</label>
         <div v-html="props.item.questions[0].response.comment"></div>
     </div>
     <template v-else-if="!props.isReadOnly">
         <p class="meta">
-            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
+            on creation.
         </p>
         <textarea :id="editorId"></textarea>
         <div class="save-container l-grid">
