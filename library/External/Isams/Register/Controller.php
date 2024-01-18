@@ -56,12 +56,34 @@ class Controller extends BaseController
      */
     public function getStudent(string $registerCode, User $student): void
     {
+        //tmpDebug options
+        $registerCode = "MCTS";
+        $collectionCode = "CoreAssignmentData";
+
+        // check if we have a valid register code
+        // Hit the iSams API:
+        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
+        // first, need to exchange client id/secret for an access token
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
+
         $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '';
+
+        $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
+        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $collectionCode);
+
+        $usersData = [
+            [
+                'user' => $student,
+                'data' => $this->getUsersData([$student], $registerCode, $config),
+            ]
+        ];
 
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
             [
-                'studentData'   => $this->getUsersData([$student], $registerCode, $config), // need an array of students, dummy this here
+                'register' => $register,
+                'recordCollection' => $recordCollection,
+                'studentData'   => $usersData,
             ],
         );
     }
@@ -246,17 +268,8 @@ class Controller extends BaseController
         }
 
         // we now have the correct register we are after
-        $recordCollections = $this->cacheHelper->getRecordCollections($register['id']);
+        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $collectionCode);
 
-        $recordCollection = null;
-        foreach ($recordCollections as $collection) {
-            if (strtolower($collection['reportingKey']) !== strtolower($collectionCode)) {
-                // the requested register Ignoring...
-                continue;
-            }
-            $recordCollection = $collection;
-            break;
-        }
         if (null === $recordCollection) {
             /**
              * Unable to find the specified Record Collections...

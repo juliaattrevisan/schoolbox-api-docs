@@ -106,7 +106,7 @@ class CacheHelper
                         'client_secret' => $this->configLoader->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_CLIENT_SECRET),
                         'grant_type'    => 'client_credentials',
                         'scope'         => 'restapi',
-                    ]
+                    ],
                 ]
             );
 
@@ -161,6 +161,48 @@ class CacheHelper
                 continue;
             }
             return $register;
+        }
+        return null;
+    }
+
+    /**
+     * For a specified register ID, retrieve the RegisterCollection from Isams
+     *
+     * @param int         $registerId
+     * @param string|null $reportingKey RecordCollection.reportingKey (optional)
+     * @return array|null
+     * @throws ClientExceptionInterface if something went wrong fetching JWKS
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     */
+    public function getRecordCollections(int $registerId, ?string $reportingKey = null): ?array
+    {
+        $recordCollections = $this->cache->get(sprintf("isams_register_%s_recordCollections", $registerId));
+
+        if (!isset($recordCollections)) {
+            // This ought to be cacheable for a lot longer than student data
+            $apiResponseBody = $this->api->request(
+                '/Main/api/registers/' . $registerId . '/recordCollections',
+                'GET',
+                token: $this->getToken(),
+            );
+            $recordCollections = $apiResponseBody['recordCollections'];
+            $this->cache->set(sprintf("isams_register_%s_recordCollections", $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+        }
+
+        // not fetching a specific register, get everything
+        if (null === $reportingKey) {
+            return $recordCollections;
+        }
+
+        // only return the specified registerCollection reporting Key
+        foreach ($recordCollections as $collection) {
+            if (strtolower($collection['reportingKey']) !== strtolower($reportingKey)) {
+                // the requested register Ignoring...
+                continue;
+            }
+            return $collection;
         }
         return null;
     }
@@ -290,37 +332,6 @@ class CacheHelper
     /****
      * debug options
      */
-
-    /**
-     *
-     *
-     * @param int $registerId
-     * @return array|mixed
-     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
-     *                                  written to or read from cache
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     */
-    public function getRecordCollections(int $registerId)
-    {
-        $recordCollections = $this->cache->get(sprintf("isams_register_%s_recordCollections", $registerId));
-
-        if (!isset($recordCollections)) {
-            // This ought to be cacheable for a lot longer than student data
-            try {
-                $recordCollections = $this->api->request(
-                    '/Main/api/registers/' . $registerId . '/recordCollections',
-                    'GET',
-                    token: $this->getToken(),
-                );
-                $this->cache->set(sprintf("isams_register_%s_recordCollections", $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
-            } catch (ClientExceptionInterface $e) {
-                // No metadata exists for this field: that's okay
-                return  [];
-            }
-        }
-        return $recordCollections['recordCollections'];
-    }
-
 
     /**
      *
