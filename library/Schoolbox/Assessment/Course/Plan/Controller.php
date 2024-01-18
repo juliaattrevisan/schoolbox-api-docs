@@ -363,8 +363,8 @@ class Controller extends Base
 
             /* Cross-referencing for fetching curriculum nodes separately
              */
-            $rubrics['capabilityIds'][] = $capabilityId;
-            $rubrics['indicatorIds'][] = $indicatorId;
+            $rubrics['capabilityIds'][$capabilityId] = $capabilityId;
+            $rubrics['indicatorIds'][$indicatorId] = $indicatorId;
 
             /* Initialise it, if it hasn't already existed
              */
