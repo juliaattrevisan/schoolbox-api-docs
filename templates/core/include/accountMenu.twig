@@ -31,13 +31,13 @@
 
     <li><a class="icon-logout" href="/logout.php">Logout</a></li>
 </ul>
-{% if user.current.linkedUser is not empty or user.previous  %}
+{% if user.current.linkedUsers is not empty or user.previous  %}
     <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
         <li class="separator">Switch User</li>
 
         {% set previousUser = user.previous | default(null) %}
-        {% if user.current.linkedUser is not empty %}
-            {% for linkedUser in user.current.linkedUser %}
+        {% if user.current.linkedUsers is not empty %}
+            {% for linkedUser in user.current.linkedUsers %}
                 {% if not previousUser or previousUser.id != linkedUser.id %}
                 <li class="user">
                     <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
