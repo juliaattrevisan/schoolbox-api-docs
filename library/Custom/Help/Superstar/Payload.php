@@ -302,7 +302,6 @@ class Payload
                 f2.id AS folder_id,
                 f2.name AS school_name,
                 fc.code AS school_code,
-                prc.project_id AS project_id,
                 prc.norm_mark
             FROM course_implementation ci
             INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
@@ -313,20 +312,26 @@ class Payload
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
             INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
             INNER JOIN project p ON acui.assessment_id = p.assessment_id
-            LEFT JOIN project_result prc ON p.assessment_id = prc.project_id
-            LEFT JOIN `user` u ON prc.user_id = u.id           
-            WHERE ci.course_specification_id = :courseId
+            INNER JOIN assessment a ON p.assessment_id = a.id
+            INNER JOIN userAccess ua ON f1.id = ua.sid
+            INNER JOIN `user` u ON ua.uid = u.id
+            LEFT JOIN project_result prc ON p.assessment_id = prc.project_id AND uid = prc.user_id 
+            WHERE ci.course_specification_id = 34
             AND cui.deleted_at IS NULL
             AND cus.deleted_at IS NULL
             AND f0.deleted_at IS NULL
             AND p.deleted_at IS NULL
-            AND prc.deleted_at IS NULL
+            AND a.deleted_at IS NULL
             AND u.deleted_at IS NULL
             AND f1.deleted_at IS NULL
             AND f2.deleted_at IS NULL
             AND fc.deleted_at IS NULL
             AND fc.code IS NOT NULL
             AND u.group_id IN ({$validGroupTypeIds})
+            AND ua.service = 1
+            AND ua.type = 1
+            AND p.assessment_id > 116060
+            AND p.assessment_id < 116140
             ORDER BY unit_spec_title, user_lastname, user_id
         ";
 
