@@ -5311,11 +5311,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with Schoolbox\\\\Resource\\\\HomepageTemplate will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/HomepageConfigMapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Link\\:\\:getHidden\\(\\) should return bool but returns int\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Link.php

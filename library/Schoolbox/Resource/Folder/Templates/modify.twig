@@ -129,8 +129,10 @@
             $('[data-reset-homepage-content]').click(function(event) {
                 event.preventDefault();
 
-                var element = $(this);
-                $(this).confirmDialog({
+                let element = $(this);
+                let toast = $('#toaster');
+
+                element.confirmDialog({
                     format: 'html',
                     text: "Are you sure you wish to delete all content from this homepage? This includes:" +
                         "<ul>" +
@@ -150,9 +152,27 @@
                         "<li>Social Stream Posts</li>" +
                         "</ul>",
                     confirmEvent: function() {
-                        $.post('{{routeLookup('folder.postFolderReset', {id: folder.id}) }}').done(function() {
-                            window.location.href = '/homepage/{{ folder.getId }}';
+                        /* Activate indicator label
+                             */
+                        toast.toastActivate({
+                            text: "Resetting contents..."
                         });
+
+                        $.post('{{routeLookup('folder.postFolderReset', {id: folder.id}) }}')
+                            .done(function() {
+                                toast.toastTimeout({
+                                    text: 'Saved',
+                                    css: 'success'
+                                });
+
+                                window.location.href = '/homepage/{{ folder.getId }}';
+                            })
+                            .fail(function(response) {
+                                toast.toastTimeout({
+                                    text: 'Could not reset homepage contents.',
+                                    css: 'alert'
+                                });
+                            })
                     }
                 });
             });

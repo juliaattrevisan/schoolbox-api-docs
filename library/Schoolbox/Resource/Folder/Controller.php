@@ -878,13 +878,15 @@ class Controller extends BaseController
     }
 
 
-    /** @noinspection PhpUnused */
     /**
      * Reset folder content
      *
-     * @api POST /resource/folder/{id}/reset
      * @param Model $folder
+     * @throws DefinitionException
      * @throws MapperException
+     * @throws PDOException
+     * @throws \JsonException
+     * @api POST /resource/folder/{id}/reset
      */
     public function postFolderReset(Model $folder): void
     {
@@ -911,7 +913,7 @@ class Controller extends BaseController
         }
 
         $this->response = $this->responseAsJson(
-            json_encode(['result' => 'success'])
+            json_encode(['result' => 'success'], JSON_THROW_ON_ERROR)
         );
     }
 
