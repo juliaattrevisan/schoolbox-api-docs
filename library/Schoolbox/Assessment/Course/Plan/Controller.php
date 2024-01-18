@@ -418,32 +418,4 @@ class Controller extends Base
         }
         return $parentIds;
     }
-
-
-    /**
-     * Extract nodes from an object that has curriculum nodes
-     *
-     * @param Collection $curriculumNodes The collection to inject the identified nodes into
-     * @param object $object The object to extract the nodes out of. This should use the HasCurriculumNodes trait
-     * @return void
-     * @throws SchoolboxException
-     */
-    private function extractCurricNodes(Collection $curriculumNodes, object $object): void
-    {
-        // ensure the object we are attempting to extract curriculum codes actually has the required function.
-        if (!method_exists($object, 'getCurriculumNodes')) {
-            throw new SchoolboxException(sprintf("Object: %s does not have the `getCurriculumNodes` function.", get_class($object)));
-        }
-        // if there are no curriculum nodes, then just exit
-        if (null === $object->getCurriculumNodes()) {
-            return;
-        }
-        foreach ($object->getCurriculumNodes() as $node) {
-            if (!$node->getEnabled() || '' === $node->getCode()) {
-                continue;
-            }
-            $this->nodeMapper->loadDescendants($node);
-            $curriculumNodes->add($node);
-        }
-    }
 }
