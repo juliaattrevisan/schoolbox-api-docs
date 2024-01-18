@@ -203,7 +203,19 @@ class Controller extends Base
     }
 
 
-    private function findTextboxes(int $unitTemplateId, int $unitFolderId)
+    /**
+     * Find all the textboxes currently in use by $unitFolderId
+     *
+     * (A count of extraneous textboxes outside of the ones specified by $unitTemplateId
+     * is thrown into extraTextboxes)
+     *
+     * @param int $unitTemplateId
+     * @param int $unitFolderId
+     * @return array
+     * @throws Exception
+     * @throws \DomainException
+     */
+    private function findTextboxes(int $unitTemplateId, int $unitFolderId): array
     {
         /**
          * Grab the list of textboxes from the Unit Template
@@ -228,7 +240,6 @@ class Controller extends Base
             $textboxes[strtolower($heading)] = null;
             $textboxesKeys[strtolower($heading)] = $heading;
         }
-
 
         // fetch all for the folder
         /* Find all the textboxes in this Unit Spec that happens to match
