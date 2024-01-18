@@ -149,8 +149,8 @@ class UserMapper extends Mapper
         // Setup callbacks
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setDefaultDisplayGradeGraph']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidUsername']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidRole']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyHasCampus']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidFirstName']);
