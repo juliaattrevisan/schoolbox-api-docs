@@ -59,11 +59,14 @@ class Scanner
      */
     public function scan(string $filelocation): void
     {
-        $output = '';
-        $resultCode = 0;
+        $output = [];
+        $resultCode = null;
 
         exec(sprintf(
-            self::CLAMSCAN_COMMAND,
+            // Note '2>&1' redirects the output intended for stderr to stdout (so it will end up in the $output variable).
+            // Without this redirection, a message like 'sh: 1: clamdscan: not found' can appear in unwanted places.
+            // The message does not give any more information than the 127 return code.
+            self::CLAMSCAN_COMMAND . ' 2>&1',
             sys_get_temp_dir() . self::VIRUS_QUARANTINE,
             $filelocation
         ), $output, $resultCode);
@@ -93,7 +96,13 @@ class Scanner
 
     public function checkExists(): string
     {
-        exec(self::TEST_CLAMSCAN_COMMAND, $output, $resultCode);
+        $output = [];
+        $resultCode = null;
+
+        // Note '2>&1' redirects the output intended for stderr to stdout (so it will end up in the $output variable).
+        // Without this redirection, a message like 'sh: 1: clamdscan: not found' can appear in unwanted places.
+        // The message does not give any more information than the 127 return code.
+        exec(self::TEST_CLAMSCAN_COMMAND . ' 2>&1', $output, $resultCode);
 
         // From clamdscan's man page:
         // RETURN CODES
