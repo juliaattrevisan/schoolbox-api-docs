@@ -63,10 +63,6 @@ class Controller extends BaseController
      */
     public function getStudent(string $registerCode, User $student): void
     {
-        //tmpDebug options
-//        $registerCode = "MCTS";
-//        $collectionCode = "CoreAssignmentData";
-
         $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
 
         /**
@@ -125,13 +121,46 @@ class Controller extends BaseController
      */
     public function getParent(string $registerCode)
     {
-        $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_FINANCIAL_REGISTERS) ?? '';
+        $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
 
-        // display to the parent
+        /**
+         * fetch both the register id / details and the admin settings for that register
+         * as specified by $registerCode
+         */
+        [$register, $config]       = $this->cacheHelper->getRegisters($registerCode, $adminConfig);
+        if (null === $register) {
+            /**
+             * Unable to find requested register...
+             */
+            throw new NotFound();
+        }
+
+        // we now have the correct register we are after
+        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
+        if (null === $recordCollection) {
+            /**
+             * Unable to find the specified Record Collections...
+             */
+            throw new NotFound();
+        }
+
+        $externalUser = new \Schoolbox\External\User();
+        $externalUser->loadChildren([$this->getUser()]);
+
+        $usersData = [];
+        foreach ($this->getUser()->getChildren() as $child) {
+            $usersData[] = [
+                'user' => $child,
+                'data' => $this->getUsersData($child, $register, $recordCollection, $config),
+            ];
+        }
+
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
             [
-//                'studentData'   => $this->getUsersData($this->getUser()->getChildren(), $registerCode, $config)
+                'register' => $register,
+                'recordCollection' => $recordCollection,
+                'studentData'   => $usersData,
             ],
         );
     }
@@ -277,11 +306,8 @@ class Controller extends BaseController
      */
     private function getUsersData(User $user, array $register, array $recordCollection, array $config)
     {
-        //tmpDebug options
-        $studentExternalId = "152840864613";
-
         // fetch user data
-        $userRecords = $this->cacheHelper->getRecordCollectionsRecords($register['id'], $studentExternalId, $recordCollection['id']);
+        $userRecords = $this->cacheHelper->getRecordCollectionsRecords($register['id'], $user->getExternalId(), $recordCollection['id']);
 
         // fetch the field metadata to join and clean the data
         $fieldMetadata = $this->cacheHelper->getMetadataFields($register['id']);
