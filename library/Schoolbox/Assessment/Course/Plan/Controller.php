@@ -273,6 +273,29 @@ class Controller extends Base
 
 
     /**
+     * We are after all the unique rubric capabilities and indicators that
+     * were in use by all the assessment specs in a course. We can find
+     * all of them with one mega query.
+     *
+     * Later on we can augment this with all the unique rubric capabilities and
+     * indicators that exist in a course; not just the ones in use.
+     *
+     * @return array
+     */
+
+    private function findRubrics(): array
+    {
+        $rubrics = [
+            'available' => [],
+            'used' => []
+        ];
+
+
+        return $rubrics;
+    }
+
+
+    /**
      * Find all ancestor ids to remove duplicates
      * Dupe of \Schoolbox\Curriculum\Component\CurriculumOverviewController::getAllAncestorIds
      *
