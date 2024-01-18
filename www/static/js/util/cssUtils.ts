@@ -16,11 +16,9 @@ export function removeClasses(element: HTMLElement, classNames: string[]) {
         }
     });
     // Remove classes from all descendants
-    element.querySelectorAll("*").forEach((descendant) => {
-        classNames.forEach((className) => {
-            if (descendant.classList.contains(className)) {
-                descendant.classList.remove(className);
-            }
+    classNames.forEach((className) => {
+        element.querySelectorAll(`.${className}`).forEach((descendant) => {
+            descendant.classList.remove(className);
         });
     });
 }
