@@ -147,72 +147,7 @@ class Controller extends Base
              *     - Merge them together
              *     _ Unique that list
              */
-            foreach ($rubricData['capabilityIds'] as $nodeId) {
-//                $this->nodeMapper->loadAncestors()
-            }
-
-//            $rubricCapabilities = [];
-//
-//            $rubrics = $this->rubricIndicatorMapper->findForFolder($unit->getFolder()->getId());
-//            $rubric = $rubrics->groupByCallback(function (RubricIndicatorModel $rubric) {
-//                return $rubric->getCapability()->getName();
-//            });
-//
-//            // parse each rubric group and jsonify each of them
-//            foreach ($rubric as $group => $indicators) {
-//                $rubricCapabilities[] = [
-//                    'id' => $indicators->first()->getCapability()->getId(),
-//                    'name' => Scrub::markdown($indicators->first()->getCapability()->getName()),
-//                    'indicators' => $indicators->map(new IndicatorModelToArray())
-//                ];
-//            }
-
-//            // Curriculum Overview
-//            // collate curriculum data
-//            $curriculumNodes = $this->nodeMapper->createCollection();
-//            $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
-//
-//            foreach ($rubrics as $rubric) {
-//                $this->extractCurricNodes($curriculumNodes, $rubric);
-//                // extract for the parent rubricCapabilities also.
-//                $this->extractCurricNodes($curriculumNodes, $rubric->getCapability());
-//            }
-//
-//            foreach ($assessments as $assessment) {
-//                $this->extractCurricNodes($curriculumNodes, $assessment);
-//            }
-//
-//            /**
-//             * Duped code from library/Schoolbox/Curriculum/Component/CurriculumOverviewController.php
-//             * as we are needing the same tree format as that component.
-//             */
-//            // make sure that the node or node's ancestors do not already in the list
-//            // to avoid same hierarchy appears twice in the component
-//            $selectedNodeIds = $curriculumNodes->getPropertyValues('id');
-//            foreach ($curriculumNodes as $offset => $node) {
-//                $this->nodeMapper->loadAncestors($node);
-//                $ancestorIds = $this->getAllAncestorIds($node);
-//                $diff        = array_diff($ancestorIds, $selectedNodeIds);
-//                if (count($diff) !== count($ancestorIds)) {
-//                    $curriculumNodes->offsetUnset($offset);
-//                }
-//            }
-//
-//            Node\Mapper::sortNodes($curriculumNodes, 0);
-
-//            $nodes = $curriculumNodes->getUnique('id');
-
-            /* Find all the unique curriculum nodes used in:
-             *     - folders
-             *     - assessments
-             *     - capabilities
-             *     - indicators
-             *
-             * Capabilities' and Indicators' curriculum nodes won't be hydrated;
-             * do those separately, but you can mine out the ones from Folders
-             * and Assessments - those should already exist.
-             */
-
+            $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
 
             /* Aggregated data for each unit appears as a row in the Unit Planner
              * on the front end - this is basically the contract between back- and
@@ -243,7 +178,7 @@ class Controller extends Base
                 /* All the unique curriculum nodes that are in use by all the assessment specs
                  * in this unit
                  */
-                'curriculumCodes' => new Collection()
+                'curriculumCodes' => $curriculumNodes
             ];
 
             // add this units data to the whole course units collection.
@@ -398,6 +333,81 @@ class Controller extends Base
 
 
     /**
+     * Find all the unique curriculum nodes used in:
+     *     - folders
+     *     - assessments
+     *     - capabilities
+     *     - indicators
+     *
+     * Capabilities' and Indicators' curriculum nodes won't be hydrated;
+     * do those separately, but you can mine out the ones from Folders
+     * and Assessments - those should already exist.
+     *
+     * @param \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit
+     * @param Collection $assessments
+     * @param array $rubricData
+     * @return \Schoolbox\GenericCollection
+     * @throws \UnexpectedValueException
+     */
+    private function findCurriculumNodes(
+        \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit,
+        Collection $assessments,
+        array $rubricData
+    ): \Schoolbox\GenericCollection {
+        $curriculumNodes = $this->nodeMapper->createCollection();
+
+        /* Nodes from the folder
+         */
+        $curriculumNodes = $curriculumNodes->merge($unit->getFolder()->getCurriculumNodes());
+
+        /* Nodes from the assessment
+         */
+        foreach ($assessments as $assessment) {
+            $curriculumNodes = $curriculumNodes->merge($assessment->getCurriculumNodes());
+        }
+
+        /* Nodes from the capabilities and indicators needs their own prehydration
+         */
+        $curriculumNodes = $curriculumNodes->merge($this->nodeMapper->findByColumnList([
+            'id' => $rubricData['capabilityIds'],
+            'enabled' => 1
+        ]));
+
+        $curriculumNodes = $curriculumNodes->merge($this->nodeMapper->findByColumnList([
+            'id' => $rubricData['indicatorIds'],
+            'enabled' => 1
+        ]));
+
+        /* Unique this set
+         */
+        $curriculumNodes = $curriculumNodes->getUnique('id')->indexBy('id');
+
+        /* Remove any curriculum nodes that aren't enabled
+         * Remove any curriculum nodes that have a meaningless code
+         */
+        foreach ($curriculumNodes as $nodeId => $node) {
+            if (!$node->getEnabled() || '' === $node->getCode()) {
+                /* Did we really need these right now?
+                 */
+                $this->nodeMapper->loadAncestors($node);
+                $this->nodeMapper->loadDescendants($node);
+
+                $ancestorIds = $this->getAllAncestorIds($node);
+                $diff = array_diff($ancestorIds, $curriculumNodes->keys());
+
+                if (count($diff) !== count($ancestorIds)) {
+                    $curriculumNodes->offsetUnset($nodeId);
+                }
+            }
+        }
+
+        Node\Mapper::sortNodes($curriculumNodes, 0);
+
+        return $curriculumNodes;
+    }
+
+
+    /**
      * Find all ancestor ids to remove duplicates
      * Dupe of \Schoolbox\Curriculum\Component\CurriculumOverviewController::getAllAncestorIds
      *
@@ -414,12 +424,14 @@ class Controller extends Base
         return $parentIds;
     }
 
+
     /**
      * Extract nodes from an object that has curriculum nodes
      *
      * @param Collection $curriculumNodes The collection to inject the identified nodes into
-     * @param object     $object The object to extract the nodes out of. This should use the HasCurriculumNodes trait
+     * @param object $object The object to extract the nodes out of. This should use the HasCurriculumNodes trait
      * @return void
+     * @throws SchoolboxException
      */
     private function extractCurricNodes(Collection $curriculumNodes, object $object): void
     {
