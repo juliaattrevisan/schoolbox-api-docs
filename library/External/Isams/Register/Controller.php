@@ -69,12 +69,26 @@ class Controller extends BaseController
         $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '';
 
         $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
+        if (null === $register) {
+            /**
+             * Unable to find requested register...
+             */
+            throw new NotFound();
+        }
+
+        // we now have the correct register we are after
         $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $collectionCode);
+        if (null === $recordCollection) {
+            /**
+             * Unable to find the specified Record Collections...
+             */
+            throw new NotFound();
+        }
 
         $usersData = [
             [
                 'user' => $student,
-                'data' => $this->getUsersData([$student], $registerCode, $config),
+                'data' => $this->getUsersData($student, $register, $recordCollection, $config),
             ]
         ];
 
@@ -112,7 +126,7 @@ class Controller extends BaseController
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
             [
-                'studentData'   => $this->getUsersData($this->getUser()->getChildren(), $registerCode, $config)
+//                'studentData'   => $this->getUsersData($this->getUser()->getChildren(), $registerCode, $config)
             ],
         );
     }
@@ -235,8 +249,9 @@ class Controller extends BaseController
     /**
      * common function to fetch / build register info for an array of users
      *
-     * @param Collection|array $users   who are we building info for
-     * @param string $registerCode      what is the requested register we want to look into
+     * @param User $user                who are we building info for
+     * @param array $register           what is the requested register we want to look into
+     * @param array $recordCollection   what is the requested register collection we are extracting the data out of
      * @param string $config            the admin approved register list
      * @return array
      * @throws ClientExceptionInterface
@@ -245,32 +260,10 @@ class Controller extends BaseController
      * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    private function getUsersData(Collection|array $users, string $registerCode, string $config)
+    private function getUsersData(User $user, array $register, array $recordCollection, string $config)
     {
         //tmpDebug options
-        $registerCode = "MCTS";
-        $collectionCode = "CoreAssignmentData";
         $studentExternalId = "152840864613";
-
-        $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
-        if (null === $register) {
-            /**
-             * Unable to find requested register...
-             */
-            throw new NotFound();
-        }
-
-        // we now have the correct register we are after
-        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $collectionCode);
-
-        if (null === $recordCollection) {
-            /**
-             * Unable to find the specified Record Collections...
-             */
-            throw new NotFound();
-        }
-
-        // we now have the correct record collection id
 
         // fetch user data
         $userRecords = $this->cacheHelper->getRecordCollectionsRecords($register['id'], $studentExternalId, $recordCollection['id']);
@@ -300,23 +293,9 @@ class Controller extends BaseController
         }
 
         return [
-            'register' => $register,
-            'recordCollection' => $recordCollection,
             'knownFields' => $knownFields,
             'userRecords'   => $out
         ];
-
-//        $usersData = [];
-//
-//        // Get each student
-//        foreach ($users as $user) {
-//            // for each student get the data from that register
-//            $usersData[] = [
-//                'user' => $user,
-//                'data' => $this->getDataFromRegister($user, $register, $this->extractRegisterConfig($config)),
-//            ];
-//        }
-//        return $usersData;
     }
 
     /**
