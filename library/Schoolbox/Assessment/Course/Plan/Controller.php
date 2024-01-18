@@ -93,15 +93,6 @@ class Controller extends Base
      */
     public function getPlan(CourseSpecification $course): void
     {
-        $unitAssessmentsTranslator = new UnitAssessments(
-            $this->routeGenerator,
-            $this->getAuthorizer(),
-            $this->getUser(),
-            $this->getUser()
-        );
-
-        $indicatorMap = new IndicatorModelToArray();
-
         /* A mega struct of all the Units' data
          */
         $units = [];
@@ -110,33 +101,17 @@ class Controller extends Base
          * for each unit, generate the data...
          */
         foreach ($course->getUnits() as $unit) {
-            /* Aggregated data for each unit appears as a row in the Unit Planner
-             * on the front end
+            /* Gather up the textboxes and extraTextboxes meta
              */
-            $unitOut = [
-                'id' => $unit->getId(),
-                'title' => $unit->getTitle(),
-                'homepage' => "/homepage/" . $unit->getFolder()->getId(),
-                /* Textboxes in the Unit that circumstantially match ones in the Template
-                 */
-                'textboxes' => [],
-                /* All the other random textboxes that don't match
-                 */
-                'extraTextboxes' => [],
-                /* All the assessment specs in this unit
-                 */
-                'activities' => [],
-                /* All the rubric capabilities and indicators that are in use among all
-                 * the assessment specs in this unit
-                 */
-                'rubricCapabilities' => [],
-                /* All the curriculum nodes that are in use by all the assessment specs
-                 * in this unit
-                 */
-                'curriculumCodes' => []
-            ];
+            $textboxData = $this->findTextboxes($course->getTemplate()->getUnitTemplate()->getId(), $unit->getFolder()->getId());
+
+            // Learning Activities
+            $options = ['order' => ['sequence' => 'ASC']];
+            $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), $options);
 
             // grab rubric info
+            $rubricCapabilities = [];
+
             $rubrics = $this->rubricIndicatorMapper->findForFolder($unit->getFolder()->getId());
             $rubric = $rubrics->groupByCallback(function (RubricIndicatorModel $rubric) {
                 return $rubric->getCapability()->getName();
@@ -144,22 +119,14 @@ class Controller extends Base
 
             // parse each rubric group and jsonify each of them
             foreach ($rubric as $group => $indicators) {
-                $unitOut['rubricCapabilities'][] = [
+                $rubricCapabilities[] = [
                     'id' => $indicators->first()->getCapability()->getId(),
                     'name' => Scrub::markdown($indicators->first()->getCapability()->getName()),
-                    'indicators' => $indicators->map($indicatorMap)
+                    'indicators' => $indicators->map(new IndicatorModelToArray())
                 ];
             }
 
-
-            $out = $this->findTextboxes($course->getTemplate()->getUnitTemplate()->getId(), $unit->getFolder()->getId());
-
-            // activities
-            $options = ['order' => ['sequence' => 'ASC']];
-            $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), $options);
-            $unitOut['activities'] = $assessments->map($unitAssessmentsTranslator);
-
-            // curriculum
+            // Curriculum Overview
             // collate curriculum data
             $curriculumNodes = $this->nodeMapper->createCollection();
             $this->extractCurricNodes($curriculumNodes, $unit->getFolder());
@@ -192,8 +159,37 @@ class Controller extends Base
 
             Node\Mapper::sortNodes($curriculumNodes, 0);
 
-            // display only unique items
-            $unitOut['curriculumCodes'] = $curriculumNodes->getUnique('id');
+            /* Aggregated data for each unit appears as a row in the Unit Planner
+             * on the front end - this is basically the contract between back- and
+             * front-end implementations and the basis of an api-first philosophy
+             */
+            $unitOut = [
+                'id' => $unit->getId(),
+                'title' => $unit->getTitle(),
+                'homepage' => "/homepage/" . $unit->getFolder()->getId(),
+                /* Textboxes in the Unit that circumstantially match ones in the Template
+                 */
+                'textboxes' => $textboxData['textboxes'],
+                /* All the other random textboxes that don't match
+                 */
+                'extraTextboxes' => $textboxData['extraTextboxes'],
+                /* All the assessment specs in this unit
+                 */
+                'activities' => $assessments->map(new UnitAssessments(
+                    $this->routeGenerator,
+                    $this->getAuthorizer(),
+                    $this->getUser(),
+                    $this->getUser()
+                )),
+                /* All the rubric capabilities and indicators that are in use among all
+                 * the assessment specs in this unit
+                 */
+                'rubricCapabilities' => $rubricCapabilities,
+                /* All the unique curriculum nodes that are in use by all the assessment specs
+                 * in this unit
+                 */
+                'curriculumCodes' => $curriculumNodes->getUnique('id')
+            ];
 
             // add this units data to the whole course units collection.
             $units[] = $unitOut;
