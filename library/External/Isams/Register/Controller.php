@@ -66,9 +66,13 @@ class Controller extends BaseController
         $registerCode = "MCTS";
         $collectionCode = "CoreAssignmentData";
 
-        $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '';
+        $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
 
-        $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
+        /**
+         * fetch both the register id / details and the admin settings for that register
+         * as specified by $registerCode
+         */
+        [$register, $config]       = $this->cacheHelper->getRegisters($registerCode, $adminConfig);
         if (null === $register) {
             /**
              * Unable to find requested register...
@@ -252,7 +256,7 @@ class Controller extends BaseController
      * @param User $user                who are we building info for
      * @param array $register           what is the requested register we want to look into
      * @param array $recordCollection   what is the requested register collection we are extracting the data out of
-     * @param string $config            the admin approved register list
+     * @param array $config             the admin approved register list
      * @return array
      * @throws ClientExceptionInterface
      * @throws GuzzleException
@@ -260,7 +264,7 @@ class Controller extends BaseController
      * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    private function getUsersData(User $user, array $register, array $recordCollection, string $config)
+    private function getUsersData(User $user, array $register, array $recordCollection, array $config)
     {
         //tmpDebug options
         $studentExternalId = "152840864613";

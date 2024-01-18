@@ -120,7 +120,7 @@ class CacheHelper
      *
      * @param string|null $registerCode if exists only return this register
      * @param array|null  $registersConfig if we are returning only 1 register, then confirm it is in the admin approved list
-     * @return ?array
+     * @return ?array [register,adminConfig]
      * @throws ClientExceptionInterface if something went wrong fetching JWKS
      * @throws GuzzleException
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
@@ -160,7 +160,7 @@ class CacheHelper
                 // the requested register Ignoring...
                 continue;
             }
-            return $register;
+            return [$register, $registersConfig[strtolower($register['code'])]];
         }
         return null;
     }
@@ -175,6 +175,7 @@ class CacheHelper
      * @throws GuzzleException
      * @throws InvalidArgumentException
      * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getRecordCollections(int $registerId, ?string $reportingKey = null): ?array
     {
