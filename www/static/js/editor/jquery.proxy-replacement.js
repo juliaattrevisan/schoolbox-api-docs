@@ -165,40 +165,48 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
         }
         source = source.replace("type=browse", "type=sbfs").replace("type=store", "type=storage");
 
+        let mediaContainer = document.createElement("div");
+        mediaContainer.setAttribute("data-schoolboxmedia-replacement-container", "");
+        mediaContainer.style.maxWidth = maxwidth + style;
+
         if (type === "video") {
-            return (
-                '<div data-schoolboxmedia-replacement-container style="max-width:' +
-                maxwidth +
-                style +
-                '">' +
-                '<video width="' +
-                width +
-                '" height="' +
-                height +
-                '" data-schoolboxmedia-replacement controls preload="none" ' +
-                'poster="' +
-                thumbnail +
-                '" class="' +
-                classes +
-                '" style="width:100%;height:100%;">' +
-                '<source src="' +
-                source +
-                '" type="video/mp4">' +
-                "</video>" +
-                "</div>"
-            );
+            let mediaElement = document.createElement("video");
+            mediaElement.setAttribute("width", width);
+            mediaElement.setAttribute("height", height);
+            mediaElement.setAttribute("data-schoolboxmedia-replacement", "");
+            mediaElement.setAttribute("controls", "");
+            mediaElement.setAttribute("preload", "none");
+            mediaElement.setAttribute("poster", thumbnail);
+            mediaElement.setAttribute("class", classes);
+            mediaElement.style.width = "100%";
+            mediaElement.style.height = "100%";
+
+            let mediaSource = document.createElement("source");
+            mediaSource.setAttribute("src", source);
+            mediaSource.setAttribute("type", "video/mp4");
+
+            mediaElement.appendChild(mediaSource);
+            mediaContainer.appendChild(mediaElement);
+
+            return mediaContainer;
         } else if (type === "audio") {
-            return (
-                "<div data-schoolboxmedia-replacement-container>" +
-                '<audio data-schoolboxmedia-replacement controls preload="none" style="' +
-                style +
-                ';width:100%;height:40px;border:0px;">' +
-                '<source src="' +
-                source +
-                '" type="audio/mpeg">' +
-                "</audio>" +
-                "</div>"
-            );
+            let mediaElement = document.createElement("audio");
+            mediaElement.setAttribute("data-schoolboxmedia-replacement", "");
+            mediaElement.setAttribute("controls", "");
+            mediaElement.setAttribute("preload", "none");
+            mediaElement.setAttribute("style", style);
+            mediaElement.style.width = "100%";
+            mediaElement.style.height = "100%";
+            mediaElement.style.border = "0px";
+
+            let mediaSource = document.createElement("source");
+            mediaSource.setAttribute("src", source);
+            mediaSource.setAttribute("type", "audio/mpeg");
+
+            mediaElement.appendChild(mediaSource);
+            mediaContainer.appendChild(mediaElement);
+
+            return mediaContainer;
         }
 
         return false;
