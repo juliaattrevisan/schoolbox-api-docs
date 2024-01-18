@@ -481,7 +481,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Get homepage
      *
-     * @return Resource\HomepageConfig
+     * @return Resource\HomepageConfig|null
      */
     public function getHomepage(): ?Resource\HomepageConfig
     {
