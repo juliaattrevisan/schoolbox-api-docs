@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -122,6 +123,10 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             'termCode'     => $term->getCode(),
             'readOnly'     => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
             'canWrite'     => ($this->getContentPermission() >= UserAccess::ACCESS_WRITE),
+            // Always return to homepage, even if this component was just added
+            'returnUrl'    => $this->getSource()
+                ? Redirect::encode('/homepage/' . $this->getSource()->getId())
+                : null,
         ];
     }
 
