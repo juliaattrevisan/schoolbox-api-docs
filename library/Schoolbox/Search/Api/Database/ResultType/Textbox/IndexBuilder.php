@@ -173,13 +173,14 @@ class IndexBuilder extends BaseBuilder
             }
         }
 
-        // Pass 2: delete obsolete textbox indices
-        // Find every textbox and every component
-        $textboxQueryString = "SELECT textBoxID AS id FROM textBox WHERE deleted_at IS NULL";
-        $textboxQuery       = $this->connector->prepareQuery($textboxQueryString);
-        $textboxQuery->execute();
-        $textboxIds = $textboxQuery->fetchColumnArray('id');
 
+        // Pass 2: delete obsolete textbox indices
+        // For textboxes with at least one component: delete the no component
+        // index
+        // Otherwise: delete indices for components which no longer exist
+
+        // Find every component for a non-deleted textbox,
+        // and then group them by textbox
         $componentQueryString = "
             SELECT ci.id, tb.textBoxID
             FROM component_definition cd
@@ -187,7 +188,8 @@ class IndexBuilder extends BaseBuilder
             INNER JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
             INNER JOIN component_config_instance   cci ON ccd.id = cci.component_config_definition_id
             INNER JOIN textBox                     tb  ON cci.value = tb.textBoxID
-            WHERE ccd.key   = :key
+            WHERE tb.deleted_at IS NULL
+            AND   ccd.key   = :key
             AND   ci.module = :module
             AND   cd.class  = :class
         ";
@@ -197,20 +199,23 @@ class IndexBuilder extends BaseBuilder
             'module' => Component_Definition::MODULE_HOMEPAGE,
             'class'  => ltrim(Controller::class, '\\'),
         ]);
-
         $componentsGroupedByTextbox = [];
         foreach ($componentQuery->fetchAll() as $row) {
             $componentsGroupedByTextbox[$row['textBoxID']][] = $row['id'];
         }
 
+        // Find every non-deleted textbox, and then clean up their textbox data
+        $textboxQueryString = "SELECT textBoxID AS id FROM textBox WHERE deleted_at IS NULL";
+        $textboxQuery       = $this->connector->prepareQuery($textboxQueryString);
+        $textboxQuery->execute();
+        $textboxIds = $textboxQuery->fetchColumnArray('id');
 
         $this->logger->info(sprintf('Cleaning up search indices for %d text boxes', count($textboxIds)));
-
         foreach ($textboxIds as $textboxId) {
             // All components for this textbox
             $componentsForTextbox = $componentsGroupedByTextbox[$textboxId] ?? [];
 
-            // All search indices for this textbox
+            // Find all search indices for this textbox
             $searchIndexQuery->execute([
                 'type'              => Hydrator::BASE_TYPE,
                 'identifierPattern' => $textboxId . '-%',
