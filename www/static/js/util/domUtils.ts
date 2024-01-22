@@ -2,6 +2,7 @@
  * Basic DOM manipulation utilities
  */
 
+import { escape } from "lodash";
 import { escapeRegExp } from "@js/util/jsUtils";
 
 /**
@@ -283,10 +284,12 @@ export async function injectScriptsIfNotLoaded(params: InjectScriptsParams) {
  * (?![^>]*>) is used to check we are not inside an element node
  * @param {string} toMark - the string to find all instanced of the current search string in
  * @param {string[]} wordList - the list of words to search for
- * @returns {string} string for v-html with <mark></mark> wrapped around each found result
+ * @returns {string} string for v-html with <mark></mark> wrapped around each found result:
+ *                          any HTML special characters in `toMark` are escaped,
+ *                          so output is known to be safe for v-html
  */
 export function addMarks(toMark: string, wordList: string[]) {
-    let marked = toMark;
+    let marked = escape(toMark);
     wordList.forEach((wordInSearch) => {
         marked = marked.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
             return `<mark>${match}</mark>`;
