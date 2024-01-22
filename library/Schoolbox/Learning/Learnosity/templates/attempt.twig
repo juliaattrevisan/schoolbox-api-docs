@@ -49,6 +49,26 @@
         mutationsList.forEach((mutation) => {
             if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
                 mutation.addedNodes.forEach((node) => {
+                    // Process any new SB media containers
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        node.querySelectorAll('[data-schoolboxresource-source]')
+                        .forEach((sbMediaEl) => {
+                            // If the next element is a schoolbox media container, skip it
+                            if (sbMediaEl.nextElementSibling && sbMediaEl.nextElementSibling.matches('[data-schoolboxmedia-replacement-container]')) {
+                                return;
+                            }
+                            // Ensure not inside a ckeditor
+                            if (sbMediaEl.closest('[contenteditable="true"]') !== null) {
+                                return;
+                            }
+
+                            // Wait an arbitrary amount of time so the content is loaded to avoid the new player ending up with 0 width/height
+                            setTimeout(() => {
+                                $.fn.schoolboxResource_ProxyReplacement(sbMediaEl.parentElement)
+                            }, 1000);
+                        });
+                    }
+
                     // Process any new oembeds
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         node.querySelectorAll('oembed[url]:empty, div[data-oembed-url]:empty')
@@ -98,10 +118,6 @@
             if (!isNaN(previousLocation)) {
                 itemsApp.items().goto(previousLocation);
             }
-
-            /* Replace video placeholders with actual player when the ui has loaded
-             */
-            $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
 
             /**
              * Listen for hash changes so we can navigate to the correct part of the app
