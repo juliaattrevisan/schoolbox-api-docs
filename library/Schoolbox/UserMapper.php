@@ -398,7 +398,7 @@ class UserMapper extends Mapper
 
         $linkedUserYearLevelIds = [];
 
-         foreach ($statement as $row) {
+        foreach ($statement as $row) {
             $userId = $row['id'];
 
             // Don't override previous hydrations of this user: add to it instead
