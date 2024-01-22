@@ -1146,7 +1146,7 @@ class UserMapper extends Mapper
 
     /**
      * Return a collection of hydrated YearLevel objects, indexed by id.
-     * @param array $userIds
+     * @param array $yearLevelIds
      * @return array
      */
     private function getYearLevelById(array $yearLevelIds): array
