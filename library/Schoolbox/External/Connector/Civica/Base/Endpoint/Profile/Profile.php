@@ -161,13 +161,31 @@ class Profile implements IStrategy
                 $ilp = (bool)$student['isEducationSupport'];
 
                 /* Compile all the alerts for this $externalId
+                 * TODO Not really sure how these are meant to be segregated effectively;
+                 *  alert['alertType'] might be a user-defined value inconsistent with
+                 *  any other Civica implementation
                  */
+                $alerts = [];
+
                 if (isset($studentAlerts[$externalId])) {
-                    foreach ($studentAlerts as $studentAlert) {
+                    foreach ($studentAlerts[$externalId] as $studentAlert) {
+                        $alerts[] = sprintf(
+                            '%s: %s',
+                            $studentAlert['alertType'],
+                            $studentAlert['alertDescription'],
+                        );
                     }
                 }
 
-                $comments = $this->findComments();
+                $comments = '';
+
+                /* FIXME There's only data for user 3964620701842002671 atm
+                 *  and they aren't in this data set atm for some reason
+                 */
+                if (\count($alerts)) {
+                    $comments = implode("\n", $alerts);
+                }
+                
                 $legal = $this->findLegal();
                 $medical = $this->findMedicalAlert();
                 $messages = '';
