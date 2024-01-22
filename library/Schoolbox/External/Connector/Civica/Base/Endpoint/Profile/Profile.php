@@ -142,10 +142,10 @@ class Profile implements IStrategy
                 $username = '';
                 $yearLevel = trim((string)($enrolmentDetails[0]['academicYearName'] ?? null));
 
-                /* TODO Fill in these dates
+                /* These will vary based on the campus we chose...
                  */
-                $enrolmentDate = '';
-                $leavingDate = '';
+                $enrolmentDate = $enrolmentDetails[0]['enrolmentDetailStartDate'];
+                $leavingDate = $enrolmentDetails[0]['enrolmentDetailEndDate'];
 
                 /* Flags
                  * TODO Fill in these flag vars
