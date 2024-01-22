@@ -578,27 +578,32 @@ class Profile implements IStrategy
         array $caregivers
     ): void
     {
-        print_r($caregivers);
-
-        $parents = [];
+        $parents = $caregivers[$studentExternalId] ?? [];
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
          */
         foreach ($parents as $parent) {
-            /* TODO Fill in these basic parent vars
+            $externalId = trim((string)$parent['caregiverPersonId']);
+            $email = trim((string)$parent['email']);
+            $firstname = trim((string)$parent['caregiverFirstName']);
+            $firstnamePreferred = trim((string)$parent['caregiverPreferredName']);
+            $lastname = trim((string)$parent['caregiverSurname']);
+            $phoneHome = trim((string)$parent['homePhoneNumber']);
+            $phoneMobile = trim((string)$parent['mobileNumber']);
+            $phoneWork = trim((string)$parent['businessPhoneNumber']);
+
+            /* I guess this is a tuple, really
              */
-            $externalId = '';
-            $email = '';
-            $firstname = '';
-            $firstnamePreferred = '';
-            $lastname = '';
-            $phoneHome = '';
-            $phoneMobile = '';
-            $phoneWork = '';
-            $relationship = '';
-            $title = '';
+            $relationship = trim((string)$parent['caregiverStudentRelationship']);
+            $relationshipType = trim((string)$parent['caregiverType']);
+
+            if ('' !== $relationshipType) {
+                $relationship .=  " ({$relationshipType})";
+            }
+
+            $title = trim((string)$parent['caregiverTitle']);
             $username = '';
 
             /* Parents might inadvertently have the same externalId as someone else's
