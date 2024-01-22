@@ -129,40 +129,41 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        // Search for indices which match a given pattern
+        // Examine and clean up every search index for textboxes
         $searchIndexQuery = $this->connector->prepareQuery("
             SELECT identifier
             FROM search_index
             WHERE type = :type
-            AND   identifier LIKE :identifierPattern
+        ");
+        $textboxExistsQuery = $this->connector->prepareQuery("
+            SELECT textBoxID
+            FROM textBox
+            WHERE deleted_at IS NULL
+            AND textBoxID = :textboxId
+        ");
+        $textboxExistsCache = [];
+        $componentExistsQuery = $this->connector->prepareQuery("
+            SELECT cci.id
+            FROM component_config_instance cci
+            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+            WHERE cci.value                 = :textboxId
+            AND   cci.component_instance_id = :componentId
+            AND   ccd.key                   = :key
         ");
 
-        // Pass 1: delete indices for deleted text boxes
-        // Only fully deleted text boxes count as deleted for the purpose of
-        // index building:
-        // components are not soft deleted, so I can't tell if an index for
-        // those no longer exists.
-        $queryString = "SELECT textBoxID AS id FROM textBox WHERE deleted_at IS NOT NULL";
-        $params      = [];
-        if ($fromDate) {
-            $queryString        .= ' AND deleted_at >= :fromDate';
-            $params['fromDate'] = $fromDate->getDatabase();
-        }
-        if ($toDate) {
-            $queryString      .= ' AND deleted_at <= :toDate';
-            $params['toDate'] = $toDate->getDatabase();
-        }
-        $query = $this->connector->prepareQuery($queryString);
-        $query->execute($params);
-        $this->logger->info(sprintf('Deleting search indices for %d deleted text boxes', $query->rowCount()));
-        foreach ($query as $row) {
-            $searchIndexQuery->execute([
-                'type'              => Hydrator::BASE_TYPE,
-                'identifierPattern' => $row['id'] . '-%',
-            ]);
-            foreach ($searchIndexQuery->fetchColumnArray('identifier') as $searchIndex) {
+        $searchIndexQuery->execute(['type' => Hydrator::BASE_TYPE]);
+        $this->logger->info(sprintf('Examining and cleaning up %d text box search indices', $searchIndexQuery->rowCount()));
+        foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
+            [$textboxId, $componentId] = explode('-', $identifier);
+
+            // Check if this textbox exists
+            if (!isset($textboxExistsCache[$textboxId])) {
+                $textboxExistsQuery->execute(['textboxId' => $textboxId]);
+                $textboxExistsCache[$textboxId] = $textboxExistsQuery->rowCount() > 0;
+            }
+            if (!$textboxExistsCache[$textboxId]) {
                 yield $this->buildIndex(
-                    (string)$searchIndex,
+                    $identifier,
                     null,
                     Hydrator::BASE_TYPE,
                     null,
@@ -170,83 +171,28 @@ class IndexBuilder extends BaseBuilder
                     null,
                     null,
                 );
+                continue;
             }
-        }
 
-
-        // Pass 2: delete obsolete textbox indices
-        // For textboxes with at least one component: delete the no component
-        // index
-        // Otherwise: delete indices for components which no longer exist
-
-        // Find every component for a non-deleted textbox,
-        // and then group them by textbox
-        $componentQueryString = "
-            SELECT ci.id, tb.textBoxID
-            FROM component_definition cd
-            INNER JOIN component_instance          ci  ON cd.id = ci.component_definition_id
-            INNER JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
-            INNER JOIN component_config_instance   cci ON ccd.id = cci.component_config_definition_id
-            INNER JOIN textBox                     tb  ON cci.value = tb.textBoxID
-            WHERE tb.deleted_at IS NULL
-            AND   ccd.key   = :key
-            AND   ci.module = :module
-            AND   cd.class  = :class
-        ";
-        $componentQuery = $this->connector->prepareQuery($componentQueryString);
-        $componentQuery->execute([
-            'key'    => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
-            'module' => Component_Definition::MODULE_HOMEPAGE,
-            'class'  => ltrim(Controller::class, '\\'),
-        ]);
-        $componentsGroupedByTextbox = [];
-        foreach ($componentQuery->fetchAll() as $row) {
-            $componentsGroupedByTextbox[$row['textBoxID']][] = $row['id'];
-        }
-
-        // Find every non-deleted textbox, and then clean up their textbox data
-        $textboxQueryString = "SELECT textBoxID AS id FROM textBox WHERE deleted_at IS NULL";
-        $textboxQuery       = $this->connector->prepareQuery($textboxQueryString);
-        $textboxQuery->execute();
-        $textboxIds = $textboxQuery->fetchColumnArray('id');
-
-        $this->logger->info(sprintf('Cleaning up search indices for %d text boxes', count($textboxIds)));
-        foreach ($textboxIds as $textboxId) {
-            // All components for this textbox
-            $componentsForTextbox = $componentsGroupedByTextbox[$textboxId] ?? [];
-
-            // Find all search indices for this textbox
-            $searchIndexQuery->execute([
-                'type'              => Hydrator::BASE_TYPE,
-                'identifierPattern' => $textboxId . '-%',
-            ]);
-            foreach ($searchIndexQuery->fetchColumnArray('identifier') as $searchIndex) {
-                [, $indexComponentId] = explode('-', $searchIndex);
-                if ($indexComponentId === '') {
-                    // This is the index for if there are no components.
-                    // Delete it if there is at least one component.
-                    if (!empty($componentsForTextbox)) {
-                        yield $this->buildIndex(
-                            (string)$searchIndex,
-                            null,
-                            Hydrator::BASE_TYPE,
-                            null,
-                            true,
-                            null,
-                            null,
-                        );
-                    }
-                } elseif (!in_array((int)$indexComponentId, $componentsForTextbox, true)) {
-                    yield $this->buildIndex(
-                        (string)$searchIndex,
-                        null,
-                        Hydrator::BASE_TYPE,
-                        null,
-                        true,
-                        null,
-                        null,
-                    );
-                }
+            // Check if this textbox is still related to this component
+            if (!isset($componentExistsCache[$textboxId][$componentId])) {
+                $componentExistsQuery->execute([
+                    'textboxId'   => $textboxId,
+                    'componentId' => $componentId,
+                    'key'         => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                ]);
+                $componentExistsCache[$textboxId][$componentId] = $textboxExistsQuery->rowCount() > 0;
+            }
+            if (!$componentExistsCache[$textboxId][$componentId]) {
+                yield $this->buildIndex(
+                    $identifier,
+                    null,
+                    Hydrator::BASE_TYPE,
+                    null,
+                    true,
+                    null,
+                    null,
+                );
             }
         }
     }
