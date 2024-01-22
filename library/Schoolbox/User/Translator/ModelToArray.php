@@ -180,14 +180,22 @@ class ModelToArray
             'givenName' => $linkedUser->getGivenName(),
             'lastName' => $linkedUser->getLastname(),
             'fullName' => $linkedUser->getFullName(),
-            'role' => [
-                'id' => $role->getId(),
-                'name' => $role->getName()
-            ],
-            'yearLevel' => [
-                'id' => $year?->getId(),
-                'name' => $year?->getName()
-            ]
+            'role' => (
+                $role === null
+                ? null
+                : [
+                    'id' => $role->getId(),
+                    'name' => $role->getName()
+                ]
+            ),
+            'yearLevel' => (
+                $year === null
+                ? null
+                : [
+                    'id' => $year?->getId(),
+                    'name' => $year?->getName()
+                ]
+            )
         ];
     }
 
