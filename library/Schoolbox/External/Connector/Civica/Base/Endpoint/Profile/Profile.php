@@ -190,14 +190,9 @@ class Profile implements IStrategy
                 }
                 
                 $legal = $this->findLegal();
-                $medical = $this->findMedicalAlert();
+                $medical = $this->findMedicalAlert($student['schools'][0]);
                 $messages = '';
                 $specialNeeds = (bool)$student['hasLearningDisabilityAlert'];
-
-                /* TODO Customise these find* methods to suit your implementation
-                 *  Maintain the methods' return signature for easiest resolution
-                 *  though you are free to customise it as you see fit
-                 */
 
                 /* Emergency Contacts
                  */
@@ -493,12 +488,15 @@ class Profile implements IStrategy
     /**
      * Find medical data for student
      *
+     * @param array $school
      * @return string|null
      */
-    private function findMedicalAlert(): ?string
+    private function findMedicalAlert(array $school): ?string
     {
-        /* TODO Fill in these medical alert vars
-         */
+        if ($school['medicalAlert']) {
+            return 'This student has medical conditions.';
+        }
+
         return null;
     }
 
