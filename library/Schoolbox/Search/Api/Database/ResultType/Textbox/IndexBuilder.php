@@ -162,6 +162,9 @@ class IndexBuilder extends BaseBuilder
                 $textboxExistsCache[$textboxId] = $textboxExistsQuery->rowCount() > 0;
             }
             if (!$textboxExistsCache[$textboxId]) {
+                $this->logger->debug(
+                    sprintf('Textbox %d no longer exists: removing index', $textboxId),
+                );
                 yield $this->buildIndex(
                     $identifier,
                     null,
@@ -184,6 +187,13 @@ class IndexBuilder extends BaseBuilder
                 $componentExistsCache[$textboxId][$componentId] = $textboxExistsQuery->rowCount() > 0;
             }
             if (!$componentExistsCache[$textboxId][$componentId]) {
+                $this->logger->debug(
+                    sprintf(
+                        'Textbox %d is no longer associated with component %d no longer exists: removing index',
+                        $textboxId,
+                        $componentId,
+                    ),
+                );
                 yield $this->buildIndex(
                     $identifier,
                     null,
