@@ -69,7 +69,7 @@ function onCommentUpdated(comment: string) {
         <student-no-score-note v-if="!store.isReadOnly" :item="props.item" />
         <div class="item-questions l-flex-col l-gap-l">
             <student-item-question-display
-                v-for="question in props.item.questions"
+                v-for="(question, index) in props.item.questions"
                 :key="question.response_id"
                 :student="props.student"
                 :item="props.item"
@@ -78,6 +78,7 @@ function onCommentUpdated(comment: string) {
                 :is-read-only="store.isReadOnly"
                 :show-feedback="props.student.isReviewed || !store.isReadOnly"
                 :has-mark-visibility="store.hasMarkVisibility"
+                :is-last-question="index === props.item.questions.length - 1"
                 @updated-score="onScoreUpdated"
             />
         </div>
