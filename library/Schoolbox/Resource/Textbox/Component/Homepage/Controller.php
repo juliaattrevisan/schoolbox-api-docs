@@ -75,7 +75,10 @@ class Controller extends Component_Homepage_ControllerAbstract
             self::DEFAULT_COMPONENT_HEADING,
         ];
         foreach ($headingCandidates as $candidate) {
-            if (isset($candidate) && trim($candidate) !== '') {
+            // In condition below, deliberately compare untrimmed $candidate string.
+            // The user might want to override the DEFAULT_COMPONENT_HEADING with a blank textbox heading or
+            // componentname, and the way to do that is to use a string containing whitespace e.g. ' '.
+            if (isset($candidate) && $candidate !== '') {
                 $this->setComponentName($candidate);
                 break;
             }

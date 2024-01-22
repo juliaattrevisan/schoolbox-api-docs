@@ -28,8 +28,8 @@ class IndexBuilder extends BaseBuilder
         // Pass 1: textboxes within a component
         //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
         //  * The displayed heading of a textbox component on a homepage will be:
-        //     * The component name if non-blank,
-        //     * otherwise the textbox heading if non-blank,
+        //     * The component name if non-empty,
+        //     * otherwise the textbox heading if non-empty,
         //     * otherwise Component_Homepage_Controller::DEFAULT_COMPONENT_HEADING.
         //    (see library/Schoolbox/Resource/Textbox/Component/Homepage/Controller.php)
         //    So that is the heading we must use for the search index.
@@ -38,8 +38,8 @@ class IndexBuilder extends BaseBuilder
             CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
             f.id AS folder_id,
             COALESCE(
-                IF(TRIM(cci_componentname.value) = '', NULL, cci_componentname.value),
-                IF(TRIM(tb.heading) = '', NULL, tb.heading),
+                IF(cci_componentname.value = '', NULL, cci_componentname.value),
+                IF(tb.heading = '', NULL, tb.heading),
                 '" . ComponentHomepageController::DEFAULT_COMPONENT_HEADING . "'
             ) AS title,
             tb.updated_at AS date,
