@@ -135,12 +135,22 @@ class IndexBuilder extends BaseBuilder
             FROM search_index
             WHERE type = :type
         ");
-        $textboxExistsQuery = $this->connector->prepareQuery("
+        $textboxExistsQueryString = "
             SELECT textBoxID
             FROM textBox
             WHERE deleted_at IS NULL
             AND textBoxID = :textboxId
-        ");
+        ";
+        $textboxExistsParams = [];
+        if ($fromDate) {
+            $textboxExistsQueryString        .= ' AND deleted_at >= :fromDate';
+            $textboxExistsParams['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $textboxExistsQueryString      .= ' AND deleted_at <= :toDate';
+            $textboxExistsParams['toDate'] = $toDate->getDatabase();
+        }
+        $textboxExistsQuery = $this->connector->prepareQuery($textboxExistsQueryString);
         $textboxExistsCache = [];
         $componentExistsQuery = $this->connector->prepareQuery("
             SELECT cci.component_instance_id
@@ -160,7 +170,7 @@ class IndexBuilder extends BaseBuilder
             // Check if this textbox exists:
             // if not, delete its index
             if (!isset($textboxExistsCache[$textboxId])) {
-                $textboxExistsQuery->execute(['textboxId' => $textboxId]);
+                $textboxExistsQuery->execute($textboxExistsParams + ['textboxId' => $textboxId]);
                 $textboxExistsCache[$textboxId] = $textboxExistsQuery->rowCount() > 0;
             }
             if (!$textboxExistsCache[$textboxId]) {
