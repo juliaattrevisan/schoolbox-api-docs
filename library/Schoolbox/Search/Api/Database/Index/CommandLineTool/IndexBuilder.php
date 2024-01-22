@@ -28,6 +28,7 @@ class IndexBuilder extends App
     private const OPT_LONG_FROM = 'from:';
     private const OPT_LONG_TO = 'to:';
     private const OPT_LONG_CLEAR = 'clear';
+    private const OPT_LONG_TYPE = 'type:';
 
     /**
      * Short options:
@@ -44,10 +45,11 @@ class IndexBuilder extends App
      * * --from:  from date
      * * --to:    to date
      * * --clear: clear index completely
+     * * --type:  if provided, only build indices of this type
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_CLEAR];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_CLEAR, self::OPT_LONG_TYPE];
     }
 
     /**
@@ -87,17 +89,17 @@ class IndexBuilder extends App
         // * Pages
         // * Tiles
         // * Users
-        /** @var array<IBuilder> $indexBuilders */
-        $indexBuilders       = [
-            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Event\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\File\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Link\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+        /** @var array<string, IBuilder> $indexBuilders */
+        $indexBuilders = [
+            ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
 
         // Run for as long as you need to?
@@ -192,6 +194,20 @@ class IndexBuilder extends App
         $green      = self::COLOUR_GREEN;
         $white      = self::COLOUR_WHITE;
         $yellow     = self::COLOUR_YELLOW;
+        $indexTypes = implode(
+            "\n        * ",
+            [
+                ResultType\Assessment\Hydrator::BASE_TYPE,
+                ResultType\Badge\Hydrator::BASE_TYPE,
+                ResultType\Blog\Hydrator::BASE_TYPE,
+                ResultType\Event\Hydrator::BASE_TYPE,
+                ResultType\File\Hydrator::BASE_TYPE,
+                ResultType\Forum\Hydrator::BASE_TYPE,
+                ResultType\Link\Hydrator::BASE_TYPE,
+                ResultType\News\Hydrator::BASE_TYPE,
+                ResultType\Textbox\Hydrator::BASE_TYPE,
+            ]
+        );
         echo <<<HELP
 NAME:
     Search index builder
@@ -229,8 +245,16 @@ OPTIONS
 
     $yellow--clear$white
         If provided, clear all existing indices before rebuilding the index.
+        (If $yellow--type$white is provided, only clear this type of index.)
 
         Has no effect without the $yellow-p$white or $yellow--perform$white flags.
+
+    $yellow--type=TYPE$white
+        If provided, only rebuild indices of this type. (May be provided more
+        than once to rebuild multiple index types.)
+
+        The following index types are able to be built by this script:
+        * {$indexTypes}
 
 
 HELP;
