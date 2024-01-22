@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 
 class Payload
@@ -60,6 +61,93 @@ class Payload
     /**
      * Generate an array of data about everyone's candidacy potential
      *
+     * A list of tuples:
+     *
+     *  $stack = [
+     *      spec id => [
+     *          unit spec title => ...
+     *          actionables => [
+     *              superstar => [],
+     *              star => [],
+     *          ],
+     *          candidates => [
+     *              user id => [
+     *                  meta => [
+     *                      id => ...
+     *                      firstname => ...
+     *                      lastname => ...
+     *                      school => [
+     *                          'folderId' => ...
+     *                          'name' => ...
+     *                          'code' => ...
+     *                      ]
+     *                  ],
+     *                  marks => [
+     *                      ...
+     *                  ],
+     *              ],
+     *              user id => [
+     *                  meta => [
+     *                      id => ...
+     *                      firstname => ...
+     *                      lastname => ...
+     *                      school => [
+     *                          'folderId' => ...
+     *                          'name' => ...
+     *                          'code' => ...
+     *                      ]
+     *                  ],
+     *                  marks => [
+     *                      ...
+     *                  ],
+     *              ],
+     *              ...
+     *          ],
+     *      ],
+     *      spec id => [
+     *          unit spec title => ...
+     *          actionables => [
+     *              superstar => [],
+     *              star => [],
+     *          ],
+     *          candidates => [
+     *              user id => [
+     *                  meta => [
+     *                      id => ...
+     *                      firstname => ...
+     *                      lastname => ...
+     *                      school => [
+     *                          'folderId' => ...
+     *                          'name' => ...
+     *                          'code' => ...
+     *                      ]
+     *                  ],
+     *                  marks => [
+     *                      ...
+     *                  ],
+     *              ],
+     *              user id => [
+     *                  meta => [
+     *                      id => ...
+     *                      firstname => ...
+     *                      lastname => ...
+     *                      school => [
+     *                          'folderId' => ...
+     *                          'name' => ...
+     *                          'code' => ...
+     *                      ]
+     *                  ],
+     *                  marks => [
+     *                      ...
+     *                  ],
+     *              ],
+     *              ...
+     *          ],
+     *          ...
+     *      ]
+     *      ...
+     *  ]
+     *
      * @param int $year
      * @return array
      * @throws DefinitionException
@@ -74,93 +162,6 @@ class Payload
     {
         $statement = $this->generateCandidatesStatement();
 
-        /* A list of tuples:
-         *
-         * $stack = [
-         *     spec id => [
-         *         unit spec title => ...
-         *         actionables => [
-         *             superstar => [],
-         *             star => [],
-         *         ],
-         *         candidates => [
-         *             user id => [
-         *                 meta => [
-         *                     id => ...
-         *                     firstname => ...
-         *                     lastname => ...
-         *                     school => [
-         *                         'folderId' => ...
-         *                         'name' => ...
-         *                         'code' => ...
-         *                     ]
-         *                 ],
-         *                 marks => [
-         *                     ...
-         *                 ],
-         *             ],
-         *             user id => [
-         *                 meta => [
-         *                     id => ...
-         *                     firstname => ...
-         *                     lastname => ...
-         *                     school => [
-         *                         'folderId' => ...
-         *                         'name' => ...
-         *                         'code' => ...
-         *                     ]
-         *                 ],
-         *                 marks => [
-         *                     ...
-         *                 ],
-         *             ],
-         *             ...
-         *         ],
-         *     ],
-         *     spec id => [
-         *         unit spec title => ...
-         *         actionables => [
-         *             superstar => [],
-         *             star => [],
-         *         ],
-         *         candidates => [
-         *             user id => [
-         *                 meta => [
-         *                     id => ...
-         *                     firstname => ...
-         *                     lastname => ...
-         *                     school => [
-         *                         'folderId' => ...
-         *                         'name' => ...
-         *                         'code' => ...
-         *                     ]
-         *                 ],
-         *                 marks => [
-         *                     ...
-         *                 ],
-         *             ],
-         *             user id => [
-         *                 meta => [
-         *                     id => ...
-         *                     firstname => ...
-         *                     lastname => ...
-         *                     school => [
-         *                         'folderId' => ...
-         *                         'name' => ...
-         *                         'code' => ...
-         *                     ]
-         *                 ],
-         *                 marks => [
-         *                     ...
-         *                 ],
-         *             ],
-         *             ...
-         *         ],
-         *         ...
-         *     ]
-         *     ...
-         * ]
-         */
         $stack = [];
 
         /* Start preprocessing each guy in the result set,
@@ -270,7 +271,7 @@ class Payload
 
             /* We don't need their raw data anymore
              */
-            unset($unitSpec['candidates']);
+            // unset($unitSpec['candidates']);
         }
 
         return $stack;
@@ -279,6 +280,17 @@ class Payload
 
     /**
      * Prepare a statement for award candidates
+     *
+     * This takes significant advantage over how "people involved in an assessment" is
+     * determined. In Help, the following axioms apply:
+     *     - you need to know about people who didn't get assessment results, But Should Have,
+     *       in order to determine celebrity status; trying to decide celebrity status based
+     *       only on the results they obtained is not correct
+     *     - sis_class_user is empty so you can't cheat with that
+     *     - you are forced to use circumstantial read-access via userAccess table
+     *       Hence, all the userAccess joins
+     *     - once you know about the users who are supposed to have results, you can then
+     *       manifest null columns via project_result like we originally tried
      *
      * @return \PDOStatement
      * @throws \PDOException
@@ -302,7 +314,6 @@ class Payload
                 f2.id AS folder_id,
                 f2.name AS school_name,
                 fc.code AS school_code,
-                prc.project_id AS project_id,
                 prc.norm_mark
             FROM course_implementation ci
             INNER JOIN course_unit_implementation cui on ci.id = cui.course_implementation_id
@@ -313,27 +324,33 @@ class Payload
             LEFT JOIN folder_code fc ON f2.id = fc.folder_id
             INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
             INNER JOIN project p ON acui.assessment_id = p.assessment_id
-            LEFT JOIN project_result prc ON p.assessment_id = prc.project_id
-            LEFT JOIN `user` u ON prc.user_id = u.id           
+            INNER JOIN assessment a ON p.assessment_id = a.id
+            INNER JOIN userAccess ua ON f1.id = ua.sid
+            INNER JOIN `user` u ON ua.uid = u.id
+            LEFT JOIN project_result prc ON p.assessment_id = prc.project_id AND uid = prc.user_id 
             WHERE ci.course_specification_id = :courseId
             AND cui.deleted_at IS NULL
             AND cus.deleted_at IS NULL
             AND f0.deleted_at IS NULL
             AND p.deleted_at IS NULL
-            AND prc.deleted_at IS NULL
+            AND a.deleted_at IS NULL
             AND u.deleted_at IS NULL
             AND f1.deleted_at IS NULL
             AND f2.deleted_at IS NULL
             AND fc.deleted_at IS NULL
             AND fc.code IS NOT NULL
             AND u.group_id IN ({$validGroupTypeIds})
+            AND ua.service = :service
+            AND ua.type = :accessLevel
             ORDER BY unit_spec_title, user_lastname, user_id
         ";
 
         $statement = $this->database->prepare($query);
 
         $statement->execute([
-            'courseId' => self::COURSE_ID
+            'courseId' => self::COURSE_ID,
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            'accessLevel' => UserAccess::ACCESS_READ
         ]);
 
         return $statement;

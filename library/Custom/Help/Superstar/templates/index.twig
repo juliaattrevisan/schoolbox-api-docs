@@ -67,14 +67,14 @@
                         {% if unitSpecData.actionables.superstar|length %}
                             <li>
                                 <h3 class="content">Superstar</h3>
-                                {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                                {{ _self.renderActionable('superstar', previousAwards, badgeMapping, unitSpecId, unitSpecData) }}
                             </li>
                         {% endif %}
 
                         {% if unitSpecData.actionables.star|length %}
                             <li>
                                 <h3 class="content">Star</h3>
-                                {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData.actionables) }}
+                                {{ _self.renderActionable('star', previousAwards, badgeMapping, unitSpecId, unitSpecData) }}
                             </li>
                         {% endif %}
                         </ul>
@@ -141,12 +141,16 @@
 {##
  # Generic renderer for each guy you can award a badge
  #
- # @param array $badgeMapping  A set of (unit spec id, badge urls) as a shortcut to repeated route generation
- # @param int $unitSpecId      Identifier for a unit spec
- # @param array $actionables   A list of superstars/stars who can be awarded something
+ # @param string $type           Render data about 'superstar' or 'star', specifically
+ # @param array $previousAwards  A list of badges previously awarded to people
+ # @param array $badgeMapping    A set of (unit spec id, badge urls) as a shortcut to repeated route generation
+ # @param int $unitSpecId        Identifier for a unit spec
+ # @param array $unitSpecData    An array containing a list of superstars/stars who can be awarded something, among other data
  #}
-{% macro renderActionable(type, previousAwards, badgeMapping, unitSpecId, actionables) %}
+{% macro renderActionable(type, previousAwards, badgeMapping, unitSpecId, unitSpecData) %}
     {% apply spaceless %}
+        {% set actionables = unitSpecData.actionables %}
+
         <ul class="action-list">
             {% for actionable in actionables[type] %}
                 {# It's possible that you don't have any badges defined for unitSpecId
@@ -173,6 +177,9 @@
                                     </span>
                                 {% endif %}
                             </div>
+
+                            {# Usually hidden from ui #}
+                            {{ _self.renderRawData(actionable.id, unitSpecData) }}
                         </div>
                         <nav>
                             {% if not previouslyAwarded %}
@@ -184,4 +191,20 @@
             {% endfor %}
         </ul>
     {% endapply %}
+{% endmacro %}
+
+{##
+ # Because it hurts trying to inspect raw data without logging into help directly
+ #
+ # @param int $userId          A user id to inspect
+ # @param array $unitSpecData  A set of (user id, user data) tuples containing raw marks
+ #}
+{% macro renderRawData(userId, unitSpecData) %}
+    {% set userData = unitSpecData.candidates[userId] %}
+
+    <ol style="clear:both;display:none">
+        {% for mark in userData.marks %}
+            <li>{{ mark ?? 'null' }}</li>
+        {% endfor %}
+    </ol>
 {% endmacro %}
