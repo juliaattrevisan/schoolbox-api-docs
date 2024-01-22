@@ -15,6 +15,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Alerts;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -99,6 +100,12 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+        /* Alerts
+         */
+        $this->log->info('Downloading student alerts (this might take a while)');
+
+        $studentAlerts = (new Alerts($this->api))->generate();
+
         $pages = $this->api->retrieve('GET', 'Students/Jurisdiction');
 
         foreach ($pages as $page) {
@@ -153,9 +160,13 @@ class Profile implements IStrategy
                 $ib = false;
                 $ilp = (bool)$student['isEducationSupport'];
 
-                /* Alerts
-                 * TODO Define the mechanism to find these alert contents
+                /* Compile all the alerts for this $externalId
                  */
+                if (isset($studentAlerts[$externalId])) {
+                    foreach ($studentAlerts as $studentAlert) {
+                    }
+                }
+
                 $comments = $this->findComments();
                 $legal = $this->findLegal();
                 $medical = $this->findMedicalAlert();
