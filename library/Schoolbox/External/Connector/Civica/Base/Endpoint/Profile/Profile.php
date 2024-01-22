@@ -295,19 +295,22 @@ class Profile implements IStrategy
                     if (isset($emergencyContacts[0])) {
                         $studentProfile
                             ->setEmergencyContactName1($emergencyContacts[0]['name'])
-                            ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
-                    }
+                            ->setEmergencyContactPhone1($emergencyContacts[0]['phone'])
+                            ->setEmergencyContactPhoneAlt1($emergencyContacts[0]['phone_alt']);
+                    };
 
                     if (isset($emergencyContacts[1])) {
                         $studentProfile
                             ->setEmergencyContactName2($emergencyContacts[1]['name'])
-                            ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
+                            ->setEmergencyContactPhone2($emergencyContacts[1]['phone'])
+                            ->setEmergencyContactPhoneAlt2($emergencyContacts[1]['phone_alt']);
                     }
 
                     if (isset($emergencyContacts[2])) {
                         $studentProfile
                             ->setEmergencyContactName3($emergencyContacts[2]['name'])
-                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
+                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone'])
+                            ->setEmergencyContactPhoneAlt3($emergencyContacts[2]['phone_alt']);
                     }
                 } else {
                     /* This student doesn't have any emergency contacts anymore
@@ -429,10 +432,8 @@ class Profile implements IStrategy
             if ($n < self::MAX_EMERGENCY_CONTACTS) {
                 $fullname = trim((string)$emergencyContact['contactName']);
                 $relation = trim((string)$emergencyContact['relationship']);
-                $phone = (new FirstMeaningfulValue())->find([
-                    $emergencyContact['mobileNumber'],
-                    $emergencyContact['phoneNumber']
-                ]);
+                $mobile = trim((string)$emergencyContact['mobileNumber']);
+                $phone = trim((string)$emergencyContact['phoneNumber']);
 
                 /* Suffix the $relation if provided
                  */
@@ -445,7 +446,8 @@ class Profile implements IStrategy
                 if ('' !== $fullname) {
                     $contacts[] = [
                         'name' => $fullname,
-                        'phone' => $phone
+                        'phone' => $mobile,
+                        'phone_alt' => $phone
                     ];
                 }
             }
