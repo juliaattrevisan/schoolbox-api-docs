@@ -1007,6 +1007,7 @@ class Profile implements IStrategy
             $endpoint = "enrolments/person/{$contact['attributes']['personId']}?include=phoneNumbers";
 
             $parent = $this->api->retrieveDocument($endpoint);
+
             /* Skip deceased humans
              */
             if ($parent['data']['attributes']['isDeceased']) {
@@ -1192,6 +1193,17 @@ class Profile implements IStrategy
                 /* Only import data for externalIds in $watchlist, if provided
                  */
                 if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
+                /* Skip deceased humans
+                 */
+                if ($staff['relationships']['person']['data']['attributes']['isDeceased']) {
+                    $this->log->debug(sprintf(
+                        'Person id %s is deceased: skipping.',
+                        $staff['relationships']['person']['data']['id']
+                    ));
+
                     continue;
                 }
 
