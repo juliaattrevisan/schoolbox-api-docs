@@ -169,7 +169,7 @@ class Profile implements IStrategy
 
                 /* Flags
                  */
-                $boardingStatus = false;
+                $boardingStatus = (bool)$student['schools'][0]['isBoarder'];
                 $esl = false;
                 $ib = false;
                 $ilp = (bool)$student['isEducationSupport'];
