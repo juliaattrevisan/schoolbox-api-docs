@@ -126,7 +126,9 @@ class Profile implements IStrategy
                 $firstname = trim((string)$student['firstName']);
                 $firstnamePreferred = trim((string)$student['preferredName']);
                 $form = '';
+                $formTeacher = $this->findFormTeacher();
                 $gender = trim((string)$student['gender']);
+                $housemaster = $this->findHousemaster($student['schools'][0]);
                 $lastname = trim((string)$student['surname']);
                 $mobile = trim((string)$student['mobileNumber']);
 
@@ -198,14 +200,6 @@ class Profile implements IStrategy
                 /* Emergency Contacts
                  */
                 $emergencyContacts = $this->findEmergencyContacts();
-
-                /* Find out a staff member via their user code
-                 */
-                $formTeacher = $this->findFormTeacher();
-
-                /* Fish out a staff member via their user code
-                 */
-                $housemaster = $this->findHousemaster($student['schools'][0]);
 
                 /* Fish out special needs
                  */
@@ -467,8 +461,6 @@ class Profile implements IStrategy
      */
     private function findFormTeacher(): array
     {
-        /* TODO Fill in these form teacher vars
-         */
         return [
             'id' => null,
             'name' => null
