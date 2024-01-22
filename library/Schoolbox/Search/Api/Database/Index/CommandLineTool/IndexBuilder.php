@@ -101,14 +101,55 @@ class IndexBuilder extends App
             ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
             ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
+        $types = $this->getOpt(self::OPT_LONG_TYPE);
+        if (!isset($types)) {
+            $this->getLogger()->notice('Building search index for all result types');
+        } else {
+            $types = is_array($types) ? $types : [$types];
+            foreach ($types as $type) {
+                if (!isset($indexBuilders[$type])) {
+                    $this->getLogger()->error(
+                        sprintf(
+                            'Result type "%s" is not recognised (recognised types: %s): exiting',
+                            $type,
+                            implode(', ', array_keys($indexBuilders)),
+                        )
+                    );
+                    exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+                }
+            }
+            $this->getLogger()->notice(
+                sprintf(
+                    'Building search index for result types: %s',
+                    implode(', ', $types),
+                )
+            );
+        }
 
         // Run for as long as you need to?
         $this->getDatabaseInternal()->executeDirectly('SET MAX_STATEMENT_TIME=0');
 
+        // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
-            $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
-            if ($this->perform()) {
-                $this->getDatabaseInternal()->execute('TRUNCATE search_index');
+            if (empty($types)) {
+                $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
+                if ($this->perform()) {
+                    $this->getDatabaseInternal()->execute('TRUNCATE search_index');
+                }
+            } else {
+                $this->getLogger()->notice('Clearing indices for provided types before rebuilding!');
+                $deleteIndexQuery = $this->getDatabaseInternal()->prepareQuery(
+                    'DELETE FROM search_index WHERE type = :type OR type LIKE :typeLike',
+                );
+                foreach ($types as $type) {
+                    $this->getLogger()->notice(sprintf('Clearing indices for type: %s', $type));
+                    if ($this->perform()) {
+                        $deleteIndexQuery->execute([
+                            'type'     => $type,
+                            'typeLike' => $this->getDatabaseInternal()->getQuoter()->escapeForLike($type . '.') . '%',
+                        ]);
+                    }
+                }
             }
         }
 
@@ -139,7 +180,11 @@ class IndexBuilder extends App
         ");
 
         $time = microtime(true);
-        foreach ($indexBuilders as $indexBuilder) {
+        foreach ($indexBuilders as $indexBuilderType => $indexBuilder) {
+            // Not in the list of types to build? Skip
+            if (!empty($types) && !in_array($indexBuilderType, $types, true)) {
+                continue;
+            }
             foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
                 if (!$this->perform()) {
                     continue;
