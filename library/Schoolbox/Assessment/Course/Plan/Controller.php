@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Plan;
 
 use Alaress\Database\Exception;
+use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
@@ -380,30 +381,33 @@ class Controller extends Base
          * Capabilities might not exist; indicators might not exist.
          */
         $query = [];
+        $params = [];
 
         if (\count($rubricData['used']['capabilityIds'])) {
-            $capabilityIds = implode(',', $rubricData['used']['capabilityIds']);
+            $placeholders = Builder::getArrayPlaceholders($rubricData['used']['capabilityIds'], 'capabilityIds');
+            $params += Builder::getArrayParameters($rubricData['used']['capabilityIds'], 'capabilityIds');
 
             $query[] = "
                 SELECT curriculum_node_id
                 FROM curriculum_node_for_rubric_capability
-                WHERE rubric_capability_id IN ({$capabilityIds})
+                WHERE rubric_capability_id IN {$placeholders}
             ";
         }
 
         if (\count($rubricData['used']['indicatorIds'])) {
-            $indicatorIds = implode(',', $rubricData['used']['indicatorIds']);
+            $placeholders = Builder::getArrayPlaceholders($rubricData['used']['indicatorIds'], 'indicatorIds');
+            $params += Builder::getArrayParameters($rubricData['used']['indicatorIds'], 'indicatorIds');
 
             $query[] = "
                 SELECT curriculum_node_id
                 FROM curriculum_node_for_rubric_indicator
-                WHERE rubric_indicator_id IN ({$indicatorIds})
+                WHERE rubric_indicator_id IN {$placeholders}
             ";
         }
 
         if (\count($query)) {
             $statement = $this->nodeMapper->getDatabase()->prepare(implode(' UNION ', $query));
-            $statement->execute();
+            $statement->execute($params);
 
             $nodeIds = [];
 
