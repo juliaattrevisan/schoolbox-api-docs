@@ -182,7 +182,8 @@ class ModelToArray
             'fullName' => $linkedUser->getFullName(),
             'role' => [
                 'id' => $role->getId(),
-                'name' => $role->getName()
+                'name' => $role->getName(),
+                'type' => $role->getType()
             ],
             'yearLevel' => (
                 $year === null
