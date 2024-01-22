@@ -154,6 +154,7 @@ class IndexBuilder extends BaseBuilder
         $searchIndexQuery->execute(['type' => Hydrator::BASE_TYPE]);
         $this->logger->info(sprintf('Examining and cleaning up %d text box search indices', $searchIndexQuery->rowCount()));
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
+            $removeIndex = false;
             [$textboxId, $componentId] = explode('-', $identifier);
 
             // Check if this textbox exists:
@@ -166,6 +167,45 @@ class IndexBuilder extends BaseBuilder
                 $this->logger->debug(
                     sprintf('Textbox %d no longer exists: removing index', $textboxId),
                 );
+                $removeIndex = true;
+            } else {
+                // Does this index have an associated component?
+                if (!isset($componentExistsCache[$textboxId])) {
+                    $componentExistsQuery->execute([
+                        'textboxId' => $textboxId,
+                        'key'       => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                    ]);
+                    $componentExistsCache[$textboxId] = $componentExistsQuery->fetchColumnArray('component_instance_id');
+                }
+                if ($componentId === '') {
+                    // This index has no component:
+                    // remove it if any components exist for this textbox
+                    if (!empty($componentExistsCache[$textboxId])) {
+                        $this->logger->debug(
+                            sprintf(
+                                'Textbox %d is associated with a component: removing componentless index',
+                                $textboxId,
+                            ),
+                        );
+                        $removeIndex = true;
+                    }
+                } else {
+                    if (!in_array($componentId, $componentExistsCache[$textboxId])) {
+                        if (!$componentExistsCache[$textboxId]) {
+                            $this->logger->debug(
+                                sprintf(
+                                    'Textbox %d is no longer associated with component %d: removing index',
+                                    $textboxId,
+                                    $componentId,
+                                ),
+                            );
+                            $removeIndex = true;
+                        }
+                    }
+                }
+            }
+
+            if ($removeIndex) {
                 yield $this->buildIndex(
                     $identifier,
                     null,
@@ -175,58 +215,6 @@ class IndexBuilder extends BaseBuilder
                     null,
                     null,
                 );
-                continue;
-            }
-
-            // Does this index have an associated component?
-            if (!isset($componentExistsCache[$textboxId])) {
-                $componentExistsQuery->execute([
-                    'textboxId' => $textboxId,
-                    'key'       => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
-                ]);
-                $componentExistsCache[$textboxId] = $componentExistsQuery->fetchColumnArray('component_instance_id');
-            }
-            if ($componentId === '') {
-                // This index has no component:
-                // remove it if any components exist for this textbox
-                if (!empty($componentExistsCache[$textboxId])) {
-                    $this->logger->debug(
-                        sprintf(
-                            'Textbox %d is associated with a component: removing componentless index',
-                            $textboxId,
-                        ),
-                    );
-                    yield $this->buildIndex(
-                        $identifier,
-                        null,
-                        Hydrator::BASE_TYPE,
-                        null,
-                        true,
-                        null,
-                        null,
-                    );
-                }
-            } else {
-                if (!in_array($componentId, $componentExistsCache[$textboxId])) {
-                    if (!$componentExistsCache[$textboxId]) {
-                        $this->logger->debug(
-                            sprintf(
-                                'Textbox %d is no longer associated with component %d: removing index',
-                                $textboxId,
-                                $componentId,
-                            ),
-                        );
-                        yield $this->buildIndex(
-                            $identifier,
-                            null,
-                            Hydrator::BASE_TYPE,
-                            null,
-                            true,
-                            null,
-                            null,
-                        );
-                    }
-                }
             }
         }
     }
