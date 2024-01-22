@@ -538,8 +538,6 @@ class Profile implements IStrategy
      */
     private function findYearLevelCoordinator(): array
     {
-        /* TODO Fill in these ylc vars
-         */
         return [
             'id' => null,
             'name' => null
