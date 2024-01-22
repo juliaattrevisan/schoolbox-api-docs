@@ -276,6 +276,13 @@ class Profile implements IStrategy
                     continue;
                 }
 
+                /* Skip deceased humans
+                 */
+                if ($student['relationships']['person']['data']['attributes']['isDeceased']) {
+                    $this->log->debug('deceased student');
+                    continue;
+                }
+
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
                 $campusName = $this->findCampusName($student);
@@ -996,7 +1003,13 @@ class Profile implements IStrategy
             $endpoint = "enrolments/person/{$contact['attributes']['personId']}?include=phoneNumbers";
 
             $parent = $this->api->retrieveDocument($endpoint);
-
+            /* Skip deceased humans
+             */
+//            if (!$student['relationships']['person']['data']['attributes']['isDeceased']) {
+//                $this->log->debug('deceased student');
+//                continue;
+//            }
+            print_r($parent);die();
             /* Catalog each of this guy's phone numbers so we can try and assign some
              */
             $numbers = [];
