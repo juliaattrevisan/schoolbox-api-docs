@@ -149,6 +149,7 @@ class IndexBuilder extends BaseBuilder
             WHERE cci.value = :textboxId
             AND   ccd.key   = :key
         ");
+        $componentExistsCache = [];
 
         $searchIndexQuery->execute(['type' => Hydrator::BASE_TYPE]);
         $this->logger->info(sprintf('Examining and cleaning up %d text box search indices', $searchIndexQuery->rowCount()));
@@ -183,7 +184,7 @@ class IndexBuilder extends BaseBuilder
                     'textboxId' => $textboxId,
                     'key'       => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
                 ]);
-                $componentExistsCache[$textboxId] = $textboxExistsQuery->fetchColumnArray('component_instance_id');
+                $componentExistsCache[$textboxId] = $componentExistsQuery->fetchColumnArray('component_instance_id');
             }
             if ($componentId === '') {
                 // This index has no component:
