@@ -108,17 +108,29 @@ class Profile implements IStrategy
             $email = '';
             $firstname = '';
             $firstnamePreferred = '';
+
+            /* TODO Sometimes these are together, sometimes not
+             */
             $form = '';
+            $formTeacher = $this->findFormTeacher();
+
             $gender = '';
+            $housemaster = $this->findHousemaster();
             $lastname = '';
             $mobile = '';
             $photoRedacted = false;
             $studiesCode = '';
             $title = '';
+
+            /* TODO Sometimes these are together, sometimes not
+             */
+            $tutor = $this->findTutor();
             $tutor = '';
             $tutorGroup = '';
+
             $username = '';
             $yearLevel = '';
+            $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
             /* TODO Fill in these dates
              */
@@ -140,35 +152,11 @@ class Profile implements IStrategy
             $legal = $this->findLegal();
             $medical = $this->findMedicalAlert();
             $messages = '';
-
-            /* TODO Customise these find* methods to suit your implementation
-             *  Maintain the methods' return signature for easiest resolution
-             *  though you are free to customise it as you see fit
-             */
+            $specialNeeds = $this->findSpecialNeeds();
 
             /* Emergency Contacts
              */
             $emergencyContacts = $this->findEmergencyContacts();
-
-            /* Find out a staff member via their user code
-             */
-            $formTeacher = $this->findFormTeacher();
-
-            /* Fish out a staff member via their user code
-             */
-            $housemaster = $this->findHousemaster();
-
-            /* Fish out special needs
-             */
-            $specialNeeds = $this->findSpecialNeeds();
-
-            /* Fish out a staff member via their user code
-             */
-            $tutor = $this->findTutor();
-
-            /* Find out a staff member via their user code
-             */
-            $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
             /* Dates
              */

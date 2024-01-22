@@ -149,6 +149,7 @@ class Profile implements IStrategy
 
                 $username = '';
                 $yearLevel = trim((string)($enrolmentDetails[0]['academicYearName'] ?? null));
+                $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
                 /* These will vary based on the campus we chose...
                  */
@@ -191,6 +192,7 @@ class Profile implements IStrategy
                 $legal = $this->findLegal();
                 $medical = $this->findMedicalAlert();
                 $messages = '';
+                $specialNeeds = (bool)$student['hasLearningDisabilityAlert'];
 
                 /* TODO Customise these find* methods to suit your implementation
                  *  Maintain the methods' return signature for easiest resolution
@@ -200,14 +202,6 @@ class Profile implements IStrategy
                 /* Emergency Contacts
                  */
                 $emergencyContacts = $this->findEmergencyContacts();
-
-                /* Fish out special needs
-                 */
-                $specialNeeds = (bool)$student['hasLearningDisabilityAlert'];
-
-                /* Find out a staff member via their user code
-                 */
-                $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
                 /* Dates
                  */
