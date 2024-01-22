@@ -10,6 +10,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<script src="https://cdn.iframe.ly/embed.js?cancel=0&api_key=94aa8fc28ac1089a2dfb28"></script>
 <script src="https://authorapi-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
 
@@ -106,6 +107,30 @@
         }
     }
     window.addEventListener('scroll', adjustItemsListHeader);
+
+    // Create a MutationObserver to watch for changes in the quiz container
+    const lrnObserver = new MutationObserver((mutationsList) => {
+        mutationsList.forEach((mutation) => {
+            if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach((node) => {
+                    // Process any new oembeds
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        node.querySelectorAll('oembed[url]:empty, div[data-oembed-url]:empty')
+                        .forEach((oEmbedEl) => {
+                            // Ensure not inside a ckeditor
+                            if (oEmbedEl.closest('[contenteditable="true"]') !== null) {
+                                return;
+                            }
+                            window.iframely.load(oEmbedEl, oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"));
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    // Start observing changes in the quiz container's subtree
+    lrnObserver.observe(document.getElementById("quiz-container"), { subtree: true, childList: true });
 
     /**
      * To add tags to the activity and also add browser state
