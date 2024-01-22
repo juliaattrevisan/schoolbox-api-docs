@@ -16,11 +16,13 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Alerts;
-use Schoolbox\External\Connector\FirstMeaningfulValue;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Caregivers;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -107,6 +109,14 @@ class Profile implements IStrategy
 
         $studentAlerts = (new Alerts($this->api))->generate();
 
+        /* Caregivers (parents etc)
+         */
+        $this->log->info('Downloading student caregivers (this might take a while)');
+
+        $caregivers = (new Caregivers($this->api))->generate();
+
+        /* Continue as intended...now that we downloaded the universe
+         */
         $pages = $this->api->retrieve('GET', 'Students/Jurisdiction');
 
         foreach ($pages as $page) {
@@ -344,7 +354,7 @@ class Profile implements IStrategy
 
                 /* Add their parents' profile data
                  */
-                $this->importParentsOfStudent($externalId, $studentBaseProfile);
+                $this->importParentsOfStudent($externalId, $studentBaseProfile, $caregivers);
             }
         }
     }
@@ -554,16 +564,22 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param string            $studentExternalId
-     * @param UserProfile\Model $studentBaseProfile
+     * @param string $studentExternalId
+     * @param Model $studentBaseProfile
+     * @param array $caregivers
      * @throws Exception
-     * @throws Mapper\DefinitionException
+     * @throws DefinitionException
      * @throws PDOException
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(
+        string $studentExternalId,
+        UserProfile\Model $studentBaseProfile,
+        array $caregivers
+    ): void
     {
+        print_r($caregivers);
+
         $parents = [];
 
         /* For every associated parent, find out if they have a parent profile
