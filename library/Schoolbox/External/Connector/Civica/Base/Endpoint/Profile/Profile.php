@@ -319,10 +319,13 @@ class Profile implements IStrategy
                     $studentProfile
                         ->setEmergencyContactName1(null)
                         ->setEmergencyContactPhone1(null)
+                        ->setEmergencyContactPhoneAlt1(null)
                         ->setEmergencyContactName2(null)
                         ->setEmergencyContactPhone2(null)
+                        ->setEmergencyContactPhoneAlt2(null)
                         ->setEmergencyContactName3(null)
-                        ->setEmergencyContactPhone3(null);
+                        ->setEmergencyContactPhone3(null)
+                        ->setEmergencyContactPhoneAlt3(null);
                 }
 
                 /* Log it
