@@ -148,11 +148,10 @@ class Profile implements IStrategy
                 $leavingDate = $enrolmentDetails[0]['enrolmentDetailEndDate'];
 
                 /* Flags
-                 * TODO Fill in these flag vars
                  */
                 $esl = false;
                 $ib = false;
-                $ilp = false;
+                $ilp = (bool)$student['isEducationSupport'];
 
                 /* Alerts
                  * TODO Define the mechanism to find these alert contents
