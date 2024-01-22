@@ -38,6 +38,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Used to serialize multi-piece data into one string, for UPS purposes usually
+     */
+    private const SEPARATOR = '~';
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -97,22 +103,30 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
-                /* TODO Fill in these basic student vars
-                 */
-                $externalId = '';
-                $academicHouse = '';
+                print_r($student);
+                $externalId = trim((string)$student['personId']);
+                $academicHouse = trim((string)$student['schools'][0]['houseName']);
                 $boardingStatus = false;
-                $campusName = '';
 
-                $dob = '';
-                $email = '';
-                $firstname = '';
-                $firstnamePreferred = '';
+                /* FIXME Someone can be in multiple campuses at the same time
+                 *  Serialize all those into one big string
+                 */
+                $campusName = $this->findCampusName($student['schools'][0]['enrolmentDetails']);
+
+                $dob = $this->findDate($student['birthDate']);
+                $email = trim((string)$student['email']);
+                $firstname = trim((string)$student['firstName']);
+                $firstnamePreferred = trim((string)$student['preferredName']);
                 $form = '';
-                $gender = '';
-                $lastname = '';
-                $mobile = '';
+                $gender = trim((string)$student['gender']);
+                $lastname = trim((string)$student['surname']);
+                $mobile = trim((string)$student['mobileNumber']);
+
+                /* TODO This might be fulfilled by $student['schools'][0]['isPublishPhoto']
+                 *  but there's no documentation for what this element means
+                 */
                 $photoRedacted = false;
+
                 $studiesCode = '';
                 $title = '';
                 $tutor = '';
@@ -155,7 +169,7 @@ class Profile implements IStrategy
 
                 /* Fish out a staff member via their user code
                  */
-                $housemaster = $this->findHousemaster();
+                $housemaster = $this->findHousemaster($student['schools'][0]);
 
                 /* Fish out special needs
                  */
@@ -315,6 +329,37 @@ class Profile implements IStrategy
 
 
     /**
+     * Find the most recent Campus someone was in; if there aren't any enrolment
+     * details, return null I guess, and let UPS sort them out
+     *
+     * @param array $enrolmentDetails
+     * @return null|string
+     */
+    private function findCampusName(array $enrolmentDetails): ?string
+    {
+        /* No campus? No trabajo
+         */
+        if (!\count($enrolmentDetails)) {
+            return null;
+        }
+
+        /* Pre-sort the list
+         */
+        $campuses = $enrolmentDetails;
+
+        usort($campuses, static function ($a, $b) {
+            if ($a['enrolmentDetailStartDate'] < $b ['enrolmentDetailStartDate']) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        return trim((string)$campuses[0]['campusName']);
+    }
+
+
+    /**
      * Find comments info for a given student
      *
      * @return string
@@ -402,15 +447,14 @@ class Profile implements IStrategy
     /**
      * Find a housemaster from their house name
      *
+     * @param array $school
      * @return array
      */
-    private function findHousemaster(): array
+    private function findHousemaster(array $school): array
     {
-        /* TODO Fill in these housemaster vars
-         */
         return [
-            'id' => null,
-            'name' => null
+            'id' => trim((string)$school['houseStaffId']),
+            'name' => trim((string)$school['houseStaffName'])
         ];
     }
 

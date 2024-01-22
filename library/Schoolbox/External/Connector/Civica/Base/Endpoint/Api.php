@@ -50,7 +50,7 @@ class Api implements IApi
      * Decide how big each page size should be
      * Civica's default response is 1000
      */
-    private const PAGE_SIZE = 10;
+    private const PAGE_SIZE = 5;
 
 
     /**
