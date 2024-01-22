@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
 use SensitiveParameter;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
@@ -45,12 +46,11 @@ class Api implements IApi
     private const NUM_RETRY = 3;
 
 
-
     /**
      * Decide how big each page size should be
      * Civica's default response is 1000
      */
-    private const PAGE_SIZE = 1000;
+    private const PAGE_SIZE = 10;
 
 
     /**
@@ -58,6 +58,7 @@ class Api implements IApi
      * to safeguard against infinite loops
      */
     private const MAX_PAYLOADS = 100;
+
 
     /**
      * @var ApiUsage
@@ -70,6 +71,7 @@ class Api implements IApi
      */
     private Client $client;
 
+
     /**
      * A Civica Access Token generator, in case you needed to
      * make a new one somewhere along the way
@@ -77,6 +79,7 @@ class Api implements IApi
      * @var AccessTokenGenerator
      */
     private AccessTokenGenerator $accessTokenGenerator;
+
 
     /**
      * The base uri that consists of host and school identifier
@@ -92,7 +95,9 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $apiKey
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RuntimeException
      */
     public function __construct(string $host, #[SensitiveParameter] string $apiKey)
     {
@@ -110,9 +115,11 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
-     * @param int    $timeout
+     * @param int $timeout
      * @return Client
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \DomainException
+     * @throws InvalidArgumentException
+     * @throws \RuntimeException
      */
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
