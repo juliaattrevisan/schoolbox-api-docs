@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Alerts;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -196,7 +197,7 @@ class Profile implements IStrategy
 
                 /* Emergency Contacts
                  */
-                $emergencyContacts = $this->findEmergencyContacts();
+                $emergencyContacts = $this->findEmergencyContacts($student['schools'][0]);
 
                 /* Dates
                  */
@@ -404,21 +405,34 @@ class Profile implements IStrategy
     /**
      * Find all the meaningful emergency contacts for a student
      *
+     * @param array $school
      * @return array
      */
-    public function findEmergencyContacts(): array
+    public function findEmergencyContacts(array $school): array
     {
-        $emergencyContacts = [];
         $contacts = [];
         $n = 0;
 
+        /* Sort by Emergency Ranking, apparently
+         */
+        $emergencyContacts = $school['emergencyContacts'];
+
+        uasort($emergencyContacts, static function ($a, $b) {
+            if ((int)$a['emergencyRanking'] > (int)$b['emergencyRanking']) {
+                return 1;
+            }
+
+            return 0;
+        });
+
         foreach ($emergencyContacts as $emergencyContact) {
             if ($n < self::MAX_EMERGENCY_CONTACTS) {
-                /* TODO Fill in these emergency contact vars
-                 */
-                $fullname = '';
-                $relation = '';
-                $phone = '';
+                $fullname = trim((string)$emergencyContact['contactName']);
+                $relation = trim((string)$emergencyContact['relationship']);
+                $phone = (new FirstMeaningfulValue())->find([
+                    $emergencyContact['mobileNumber'],
+                    $emergencyContact['phoneNumber']
+                ]);
 
                 /* Suffix the $relation if provided
                  */
