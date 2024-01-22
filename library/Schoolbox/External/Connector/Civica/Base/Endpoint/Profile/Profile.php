@@ -382,17 +382,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Find comments info for a given student
-     *
-     * @return string
-     */
-    private function findComments(): string
-    {
-        return '';
-    }
-
-
-    /**
      * Convert a date from possibly null/empty value
      *
      * @param string|null $date
