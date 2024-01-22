@@ -66,6 +66,16 @@ class CacheHelper
      */
     public const DATASOURCE_FIELDS_CACHE_KEY = 'isams_register_datasource_%s';
 
+    /**
+     * Where to cache the record collections for the specific register
+     */
+    public const RECORD_COLLECTIONS_CACHE_KEY = 'isams_register_%s_recordCollections';
+
+    /**
+     * Where to cache the student records for the specified collection and student
+     */
+    public const RECORD_COLLECTION_STUDENT_CACHE_KEY = 'isams_register_%s_collection_%s_student_%s';
+
     private API $api;
 
     /**
@@ -179,7 +189,7 @@ class CacheHelper
      */
     public function getRecordCollections(int $registerId, ?string $reportingKey = null): ?array
     {
-        $recordCollections = $this->cache->get(sprintf("isams_register_%s_recordCollections", $registerId));
+        $recordCollections = $this->cache->get(sprintf(self::RECORD_COLLECTIONS_CACHE_KEY, $registerId));
 
         if (!isset($recordCollections)) {
             // This ought to be cacheable for a lot longer than student data
@@ -189,7 +199,7 @@ class CacheHelper
                 token: $this->getToken(),
             );
             $recordCollections = $apiResponseBody['recordCollections'];
-            $this->cache->set(sprintf("isams_register_%s_recordCollections", $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+            $this->cache->set(sprintf(self::RECORD_COLLECTIONS_CACHE_KEY, $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
         }
 
         // not fetching a specific register, get everything
@@ -348,7 +358,7 @@ class CacheHelper
      */
     public function getRecordCollectionsRecords(int $registerId, string $externalId, int $collectionId)
     {
-        $recordCollections = $this->cache->get(sprintf("isams_register_%s_collection_%s_student_%s", $registerId, $collectionId, $externalId));
+        $recordCollections = $this->cache->get(sprintf(self::RECORD_COLLECTION_STUDENT_CACHE_KEY, $registerId, $collectionId, $externalId));
 
         if (!isset($recordCollections)) {
             // This ought to be cacheable for a lot longer than student data
@@ -358,7 +368,7 @@ class CacheHelper
                     'GET',
                     token: $this->getToken(),
                 );
-                $this->cache->set(sprintf("isams_register_%s_collection_%s_student_%s", $registerId, $collectionId, $externalId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+                $this->cache->set(sprintf(self::RECORD_COLLECTION_STUDENT_CACHE_KEY, $registerId, $collectionId, $externalId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
             } catch (ClientExceptionInterface $e) {
                 // No metadata exists for this field: that's okay
                 return  [];
