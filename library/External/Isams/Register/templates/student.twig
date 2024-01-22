@@ -29,8 +29,16 @@
                                 <tbody>
                                 {% for record in (child.data.userRecords ?? []) %}
                                     <tr>
-                                        {% for field in record %}
-                                            <td>{{ field.value }}</td>
+                                        {% for key, field in record %}
+                                            <td>
+                                                {% if field.type == 'url' %}
+                                                    <a href="{{ field.value }}">{{ child.data.knownFields[key] }}</a>
+                                                {% elseif field.type == 'html' %}
+                                                    {{ field.value | purify }}
+                                                {% else %}
+                                                    {{ field.value }}
+                                                {% endif %}
+                                            </td>
                                         {% endfor %}
                                     </tr>
                                 {% endfor %}

@@ -287,10 +287,27 @@ class Controller extends BaseController
                     continue;
                 }
                 $knownFields[$metadata['key']] = $metadata['name'];
+
+                // if TextboxField confirm the field type  (url / html?)
+                $value = $record['fields'][lcfirst($metadata['key'])];
+                $type = $metadata['type'];
+                if ('TextboxField' === $metadata['type']) {
+                    // is this a url, if so get twig to format as href
+                    $url = new \Url($value);
+                    if ($url->isUrl()) {
+                        $type = 'url';
+                    }
+
+                    // is html, then get twig to sanitise with `| purify`
+                    if (0 !== preg_match("/<[^<]+>/", $value, $m)) {
+                        $type = 'html';
+                    }
+                }
+
                 // join the record field to the metadata field and append to a new array
                 $fields[$metadata['key']] = [
-                    'type' => $metadata['type'],
-                    'value' => $record['fields'][lcfirst($metadata['key'])]
+                    'type' => $type,
+                    'value' => $value
                 ];
             }
             $out[] = $fields;
