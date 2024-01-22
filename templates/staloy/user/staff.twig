@@ -1,121 +1,22 @@
-{##
- # Staff Profile
- #
- # showEmails   bool    Spec pattern to decide whether email address is visible
- # showDetails  bool    Spec patternt to decide whether details are visible
- #}
+{% extends '@core/user/staff.twig' %}
 
-{# Permissions #}
-{% set isSuperuser = session.user.isSuperUser() %}
-{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
-{% set isSelf = session.user.getId() == user.getId() %}
-
-{% set showTitle = user.hasPositionTitle() %}
-{% set showButtons = isStaff or isSelf %}
-
-<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>{{ user.formatName() }}</h1>
-        </div>
-    </div>
-    <nav>
-        {% if routeLookupIfAuthorized('adminUser.getModify') %}
-            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User"></a>
-        {% endif %}
-    </nav>
-</div>
-<div class="row">
-    <div class="small-12 island">
-        <section class="no-pad">
-            <div class="profile content">
-                <div class="row no-margin">
-                    <div class="small-12 medium-2 columns no-pad">
-                        {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
-                    </div>
-
-                    <div class="small-12 medium-10 columns">
-                        <dl class="profile">
-                            {% if showTitle %}
-                                <dt class="small-12 medium-3">Position Title</dt>
-                                <dd class="small-12 medium-9">
-                                    {{ user.getPositionTitle() }}
-                                </dd>
-                            {% endif %}
-
-                            {% if showDetails %}
-                                {% block details_email %}
-                                    {% if user.getEmail() %}
-                                        <dt class="small-12 medium-3">Email</dt>
-                                        <dd class="small-12 medium-9">
-                                            <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
-                                        </dd>
-                                    {% endif %}
-                                {% endblock details_email %}
-                            {% endif %}
-
-                            {% if showDetails %}
-                                {% block details %}
-                                    {% if externalUser.StaffDepartment is defined and externalUser.StaffDepartment%}
-                                        <dt class="small-12 medium-3">Department:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffDepartment }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffCategoryDescription is defined and externalUser.StaffCategoryDescription %}
-                                        <dt class="small-12 medium-3">Type:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffExtension is defined and externalUser.StaffExtension %}
-                                        <dt class="small-12 medium-3">Extension:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffExtension }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffCampusDescription is defined and externalUser.StaffCampusDescription%}
-                                        <dt class="small-12 medium-3">Campus:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
-                                    {% endif %}
-                                    {% block house %}
-                                    {% endblock %}
-                                {% endblock %}
-                            {% endif %}
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            {% block buttons_island %}
-                <ul class='flex-list flex-wrap buttons'>
-                    {% block buttons %}
-                        {% if eportfolioAuth %}
-                            {% block buttons_eportfolio %}
-                                <li>
-                                    <a href="/eportfolio/{{ user.getId() }}/profile"
-                                       class="icon-eportfolio">ePortfolio</a>
-                                </li>
-                            {% endblock buttons_eportfolio %}
-                        {% endif %}
-
-                        {% if showButtons %}
-                            {% block buttons_calendar %}
-                                <li>
-                                    <a href='/calendar/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                       class="icon-calendar">{{ locale.calendar.proper }}</a>
-                                </li>
-                            {% endblock buttons_calendar %}
-
-                            {% block buttons_timetable %}
-                                <li>
-                                    <a href="/timetable/{{ user.getId() }}"
-                                       class="icon-timetable">Timetable</a>
-                                </li>
-                            {% endblock buttons_timetable %}
-
-                            {% for button in customButtons %}
-                                <li>
-                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
-                                </li>
-                            {% endfor %}
-                        {% endif %}
-                    {% endblock buttons %}
-                </ul>
-            {% endblock buttons_island %}
-        </section>
-    </div>
-</div>
+{% block details %}
+    {% if externalUser.StaffDepartment is defined and externalUser.StaffDepartment%}
+        <dt class="small-12 medium-3">Department:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.StaffDepartment }}</dd>
+    {% endif %}
+    {% if externalUser.StaffCategoryDescription is defined and externalUser.StaffCategoryDescription %}
+        <dt class="small-12 medium-3">Type:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
+    {% endif %}
+    {% if externalUser.StaffExtension is defined and externalUser.StaffExtension %}
+        <dt class="small-12 medium-3">Extension:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.StaffExtension }}</dd>
+    {% endif %}
+    {% if externalUser.StaffCampusDescription is defined and externalUser.StaffCampusDescription%}
+        <dt class="small-12 medium-3">Campus:</dt>
+        <dd class="small-12 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
+    {% endif %}
+    {% block house %}
+    {% endblock %}
+{% endblock %}
