@@ -279,7 +279,11 @@ class Profile implements IStrategy
                 /* Skip deceased humans
                  */
                 if ($student['relationships']['person']['data']['attributes']['isDeceased']) {
-                    $this->log->debug('deceased student');
+                    $this->log->debug(sprintf(
+                        'Person id %s is deceased: skipping.',
+                        $student['relationships']['person']['data']['id']
+                    ));
+
                     continue;
                 }
 
@@ -1005,11 +1009,15 @@ class Profile implements IStrategy
             $parent = $this->api->retrieveDocument($endpoint);
             /* Skip deceased humans
              */
-//            if (!$student['relationships']['person']['data']['attributes']['isDeceased']) {
-//                $this->log->debug('deceased student');
-//                continue;
-//            }
-            print_r($parent);die();
+            if ($parent['data']['attributes']['isDeceased']) {
+                $this->log->debug(sprintf(
+                    'Person id %s is deceased: skipping.',
+                    $parent['data']['id']
+                ));
+
+                continue;
+            }
+
             /* Catalog each of this guy's phone numbers so we can try and assign some
              */
             $numbers = [];
