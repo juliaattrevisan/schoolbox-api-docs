@@ -103,7 +103,8 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
-                print_r($student);
+                $enrolmentDetails = $this->sortEnrolmentDetails($student['schools'][0]['enrolmentDetails']);
+
                 $externalId = trim((string)$student['personId']);
                 $academicHouse = trim((string)$student['schools'][0]['houseName']);
                 $boardingStatus = false;
@@ -111,7 +112,7 @@ class Profile implements IStrategy
                 /* FIXME Someone can be in multiple campuses at the same time
                  *  Serialize all those into one big string
                  */
-                $campusName = $this->findCampusName($student['schools'][0]['enrolmentDetails']);
+                $campusName = trim((string)($enrolmentDetails[0]['campusName'] ?? null));
 
                 $dob = $this->findDate($student['birthDate']);
                 $email = trim((string)$student['email']);
@@ -127,12 +128,19 @@ class Profile implements IStrategy
                  */
                 $photoRedacted = false;
 
-                $studiesCode = '';
+                $studiesCode = trim((string)$student['usi']);
                 $title = '';
-                $tutor = '';
-                $tutorGroup = '';
+
+                /* Sequential Dependency
+                 *
+                 * Gather some tutor info; group happens to be in the same place as the tutor
+                 * itself, so we can collect them both with the same method here
+                 */
+                $tutor = $this->findTutor($enrolmentDetails);
+                $tutorGroup = $tutor['group'];
+
                 $username = '';
-                $yearLevel = '';
+                $yearLevel = trim((string)($enrolmentDetails[0]['academicYearName'] ?? null));
 
                 /* TODO Fill in these dates
                  */
@@ -174,10 +182,6 @@ class Profile implements IStrategy
                 /* Fish out special needs
                  */
                 $specialNeeds = $this->findSpecialNeeds();
-
-                /* Fish out a staff member via their user code
-                 */
-                $tutor = $this->findTutor();
 
                 /* Find out a staff member via their user code
                  */
@@ -333,9 +337,9 @@ class Profile implements IStrategy
      * details, return null I guess, and let UPS sort them out
      *
      * @param array $enrolmentDetails
-     * @return null|string
+     * @return null|array
      */
-    private function findCampusName(array $enrolmentDetails): ?string
+    private function sortEnrolmentDetails(array $enrolmentDetails): ?array
     {
         /* No campus? No trabajo
          */
@@ -355,7 +359,7 @@ class Profile implements IStrategy
             return 0;
         });
 
-        return trim((string)$campuses[0]['campusName']);
+        return $campuses;
     }
 
 
@@ -501,15 +505,27 @@ class Profile implements IStrategy
     /**
      * Find a tutor from their id
      *
+     * @param array $enrolmentDetails
      * @return array
      */
-    private function findTutor(): array
+    private function findTutor(array $enrolmentDetails): array
     {
-        /* TODO Fill in these tutor vars
+        /* No campuses? No trabajo
          */
+        if (!\count($enrolmentDetails)) {
+            return [
+                'id' => null,
+                'name' => null,
+                'group' => null,
+            ];
+        }
+
+        $campus = $enrolmentDetails[0];
+
         return [
-            'id' => null,
-            'name' => null
+            'id' => trim((string)$campus['rollGroupStaffId']),
+            'name' => trim((string)$campus['rollGroupStaffName']),
+            'group' => trim((string)$campus['rollGroupCode'])
         ];
     }
 
