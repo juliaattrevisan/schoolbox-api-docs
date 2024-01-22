@@ -396,7 +396,14 @@ class UserMapper extends Mapper
         /** @var CampusMapper $campusMapper */
         $campusMapper = $this->getJoinMapper('userCampus');
 
+        // Get hydrated yearLevel objects for each linked user.
+        $userIdsAsKeys = [];
         foreach ($statement as $row) {
+            $userIdsAsKeys[$row['id']] = null;
+        }
+        $yearLevelById = $this->getYearLevelByIdForAllUsersLinkedToUserIds(array_keys($userIdsAsKeys));
+
+         foreach ($statement as $row) {
             $userId = $row['id'];
 
             // Don't override previous hydrations of this user: add to it instead
@@ -441,6 +448,8 @@ class UserMapper extends Mapper
             if ($linkedUser) {
                 // Don't double add
                 $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
+                $linkedUser->setYear($yearLevelById[$linkedUser->getYear()->getId()]);
+
                 $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
             }
 
@@ -556,7 +565,7 @@ class UserMapper extends Mapper
         }
 
         $roleMapper = new RoleMapper();
-        $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
+        $yearLevelMapper = YearLevel\Mapper::getInstance();
 
         $pb = $this->getPredicateBuilder();
         $pb->any(
@@ -1123,5 +1132,43 @@ class UserMapper extends Mapper
         }
 
         return true;
+    }
+
+    /**
+     * Return a collection of YearLevel objects, indexed by id.
+     * @param array $userIds
+     * @return array
+     */
+    private function getYearLevelByIdForAllUsersLinkedToUserIds(array $userIds): array
+    {
+        if (count($userIds) === 0) {
+            return [];
+        }
+
+        $yearLevelIds = $this->getDatabase()->executeQuery(
+            'SELECT DISTINCT lu.year_id
+            FROM `user`         AS u
+            LEFT JOIN user_link AS ul ON u.id = ul.user_id
+            LEFT JOIN `user`    AS lu ON (lu.id = ul.linked_user_id AND lu.deleted_at IS NULL)
+            WHERE u.id IN (' . implode(',', array_map('intval', $userIds)) . ')
+            AND lu.year_id IS NOT NULL'
+        )->fetchColumnArray('year_id');
+
+        $yearLevels = new Collection();
+        foreach ($yearLevelIds as $yearLevelId) {
+            $yearLevel = new YearLevel\Model();
+            $yearLevel->setId($yearLevelId);
+            $yearLevels[] = $yearLevel;
+        }
+
+        $yearLevelMapper = new YearLevel\Mapper();
+        $yearLevels =$yearLevelMapper->hydrateCollection($yearLevels);
+
+        $yearLevelById = [];
+        foreach ($yearLevels as $yearLevel) {
+            $yearLevelById[$yearLevel->getId()] = $yearLevel;
+        }
+
+        return $yearLevelById;
     }
 }
