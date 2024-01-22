@@ -102,7 +102,6 @@ class Profile implements IStrategy
              */
             $externalId = '';
             $academicHouse = '';
-            $boardingStatus = false;
             $campusName = '';
 
             $dob = '';
@@ -129,6 +128,7 @@ class Profile implements IStrategy
             /* Flags
              * TODO Fill in these flag vars
              */
+            $boardingStatus = false;
             $esl = false;
             $ib = false;
             $ilp = false;

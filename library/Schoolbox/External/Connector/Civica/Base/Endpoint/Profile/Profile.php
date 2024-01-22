@@ -114,7 +114,6 @@ class Profile implements IStrategy
 
                 $externalId = trim((string)$student['personId']);
                 $academicHouse = trim((string)$student['schools'][0]['houseName']);
-                $boardingStatus = false;
 
                 /* FIXME Someone can be in multiple campuses at the same time
                  *  Serialize all those into one big string
@@ -158,6 +157,7 @@ class Profile implements IStrategy
 
                 /* Flags
                  */
+                $boardingStatus = false;
                 $esl = false;
                 $ib = false;
                 $ilp = (bool)$student['isEducationSupport'];
@@ -203,7 +203,7 @@ class Profile implements IStrategy
 
                 /* Fish out special needs
                  */
-                $specialNeeds = $this->findSpecialNeeds();
+                $specialNeeds = (bool)$student['hasLearningDisabilityAlert'];
 
                 /* Find out a staff member via their user code
                  */
@@ -506,19 +506,6 @@ class Profile implements IStrategy
         /* TODO Fill in these medical alert vars
          */
         return null;
-    }
-
-
-    /**
-     * Find out if this student has special needs
-     *
-     * @return bool
-     */
-    private function findSpecialNeeds(): bool
-    {
-        /* TODO Fill in these special needs vars
-         */
-        return false;
     }
 
 
