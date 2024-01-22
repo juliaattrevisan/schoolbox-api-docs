@@ -327,7 +327,8 @@ class Controller extends BaseController
                 if (!in_array(lcfirst($metadata['key']), $config['fields'])) {
                     continue;
                 }
-                $knownFields[$metadata['key']] = $metadata['name'];
+                $sequence = array_search(lcfirst($metadata['key']), $config['fields']);
+                $knownFields[$sequence] = $metadata['name'];
 
                 // if TextboxField confirm the field type  (url / html?)
                 $value = $record['fields'][lcfirst($metadata['key'])];
@@ -346,14 +347,16 @@ class Controller extends BaseController
                 }
 
                 // join the record field to the metadata field and append to a new array
-                $fields[$metadata['key']] = [
+                $fields[$sequence] = [
                     'type' => $type,
                     'value' => $value
                 ];
             }
+            ksort($fields);
             $out[] = $fields;
         }
 
+        ksort($knownFields);
         return [
             'knownFields' => $knownFields,
             'userRecords'   => $out
