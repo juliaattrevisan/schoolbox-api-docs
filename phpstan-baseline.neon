@@ -641,11 +641,6 @@ parameters:
 			path: library/Calendar/Layout/Full/Abstract.php
 
 		-
-			message: "#^Instanceof between null and DateTime will always evaluate to false\\.$#"
-			count: 1
-			path: library/Chat.php
-
-		-
 			message: "#^PHPDoc tag @return with type object is not subtype of native type Alaress\\\\Authorizer\\\\Authorizer\\.$#"
 			count: 1
 			path: library/Component/ControllerAbstract.php
