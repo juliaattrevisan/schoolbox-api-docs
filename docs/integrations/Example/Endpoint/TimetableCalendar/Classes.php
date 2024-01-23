@@ -157,6 +157,29 @@ class Classes implements IStrategy
     private function processClass(array $class): void
     {
         foreach ($class['lessons']['data'] as $classInstance) {
+            /* TODO Implement the Watchlist by doing a lookahead
+             *  to see if this class should even be made; you might
+             *  have to refine this approach to something else if
+             *  the sis compels you to do it differently
+             */
+//            /* Do a lookahead to see whether this classInstance is relevant
+//             * to $externalId or not
+//             */
+//            $candidates = [];
+//
+//            foreach ($class['students'] as $student) {
+//                $candidates[] = (string)$student['personId'];
+//            }
+//
+//            /* If any of the candidates from this class enrolments are on the watchlist
+//             * Then process the data like we usually do; otherwise skip it
+//             */
+//            if (!(new Watchlist())->isAnyOnWatchlist($candidates, $this->watchlist)) {
+//                continue;
+//            }
+
+
+
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $classInstance);
@@ -350,12 +373,6 @@ class Classes implements IStrategy
             foreach ($class['employees']['data'] as $employee) {
                 $externalId = (string)$employee['mis_id'];
 
-                /* Only import data for externalIds in $watchlist, if provided
-                 */
-                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
-                    continue;
-                }
-
                 $name = sprintf(
                     '%s %s %s',
                     $employee['title'],
@@ -378,12 +395,6 @@ class Classes implements IStrategy
         } else {
             foreach ($class['students']['data'] as $student) {
                 $externalId = (string)$student['mis_id'];
-
-                /* Only import data for externalIds in $watchlist, if provided
-                 */
-                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
-                    continue;
-                }
 
                 $name = sprintf(
                     '%s %s',

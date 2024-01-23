@@ -151,6 +151,22 @@ class Classes implements IStrategy
     private function processClass(array $class): void
     {
         foreach ($class['sessions'] as $classInstance) {
+            /* Do a lookahead to see whether this classInstance is relevant
+             * to $externalId or not
+             */
+            $candidates = [];
+
+            foreach ($class['students'] as $student) {
+                $candidates[] = (string)$student['personId'];
+            }
+
+            /* If any of the candidates from this class enrolments are on the watchlist
+             * Then process the data like we usually do; otherwise skip it
+             */
+            if (!(new Watchlist())->isAnyOnWatchlist($candidates, $this->watchlist)) {
+                continue;
+            }
+
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $classInstance);
@@ -342,29 +358,15 @@ class Classes implements IStrategy
                 $class['className']
             ));
         } else {
-            /* Do a lookahead to see whether this classInstance is relevant
-             * to $externalId or not
-             */
-            $candidates = [];
-
             foreach ($classInstance['staff'] as $employee) {
-                $candidates[] = (string)$employee['personId'];
-            }
+                $externalId = (string)$employee['personId'];
 
-            /* If any of the candidates from this classInstance are on the watchlist
-             * Then process the data like we usually do; otherwise skip it
-             */
-            if ((new Watchlist())->isAnyOnWatchlist($candidates, $this->watchlist)) {
-                foreach ($classInstance['staff'] as $employee) {
-                    $externalId = (string)$employee['personId'];
+                /* There isn't a convenient way to identify who $externalId
+                 * happens to be, by name...you'll have to do by number for now lol
+                 */
+                $name = $externalId;
 
-                    /* There isn't a convenient way to identify who $externalId
-                     * happens to be, by name...you'll have to do by number for now lol
-                     */
-                    $name = $externalId;
-
-                    $this->saveInvolvement($event, $classEntry, $name, $externalId);
-                }
+                $this->saveInvolvement($event, $classEntry, $name, $externalId);
             }
         }
 
@@ -377,51 +379,37 @@ class Classes implements IStrategy
                 $class['className']
             ));
         } else {
-            /* Do a lookahead to see whether this classInstance is relevant
-             * to $externalId or not
-             */
-            $candidates = [];
-
             foreach ($class['students'] as $student) {
-                $candidates[] = (string)$student['personId'];
-            }
+                $externalId = (string)$student['personId'];
 
-            /* If any of the candidates from this class enrolments are on the watchlist
-             * Then process the data like we usually do; otherwise skip it
-             */
-            if ((new Watchlist())->isAnyOnWatchlist($candidates, $this->watchlist)) {
-                foreach ($class['students'] as $student) {
-                    $externalId = (string)$student['personId'];
+                /* Decide if this class is relevant for this particular student
+                 * The student's startDate and endDate dictates whether this student
+                 * is even supposed to be in the class - it appears here, even if
+                 * it's obsolete...for civica reasons
+                 */
+                $sessionStartDate = sprintf(
+                    '%s %s',
+                    $classInstance['date'],
+                    $classInstance['startTime']
+                );
 
-                    /* Decide if this class is relevant for this particular student
-                     * The student's startDate and endDate dictates whether this student
-                     * is even supposed to be in the class - it appears here, even if
-                     * it's obsolete...for civica reasons
-                     */
-                    $sessionStartDate = sprintf(
-                        '%s %s',
-                        $classInstance['date'],
-                        $classInstance['startTime']
-                    );
+                if (!$this->isValid($student['startDate'], $student['endDate'], $sessionStartDate)) {
+                    $this->log->debug(sprintf(
+                        'Student %s enrolment in %s (%s) has expired; skipping',
+                        $externalId,
+                        $classEntry->getName(),
+                        $classEntry->getCode()
+                    ));
 
-                    if (!$this->isValid($student['startDate'], $student['endDate'], $sessionStartDate)) {
-                        $this->log->debug(sprintf(
-                            'Student %s enrolment in %s (%s) has expired; skipping',
-                            $externalId,
-                            $classEntry->getName(),
-                            $classEntry->getCode()
-                        ));
-
-                        continue;
-                    }
-
-                    /* There isn't a convenient way to identify who $externalId
-                     * happens to be, by name...you'll have to do by number for now lol
-                     */
-                    $name = $externalId;
-
-                    $this->saveEnrolment($event, $classEntry, $name, $externalId);
+                    continue;
                 }
+
+                /* There isn't a convenient way to identify who $externalId
+                 * happens to be, by name...you'll have to do by number for now lol
+                 */
+                $name = $externalId;
+
+                $this->saveEnrolment($event, $classEntry, $name, $externalId);
             }
         }
     }
