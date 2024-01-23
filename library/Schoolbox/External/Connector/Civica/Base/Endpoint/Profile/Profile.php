@@ -13,15 +13,14 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\IsValid;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Alerts;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Caregivers;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Model;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
@@ -48,6 +47,15 @@ class Profile implements IStrategy
 
 
     /**
+     * A Y-m-d string used to decide if certain data are relevant to that date.
+     * Civica gives us a bunch of obsolete data that we need to skip over.
+     *
+     * @var IsValid $isValid
+     */
+    private IsValid $isValid;
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -71,6 +79,9 @@ class Profile implements IStrategy
         private UserProfile\Staff\Mapper $staffProfileMapper,
         private UserProfile\Relationship\Mapper $relationshipMapper
     ) {
+        /* TODO maybe this should be adf, can't tell atm
+         */
+        $this->isValid = new IsValid(date('Y-m-d'));
     }
 
 
@@ -114,7 +125,7 @@ class Profile implements IStrategy
          */
         $this->log->info('Downloading student alerts (this might take a while)');
 
-        $studentAlerts = (new Alerts($this->api))->generate();
+        $studentAlerts = (new Alerts($this->isValid, $this->api))->generate();
 
         /* Caregivers (parents etc)
          */
@@ -704,83 +715,113 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-        $staffs = [];
+        /* Continue as intended...now that we downloaded the universe
+         */
+        $pages = $this->api->retrieve('GET', 'Staff/Jurisdiction');
 
-        foreach ($staffs as $staff) {
-            /* TODO Fill in basic staff vars
-             */
-            $externalId = '';
+        foreach ($pages as $page) {
+            foreach ($page['values'] as $staff) {
+                $externalId = trim((string)$staff['personId']);
 
-            $firstname = '';
-            $firstnamePreferred = '';
-            $lastname = '';
-            $building = '';
-            $campusName = '';
-            $category = '';
-            $department = '';
-            $email = '';
-            $phone = '';
-            $positionTitle = '';
-            $room = '';
-            $title = '';
-            $username = '';
+                $firstname = trim((string)$staff['firstName']);
+                $firstnamePreferred = trim((string)$staff['preferredFirstName']);
+                $lastname = trim((string)$staff['surname']);
+                $building = '';
+                $campusName = '';
+                $category = '';
+                $department = '';
+                $email = trim((string)$staff['workEmail']);
+                $phone = trim((string)$staff['workPhoneNumber']);
+                $positionTitle = $this->findPositions($staff['schools'][0]['positions']);
+                $room = '';
+                $title = trim((string)$staff['title']);
+                $username = '';
 
-            /* Find out if this externalId already has a staff profile
-             * If one already exists, load it, update it, then save it
-             * Otherwise make a new one for the given id
-             */
-            try {
-                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
-                $staffBaseProfile = $staffProfile->getBaseProfile();
-            } catch (Exception $e) {
-                $staffProfile = $this->staffProfileMapper->createModel();
-
+                /* Find out if this externalId already has a staff profile
+                 * If one already exists, load it, update it, then save it
+                 * Otherwise make a new one for the given id
+                 */
                 try {
-                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                    $staffBaseProfile = $staffProfile->getBaseProfile();
                 } catch (Exception $e) {
-                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                    $staffProfile = $this->staffProfileMapper->createModel();
+
+                    try {
+                        $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    } catch (Exception $e) {
+                        $staffBaseProfile = $this->baseProfileMapper->createModel();
+                    }
+
+                    $staffProfile->setBaseProfile($staffBaseProfile);
                 }
 
-                $staffProfile->setBaseProfile($staffBaseProfile);
-            }
+                $staffBaseProfile
+                    ->setExternalId($externalId)
+                    ->setTitle($title)
+                    ->setFirstname($firstname)
+                    ->setFirstnamePreferred($firstnamePreferred)
+                    ->setLastname($lastname);
 
-            $staffBaseProfile
-                ->setExternalId($externalId)
-                ->setTitle($title)
-                ->setFirstname($firstname)
-                ->setFirstnamePreferred($firstnamePreferred)
-                ->setLastname($lastname);
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($staffBaseProfile);
+                }
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($staffBaseProfile);
-            }
+                $staffProfile
+                    ->setBuilding($building)
+                    ->setCampusName($campusName)
+                    ->setCategory($category)
+                    ->setDepartment($department)
+                    ->setEmail($email)
+                    ->setPhone($phone)
+                    ->setPositionTitle($positionTitle)
+                    ->setRoom($room)
+                    ->setUsername($username);
 
-            $staffProfile
-                ->setBuilding($building)
-                ->setCampusName($campusName)
-                ->setCategory($category)
-                ->setDepartment($department)
-                ->setEmail($email)
-                ->setPhone($phone)
-                ->setPositionTitle($positionTitle)
-                ->setRoom($room)
-                ->setUsername($username);
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding staff profile for %s (%s)',
+                    trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                    $externalId
+                ));
 
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding staff profile for %s (%s)',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
-                $externalId
-            ));
-
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->staffProfileMapper->save($staffProfile);
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->staffProfileMapper->save($staffProfile);
+                }
             }
         }
+    }
+
+
+    /**
+     * Aggregates all the position titles this staff member owns
+     * and presents it as a csv
+     *
+     * @param array $positions
+     * @return string
+     */
+    private function findPositions(array $positions): string
+    {
+        $stack =  [];
+
+        foreach ($positions as &$position) {
+            $position['startDate'] = trim((string)$position['startDate']);
+            $position['endDate'] = trim((string)$position['endDate']);
+
+            /* Use the dates to figure out if this is relevant or not
+             */
+            if ($this->isValid->isSatisifiedBy($position)) {
+                $stack[$position['position']] = $position['position'];
+            }
+        }
+
+        unset($position);
+
+        return implode(', ', array_values($stack));
     }
 }

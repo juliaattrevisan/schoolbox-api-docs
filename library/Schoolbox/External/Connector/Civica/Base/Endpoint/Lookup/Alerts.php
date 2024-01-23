@@ -10,13 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup;
 
 use \Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\IsValid;
 
 class Alerts
 {
     /**
+     * @param IsValid $isValid
      * @param IApi $api
      */
-    public function __construct(private IApi $api)
+    public function __construct(private IsValid $isValid, private IApi $api)
     {
     }
 
@@ -31,10 +33,6 @@ class Alerts
     {
         $stack = [];
 
-        /* Filter out any dead alerts
-         */
-        $now = date('Y-m-d');
-
         $pages = $this->api->retrieve('GET', 'StudentAlerts/Jurisdiction');
 
         foreach ($pages as $page) {
@@ -44,7 +42,9 @@ class Alerts
                         $alert['startDate'] = trim((string)$alert['startDate']);
                         $alert['endDate'] = trim((string)$alert['endDate']);
 
-                        if ($this->isValid($now, $alert)) {
+                        /* Use the dates to figure out if this is relevant or not
+                         */
+                        if ($this->isValid->isSatisifiedBy($alert)) {
                             $stack[$personAlerts['studentPersonId']][$alert['alertId']] = $alert;
                         }
                     }
@@ -55,40 +55,5 @@ class Alerts
         unset($alert);
 
         return $stack;
-    }
-
-
-    /**
-     * Decide if we care about this $alert struct
-     *
-     * @param string $now
-     * @param array $alert
-     * @return bool
-     */
-    private function isValid(string $now, array $alert): bool
-    {
-        /* Start date is in the past
-         * Look at the end date
-         */
-        if ($alert['startDate'] && $now >= $alert['startDate']) {
-            if ('' === $alert['endDate']) {
-                /* No end date specified;
-                 * Alert is valid at the moment
-                 */
-                return true;
-            }
-
-            /* End date was specified, and it's in the future
-             * Alert is valid at the moment
-             */
-            if ($now < $alert['endDate']) {
-                return true;
-            }
-        }
-
-        /* Alert starts in the future, or it ended in the past
-         * Ignore it
-         */
-        return false;
     }
 }
