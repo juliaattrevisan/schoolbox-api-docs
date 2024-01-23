@@ -999,6 +999,16 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
     width: 100%;
 }
 
+/* Show something for oembeds inside the editor instead of nothing */
+.lrn .cke_editable oembed,
+.lrn .cke_editable div[data-oembed-url] {
+    background: #eee;
+    border: 2px dashed #888;
+    display: block;
+    height: 20px;
+    margin-top: 10px;
+}
+
 /* Fixed the mobile version for the search page */
 @media #{$small-only} {
     .lrn .lrn-author-ui .lrn-list-view-col:not(.lrn-list-view-select-col):first-child {
