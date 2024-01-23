@@ -251,7 +251,7 @@ class Profile implements IStrategy
                 if (\count($alerts)) {
                     $comments = implode("\n", $alerts);
                 }
-                
+
                 $legal = $this->findLegal();
                 $medical = $this->findMedicalAlert($currentSchool);
                 $messages = '';
@@ -690,8 +690,7 @@ class Profile implements IStrategy
         string $studentExternalId,
         UserProfile\Model $studentBaseProfile,
         array $caregivers
-    ): void
-    {
+    ): void {
         $parents = $caregivers[$studentExternalId] ?? [];
 
         /* For every associated parent, find out if they have a parent profile

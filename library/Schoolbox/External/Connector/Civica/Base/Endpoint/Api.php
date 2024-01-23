@@ -201,17 +201,17 @@ class Api implements IApi
             $this->schoolId,
             $endpoint
         );
-        
+
         return $this->retrieve($method, $specificEndpoint, $params, $pageSize);
     }
 
 
     /**
      * Jurisdictional endpoint access
-     * 
-     * Retrieve data using a hardcoded 0 as a schoolId, which grants you 
+     *
+     * Retrieve data using a hardcoded 0 as a schoolId, which grants you
      * access to all the /Jurisdiction endpoints...because Civica reasons.
-     * 
+     *
      * This is allegedly used for *some* (but not all) endpoints
      *
      * @param string $method

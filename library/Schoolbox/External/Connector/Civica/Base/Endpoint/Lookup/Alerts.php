@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup;
 
-use \Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IsValid;
 
 class Alerts
