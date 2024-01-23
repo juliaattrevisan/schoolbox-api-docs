@@ -119,7 +119,10 @@ class Profile implements IStrategy
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws \DomainException
      * @throws \InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     private function importStudents(): void
     {
@@ -137,7 +140,7 @@ class Profile implements IStrategy
 
         /* Continue as intended...now that we downloaded the universe
          */
-        $pages = $this->api->retrieve('GET', 'Students/Jurisdiction');
+        $pages = $this->api->retrieveForJurisdiction('GET', 'Students/Jurisdiction');
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
@@ -732,7 +735,7 @@ class Profile implements IStrategy
     {
         /* Continue as intended...now that we downloaded the universe
          */
-        $pages = $this->api->retrieve('GET', 'Staff/Jurisdiction');
+        $pages = $this->api->retrieveForJurisdiction('GET', 'Staff/Jurisdiction');
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $staff) {

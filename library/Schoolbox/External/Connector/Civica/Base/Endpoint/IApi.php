@@ -17,14 +17,48 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 interface IApi
 {
     /**
-     * Retrieves data from an endpoint
+     * Decide how big each page size should be
+     * Civica's default response is 1000
+     */
+    public const PAGE_SIZE = 5;
+
+
+    /**
+     * School-specific endpoint access
+     *
+     * Retrieve data using the SUDS Control Panel's schoolId field
+     * This is allegedly used for *some* (but not all) endpoints
      *
      * @param string $method
      * @param string $endpoint
-     * @param array  $params
+     * @param array $params
+     * @param int $pageSize
      * @return \Generator
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, array $params = []): \Generator;
+    public function retrieveForSchool(string $method, string $endpoint, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator;
+
+
+    /**
+     * Jurisdictional endpoint access
+     *
+     * Retrieve data using a hardcoded 0 as a schoolId, which grants you
+     * access to all the /Jurisdiction endpoints...because Civica reasons.
+     *
+     * This is allegedly used for *some* (but not all) endpoints
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param array $params
+     * @param int $pageSize
+     * @return \Generator
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function retrieveForJurisdiction(string $method, string $endpoint, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator;
 
 
     /**

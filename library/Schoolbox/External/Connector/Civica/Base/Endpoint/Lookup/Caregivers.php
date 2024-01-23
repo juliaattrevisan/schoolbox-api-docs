@@ -25,12 +25,15 @@ class Caregivers
      * Generate a set of (externalId, contact data) tuples
      *
      * @return array
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function generate(): array
     {
         $stack = [];
 
-        $pages = $this->api->retrieve('GET', 'StudentCaregivers/Jurisdiction');
+        $pages = $this->api->retrieveForJurisdiction('GET', 'StudentCaregivers/Jurisdiction');
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $caregivers) {
