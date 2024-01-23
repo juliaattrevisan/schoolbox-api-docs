@@ -30,11 +30,7 @@ class IndexBuilder extends BaseBuilder
                 f.created_by,
                 " . $this->buildTypeExpression() . " AS type
             FROM folder f
-            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
-            LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
-            LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
-            LEFT JOIN homepage_config hc ON f.id = hc.cid
-            LEFT JOIN userGroups ug ON f.id = ug.cid
+            " . $this->getJoinsFromFolderForTypeExpression() . "
             WHERE f.deleted_at IS NULL
         ";
         $params = [];
@@ -62,6 +58,44 @@ class IndexBuilder extends BaseBuilder
             );
             $index = $this->addFulltextIndex($index, $row['name'], self::INDEX_STRATEGY_TEXT);
             yield $index;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    {
+        $queryString = "
+            SELECT
+                f.id,
+                " . $this->buildTypeExpression() . " AS type
+            FROM folder f
+            " . $this->getJoinsFromFolderForTypeExpression() . "
+            WHERE f.deleted_at IS NOT NULL
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString .= ' AND f.deleted_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString .= ' AND f.deleted_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        $query = $this->connector->prepareQuery($queryString);
+        $query->execute($params);
+        $this->logger->info(sprintf('Deleting search indices for %d pages/folders', $query->rowCount()));
+        foreach ($query as $row) {
+            yield $this->buildIndex(
+                (string)$row['id'],
+                null,
+                $row['type'],
+                null,
+                false,
+                null,
+                null,
+            );
         }
     }
 
@@ -103,38 +137,17 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
-     * @inheritdoc
+     * Return the SQL JOIN clauses from table `folder` that are necessary for $this->buildTypeExpression().
+     * @returns string
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    private function getJoinsFromFolderForTypeExpression(): string
     {
-        $queryString = "
-            SELECT
-            f.id
-            FROM folder f
-            WHERE f.deleted_at IS NOT NULL
+        return "
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
+            LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+            LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+            LEFT JOIN homepage_config hc ON f.id = hc.cid
+            LEFT JOIN userGroups ug ON f.id = ug.cid
         ";
-        $params = [];
-        if ($fromDate) {
-            $queryString .= ' AND f.deleted_at >= :fromDate';
-            $params['fromDate'] = $fromDate->getDatabase();
-        }
-        if ($toDate) {
-            $queryString .= ' AND f.deleted_at <= :toDate';
-            $params['toDate'] = $toDate->getDatabase();
-        }
-        $query = $this->connector->prepareQuery($queryString);
-        $query->execute($params);
-        $this->logger->info(sprintf('Deleting search indices for %d pages/folders', $query->rowCount()));
-        foreach ($query as $row) {
-            yield $this->buildIndex(
-                (string)$row['id'],
-                null,
-                Hydrator::BASE_TYPE,
-                null,
-                true,
-                null,
-                null,
-            );
-        }
     }
 }
