@@ -138,7 +138,7 @@ class Profile implements IStrategy
          */
         $this->log->info('Downloading student alerts (this might take a while)');
 
-//        $studentAlerts = (new Alerts($this->isValid, $this->api))->generate();
+        $studentAlerts = (new Alerts($this->isValid, $this->api))->generate();
 
         /* Caregivers (parents etc)
          */

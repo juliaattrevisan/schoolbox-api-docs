@@ -28,12 +28,15 @@ class Alerts
      * aggregated from all their campuses
      *
      * @return array
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function generate(): array
     {
         $stack = [];
 
-        $pages = $this->api->retrieve('GET', 'StudentAlerts/Jurisdiction');
+        $pages = $this->api->retrieveForJurisdiction('GET', 'StudentAlerts/Jurisdiction');
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $personAlerts) {
