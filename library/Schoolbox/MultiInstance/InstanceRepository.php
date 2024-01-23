@@ -38,7 +38,9 @@ class InstanceRepository
     /**
      * Constructor
      *
-     * @param array<string, TInstanceConfigArray> $instances A list of instances, as parsed from an .ini file.
+     * @param array<array-key, TInstanceConfigArray> $instances A list of instances, as parsed from an .ini file.
+     *                                                          The key is usually a string, but in rare cases (i.e. an
+     *                                                          instance ID which is wholly numeric) may be an integer.
      */
     public function __construct(private array $instances)
     {
@@ -82,7 +84,7 @@ class InstanceRepository
     public function fetchConfigForHostname(string $hostname): InstanceConfig
     {
         foreach ($this->instances as $instanceId => $instance) {
-            $instanceConfig = $this->fetchConfigForInstance($instanceId);
+            $instanceConfig = $this->fetchConfigForInstance((string)$instanceId);
             if (in_array($hostname, $instanceConfig->hostnames)) {
                 return $instanceConfig;
             }
