@@ -590,7 +590,7 @@ class Scrub
             // I'd have to rewrite the whole thing to not be a static class.
             // For now: just create a concrete HTTP client.
             $httpClient = new Client(['curl' => ProxyServer::getInstance()->buildCurlOptions()]);
-            self::$embedReplacer = new EmbedReplacer($httpClient);
+            self::$embedReplacer = new EmbedReplacer($httpClient, Config::get('iframely_license_key_private'));
         }
         return self::$embedReplacer;
     }

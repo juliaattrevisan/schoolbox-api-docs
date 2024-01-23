@@ -4,7 +4,6 @@
  */
 
 const IFRAME_SRC = "//cdn.iframe.ly/api/iframe";
-const API_KEY = "94aa8fc28ac1089a2dfb28";
 
 /**
  * Returns the settings for the mediaEmbed plugin.
@@ -23,7 +22,7 @@ export function getMediaEmbedSettings() {
                     url: /.+/, // Match all URLs or just the ones you need
                     html: (match: string) => {
                         const url = match[0];
-                        const iframeUrl = `${IFRAME_SRC}?app=1&api_key=${API_KEY}&url=${encodeURIComponent(url)}`;
+                        const iframeUrl = `${IFRAME_SRC}?app=1&key=${window.sbProps.iframelyLicenseKey}&url=${encodeURIComponent(url)}`;
                         // alternatively, use &key= instead of &api_key with the MD5 hash of your api_key
                         // more about it: https://iframely.com/docs/allow-origins
                         return (

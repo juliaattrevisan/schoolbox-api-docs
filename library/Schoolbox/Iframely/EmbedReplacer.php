@@ -54,11 +54,6 @@ class EmbedReplacer
     private const IFRAMELY_API_ENDPOINT = 'https://iframe.ly/api/iframely';
 
     /**
-     * API Key for fetching URL information.
-     */
-    private const IFRAMELY_API_KEY = '94aa8fc28ac1089a2dfb28';
-
-    /**
      * A set of additional parameters for the API endpoint, to be attempted in
      * order.
      *
@@ -82,8 +77,9 @@ class EmbedReplacer
      * @param Client $httpClient Required for making requests to Iframely's API
      *                           (for a version of the embed which does not use
      *                           Iframely's CDN)
+     * @param string $iframelyLicenseKey
      */
-    public function __construct(private Client $httpClient)
+    public function __construct(private Client $httpClient, private string $iframelyLicenseKey)
     {
     }
 
@@ -181,7 +177,7 @@ class EmbedReplacer
                 $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT));
                 if ('oembed' === $srcNode->tagName()) {
                     // We are in an oembed ckeditor5 object so we need to add different query strings
-                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => self::IFRAMELY_API_KEY, 'url' => $srcNode->getAttribute($attribute)]);
+                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => $this->iframelyLicenseKey, 'url' => $srcNode->getAttribute($attribute)]);
                 } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
                     //ckeditor4 the iframe tag contains the required iframe url with the key already there
                     $apiUrl = $apiUrl->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
