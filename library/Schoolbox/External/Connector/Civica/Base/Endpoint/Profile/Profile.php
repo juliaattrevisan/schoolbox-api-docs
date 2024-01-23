@@ -265,6 +265,8 @@ class Profile implements IStrategy
                 $enrolment = $this->findDate($enrolmentDate);
                 $leaving = $this->findDate($leavingDate);
 
+                /* Arbitrary diagnostics, for lack of a better place to put them
+                 */
                 $this->log->debug(sprintf(
                     'Found campus(es) "%s" for %s %s (%s)',
                     $campusName,
@@ -827,7 +829,7 @@ class Profile implements IStrategy
                 $firstnamePreferred = trim((string)$staff['preferredFirstName']);
                 $lastname = trim((string)$staff['surname']);
                 $building = '';
-                $campusName = '';
+                $campusName = $this->aggregateStaffCampuses($staff['schools']);
                 $category = '';
                 $department = '';
                 $email = trim((string)$staff['workEmail']);
@@ -836,6 +838,16 @@ class Profile implements IStrategy
                 $room = '';
                 $title = trim((string)$staff['title']);
                 $username = '';
+
+                /* Arbitrary diagnostics, for lack of a better place to put them
+                 */
+                $this->log->debug(sprintf(
+                    'Found campus(es) "%s" for %s %s (%s)',
+                    $campusName,
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
 
                 /* Find out if this externalId already has a staff profile
                  * If one already exists, load it, update it, then save it
@@ -923,5 +935,53 @@ class Profile implements IStrategy
         unset($position);
 
         return implode(', ', array_values($stack));
+    }
+
+
+    /**
+     * Civica "schools" correspond to our idea of "campuses"
+     * (schoolbox campuses are a way of categorising the whole demographic of humans)
+     *
+     * A person's set of campus is derived from all the $school elements that have at
+     * least one relevant $position['isPrimaryAssignment'] = 1...anything else is
+     * skipped, I guess, for lack of any way to know a campus. This sounds weird to me
+     * but whatever - Civica really has some weird ways of doing things
+     *
+     * Serialize multiple schools/campuses into one string to decipher in UPS
+     *
+     * SUDS doesn't support true multi-school support, really - we just have one
+     * field which we h4x0r to "make work" in UPS.
+     *
+     * @param array $schools
+     * @return string
+     */
+    private function aggregateStaffCampuses(array $schools): string
+    {
+        $stack = [];
+
+        foreach ($schools as $school) {
+            foreach ($school['positions'] as &$position) {
+                $position['startDate'] = trim((string)$position['startDate']);
+                $position['endDate'] = trim((string)$position['endDate']);
+
+                /* Use the dates to figure out if this is relevant or not;
+                 * but also this random isPrimaryAssignment field...it seems
+                 * the combination of these data decides campus relevancy
+                 * because Civica reasons
+                 */
+                if ($position['isPrimaryAssignment'] && $this->isValid->isSatisifiedBy($position)) {
+                    $stack[$position['campus']] = $position['campus'];
+                }
+            }
+        }
+
+        unset($position);
+
+        /* "Erin says worm"
+         *
+         * Serialize it with the separator she chose; you'll have to work
+         * with this in UPS
+         */
+        return implode(self::SEPARATOR, array_values($stack));
     }
 }
