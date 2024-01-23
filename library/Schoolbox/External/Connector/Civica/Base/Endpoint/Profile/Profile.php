@@ -825,6 +825,12 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $staff) {
+                /* FIXME There is an Omega Assumption about using $schools[0]
+                 *  because we don't have a means by which to choose which of $schools
+                 *  is the one to use...
+                 */
+                $currentSchool = $staff['schools'][0];
+
                 $externalId = trim((string)$staff['personId']);
                 $firstname = trim((string)$staff['firstName']);
                 $firstnamePreferred = trim((string)$staff['preferredFirstName']);
@@ -835,7 +841,7 @@ class Profile implements IStrategy
                 $department = '';
                 $email = trim((string)$staff['workEmail']);
                 $phone = trim((string)$staff['workPhoneNumber']);
-                $positionTitle = $this->findPositions($staff['schools'][0]['positions']);
+                $positionTitle = $this->findPositions($currentSchool['positions']);
                 $room = '';
                 $title = trim((string)$staff['title']);
                 $username = '';
