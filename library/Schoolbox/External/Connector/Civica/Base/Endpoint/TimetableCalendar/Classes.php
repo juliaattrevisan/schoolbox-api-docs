@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -16,7 +16,6 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Factory;
-use Schoolbox\External\Connector\Civica\Base\Endpoint\IsValid;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
