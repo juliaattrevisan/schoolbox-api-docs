@@ -117,20 +117,19 @@ window.Vue.onUnmounted(async () => {
 
 <template>
     <div>
-        <label>Comment</label>
-        <p
+        <template
             v-if="
-                (props.isReadOnly && props.item.questions[0].response?.comment === undefined) ||
-                (props.isReadOnly && props.item.questions[0].response?.comment === '')
+                props.isReadOnly &&
+                props.item.questions[0].response?.comment !== undefined &&
+                props.item.questions[0].response?.comment !== ''
             "
         >
-            <em>No comment added.</em>
-        </p>
-        <div
-            v-else-if="props.isReadOnly && props.item.questions[0].response?.comment !== ''"
-            v-html="props.item.questions[0].response?.comment"
-        ></div>
-        <template v-else>
+            <div>
+                <label>Comment</label>
+                <div v-html="props.item.questions[0].response.comment"></div>
+            </div>
+        </template>
+        <template v-else-if="!props.isReadOnly">
             <p class="meta">
                 Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
                 details on creation.

@@ -19,6 +19,7 @@ interface Props {
     isReadOnly: boolean; // whether the question is readonly
     showFeedback: boolean; // whether to show the feedback
     hasMarkVisibility: boolean; // whether marks and feedback are visible to the user
+    isLastQuestion: boolean; // whether thta's the last question
 }
 const props = defineProps<Props>();
 const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element to render the report into
@@ -160,6 +161,20 @@ window.Vue.onBeforeUnmount(async () => {
         await saveScore();
     }
 });
+
+/**
+ * Hide the bottom border if there is no comment
+ */
+const bottomBorder = window.Vue.computed(() => {
+    if (!props.isReadOnly) {
+        return "2px solid var(--body-background)";
+    }
+
+    return props.isLastQuestion &&
+        (props.item.questions[0].response?.comment === "" || props.item.questions[0].response?.comment === undefined)
+        ? "none"
+        : "2px solid var(--body-background)";
+});
 </script>
 
 <template>
@@ -172,10 +187,12 @@ window.Vue.onBeforeUnmount(async () => {
                     <p>{{ question.metadata.sample_answer }}</p>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
-                    <label>Score (max score: {{ props.question.response.maxScore }})</label>
-                    <p v-if="props.isReadOnly">{{ score }}</p>
+                    <label v-if="props.item.questions.length > 1 || !props.isReadOnly"
+                        >Score (max score: {{ props.question.response.maxScore }})</label
+                    >
+                    <p v-if="props.isReadOnly && props.item.questions.length > 1">{{ score }}</p>
                     <input
-                        v-else
+                        v-else-if="props.item.questions.length > 1 || !props.isReadOnly"
                         :id="`customise-score-${props.question.response.learnosityReference}`"
                         ref="scoreEl"
                         v-model="score"
@@ -208,7 +225,7 @@ window.Vue.onBeforeUnmount(async () => {
     }
 }
 .question {
-    border-bottom: 2px solid var(--body-background);
+    border-bottom: v-bind(bottomBorder);
 }
 /* as it's readonly, but we still want to make it fully readable  */
 input[readonly] {
