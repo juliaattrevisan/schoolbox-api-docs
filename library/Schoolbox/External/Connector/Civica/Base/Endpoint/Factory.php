@@ -105,6 +105,8 @@ class Factory
      * @return GenericCollection
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \RuntimeException
      */
     public function produce(): GenericCollection
     {
@@ -159,37 +161,37 @@ class Factory
         }
 
         if ($this->validStrats->isTimetableStratEnabled()) {
-//            $bus
-//                /* SUDS Timetable Events
-//                 */
-//                ->add(new TimetableCalendar\Prepare(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->eventMapper,
-//                    $this->classEntryMapper,
-//                    $this->classInvolvementMapper,
-//                    $this->classPeriodMapper,
-//                    $this->periodMapper,
-//                    $this->overridesMapper
-//                ))
-//                ->add(new TimetableCalendar\Classes(
-//                    $this->log,
-//                    $this->perform,
-//                    $api,
-//                    $this->watchlist,
-//                    $this->eventMapper,
-//                    $this->overridesMapper,
-//                    $this->classEntryMapper,
-//                    $this->classInvolvementMapper,
-//                    $timezone,
-//                    $from,
-//                    $to
-//                ))
-//                ->add(new TimetableCalendar\Cleanup(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->eventMapper
-//                ));
+            $bus
+                /* SUDS Timetable Events
+                 */
+                ->add(new TimetableCalendar\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper
+                ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->watchlist,
+                    $this->eventMapper,
+                    $this->overridesMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $timezone,
+                    $from,
+                    $to
+                ))
+                ->add(new TimetableCalendar\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ));
         }
 
         $bus
