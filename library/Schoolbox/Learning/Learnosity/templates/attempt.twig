@@ -71,7 +71,7 @@
 
                     // Process any new oembeds
                     if (node.nodeType === Node.ELEMENT_NODE) {
-                        node.querySelectorAll('oembed[url]:empty, div[data-oembed-url]:empty')
+                        node.querySelectorAll('oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))')
                         .forEach((oEmbedEl) => {
                             // Ensure not inside a ckeditor
                             if (oEmbedEl.closest('[contenteditable="true"]') !== null) {
