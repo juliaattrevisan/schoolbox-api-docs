@@ -167,7 +167,6 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
 
         let mediaContainer = document.createElement("div");
         mediaContainer.setAttribute("data-schoolboxmedia-replacement-container", "");
-        mediaContainer.style.maxWidth = maxwidth;
 
         if (type === "video") {
             let mediaElement = document.createElement("video");
@@ -186,6 +185,7 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
             mediaSource.setAttribute("type", "video/mp4");
 
             mediaElement.appendChild(mediaSource);
+            mediaContainer.style.maxWidth = maxwidth;
             mediaContainer.appendChild(mediaElement);
 
             return mediaContainer;
@@ -196,7 +196,7 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
             mediaElement.setAttribute("preload", "none");
             mediaElement.setAttribute("style", style);
             mediaElement.style.width = "100%";
-            mediaElement.style.height = "100%";
+            mediaElement.style.height = "40px";
             mediaElement.style.border = "0px";
 
             let mediaSource = document.createElement("source");
