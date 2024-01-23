@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Example\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -40,14 +41,15 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
-     * @param ValidStrats                     $validStrats
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param IApi                            $api
-     * @param UserProfile\Mapper              $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param array $watchlist
+     * @param UserProfile\Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
@@ -55,6 +57,7 @@ class Profile implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private array $watchlist,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -101,6 +104,15 @@ class Profile implements IStrategy
             /* TODO Fill in these basic student vars
              */
             $externalId = '';
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
+            /* TODO Fill in these basic student vars
+             */
             $academicHouse = '';
             $campusName = '';
 
@@ -605,6 +617,14 @@ class Profile implements IStrategy
              */
             $externalId = '';
 
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
+            /* TODO Fill in basic staff vars
+             */
             $firstname = '';
             $firstnamePreferred = '';
             $lastname = '';

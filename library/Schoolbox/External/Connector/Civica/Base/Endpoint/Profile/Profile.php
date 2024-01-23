@@ -18,8 +18,10 @@ use Schoolbox\External\Connector\Civica\Base\Endpoint\IsValid;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Alerts;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Lookup\Caregivers;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -67,14 +69,15 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
-     * @param ValidStrats                     $validStrats
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param IApi                            $api
-     * @param UserProfile\Mapper              $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param array $watchlist
+     * @param Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
@@ -82,6 +85,7 @@ class Profile implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private array $watchlist,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -152,6 +156,14 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
+                $externalId = trim((string)$student['personId']);
+
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
                 /* FIXME There is an Omega Assumption about using $schools[0]
                  *  because we don't have a means by which to choose which of $schools
                  *  is the one to use...
@@ -173,7 +185,6 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                $externalId = trim((string)$student['personId']);
                 $academicHouse = trim((string)$currentSchool['houseName']);
 
                 /* Someone can be in multiple campuses at the same time
@@ -825,13 +836,20 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $staff) {
+                $externalId = trim((string)$staff['personId']);
+
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
                 /* FIXME There is an Omega Assumption about using $schools[0]
                  *  because we don't have a means by which to choose which of $schools
                  *  is the one to use...
                  */
                 $currentSchool = $staff['schools'][0];
 
-                $externalId = trim((string)$staff['personId']);
                 $firstname = trim((string)$staff['firstName']);
                 $firstnamePreferred = trim((string)$staff['preferredFirstName']);
                 $lastname = trim((string)$staff['surname']);

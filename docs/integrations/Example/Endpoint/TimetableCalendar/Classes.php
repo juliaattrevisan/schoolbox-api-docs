@@ -16,6 +16,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Example\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Example\Base\Endpoint\Factory;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -347,7 +348,13 @@ class Classes implements IStrategy
             ));
         } else {
             foreach ($class['employees']['data'] as $employee) {
-                $externalId = $employee['mis_id'];
+                $externalId = (string)$employee['mis_id'];
+
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
 
                 $name = sprintf(
                     '%s %s %s',
@@ -370,7 +377,13 @@ class Classes implements IStrategy
             ));
         } else {
             foreach ($class['students']['data'] as $student) {
-                $externalId = $student['mis_id'];
+                $externalId = (string)$student['mis_id'];
+
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
 
                 $name = sprintf(
                     '%s %s',

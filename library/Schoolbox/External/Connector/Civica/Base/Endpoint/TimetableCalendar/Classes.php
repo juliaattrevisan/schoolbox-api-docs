@@ -16,6 +16,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Factory;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -344,6 +345,12 @@ class Classes implements IStrategy
             foreach ($classInstance['staff'] as $employee) {
                 $externalId = (string)$employee['personId'];
 
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
                 /* There isn't a convenient way to identify who $externalId
                  * happens to be, by name...you'll have to do by number for now lol
                  */
@@ -364,6 +371,12 @@ class Classes implements IStrategy
         } else {
             foreach ($class['students'] as $student) {
                 $externalId = (string)$student['personId'];
+
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
 
                 /* Decide if this class is relevant for this particular student
                  * The student's startDate and endDate dictates whether this student
