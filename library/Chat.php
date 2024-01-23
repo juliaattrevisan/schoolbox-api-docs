@@ -30,10 +30,10 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     /**
      * Get logs
      *
-     * @param int  $category_id
-     * @param null $last_poll
-     * @param int  $not_user_id
-     * @return array|bool
+     * @param int           $category_id
+     * @param DateTime|null $last_poll
+     * @param int           $not_user_id
+     * @return array
      */
     public function getLogs($category_id, $last_poll = null, $not_user_id = 0)
     {
@@ -49,20 +49,23 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             FROM {$this->_table} c
             LEFT JOIN user ON c.user_id = user.id
             LEFT JOIN pronoun ON user.pronoun = pronoun.id
-            WHERE `category_id` = $category_id
+            WHERE `category_id` = :categoryId
         ";
+        $params = ['categoryId' => $category_id];
 
         if (!empty($not_user_id)) {
-            $query .= " AND `user_id` != $not_user_id";
+            $query .= " AND `user_id` != :notUserId";
+            $params['notUserId'] = $not_user_id;
         }
 
         if ($last_poll instanceof DateTime) {
-            $query .= " AND `time` > '" . $last_poll->format('Y-m-d H:i:s') . "'";
+            $query .= " AND `time` > :lastPoll";
+            $params['lastPoll'] = $last_poll->format('Y-m-d H:i:s');
         }
 
         $query .= " ORDER BY time ASC";
 
-        $logs = $this->db->query($query)->fetchAll();
+        $logs = $this->db->query($query, $params)->fetchAll();
 
         if (!empty($logs)) {
             $userHandler = new User();
