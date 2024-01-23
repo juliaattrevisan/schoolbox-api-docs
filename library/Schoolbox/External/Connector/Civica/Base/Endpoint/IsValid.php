@@ -36,7 +36,7 @@ class IsValid
          * Look at the end date
          */
         if ($data[$startDateKey] && $this->now >= $data[$startDateKey]) {
-            if ('' === $data[$endDateKey]) {
+            if ((null === $data[$endDateKey]) || ('' === $data[$endDateKey])) {
                 /* No end date specified;
                  * Alert is valid at the moment
                  */

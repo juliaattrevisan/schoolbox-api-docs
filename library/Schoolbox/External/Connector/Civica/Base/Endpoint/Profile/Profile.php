@@ -53,6 +53,7 @@ class Profile implements IStrategy
      * @var IsValid $isValid
      */
     private IsValid $isValid;
+    private string $now;
 
 
     /**
@@ -81,7 +82,8 @@ class Profile implements IStrategy
     ) {
         /* TODO maybe this should be adf, can't tell atm
          */
-        $this->isValid = new IsValid(date('Y-m-d'));
+        $this->now = date('Y-m-d');
+        $this->isValid = new IsValid($this->now);
     }
 
 
@@ -125,7 +127,7 @@ class Profile implements IStrategy
          */
         $this->log->info('Downloading student alerts (this might take a while)');
 
-        $studentAlerts = (new Alerts($this->isValid, $this->api))->generate();
+//        $studentAlerts = (new Alerts($this->isValid, $this->api))->generate();
 
         /* Caregivers (parents etc)
          */
@@ -139,7 +141,19 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
+                /* This is reused a lot
+                 */
                 $enrolmentDetails = $this->sortEnrolmentDetails($student['schools'][0]['enrolmentDetails']);
+
+                if (!\count($enrolmentDetails)) {
+                    $this->log->warning(sprintf(
+                        'Student %s has no enrolment details relevant to %s; skipping',
+                        $student['personId'],
+                        $this->now
+                    ));
+
+                    continue;
+                }
 
                 $externalId = trim((string)$student['personId']);
                 $academicHouse = trim((string)$student['schools'][0]['houseName']);
@@ -396,17 +410,18 @@ class Profile implements IStrategy
 
         /* Pre-sort the list
          */
-        $campuses = $enrolmentDetails;
+        $startKey = 'enrolmentDetailStartDate';
+        $endKey = 'enrolmentDetailEndDate';
 
-        usort($campuses, static function ($a, $b) {
-            if ($a['enrolmentDetailStartDate'] < $b ['enrolmentDetailStartDate']) {
-                return 1;
+        $stack = [];
+
+        foreach ($enrolmentDetails as $enrolmentDetail) {
+            if ($this->isValid->isSatisifiedBy($enrolmentDetail, $startKey, $endKey)) {
+                $stack[] = $enrolmentDetail;
             }
+        }
 
-            return 0;
-        });
-
-        return $campuses;
+        return $stack;
     }
 
 
@@ -722,7 +737,6 @@ class Profile implements IStrategy
         foreach ($pages as $page) {
             foreach ($page['values'] as $staff) {
                 $externalId = trim((string)$staff['personId']);
-
                 $firstname = trim((string)$staff['firstName']);
                 $firstnamePreferred = trim((string)$staff['preferredFirstName']);
                 $lastname = trim((string)$staff['surname']);
