@@ -166,8 +166,12 @@ window.Vue.onBeforeUnmount(async () => {
  * Hide the bottom border if there is no comment
  */
 const bottomBorder = window.Vue.computed(() => {
-    return (props.isLastQuestion && props.item.questions[0].response?.comment === "") ||
-        (props.isLastQuestion && props.item.questions[0].response?.comment === undefined)
+    if (!props.isReadOnly) {
+        return "2px solid var(--body-background)";
+    }
+
+    return props.isLastQuestion &&
+        (props.item.questions[0].response?.comment === "" || props.item.questions[0].response?.comment === undefined)
         ? "none"
         : "2px solid var(--body-background)";
 });
