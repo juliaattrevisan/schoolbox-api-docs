@@ -436,13 +436,10 @@ class Profile implements IStrategy
 
         /* Pre-sort the list
          */
-        $startKey = 'enrolmentDetailStartDate';
-        $endKey = 'enrolmentDetailEndDate';
-
         $stack = [];
 
         foreach ($enrolmentDetails as $enrolmentDetail) {
-            if ($this->isValid->isSatisifiedBy($enrolmentDetail, $startKey, $endKey)) {
+            if ($this->isValid->isSatisifiedBy($enrolmentDetail, 'enrolmentDetailStartDate', 'enrolmentDetailEndDate')) {
                 $stack[] = $enrolmentDetail;
             }
         }
