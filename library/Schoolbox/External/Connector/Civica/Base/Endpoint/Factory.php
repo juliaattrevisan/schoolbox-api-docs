@@ -184,7 +184,6 @@ class Factory
                     $this->overridesMapper,
                     $this->classEntryMapper,
                     $this->classInvolvementMapper,
-                    $timezone,
                     $from,
                     $to
                 ))

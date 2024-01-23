@@ -29,19 +29,6 @@ use Schoolbox\Mapper\Exception;
 class Classes implements IStrategy
 {
     /**
-     * Prevent infinite loop of api calls
-     */
-    private const MAX_CALLS = 100;
-
-
-    /**
-     * Number of records per page
-     * The maximum is an unwritten 200 or so, apparently
-     */
-    private const NUM_PER_PAGE = 200;
-
-
-    /**
      * A list of classEntries that we saw previously
      *
      * @var array
@@ -76,7 +63,6 @@ class Classes implements IStrategy
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \DateTimeZone                              $timezone
      * @param \Alaress_Date_Format                       $fromDate
      * @param \Alaress_Date_Format                       $toDate
      */
@@ -89,7 +75,6 @@ class Classes implements IStrategy
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
-        private \DateTimeZone $timezone,
         private \Alaress_Date_Format $fromDate,
         private \Alaress_Date_Format $toDate
     ) {
