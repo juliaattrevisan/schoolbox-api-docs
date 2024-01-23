@@ -205,19 +205,23 @@ class Controller extends AbstractController
      *
      * @param int $assessmentId
      * @return Model
+     * @throws \Exception
      */
     private function getQuizForAssessmentId($assessmentId)
     {
-        /** @var Model $quiz */
-        $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
+        $quizzes = $this->mapper->findByColumn('assessment_id', $assessmentId);
 
-        if (!$quiz) {
+        if (count($quizzes) === 0) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
+
+        /** @var Model $quiz */
+        $quiz = $quizzes->first();
 
         if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
+
         return $quiz;
     }
 
