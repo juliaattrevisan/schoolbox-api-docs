@@ -16,6 +16,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Factory;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\IsValid;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -103,15 +104,16 @@ class Classes implements IStrategy
      * @return void
      * @throws DebugBarException
      * @throws Exception
+     * @throws \DomainException
      * @throws \InvalidArgumentException
+     * @throws \JsonException
      * @throws \PDOException
+     * @throws \RuntimeException
      * @throws \UnexpectedValueException
      */
     public function import(): void
     {
         $this->log->info('Processing timetables.');
-
-        $this->log->debug('Preloading student involvements for all the classes.');
 
         $this->log->debug(sprintf(
             'Processing lessons between %s and %s',
@@ -119,24 +121,16 @@ class Classes implements IStrategy
             $this->toDate
         ));
 
-        /* Hit the endpoint to get all the classes as best you can
+        /* /api/0/TeachingGroups/ByDate is broken and returns no data;
+         * We have to use the overly generic /api/0/TeachingGroups/Jurisdiction
+         * endpoint instead and manually filter out all the jank we don't need;
+         * what a waste
          */
-        $nextUrl = '';
+        $pages = $this->api->retrieveForJurisdiction('GET', 'TeachingGroups/Jurisdiction');
 
-        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
-            $classes = [];
-
-            foreach ($classes as $class) {
+        foreach ($pages as $page) {
+            foreach ($page['values'] as $class) {
                 $this->processClass($class);
-            }
-
-            /* If there's a pagination struct, there's more data to come...
-             * But make sure that the 'next' element exists before trying to go there
-             */
-            $nextUrl = false;
-
-            if (isset($classes['meta']['pagination'])) {
-                $nextUrl = $classes['meta']['pagination']['next'] ?? false;
             }
         }
     }
@@ -156,7 +150,7 @@ class Classes implements IStrategy
      */
     private function processClass(array $class): void
     {
-        foreach ($class['lessons']['data'] as $classInstance) {
+        foreach ($class['sessions'] as $classInstance) {
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $classInstance);
@@ -188,15 +182,13 @@ class Classes implements IStrategy
         array $class,
         array $classInstance
     ): \Schoolbox\External\Event\Model {
-        /* TODO Fill in these vars as usual
-         */
-        $classCode = null;
+        $classCode = trim((string)$class['className']);
         $day = null;
         $detail = null;
-        $guid = null;
+        $guid = trim((string)$classInstance['sessionId']);
         $period = null;
-        $room = null;
-        $title = null;
+        $room = trim((string)$classInstance['room']);
+        $title = trim((string)$class['subjectFullName']);
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
@@ -204,24 +196,26 @@ class Classes implements IStrategy
          */
         $type = '';
 
-        /* Decide where this class happens
-         */
-        if (is_array($classInstance['room'])) {
-            $room = "{$classInstance['room']['data']['name']} ({$classInstance['room']['data']['code']}";
-        }
-
         /* Don't forget to check if your data is timezone-sensitive
          * Alaress_Date_Format has some consts which you could use
          */
         $startAt = (new \Alaress_Date_Format(
-            $classInstance['start'],
-            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            sprintf(
+                '%s %s',
+                $classInstance['date'],
+                $classInstance['startTime'],
+            ),
+            \Alaress_Date_Format::DATABASE_FORMAT,
             new \DateTimeZone('UTC')
         ))->setTimezone($this->timezone);
 
         $finishAt = (new \Alaress_Date_Format(
-            $classInstance['end'],
-            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            sprintf(
+                '%s %s',
+                $classInstance['date'],
+                $classInstance['endTime'],
+            ),
+            \Alaress_Date_Format::DATABASE_FORMAT,
             new \DateTimeZone('UTC')
         ))->setTimezone($this->timezone);
 
@@ -306,8 +300,8 @@ class Classes implements IStrategy
             $classEntry = $this->classEntries[$event->getCode()];
         } else {
             $classEntry = $this->classEntryMapper->createModel()
-                ->setName($class['name'])
-                ->setCode($class['code']);
+                ->setName($class['subjectFullName'])
+                ->setCode($class['className']);
 
             if ($this->perform) {
                 $this->classEntryMapper->save($classEntry);
@@ -323,39 +317,38 @@ class Classes implements IStrategy
     /**
      * Save all the involvements for a given $class
      *
-     * @param array                           $class
-     * @param array                           $lesson
-     * @param \Schoolbox\External\Event\Model $event
-     * @param ClassEntry                      $classEntry
+     * @param array $class
+     * @param array $classInstance
+     * @param Model $event
+     * @param ClassEntry $classEntry
      * @return void
+     * @throws Exception
+     * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     private function createInvolvements(
         array $class,
-        array $lesson,
+        array $classInstance,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
         /* Save sis_class_user involvements
          * This is the teacher(s)
          */
-        if (!\count($class['employees']['data'])) {
+        if (!\count($classInstance['staff'])) {
             $this->log->debug(sprintf(
                 '%s: no staff involved',
-                $class['code']
+                $class['className']
             ));
         } else {
-            foreach ($class['employees']['data'] as $employee) {
-                $externalId = $employee['mis_id'];
+            foreach ($classInstance['staff'] as $employee) {
+                $externalId = (string)$employee['personId'];
 
-                $name = sprintf(
-                    '%s %s %s',
-                    $employee['title'],
-                    $employee['forename'],
-                    $employee['surname']
-                );
+                /* There isn't a convenient way to identify who $externalId
+                 * happens to be, by name...you'll have to do by number for now lol
+                 */
+                $name = $externalId;
 
                 $this->saveInvolvement($event, $classEntry, $name, $externalId);
             }
@@ -364,24 +357,77 @@ class Classes implements IStrategy
         /* Save sis_class_user involvements
          * This is the student(s)
          */
-        if (!\count($class['students']['data'])) {
+        if (!\count($class['students'])) {
             $this->log->debug(sprintf(
                 '%s: no students involved',
-                $class['code']
+                $class['className']
             ));
         } else {
-            foreach ($class['students']['data'] as $student) {
-                $externalId = $student['mis_id'];
+            foreach ($class['students'] as $student) {
+                $externalId = (string)$student['personId'];
 
-                $name = sprintf(
+                /* Decide if this class is relevant for this particular student
+                 * The student's startDate and endDate dictates whether this student
+                 * is even supposed to be in the class - it appears here, even if
+                 * it's obsolete...for civica reasons
+                 */
+                $sessionStartDate = sprintf(
                     '%s %s',
-                    $student['forename'],
-                    $student['surname']
+                    $classInstance['date'],
+                    $classInstance['startTime']
                 );
+
+                if (!$this->isValid($student['startDate'], $student['endDate'], $sessionStartDate)) {
+                    $this->log->debug(sprintf(
+                        'Student %s enrolment in %s (%s) has expired; skipping',
+                        $externalId,
+                        $classEntry->getName(),
+                        $classEntry->getCode()
+                    ));
+
+                    continue;
+                }
+
+                /* There isn't a convenient way to identify who $externalId
+                 * happens to be, by name...you'll have to do by number for now lol
+                 */
+                $name = $externalId;
 
                 $this->saveEnrolment($event, $classEntry, $name, $externalId);
             }
         }
+    }
+
+
+    /**
+     * Decide if the student's enrolment date is valid for the session
+     * The student's enrolment might end halfway through a teaching period
+     * and we don't want them to appear for classes in which they're not
+     * attending anymore.
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param string $sessionStartDate
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    private function isValid(string $startDate, string $endDate, string $sessionStartDate): bool
+    {
+        /* We actually don't care about times here, just dates
+         *
+         * We can presume enrolments to be at noon  for the express purpose
+         * of checking if an enrolment date is valid for a given session
+         *
+         * Assume that sessions don't span multiple days, for now - that's a bit
+         * weird, to have a multiday "class"
+         */
+        $enrolmentStart = new \Alaress_Date_Format(sprintf('%s 12:00:00', $startDate), \Alaress_Date_Format::DATABASE_FORMAT);
+        $enrolmentEnd = new \Alaress_Date_Format(sprintf('%s 12:00:00', $endDate), \Alaress_Date_Format::DATABASE_FORMAT);
+        $sessionStart = new \Alaress_Date_Format($sessionStartDate, \Alaress_Date_Format::DATABASE_FORMAT);
+
+        /* Session date must be within the student's enrolment range
+         */
+        return $sessionStart->between($enrolmentStart, $enrolmentEnd);
     }
 
 
@@ -431,7 +477,7 @@ class Classes implements IStrategy
 
         $involvementOverride = $this->overridesMapper->createModel()
             ->setEventId($event->getId())
-            ->setExternalId($coveringTeacher['externalId'])
+            ->setExternalId($externalId)
             ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
             ->setSequence(2);
 

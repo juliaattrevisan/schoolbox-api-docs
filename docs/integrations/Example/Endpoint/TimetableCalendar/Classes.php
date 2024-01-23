@@ -323,7 +323,7 @@ class Classes implements IStrategy
      * Save all the involvements for a given $class
      *
      * @param array                           $class
-     * @param array                           $lesson
+     * @param array                           $classInstance
      * @param \Schoolbox\External\Event\Model $event
      * @param ClassEntry                      $classEntry
      * @return void
@@ -333,7 +333,7 @@ class Classes implements IStrategy
      */
     private function createInvolvements(
         array $class,
-        array $lesson,
+        array $classInstance,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
