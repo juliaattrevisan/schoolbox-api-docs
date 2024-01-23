@@ -180,28 +180,50 @@ class Controller extends AbstractController
 //        $assessId       = $this->getQuizForAssessmentId($assessmentId)->getId();
 //        $this->response = $this->redirectFound("/assess/attempts/$assessId/$userId");
 //    }
-//
-//
-//    /**
-//     * Converts an assessment_id to an assess_id
-//     *
-//     * @param int $assessmentId
-//     * @return Model
-//     */
-//    private function getQuizForAssessmentId($assessmentId)
-//    {
-//        /** @var Model $quiz */
-//        $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
-//
-//        if (!$quiz) {
-//            throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-//        }
-//
-//        if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
-//            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-//        }
-//        return $quiz;
-//    }
+
+    /**
+     * Exports all answers given to the specified quiz
+     *
+     * Format of export derived from GET param ('csv', 'xml', etc)
+     *
+     * @api   GET /learning/quiz/{assessmentId}/attempts/export?format=csv
+     * @since 165
+     * @param int $assessmentId
+     */
+    public function getExportAttempts($assessmentId)
+    {
+        $format = strtolower($this->requestQuery->get('format'));
+        if (!in_array($format, ['csv', 'xml'])) {
+            throw new \InvalidArgumentException("Unsupported export format: $format");
+        }
+        $quiz           = $this->getQuizForAssessmentId($assessmentId);
+        $this->response = $this->redirectFound("/assess/export/$format/{$quiz->getId()}");
+    }
+
+    /**
+     * Converts an assessment_id to an assess_id
+     *
+     * @param int $assessmentId
+     * @return Model
+     * @throws \Exception
+     */
+    private function getQuizForAssessmentId($assessmentId)
+    {
+        $quizzes = $this->mapper->findByColumn('assessment_id', $assessmentId);
+
+        if (count($quizzes) === 0) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /** @var Model $quiz */
+        $quiz = $quizzes->first();
+
+        if (Model::AVAILABILITY_ASSESS != $quiz->getAvailability()) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        return $quiz;
+    }
 
 //    /**
 //     * Marks an attempt as completed
