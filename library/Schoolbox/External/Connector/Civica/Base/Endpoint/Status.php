@@ -26,7 +26,6 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
-     * @throws InvalidArgumentException
      */
     public function __construct(
         private string $host,
@@ -39,10 +38,15 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function isReachable(): bool
     {
-        (new Api($this->host, $this->key))->retrieveOne('GET', 'Students/Jurisdiction', ['pageSize' => 1]);
+        (new Api($this->host, $this->key))->retrieveForJurisdiction('GET', 'Students/Jurisdiction', ['pageSize' => 1]);
+
         return true;
     }
 
@@ -51,6 +55,9 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RuntimeException
      */
     public function getReport(): array
     {
