@@ -64,11 +64,9 @@ class Sync extends App
 
         $this->getLogger()->debug($command);
 
-        exec($command, $output);
+        passthru($command, $output);
 
-        foreach ($output as $line) {
-            $this->getLogger()->debug($line);
-        }
+        exit($output);
     }
 
     /**
