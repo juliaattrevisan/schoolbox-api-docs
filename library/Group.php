@@ -240,21 +240,21 @@ class Group extends DeprecatedModel
         $params          = [];
         $serviceIdFilter = '';
         if ($this->_service == UserAccess::SERVICE_CALENDAR) {
-            $serviceIdFilter = "AND sid = ?";
-            $params[] = $relationID;
+            $serviceIdFilter = "AND sid = :relationId";
+            $params['relationId'] = $relationID;
         }
 
         // check individual access
         $query = "
             SELECT type
             FROM userAccess
-            WHERE uid = ?
+            WHERE uid = :userId
             $serviceIdFilter
-            AND ((service = ?))
+            AND service = :service
             ORDER BY `type` DESC LIMIT 1
         ";
-        $params[] = $userID;
-        $params[] = $this->_service;
+        $params['userId']  = $userID;
+        $params['service'] = $this->_service;
 
         $permission = $this->db->query($query, $params)->fetchColumn();
         $permission = (int)$permission;
