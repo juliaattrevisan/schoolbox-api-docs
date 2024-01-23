@@ -84,11 +84,6 @@ class IndexBuilder extends App
             ),
         );
 
-        // There's no point indexing any result type without a search on a text
-        // field. Thus, the following result types are not pre-indexed:
-        // * Pages
-        // * Tiles
-        // * Users
         /** @var array<string, IBuilder> $indexBuilders */
         $indexBuilders = [
             ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
@@ -100,6 +95,7 @@ class IndexBuilder extends App
             ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
             ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
             ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
         $types = $this->getOpt(self::OPT_LONG_TYPE);
         if (!isset($types)) {
