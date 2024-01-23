@@ -50,10 +50,18 @@ class Profile implements IStrategy
      * A Y-m-d string used to decide if certain data are relevant to that date.
      * Civica gives us a bunch of obsolete data that we need to skip over.
      *
-     * @var IsValid $isValid
+     * @var string $now
+     */
+    private string $now;
+
+
+    /**
+     * We have to skip over obsolete data - this instance helps us decide which
+     * elements are relevant to $now
+     *
+     * @var IsValid
      */
     private IsValid $isValid;
-    private string $now;
 
 
     /**
