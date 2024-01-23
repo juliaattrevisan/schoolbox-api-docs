@@ -179,7 +179,7 @@ class Profile implements IStrategy
                  * Serialize all those into one big string for now.
                  * SUDS doesn't have true multi-campus support atm
                  */
-                $campusName = trim((string)($enrolmentDetails[0]['campusName'] ?? null));
+                $campusName = $this->aggregateStudentCampuses($student['schools']);
 
                 $dob = $this->findDate($student['birthDate']);
                 $email = trim((string)$student['email']);
@@ -264,6 +264,14 @@ class Profile implements IStrategy
                  */
                 $enrolment = $this->findDate($enrolmentDate);
                 $leaving = $this->findDate($leavingDate);
+
+                $this->log->debug(sprintf(
+                    'Found campus(es) "%s" for %s %s (%s)',
+                    $campusName,
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
 
                 /* Parents might inadvertently have the same externalId as someone else's
                  * base profile (e.g. parent has same external id as student)
@@ -440,6 +448,60 @@ class Profile implements IStrategy
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Civica "schools" correspond to our idea of "campuses"
+     * (schoolbox campuses are a way of categorising the whole demographic of humans)
+     *
+     * A person's set of campus is derived from all the $school elements that have at
+     * least one relevant $enrolmentDetail...but there was supposed to be an official
+     * way to conclusively know
+     *
+     * Serialize multiple schools/campuses into one string to decipher in UPS
+     *
+     * SUDS doesn't support true multi-school support, really - we just have one
+     * field which we h4x0r to "make work" in UPS.
+     *
+     * @param array $schools
+     * @return string
+     */
+    private function aggregateStudentCampuses(array $schools): string
+    {
+        $stack = [];
+
+        foreach ($schools as $school) {
+            /* TODO There is *supposed* to be a way to decide which ones
+             *  are relevant to a particular human, but it's not obvious
+             *  Each school also has its own $enrolmentDetails for which
+             *  zero or one $enrolmentDetail is relevant, by date, maybe
+             */
+            $enrolmentDetails = $this->sortEnrolmentDetails($school['enrolmentDetails']);
+
+            if (!\count($enrolmentDetails)) {
+                /* No enrolment details relevant for $school
+                 * Nothing to shank from here. Keep going
+                 */
+                continue;
+            }
+
+            /* We found at least one thing that's relevant
+             * Scoop up all the unique $campusNames
+             */
+            foreach ($enrolmentDetails as $enrolmentDetail) {
+                $campusName = trim((string)$enrolmentDetail['campusName']);
+
+                $stack[$campusName] = $campusName;
+            }
+        }
+
+        /* "Erin says worm"
+         *
+         * Serialize it with the separator she chose; you'll have to work
+         * with this in UPS
+         */
+        return implode(self::SEPARATOR, array_values($stack));
     }
 
 
