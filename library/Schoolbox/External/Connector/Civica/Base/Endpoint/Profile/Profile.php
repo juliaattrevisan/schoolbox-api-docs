@@ -252,7 +252,8 @@ class Profile implements IStrategy
                     $comments = implode("\n", $alerts);
                 }
 
-                $legal = $this->findLegal();
+//                $legal = $this->findLegal();
+                $legal = '';
                 $medical = $this->findMedicalAlert($currentSchool);
                 $messages = '';
                 $specialNeeds = (bool)$student['hasLearningDisabilityAlert'];
@@ -604,17 +605,17 @@ class Profile implements IStrategy
     }
 
 
-    /**
-     * Find legal alerts
-     *
-     * @return string|null
-     */
-    private function findLegal(): ?string
-    {
-        /* TODO Fill in these legal alert vars
-         */
-        return null;
-    }
+//    /**
+//     * Find legal alerts
+//     *
+//     * @return string|null
+//     */
+//    private function findLegal(): ?string
+//    {
+//        /* TODO Fill in these legal alert vars
+//         */
+//        return null;
+//    }
 
 
     /**
