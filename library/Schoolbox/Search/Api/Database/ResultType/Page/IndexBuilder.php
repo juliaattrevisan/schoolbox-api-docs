@@ -28,8 +28,13 @@ class IndexBuilder extends BaseBuilder
                 f.name,
                 f.updated_at AS date,
                 f.created_by,
-                f.id AS folder_id
+                " . $this->buildTypeExpression() . " AS type
             FROM folder f
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
+            LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+            LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+            LEFT JOIN homepage_config hc ON f.id = hc.cid
+            LEFT JOIN userGroups ug ON f.id = ug.cid
             WHERE f.deleted_at IS NULL
         ";
         $params = [];
@@ -49,11 +54,11 @@ class IndexBuilder extends BaseBuilder
             $index = $this->buildIndex(
                 (string)$row['id'],
                 $row['name'],
-                Hydrator::BASE_TYPE,
+                $row['type'],
                 $row['date'],
                 true,
                 $row['created_by'],
-                $row['folder_id'],
+                null,
             );
             $index = $this->addFulltextIndex($index, $row['name'], self::INDEX_STRATEGY_TEXT);
             yield $index;
@@ -61,11 +66,49 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
+     * A page's type depends on what sort of page it is, in the
+     * following order of preference:
+     * * course: pages with a related course specification
+     * * unit: pages with a related unit specification
+     * * class: pages with a class code
+     * * group: pages with a user group
+     * * homepage: pages with no class code, but a homepage
+     * * folder: pages without a homepage
+     *
+     * @inheritdoc
+     */
+    private function buildTypeExpression(): string
+    {
+        // NVL2: if param 1 is not null returns param 2, otherwise param 3 (https://mariadb.com/kb/en/nvl2/)
+        return "CONCAT(
+            '" . Hydrator::BASE_TYPE . ".',
+            NVL2(
+                cs.id,
+                'course',
+                NVL2(
+                    cus.id,
+                    'unit',
+                    NVL2(
+                        fc.code,
+                        'class',
+                        NVL2(
+                            ug.cid,
+                            'group',
+                            NVL2(hc.template, 'homepage', 'folder')
+                        )
+                    )
+                )
+            )
+        )";
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        $queryString = "SELECT
+        $queryString = "
+            SELECT
             f.id
             FROM folder f
             WHERE f.deleted_at IS NOT NULL
