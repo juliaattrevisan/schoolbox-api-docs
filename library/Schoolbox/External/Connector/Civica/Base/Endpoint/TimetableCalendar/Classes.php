@@ -221,9 +221,8 @@ class Classes implements IStrategy
                 $classInstance['date'],
                 $classInstance['startTime'],
             ),
-            \Alaress_Date_Format::DATABASE_FORMAT,
-            new \DateTimeZone('UTC')
-        ))->setTimezone($this->timezone);
+            \Alaress_Date_Format::DATABASE_FORMAT
+        ));
 
         $finishAt = (new \Alaress_Date_Format(
             sprintf(
@@ -232,8 +231,7 @@ class Classes implements IStrategy
                 $classInstance['endTime'],
             ),
             \Alaress_Date_Format::DATABASE_FORMAT,
-            new \DateTimeZone('UTC')
-        ))->setTimezone($this->timezone);
+        ));
 
         /* Try to recycle based on guid
          */
