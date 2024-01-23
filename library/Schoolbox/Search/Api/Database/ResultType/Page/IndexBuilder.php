@@ -11,10 +11,9 @@ namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
-use Schoolbox\Search\Api\Database\ResultType\Link\Hydrator;
 
 /**
- * Index builder for links.
+ * Index builder for pages/folders.
  */
 class IndexBuilder extends BaseBuilder
 {
