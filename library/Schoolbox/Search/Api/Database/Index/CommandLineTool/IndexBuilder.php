@@ -192,7 +192,7 @@ class IndexBuilder extends App
                         'identifier'              => $updatedIndex->getIdentifier(),
                         'title'                   => $updatedIndex->getTitle(),
                         'date'                    => $updatedIndex->getDate()?->getDatabase(),
-                        'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected(),
+                        'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected() ? 1 : 0,
                         'createdBy'               => $updatedIndex->getCreatedBy(),
                         'folderId'                => $updatedIndex->getFolderId(),
                         'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
