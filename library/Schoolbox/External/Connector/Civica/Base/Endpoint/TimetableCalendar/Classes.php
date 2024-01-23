@@ -152,9 +152,53 @@ class Classes implements IStrategy
                 continue;
             }
 
+            /* If this particular $classInstance falls outside our desired timeframe, skip it
+             */
+            $startAt = (new \Alaress_Date_Format(
+                sprintf(
+                    '%s %s',
+                    $classInstance['date'],
+                    $classInstance['startTime'],
+                ),
+                \Alaress_Date_Format::DATABASE_FORMAT
+            ));
+
+            $endAt = (new \Alaress_Date_Format(
+                sprintf(
+                    '%s %s',
+                    $classInstance['date'],
+                    $classInstance['endTime'],
+                ),
+                \Alaress_Date_Format::DATABASE_FORMAT
+            ));
+
+            /* Event starts in the future; ignore it
+             */
+            if ($startAt->gt($this->toDate)) {
+                $this->log->debug(sprintf(
+                    'Class %s (%s) starts too far in the future; skipping',
+                    $class['subjectFullName'],
+                    $class['className']
+                ));
+
+                return;
+            }
+
+            /* Event ended in the past; ignore it
+             */
+            if ($endAt->lt($this->fromDate)) {
+                $this->log->debug(sprintf(
+                    'Class %s (%s) started too far in the past; skipping',
+                    $class['subjectFullName'],
+                    $class['className']
+                ));
+
+                return;
+            }
+
             /* Save sis_event record
              */
-            $event = $this->createEvent($class, $classInstance);
+            $event = $this->createEvent($class, $classInstance, $startAt, $endAt);
 
             /* Save sis_class record
              */
@@ -172,16 +216,19 @@ class Classes implements IStrategy
      *
      * @param array $class
      * @param array $classInstance
+     * @param \Alaress_Date_Format $startAt
+     * @param \Alaress_Date_Format $finishAt
      * @return Model
      * @throws DebugBarException
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
      * @throws Exception
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     private function createEvent(
         array $class,
-        array $classInstance
+        array $classInstance,
+        \Alaress_Date_Format $startAt,
+        \Alaress_Date_Format $finishAt,
     ): \Schoolbox\External\Event\Model {
         $classCode = trim((string)$class['className']);
         $day = null;
@@ -196,27 +243,6 @@ class Classes implements IStrategy
          * possible. If you can't get it, dw about it
          */
         $type = '';
-
-        /* Don't forget to check if your data is timezone-sensitive
-         * Alaress_Date_Format has some consts which you could use
-         */
-        $startAt = (new \Alaress_Date_Format(
-            sprintf(
-                '%s %s',
-                $classInstance['date'],
-                $classInstance['startTime'],
-            ),
-            \Alaress_Date_Format::DATABASE_FORMAT
-        ));
-
-        $finishAt = (new \Alaress_Date_Format(
-            sprintf(
-                '%s %s',
-                $classInstance['date'],
-                $classInstance['endTime'],
-            ),
-            \Alaress_Date_Format::DATABASE_FORMAT,
-        ));
 
         /* Try to recycle based on guid
          */
@@ -370,13 +396,7 @@ class Classes implements IStrategy
                  * is even supposed to be in the class - it appears here, even if
                  * it's obsolete...for civica reasons
                  */
-                $sessionStartDate = sprintf(
-                    '%s %s',
-                    $classInstance['date'],
-                    $classInstance['startTime']
-                );
-
-                if (!$this->isValid($student['startDate'], $student['endDate'], $sessionStartDate)) {
+                if (!$this->isValid($student['startDate'], $student['endDate'], $event->getStartAt())) {
                     $this->log->debug(sprintf(
                         'Student %s enrolment in %s (%s) has expired; skipping',
                         $externalId,
@@ -406,11 +426,11 @@ class Classes implements IStrategy
      *
      * @param string $startDate
      * @param string $endDate
-     * @param string $sessionStartDate
+     * @param \Alaress_Date_Format $sessionStart
      * @return bool
      * @throws \InvalidArgumentException
      */
-    private function isValid(string $startDate, string $endDate, string $sessionStartDate): bool
+    private function isValid(string $startDate, string $endDate, \Alaress_Date_Format $sessionStart): bool
     {
         /* We actually don't care about times here, just dates
          *
@@ -422,7 +442,6 @@ class Classes implements IStrategy
          */
         $enrolmentStart = new \Alaress_Date_Format(sprintf('%s 12:00:00', $startDate), \Alaress_Date_Format::DATABASE_FORMAT);
         $enrolmentEnd = new \Alaress_Date_Format(sprintf('%s 12:00:00', $endDate), \Alaress_Date_Format::DATABASE_FORMAT);
-        $sessionStart = new \Alaress_Date_Format($sessionStartDate, \Alaress_Date_Format::DATABASE_FORMAT);
 
         /* Session date must be within the student's enrolment range
          */
