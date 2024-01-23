@@ -924,8 +924,7 @@ export default {
         <div class="small-12 columns">
             <h1>
                 Timetable for
-                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span
-                >,
+                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span><template v-if="selectedOption?.yearLevel?.length">,</template>
                 <span data-heading-user-year>{{ selectedOption === null ? "" : selectedOption.yearLevel }}</span>
             </h1>
         </div>
