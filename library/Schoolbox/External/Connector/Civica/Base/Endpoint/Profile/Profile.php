@@ -152,10 +152,16 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
+                /* FIXME There is an Omega Assumption about using $schools[0]
+                 *  because we don't have a means by which to choose which of $schools
+                 *  is the one to use...
+                 */
+                $currentSchool = $student['schools'][0];
+
                 /* This is reused a lot but *only one* of these Enrolment Details is supposed
                  * to be relevant at any given time...supposedly
                  */
-                $enrolmentDetails = $this->sortEnrolmentDetails($student['schools'][0]['enrolmentDetails']);
+                $enrolmentDetails = $this->sortEnrolmentDetails($currentSchool['enrolmentDetails']);
 
                 if (!\count($enrolmentDetails)) {
                     $this->log->warning(sprintf(
@@ -167,13 +173,8 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                /* FIXME There is an Omega Assumption about using $schools[0]
-                 *  because we don't have a means by which to choose which of $schools
-                 *  is the one to use...
-                 */
-
                 $externalId = trim((string)$student['personId']);
-                $academicHouse = trim((string)$student['schools'][0]['houseName']);
+                $academicHouse = trim((string)$currentSchool['houseName']);
 
                 /* Someone can be in multiple campuses at the same time
                  * Serialize all those into one big string for now.
@@ -188,7 +189,7 @@ class Profile implements IStrategy
                 $form = '';
                 $formTeacher = $this->findFormTeacher();
                 $gender = trim((string)$student['gender']);
-                $housemaster = $this->findHousemaster($student['schools'][0]);
+                $housemaster = $this->findHousemaster($currentSchool);
                 $lastname = trim((string)$student['surname']);
                 $mobile = trim((string)$student['mobileNumber']);
 
@@ -219,7 +220,7 @@ class Profile implements IStrategy
 
                 /* Flags
                  */
-                $boardingStatus = (bool)$student['schools'][0]['isBoarder'];
+                $boardingStatus = (bool)$currentSchool['isBoarder'];
                 $esl = false;
                 $ib = false;
                 $ilp = (bool)$student['isEducationSupport'];
@@ -252,13 +253,13 @@ class Profile implements IStrategy
                 }
                 
                 $legal = $this->findLegal();
-                $medical = $this->findMedicalAlert($student['schools'][0]);
+                $medical = $this->findMedicalAlert($currentSchool);
                 $messages = '';
                 $specialNeeds = (bool)$student['hasLearningDisabilityAlert'];
 
                 /* Emergency Contacts
                  */
-                $emergencyContacts = $this->findEmergencyContacts($student['schools'][0]);
+                $emergencyContacts = $this->findEmergencyContacts($currentSchool);
 
                 /* Dates
                  */
