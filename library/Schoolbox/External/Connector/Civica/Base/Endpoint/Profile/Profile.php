@@ -152,7 +152,8 @@ class Profile implements IStrategy
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $student) {
-                /* This is reused a lot
+                /* This is reused a lot but *only one* of these Enrolment Details is supposed
+                 * to be relevant at any given time...supposedly
                  */
                 $enrolmentDetails = $this->sortEnrolmentDetails($student['schools'][0]['enrolmentDetails']);
 
@@ -166,11 +167,17 @@ class Profile implements IStrategy
                     continue;
                 }
 
+                /* FIXME There is an Omega Assumption about using $schools[0]
+                 *  because we don't have a means by which to choose which of $schools
+                 *  is the one to use...
+                 */
+
                 $externalId = trim((string)$student['personId']);
                 $academicHouse = trim((string)$student['schools'][0]['houseName']);
 
-                /* FIXME Someone can be in multiple campuses at the same time
-                 *  Serialize all those into one big string
+                /* Someone can be in multiple campuses at the same time
+                 * Serialize all those into one big string for now.
+                 * SUDS doesn't have true multi-campus support atm
                  */
                 $campusName = trim((string)($enrolmentDetails[0]['campusName'] ?? null));
 
@@ -738,6 +745,15 @@ class Profile implements IStrategy
 
     /**
      * Import staff profile data
+     *
+     * @return void
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     private function importStaff(): void
     {
