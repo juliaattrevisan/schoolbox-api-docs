@@ -100,6 +100,13 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
+     *
+     * @return void
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     private function importStudents(): void
     {
@@ -175,6 +182,7 @@ class Profile implements IStrategy
                 $ilp = (bool)$student['isEducationSupport'];
 
                 /* Compile all the alerts for this $externalId
+                 *
                  * TODO Not really sure how these are meant to be segregated effectively;
                  *  alert['alertType'] might be a user-defined value inconsistent with
                  *  any other Civica implementation
