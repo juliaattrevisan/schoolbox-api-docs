@@ -56,7 +56,7 @@ class IndexBuilder extends BaseBuilder
                 $row['name'],
                 $row['type'],
                 $row['date'],
-                true,
+                false, // Pages/folders are always maximally relevant.
                 $row['created_by'],
                 null,
             );
