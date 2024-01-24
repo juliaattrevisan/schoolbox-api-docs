@@ -37,7 +37,7 @@ class Caregivers
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $caregivers) {
-                $externalId = $caregivers['studentPersonId'];
+                $externalId = (string)$caregivers['studentPersonId'];
 
                 foreach ($caregivers['schools'] as $caregiverSchool) {
                     foreach ($caregiverSchool['caregivers'] as $caregiver) {
