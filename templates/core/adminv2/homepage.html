@@ -217,10 +217,10 @@
 
 <div id="newDialog" class="reveal-modal" data-reveal aria-labelledby="newDialogLabel" aria-hidden="true" role="dialog">
     <h2 id="newDialogLabel">Add new homepage template</h2>
-    <form action="/adminv2/homepage/homepageForm.php" method="POST">
+    <form action="/adminv2/homepage/homepageForm.php" method="POST" onsubmit="this.onsubmit = () => { return false }">
         <label>
             Template name
-            <input type="text" name="name" />
+            <input type="text" name="name" required/>
         </label>
         <input type="submit" name="action" value="Create" />
     </form>
@@ -239,7 +239,7 @@
 
         <label>
             New name
-            <input type="text" name="name"/>
+            <input type="text" name="name" required/>
         </label>
         <input type="submit" value="Rename" />
     </form>
