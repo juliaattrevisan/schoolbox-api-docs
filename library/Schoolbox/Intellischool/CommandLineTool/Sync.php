@@ -51,8 +51,8 @@ class Sync extends App
         /**
          * get sync parameters
          */
-        $deploymentId = $this->getConfig()->get('intellischool_deployment_id');
-        $secret = $this->getConfig()->get('intellischool_deployment_secret');
+        $deploymentId = $this->getConfig()->get('intellischool_deployment_id') ?? '';
+        $secret = $this->getConfig()->get('intellischool_deployment_secret') ?? '';
 
         // Check if intellischool is setup or exit early
         if ('' === $deploymentId || '' === $secret) {
