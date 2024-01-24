@@ -20,7 +20,7 @@ interface IApi
      * Decide how big each page size should be
      * Civica's default response is 1000
      */
-    public const PAGE_SIZE = 5;
+    public const PAGE_SIZE = 1000;
 
 
     /**
