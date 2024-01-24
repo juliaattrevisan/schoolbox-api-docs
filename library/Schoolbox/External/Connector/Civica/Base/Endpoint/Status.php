@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
-use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use SensitiveParameter;
 
 /**
@@ -62,16 +61,6 @@ class Status implements IStatus
      */
     public function getReport(): array
     {
-        $specification = new Specification(new Api($this->host, $this->key));
-
-        try {
-            return $specification->check();
-        } catch (\RuntimeException $e) {
-            return [[
-                 'message' => 'Cannot access api endpoint',
-                 'reason' => $e->getMessage(),
-                 'status' => ISpecification::STATUS_ERROR
-            ]];
-        }
+        return (new Specification(new Api($this->host, $this->key)))->check();
     }
 }
