@@ -364,7 +364,6 @@ class Factory implements IFactory
                     $this->host,
                     $this->key,
                     $this->watchlist,
-                    Loader::getInstance()->get('date_timezone'),
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance()->disableCache(),

@@ -63,7 +63,6 @@ class Factory
      * @param string                                     $host
      * @param string                                     $key
      * @param array                                      $watchlist
-     * @param string                                     $timezone
      * @param Mapper                                     $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
      * @param UserProfile\Parent\Mapper                  $parentProfileMapper
@@ -83,7 +82,6 @@ class Factory
         private string $host,
         #[SensitiveParameter] private string $key,
         private array $watchlist,
-        private string $timezone,
         /* Profile pieces */
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
@@ -114,10 +112,6 @@ class Factory
          */
         $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
         $to = \Alaress_Date_Format::now()->addMonths(self::TO);
-
-        /* Decide a timezone for all the UTC dates sis gives to us
-         */
-        $timezone = new \DateTimeZone($this->timezone);
 
         /* Spawn an Api instance
          */
