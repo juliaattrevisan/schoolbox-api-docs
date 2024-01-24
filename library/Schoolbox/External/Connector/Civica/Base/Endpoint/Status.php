@@ -57,6 +57,7 @@ class Status implements IStatus
      * @return array
      * @throws InvalidArgumentException
      * @throws \DomainException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function getReport(): array
