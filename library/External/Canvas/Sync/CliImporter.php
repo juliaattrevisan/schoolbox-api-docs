@@ -45,6 +45,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use RuntimeException;
 use Schoolbox\MapperFactory;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 use function file_exists;
@@ -403,6 +404,8 @@ class CliImporter extends CliTool\App
         $participantMapper = $mapperFactory->get(Participant\Mapper::class);
         /** @var Folder\Mapper $folderMapper */
         $folderMapper = $mapperFactory->get(Folder\Mapper::class);
+        // we are cleaning up folders, we should set the user object for the mapper as alaress, so we know who deleted things
+        $folderMapper->setSessionData(['user' => (new User())->setUsername(User::USERNAME_SCHOOLBOX_ADMIN)->setId(1)]);
         /** @var UserMapper $userMapper */
         $userMapper = $mapperFactory->get(UserMapper::class);
         /** @var CourseImpl\Mapper $courseImplMapper */
