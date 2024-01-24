@@ -26,13 +26,41 @@ class IndexBuilder extends BaseBuilder
             SELECT
                 f.id,
                 f.realname AS title,
+                IF(
+                    LOCATE('pdf', aft.mime)
+                    OR LOCATE('msword', aft.mime)
+                    OR LOCATE('vnd.ms', aft.mime)
+                    OR LOCATE('rtf', aft.mime)
+                    OR LOCATE('text', aft.mime)
+                    OR LOCATE('document', aft.mime)
+                    OR LOCATE('powerpoint', aft.mime),
+                    'document',
+                    IF(
+                        LOCATE('image', aft.mime),
+                        'image',
+                        IF(
+                            LOCATE('audio', aft.mime),
+                            'audio',
+                            IF(
+                                LOCATE('video', aft.mime)
+                                OR LOCATE('flash', aft.mime)
+                                OR LOCATE('realmedia', aft.mime),
+                                'video',
+                                'other'
+                            )
+                        )
+                    )
+                ) AS sub_type,
                 f.modified AS date,
                 f.owner AS created_by,
                 f.category AS folder_id,
                 f.description AS fulltext_index1,
                 f.comment AS fulltext_index2
             FROM file f
-            INNER JOIN folder fo ON f.category = fo.id
+            INNER JOIN folder               fo  ON f.category = fo.id
+            INNER JOIN storage              s   ON f.hash = s.hash
+            INNER JOIN allowedFileExtension afe ON s.ext = afe.extension
+            INNER JOIN allowedFileTypes     aft ON afe.fileTypeID = aft.fileTypeID
             WHERE f.deleted_at IS NULL
             AND fo.deleted_at IS NULL
         ";
@@ -53,7 +81,7 @@ class IndexBuilder extends BaseBuilder
             $index = $this->buildIndex(
                 (string)$row['id'],
                 $row['title'],
-                Hydrator::BASE_TYPE,
+                Hydrator::BASE_TYPE . '.' . $row['sub_type'],
                 $row['date'],
                 true,
                 $row['created_by'],
