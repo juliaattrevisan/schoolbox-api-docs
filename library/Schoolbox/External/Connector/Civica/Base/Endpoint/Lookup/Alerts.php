@@ -48,7 +48,9 @@ class Alerts
                         /* Use the dates to figure out if this is relevant or not
                          */
                         if ($this->isValid->isSatisifiedBy($alert)) {
-                            $stack[$personAlerts['studentPersonId']][$alert['alertId']] = $alert;
+                            $externalId = (string)$personAlerts['studentPersonId'];
+
+                            $stack[$externalId][$alert['alertId']] = $alert;
                         }
                     }
                 }
