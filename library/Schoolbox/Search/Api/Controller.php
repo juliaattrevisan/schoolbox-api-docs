@@ -39,7 +39,6 @@ class Controller extends Base
      */
     private const MIN_CHARACTER_LIMIT = 2;
 
-
     /**
      * Constructor
      *
