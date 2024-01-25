@@ -26,7 +26,7 @@ class IndexBuilder extends BaseBuilder
             SELECT
                 f.id,
                 f.name,
-                f.updated_at AS date,
+                f.updated_at,
                 f.created_by,
                 " . $this->buildTypeExpression() . " AS type
             FROM folder f
@@ -51,7 +51,7 @@ class IndexBuilder extends BaseBuilder
                 (string)$row['id'],
                 $row['name'],
                 $row['type'],
-                $row['date'],
+                $row['updated_at'],
                 false, // Pages/folders are always maximally relevant.
                 $row['created_by'],
                 null,
