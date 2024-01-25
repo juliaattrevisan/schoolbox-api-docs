@@ -96,6 +96,7 @@ class IndexBuilder extends App
             ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
             ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
             ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Tile\Hydrator::BASE_TYPE       => new ResultType\Tile\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
         $types = $this->getOpt(self::OPT_LONG_TYPE);
         if (!isset($types)) {
