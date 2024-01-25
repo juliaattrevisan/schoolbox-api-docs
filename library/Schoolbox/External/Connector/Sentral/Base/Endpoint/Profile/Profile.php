@@ -1250,17 +1250,6 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                /* Disregard deceased staff (never seen this set to true so far)
-                 */
-                if ($staff['relationships']['person']['data']['attributes']['isDeceased']) {
-                    $this->log->warning(sprintf(
-                        'Skipping base profile for staff %s - deceased',
-                        $fullname
-                    ));
-
-                    continue;
-                }
-
                 /* Disregard inactive staff
                  */
                 if (!(int)$staff['attributes']['isActive']) {
