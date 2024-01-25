@@ -17,7 +17,7 @@ const store = useCourseBuilderStore();
  * @param {Function} done - to be called once animation is complete
  */
 async function onRowEnter(element: Element, done: () => void) {
-    await slideDown(element);
+    await slideDown(element as HTMLElement);
     done();
 }
 
@@ -27,7 +27,7 @@ async function onRowEnter(element: Element, done: () => void) {
  * @param {Function} done - to be called once animation is complete
  */
 async function onRowLeave(element: Element, done: () => void) {
-    await slideUp(element);
+    await slideUp(element as HTMLElement);
     done();
 }
 
@@ -75,9 +75,9 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                             required
                             @input="clearNameValidationError(courseTemplate)"
                         />
-                        <label v-if="courseTemplate.nameHasValidationError" class="error"
-                            >This field is required.</label
-                        >
+                        <label v-if="courseTemplate.nameHasValidationError" class="error">
+                            This field is required.
+                        </label>
                     </div>
                     <div class="small-12 medium-3 column">
                         <strong class="hide-for-medium-up">Course Page Template:</strong>

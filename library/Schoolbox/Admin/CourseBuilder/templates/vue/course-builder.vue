@@ -29,25 +29,15 @@ const newRowAmount = window.Vue.ref(0);
  * Add a new row to the list
  */
 function onAddNewRow() {
+    const firstValidTemplate = props.availableTemplates.filter((template) => !template.deleted)[0];
+
     newRowAmount.value += 1;
     store.courseTemplates.push({
         id: -newRowAmount.value, // New rows are set with an ever increasing negative increment to mark them as new for the back end
         name: "",
-        courseTemplate: firstTemplate(),
-        unitTemplate: firstTemplate(),
+        courseTemplate: firstValidTemplate,
+        unitTemplate: firstValidTemplate,
     });
-}
-
-/**
- * Grab the first valid template
- * they can now be deleted, so we need to ensure we only add new rows that contain non deleted entries
- */
-function firstTemplate() {
-    for (const [key, value] of Object.entries(props.availableTemplates)) {
-        if (!value.deleted) {
-            return value;
-        }
-    }
 }
 
 /**
