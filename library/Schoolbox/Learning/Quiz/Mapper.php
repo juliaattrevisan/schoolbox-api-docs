@@ -243,6 +243,7 @@ class Mapper extends BaseMapper
      *
      * For now, this call will throw an exception if the destination Quiz already has Sections.
      *
+     * @param Api   $api
      * @param Model $source
      * @param Model $destination
      * @return string|null The Learnosity job ID for duplicating activities
@@ -250,20 +251,8 @@ class Mapper extends BaseMapper
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function copyQuizConstituents(Model $source, Model $destination): ?string
+    public function copyQuizConstituents(Api $api, Model $source, Model $destination): ?string
     {
-        $learnosityVersion = $this->getConfigLoader()->get('learnosity_version');
-        $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
-        $learnosityConsumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
-
-        $api = new Api(
-            (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
-            $learnosityVersion,
-            $learnosityConsumerKey,
-            $learnosityConsumerSecret,
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
         /* Clone a Learnosity Reference in Learnosity land
          */
         $oldLearnosityReference = $source->getLearnosityReference();

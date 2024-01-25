@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\MapperFactory;
 
@@ -23,6 +24,15 @@ class RestartPendingTool extends CliTool\App
 {
     public function run(): void
     {
+        // Build Learnosity API
+        $api = new Api(
+            (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified()->getHost(),
+            $this->getConfig()->get('learnosity_version'),
+            $this->getConfig()->get('learnosity_consumer_key'),
+            $this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getLogger(),
+        );
+
         // Find pending quizzes
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
             "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
@@ -60,6 +70,7 @@ class RestartPendingTool extends CliTool\App
                     )
                 );
                 $quizMapper->copyQuizConstituents(
+                    $api,
                     $quizMapper->findById($pendingQuiz->getLearnositySourceAssessmentId()),
                     $pendingQuiz,
                 );
@@ -92,6 +103,7 @@ class RestartPendingTool extends CliTool\App
                         )
                     );
                     $quizMapper->copyQuizConstituents(
+                        $api,
                         $quizMapper->findOneByColumn('assessment_id', $specQuiz->getId()),
                         $pendingQuiz,
                     );
@@ -132,6 +144,7 @@ class RestartPendingTool extends CliTool\App
                         )
                     );
                     $quizMapper->copyQuizConstituents(
+                        $api,
                         $quizMapper->findOneByColumn('assessment_id', $implQuiz),
                         $pendingQuiz,
                     );

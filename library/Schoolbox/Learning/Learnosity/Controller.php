@@ -1762,6 +1762,7 @@ class Controller extends Base
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
         $jobId = $this->quizMapper->copyQuizConstituents(
+            $this->api,
             $this->quizMapper->findOneByColumn('assessment_id', $source->getId()),
             $this->quizMapper->findOneByColumn('assessment_id', $destination->getId()),
         );
