@@ -16,6 +16,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Example\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Example\Base\Endpoint\Factory;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -156,6 +157,29 @@ class Classes implements IStrategy
     private function processClass(array $class): void
     {
         foreach ($class['lessons']['data'] as $classInstance) {
+            /* TODO Implement the Watchlist by doing a lookahead
+             *  to see if this class should even be made; you might
+             *  have to refine this approach to something else if
+             *  the sis compels you to do it differently
+             */
+//            /* Do a lookahead to see whether this classInstance is relevant
+//             * to $externalId or not
+//             */
+//            $candidates = [];
+//
+//            foreach ($class['students'] as $student) {
+//                $candidates[] = (string)$student['personId'];
+//            }
+//
+//            /* If any of the candidates from this class enrolments are on the watchlist
+//             * Then process the data like we usually do; otherwise skip it
+//             */
+//            if (!(new Watchlist())->isAnyOnWatchlist($candidates, $this->watchlist)) {
+//                continue;
+//            }
+
+
+
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $classInstance);
@@ -323,7 +347,7 @@ class Classes implements IStrategy
      * Save all the involvements for a given $class
      *
      * @param array                           $class
-     * @param array                           $lesson
+     * @param array                           $classInstance
      * @param \Schoolbox\External\Event\Model $event
      * @param ClassEntry                      $classEntry
      * @return void
@@ -333,7 +357,7 @@ class Classes implements IStrategy
      */
     private function createInvolvements(
         array $class,
-        array $lesson,
+        array $classInstance,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
@@ -347,7 +371,7 @@ class Classes implements IStrategy
             ));
         } else {
             foreach ($class['employees']['data'] as $employee) {
-                $externalId = $employee['mis_id'];
+                $externalId = (string)$employee['mis_id'];
 
                 $name = sprintf(
                     '%s %s %s',
@@ -370,7 +394,7 @@ class Classes implements IStrategy
             ));
         } else {
             foreach ($class['students']['data'] as $student) {
-                $externalId = $student['mis_id'];
+                $externalId = (string)$student['mis_id'];
 
                 $name = sprintf(
                     '%s %s',

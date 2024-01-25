@@ -41,19 +41,12 @@ class Specification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
-     *
+     * @throws \DomainException
+     * @throws \JsonException
      */
     public function check(): array
     {
         $paths = [
-
-            /* Example struct
-             */
-//            [
-//                'endpoint' => '',
-//                'params' => [],
-//            ],
-
             /**
              * Student Profile nodes
              */
@@ -102,7 +95,7 @@ class Specification
             /* Try to access the endpoint and capture the outcome
              */
             try {
-                $result = (bool)$this->api->retrieveOne('GET', $message, ['pageSize' => 1]);
+                $result = (bool)$this->api->retrieveForJurisdiction('GET', $message, ['pageSize' => 1]);
             } catch (\RuntimeException $e) {
                 $errorMessage = $e->getMessage();
                 $result = false;

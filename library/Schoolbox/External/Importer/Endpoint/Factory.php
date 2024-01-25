@@ -24,6 +24,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint as WondeEndpoint;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint as VeracrossEndpoint;
+use Schoolbox\External\Connector\Civica\Base\Endpoint as CivicaEndpoint;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -55,7 +56,6 @@ class Factory implements IFactory
     public const WONDE = 'wonde';
     public const LISS = 'liss';
     public const VERACROSS = 'veracross';
-
     public const CIVICA = 'civica';
     public const CSV = 'csv';
 
@@ -356,9 +356,30 @@ class Factory implements IFactory
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
 
-            // TODO: Civica Endpoint/Factory
             case self::CIVICA:
-                return null;
+                return (new CivicaEndpoint\Factory(
+                    $this->validStrats,
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+                    $this->watchlist,
+                    /* Profile pieces
+                     */
+                    UserProfile\Mapper::getInstance()->disableCache(),
+                    UserProfile\Student\Mapper::getInstance()->disableCache(),
+                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                    /* Timetable pieces
+                     */
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+                ))->produce();
 
             default:
                 // Use manual csv imports

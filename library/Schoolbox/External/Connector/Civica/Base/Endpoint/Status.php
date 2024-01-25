@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
-use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use SensitiveParameter;
 
 /**
@@ -26,7 +25,6 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
-     * @throws InvalidArgumentException
      */
     public function __construct(
         private string $host,
@@ -39,10 +37,15 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function isReachable(): bool
     {
-        (new Api($this->host, $this->key))->retrieveOne('GET', 'Students/Jurisdiction', ['pageSize' => 1]);
+        (new Api($this->host, $this->key))->retrieveForJurisdiction('GET', 'Students/Jurisdiction', ['pageSize' => 1]);
+
         return true;
     }
 
@@ -51,19 +54,13 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function getReport(): array
     {
-        $specification = new Specification(new Api($this->host, $this->key));
-
-        try {
-            return $specification->check();
-        } catch (\RuntimeException $e) {
-            return [[
-                 'message' => 'Cannot access api endpoint',
-                 'reason' => $e->getMessage(),
-                 'status' => ISpecification::STATUS_ERROR
-            ]];
-        }
+        return (new Specification(new Api($this->host, $this->key)))->check();
     }
 }

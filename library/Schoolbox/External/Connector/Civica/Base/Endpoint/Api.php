@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
 use SensitiveParameter;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
@@ -45,19 +46,19 @@ class Api implements IApi
     private const NUM_RETRY = 3;
 
 
-
-    /**
-     * Decide how big each page size should be
-     * Civica's default response is 1000
-     */
-    private const PAGE_SIZE = 1000;
-
-
     /**
      * Maximum number of pages to obtain from an endpoint
      * to safeguard against infinite loops
      */
     private const MAX_PAYLOADS = 100;
+
+
+    /**
+     * A special school id that is only used for some endpoints
+     * A special Civica secret (undocumented)
+     */
+    private const JURISDICTIONAL_SCHOOL_ID = 0;
+
 
     /**
      * @var ApiUsage
@@ -70,6 +71,7 @@ class Api implements IApi
      */
     private Client $client;
 
+
     /**
      * A Civica Access Token generator, in case you needed to
      * make a new one somewhere along the way
@@ -77,6 +79,7 @@ class Api implements IApi
      * @var AccessTokenGenerator
      */
     private AccessTokenGenerator $accessTokenGenerator;
+
 
     /**
      * The base uri that consists of host and school identifier
@@ -88,11 +91,22 @@ class Api implements IApi
 
 
     /**
+     * Some endpoints use schoolId 0 to obtain data across the Jurisdiction
+     * Others require a school id for some reason or other that I don't know yet
+     *
+     * @var string
+     */
+    private string $schoolId = '';
+
+
+    /**
      * Constructor
      *
      * @param string $host
      * @param string $apiKey
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
+     * @throws \DomainException
+     * @throws \RuntimeException
      */
     public function __construct(string $host, #[SensitiveParameter] string $apiKey)
     {
@@ -110,13 +124,19 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
-     * @param int    $timeout
+     * @param int $timeout
      * @return Client
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \DomainException
+     * @throws InvalidArgumentException
+     * @throws \RuntimeException
      */
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
         $credentials = (new Codec\DSN())->decode($dsn);
+
+        /* We *might* need this later
+         */
+        $this->schoolId = $credentials['schoolid'];
 
         /* Enforce slash in the endpoint prefix
          *
@@ -127,12 +147,7 @@ class Api implements IApi
          *
          * Ensure this baseUri ends in just one /
          */
-        $this->baseUri = sprintf(
-            '%s/api/%s/',
-            rtrim($host, '/'),
-            $credentials['schoolid'],
-        );
-
+        $this->baseUri = rtrim($host, '/') . '/';
 
         /* Access Token Generator
          */
@@ -161,6 +176,67 @@ class Api implements IApi
         ]);
     }
 
+
+    /**
+     * School-specific endpoint access
+     *
+     * Retrieve data using the SUDS Control Panel's schoolId field
+     * This is allegedly used for *some* (but not all) endpoints
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param array $params
+     * @param int $pageSize
+     * @return \Generator
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function retrieveForSchool(string $method, string $endpoint, array $params = [], int $pageSize = IApi::PAGE_SIZE): \Generator
+    {
+        /* Forcibly prepend schoolId
+         */
+        $specificEndpoint = sprintf(
+            '%s/%s',
+            $this->schoolId,
+            $endpoint
+        );
+
+        return $this->retrieve($method, $specificEndpoint, $params, $pageSize);
+    }
+
+
+    /**
+     * Jurisdictional endpoint access
+     *
+     * Retrieve data using a hardcoded 0 as a schoolId, which grants you
+     * access to all the /Jurisdiction endpoints...because Civica reasons.
+     *
+     * This is allegedly used for *some* (but not all) endpoints
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param array $params
+     * @param int $pageSize
+     * @return \Generator
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function retrieveForJurisdiction(string $method, string $endpoint, array $params = [], int $pageSize = IApi::PAGE_SIZE): \Generator
+    {
+        /* Forcibly prepend schoolId
+         */
+        $specificEndpoint = sprintf(
+            '%s/%s',
+            self::JURISDICTIONAL_SCHOOL_ID,
+            $endpoint
+        );
+
+        return $this->retrieve($method, $specificEndpoint, $params, $pageSize);
+    }
+
+
     /**
      * Yield one page of the return payload per iteration,
      * spawning new payloads while Civica has data for it
@@ -180,7 +256,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    private function retrieve(string $method, string $endpoint, array $params = [], int $pageSize = IApi::PAGE_SIZE): \Generator
     {
         $pageNum = 1;
         $payload = null;
@@ -192,11 +268,12 @@ class Api implements IApi
          * 2. If you're requesting your first payload
          * 3. The payload size == page size
          */
-        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['values']) === self::PAGE_SIZE)) {
+        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['values']) === IApi::PAGE_SIZE)) {
             $params = array_merge($params, [
                 'pageNumber' => $pageNum,
                 'pageSize'  => $pageSize
             ]);
+
             $payload = $this->retrieveOne($method, $endpoint, $params);
 
             $pageNum++;

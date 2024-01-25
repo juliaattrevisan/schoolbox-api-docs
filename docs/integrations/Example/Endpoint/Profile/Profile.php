@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Example\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -40,14 +41,15 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
-     * @param ValidStrats                     $validStrats
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param IApi                            $api
-     * @param UserProfile\Mapper              $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param array $watchlist
+     * @param UserProfile\Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
@@ -55,6 +57,7 @@ class Profile implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private array $watchlist,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -101,25 +104,45 @@ class Profile implements IStrategy
             /* TODO Fill in these basic student vars
              */
             $externalId = '';
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
+            /* TODO Fill in these basic student vars
+             */
             $academicHouse = '';
-            $boardingStatus = false;
             $campusName = '';
 
             $dob = '';
             $email = '';
             $firstname = '';
             $firstnamePreferred = '';
+
+            /* TODO Sometimes these are together, sometimes not
+             */
             $form = '';
+            $formTeacher = $this->findFormTeacher();
+
             $gender = '';
+            $housemaster = $this->findHousemaster();
             $lastname = '';
             $mobile = '';
             $photoRedacted = false;
             $studiesCode = '';
             $title = '';
+
+            /* TODO Sometimes these are together, sometimes not
+             */
+            $tutor = $this->findTutor();
             $tutor = '';
             $tutorGroup = '';
+
             $username = '';
             $yearLevel = '';
+            $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
             /* TODO Fill in these dates
              */
@@ -129,6 +152,7 @@ class Profile implements IStrategy
             /* Flags
              * TODO Fill in these flag vars
              */
+            $boardingStatus = false;
             $esl = false;
             $ib = false;
             $ilp = false;
@@ -140,35 +164,11 @@ class Profile implements IStrategy
             $legal = $this->findLegal();
             $medical = $this->findMedicalAlert();
             $messages = '';
-
-            /* TODO Customise these find* methods to suit your implementation
-             *  Maintain the methods' return signature for easiest resolution
-             *  though you are free to customise it as you see fit
-             */
+            $specialNeeds = $this->findSpecialNeeds();
 
             /* Emergency Contacts
              */
             $emergencyContacts = $this->findEmergencyContacts();
-
-            /* Find out a staff member via their user code
-             */
-            $formTeacher = $this->findFormTeacher();
-
-            /* Fish out a staff member via their user code
-             */
-            $housemaster = $this->findHousemaster();
-
-            /* Fish out special needs
-             */
-            $specialNeeds = $this->findSpecialNeeds();
-
-            /* Fish out a staff member via their user code
-             */
-            $tutor = $this->findTutor();
-
-            /* Find out a staff member via their user code
-             */
-            $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
             /* Dates
              */
@@ -617,6 +617,14 @@ class Profile implements IStrategy
              */
             $externalId = '';
 
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
+            /* TODO Fill in basic staff vars
+             */
             $firstname = '';
             $firstnamePreferred = '';
             $lastname = '';
