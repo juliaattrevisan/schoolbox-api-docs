@@ -67,6 +67,7 @@ export type Resource = {
         | ResourceType.MEETING_URL
         | ResourceType.OTHER;
     id?: string; // id will only be available on an already existing resource
+    default?: string; // used by CKEditor ImageUpload plugin to display a loaded image
 };
 
 /**

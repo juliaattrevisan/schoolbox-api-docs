@@ -14,7 +14,6 @@ import { Style } from "@ckeditor/ckeditor5-style";
 import { Subscript, Superscript } from "@ckeditor/ckeditor5-basic-styles";
 import { Font } from "@ckeditor/ckeditor5-font";
 import { RemoveFormat } from "@ckeditor/ckeditor5-remove-format";
-import { SimpleUploadAdapter } from "@ckeditor/ckeditor5-upload";
 import { MediaEmbed } from "@ckeditor/ckeditor5-media-embed";
 import { SpecialCharacters, SpecialCharactersEssentials } from "@ckeditor/ckeditor5-special-characters";
 import { HorizontalLine } from "@ckeditor/ckeditor5-horizontal-line";
@@ -64,7 +63,6 @@ export function getConfig(config: EditorConfig) {
             Superscript,
             Font,
             RemoveFormat,
-            SimpleUploadAdapter,
             MediaEmbed,
             SpecialCharacters,
             SpecialCharactersEssentials,

@@ -69,6 +69,7 @@ export default class UploadAdapter {
             mime: response.meta.file.mime,
             name: response.meta.name,
             type: response.meta.file.type,
+            default: response.meta.file._links.fetch,
         };
         resolve(resource);
     }
