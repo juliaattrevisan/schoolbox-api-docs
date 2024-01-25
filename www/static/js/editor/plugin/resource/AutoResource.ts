@@ -1,6 +1,7 @@
 /**
- * To automatically embed resources into the editor when they are
- * dragged and dropped into the editor
+ * To automatically embed non image resources into the editor when they are
+ * dragged and dropped into the editor.
+ * Note that images are handled more comprehensively by the native ImageUpload plugin
  */
 
 import { Plugin } from "@ckeditor/ckeditor5-core";
@@ -12,6 +13,7 @@ import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 import type { FileLoader, FileRepository } from "@ckeditor/ckeditor5-upload/";
 import type { ClipboardInputEventData } from "@ckeditor/ckeditor5-clipboard/src/clipboardobserver";
+import { createImageTypeRegExp } from "@ckeditor/ckeditor5-image/src/imageupload/utils";
 
 export default class ResourceEditing extends Plugin {
     totalUploadCount = 0; // the total number of files to upload
@@ -42,8 +44,10 @@ export default class ResourceEditing extends Plugin {
             if (isHtmlIncluded(data.dataTransfer)) {
                 return;
             }
-            const files = Array.from(data.dataTransfer._files);
-            // Ensure there are files to upload
+            let files = Array.from(data.dataTransfer._files);
+            const imageTypes = createImageTypeRegExp(["jpeg", "png", "gif", "bmp", "webp", "tiff"]);
+            files = files.filter((file) => !imageTypes.test(file.type)); // ensure images aren't uploaded
+            // Ensure there are still files to upload after images have been filtered
             if (files.length === 0) {
                 return;
             }
