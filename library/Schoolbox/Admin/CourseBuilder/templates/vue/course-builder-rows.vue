@@ -91,6 +91,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                         "
                                         :key="availableTemplate.id"
                                         :value="availableTemplate"
+                                        :disabled="availableTemplate.deleted"
                                     >
                                         {{ availableTemplate.name }}
                                         <template v-if="availableTemplate.deleted">(Deleted)</template>
@@ -111,6 +112,7 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                         "
                                         :key="availableTemplate.id"
                                         :value="availableTemplate"
+                                        :disabled="availableTemplate.deleted"
                                     >
                                         {{ availableTemplate.name }}
                                         <template v-if="availableTemplate.deleted">(Deleted)</template>
