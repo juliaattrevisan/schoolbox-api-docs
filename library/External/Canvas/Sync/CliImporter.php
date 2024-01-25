@@ -129,6 +129,31 @@ class CliImporter extends CliTool\App
         "users",
     ];
 
+
+    /**
+     * Guzzle requests consts
+     */
+    /**
+     * Request timeout
+     */
+    private const DEFAULT_TIMEOUT = 300;
+
+    /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     */
+    private const NAP_TIMEOUT = 3;
+
+    /**
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
+     */
+    private const NUM_RETRY = 3;
+
+
     /** @inheritdoc */
     public function getShortOpts(): array
     {
@@ -485,7 +510,10 @@ class CliImporter extends CliTool\App
      */
     private function downloadDataFiles(array $tableList, string $tempDir, array $tablesToImport): void
     {
-        $client = new Client();
+        $client = new Client([
+                                 'timeout' => self::DEFAULT_TIMEOUT,
+                                 'http_errors' => false,
+                             ]);
         foreach ($tableList as $tableName => $tableData) {
             if (!in_array($tableName, $tablesToImport) || !count($tableData['files'])) {
                 continue;
@@ -495,18 +523,35 @@ class CliImporter extends CliTool\App
             foreach ($tableFiles as $index => $tableFile) {
                 $fileName      = "$tempDir/$tableName.$index.gz";
                 $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName : '/dev/null', 'wb');
-                try {
-                    $this->getLogger()->debug("Downloading $tableName to $fileName");
-                    $client->get($tableFile['url'], ['sink' => $tableDataFile]);
-                } catch (GuzzleException $e) {
-                    $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
-                    // Re-trying one more time
+                $this->getLogger()->debug("Downloading $tableName to $fileName");
+
+                /* Mine out an error message if you try to access a thing that doesn't exist
+                */
+                $fails = 0;
+
+                /* Try multiple times in case sis dies for a random reason
+                 */
+                while ($fails < self::NUM_RETRY) {
+                    /* Any exception thrown by guzzle might as well be a reason to nap and retry
+                     */
                     try {
-                        $this->getLogger()->debug("Retry downloading $tableName to $fileName");
                         $client->get($tableFile['url'], ['sink' => $tableDataFile]);
+                        continue 2;
                     } catch (GuzzleException $e) {
+                        $fails++;
+
                         $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
+
+                        sleep(self::NAP_TIMEOUT);
+
+                        continue;
                     }
+                }
+                // if more fails than allowed.. then exit
+                if ($fails <= self::NUM_RETRY) {
+                    throw new \Schoolbox\Application\Exception\Exception(
+                        sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
+                    );
                 }
             }
         }
