@@ -44,6 +44,7 @@ export default class ResourceEditing extends Plugin {
             if (isHtmlIncluded(data.dataTransfer)) {
                 return;
             }
+            // Get the files from the clipboard dataTransfer object
             let files = Array.from(data.dataTransfer._files);
             const imageTypes = createImageTypeRegExp(["jpeg", "png", "gif", "bmp", "webp", "tiff"]);
             files = files.filter((file) => !imageTypes.test(file.type)); // ensure images aren't uploaded
@@ -67,7 +68,7 @@ export default class ResourceEditing extends Plugin {
             });
         });
 
-        // When an image is uploaded, add the alt and linkHref attributes (so the image is a link to the original file)
+        // When an image is uploaded, add the alt and linkHref attributes (so the image has a link to the original file)
         const imageUploadEditing = this.editor.plugins.get("ImageUploadEditing");
         imageUploadEditing.on("uploadComplete", (evt, { data, imageElement }) => {
             this.editor.model.change((writer) => {
