@@ -323,7 +323,20 @@ class Controller extends BaseController
                 if (!isset($record['fields'][lcfirst($metadata['key'])])) {
                     continue;
                 }
-                // if the field is not in the approved list, then build it, else continue
+                /**
+                 * If the field is not in the approved list, then build it, else continue
+                 *
+                 * NOTE:
+                 * register metadata fields keys all words are caps,
+                 * the student data fields first character is lowercase...
+                 *
+                 * Regarding the capitalisation, I know this happens elsewhere with OData filters – they always flip the capitals…
+                 * -Mark@EIM
+                 *
+                 * so we need to keep the config as 1 of the schemes,
+                 * I decided that the case should match the student record, not the metadata endpoints
+                 * -Justin
+                 */
                 if (!in_array(lcfirst($metadata['key']), $config['fields'])) {
                     continue;
                 }
