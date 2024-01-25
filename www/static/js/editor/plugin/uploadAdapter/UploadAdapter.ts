@@ -71,7 +71,6 @@ export default class UploadAdapter {
             type: response.meta.file.type,
             default: response.meta.file._links.fetch,
         };
-        console.warn("uploaded");
         resolve(resource);
     }
 
