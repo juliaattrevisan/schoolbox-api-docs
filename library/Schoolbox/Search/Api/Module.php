@@ -106,7 +106,6 @@ class Module extends BaseModule
         $queryParamBuilders = [
             new Database\Index\QueryParamBuilder($database->getQuoter()),
             new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
-            new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
         ];
 
         $hydrators = [
