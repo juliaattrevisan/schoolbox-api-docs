@@ -144,7 +144,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                 // reload the page to get the new data
                 window.location.reload();
             } else {
-                const responseText = await response.json();
+                const responseText = await response.json() as { title: string; type: string; status: number };
                 toastEl.value.timeout(responseText.title, false, 2000);
             }
         } catch (error) {
