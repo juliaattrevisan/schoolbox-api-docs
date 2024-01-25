@@ -26,8 +26,8 @@ class IndexBuilder extends BaseBuilder
         $queryString = "
             SELECT
                 t.id,
-                t.title_text AS title,
-                t.modified_at AS date,
+                t.title_text,
+                t.modified_at,
                 tlf.folder_id
             FROM tile t
             JOIN tile_layout tl ON tl.id=t.tile_layout_id
@@ -52,14 +52,14 @@ class IndexBuilder extends BaseBuilder
         foreach ($query as $row) {
             $index = $this->buildIndex(
                 (string)$row['id'],
-                $row['title'],
+                $row['title_text'],
                 Hydrator::BASE_TYPE,
-                $row['date'],
+                $row['modified_at'],
                 true,
                 null,
                 $row['folder_id'],
             );
-            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['title_text'], self::INDEX_STRATEGY_TEXT);
             yield $index;
         }
     }

@@ -47,7 +47,7 @@ class IndexBuilder extends BaseBuilder
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND l.modified <= :toDate';
+            $queryString .= ' AND u.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
