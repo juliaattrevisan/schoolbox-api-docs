@@ -276,6 +276,17 @@ class Profile implements IStrategy
                     continue;
                 }
 
+                /* Skip deceased humans
+                 */
+                if ($student['relationships']['person']['data']['attributes']['isDeceased']) {
+                    $this->log->debug(sprintf(
+                        'Person id %s is deceased: skipping.',
+                        $student['relationships']['person']['data']['id']
+                    ));
+
+                    continue;
+                }
+
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
                 $campusName = $this->findCampusName($student);
@@ -997,6 +1008,17 @@ class Profile implements IStrategy
 
             $parent = $this->api->retrieveDocument($endpoint);
 
+            /* Skip deceased humans
+             */
+            if ($parent['data']['attributes']['isDeceased']) {
+                $this->log->debug(sprintf(
+                    'Person id %s is deceased: skipping.',
+                    $parent['data']['id']
+                ));
+
+                continue;
+            }
+
             /* Catalog each of this guy's phone numbers so we can try and assign some
              */
             $numbers = [];
@@ -1174,6 +1196,17 @@ class Profile implements IStrategy
                     continue;
                 }
 
+                /* Skip deceased humans
+                 */
+                if ($staff['relationships']['person']['data']['attributes']['isDeceased']) {
+                    $this->log->debug(sprintf(
+                        'Person id %s is deceased: skipping.',
+                        $staff['relationships']['person']['data']['id']
+                    ));
+
+                    continue;
+                }
+
                 /* Find the first meaningful value out of this set
                  */
                 $firstname = (new FirstMeaningfulValue())->find([
@@ -1211,17 +1244,6 @@ class Profile implements IStrategy
                 if (!$isEmployed) {
                     $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - staff is not currently employed',
-                        $fullname
-                    ));
-
-                    continue;
-                }
-
-                /* Disregard deceased staff (never seen this set to true so far)
-                 */
-                if ($staff['relationships']['person']['data']['attributes']['isDeceased']) {
-                    $this->log->warning(sprintf(
-                        'Skipping base profile for staff %s - deceased',
                         $fullname
                     ));
 
