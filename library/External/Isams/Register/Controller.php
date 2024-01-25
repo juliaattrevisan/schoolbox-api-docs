@@ -165,84 +165,85 @@ class Controller extends BaseController
         );
     }
 
-    /**
-     * Fetch data for user from ISAMS Register endpoints
-     *
-     * @param User $user // the user we want data for
-     * @param array $register // array of the register object
-     * @param array $registersConfig // approved list of fields to show
-     * @return array
-     */
-    private function getDataFromRegister(User $user, array $register, array $registersConfig): array
-    {
-        $globalData  = $register;
-        $userData = ['hasDateRange' => false];
-
-        // Request 1.1.1: field data sources
-        foreach ($this->cacheHelper->getMetadataFields($register['id']) as $metadataField) {
-            // check if we are wanting this field...
-            if (!in_array(strtolower($metadataField['key']), $registersConfig[strtolower($register['code'])])) {
-                // not one of the requested field... ignoring
-                continue;
-            }
-            // Fetch data source only if it's a list
-            $metadataFieldValues = null;
-            $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
-            if (in_array($dataSource, ['private', 'shared'])) {
-                if ($metadataField['properties']['dataSourceUrl'] ?? null) {
-                    foreach ($this->cacheHelper->getDataSource($metadataField['properties']['dataSourceUrl']) as $item) {
-                        $metadataFieldValues[$item['value']] = $item['text'];
-                    }
-                }
-            }
-            $globalData['metadata'][strtolower($metadataField['key'])] = [
-                'name'   => $metadataField['name'],
-                'values' => $metadataFieldValues,
-                'type'   => $metadataField['type']
-            ];
-        }
-
-        // Collate student data
-        foreach ($this->cacheHelper->getStudentFields($register['id'], $user->getExternalId()) as $key => $fieldValue) {
-            $key = strtolower($key);
-            // check if we are wanting this field...
-            if (!in_array(strtolower($key), $registersConfig[strtolower($register['code'])])) {
-                // not one of the requested field... ignoring
-                continue;
-            }
-            if (isset($fieldValue)) {
-                // switch for types of fields??? and TextboxField can also be links?
-                $value = $globalData['metadata'][$key]['values'][$fieldValue] ?? $fieldValue;
-                $type = $globalData['metadata'][$key]['type'];
-                switch ($globalData['metadata'][$key]['type']) {
-                    case 'TextboxField':
-                        // am I a URL?
-                        $url = new \Url($value);
-                        if ($url->isUrl()) {
-                            $type = 'url';
-                        }
-                        break;
-                    case 'DateTimeField':
-                        $value = new Alaress_Date_Format($value, Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                        break;
-                    default:
-                }
-                $userData['fields'][$key] = [
-                    'name'  => $globalData['metadata'][$key]['name'],
-                    'value' => $value,
-                    'type' => $type,
-                ];
-            }
-        }
-        foreach ($this->cacheHelper->getStudentDateRanges($register['id'], $user->getExternalId()) as $dateRange) {
-            $userData['hasDateRange'] = true;
-            $userData['dateRanges'][] = [
-                'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
-            ];
-        }
-        return $userData;
-    }
+//     Currently unused, may be needed when we start using a register with `RegisterWithRanges`...
+//    /**
+//     * Fetch data for user from ISAMS Register endpoints
+//     *
+//     * @param User $user // the user we want data for
+//     * @param array $register // array of the register object
+//     * @param array $registersConfig // approved list of fields to show
+//     * @return array
+//     */
+//    private function getDataFromRegister(User $user, array $register, array $registersConfig): array
+//    {
+//        $globalData  = $register;
+//        $userData = ['hasDateRange' => false];
+//
+//        // Request 1.1.1: field data sources
+//        foreach ($this->cacheHelper->getMetadataFields($register['id']) as $metadataField) {
+//            // check if we are wanting this field...
+//            if (!in_array(strtolower($metadataField['key']), $registersConfig[strtolower($register['code'])])) {
+//                // not one of the requested field... ignoring
+//                continue;
+//            }
+//            // Fetch data source only if it's a list
+//            $metadataFieldValues = null;
+//            $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
+//            if (in_array($dataSource, ['private', 'shared'])) {
+//                if ($metadataField['properties']['dataSourceUrl'] ?? null) {
+//                    foreach ($this->cacheHelper->getDataSource($metadataField['properties']['dataSourceUrl']) as $item) {
+//                        $metadataFieldValues[$item['value']] = $item['text'];
+//                    }
+//                }
+//            }
+//            $globalData['metadata'][strtolower($metadataField['key'])] = [
+//                'name'   => $metadataField['name'],
+//                'values' => $metadataFieldValues,
+//                'type'   => $metadataField['type']
+//            ];
+//        }
+//
+//        // Collate student data
+//        foreach ($this->cacheHelper->getStudentFields($register['id'], $user->getExternalId()) as $key => $fieldValue) {
+//            $key = strtolower($key);
+//            // check if we are wanting this field...
+//            if (!in_array(strtolower($key), $registersConfig[strtolower($register['code'])])) {
+//                // not one of the requested field... ignoring
+//                continue;
+//            }
+//            if (isset($fieldValue)) {
+//                // switch for types of fields??? and TextboxField can also be links?
+//                $value = $globalData['metadata'][$key]['values'][$fieldValue] ?? $fieldValue;
+//                $type = $globalData['metadata'][$key]['type'];
+//                switch ($globalData['metadata'][$key]['type']) {
+//                    case 'TextboxField':
+//                        // am I a URL?
+//                        $url = new \Url($value);
+//                        if ($url->isUrl()) {
+//                            $type = 'url';
+//                        }
+//                        break;
+//                    case 'DateTimeField':
+//                        $value = new Alaress_Date_Format($value, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+//                        break;
+//                    default:
+//                }
+//                $userData['fields'][$key] = [
+//                    'name'  => $globalData['metadata'][$key]['name'],
+//                    'value' => $value,
+//                    'type' => $type,
+//                ];
+//            }
+//        }
+//        foreach ($this->cacheHelper->getStudentDateRanges($register['id'], $user->getExternalId()) as $dateRange) {
+//            $userData['hasDateRange'] = true;
+//            $userData['dateRanges'][] = [
+//                'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+//                'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+//            ];
+//        }
+//        return $userData;
+//    }
 
     /**
      * Extract common config settings
