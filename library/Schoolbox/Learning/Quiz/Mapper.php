@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
+use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -335,6 +336,120 @@ class Mapper extends BaseMapper
 
         return null;
     }
+
+
+    /**
+     * Poll Learnosity for the status of this quiz
+     *
+     * @param Model $quiz
+     * @return void
+     */
+    public function pollQuizStatus(Api $api, Model $quiz, array $newTags): void
+    {
+        // Already complete or failed: don't bother re-checking
+        $jobStatus = $quiz->getLearnosityJobStatus();
+        if ($jobStatus === Model::LEARNOSITY_JOB_STATUS_PROCESSING) {
+            // Check the API for this job's status
+            $learnosityJobResponse = $api->dataGetRequest(
+                '/jobs',
+                ["references" => [$quiz->getLearnosityJobReference()],],
+            );
+
+            // Possible statuses: queued, running, halted, completed
+            // https://reference.learnosity.com/data-api/endpoints/jobs_endpoints
+            $learnosityJobStatus = $learnosityJobResponse['data'][0]['status'] ?? null;
+            $setTags             = false;
+            if ($learnosityJobStatus === Api::JOB_STATUS_COMPLETED) {
+                $jobStatus = Model::LEARNOSITY_JOB_STATUS_COMPLETED;
+                $setTags   = true;
+                $quiz->setLearnosityJobStatus($jobStatus);
+                $this->save($quiz);
+            } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
+                $setTags   = true;
+                $jobStatus = Model::LEARNOSITY_JOB_STATUS_FAILED;
+                $quiz->setLearnosityJobStatus($jobStatus);
+                $this->save($quiz);
+            }
+
+            // If complete or failed: set the tags
+            if ($setTags) {
+                /* Fetch this activity from Learnosity; we need to assign tags to each of its items
+                 * because they appear in the global Item Bank. Unless we assign the classCode tag
+                 * here, we'll never know if items are for a spec or an impl when users search
+                 */
+                $itemReferences = $api->dataGetRequest('/itembank/activities', [
+                    'references' => [
+                        $quiz->getLearnosityReference()
+                    ]
+                ])['data'][0]['data']['items'] ?? null;
+
+                if (null !== $itemReferences) {
+                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                     */
+                    if (is_array($itemReferences[0])) {
+                        /* Forcibly mutate this, because learnosity insanity
+                         */
+                        $itemReferenceList = array_column($itemReferences, 'id');
+                    } else {
+                        /* Presume it was a list of reference strings already
+                         */
+                        $itemReferenceList = $itemReferences;
+                    }
+
+                    /* Initialise payload container
+                     */
+                    $emptyPayload = [
+                        'items' => []
+                    ];
+
+                    $payload = $emptyPayload;
+
+                    /* Assign tags to each item
+                     */
+                    foreach ($itemReferenceList as $item) {
+                        /* Maxed out? Send it.
+                         */
+                        if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                            $api->dataSetRequest('/itembank/items/tags', $payload);
+
+                            /* Reset this for the next cycle
+                             */
+                            $payload = $emptyPayload;
+                        }
+
+                        /* Keep accumulating until we max out
+                         */
+                        $payload['items'][] = [
+                            'reference' => $item,
+                            'tags' => $newTags
+                        ];
+                    }
+
+                    /* Send the last payload if anything is in it
+                     */
+                    if (\count($payload['items'])) {
+                        $api->dataSetRequest('/itembank/items/tags', $payload);
+                    }
+                }
+
+                /* Assign tags to the activity itself
+                 */
+                $api->dataSetRequest(
+                    '/itembank/activities/tags',
+                    [
+                        'activities' => [
+                            [
+                                'reference' => $quiz->getLearnosityReference(),
+                                'tags'      => $newTags,
+                            ],
+                        ],
+                    ],
+                );
+            }
+        }
+    }
+
 
     /**
      * Deletes all constituents (sections and questions) from the quiz whose
