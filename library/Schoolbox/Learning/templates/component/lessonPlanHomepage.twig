@@ -135,6 +135,10 @@
                 This component only works on class pages as lesson plans must be connected to a course.
                 This page is {{ locale.unit.indefiniteArticle }} {{ locale.unit }} page so the component doesn't work here.
                 <a href="#remove-component" data-target="delete">Remove this component</a>.
+            {% elseif hasCourseSpec %}
+                This component only works on class pages as lesson plans must be connected to a course.
+                This page is {{ locale.unit.indefiniteArticle }} course page so the component doesn't work here.
+                <a href="#remove-component" data-target="delete">Remove this component</a>.
             {% else %}
                 Lesson plans must be connected to a course. To start using lesson plans please
                 <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: component.getContext.getFolder.getId }) }}" data-course-selector>
