@@ -66,6 +66,15 @@ export default class ResourceEditing extends Plugin {
                 });
             });
         });
+
+        // When an image is uploaded, add the alt and linkHref attributes (so the image is a link to the original file)
+        const imageUploadEditing = this.editor.plugins.get("ImageUploadEditing");
+        imageUploadEditing.on("uploadComplete", (evt, { data, imageElement }) => {
+            this.editor.model.change((writer) => {
+                writer.setAttribute("alt", data.name, imageElement);
+                writer.setAttribute("linkHref", data.default, imageElement);
+            });
+        });
     }
 
     /**
