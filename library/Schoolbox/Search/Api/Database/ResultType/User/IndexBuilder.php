@@ -25,11 +25,17 @@ class IndexBuilder extends BaseBuilder
         $queryString = "
             SELECT
                 u.id,
-                u.udated_at AS date,
+                u.updated_at,
                 u.username,
                 u.firstname,
                 u.preferred_name,
-                u.lastname
+                u.lastname,
+                CONCAT_WS(' ', u.title, u.firstname, u.lastname) AS nameFormat1,
+                CONCAT_WS(' ', u.firstname, u.lastname) AS nameFormat2,
+                CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) AS nameFormat3,
+                CONCAT_WS(' ', u.preferred_name, u.lastname) AS nameFormat4,
+                CONCAT_WS(' ', u.title, u.lastname) AS nameFormat5,
+                CONCAT('" . Hydrator::BASE_TYPE . ".', r.group_type) AS type
             FROM `user` u
             LEFT JOIN `groups` AS r ON u.group_id = r.id
             WHERE u.deleted_at IS NULL
@@ -51,16 +57,22 @@ class IndexBuilder extends BaseBuilder
         foreach ($query as $row) {
             $index = $this->buildIndex(
                 (string)$row['id'],
-                $row['title'],
-                Hydrator::BASE_TYPE,
-                $row['date'],
-                true,
-                $row['created_by'],
-                $row['folder_id'],
+                $row['nameFormat2'],
+                $row['type'],
+                $row['updated_at'],
+                false,
+                null,
+                null,
             );
-            $index = $this->addFulltextIndex($index, $row['url'], self::INDEX_STRATEGY_TEXT);
-            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index'], self::INDEX_STRATEGY_HTML);
+            $index = $this->addFulltextIndex($index, $row['username'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['firstname'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['preferred_name'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['lastname'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat1'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat2'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat3'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat4'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat5'], self::INDEX_STRATEGY_TEXT);
             yield $index;
         }
     }
@@ -71,18 +83,19 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
         $queryString = "SELECT
-            l.id
-            FROM link l
-            INNER JOIN folder fo ON l.category = fo.id
-            WHERE COALESCE(l.deleted_at, fo.deleted_at) IS NOT NULL
+            u.id,
+            CONCAT('" . Hydrator::BASE_TYPE . ".', r.group_type) AS type
+            FROM user u
+            LEFT JOIN `groups` AS r ON u.group_id = r.id
+            WHERE u.deleted_at IS NOT NULL
         ";
-        $params      = [];
+        $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND COALESCE(l.deleted_at, fo.deleted_at) >= :fromDate';
+            $queryString .= ' AND u.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND COALESCE(l.deleted_at, fo.deleted_at) <= :toDate';
+            $queryString .= ' AND u.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -92,9 +105,9 @@ class IndexBuilder extends BaseBuilder
             yield $this->buildIndex(
                 (string)$row['id'],
                 null,
-                Hydrator::BASE_TYPE,
+                $row['type'],
                 null,
-                true,
+                false,
                 null,
                 null,
             );
