@@ -17,6 +17,7 @@ declare global {
         };
         sbProps: {
             ckeditor5LicenseKey: string;
+            iframelyLicenseKey: string;
             colourDefaults: { [key: string]: any };
             editors: { [key: string]: Editor };
             hasEditorAI: boolean; // to display the AI features within the editor

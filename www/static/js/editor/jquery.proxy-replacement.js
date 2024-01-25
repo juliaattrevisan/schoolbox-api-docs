@@ -23,13 +23,15 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
      * @return int      the number of things that got replaced
      */
     $.fn.schoolboxResource_ReplaceAll = function (selector) {
-        var count = 0;
+        let count = 0;
 
         $.each(selector.find("[data-schoolboxresource-type]"), function (index, element) {
-            var replaced = $.fn.schoolboxResource_ReplaceOne(element);
-
-            if (replaced) {
-                count++;
+            // Only replace the placeholder if it doesn't already have a replacement
+            if ($(element).next(`[data-schoolboxmedia-replacement-container]`).length === 0) {
+                const replaced = $.fn.schoolboxResource_ReplaceOne(element);
+                if (replaced) {
+                    count++;
+                }
             }
         });
 

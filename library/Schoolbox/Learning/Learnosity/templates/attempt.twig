@@ -11,8 +11,10 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<script src="https://cdn.iframe.ly/embed.js?cancel=0&key={{ config.iframely_license_key_public }}"></script>
 <script src="https://items-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
+
 <div class="row">
     <div id='quiz-container' class="small-12 island">
         <section class="content">
@@ -41,6 +43,48 @@
 <script>
     // Track if the time has ended or not
     let timeEnded = false;
+
+    // Create a MutationObserver to watch for changes in the quiz container
+    const lrnObserver = new MutationObserver((mutationsList) => {
+        mutationsList.forEach((mutation) => {
+            if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach((node) => {
+                    // Process any new SB media containers
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        node.querySelectorAll('[data-schoolboxresource-source]')
+                        .forEach((sbMediaEl) => {
+                            // If the next element is a schoolbox media container, skip it
+                            if (sbMediaEl.nextElementSibling && sbMediaEl.nextElementSibling.matches('[data-schoolboxmedia-replacement-container]')) {
+                                return;
+                            }
+                            // Ensure not inside a ckeditor
+                            if (sbMediaEl.closest('[contenteditable="true"]') !== null) {
+                                return;
+                            }
+
+                            // Wait an arbitrary amount of time so the content is loaded to avoid the new player ending up with 0 width/height
+                            setTimeout(() => {
+                                $.fn.schoolboxResource_ProxyReplacement(sbMediaEl.parentElement)
+                            }, 1000);
+                        });
+                    }
+
+                    // Process any new oembeds
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        node.querySelectorAll('oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))')
+                        .forEach((oEmbedEl) => {
+                            // Ensure not inside a ckeditor
+                            if (oEmbedEl.closest('[contenteditable="true"]') !== null) {
+                                return;
+                            }
+                            window.iframely.load(oEmbedEl, oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"));
+                        });
+                    }
+                });
+            }
+        });
+    });
+    lrnObserver.observe(document.getElementById("quiz-container"), { subtree: true, childList: true });
 
     /**
      * So we can add browser state when moving between items (cards)
@@ -74,10 +118,6 @@
             if (!isNaN(previousLocation)) {
                 itemsApp.items().goto(previousLocation);
             }
-
-            /* Replace video placeholders with actual player when the ui has loaded
-             */
-            $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
 
             /**
              * Listen for hash changes so we can navigate to the correct part of the app

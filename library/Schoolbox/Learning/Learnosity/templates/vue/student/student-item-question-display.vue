@@ -145,6 +145,12 @@ window.Vue.onMounted(() => {
         if (!response.querySelector("[data-schoolboxmedia-replacement-container]")) {
             $.fn.schoolboxResource_ProxyReplacement($(selector));
         }
+
+        // Find any oembeds and load them
+        responsesEl.value?.querySelectorAll('oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))')
+        .forEach((oEmbedEl) => {
+            window.iframely.load(oEmbedEl, oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"));
+        });
     }
 });
 

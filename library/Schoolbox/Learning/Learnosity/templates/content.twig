@@ -10,6 +10,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<script src="https://cdn.iframe.ly/embed.js?cancel=0&key={{ config.iframely_license_key_public }}"></script>
 <script src="https://authorapi-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
 
@@ -107,6 +108,50 @@
     }
     window.addEventListener('scroll', adjustItemsListHeader);
 
+    // Create a MutationObserver to watch for changes in the quiz container
+    const lrnObserver = new MutationObserver((mutationsList) => {
+        mutationsList.forEach((mutation) => {
+            if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach((node) => {
+                    // Process any new oembeds
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        node.querySelectorAll('oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))')
+                        .forEach((oEmbedEl) => {
+                            // Ensure not inside a ckeditor
+                            if (oEmbedEl.closest('[contenteditable="true"]') !== null) {
+                                return;
+                            }
+                            window.iframely.load(oEmbedEl, oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"));
+                        });
+                    }
+
+                    // Process any new SB media containers
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        node.querySelectorAll('[data-schoolboxresource-source]')
+                        .forEach((sbMediaEl) => {
+                            // If the next element is a schoolbox media container, skip it
+                            if (sbMediaEl.nextElementSibling && sbMediaEl.nextElementSibling.matches('[data-schoolboxmedia-replacement-container]')) {
+                                return;
+                            }
+                            // Ensure not inside a ckeditor
+                            if (sbMediaEl.closest('[contenteditable="true"]') !== null) {
+                                return;
+                            }
+
+                            // Wait an arbitrary amount of time so the content is loaded to avoid the new player ending up with 0 width/height
+                            setTimeout(() => {
+                                $.fn.schoolboxResource_ProxyReplacement(sbMediaEl.parentElement)
+                            }, 1000);
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    // Start observing changes in the quiz container's subtree
+    lrnObserver.observe(document.getElementById("quiz-container"), { subtree: true, childList: true });
+
     /**
      * To add tags to the activity and also add browser state
      */
@@ -128,31 +173,6 @@
              */
             authorApp.on('render:activity', function(event) {
                 authorApp.setActivityTags({{ tags|raw }});
-            });
-
-
-            /* Replace video placeholders with actual player when the ui has loaded
-             */
-            authorApp.on('render:item', function(event) {
-                $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
-            });
-
-            authorApp.on('itemedit:changed', function(event) {
-                /* Remove all replacements first
-                 */
-                $('[data-schoolboxmedia-replacement-container]').remove();
-
-                setTimeout(function() {
-                    {# Reinit them any time something is dragged around (ugh)
-                     # because you don't know what you're dragging
-                     #
-                     # Also this event fires before their javascript has actually
-                     # loaded any content...meaning we can't operate on any of its
-                     # contents. We have to w8 an arbitrary amount of time before
-                     # we can presume to have the dom loaded.
-                     #}
-                    $.fn.schoolboxResource_ProxyReplacement($('.lrn_stimulus_content'));
-                }, 1000);
             });
 
 
