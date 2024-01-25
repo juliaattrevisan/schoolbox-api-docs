@@ -40,7 +40,7 @@ class IndexBuilder extends BaseBuilder
             COALESCE(
                 IF(cci_componentname.value = '', NULL, cci_componentname.value),
                 IF(tb.heading = '', NULL, tb.heading),
-                '" . ComponentHomepageController::DEFAULT_COMPONENT_HEADING . "'
+                :homepageDefaultComponentHeading
             ) AS title,
             tb.updated_at AS date,
             tb.created_by AS created_by,
@@ -50,7 +50,7 @@ class IndexBuilder extends BaseBuilder
             JOIN folder f ON f.id = ci.identifier
             JOIN component_config_definition ccd_textbox ON (
                 ccd_textbox.component_definition_id = cd.id AND
-                ccd_textbox.key = '" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
+                ccd_textbox.key = :homepageComponentKey
             )
             LEFT JOIN component_config_instance cci_textbox ON (
                 cci_textbox.component_config_definition_id = ccd_textbox.id AND
@@ -59,7 +59,7 @@ class IndexBuilder extends BaseBuilder
             JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
             JOIN component_config_definition ccd_componentname ON (
                 ccd_componentname.component_definition_id = cd.id AND
-                ccd_componentname.key = '" . Component_Config_Componentname::KEY . "'
+                ccd_componentname.key = :componentConfigComponentNameKey
             )
             LEFT JOIN component_config_instance cci_componentname ON (
                 cci_componentname.component_config_definition_id = ccd_componentname.id AND
@@ -69,7 +69,11 @@ class IndexBuilder extends BaseBuilder
             AND f.deleted_at IS NULL
             AND tb.deleted_at IS NULL
         ";
-        $params = [];
+        $params = [
+            'homepageDefaultComponentHeading' => ComponentHomepageController::DEFAULT_COMPONENT_HEADING,
+            'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+            'componentConfigComponentNameKey' => Component_Config_Componentname::KEY
+        ];
         if ($fromDate) {
             $queryString .= ' AND tb.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
@@ -117,13 +121,14 @@ class IndexBuilder extends BaseBuilder
             WHERE tb2.deleted_at IS NULL
             AND cci2.id IS NULL
         ";
-
-        // Don't need new params for the second pass
+        $params = [];
         if ($fromDate) {
             $queryString .= ' AND tb2.updated_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
             $queryString .= ' AND tb2.updated_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
