@@ -137,45 +137,48 @@ class DataSync
      */
     public function synchronise(): void
     {
-        // If not persisting changes, wrap everything in a transaction we will subsequently rollback.
-        if (!$this->persist) {
-            $this->schoolboxDb->beginTransaction();
+        $this->schoolboxDb->beginTransaction();
+
+        try {
+            $bridgeFactory = new BridgeFactory($this->siteSchoolCode);
+
+            $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
+            $accountBridge    = new Bridge\Account($this->schoolboxDb);
+            $assignmentBridge = $bridgeFactory->getAssignment(
+                $this->markTypeMapper->findAll(),
+                $this->workTypeMapper->findAll()
+            );
+            $assignmentBridge->prepareLetterGrades($this->gradeLevelGroupMapper, $this->gradeLevelMapper, $this->userMapper);
+            $courseBridge             = $bridgeFactory->getCourse($this->canvasDb, $this->schoolboxDb);
+            $courseGroupBridge        = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
+            $assignmentDatesBridge    = $bridgeFactory->getAssignmentDates();
+            $assignmentOverrideBridge = new Bridge\AssignmentOverride($this->schoolboxDb);
+
+            $this->syncAccounts($accountBridge);
+            $this->syncCourses($accountBridge, $courseBridge, $courseGroupBridge);
+            $this->syncCourseAssignments($assignmentBridge, $courseBridge);
+            $this->syncCourseQuiz($assignmentBridge, $courseBridge);
+            // Defer building this one till as late as possible (it can take a while)
+            $sectionBridge = $bridgeFactory->getCourseSection(
+                $this->canvasDb,
+                $this->schoolboxDb,
+                $this->folderMapper,
+                $courseBridge,
+                $this->log
+            );
+            $sectionBridge->execute();
+
+            $this->syncCourseSections($courseBridge, $courseGroupBridge, $sectionBridge);
+            $this->syncClassAssignments($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
+            $this->syncClassQuiz($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
+        } catch (\Exception $e) {
+            $this->log->critical(sprintf("Sync Failure: %s", $e->getMessage()));
+            $this->schoolboxDb->rollBack();
+            exit(1);
         }
 
-        $bridgeFactory = new BridgeFactory($this->siteSchoolCode);
-
-        $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
-        $accountBridge            = new Bridge\Account($this->schoolboxDb);
-        $assignmentBridge         = $bridgeFactory->getAssignment(
-            $this->markTypeMapper->findAll(),
-            $this->workTypeMapper->findAll()
-        );
-        $assignmentBridge->prepareLetterGrades($this->gradeLevelGroupMapper, $this->gradeLevelMapper, $this->userMapper);
-        $courseBridge             = $bridgeFactory->getCourse($this->canvasDb, $this->schoolboxDb);
-        $courseGroupBridge        = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
-        $assignmentDatesBridge    = $bridgeFactory->getAssignmentDates();
-        $assignmentOverrideBridge = new Bridge\AssignmentOverride($this->schoolboxDb);
-
-        $this->syncAccounts($accountBridge);
-        $this->syncCourses($accountBridge, $courseBridge, $courseGroupBridge);
-        $this->syncCourseAssignments($assignmentBridge, $courseBridge);
-        $this->syncCourseQuiz($assignmentBridge, $courseBridge);
-        // Defer building this one till as late as possible (it can take a while)
-        $sectionBridge = $bridgeFactory->getCourseSection(
-            $this->canvasDb,
-            $this->schoolboxDb,
-            $this->folderMapper,
-            $courseBridge,
-            $this->log
-        );
-        $sectionBridge->execute();
-
-        $this->syncCourseSections($courseBridge, $courseGroupBridge, $sectionBridge);
-        $this->syncClassAssignments($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
-        $this->syncClassQuiz($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
-
-        if (!$this->persist) {
-            $this->schoolboxDb->rollBack();
+        if ($this->persist) {
+            $this->schoolboxDb->commit();
         }
     }
 
