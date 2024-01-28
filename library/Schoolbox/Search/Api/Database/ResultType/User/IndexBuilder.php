@@ -39,7 +39,6 @@ class IndexBuilder extends BaseBuilder
             FROM `user` u
             LEFT JOIN `groups` AS r ON u.group_id = r.id
             WHERE u.deleted_at IS NULL
-            AND u.deleted_at IS NULL
         ";
         $params = [];
         if ($fromDate) {
