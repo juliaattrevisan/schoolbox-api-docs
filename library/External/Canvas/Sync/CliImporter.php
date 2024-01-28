@@ -402,12 +402,12 @@ class CliImporter extends CliTool\App
         $assessmentMapper  = $mapperFactory->get(Assessment\Mapper::class);
         $planMapper        = $mapperFactory->get(Participant\Plan\Mapper::class);
         $participantMapper = $mapperFactory->get(Participant\Mapper::class);
+        /** @var UserMapper $userMapper */
+        $userMapper = $mapperFactory->get(UserMapper::class);
         /** @var Folder\Mapper $folderMapper */
         $folderMapper = $mapperFactory->get(Folder\Mapper::class);
         // we are cleaning up folders, we should set the user object for the mapper as alaress, so we know who deleted things
-        $folderMapper->setSessionData(['user' => (new User())->setUsername(User::USERNAME_SCHOOLBOX_ADMIN)->setId(1)]);
-        /** @var UserMapper $userMapper */
-        $userMapper = $mapperFactory->get(UserMapper::class);
+        $folderMapper->setSessionData(['user' => $userMapper->findByUsername(User::USERNAME_SCHOOLBOX_ADMIN)]);
         /** @var CourseImpl\Mapper $courseImplMapper */
         $courseImplMapper = $mapperFactory->get(CourseImpl\Mapper::class);
         $courseSpecMapper = $mapperFactory->get(CourseSpec\Mapper::class);
