@@ -188,6 +188,16 @@ class Assignment
         return null;
     }
 
+    /**
+     * For now: quizzes will only ever have the "Total Mark" mark type, as they
+     * were prior to the Learnosity changes.
+     *
+     * @return SubmissionBox\MarkType
+     */
+    public function getQuizMarkType(): SubmissionBox\MarkType
+    {
+        return $this->markTypes[SubmissionBox\MarkType::SLUG_TOTAL];
+    }
 
     /**
      * Returns a translated mark type

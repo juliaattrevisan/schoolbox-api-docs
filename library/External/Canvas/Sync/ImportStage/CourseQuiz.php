@@ -781,6 +781,9 @@ class CourseQuiz extends CourseAssessmentAbstract
             ->setExternalId((string)$quizCanvasId)
             ->setCreated($assessment->getCreatedAt())
             ->setReadingTimeDuration(0)
+            ->setShuffleItems(0)
+            ->setPromptsMode(0)
+            ->setMarkType($this->assignmentBridge->getQuizMarkType())
         ;
 
         // Need to respect Canvas's created_at value
