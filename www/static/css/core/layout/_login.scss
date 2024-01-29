@@ -116,12 +116,16 @@ $login-img-max-height: 12rem !default; // 192px
         }
 
         .login-links {
-            p:first-of-type {
+            /* That random " - OR - " separator
+             */
+            .separator {
                 margin: 0.75rem 0 1rem 0;
                 color: calc-text-color($login-overlay);
                 text-align: center;
             }
-            p:not(:first-of-type) {
+            /* saml, oidc, etc. and any other login mechanism has this style
+             */
+            .login-method {
                 font-weight: $font-weight-bold;
                 text-align: center;
             }
