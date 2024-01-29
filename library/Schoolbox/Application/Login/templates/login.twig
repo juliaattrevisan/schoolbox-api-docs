@@ -34,31 +34,37 @@
             background-image: url("{{ random(login_backgrounds) }}");
         }
 
-        {# These are configured in admin to some extent #}
-        .samlbutton {
+        {# These are configured in admin to some extent
+         # The 1rem padding is optional (and equal) in case nobody chose an icon
+         # and is the same for all usages of this idea
+         #}
+        .samlbutton, .oidcbutton {
+            display: block;
             padding: 1rem 1rem 1rem 1rem;
+        }
+
+        {# If an icon was chosen, reconfigure padding and background images etc. #}
+        .saml-icon, .oidc-icon {
+            background-position-x: left;
+            background-repeat: no-repeat;
+            background-size: 4rem;
+            padding-left: 5rem;
+        }
+
+        .samlbutton {
             background-color: {{ config.single_sign_on_colour|raw }};
         }
 
         .samlbutton.saml-icon {
-            padding-left: 5rem;
             background-image: url('/storage/image.php?hash={{ config.single_sign_on_icon }}');
-            background-position-x: left;
-            background-repeat: no-repeat;
-            background-size: 4rem;
         }
 
         .oidcbutton {
-            padding: 1rem 1rem 1rem 1rem;
             background-color: {{ config.oauth_colour|raw }};
         }
 
         .oidcbutton.oidc-icon {
-            padding-left: 5rem;
             background-image: url('/storage/image.php?hash={{ config.oauth_icon }}');
-            background-position-x: left;
-            background-repeat: no-repeat;
-            background-size: 4rem;
         }
     </style>
 {% endautoescape %}
