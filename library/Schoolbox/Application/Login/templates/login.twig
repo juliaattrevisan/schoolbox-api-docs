@@ -170,7 +170,13 @@
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                         {% block sso %}
-                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton {% if config.saml_login_icon ?? null %}saml-icon{% endif %}">Login using {{ config.saml_login_title }}</a></p>
+                            {# Interpret title setting forcing a meaningful default#}
+                            {% set samlTitle = config.saml_login_title ?? '' %}
+
+                            {% if '' == samlTitle %}
+                                {% set samlTitle = 'Single Sign-On' %}
+                            {% endif %}
+                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton {% if config.saml_login_icon ?? null %}saml-icon{% endif %}">Login using {{ samlTitle }}</a></p>
                         {% endblock %}
                     {% endif %}
 
@@ -178,7 +184,13 @@
                     {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
                     {% if oidcUrl or true %}
                     {% block oidc %}
-                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">Login using {{ config.oidc_login_title }}</a></p>
+                        {# Interpret title setting forcing a meaningful default#}
+                        {% set oidcTitle = config.oidc_login_title ?? '' %}
+
+                        {% if '' == oidcTitle %}
+                            {% set oidcTitle = 'OpenID Connect' %}
+                        {% endif %}
+                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">Login using {{ oidcTitle }}</a></p>
                     {% endblock %}
                     {% endif %}
 
