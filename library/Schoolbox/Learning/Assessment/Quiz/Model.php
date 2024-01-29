@@ -82,6 +82,13 @@ class Model extends AbstractAssessment
 
 
     /**
+     * The assessment ID from which this assessment's Learnosity data was
+     * copied, if any.
+     */
+    private ?int $learnositySourceAssessmentId = null;
+
+
+    /**
      * Decide whether to randomise all the items in a learnosity quiz
      *
      * @var int
@@ -686,6 +693,26 @@ class Model extends AbstractAssessment
     public function setLearnosityJobStatus(?string $learnosityJobStatus): self
     {
         $this->learnosityJobStatus = $learnosityJobStatus;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getLearnositySourceAssessmentId(): ?int
+    {
+        return $this->learnositySourceAssessmentId;
+    }
+
+
+    /**
+     * @param int|null $learnositySourceAssessmentId
+     * @return $this
+     */
+    public function setLearnositySourceAssessmentId(?int $learnositySourceAssessmentId): self
+    {
+        $this->learnositySourceAssessmentId = $learnositySourceAssessmentId;
         return $this;
     }
 }

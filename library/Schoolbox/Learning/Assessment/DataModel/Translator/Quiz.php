@@ -95,6 +95,7 @@ class Quiz implements IAssessmentTypeTranslator
             ->setLearnosityReference($domainObject->getLearnosityReference())
             ->setLearnosityJobReference($domainObject->getLearnosityJobReference())
             ->setLearnosityJobStatus($domainObject->getLearnosityJobStatus())
+            ->setLearnositySourceAssessmentId($domainObject->getLearnositySourceAssessmentId())
         ;
 
         // Translate mark scheme
@@ -134,6 +135,7 @@ class Quiz implements IAssessmentTypeTranslator
             ->setLearnosityReference($dataModel->getLearnosityReference())
             ->setLearnosityJobReference($dataModel->getLearnosityJobReference())
             ->setLearnosityJobStatus($dataModel->getLearnosityJobStatus())
+            ->setLearnositySourceAssessmentId($dataModel->getLearnositySourceAssessmentId())
         ;
 
         // Copy mark type and grade group
