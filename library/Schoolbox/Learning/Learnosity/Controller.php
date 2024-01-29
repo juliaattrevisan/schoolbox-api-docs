@@ -160,13 +160,6 @@ class Controller extends Base
 
 
     /**
-     * Learnosity quiz duplicator: contains convenience methods for duplicating
-     * one quiz's contents into another.
-     */
-    private Api\Duplicator $duplicator;
-
-
-    /**
      * Controller constructor.
      *
      * @param Factory $urlFactory
@@ -218,16 +211,6 @@ class Controller extends Base
         );
 
         $this->helper = new Helper($this->api, $logger);
-
-        $this->duplicator = new Api\Duplicator(
-            $this->api,
-            $this->quizMapper->getDatabase(),
-            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
-            $this->httpFactory,
-            $this->routeGenerator,
-            $this->messageFactory,
-            $this->messageProducer,
-        );
     }
 
 
@@ -1778,8 +1761,9 @@ class Controller extends Base
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
         // Start duplicating and polling status of duplication
-        $jobId = $this->duplicator->copyQuizConstituents($source, $destination);
-        $this->duplicator->initiatePollingForQuizStatus($this->getUser(), $destination);
+        $duplicator = $this->buildDuplicator();
+        $jobId = $duplicator->copyQuizConstituents($source, $destination);
+        $duplicator->initiatePollingForQuizStatus($this->getUser(), $destination);
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
     }
 
@@ -1818,7 +1802,7 @@ class Controller extends Base
         if ($assessment->getContext()->isImplementationContext()) {
             $newTags[] = $tagFactory->produceImplFlag();
         }
-        $this->duplicator->pollQuizStatus($assessment, $newTags);
+        $this->buildDuplicator()->pollQuizStatus($assessment, $newTags);
 
         // What's in the response: just a "status" callback,
         // possibly an API problem?
@@ -2006,5 +1990,25 @@ class Controller extends Base
     {
         return (new TokenReplacer\Student(new TokenReplacer\Simple()))
             ->replace(trim((string)($comment ?? '')), $student);
+    }
+
+
+    /**
+     * Build assessment duplicator upon request, because it cannot be built
+     * in the constructor.
+     *
+     * @return Api\Duplicator
+     */
+    private function buildDuplicator(): Api\Duplicator
+    {
+        return new Api\Duplicator(
+            $this->api,
+            $this->quizMapper->getDatabase(),
+            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->httpFactory,
+            $this->routeGenerator,
+            $this->messageFactory,
+            $this->messageProducer,
+        );
     }
 }
