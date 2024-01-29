@@ -160,6 +160,13 @@ class Controller extends Base
 
 
     /**
+     * Learnosity quiz duplicator: contains convenience methods for duplicating
+     * one quiz's contents into another.
+     */
+    private Api\Duplicator $duplicator;
+
+
+    /**
      * Controller constructor.
      *
      * @param Factory $urlFactory
@@ -211,6 +218,16 @@ class Controller extends Base
         );
 
         $this->helper = new Helper($this->api, $logger);
+
+        $this->duplicator = new Api\Duplicator(
+            $this->api,
+            $this->quizMapper->getDatabase(),
+            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->httpFactory,
+            $this->routeGenerator,
+            $this->messageFactory,
+            $this->messageProducer,
+        );
     }
 
 
@@ -1760,19 +1777,9 @@ class Controller extends Base
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
-        $duplicator = new Api\Duplicator(
-            $this->api,
-            $this->quizMapper->getDatabase(),
-            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
-            $this->httpFactory,
-            $this->routeGenerator,
-            $this->messageFactory,
-            $this->messageProducer,
-        );
-
         // Start duplicating and polling status of duplication
-        $jobId = $duplicator->copyQuizConstituents($source, $destination);
-        $duplicator->initiatePollingForQuizStatus($this->getUser(), $destination);
+        $jobId = $this->duplicator->copyQuizConstituents($source, $destination);
+        $this->duplicator->initiatePollingForQuizStatus($this->getUser(), $destination);
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
     }
 
@@ -1800,8 +1807,7 @@ class Controller extends Base
         // complete: set and return status 200
 
         // Not a quiz, or no Learnosity job reference? error
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-        if (!$quiz->getLearnosityJobReference()) {
+        if (!$assessment->getLearnosityJobReference()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
@@ -1812,12 +1818,11 @@ class Controller extends Base
         if ($assessment->getContext()->isImplementationContext()) {
             $newTags[] = $tagFactory->produceImplFlag();
         }
-
-        $this->quizMapper->pollQuizStatus($this->api, $quiz, $newTags);
+        $this->duplicator->pollQuizStatus($assessment, $newTags);
 
         // What's in the response: just a "status" callback,
         // possibly an API problem?
-        $jobStatus    = $quiz->getLearnosityJobStatus();
+        $jobStatus    = $assessment->getLearnosityJobStatus();
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
