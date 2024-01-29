@@ -89,7 +89,7 @@ class Controller extends Base
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $entityType   = $row['entity_type'];
-            $value        = $row['id'];
+            $value        = (string)$row['id'];
             $name         = $simpleStrategies[$entityType]->formatName($row['name']);
             $meta         = $row['entity_meta'];
             $encodedValue = $codec->encodeValue($value);
