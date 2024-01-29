@@ -15,6 +15,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\MapperFactory;
+use Schoolbox\Url\Factory;
+use Schoolbox\UserMapper;
 
 /**
  * CLI tool for restarting sync of Learnosity data for quizzes in the pending
@@ -33,6 +35,17 @@ class RestartPendingTool extends CliTool\App
             $this->getLogger(),
         );
 
+        // Build duplicator
+        $duplicator = new Api\Duplicator(
+            $api,
+            $this->getDatabaseInternal(),
+            (new Factory($this->getConfig()))->buildFullyQualified(),
+            $this->getDi()->get('httpFactory'),
+            $this->getDi()->get('router.generator'),
+            $this->getDi()->get('taskd.httpRequestMessageFactory'),
+            $this->getDi()->get('taskd.messageProducer'),
+        );
+
         // Find pending quizzes
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
             "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
@@ -43,7 +56,10 @@ class RestartPendingTool extends CliTool\App
         $mapperFactory = $this->getDi()->get('mapperFactory');
         $quizMapper    = $mapperFactory->get(Quiz\Mapper::class);
 
-        /** @var MapperProxy $assessmentDataSource */
+        // Perform all copies within the context of the Schoolbox user
+        $schoolboxUser = $mapperFactory->get(UserMapper::class)->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+
+            /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
         /** @var Quiz\Model[] $pendingQuizzes */
@@ -69,13 +85,12 @@ class RestartPendingTool extends CliTool\App
                         $pendingQuiz->getLearnositySourceAssessmentId(),
                     )
                 );
-                $quizMapper->copyQuizConstituents(
-                    $api,
-                    $quizMapper->findById($pendingQuiz->getLearnositySourceAssessmentId()),
-                    $pendingQuiz,
-                );
+                $source      = $assessmentDataSource->findById($pendingQuiz->getLearnositySourceAssessmentId());
+                $destination = $assessmentDataSource->findById($pendingQuiz->getAssessmentModel()->getId());
+                $duplicator->copyQuizConstituents($source, $destination);
 
-                // Need to also tell taskd to start polling
+                // Tell taskd to start polling
+                $duplicator->initiatePollingForQuizStatus($schoolboxUser, $destination);
                 continue;
             }
 
