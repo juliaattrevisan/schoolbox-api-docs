@@ -59,29 +59,29 @@ HELP;
             $this->getLogger()->info("Action Mode");
         }
 
-        $db     = $this->getDatabaseInternal();
+        $db = $this->getDatabaseInternal();
 
         // get list of quiz attempts to complete
-        $completedAttempts = $db->prepareQuery("SELECT
-            aa.attempt_id as 'attemptId',
-            aa.user_id as 'userId',
-            a.assessment_id as 'assessmentId'
-        FROM
-            assess_attempt aa
-                JOIN
-            assess a ON aa.assess_id = a.assess_id
-                AND a.availability = 'assess'
-                JOIN
-            user u ON aa.user_id = u.id
-                AND u.deleted_at IS NULL
-                JOIN
-            folder c ON a.category_id = c.id
-                AND c.deleted_at IS NULL
-        WHERE
-            aa.reviewed_at IS NULL
-                AND aa.finish IS NOT NULL
-                AND aa.deleted_at IS NULL
-        ORDER BY aa.finish DESC;");
+        /* As of SA-17127 we also skip any assessments that were implementations of
+         * 79541 User Experience (Level 1)
+         * 155962 News and Communication (Level 2)
+         */
+        $completedAttempts = $db->prepareQuery("
+            SELECT
+                aa.attempt_id as 'attemptId',
+                aa.user_id as 'userId',
+                a.assessment_id as 'assessmentId'
+            FROM assess_attempt aa
+            JOIN assess a ON aa.assess_id = a.assess_id AND a.availability = 'assess'
+            JOIN user u ON aa.user_id = u.id AND u.deleted_at IS NULL
+            JOIN folder c ON a.category_id = c.id AND c.deleted_at IS NULL
+            LEFT JOIN assessment_specification_implementation asi ON a.assessment_id = asi.implementation_assessment_id
+            WHERE aa.reviewed_at IS NULL
+            AND aa.finish IS NOT NULL
+            AND aa.deleted_at IS NULL
+            AND (asi.specification_assessment_id NOT IN (79541, 155962) OR asi.specification_assessment_id IS NULL)
+            ORDER BY aa.finish DESC
+        ");
 
         $completedAttempts->execute();
 
