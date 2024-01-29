@@ -108,7 +108,7 @@ class RestartPendingTool extends CliTool\App
                         $pendingQuiz,
                     );
                 } else {
-                    $this->getLogger()->info(
+                    $this->getLogger()->warning(
                         sprintf(
                             'Assessment #%d is an implementation with no spec assessment: cannot copy',
                             $pendingQuiz->getAssessmentModel()->getId(),
@@ -149,7 +149,7 @@ class RestartPendingTool extends CliTool\App
                         $pendingQuiz,
                     );
                 } else {
-                    $this->getLogger()->info(
+                    $this->getLogger()->warning(
                         sprintf(
                             'Assessment #%d is a spec with %s implementations: cannot copy',
                             ($implementationsCount === 0 ? 'no' : 'multiple'),
