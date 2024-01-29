@@ -129,24 +129,6 @@ class Profile implements IStrategy
 
 
     /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a father specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $fatherAddressDescription;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a mother specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $motherAddressDescription;
-
-
-    /**
      * @var bool
      */
     private bool $includePhoto;
@@ -234,8 +216,6 @@ class Profile implements IStrategy
      * @param array                           $watchlist
      * @param int                             $addnumFather
      * @param int                             $addnumMother
-     * @param string                          $fatherAddressDescription
-     * @param string                          $motherAddressDescription
      * @param bool                            $includePhoto
      * @param string                          $spousePrefix
      * @param string                          $communicationTypes
@@ -254,8 +234,6 @@ class Profile implements IStrategy
         array $watchlist,
         int $addnumFather,
         int $addnumMother,
-        string $fatherAddressDescription,
-        string $motherAddressDescription,
         bool $includePhoto,
         string $spousePrefix,
         string $communicationTypes,
@@ -273,8 +251,6 @@ class Profile implements IStrategy
         $this->watchlist = $watchlist;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
-        $this->fatherAddressDescription = $fatherAddressDescription;
-        $this->motherAddressDescription = $motherAddressDescription;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
 
@@ -348,8 +324,8 @@ class Profile implements IStrategy
                 $this->addnumMother,
                 (new Communications(
                     $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
-                    $this->fatherAddressDescription,
-                    $this->motherAddressDescription,
+                    $this->addnumFather,
+                    $this->addnumMother,
                     $this->communicationTypes
                 ))->generate()
             ))->generate();
