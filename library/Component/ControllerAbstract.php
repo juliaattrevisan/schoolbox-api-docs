@@ -1301,9 +1301,9 @@ abstract class Component_ControllerAbstract
                 $dateEnd->addDays(self::N_DAYS_IN_ONE_WEEK - 1);
                 break;
             case self::RANGE_MONTH:
-                // The date range is defined as within the current month.
-                $dateStart = \Alaress_Date_Format::now()->startOfMonth();
-                $dateEnd = \Alaress_Date_Format::now()->endOfMonth();
+                // The date range is defined as within the 2 weeks either side of now
+                $dateStart = \Alaress_Date_Format::now()->startOfDay()->addWeeks(-2);
+                $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addWeeks(2);
                 break;
             default:
                 // The date range is defined as $this->range days either side of the current date inclusive.
