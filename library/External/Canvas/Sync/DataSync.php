@@ -179,6 +179,8 @@ class DataSync
 
         if ($this->persist) {
             $this->schoolboxDb->commit();
+        } else {
+            $this->schoolboxDb->rollBack();
         }
     }
 
@@ -320,10 +322,6 @@ class DataSync
             new Bridge\CourseSectionDates(),
             $this->schoolboxTimezone
         ))->synchronise();
-
-        if (!$this->persist) {
-            $this->schoolboxDb->rollBack();
-        }
     }
 
     /**
