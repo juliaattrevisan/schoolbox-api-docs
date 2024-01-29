@@ -12,7 +12,7 @@ $config = $kernel->get('config');
 /** @var PrefixGenerator $cdnPrefixGenerator */
 $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
 ?>
-<html>
+<html lang="en">
 
 <head>
     <title>Your browser is no longer supported</title>
