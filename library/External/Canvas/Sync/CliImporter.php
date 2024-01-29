@@ -511,9 +511,8 @@ class CliImporter extends CliTool\App
     private function downloadDataFiles(array $tableList, string $tempDir, array $tablesToImport): void
     {
         $client = new Client([
-                                 'timeout' => self::DEFAULT_TIMEOUT,
-                                 'http_errors' => false,
-                             ]);
+            'timeout' => self::DEFAULT_TIMEOUT,
+        ]);
         foreach ($tableList as $tableName => $tableData) {
             if (!in_array($tableName, $tablesToImport) || !count($tableData['files'])) {
                 continue;
