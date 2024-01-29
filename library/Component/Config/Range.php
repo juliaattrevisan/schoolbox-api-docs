@@ -13,7 +13,9 @@ class Component_Config_Range extends Component_Config_Abstract
             0 => 'Today Only',
             1 => '1 Day',
             2 => '2 Days',
-            3 => '3 Days'
+            3 => '3 Days',
+            4 => 'This week', // Week starting at config.calendar_start_day.  See CurrentLessonPlanController.php.
+            5 => 'This month'
         ];
     }
 

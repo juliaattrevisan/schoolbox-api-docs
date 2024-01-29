@@ -17,6 +17,12 @@ use Schoolbox\User;
 
 abstract class Component_ControllerAbstract
 {
+    // These constants pertain to the date range selector in the component config UI.
+    private const RANGE_DEFAULT = 0;
+    private const RANGE_WEEK = 4;
+    private const RANGE_MONTH = 5;
+    private const N_DAYS_IN_ONE_WEEK = 7;
+
     // Reasons for showing a component empty state
 
     const EMPTY_STATE_REASON_UNKNOWN = 0;           // Default
@@ -1270,5 +1276,41 @@ abstract class Component_ControllerAbstract
     {
         $this->configLoader = $configLoader;
         return $this;
+    }
+
+    /**
+     * @param int $range
+     * @return array
+     */
+    protected function getDateStartAndEndFromRangeOptionValue(int $range): array
+    {
+        $range = is_numeric($this->getConfig('range')) ? (int)$this->getConfig('range') : self::RANGE_DEFAULT;
+
+        $now = \Alaress_Date_Format::now();
+
+        switch ($range) {
+            case self::RANGE_WEEK:
+                // The date range is defined as within the current week (with start day defined as config->calendar_start_day).
+                $weekStartDayOfWeek = $this->getConfigLoader()->get('calendar_start_day');
+                $dateStart = (
+                    (\Alaress_Date_Format::now()->getWeekDayNumber() === $weekStartDayOfWeek)
+                    ? \Alaress_Date_Format::now()->startOfDay()
+                    : \Alaress_Date_Format::now()->previous((int)$weekStartDayOfWeek)
+                );
+                $dateEnd = new \Alaress_Date_Format($dateStart->getDatabaseDate(), \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $dateEnd->addDays(self::N_DAYS_IN_ONE_WEEK - 1);
+                break;
+            case self::RANGE_MONTH:
+                // The date range is defined as within the 2 weeks either side of now
+                $dateStart = \Alaress_Date_Format::now()->startOfDay()->addWeeks(-2);
+                $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addWeeks(2);
+                break;
+            default:
+                // The date range is defined as $this->range days either side of the current date inclusive.
+                $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$range);
+                $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($range);
+        }
+
+        return [$range, $dateStart, $dateEnd];
     }
 }

@@ -10,11 +10,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 
 class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 {
-    // Should match the DB value
-    private const RANGE_DEFAULT = 0;
-
     /**
-     * The number of days to find lesson plans either side of today
+     * The value of the selected option from the date range selector in the component config UI.
      *
      * @var int
      */
@@ -51,10 +48,8 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         $lessonPlanMapper = LessonPlanMapper::getInstance();
         $assessmentDataSource = $this->getSitePage()->getDi()->get('assessmentDataSource');
 
-        $this->range = is_numeric($this->getConfig('range')) ? $this->getConfig('range') : self::RANGE_DEFAULT;
+        [$this->range, $dateStart, $dateEnd] = $this->getDateStartAndEndFromRangeOptionValue($this->getConfig('range'));
 
-        $dateStart = \Alaress_Date_Format::now()->startOfDay()->addDays(-$this->range);
-        $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($this->range);
         $publishDate = \Alaress_Date_Format::now();
 
         // grab the assessmentID for all lesson plans from the students subject list
