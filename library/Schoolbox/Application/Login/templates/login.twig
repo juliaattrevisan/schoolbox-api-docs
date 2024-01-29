@@ -33,6 +33,20 @@
         body.login {
             background-image: url("{{ random(login_backgrounds) }}");
         }
+
+        {# These are configured in admin to some extent #}
+        .oidcbutton {
+            padding: 1rem 1rem 1rem 1rem;
+            background-color: {{ config.oauth_colour|raw }};
+        }
+
+        .oidcbutton.oidc-icon {
+            padding-left: 5rem;
+            background-image: url('/storage/image.php?hash={{ config.oauth_icon }}');
+            background-position-x: left;
+            background-repeat: no-repeat;
+            background-size: 4rem;
+        }
     </style>
 {% endautoescape %}
 
@@ -139,9 +153,9 @@
 
                     {# Only show OIDC login if it's enabled #}
                     {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
-                    {% if oidcUrl %}
+                    {% if oidcUrl or true %}
                     {% block oidc %}
-                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton">Login using OpenID Connect</a></p>
+                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton {% if config.oauth_icon %}oidc-icon{% endif %}">Login using {{ config.oauth_openid_title }}</a></p>
                     {% endblock %}
                     {% endif %}
 
