@@ -55,17 +55,21 @@
             background-color: {{ config.saml_login_colour|raw }};
         }
 
+        {% if config.saml_login_icon ?? null %}
         .samlbutton.saml-icon {
             background-image: url('/storage/image.php?hash={{ config.saml_login_icon }}');
         }
+        {% endif %}
 
         .oidcbutton {
             background-color: {{ config.oidc_login_colour|raw }};
         }
 
+        {% if config.oidc_login_icon ?? null %}
         .oidcbutton.oidc-icon {
             background-image: url('/storage/image.php?hash={{ config.oidc_login_icon }}');
         }
+        {% endif %}
     </style>
 {% endautoescape %}
 
@@ -166,7 +170,7 @@
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                         {% block sso %}
-                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton {% if config.saml_login_icon %}saml-icon{% endif %}">Login using {{ config.saml_login_title }}</a></p>
+                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton {% if config.saml_login_icon ?? null %}saml-icon{% endif %}">Login using {{ config.saml_login_title }}</a></p>
                         {% endblock %}
                     {% endif %}
 
@@ -174,7 +178,7 @@
                     {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
                     {% if oidcUrl or true %}
                     {% block oidc %}
-                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton {% if config.oidc_login_icon %}oidc-icon{% endif %}">Login using {{ config.oidc_login_title }}</a></p>
+                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">Login using {{ config.oidc_login_title }}</a></p>
                     {% endblock %}
                     {% endif %}
 
