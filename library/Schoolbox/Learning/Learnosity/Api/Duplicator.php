@@ -157,25 +157,24 @@ class Duplicator
      * @param User            $user
      * @param QuizDomainModel $destination
      * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Interop\Queue\Exception
      * @throws \Interop\Queue\Exception\InvalidDestinationException
      * @throws \Interop\Queue\Exception\InvalidMessageException
      */
     public function initiatePollingForQuizStatus(User $user, QuizDomainModel $destination): void
     {
+        /** @noinspection PhpUnhandledExceptionInspection - this route exists */
+        $route = $this->routeGenerator->generate(
+            'learnosity.postPollQuizStatus',
+            ['assessmentId' => $destination->getId()]
+        );
         $message = $this->messageFactory
             ->setUser($user)
             ->setRequest(
                 $this->httpFactory
                     ->createRequest(
                         'POST',
-                        $this->baseUrl->withPath(
-                            $this->routeGenerator->generate(
-                                'learnosity.postPollQuizStatus',
-                                ['assessmentId' => $destination->getId()]
-                            )
-                        )
+                        $this->baseUrl->withPath($route),
                     )
                     ->withHeader('accept', 'application/json')
             )
