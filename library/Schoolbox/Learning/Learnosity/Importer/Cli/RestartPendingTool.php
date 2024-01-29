@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
+use Interop\Queue\Exception as InteropQueueException;
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
 
 /**
@@ -88,29 +91,35 @@ class RestartPendingTool extends CliTool\App
 
             // Does this quiz already have a Learnosity source assessment?
             // If so, use that
-            if ($pendingQuiz->getLearnositySourceAssessmentId()) {
-                $this->copyFromLearnositySourceAssessment($pendingQuiz);
-                continue;
-            }
+            try {
+                if ($pendingQuiz->getLearnositySourceAssessmentId()) {
+                    $this->copyFromLearnositySourceAssessment($pendingQuiz);
+                    continue;
+                }
 
-            $this->getLogger()->debug(
-                sprintf(
-                    'Assessment #%d has no source assessment: deriving source from relations',
-                    $pendingQuiz->getId(),
-                )
-            );
-
-            if ($pendingQuiz->isImplementation()) {
-                $this->copyFromSpecificationAssessment($pendingQuiz);
-            } elseif ($pendingQuiz->isSpecification()) {
-                $this->copyFromImplementationAssessment($pendingQuiz);
-            } else {
-                $this->getLogger()->warning(
+                $this->getLogger()->debug(
                     sprintf(
-                        'Assessment #%d is somehow neither an implementation nor specification: skipping',
+                        'Assessment #%d has no source assessment: deriving source from relations',
                         $pendingQuiz->getId(),
                     )
                 );
+
+                if ($pendingQuiz->isImplementation()) {
+                    $this->copyFromSpecificationAssessment($pendingQuiz);
+                } elseif ($pendingQuiz->isSpecification()) {
+                    $this->copyFromImplementationAssessment($pendingQuiz);
+                } else {
+                    $this->getLogger()->warning(
+                        sprintf(
+                            'Assessment #%d is somehow neither an implementation nor specification: skipping',
+                            $pendingQuiz->getId(),
+                        )
+                    );
+                }
+            } catch (InteropQueueException $e) {
+                // Something went wrong when sending message to taskd
+            } catch (ValidationException $e) {
+                // Something went wrong when sending message to Learnosity
             }
         }
     }
@@ -126,7 +135,6 @@ class RestartPendingTool extends CliTool\App
      * @throws \Interop\Queue\Exception\InvalidDestinationException
      * @throws \Interop\Queue\Exception\InvalidMessageException
      * @throws \LearnositySdk\Exceptions\ValidationException
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     private function copyFromLearnositySourceAssessment(QuizDomainModel $pendingQuiz): void
     {
@@ -137,7 +145,28 @@ class RestartPendingTool extends CliTool\App
                 $pendingQuiz->getLearnositySourceAssessmentId(),
             )
         );
-        $source = $this->assessmentDataSource->findById($pendingQuiz->getLearnositySourceAssessmentId());
+
+        // Find the assessment
+        try {
+            $source = $this->assessmentDataSource->findById($pendingQuiz->getLearnositySourceAssessmentId());
+        } catch (MapperException\Deleted $e) {
+            $source = $e->getDeletedObject();
+            $this->getLogger()->debug(
+                sprintf(
+                    'Source assessment #%d has been deleted: still using as source',
+                    $pendingQuiz->getLearnositySourceAssessmentId(),
+                )
+            );
+        } catch (MapperException $e) {
+            // Not found at all: raise an error
+            $this->getLogger()->warning(
+                sprintf(
+                    'Source assessment #%d does not exist: skipping',
+                    $pendingQuiz->getLearnositySourceAssessmentId(),
+                )
+            );
+            return;
+        }
         if (!$source instanceof QuizDomainModel) {
             $this->getLogger()->warning(
                 sprintf(
@@ -226,8 +255,13 @@ class RestartPendingTool extends CliTool\App
                 $pendingQuiz->getId(),
             )
         );
+
+        // Search within deleted implementations:
+        // this is because it's viable that the assessment could have been
+        // copied from an assessment which is now deleted.
         $implementations      = $this->assessmentDataSource->findAllImplementationsBySpecificationId(
             $pendingQuiz->getId(),
+            ['deleted' => true]
         );
         $implementationsCount = count($implementations);
         if ($implementationsCount === 1) {
