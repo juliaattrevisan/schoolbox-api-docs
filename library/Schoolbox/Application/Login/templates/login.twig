@@ -35,6 +35,19 @@
         }
 
         {# These are configured in admin to some extent #}
+        .samlbutton {
+            padding: 1rem 1rem 1rem 1rem;
+            background-color: {{ config.single_sign_on_colour|raw }};
+        }
+
+        .samlbutton.saml-icon {
+            padding-left: 5rem;
+            background-image: url('/storage/image.php?hash={{ config.single_sign_on_icon }}');
+            background-position-x: left;
+            background-repeat: no-repeat;
+            background-size: 4rem;
+        }
+
         .oidcbutton {
             padding: 1rem 1rem 1rem 1rem;
             background-color: {{ config.oauth_colour|raw }};
@@ -147,7 +160,7 @@
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                         {% block sso %}
-                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
+                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton {% if config.single_sign_on_icon %}saml-icon{% endif %}">Login using {{ config.single_sign_on_title }}</a></p>
                         {% endblock %}
                     {% endif %}
 
