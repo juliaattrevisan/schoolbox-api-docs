@@ -109,6 +109,8 @@ class RestartPendingTool extends CliTool\App
                 } elseif ($pendingQuiz->isSpecification()) {
                     $this->copyFromImplementationAssessment($pendingQuiz);
                 } else {
+                    // If somehow this isn't an assessment:
+                    // mark it as failed
                     $this->getLogger()->warning(
                         sprintf(
                             'Assessment #%d is somehow neither an implementation nor specification: skipping',
@@ -116,8 +118,20 @@ class RestartPendingTool extends CliTool\App
                         )
                     );
                 }
+            } catch (SourceAssociationException $e) {
+                // This pending quiz couldn't be associated with a source:
+                // mark it as failed.
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Could not associate assessment with source (message: %s): marking as failed',
+                        $e->getMessage(),
+                    )
+                );
+                $pendingQuiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED);
+                $this->assessmentDataSource->save($pendingQuiz, $pendingQuiz->getCreator());
             } catch (InteropQueueException $e) {
-                // Something went wrong when sending message to taskd
+                // Something went wrong when sending message to taskd:
+                // this is likely a transient error, try again later
                 $this->getLogger()->warning(
                     sprintf(
                         'Possible error occurred when sending to task daemon: %s',
@@ -125,7 +139,8 @@ class RestartPendingTool extends CliTool\App
                     ),
                 );
             } catch (ValidationException $e) {
-                // Something went wrong when sending message to Learnosity
+                // Something went wrong when sending message to Learnosity:
+                // this is likely a transient error, try again later
                 $this->getLogger()->warning(
                     sprintf(
                         'Possible error occurred when sending to Learnosity: %s',
@@ -143,6 +158,7 @@ class RestartPendingTool extends CliTool\App
      *
      * @param QuizDomainModel $destination
      * @return void
+     * @throws SourceAssociationException
      * @throws \Interop\Queue\Exception
      * @throws \Interop\Queue\Exception\InvalidDestinationException
      * @throws \Interop\Queue\Exception\InvalidMessageException
@@ -172,30 +188,28 @@ class RestartPendingTool extends CliTool\App
             );
         } catch (MapperException $e) {
             // Not found at all: raise a warning
-            // Also: mark this item as failed, as it will never be able to be
-            // synced.
-            $this->getLogger()->warning(
+            throw new SourceAssociationException(
                 sprintf(
-                    'Source assessment #%d does not exist (message: %s): skipping',
+                    'Source assessment #%d does not exist: skipping',
                     $destination->getLearnositySourceAssessmentId(),
-                    $e->getMessage(),
-                )
+                ),
+                0,
+                $e,
             );
-            return;
         }
 
         if (!$source instanceof QuizDomainModel) {
             // Somehow not a quiz: raise a warning
-            // Also: mark as failed, as the source will never be a quiz
-            $this->getLogger()->warning(
+            throw new SourceAssociationException(
                 sprintf(
                     'Assessment #%d source assessment #%d is somehow not a quiz: skipping',
                     $destination->getId(),
                     $destination->getLearnositySourceAssessmentId(),
-                )
+                ),
             );
-            return;
         }
+
+        // Otherwise restart the copy process
         $this->restartCopyProcess($source, $destination);
     }
 
@@ -207,6 +221,7 @@ class RestartPendingTool extends CliTool\App
      *
      * @param QuizDomainModel $destination
      * @return void
+     * @throws SourceAssociationException
      * @throws \Interop\Queue\Exception
      * @throws \Interop\Queue\Exception\InvalidDestinationException
      * @throws \Interop\Queue\Exception\InvalidMessageException
@@ -221,31 +236,33 @@ class RestartPendingTool extends CliTool\App
             )
         );
         $specQuiz = $destination->getSpecificationAssessment();
-        if ($specQuiz instanceof QuizDomainModel) {
-            $this->getLogger()->debug(
-                sprintf(
-                    'Assessment #%d has spec assessment #%d: copying from that assessment',
-                    $destination->getId(),
-                    $specQuiz->getId(),
-                )
-            );
-            $this->restartCopyProcess($specQuiz, $destination);
-        } elseif ($specQuiz) {
-            $this->getLogger()->warning(
-                sprintf(
+
+        // Somehow not a quiz: raise a warning
+        if (!$specQuiz instanceof QuizDomainModel) {
+            if ($specQuiz) {
+                $message = sprintf(
                     'Assessment #%d spec assessment #%d is somehow not a quiz: skipping',
                     $destination->getId(),
                     $specQuiz->getId(),
-                )
-            );
-        } else {
-            $this->getLogger()->warning(
-                sprintf(
+                );
+            } else {
+                $message = sprintf(
                     'Assessment #%d is an implementation with no spec assessment: cannot copy',
                     $destination->getId(),
-                )
-            );
+                );
+            }
+            throw new SourceAssociationException($message);
         }
+
+        // Otherwise restart the copy process
+        $this->getLogger()->debug(
+            sprintf(
+                'Assessment #%d has spec assessment #%d: copying from that assessment',
+                $destination->getId(),
+                $specQuiz->getId(),
+            )
+        );
+        $this->restartCopyProcess($specQuiz, $destination);
     }
 
     /**
@@ -261,6 +278,7 @@ class RestartPendingTool extends CliTool\App
      *
      * @param QuizDomainModel $destination
      * @return void
+     * @throws SourceAssociationException
      * @throws \Interop\Queue\Exception
      * @throws \Interop\Queue\Exception\InvalidDestinationException
      * @throws \Interop\Queue\Exception\InvalidMessageException
@@ -283,35 +301,40 @@ class RestartPendingTool extends CliTool\App
             ['deleted' => true]
         );
         $implementationsCount = count($implementations);
-        if ($implementationsCount === 1) {
-            $implQuiz = $implementations->first();
-            $this->getLogger()->debug(
-                sprintf(
-                    'Assessment #%d has singular implementation assessment #%d: copying from that assessment',
-                    $destination->getId(),
-                    $implQuiz->getId(),
-                )
-            );
-            if ($implQuiz instanceof QuizDomainModel) {
-                $this->restartCopyProcess($implQuiz, $destination);
-            } else {
-                $this->getLogger()->warning(
-                    sprintf(
-                        'Assessment #%d implementation assessment #%d is somehow not a quiz: skipping',
-                        $destination->getId(),
-                        $implQuiz->getId(),
-                    )
-                );
-            }
-        } else {
-            $this->getLogger()->warning(
+
+        // No candidates, or more than one: raise warning
+        if ($implementationsCount !== 1) {
+            throw new SourceAssociationException(
                 sprintf(
                     'Assessment #%d is a spec with %s implementations: cannot copy',
                     ($implementationsCount === 0 ? 'no' : 'multiple'),
                     $destination->getId(),
-                )
+                ),
             );
         }
+
+        $implQuiz = $implementations->first();
+
+        // Somehow not a quiz: raise warning
+        if (!$implQuiz instanceof QuizDomainModel) {
+            throw new SourceAssociationException(
+                sprintf(
+                    'Assessment #%d implementation assessment #%d is somehow not a quiz: skipping',
+                    $destination->getId(),
+                    $implQuiz->getId(),
+                ),
+            );
+        }
+
+        // Otherwise restart the copy process
+        $this->getLogger()->debug(
+            sprintf(
+                'Assessment #%d has singular implementation assessment #%d: copying from that assessment',
+                $destination->getId(),
+                $implQuiz->getId(),
+            )
+        );
+        $this->restartCopyProcess($implQuiz, $destination);
     }
 
     /**
