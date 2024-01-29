@@ -531,6 +531,7 @@ class CliImporter extends CliTool\App
 
                 /* Try multiple times in case sis dies for a random reason
                  */
+                $e = null;
                 while ($fails < self::NUM_RETRY) {
                     /* Any exception thrown by guzzle might as well be a reason to nap and retry
                      */
@@ -547,12 +548,10 @@ class CliImporter extends CliTool\App
                         continue;
                     }
                 }
-                // if more fails than allowed.. then exit
-                if ($fails <= self::NUM_RETRY) {
-                    throw new \Schoolbox\Application\Exception\Exception(
-                        sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
-                    );
-                }
+                // If fallen through to here, there was an error
+                throw new \Schoolbox\Application\Exception\Exception(
+                    sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
+                );
             }
         }
     }
