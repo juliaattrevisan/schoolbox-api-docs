@@ -51,7 +51,7 @@ INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_
 VALUES (
     'saml_login_colour',
     'Colour for Single Sign-On',
-    'rgb(0, 102, 176)',
+    'rgb(0, 102, 176, 0)',
     'Choose a colour for this login button.',
     (SELECT id FROM lu_config_field WHERE field = 'colour'),
     (SELECT id FROM lu_config_type WHERE type = 'SAML'),
@@ -99,7 +99,7 @@ INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_
 VALUES (
     'oidc_login_colour',
     'Colour for OpenID Connect',
-    'rgb(0, 102, 176)',
+    'rgb(0, 102, 176, 0)',
     'Choose a colour for this login button.',
     (SELECT id FROM lu_config_field WHERE field = 'colour'),
     null,
