@@ -36,14 +36,15 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     ): ?QueryParams {
         ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
 
-        $relevancePart = $this->buildRelevanceExpression($paramKeySuffix);
+        $relevancePart = $this->buildRelevanceExpression($keyword, $paramKeySuffix);
         $titlePart     = $this->buildTitleExpression($paramKeySuffix);
         $typePart      = $this->buildTypeExpression($paramKeySuffix);
         $idPart        = $this->buildIdExpression($paramKeySuffix);
         $datePart      = $this->buildDateExpression($paramKeySuffix);
         $creatorPart   = $this->buildCreatorExpression($paramKeySuffix);
         $folderPart    = $this->buildFolderExpression($paramKeySuffix);
-        $havingParts   = [];
+
+        $whereParts[] = "$relevancePart > 0";
 
         // Apply filter
         if ($filter->types) {
@@ -117,8 +118,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $typePart      AS type,
                 $relevancePart AS relevance
             $from" .
-            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') .
-            ((count($havingParts) > 0) ? "\nHAVING " . implode(' AND ', $havingParts) : '')
+            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '')
         );
 
         // Build order parts.
@@ -238,7 +238,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * @param string $paramKeySuffix
      * @return string An SQL expression for determining
      */
-    abstract protected function buildRelevanceExpression(string $paramKeySuffix = ''): string;
+    abstract protected function buildRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
 
     /**
      * Does the relevance of an item depend on the evaluation of an expression?

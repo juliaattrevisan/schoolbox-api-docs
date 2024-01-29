@@ -34,11 +34,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
-        $whereParts[] = "(MATCH(si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix))";
-        $params       = [
+        $whereParts = [];
+        $params = [
             "indexNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-            "indexKeyword$paramKeySuffix"     => $keyword,
-            "indexKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
+//            "indexKeyword$paramKeySuffix"     => $keyword,
+//            "indexKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
         ];
 
         return [
@@ -50,15 +50,37 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritdoc
      */
-    protected function buildRelevanceExpression(string $paramKeySuffix = ''): string
+    protected function buildRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
-        $relevancePart = $this->buildLinearDecayExpression(
+        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
+        $quoter = $this->quoter;
+
+        $sqlSumTerms = [
+            "IF(si.title = '" . $quoter->escapeForLike($keywordMinusPunctuation) . "', 100, 0)",
+            "IF(si.title LIKE '%" . $quoter->escapeForLike($keywordMinusPunctuation) . "%', 50, 0)"
+        ];
+
+        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
+        $keywordWords = explode(' ', $keywordMinusPunctuation);
+
+        foreach ($keywordWords as $word) {
+            if (strlen($word) > 1) {
+                $sqlSumTerms[] = "IF(si.title LIKE '%" . $quoter->escapeForLike(trim($word)) . "%', 10, 0)";
+            }
+        }
+
+        $sqlSumTerms[] = "MATCH (si.fulltext_index) AGAINST ('" . $quoter->escapeForLike($keyword) . "' IN NATURAL LANGUAGE MODE)";
+
+        $datePart = $this->buildLinearDecayExpression(
             ":indexNow$paramKeySuffix",
             'si.date',
             7,
             56,
         );
-        return "IF(si.is_relevance_date_affected, $relevancePart, 1)";
+
+        $sqlSumTerms[] = "IF(si.is_relevance_date_affected, $datePart, 1)";
+
+        return '(' . implode(' + ', $sqlSumTerms) . ')';
     }
 
     /**
