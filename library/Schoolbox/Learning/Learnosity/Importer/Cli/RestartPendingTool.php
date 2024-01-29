@@ -118,8 +118,20 @@ class RestartPendingTool extends CliTool\App
                 }
             } catch (InteropQueueException $e) {
                 // Something went wrong when sending message to taskd
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Possible error occurred when sending to task daemon: %s',
+                        $e->getMessage(),
+                    ),
+                );
             } catch (ValidationException $e) {
                 // Something went wrong when sending message to Learnosity
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Possible error occurred when sending to Learnosity: %s',
+                        $e->getMessage(),
+                    ),
+                );
             }
         }
     }
