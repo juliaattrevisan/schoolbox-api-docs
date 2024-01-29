@@ -44,6 +44,7 @@ Admin,Configure notification delivery,https://vagrant.dev.schoolbox.cloud/adminv
 Admin,Configure student notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student
 Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps
 Admin,System Settings 3rd Party Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services
+Admin,System Settings AI Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI
 Admin,System Settings Debugging,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging
 Admin,System Settings Email,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Email
 Admin,System Settings External DB,https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB
@@ -171,6 +172,7 @@ LMS,View course markbook,https://vagrant.dev.schoolbox.cloud/learning/courseMark
 LMS,View learning analytics,https://vagrant.dev.schoolbox.cloud/learning/analytics/course/2
 LMS,View assessment calendar,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=
 LMS,Modify course,https://vagrant.dev.schoolbox.cloud/course/modify/2
+LMS,View course unit plan,https://vagrant.dev.schoolbox.cloud/course/plan/6
 LMS,Create project,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1
 LMS,Create task,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=task&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1
 LMS,Create due work,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=dueWork&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1
@@ -245,6 +247,7 @@ ePortfolio,Create a page on the students ePortfolio,https://vagrant.dev.schoolbo
 ePortfolio,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/profile
 ePortfolio,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
 ePortfolio,Create a page on the students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
+
 Search,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all"
 Search,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user"
 Search,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox"

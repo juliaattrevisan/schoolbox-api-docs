@@ -182,6 +182,10 @@ Admin,"System Settings 3rd Party Services",Superuser,https://vagrant.dev.schoolb
 Admin,"System Settings 3rd Party Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
 Admin,"System Settings 3rd Party Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
 Admin,"System Settings 3rd Party Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
+Admin,"System Settings AI Services",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,200
+Admin,"System Settings AI Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
+Admin,"System Settings AI Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
+Admin,"System Settings AI Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
 Admin,"System Settings Debugging",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,200
 Admin,"System Settings Debugging",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,401
 Admin,"System Settings Debugging",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,401
@@ -694,6 +698,10 @@ LMS,"Modify course",Superuser,https://vagrant.dev.schoolbox.cloud/course/modify/
 LMS,"Modify course",Teacher,https://vagrant.dev.schoolbox.cloud/course/modify/2,200
 LMS,"Modify course",Student,https://vagrant.dev.schoolbox.cloud/course/modify/2,401
 LMS,"Modify course",Parent,https://vagrant.dev.schoolbox.cloud/course/modify/2,401
+LMS,"View course unit plan",Superuser,https://vagrant.dev.schoolbox.cloud/course/plan/6,200
+LMS,"View course unit plan",Teacher,https://vagrant.dev.schoolbox.cloud/course/plan/6,200
+LMS,"View course unit plan",Student,https://vagrant.dev.schoolbox.cloud/course/plan/6,401
+LMS,"View course unit plan",Parent,https://vagrant.dev.schoolbox.cloud/course/plan/6,401
 LMS,"Create project",Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
 LMS,"Create project",Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
 LMS,"Create project",Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
@@ -978,6 +986,10 @@ ePortfolio,"Add a new page",Superuser,https://vagrant.dev.schoolbox.cloud/eportf
 ePortfolio,"Add a new page",Teacher,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,200
 ePortfolio,"Add a new page",Student,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,200
 ePortfolio,"Add a new page",Parent,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create,400
+Search,"Search page",Superuser,https://vagrant.dev.schoolbox.cloud/search,200
+Search,"Search pages",Teacher,https://vagrant.dev.schoolbox.cloud/search,200
+Search,"Search page",Student,https://vagrant.dev.schoolbox.cloud/search,200
+Search,"Search page",Parent,https://vagrant.dev.schoolbox.cloud/search,200
 Search,"Search for user with results",Superuser,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed,200
 Search,"Search for user with results",Teacher,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed,200
 Search,"Search for user with results",Student,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed,200
