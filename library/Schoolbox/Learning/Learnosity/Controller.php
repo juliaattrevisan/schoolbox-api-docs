@@ -1763,29 +1763,17 @@ class Controller extends Base
         $duplicator = new Api\Duplicator(
             $this->api,
             $this->quizMapper->getDatabase(),
+            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->httpFactory,
+            $this->routeGenerator,
+            $this->messageFactory,
+            $this->messageProducer,
         );
-        $jobId = $duplicator->copyQuizConstituents($source, $destination);
-        $this->response = $this->responseAsJson(['jobId' => $jobId]);
 
-        // Start polling status of duplication
-        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
-        $message = $this->messageFactory
-            ->setUser($this->getUser())
-            ->setRequest(
-                $this->httpFactory
-                    ->createRequest(
-                        'POST',
-                        $baseUrl->withPath(
-                            $this->routeGenerator->generate(
-                                'learnosity.postPollQuizStatus',
-                                ['assessmentId' => $destination->getId()]
-                            )
-                        )
-                    )
-                    ->withHeader('accept', 'application/json')
-            )
-            ->build();
-        $this->messageProducer->send($message, delay: 5, maxRequeues: 10);
+        // Start duplicating and polling status of duplication
+        $jobId = $duplicator->copyQuizConstituents($source, $destination);
+        $duplicator->initiatePollingForQuizStatus($this->getUser(), $destination);
+        $this->response = $this->responseAsJson(['jobId' => $jobId]);
     }
 
     /**

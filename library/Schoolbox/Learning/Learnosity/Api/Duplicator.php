@@ -10,11 +10,17 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Api;
 
 use Alaress\Database\Connector\IConnector;
+use Aura\Router\Generator;
 use LearnositySdk\Exceptions\ValidationException;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Quiz\Model;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
+use Schoolbox\User;
 
 /**
  * Specialised command for duplicating quiz contents from one quiz to another,
@@ -25,11 +31,26 @@ class Duplicator
     /**
      * Constructor
      *
-     * @param Api        $api      Learnosity API
-     * @param IConnector $database Database in which to write
+     * @param Api                     $api             Learnosity API connection.
+     * @param IConnector              $database        Database in which to write the status of the duplication job.
+     * @param UriInterface            $baseUrl         This Schoolbox instance's base URL: required for sending a
+     *                                                 polling task to the task daemon.
+     * @param RequestFactoryInterface $httpFactory     A HTTP request factory: required for creating requests to send to
+     *                                                 the task daemon.
+     * @param Generator               $routeGenerator  A route generator: used to create a URL for the polling request.
+     * @param MessageFactory          $messageFactory  A message factory: used to create the message to send to the task
+     *                                                 daemon.
+     * @param Producer                $messageProducer Used to send messages to the task daemon once built.
      */
-    public function __construct(private Api $api, private IConnector $database)
-    {
+    public function __construct(
+        private Api $api,
+        private IConnector $database,
+        private UriInterface $baseUrl,
+        private RequestFactoryInterface $httpFactory,
+        private Generator $routeGenerator,
+        private MessageFactory $messageFactory,
+        private Producer $messageProducer,
+    ) {
     }
 
     /**
@@ -125,5 +146,40 @@ class Duplicator
         }
 
         return null;
+    }
+
+    /**
+     * Start polling for the status of the quiz's duplication job.
+     *
+     * This will set up a task daemon job, which will call `pollQuizStatus`
+     * (via a controller) repeatedly until that method reports it's done.
+     *
+     * @param User            $user
+     * @param QuizDomainModel $destination
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     */
+    public function initiatePollingForQuizStatus(User $user, QuizDomainModel $destination): void
+    {
+        $message = $this->messageFactory
+            ->setUser($user)
+            ->setRequest(
+                $this->httpFactory
+                    ->createRequest(
+                        'POST',
+                        $this->baseUrl->withPath(
+                            $this->routeGenerator->generate(
+                                'learnosity.postPollQuizStatus',
+                                ['assessmentId' => $destination->getId()]
+                            )
+                        )
+                    )
+                    ->withHeader('accept', 'application/json')
+            )
+            ->build();
+        $this->messageProducer->send($message, delay: 5, maxRequeues: 10);
     }
 }
