@@ -24,22 +24,29 @@ use Schoolbox\UserMapper;
  */
 class RestartPendingTool extends CliTool\App
 {
+    /**
+     * Duplicator for quiz data.
+     */
+    private Api\Duplicator $duplicator;
+
+    /**
+     * Data source for assessments.
+     */
+    private MapperProxy $assessmentDataSource;
+
     public function run(): void
     {
         $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
 
-        // Build Learnosity API
-        $api = new Api(
-            $baseUrl->getHost(),
-            $this->getConfig()->get('learnosity_version'),
-            $this->getConfig()->get('learnosity_consumer_key'),
-            $this->getConfig()->get('learnosity_consumer_secret'),
-            $this->getLogger(),
-        );
-
         // Build duplicator
-        $duplicator = new Api\Duplicator(
-            $api,
+        $this->duplicator = new Api\Duplicator(
+            new Api(
+                $baseUrl->getHost(),
+                $this->getConfig()->get('learnosity_version'),
+                $this->getConfig()->get('learnosity_consumer_key'),
+                $this->getConfig()->get('learnosity_consumer_secret'),
+                $this->getLogger(),
+            ),
             $this->getDatabaseInternal(),
             $baseUrl,
             $this->getDi()->get('httpFactory'),
@@ -47,6 +54,9 @@ class RestartPendingTool extends CliTool\App
             $this->getDi()->get('taskd.httpRequestMessageFactory'),
             $this->getDi()->get('taskd.messageProducer'),
         );
+
+        // Build assessment data source
+        $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
@@ -60,9 +70,7 @@ class RestartPendingTool extends CliTool\App
         );
         $quizQuery->execute(['status' => Quiz\Model::LEARNOSITY_JOB_STATUS_PENDING]);
         $quizIds = $quizQuery->fetchColumnArray('assessment_id');
-        /** @var MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-        $pendingQuizzes = $assessmentDataSource->findAllByIds($quizIds);
+        $pendingQuizzes = $this->assessmentDataSource->findAllByIds($quizIds);
 
         $this->getLogger()->info(sprintf('Found %d quizzes currently pending copy', count($pendingQuizzes)));
         foreach ($pendingQuizzes as $pendingQuiz) {
@@ -82,26 +90,7 @@ class RestartPendingTool extends CliTool\App
             // Does this quiz already have a Learnosity source assessment?
             // If so, use that
             if ($pendingQuiz->getLearnositySourceAssessmentId()) {
-                $this->getLogger()->debug(
-                    sprintf(
-                        'Assessment #%d has source assessment #%d: copying from that assessment',
-                        $pendingQuiz->getId(),
-                        $pendingQuiz->getLearnositySourceAssessmentId(),
-                    )
-                );
-                $source = $assessmentDataSource->findById($pendingQuiz->getLearnositySourceAssessmentId());
-                if (!$source instanceof QuizDomainModel) {
-                    $this->getLogger()->warning(
-                        sprintf(
-                            'Assessment #%d source assessment #%d is somehow not a quiz: skipping',
-                            $pendingQuiz->getId(),
-                            $pendingQuiz->getLearnositySourceAssessmentId(),
-                        )
-                    );
-                    continue;
-                }
-                $duplicator->copyQuizConstituents($source, $pendingQuiz);
-                $duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuiz);
+                $this->copyFromLearnositySourceAssessment($pendingQuiz, $schoolboxUser);
                 continue;
             }
 
@@ -114,39 +103,7 @@ class RestartPendingTool extends CliTool\App
                 )
             );
             if ($pendingQuiz->isImplementation()) {
-                $this->getLogger()->debug(
-                    sprintf(
-                        'Assessment #%d is an implementation: source is specification',
-                        $pendingQuiz->getId(),
-                    )
-                );
-                $specQuiz = $pendingQuiz->getSpecificationAssessment();
-                if ($specQuiz instanceof QuizDomainModel) {
-                    $this->getLogger()->debug(
-                        sprintf(
-                            'Assessment #%d has spec assessment #%d: copying from that assessment',
-                            $pendingQuiz->getId(),
-                            $specQuiz->getId(),
-                        )
-                    );
-                    $duplicator->copyQuizConstituents($specQuiz, $pendingQuiz);
-                    $duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuiz);
-                } elseif ($specQuiz) {
-                    $this->getLogger()->warning(
-                        sprintf(
-                            'Assessment #%d spec assessment #%d is somehow not a quiz: skipping',
-                            $pendingQuiz->getId(),
-                            $specQuiz->getId(),
-                        )
-                    );
-                } else {
-                    $this->getLogger()->warning(
-                        sprintf(
-                            'Assessment #%d is an implementation with no spec assessment: cannot copy',
-                            $pendingQuiz->getId(),
-                        )
-                    );
-                }
+                $this->copyFromImplementationAssessment($pendingQuiz, $schoolboxUser);
                 continue;
             }
 
@@ -155,47 +112,148 @@ class RestartPendingTool extends CliTool\App
             // If there's only one, I can use that; otherwise I cannot tell from
             // the quiz itself.
             if ($pendingQuiz->isSpecification()) {
-                $this->getLogger()->debug(
+                $this->copyFromSpecificationAssessment($pendingQuiz, $schoolboxUser);
+            }
+        }
+    }
+
+    /**
+     * @param QuizDomainModel      $pendingQuiz
+     * @param MapperProxy          $assessmentDataSource
+     * @param Api\Duplicator       $duplicator
+     * @param \Schoolbox\User|null $schoolboxUser
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function copyFromLearnositySourceAssessment(
+        QuizDomainModel $pendingQuiz,
+        ?\Schoolbox\User $schoolboxUser
+    ): void {
+        $this->getLogger()->debug(
+            sprintf(
+                'Assessment #%d has source assessment #%d: copying from that assessment',
+                $pendingQuiz->getId(),
+                $pendingQuiz->getLearnositySourceAssessmentId(),
+            )
+        );
+        $source = $this->assessmentDataSource->findById($pendingQuiz->getLearnositySourceAssessmentId());
+        if (!$source instanceof QuizDomainModel) {
+            $this->getLogger()->warning(
+                sprintf(
+                    'Assessment #%d source assessment #%d is somehow not a quiz: skipping',
+                    $pendingQuiz->getId(),
+                    $pendingQuiz->getLearnositySourceAssessmentId(),
+                )
+            );
+            return;
+        }
+        $this->duplicator->copyQuizConstituents($source, $pendingQuiz);
+        $this->duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuiz);
+    }
+
+    /**
+     * @param QuizDomainModel      $pendingQuiz
+     * @param \Schoolbox\User|null $schoolboxUser
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     */
+    private function copyFromImplementationAssessment(QuizDomainModel $pendingQuiz, ?\Schoolbox\User $schoolboxUser): void
+    {
+        $this->getLogger()->debug(
+            sprintf(
+                'Assessment #%d is an implementation: source is specification',
+                $pendingQuiz->getId(),
+            )
+        );
+        $specQuiz = $pendingQuiz->getSpecificationAssessment();
+        if ($specQuiz instanceof QuizDomainModel) {
+            $this->getLogger()->debug(
+                sprintf(
+                    'Assessment #%d has spec assessment #%d: copying from that assessment',
+                    $pendingQuiz->getId(),
+                    $specQuiz->getId(),
+                )
+            );
+            $this->duplicator->copyQuizConstituents($specQuiz, $pendingQuiz);
+            $this->duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuiz);
+        } elseif ($specQuiz) {
+            $this->getLogger()->warning(
+                sprintf(
+                    'Assessment #%d spec assessment #%d is somehow not a quiz: skipping',
+                    $pendingQuiz->getId(),
+                    $specQuiz->getId(),
+                )
+            );
+        } else {
+            $this->getLogger()->warning(
+                sprintf(
+                    'Assessment #%d is an implementation with no spec assessment: cannot copy',
+                    $pendingQuiz->getId(),
+                )
+            );
+        }
+    }
+
+    /**
+     * @param QuizDomainModel      $pendingQuiz
+     * @param \Schoolbox\User|null $schoolboxUser
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     */
+    private function copyFromSpecificationAssessment(QuizDomainModel $pendingQuiz, ?\Schoolbox\User $schoolboxUser): void
+    {
+        $this->getLogger()->debug(
+            sprintf(
+                'Assessment #%d is an specification: source is an implementation',
+                $pendingQuiz->getId(),
+            )
+        );
+        $implementations      = $this->assessmentDataSource->findAllImplementationsBySpecificationId(
+            $pendingQuiz->getId(),
+        );
+        $implementationsCount = count($implementations);
+        if ($implementationsCount === 1) {
+            $implQuiz = $implementations->first();
+            $this->getLogger()->debug(
+                sprintf(
+                    'Assessment #%d has singular implementation assessment #%d: copying from that assessment',
+                    $pendingQuiz->getId(),
+                    $implQuiz->getId(),
+                )
+            );
+            if ($implQuiz instanceof QuizDomainModel) {
+                $this->duplicator->copyQuizConstituents($implQuiz, $pendingQuiz);
+                $this->duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuiz);
+            } else {
+                $this->getLogger()->warning(
                     sprintf(
-                        'Assessment #%d is an specification: source is an implementation',
+                        'Assessment #%d implementation assessment #%d is somehow not a quiz: skipping',
                         $pendingQuiz->getId(),
+                        $implQuiz->getId(),
                     )
                 );
-                $implementations = $assessmentDataSource->findAllImplementationsBySpecificationId(
-                    $pendingQuiz->getId(),
-                );
-                $implementationsCount = count($implementations);
-                if ($implementationsCount === 1) {
-                    $implQuiz = $implementations->first();
-                    $this->getLogger()->debug(
-                        sprintf(
-                            'Assessment #%d has singular implementation assessment #%d: copying from that assessment',
-                            $pendingQuiz->getId(),
-                            $implQuiz->getId(),
-                        )
-                    );
-                    if ($implQuiz instanceof QuizDomainModel) {
-                        $duplicator->copyQuizConstituents($implQuiz, $pendingQuiz);
-                        $duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuiz);
-                    } else {
-                        $this->getLogger()->warning(
-                            sprintf(
-                                'Assessment #%d implementation assessment #%d is somehow not a quiz: skipping',
-                                $pendingQuiz->getId(),
-                                $implQuiz->getId(),
-                            )
-                        );
-                    }
-                } else {
-                    $this->getLogger()->warning(
-                        sprintf(
-                            'Assessment #%d is a spec with %s implementations: cannot copy',
-                            ($implementationsCount === 0 ? 'no' : 'multiple'),
-                            $pendingQuiz->getId(),
-                        )
-                    );
-                }
             }
+        } else {
+            $this->getLogger()->warning(
+                sprintf(
+                    'Assessment #%d is a spec with %s implementations: cannot copy',
+                    ($implementationsCount === 0 ? 'no' : 'multiple'),
+                    $pendingQuiz->getId(),
+                )
+            );
         }
     }
 }
