@@ -1,7 +1,7 @@
-import { getIndex, removeAllFromElement } from "../domUtils";
+import { getIndex } from "../domUtils";
 
 describe("getIndex()", () => {
-    test("first child to return an index of 1", () => {
+    test("frist child to return an index of 1", () => {
         const div = document.createElement("div");
         const firstChild = document.createElement("div");
         const secondChild = document.createElement("div");
