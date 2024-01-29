@@ -74,6 +74,8 @@ class RestartPendingTool extends CliTool\App
                     $quizMapper->findById($pendingQuiz->getLearnositySourceAssessmentId()),
                     $pendingQuiz,
                 );
+
+                // Need to also tell taskd to start polling
                 continue;
             }
 
