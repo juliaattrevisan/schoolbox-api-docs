@@ -15,6 +15,8 @@ use Schoolbox\Comms\News\Model as News;
 use Schoolbox\Role;
 use Symfony\Component\Yaml\Yaml;
 use Tests\Support\ApiTester;
+use Schoolbox\Application\CliTool\Kernel as CliToolKernel;
+use Schoolbox\Search\Api\Database\Index\CommandLineTool\IndexBuilder;
 use Schoolbox\User;
 
 /**
@@ -53,6 +55,13 @@ class SearchUserCest
     {
         $targetStudent = $i->createTestUser('student' . $i->generateText(10, true), Role::STUDENT, false);
         $targetStaff   = $i->createTestUser('staff' . $i->generateText(10, true), Role::STAFF, false);
+
+        // Must rebuild search index because we have added new users.
+        // Note we only need to rebuild the search index for result type 'user', but just rebuild everything for now.
+        $app = new IndexBuilder();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        (new CliToolKernel($app, []))->runApp(true);
+
         $targetUsers   = [$targetStudent, $targetStaff];
         $i->switchUser($user);
         foreach ($targetUsers as $targetUser) {
