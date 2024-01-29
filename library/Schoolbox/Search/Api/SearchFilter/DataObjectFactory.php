@@ -48,7 +48,7 @@ class DataObjectFactory
                 $types = $decodedFilter['types'];
 
                 // Expand parent types to include child types.
-                // This is done so API users can specify filter 'user' to mean "'user' plus all subtypes of 'user'".
+                // This is done so API users can specify filter 'user' to mean "'user' plus all subtypes of 'user'", etc.
                 // Filter types and subtypes are defined in ResultTypes.ts.  Types/subtypes used below must match that file.
                 $typesAsKeys = array_fill_keys($types, null);
                 foreach (array_keys($typesAsKeys) as $type) {
