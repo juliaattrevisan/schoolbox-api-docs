@@ -69,6 +69,8 @@ class RestartPendingTool extends CliTool\App
         );
         $this->getLogger()->info(sprintf('Found %d quizzes currently pending copy', count($pendingQuizzes)));
         foreach ($pendingQuizzes as $pendingQuiz) {
+            $pendingQuizDomainModel = $assessmentDataSource->findById($pendingQuiz->getAssessmentModel()->getId());
+
             // Does this quiz have a source quiz? If so use it
             $this->getLogger()->info(
                 sprintf(
@@ -85,12 +87,11 @@ class RestartPendingTool extends CliTool\App
                         $pendingQuiz->getLearnositySourceAssessmentId(),
                     )
                 );
-                $source      = $assessmentDataSource->findById($pendingQuiz->getLearnositySourceAssessmentId());
-                $destination = $assessmentDataSource->findById($pendingQuiz->getAssessmentModel()->getId());
-                $duplicator->copyQuizConstituents($source, $destination);
+                $source = $assessmentDataSource->findById($pendingQuiz->getLearnositySourceAssessmentId());
+                $duplicator->copyQuizConstituents($source, $pendingQuizDomainModel);
 
                 // Tell taskd to start polling
-                $duplicator->initiatePollingForQuizStatus($schoolboxUser, $destination);
+                $duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuizDomainModel);
                 continue;
             }
 
@@ -102,7 +103,6 @@ class RestartPendingTool extends CliTool\App
                     $pendingQuiz->getAssessmentModel()->getId(),
                 )
             );
-            $pendingQuizDomainModel = $assessmentDataSource->findById($pendingQuiz->getAssessmentModel()->getId());
             if ($pendingQuizDomainModel->isImplementation()) {
                 $this->getLogger()->debug(
                     sprintf(
@@ -119,11 +119,10 @@ class RestartPendingTool extends CliTool\App
                             $specQuiz->getId(),
                         )
                     );
-                    $quizMapper->copyQuizConstituents(
-                        $api,
-                        $quizMapper->findOneByColumn('assessment_id', $specQuiz->getId()),
-                        $pendingQuiz,
-                    );
+                    $duplicator->copyQuizConstituents($specQuiz, $pendingQuizDomainModel);
+
+                    // Tell taskd to start polling
+                    $duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuizDomainModel);
                 } else {
                     $this->getLogger()->warning(
                         sprintf(
@@ -160,11 +159,10 @@ class RestartPendingTool extends CliTool\App
                             $implQuiz->getId(),
                         )
                     );
-                    $quizMapper->copyQuizConstituents(
-                        $api,
-                        $quizMapper->findOneByColumn('assessment_id', $implQuiz),
-                        $pendingQuiz,
-                    );
+                    $duplicator->copyQuizConstituents($implQuiz, $pendingQuizDomainModel);
+
+                    // Tell taskd to start polling
+                    $duplicator->initiatePollingForQuizStatus($schoolboxUser, $pendingQuizDomainModel);
                 } else {
                     $this->getLogger()->warning(
                         sprintf(
