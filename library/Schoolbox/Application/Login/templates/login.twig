@@ -78,10 +78,13 @@
                 <div class="small-12 column">
                     <p id="error-msg" class="alert-box alert">{{ error }}</p>
                 </div>
-                <div class="small-12 column">
-                    <input type="text" name="username" id="username" placeholder="Username" />
-                    <input type="password" name="password" id="password" placeholder="Password" />
-                </div>
+                {# Only show default login fields if Site settings allow it #}
+                {% if config.show_default_login %}
+                    <div class="small-12 column">
+                        <input type="text" name="username" id="username" placeholder="Username" />
+                        <input type="password" name="password" id="password" placeholder="Password" />
+                    </div>
+                {% endif %}
             </div>
             <div class="row collapse">
                 {% if config.login_terms_and_conditions != '' %}
@@ -99,32 +102,38 @@
                 </div>
                 {% endif %}
 
-                {% if config.forgotten_password_text and config.forgotten_password_url %}
-                <div class="small-12 column">
-                    <p><a href="{{ config.forgotten_password_url }}">{{ config.forgotten_password_text }}</a></p>
-                </div>
-                {% endif %}
+                {# Only show default login fields if Site settings allow it #}
+                {% if config.show_default_login %}
+                    {% if config.forgotten_password_text and config.forgotten_password_url %}
+                    <div class="small-12 column">
+                        <p><a href="{{ config.forgotten_password_url }}">{{ config.forgotten_password_text }}</a></p>
+                    </div>
+                    {% endif %}
 
-                {% if config.session_remember %}
-                <div class="small-12 column">
-                    <input id="rememberme" type="checkbox" name="rememberme" value="1" />
-                    <label for="rememberme">Remember me</label>
-                </div>
+                    {% if config.session_remember %}
+                    <div class="small-12 column">
+                        <input id="rememberme" type="checkbox" name="rememberme" value="1" />
+                        <label for="rememberme">Remember me</label>
+                    </div>
+                    {% endif %}
                 {% endif %}
                 <div class="small-12 column login-links">
-                    <input type="submit" name="Submit" value="Login" />
+                    {# Only show default login fields if Site settings allow it #}
+                    {% if config.show_default_login %}
+                        <input type="submit" name="Submit" value="Login" />
 
-                    {% if config.login_anonymous != '' or config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
-                    <p> - OR - </p>
+                        {% if config.login_anonymous != '' or config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
+                            <p> - OR - </p>
+                        {% endif %}
                     {% endif %}
 
                     {% if config.login_anonymous != '' %}
-                    <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
+                        <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
                     {% endif %}
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                         {% block sso %}
-                    <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
+                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
                         {% endblock %}
                     {% endif %}
 
