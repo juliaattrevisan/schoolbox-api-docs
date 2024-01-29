@@ -50,7 +50,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritdoc
      */
-    protected function buildRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
+    protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
         $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
         $quoter = $this->quoter;
@@ -69,8 +69,23 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             }
         }
 
-        $sqlSumTerms[] = "MATCH (si.fulltext_index) AGAINST ('" . $quoter->escapeForLike($keyword) . "' IN NATURAL LANGUAGE MODE)";
+        return '(' . implode(' + ', $sqlSumTerms) . ')';
+    }
 
+    /**
+     * @inheritdoc
+     */
+    protected function buildContentRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
+    {
+        $quoter = $this->quoter;
+        return "MATCH (si.fulltext_index) AGAINST ('" . $quoter->escapeForLike($keyword) . "' IN NATURAL LANGUAGE MODE)";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildDateRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
+    {
         $datePart = $this->buildLinearDecayExpression(
             ":indexNow$paramKeySuffix",
             'si.date',
@@ -78,9 +93,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             56,
         );
 
-        $sqlSumTerms[] = "IF(si.is_relevance_date_affected, $datePart, 1)";
-
-        return '(' . implode(' + ', $sqlSumTerms) . ')';
+        return "IF(si.is_relevance_date_affected, $datePart, 1)";
     }
 
     /**

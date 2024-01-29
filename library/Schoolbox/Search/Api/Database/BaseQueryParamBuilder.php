@@ -36,15 +36,16 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     ): ?QueryParams {
         ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
 
-        $relevancePart = $this->buildRelevanceExpression($keyword, $paramKeySuffix);
-        $titlePart     = $this->buildTitleExpression($paramKeySuffix);
-        $typePart      = $this->buildTypeExpression($paramKeySuffix);
-        $idPart        = $this->buildIdExpression($paramKeySuffix);
-        $datePart      = $this->buildDateExpression($paramKeySuffix);
-        $creatorPart   = $this->buildCreatorExpression($paramKeySuffix);
-        $folderPart    = $this->buildFolderExpression($paramKeySuffix);
-
-        $whereParts[] = "$relevancePart > 0";
+        $titleRelevancePart   = $this->buildTitleRelevanceExpression($keyword, $paramKeySuffix);
+        $contentRelevancePart = $this->buildContentRelevanceExpression($keyword, $paramKeySuffix);
+        $dateRelevancePart    = $this->buildDateRelevanceExpression($keyword, $paramKeySuffix);
+        $totalRelevancePart   = "($titleRelevancePart + $contentRelevancePart + $dateRelevancePart)";
+        $titlePart            = $this->buildTitleExpression($paramKeySuffix);
+        $typePart             = $this->buildTypeExpression($paramKeySuffix);
+        $idPart               = $this->buildIdExpression($paramKeySuffix);
+        $datePart             = $this->buildDateExpression($paramKeySuffix);
+        $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
+        $folderPart           = $this->buildFolderExpression($paramKeySuffix);
 
         // Apply filter
         if ($filter->types) {
@@ -96,10 +97,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 //  * The direction of the comparisons here (> or <) must match the directions used in the ORDER BY clause below, in the following way:
                 //     * ORDER BY ASC  below implies < here.
                 //     * ORDER BY DESC below implies > here.
-                "($relevancePart < :cursorRelevance$paramKeySuffix)", // < because ORDER BY relevance DESC.
-                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart > :cursorTitle$paramKeySuffix)", // > because ORDER BY title ASC.
-                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart > :cursorType$paramKeySuffix)", // > because ORDER BY type ASC.
-                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart = :cursorType$paramKeySuffix AND $idPart < :cursorId$paramKeySuffix)", // < because ORDER BY id DESC.
+                "($totalRelevancePart < :cursorRelevance$paramKeySuffix)", // < because ORDER BY relevance DESC.
+                "($totalRelevancePart = :cursorRelevance$paramKeySuffix AND $titlePart > :cursorTitle$paramKeySuffix)", // > because ORDER BY title ASC.
+                "($totalRelevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart > :cursorType$paramKeySuffix)", // > because ORDER BY type ASC.
+                "($totalRelevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart = :cursorType$paramKeySuffix AND $idPart < :cursorId$paramKeySuffix)", // < because ORDER BY id DESC.
             ];
 
             $whereParts[] = '(' . implode(' OR ', $cursorSearchParts) . ')';
@@ -113,12 +114,16 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $from = $this->buildFromStatement($paramKeySuffix);
         $query = (
             "SELECT DISTINCT
-                $idPart        AS id,
-                $titlePart     AS title,
-                $typePart      AS type,
-                $relevancePart AS relevance
+                $idPart               AS id,
+                $titlePart            AS title,
+                $typePart             AS type,
+                $titleRelevancePart   AS titleRelevance,
+                $contentRelevancePart AS contentRelevance,
+                $dateRelevancePart    AS dateRelevance,
+                $totalRelevancePart   AS relevance
             $from" .
-            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '')
+            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') . "
+            HAVING (titleRelevance + contentRelevance) > 0\n"
         );
 
         // Build order parts.
@@ -127,9 +132,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         //  * The order of `id` is DESC because all other things being equal, we want more recently created rows to
         //    appear before less recently created rows.
         $orderParts = [];
-        if ($this->isOrderedByRelevance()) {
-            $orderParts[] = "$relevancePart DESC";
-        }
+        $orderParts[] = "relevance DESC";
         $orderParts[] = "$titlePart ASC";
         $orderParts[] = "`type` ASC";
         $orderParts[] = "$idPart DESC";
@@ -238,7 +241,11 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * @param string $paramKeySuffix
      * @return string An SQL expression for determining
      */
-    abstract protected function buildRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
+    abstract protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
+
+    abstract protected function buildContentRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
+
+    abstract protected function buildDateRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
 
     /**
      * Does the relevance of an item depend on the evaluation of an expression?
