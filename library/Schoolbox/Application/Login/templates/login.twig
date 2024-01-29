@@ -52,19 +52,19 @@
         }
 
         .samlbutton {
-            background-color: {{ config.single_sign_on_colour|raw }};
+            background-color: {{ config.saml_login_colour|raw }};
         }
 
         .samlbutton.saml-icon {
-            background-image: url('/storage/image.php?hash={{ config.single_sign_on_icon }}');
+            background-image: url('/storage/image.php?hash={{ config.saml_login_icon }}');
         }
 
         .oidcbutton {
-            background-color: {{ config.oauth_colour|raw }};
+            background-color: {{ config.oidc_login_colour|raw }};
         }
 
         .oidcbutton.oidc-icon {
-            background-image: url('/storage/image.php?hash={{ config.oauth_icon }}');
+            background-image: url('/storage/image.php?hash={{ config.oidc_login_icon }}');
         }
     </style>
 {% endautoescape %}
@@ -166,7 +166,7 @@
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                         {% block sso %}
-                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton {% if config.single_sign_on_icon %}saml-icon{% endif %}">Login using {{ config.single_sign_on_title }}</a></p>
+                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton {% if config.saml_login_icon %}saml-icon{% endif %}">Login using {{ config.saml_login_title }}</a></p>
                         {% endblock %}
                     {% endif %}
 
@@ -174,7 +174,7 @@
                     {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
                     {% if oidcUrl or true %}
                     {% block oidc %}
-                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton {% if config.oauth_icon %}oidc-icon{% endif %}">Login using {{ config.oauth_openid_title }}</a></p>
+                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton {% if config.oidc_login_icon %}oidc-icon{% endif %}">Login using {{ config.oidc_login_title }}</a></p>
                     {% endblock %}
                     {% endif %}
 

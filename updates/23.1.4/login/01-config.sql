@@ -17,7 +17,7 @@ VALUES (
 -- Add new config
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
-    'single_sign_on_title',
+    'saml_login_title',
     'Title for Single Sign-On',
     'Single Sign-On',
     '“Single Sign-On” will show by default if left empty.',
@@ -33,7 +33,7 @@ VALUES (
 -- Add new config
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
-    'single_sign_on_icon',
+    'saml_login_icon',
     'Icon for Single Sign-On',
     null,
     'This icon will display to the left of the title.',
@@ -49,7 +49,7 @@ VALUES (
 -- Add new config
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
-    'single_sign_on_colour',
+    'saml_login_colour',
     'Colour for Single Sign-On',
     'rgb(0, 102, 176)',
     'Choose a colour for this login button.',
@@ -65,7 +65,7 @@ VALUES (
 -- Add new config
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
-    'oauth_openid_title',
+    'oidc_login_title',
     'Title for OpenID Connect',
     'OpenID Connect',
     '“OpenID Connect” will show by default if left empty.',
@@ -81,7 +81,7 @@ VALUES (
 -- Add new config
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
-    'oauth_icon',
+    'oidc_login_icon',
     'Icon for OpenID Connect',
     null,
     'This icon will display to the left of the title.',
@@ -97,7 +97,7 @@ VALUES (
 -- Add new config
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
-    'oauth_colour',
+    'oidc_login_colour',
     'Colour for OpenID Connect',
     'rgb(0, 102, 176)',
     'Choose a colour for this login button.',
