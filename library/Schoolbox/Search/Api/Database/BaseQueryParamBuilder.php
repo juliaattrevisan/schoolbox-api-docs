@@ -47,32 +47,9 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
 
         // Apply filter
         if ($filter->types) {
-            $handledSubtypes = array_filter($filter->types, [$this, 'handlesSubtype']);
-            if (!empty($handledSubtypes)) {
-                $bindings = Builder::getBindings($handledSubtypes, "filterType$paramKeySuffix");
-
-                // Why introduce a HAVING clause?
-                // ------------------------------
-                // Variable `type` is the result of an expression, and so will not be available in the WHERE clause.
-                // It will be available in the HAVING clause however, so let's put it there instead.
-                // (Note `type` comes from the SELECT clause, defined in this function below).
-                // We ought to be able to use the expression itself in the WHERE clause, like this:
-                //    Example: $whereParts = "$typePart IN ({$bindings->getPlaceholder()})";
-                // But that does not produce expected results for unknown reasons.  So we introduce a HAVING clause.
-                // @see https://github.com/alaress/schoolbox/pull/28994
-                $havingParts[] = "`type` IN ({$bindings->getPlaceholder()})";
-
-                $params = array_merge($params, $bindings->getParams());
-            } else {
-                // Does this handle any of the filter's types directly?
-                // If so, don't apply a having part.
-                $handledTypes = array_filter($filter->types, [$this, 'handlesType']);
-
-                // Otherwise, there are no relevant types in this filter: skip
-                if (empty($handledTypes)) {
-                    return null;
-                }
-            }
+            $bindings = Builder::getBindings($filter->types, "filterType$paramKeySuffix");
+            $havingParts[] = "`type` IN ({$bindings->getPlaceholder()})";
+            $params = array_merge($params, $bindings->getParams());
         }
         if ($filter->fromDate) {
             // No date part? Exclude this type of result entirely
@@ -300,18 +277,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     protected function handlesType(string $type): bool
     {
         return $type === $this->getType();
-    }
-
-    /**
-     * By default, a query+param builder handles a type if `$type` starts with
-     * `$this->getType()`
-     *
-     * @param string $type
-     * @return bool
-     */
-    protected function handlesSubtype(string $type): bool
-    {
-        return str_starts_with($type, $this->getType() . '.');
     }
 
     /**
