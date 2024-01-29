@@ -779,7 +779,12 @@ class CourseQuiz extends CourseAssessmentAbstract
             ->setAnonymousResult($anonymousSubmissions)
             ->setMarkVisibility($markVisibility)
             ->setExternalId((string)$quizCanvasId)
-            ->setCreated($assessment->getCreatedAt());
+            ->setCreated($assessment->getCreatedAt())
+            ->setReadingTimeDuration(0)
+            ->setShuffleItems(0)
+            ->setPromptsMode(0)
+            ->setMarkType($this->assignmentBridge->getQuizMarkType())
+        ;
 
         // Need to respect Canvas's created_at value
         $this->saveModel($this->quizMapper, $quiz, false);

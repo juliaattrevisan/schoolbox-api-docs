@@ -171,7 +171,11 @@ class Courses
             foreach ($accountData['courseGroups'] as $courseGroupCode => $courseGroupData) {
                 $mostRecentCourse                   = end($courseGroupData['courses']);
                 $mostRecentCourseName               = $mostRecentCourse['name'];
-                $courseSpecFolder                   = $this->processCanvasCourseGroup($accountCanvasId, $mostRecentCourseName, $courseGroupCode);
+                $courseSpecFolder                   = $this->processCanvasCourseGroup(
+                    $accountCanvasId,
+                    $mostRecentCourseName,
+                    (string)$courseGroupCode,
+                );
                 $synchronizedCourseGroupFolderIds[] = $courseSpecFolder->getId();
 
                 foreach ($courseGroupData['courses'] as $courseCanvasId => $courseData) {

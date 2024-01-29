@@ -551,7 +551,12 @@ class SectionQuiz extends SectionAssessmentAbstract
             ->setAvailability(Quiz\Model::AVAILABILITY_ASSESS)
             ->setAnonymousResult($quizSpec->getAnonymousResult())
             ->setMarkVisibility($quizSpec->getMarkVisibility())
-            ->setCreated($quizSpec->getCreated());
+            ->setCreated($quizSpec->getCreated())
+            ->setReadingTimeDuration($quizSpec->getReadingTimeDuration())
+            ->setShuffleItems($quizSpec->getShuffleItems())
+            ->setPromptsMode($quizSpec->getPromptsMode())
+            ->setMarkType($quizSpec->getMarkType())
+        ;
 
         $this->quizMapper->save($quizImpl);
 
