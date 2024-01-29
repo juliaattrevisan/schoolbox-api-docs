@@ -12,14 +12,15 @@ namespace Schoolbox\Learning\Learnosity\Api;
 use Alaress\Database\Connector\IConnector;
 use LearnositySdk\Exceptions\ValidationException;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Quiz\Model;
 
 /**
- * Specialised command for copying quiz contents from one quiz to another,
+ * Specialised command for duplicating quiz contents from one quiz to another,
  * using the Learnosity API.
  */
-class Copier
+class Duplicator
 {
     /**
      * Constructor
@@ -36,14 +37,14 @@ class Copier
      *
      * For now, this call will throw an exception if the destination Quiz already has Sections.
      *
-     * @param Model $source
-     * @param Model $destination
+     * @param QuizDomainModel $source
+     * @param QuizDomainModel $destination
      * @return string|null The Learnosity job ID for duplicating activities
      * @throws \DomainException
      * @throws ValidationException
      * @throws \RuntimeException
      */
-    public function copyQuizConstituents(Model $source, Model $destination): ?string
+    public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
     {
         /* Clone a Learnosity Reference in Learnosity land
          */
@@ -99,7 +100,7 @@ class Copier
              */
             $destination->setLearnosityReference($newLearnosityReference);
             $destination->setLearnosityJobReference($learnosityJobReference);
-            if ($destination->getAssessmentModel()?->getId()) {
+            if ($destination->getId()) {
                 $this->database->prepareQuery(
                     "
                         UPDATE assess
@@ -114,7 +115,7 @@ class Copier
                         $learnosityJobReference,
                         Model::LEARNOSITY_JOB_STATUS_PROCESSING,
                         $source->getId(),
-                        $destination->getAssessmentModel()->getId(),
+                        $destination->getId(),
                     ],
                 )->execute();
             }
