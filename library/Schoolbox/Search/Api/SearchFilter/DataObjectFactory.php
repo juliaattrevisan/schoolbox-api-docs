@@ -46,6 +46,43 @@ class DataObjectFactory
         if (isset($decodedFilter['types'])) {
             if (is_array($decodedFilter['types']) && array_is_list($decodedFilter['types'])) {
                 $types = $decodedFilter['types'];
+
+                // Expand parent types to include child types.
+                // This is done so API users can specify filter 'user' to mean "'user' plus all subtypes of 'user'".
+                // Filter types and subtypes are defined in ResultTypes.ts.  Types/subtypes used below must match that file.
+                $typesAsKeys = array_fill_keys($types, null);
+                foreach (array_keys($typesAsKeys) as $type) {
+                    if ($type === 'assessment') {
+                        $typesAsKeys['assessment.dueWork'] = null;
+                        $typesAsKeys['assessment.lessonPlan'] = null;
+                        $typesAsKeys['assessment.project'] = null;
+                        $typesAsKeys['assessment.lti'] = null;
+                        $typesAsKeys['assessment.task'] = null;
+                        $typesAsKeys['assessment.quiz'] = null;
+                    }
+                    if ($type === 'file') {
+                        $typesAsKeys['file.audio'] = null;
+                        $typesAsKeys['file.document'] = null;
+                        $typesAsKeys['file.image'] = null;
+                        $typesAsKeys['file.video'] = null;
+                        $typesAsKeys['file.other'] = null;
+                    }
+                    if ($type === 'page') {
+                        $typesAsKeys['page.class'] = null;
+                        $typesAsKeys['page.course'] = null;
+                        $typesAsKeys['page.homepage'] = null;
+                        $typesAsKeys['page.unit'] = null;
+                        $typesAsKeys['page.folder'] = null;
+                        $typesAsKeys['page.group'] = null;
+                    }
+                    if ($type === 'user') {
+                        $typesAsKeys['user.guest'] = null;
+                        $typesAsKeys['user.parent'] = null;
+                        $typesAsKeys['user.staff'] = null;
+                        $typesAsKeys['user.student'] = null;
+                    }
+                }
+                $types = array_keys($typesAsKeys);
             } else {
                 throw new Exception('Invalid filter: types is not a list of valid types');
             }

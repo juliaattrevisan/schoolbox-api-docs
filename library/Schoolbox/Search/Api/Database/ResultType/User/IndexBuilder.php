@@ -54,29 +54,25 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Building search indices for %d users', $query->rowCount()));
         foreach ($query as $row) {
-            // Add a search_index row for type 'user' as well as eg. 'user.student'.
-            // This enables filter type='user' to include all user subtypes.
-            foreach ([Hydrator::BASE_TYPE, $row['type']] as $type) {
-                $index = $this->buildIndex(
-                    (string)$row['id'],
-                    $row['nameFormat2'],
-                    $type,
-                    $row['updated_at'],
-                    false,
-                    null,
-                    null,
-                );
-                $index = $this->addFulltextIndex($index, $row['username'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['firstname'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['preferred_name'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['lastname'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['nameFormat1'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['nameFormat2'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['nameFormat3'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['nameFormat4'], self::INDEX_STRATEGY_TEXT);
-                $index = $this->addFulltextIndex($index, $row['nameFormat5'], self::INDEX_STRATEGY_TEXT);
-                yield $index;
-            }
+            $index = $this->buildIndex(
+                (string)$row['id'],
+                $row['nameFormat2'],
+                $row['type'],
+                $row['updated_at'],
+                false,
+                null,
+                null,
+            );
+            $index = $this->addFulltextIndex($index, $row['username'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['firstname'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['preferred_name'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['lastname'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat1'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat2'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat3'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat4'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['nameFormat5'], self::INDEX_STRATEGY_TEXT);
+            yield $index;
         }
     }
 
