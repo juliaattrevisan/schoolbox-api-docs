@@ -93,31 +93,31 @@ class RestartPendingTool extends CliTool\App
             // If so, use that
             try {
                 if ($pendingQuiz->getLearnositySourceAssessmentId()) {
-                    $this->copyFromLearnositySourceAssessment($pendingQuiz);
-                    continue;
-                }
-
-                $this->getLogger()->debug(
-                    sprintf(
-                        'Assessment #%d has no source assessment: deriving source from relations',
-                        $pendingQuiz->getId(),
-                    )
-                );
-
-                if ($pendingQuiz->isImplementation()) {
-                    $this->copyFromSpecificationAssessment($pendingQuiz);
+                    $sourceQuiz = $this->findFromLearnositySourceAssessment($pendingQuiz);
+                } elseif ($pendingQuiz->isImplementation()) {
+                    $sourceQuiz = $this->findFromSpecificationAssessment($pendingQuiz);
                 } elseif ($pendingQuiz->isSpecification()) {
-                    $this->copyFromImplementationAssessment($pendingQuiz);
+                    $sourceQuiz = $this->findFromImplementationAssessment($pendingQuiz);
                 } else {
                     // If somehow this isn't an assessment:
                     // mark it as failed
-                    $this->getLogger()->warning(
+                    throw new SourceAssociationException(
                         sprintf(
                             'Assessment #%d is somehow neither an implementation nor specification: skipping',
                             $pendingQuiz->getId(),
                         )
                     );
                 }
+
+                // Restart the copy process
+                $this->getLogger()->debug(
+                    sprintf(
+                        'Assessment #%d has source assessment #%d: copying from that assessment',
+                        $pendingQuiz->getId(),
+                        $sourceQuiz->getId(),
+                    )
+                );
+                $this->restartCopyProcess($sourceQuiz, $pendingQuiz);
             } catch (SourceAssociationException $e) {
                 // This pending quiz couldn't be associated with a source:
                 // mark it as failed.
@@ -152,19 +152,15 @@ class RestartPendingTool extends CliTool\App
     }
 
     /**
-     * Copy Learnosity data from `$destination`'s Learnosity source assessment.
+     * Find source quiz based on `$destination`'s Learnosity source assessment.
      *
      * This field exists for quizzes copied as of SA-17023.
      *
      * @param QuizDomainModel $destination
-     * @return void
+     * @return QuizDomainModel
      * @throws SourceAssociationException
-     * @throws \Interop\Queue\Exception
-     * @throws \Interop\Queue\Exception\InvalidDestinationException
-     * @throws \Interop\Queue\Exception\InvalidMessageException
-     * @throws \LearnositySdk\Exceptions\ValidationException
      */
-    private function copyFromLearnositySourceAssessment(QuizDomainModel $destination): void
+    private function findFromLearnositySourceAssessment(QuizDomainModel $destination): QuizDomainModel
     {
         $this->getLogger()->debug(
             sprintf(
@@ -209,25 +205,20 @@ class RestartPendingTool extends CliTool\App
             );
         }
 
-        // Otherwise restart the copy process
-        $this->restartCopyProcess($source, $destination);
+        return $source;
     }
 
     /**
-     * Copy Learnosity data from `$destination`'s specification assessment.
+     * Find source quiz from `$destination`'s specification assessment.
      *
      * This covers the case where an implementation quiz is copied from a spec
      * by importing a course into a class.
      *
      * @param QuizDomainModel $destination
-     * @return void
+     * @return QuizDomainModel
      * @throws SourceAssociationException
-     * @throws \Interop\Queue\Exception
-     * @throws \Interop\Queue\Exception\InvalidDestinationException
-     * @throws \Interop\Queue\Exception\InvalidMessageException
-     * @throws \LearnositySdk\Exceptions\ValidationException
      */
-    private function copyFromSpecificationAssessment(QuizDomainModel $destination): void
+    private function findFromSpecificationAssessment(QuizDomainModel $destination): QuizDomainModel
     {
         $this->getLogger()->debug(
             sprintf(
@@ -254,37 +245,25 @@ class RestartPendingTool extends CliTool\App
             throw new SourceAssociationException($message);
         }
 
-        // Otherwise restart the copy process
-        $this->getLogger()->debug(
-            sprintf(
-                'Assessment #%d has spec assessment #%d: copying from that assessment',
-                $destination->getId(),
-                $specQuiz->getId(),
-            )
-        );
-        $this->restartCopyProcess($specQuiz, $destination);
+        return $specQuiz;
     }
 
     /**
-     * Attempt to copy Learnosity data from an implementation of `$destination`.
+     * Find source quiz from an implementation of `$destination`.
      *
      * This covers the case where an implementation quiz is written back into
      * its spec by copying the quiz from the class back into its course.
      *
-     * The copy will only succeed if there is one and only one implementation:
+     * The search will only succeed if there is one and only one implementation:
      * * if there are no implementations, then there's nothing to copy from
      * * if there's more than one implementation, then it's uncertain which to
      *   copy from so don't even try
      *
      * @param QuizDomainModel $destination
-     * @return void
+     * @return QuizDomainModel
      * @throws SourceAssociationException
-     * @throws \Interop\Queue\Exception
-     * @throws \Interop\Queue\Exception\InvalidDestinationException
-     * @throws \Interop\Queue\Exception\InvalidMessageException
-     * @throws \LearnositySdk\Exceptions\ValidationException
      */
-    private function copyFromImplementationAssessment(QuizDomainModel $destination): void
+    private function findFromImplementationAssessment(QuizDomainModel $destination): QuizDomainModel
     {
         $this->getLogger()->debug(
             sprintf(
@@ -326,15 +305,7 @@ class RestartPendingTool extends CliTool\App
             );
         }
 
-        // Otherwise restart the copy process
-        $this->getLogger()->debug(
-            sprintf(
-                'Assessment #%d has singular implementation assessment #%d: copying from that assessment',
-                $destination->getId(),
-                $implQuiz->getId(),
-            )
-        );
-        $this->restartCopyProcess($implQuiz, $destination);
+        return $implQuiz;
     }
 
     /**
