@@ -123,4 +123,3 @@ class DataObjectFactory
         return new DataObject($types, $fromDate, $toDate, $creator, $folder);
     }
 }
-
