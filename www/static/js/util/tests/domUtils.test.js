@@ -1,7 +1,7 @@
-import { getIndex } from "../domUtils";
+import { getIndex, removeAllFromElement } from "../domUtils";
 
 describe("getIndex()", () => {
-    test("frist child to return an index of 1", () => {
+    test("first child to return an index of 1", () => {
         const div = document.createElement("div");
         const firstChild = document.createElement("div");
         const secondChild = document.createElement("div");
@@ -46,5 +46,20 @@ describe("getIndex()", () => {
         div.appendChild(firstChild);
         div.appendChild(secondChild);
         expect(getIndex(thirdChild)).toBe(-1);
+    });
+});
+
+describe("removeAllFromElement()", () => {
+    test("all children removed from targeted element", () => {
+        const div = document.createElement("div");
+        const firstChild = document.createElement("div");
+        const secondChild = document.createElement("div");
+        const thirdChild = document.createElement("div");
+        div.appendChild(firstChild);
+        div.appendChild(secondChild);
+        div.appendChild(thirdChild);
+        expect(div.children.length).toBe(3);
+        removeAllFromElement(div, "div");
+        expect(div.children.length).toBe(0);
     });
 });
