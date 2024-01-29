@@ -215,13 +215,16 @@ class Duplicator
             // If complete or failed:
             // update status and set the tags
             if ($setTags) {
-                $query = $this->database->prepareQuery("
-                    UPDATE assess
-                    SET learnosity_job_status = ?
-                    WHERE assessment_id = ?
-                ");
+                $query = $this->database->prepareQuery(
+                    "
+                        UPDATE assess
+                        SET learnosity_job_status = ?
+                        WHERE assessment_id = ?
+                    ",
+                    [$jobStatus, $quiz->getId()],
+                );
                 $quiz->setLearnosityJobStatus($jobStatus);
-                $query->execute([$jobStatus, $quiz->getId()]);
+                $query->execute();
 
                 /* Fetch this activity from Learnosity; we need to assign tags to each of its items
                  * because they appear in the global Item Bank. Unless we assign the classCode tag
