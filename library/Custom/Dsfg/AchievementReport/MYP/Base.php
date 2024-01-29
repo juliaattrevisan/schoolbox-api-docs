@@ -63,13 +63,13 @@ class Base extends AchievementReportBase
         $mypData  = [];
         $headings = [];
         foreach ($rows as $row) {
-            $subject      = trim($row['SubjectName']);
-            $classCode    = trim($row['ClassCode']);
-            $topicHeading = trim($row['TopicHeading']);
-            $shortHeading = trim($row['ShortHeading']);
-            $shortCode    = trim($row['HdgAbbrev1']);
-            $staffName    = trim($row['StaffMailNamePrimary']);
-            $staffEmail   = trim($row['StaffEmail']);
+            $subject      = trim((string)$row['SubjectName']);
+            $classCode    = trim((string)$row['ClassCode']);
+            $topicHeading = trim((string)$row['TopicHeading']);
+            $shortHeading = trim((string)$row['ShortHeading']);
+            $shortCode    = trim((string)$row['HdgAbbrev1']);
+            $staffName    = trim((string)$row['StaffMailNamePrimary']);
+            $staffEmail   = trim((string)$row['StaffEmail']);
 
             // HEADINGS
             if (!key_exists($classCode, $headings)) {
