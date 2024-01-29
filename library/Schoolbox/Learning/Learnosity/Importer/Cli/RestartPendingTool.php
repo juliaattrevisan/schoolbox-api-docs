@@ -153,16 +153,18 @@ class RestartPendingTool extends CliTool\App
             $source = $e->getDeletedObject();
             $this->getLogger()->debug(
                 sprintf(
-                    'Source assessment #%d has been deleted: still using as source',
+                    'Source assessment #%d has been deleted (message: %s): still using as source',
                     $pendingQuiz->getLearnositySourceAssessmentId(),
+                    $e->getMessage(),
                 )
             );
         } catch (MapperException $e) {
             // Not found at all: raise an error
             $this->getLogger()->warning(
                 sprintf(
-                    'Source assessment #%d does not exist: skipping',
+                    'Source assessment #%d does not exist (message: %s): skipping',
                     $pendingQuiz->getLearnositySourceAssessmentId(),
+                    $e->getMessage(),
                 )
             );
             return;
