@@ -58,6 +58,6 @@ describe("getGradient()", () => {
         expect(getGradient(0, 0)).toBe("gradient-none");
     });
     test("passing a string to return gradient-none", () => {
-        expect(getGradient("0", 0)).toBe("gradient-none");
+        expect(getGradient("0", 0)).toBe("gradient-blah");
     });
 });
