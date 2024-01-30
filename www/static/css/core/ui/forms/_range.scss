@@ -67,4 +67,8 @@ input[type="range"]:focus::-moz-range-thumb {
     &__label {
         font-size: 1rem; // ^foundation-fixes^ - override default font-size, all labels should be 1rem soon...
     }
+    &__input:hover,
+    &__input:focus {
+        background-color: transparent; // ^foundation-fixes^ - override background-color change on all inputs
+    }
 }
