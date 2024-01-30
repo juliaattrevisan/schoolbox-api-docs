@@ -16,7 +16,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Components/Form/Range Slider",
+    title: "Components/Form/Range",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -24,7 +24,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Standard: Story = {
     render: () => ({
         template: `
-            <div>
+            <div class="c-range">
                 <label for="column-width">Column Width</label>
                 <input type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
             </div>
