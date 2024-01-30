@@ -52,7 +52,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
+        // Remove all punctuation characters.
         $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
+
+         // Replace multiple spaces with single space.
+        $keywordMinusPunctuation = preg_replace('!\s+!', ' ', $keywordMinusPunctuation);
+
         $quoter = $this->quoter;
 
         $sqlSumTerms = [
