@@ -1,4 +1,4 @@
-import { getIndex, removeAllFromElement } from "../domUtils";
+import { getIndex, removeAllFromElement, hideAllChildren } from "../domUtils";
 
 describe("getIndex()", () => {
     test("first child to return an index of 1", () => {
@@ -61,5 +61,25 @@ describe("removeAllFromElement()", () => {
         expect(div.children.length).toBe(3);
         removeAllFromElement(div, "div");
         expect(div.children.length).toBe(0);
+    });
+});
+
+describe("hideAllChildren()", () => {
+    test("all children will be hidden in target element", () => {
+        const div = document.createElement("div");
+        const firstChild = document.createElement("div");
+        firstChild.style.display = "block";
+        const secondChild = document.createElement("div");
+        secondChild.style.display = "block";
+        const thirdChild = document.createElement("div");
+        thirdChild.style.display = "block";
+        div.appendChild(firstChild);
+        div.appendChild(secondChild);
+        div.appendChild(thirdChild);
+        expect(firstChild.style.display).toBe("block");
+        expect(thirdChild.style.display).toBe("block");
+        hideAllChildren(div);
+        expect(firstChild.style.display).toBe("none");
+        expect(thirdChild.style.display).toBe("none");
     });
 });
