@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
 use Interop\Queue\Exception as InteropQueueException;
 use LearnositySdk\Exceptions\ValidationException;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
@@ -24,6 +25,27 @@ use Schoolbox\Url\Factory;
  */
 class RestartPendingTool extends CliTool\App
 {
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP  = 'help';
+
+    /**
+     * Short options:
+     * * -h: help
+     */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
+
+    /**
+     * Long options:
+     * * --help:  help
+     */
+    public function getLongOpts(): array
+    {
+        return [self::OPT_LONG_HELP];
+    }
+
     /**
      * Duplicator for quiz data.
      */
@@ -34,8 +56,16 @@ class RestartPendingTool extends CliTool\App
      */
     private MapperProxy $assessmentDataSource;
 
+    /**
+     * @inheritdoc
+     */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->printHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
 
         // Build duplicator
@@ -326,5 +356,47 @@ class RestartPendingTool extends CliTool\App
     {
         $this->duplicator->copyQuizConstituents($source, $destination);
         $this->duplicator->initiatePollingForQuizStatus($destination->getCreator(), $destination);
+    }
+
+    /**
+     * Print help text
+     *
+     * @return void
+     */
+    private function printHelp(): void
+    {
+        $file       = $this->getToolFilename();
+        $green      = self::COLOUR_GREEN;
+        $white      = self::COLOUR_WHITE;
+        $yellow     = self::COLOUR_YELLOW;
+        echo <<<HELP
+NAME:
+    Restart pending quiz duplication tool
+
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+    Attempts to restart any pending quiz duplication jobs.
+
+    A quiz duplication will be pending if:
+    * it has been either imported from a course to a class, or exported from a class back into its course, and;
+    * it has not been marked as processing yet (i.e. it does not have a Learnosity job reference)
+
+    This tool will:
+    * attempt to find the source quiz from which each pending quiz was copied from
+    * create a new job in Learnosity for copying the contents of the source quiz into the pending quiz
+    * set the quiz's status to "processing"
+    * initiate polling for the status of the Learnosity job: when it is finished, it will be marked as complete
+
+OPTIONS
+    $yellow-h, --help$white
+        Print this help and exit
+
+    $yellow-p, --perform$white
+        Actually restart duplication jobs: otherwise, only output what would be restarted.
+
+
+HELP;
     }
 }
