@@ -16,6 +16,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
 
@@ -83,6 +84,7 @@ class RestartPendingTool extends CliTool\App
             $this->getDi()->get('router.generator'),
             $this->getDi()->get('taskd.httpRequestMessageFactory'),
             $this->getDi()->get('taskd.messageProducer'),
+            new TagFactory($this->getConfig()->get('site_school_code')),
         );
 
         // Build assessment data source

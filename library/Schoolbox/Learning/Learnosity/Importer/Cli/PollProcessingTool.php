@@ -77,6 +77,7 @@ class PollProcessingTool extends CliTool\App
             $this->getDi()->get('router.generator'),
             $this->getDi()->get('taskd.httpRequestMessageFactory'),
             $this->getDi()->get('taskd.messageProducer'),
+            new TagFactory($this->getConfig()->get('site_school_code')),
         );
 
         // Build assessment data source
@@ -113,8 +114,7 @@ class PollProcessingTool extends CliTool\App
             );
 
             if ($this->perform()) {
-                $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
-                $this->duplicator->pollQuizStatus($processingQuiz, $tagFactory->produceFromAssessment($processingQuiz));
+                $this->duplicator->pollQuizStatus($processingQuiz);
             }
         }
     }

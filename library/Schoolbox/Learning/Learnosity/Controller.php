@@ -1795,14 +1795,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        // Build a tag list to set on the Learnosity quiz if it's successfully
-        // produced
-        $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
-        $newTags    = $tagFactory->produceFromAssessment($assessment);
-        if ($assessment->getContext()->isImplementationContext()) {
-            $newTags[] = $tagFactory->produceImplFlag();
-        }
-        $this->buildDuplicator()->pollQuizStatus($assessment, $newTags);
+        $this->buildDuplicator()->pollQuizStatus($assessment);
 
         // What's in the response: just a "status" callback,
         // possibly an API problem?
@@ -2009,6 +2002,7 @@ class Controller extends Base
             $this->routeGenerator,
             $this->messageFactory,
             $this->messageProducer,
+            new TagFactory($this->getConfigLoader()->get('site_school_code')),
         );
     }
 }

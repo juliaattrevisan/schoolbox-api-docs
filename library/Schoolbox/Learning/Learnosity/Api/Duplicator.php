@@ -18,6 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
+use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
@@ -41,6 +42,7 @@ class Duplicator
      * @param MessageFactory          $messageFactory  A message factory: used to create the message to send to the task
      *                                                 daemon.
      * @param Producer                $messageProducer Used to send messages to the task daemon once built.
+     * @param TagFactory              $tagFactory      Used to build a set of tags for the quiz in Learnosity.
      */
     public function __construct(
         private Api $api,
@@ -50,6 +52,7 @@ class Duplicator
         private Generator $routeGenerator,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
+        private TagFactory $tagFactory,
     ) {
     }
 
@@ -189,7 +192,7 @@ class Duplicator
      * @param QuizDomainModel $quiz
      * @return void
      */
-    public function pollQuizStatus(QuizDomainModel $quiz, array $newTags): void
+    public function pollQuizStatus(QuizDomainModel $quiz): void
     {
         // Already complete or failed: don't bother re-checking
         $jobStatus = $quiz->getLearnosityJobStatus();
@@ -215,6 +218,11 @@ class Duplicator
             // If complete or failed:
             // update status and set the tags
             if ($setTags) {
+                $newTags = $this->tagFactory->produceFromAssessment($quiz);
+                if ($quiz->getContext()->isImplementationContext()) {
+                    $newTags[] = $this->tagFactory->produceImplFlag();
+                }
+
                 $query = $this->database->prepareQuery(
                     "
                         UPDATE assess
