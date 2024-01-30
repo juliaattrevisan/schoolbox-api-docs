@@ -116,7 +116,9 @@ class RestartPendingTool extends CliTool\App
                         $sourceQuiz->getId(),
                     )
                 );
-                $this->restartCopyProcess($sourceQuiz, $pendingQuiz);
+                if ($this->perform()) {
+                    $this->restartCopyProcess($sourceQuiz, $pendingQuiz);
+                }
             } catch (SourceAssociationException $e) {
                 // This pending quiz couldn't be associated with a source:
                 // mark it as failed.
@@ -126,8 +128,10 @@ class RestartPendingTool extends CliTool\App
                         $e->getMessage(),
                     )
                 );
-                $pendingQuiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED);
-                $this->assessmentDataSource->save($pendingQuiz, $pendingQuiz->getCreator());
+                if ($this->perform()) {
+                    $pendingQuiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED);
+                    $this->assessmentDataSource->save($pendingQuiz, $pendingQuiz->getCreator());
+                }
             } catch (InteropQueueException $e) {
                 // Something went wrong when sending message to taskd:
                 // this is likely a transient error, try again later

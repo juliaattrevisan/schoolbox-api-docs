@@ -86,8 +86,10 @@ class RestartProcessingTool extends CliTool\App
                 )
             );
 
-            $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
-            $this->duplicator->pollQuizStatus($processingQuiz, $tagFactory->produceFromAssessment($processingQuiz));
+            if ($this->perform()) {
+                $tagFactory = new TagFactory($this->getConfig()->get('site_school_code'));
+                $this->duplicator->pollQuizStatus($processingQuiz, $tagFactory->produceFromAssessment($processingQuiz));
+            }
         }
     }
 }
