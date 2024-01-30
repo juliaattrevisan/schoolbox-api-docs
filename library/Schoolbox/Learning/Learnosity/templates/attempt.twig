@@ -11,7 +11,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<script src="https://cdn.iframe.ly/embed.js?cancel=0&key={{ config.iframely_license_key_public }}"></script>
+<script src="https://cdn.iframe.ly/embed.js?cancel=0&key={{ config.iframely_license_key_public ?? null }}"></script>
 <script src="https://items-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
 
