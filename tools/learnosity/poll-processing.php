@@ -9,11 +9,11 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\Learning\Learnosity\Importer\Cli\RestartProcessingTool;
+use Schoolbox\Learning\Learnosity\Importer\Cli\PollProcessingTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app     = new RestartProcessingTool();
+$app     = new PollProcessingTool();
 $options = [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO, CliKernelAbstract::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
