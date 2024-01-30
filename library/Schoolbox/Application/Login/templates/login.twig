@@ -192,7 +192,7 @@
                             {% if '' == samlTitle %}
                                 {% set samlTitle = 'Single Sign-On' %}
                             {% endif %}
-                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="login-method samlbutton {% if config.saml_login_icon ?? null %}saml-icon{% endif %}">Login using {{ samlTitle }}</a></p>
+                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="login-method samlbutton {% if config.saml_login_icon ?? null %}saml-icon{% endif %}">{{ samlTitle }}</a></p>
                         {% endblock %}
                     {% endif %}
 
@@ -206,7 +206,7 @@
                         {% if '' == oidcTitle %}
                             {% set oidcTitle = 'OpenID Connect' %}
                         {% endif %}
-                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="login-method oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">Login using {{ oidcTitle }}</a></p>
+                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="login-method oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">{{ oidcTitle }}</a></p>
                     {% endblock %}
                     {% endif %}
 

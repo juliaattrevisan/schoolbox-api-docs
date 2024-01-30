@@ -19,8 +19,8 @@ INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_
 VALUES (
     'saml_login_title',
     'Title for Single Sign-On',
-    'Single Sign-On',
-    '“Single Sign-On” will show by default if left empty.',
+    'Login with Single Sign-On',
+    '“Login with Single Sign-On” will show by default if left empty.',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     (SELECT id FROM lu_config_type WHERE type = 'SAML'),
     'true',
@@ -67,8 +67,8 @@ INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_
 VALUES (
     'oidc_login_title',
     'Title for OpenID Connect',
-    'OpenID Connect',
-    '“OpenID Connect” will show by default if left empty.',
+    'Login with OpenID Connect',
+    '“Login with OpenID Connect” will show by default if left empty.',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     null,
     'true',
