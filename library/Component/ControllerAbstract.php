@@ -1286,8 +1286,6 @@ abstract class Component_ControllerAbstract
     {
         $range = is_numeric($this->getConfig('range')) ? (int)$this->getConfig('range') : self::RANGE_DEFAULT;
 
-        $now = \Alaress_Date_Format::now();
-
         switch ($range) {
             case self::RANGE_WEEK:
                 // The date range is defined as within the current week (with start day defined as config->calendar_start_day).
@@ -1301,7 +1299,7 @@ abstract class Component_ControllerAbstract
                 $dateEnd->addDays(self::N_DAYS_IN_ONE_WEEK - 1);
                 break;
             case self::RANGE_MONTH:
-                // The date range is defined as within the 2 weeks either side of now
+                // The date range is defined as within the 2 weeks either side of the current date inclusive.
                 $dateStart = \Alaress_Date_Format::now()->startOfDay()->addWeeks(-2);
                 $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addWeeks(2);
                 break;
@@ -1311,6 +1309,6 @@ abstract class Component_ControllerAbstract
                 $dateEnd = \Alaress_Date_Format::now()->endOfDay()->addDays($range);
         }
 
-        return [$range, $dateStart, $dateEnd];
+        return [$range, $dateStart->startOfDay(), $dateEnd->endOfDay()];
     }
 }
