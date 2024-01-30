@@ -2,6 +2,8 @@
 // foundation.zurb.com
 // Licensed under MIT Open Source
 
+@use "range";
+
 @import "buttons";
 
 //
@@ -1231,7 +1233,6 @@ input.invalid-data:focus {
 }
 
 @import "dropzone";
-@import "rangeslider";
 
 /**
  * when you have an action bar that includes state tracking, this is

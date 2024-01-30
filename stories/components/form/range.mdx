@@ -1,0 +1,37 @@
+import { Meta, Stories } from "@storybook/blocks";
+
+import * as RangeStories from "./range.stories";
+
+<Meta of={RangeStories} />
+
+# Range
+
+[**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range)
+
+Styles: `www/static/css/core/ui/forms/_range.scss`
+
+To toggle the display of further navigation or control actions.
+
+## Properties
+
+| Property                | Type      | Description                                                                                                                                       |
+| ----------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content-id` \*         | `string`  | The id of the content to display                                                                                                                  |
+| `button-text`           | `string`  | The text to display on the button                                                                                                                 |
+| `disabled`              | `boolean` | Whether the button is to be disabled                                                                                                              |
+| `isFullWidth`           | `boolean` | Whether the button should be full width, stretching to the width of the parent container                                                          |
+| `isArrowIcon`           | `boolean` | Whether to use an arrow icon instead of the default icon, which will switch the icon rotation depending on whether the button is opened or closed |
+| `isCloseOnContentClick` | `boolean` | Close the dropdown when the content is clicked                                                                                                    |
+
+## Example usage
+
+```
+<sbx-pop-out content-id="dropdown-1" button-text="Modify Participation"></sbx-pop-out>
+<ul id="dropdown-1" class="f-dropdown" data-dropdown-content="">
+    <li class="separator">Manage</li>
+    <li><a>Course Markbook</a></li>
+    <li><a>Delete</a></li>
+</ul>
+```
+
+<Stories />
