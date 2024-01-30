@@ -190,7 +190,7 @@
                             {% set samlTitle = config.saml_login_title ?? '' %}
 
                             {% if '' == samlTitle %}
-                                {% set samlTitle = 'Single Sign-On' %}
+                                {% set samlTitle = 'Login with Single Sign-On' %}
                             {% endif %}
                             <p><a href="/saml/index.php?{{ requestParams|escape }}" class="login-method samlbutton {% if config.saml_login_icon ?? null %}saml-icon{% endif %}">{{ samlTitle }}</a></p>
                         {% endblock %}
@@ -204,7 +204,7 @@
                         {% set oidcTitle = config.oidc_login_title ?? '' %}
 
                         {% if '' == oidcTitle %}
-                            {% set oidcTitle = 'OpenID Connect' %}
+                            {% set oidcTitle = 'Login with OpenID Connect' %}
                         {% endif %}
                         <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="login-method oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">{{ oidcTitle }}</a></p>
                     {% endblock %}
