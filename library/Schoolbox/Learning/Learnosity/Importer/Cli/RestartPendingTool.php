@@ -15,7 +15,6 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Quiz;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
 
@@ -63,7 +62,7 @@ class RestartPendingTool extends CliTool\App
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
             "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
         );
-        $quizQuery->execute(['status' => Quiz\Model::LEARNOSITY_JOB_STATUS_PENDING]);
+        $quizQuery->execute(['status' => QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING]);
         $quizIds = $quizQuery->fetchColumnArray('assessment_id');
         $pendingQuizzes = $this->assessmentDataSource->findAllByIds($quizIds);
 
