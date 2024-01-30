@@ -25,8 +25,8 @@ export const Standard: Story = {
     render: () => ({
         template: `
             <div class="c-range">
-                <label for="column-width">Column Width</label>
-                <input type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
+                <label class="c-range__label" for="column-width">Column Width</label>
+                <input class="c-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
             </div>
         `,
     }),
