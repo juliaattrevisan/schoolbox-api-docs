@@ -11,6 +11,8 @@ declare(strict_types=1);
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Learning\Learnosity\Importer\Cli\RestartProcessingTool;
 
+require_once __DIR__ . '/../../conf/core/require.php';
+
 $app     = new RestartProcessingTool();
 $options = [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO, CliKernelAbstract::OPTION_ERRORS => E_ALL,];
 
