@@ -22,7 +22,6 @@ module.exports = {
             "./www/static/js/foundation/foundation.equalizer.js",
             "./www/static/js/foundation/foundation.offcanvas.js",
             "./www/static/js/foundation/foundation.reveal.js",
-            "./www/static/js/foundation/foundation.slider.js",
             "./www/static/js/foundation/foundation.tab.js",
             "./www/static/js/foundation/foundation.tooltip.js",
             "./www/static/js/foundation/foundation.joyride.js",
