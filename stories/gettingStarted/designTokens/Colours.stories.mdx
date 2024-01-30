@@ -1,0 +1,68 @@
+import { Meta, ColorItem } from "@storybook/addon-docs";
+
+<Meta title="Getting Started/Design Tokens/Colours" />
+
+# Colours
+
+These are the colours currently avaiable as CSS custom properties. As we continue to migrate from Foundation/SASS vars to CSS custom properties, we will be adding more colours to this list.
+
+## User Configurable
+
+The following colours are configurable by schools via the admin system. The following colours currently match those used in the demo data, visible at: https://demo.schoolbox.com.au/login/
+
+<ColorItem title="Top Menu Icon Colour" colors={{ "--navigation-foreground": "rgb(255, 255, 255)" }} />
+<ColorItem title="Top Menu Background Colour" colors={{ "--navigation-background": "rgb(0, 102, 176)" }} />
+<ColorItem title="Top Menu Hover Colour" colors={{ "--navigation-hover": "rgb(0, 158, 178)" }} />
+<ColorItem
+    title="Side Menu and Notification Panel Text Colour"
+    colors={{ "--off-canvas-foreground": "rgb(0, 102, 176)" }}
+/>
+<ColorItem
+    title="Side Menu and Notification Panel Background Colour"
+    colors={{ "--off-canvas-background": "rgb(255, 255, 255)" }}
+/>
+<ColorItem title="Side Menu Hover Colour" colors={{ "--off-canvas-hover": "rgb(229, 239, 247)" }} />
+<ColorItem title="User Account Menu Text Colour" colors={{ "--accounts-menu-foreground": "rgb(0, 102, 176)" }} />
+<ColorItem
+    title="User Account Menu Background Colour"
+    colors={{ "--accounts-menu-background": "rgb(255, 255, 255)" }}
+/>
+<ColorItem title="User Account Menu Hover Colour" colors={{ "--accounts-menu-hover": "rgb(229, 239, 247)" }} />
+<ColorItem
+    title="Primary Interactive Content Foreground Colour"
+    colors={{ "--content-ui-foreground": "rgb(0, 102, 176)" }}
+/>
+<ColorItem
+    title="Primary Interactive Content Background Colour"
+    colors={{ "--content-ui-background": "rgb(178, 209, 231)" }}
+/>
+<ColorItem title="Primary Interactive Content Hover Colour" colors={{ "--content-ui-hover": "rgb(204, 224, 239)" }} />
+<ColorItem
+    title="Primary Interactive Content Selected-State Colour"
+    colors={{ "--content-ui-selected": "rgb(204, 249, 233)" }}
+/>
+<ColorItem title="Form Submit Button Text Colour" colors={{ "--content-ui-submit-foreground": "rgb(255, 255, 255)" }} />
+<ColorItem
+    title="Form Submit Button Background Colour"
+    colors={{ "--content-ui-submit-background": "rgb(0, 158, 178)" }}
+/>
+<ColorItem
+    title="Secondary Interactive Content Foreground Colour"
+    colors={{ "--accent-foreground": "rgb(0, 102, 176)" }}
+/>
+<ColorItem
+    title="Secondary Interactive Content Background Colour"
+    colors={{ "--accent-background": "rgb(229, 239, 247)" }}
+/>
+<ColorItem title="Secondary Interactive Content Hover Colour" colors={{ "--accent-hover": "rgb(242, 247, 251)" }} />
+<ColorItem title="Side Menu Logo Background Colour" colors={{ "--logo-background": "rgb(255, 255, 255)" }} />
+<ColorItem title="Body Background Colour" colors={{ "--body-background": "rgb(229, 239, 247)" }} />
+<ColorItem title="Login Background Colour" colors={{ "--login-form-background": "rgba(0, 102, 176, 0.65)" }} />
+<ColorItem title="Form Input Border Colour" colors={{ "--form-border-color": "rgb(76, 148, 200)" }} />
+<ColorItem title="Form Input Hover Colour " colors={{ "--form-bg-hover-color": "rgb(242, 247, 251)" }} />
+
+## Unconfigurable
+
+<ColorItem title="Foreground colour" colors={{ "--foreground-colour": "rgb(255, 255, 255)" }} />
+<ColorItem title="Primary text colour" colors={{ "--primary-text-colour": "rgb(0, 0, 0)" }} />
+<ColorItem title="Loading colour" colors={{ "--loading-colour": "rgb(235, 234, 234);" }} />
