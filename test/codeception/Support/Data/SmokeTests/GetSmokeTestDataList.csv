@@ -694,14 +694,14 @@ LMS,"View assessment calendar",Superuser,https://vagrant.dev.schoolbox.cloud/lea
 LMS,"View assessment calendar",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,200
 LMS,"View assessment calendar",Student,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,401
 LMS,"View assessment calendar",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessment/calendar?1=,401
+LMS,"View course unit planner",Superuser,https://vagrant.dev.schoolbox.cloud/course/plan/6,200
+LMS,"View course unit planner",Teacher,https://vagrant.dev.schoolbox.cloud/course/plan/6,200
+LMS,"View course unit planner",Student,https://vagrant.dev.schoolbox.cloud/course/plan/6,401
+LMS,"View course unit planner",Parent,https://vagrant.dev.schoolbox.cloud/course/plan/6,401
 LMS,"Modify course",Superuser,https://vagrant.dev.schoolbox.cloud/course/modify/2,200
 LMS,"Modify course",Teacher,https://vagrant.dev.schoolbox.cloud/course/modify/2,200
 LMS,"Modify course",Student,https://vagrant.dev.schoolbox.cloud/course/modify/2,401
 LMS,"Modify course",Parent,https://vagrant.dev.schoolbox.cloud/course/modify/2,401
-LMS,"View course unit plan",Superuser,https://vagrant.dev.schoolbox.cloud/course/plan/6,200
-LMS,"View course unit plan",Teacher,https://vagrant.dev.schoolbox.cloud/course/plan/6,200
-LMS,"View course unit plan",Student,https://vagrant.dev.schoolbox.cloud/course/plan/6,401
-LMS,"View course unit plan",Parent,https://vagrant.dev.schoolbox.cloud/course/plan/6,401
 LMS,"Create project",Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
 LMS,"Create project",Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
 LMS,"Create project",Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=project&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
