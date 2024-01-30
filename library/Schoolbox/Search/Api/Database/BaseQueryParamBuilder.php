@@ -46,6 +46,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $datePart             = $this->buildDateExpression($paramKeySuffix);
         $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
         $folderPart           = $this->buildFolderExpression($paramKeySuffix);
+        $havingParts          = [];
 
         // Apply filter
         if ($filter->types) {
@@ -110,6 +111,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             $params["cursorId$paramKeySuffix"]        = $cursor->id;
         }
 
+        $havingParts[] = "(titleRelevance + contentRelevance) > 0";
+
         // Build query and params
         $from = $this->buildFromStatement($paramKeySuffix);
         $query = (
@@ -122,8 +125,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $dateRelevancePart    AS dateRelevance,
                 $totalRelevancePart   AS relevance
             $from" .
-            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') . "
-            HAVING (titleRelevance + contentRelevance) > 0\n"
+            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') .
+            ((count($havingParts) > 0) ? "\nHAVING " . implode(' AND ', $havingParts) : '')
         );
 
         // Build order parts.
