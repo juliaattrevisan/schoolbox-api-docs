@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class External_Tass_User implements External_UserInterface
 {
-
     /**
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
@@ -469,7 +468,7 @@ class External_Tass_User implements External_UserInterface
                 $subject['year_grp'] = '';
             }
             $subjectList[] = [
-                'code'       => $subject['year_grp'] . '-' . $subject['sub_code'] . '-' . $subject['class'],
+                'code'       => trim((string)$subject['year_grp']) . '-' . trim((string)$subject['sub_code']) . '-' . trim((string)$subject['class']),
                 'name'       => trim($subject['sub_desc']),
                 'classType'  => '',
                 'campusCode' => '',
