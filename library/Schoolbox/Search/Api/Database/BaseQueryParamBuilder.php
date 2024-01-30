@@ -226,7 +226,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *
      * @param string $keyword The search term from `buildMatchQueryParams`.
      * @param string $paramKeySuffix
-     * @return array{where: array<string>, params: array}
+     * @return non-empty-array<non-falsy-string, string|null>
      */
     abstract protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array;
 
