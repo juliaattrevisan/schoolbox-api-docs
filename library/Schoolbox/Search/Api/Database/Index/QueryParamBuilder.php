@@ -56,8 +56,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         $quoter = $this->quoter;
 
         $sqlSumTerms = [
-            "IF(si.title = '" . $quoter->escapeForLike($keywordMinusPunctuation) . "', 100, 0)",
-            "IF(si.title LIKE '%" . $quoter->escapeForLike($keywordMinusPunctuation) . "%', 50, 0)"
+            // NOTE: Must include punctuation for searches for filenames e.g. 'shutterstock_282889763'.
+            "IF(si.title = '" . $quoter->escapeForLike($keyword) . "', 250, 0)",
+            "IF(si.title = '" . $quoter->escapeForLike($keywordMinusPunctuation) . "', 200, 0)",
+            "IF(si.title LIKE '%" . $quoter->escapeForLike($keyword) . "%', 150, 0)",
+            "IF(si.title LIKE '%" . $quoter->escapeForLike($keywordMinusPunctuation) . "%', 100, 0)"
         ];
 
         $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
@@ -65,7 +68,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
         foreach ($keywordWords as $word) {
             if (strlen($word) > 1) {
-                $sqlSumTerms[] = "IF(si.title LIKE '%" . $quoter->escapeForLike(trim($word)) . "%', 10, 0)";
+                $sqlSumTerms[] = "IF(si.title LIKE '%" . $quoter->escapeForLike(trim($word)) . "%', 20, 0)";
             }
         }
 
