@@ -134,11 +134,12 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         //  * Order here must match order in library/Schoolbox/Search/Api/Database/AggregateSource->search().
         //  * The order of `id` is DESC because all other things being equal, we want more recently created rows to
         //    appear before less recently created rows.
-        $orderParts = [];
-        $orderParts[] = "relevance DESC";
-        $orderParts[] = "$titlePart ASC";
-        $orderParts[] = "`type` ASC";
-        $orderParts[] = "$idPart DESC";
+        $orderParts = [
+            'relevance DESC',
+            'title ASC',
+            'type ASC',
+            'id DESC',
+        ];
         $query .= ' ORDER BY ' . implode(', ', $orderParts);
         $query .= " LIMIT :limit$paramKeySuffix";
 
