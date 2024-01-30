@@ -108,6 +108,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildContentRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
+        // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
+        //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
+        // The same algorithm is used for BOOLEAN MODE and NATURAL LANGUAGE MODE.  I confirmed this by experiment.
         return "MATCH (si.fulltext_index) AGAINST (:indexKeywordLike$paramKeySuffix IN NATURAL LANGUAGE MODE)";
     }
 
