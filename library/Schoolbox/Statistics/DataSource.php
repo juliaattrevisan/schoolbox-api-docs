@@ -198,9 +198,9 @@ class DataSource
                         {$this->folderLogMapper->getJoinColumnString('user.pronoun', 'op')},
                         {$this->folderLogMapper->getJoinColumnString('user.role', 'ur')}
             FROM        `{$this->folderLogMapper->getTable()}` AS `hl`
-            LEFT JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
-            LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
-            LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.pronoun', 'u', 'op')}
+            JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
+            JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
+            JOIN   {$this->folderLogMapper->getJoinSql('user.pronoun', 'u', 'op')}
             WHERE       hl.folder_id = :folderId AND
                         datetime BETWEEN :startDate AND :endDate
                         {$roleClause}
@@ -259,8 +259,8 @@ class DataSource
         $query = "
             SELECT      COUNT(user_id)
             FROM        `{$this->folderLogMapper->getTable()}` AS `hl`
-            LEFT JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
-            LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
+            JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
+            JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
             WHERE       folder_id = :folderId AND
                         datetime BETWEEN :startDate AND :endDate
                         {$roleClause}
@@ -309,9 +309,9 @@ class DataSource
         $fileSelects = '';
         if ($object == self::FILTER_FILE) {
             $fileJoins = '
-                LEFT JOIN storage ON f.hash = storage.hash
-                LEFT JOIN allowedFileExtension as afe ON storage.ext = afe.extension
-                LEFT JOIN allowedFileTypes as aft ON afe.fileTypeID = aft.fileTypeID
+                JOIN storage ON f.hash = storage.hash
+                JOIN allowedFileExtension as afe ON storage.ext = afe.extension
+                JOIN allowedFileTypes as aft ON afe.fileTypeID = aft.fileTypeID
             ';
             $fileSelects = ',storage.filesize, aft.iconFile';
         }
@@ -321,9 +321,9 @@ class DataSource
                         {$this->logMapper->getJoinColumnString($object, 'f')}
                         {$fileSelects}
             FROM        `{$this->logMapper->getTable()}` AS cl
-            LEFT JOIN   {$this->logMapper->getJoinSql($object, 'cl', 'f')}
-            LEFT JOIN   {$this->logMapper->getJoinSql('user', 'cl', 'u')}
-            LEFT JOIN   {$this->logMapper->getJoinSql('user.role', 'u', 'ur')}
+            JOIN   {$this->logMapper->getJoinSql($object, 'cl', 'f')}
+            JOIN   {$this->logMapper->getJoinSql('user', 'cl', 'u')}
+            JOIN   {$this->logMapper->getJoinSql('user.role', 'u', 'ur')}
             {$fileJoins}
             WHERE       cl.object = '{$object}'
                         AND f.`category` = :folderId
