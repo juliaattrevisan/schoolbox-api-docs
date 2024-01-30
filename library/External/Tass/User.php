@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class External_Tass_User implements External_UserInterface
 {
-
     /**
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
