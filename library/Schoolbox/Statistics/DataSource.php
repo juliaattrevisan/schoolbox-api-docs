@@ -27,7 +27,6 @@ use Schoolbox\Resource\Folder;
  */
 class DataSource
 {
-
     /**
      * Object types for filtering the log
      */
