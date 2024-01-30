@@ -28,6 +28,7 @@ class IndexBuilder extends App
     private const OPT_LONG_FROM = 'from:';
     private const OPT_LONG_TO = 'to:';
     private const OPT_LONG_CLEAR = 'clear';
+    private const OPT_LONG_TYPE = 'type:';
 
     /**
      * Short options:
@@ -44,10 +45,11 @@ class IndexBuilder extends App
      * * --from:  from date
      * * --to:    to date
      * * --clear: clear index completely
+     * * --type:  if provided, only build indices of this type
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_CLEAR];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_CLEAR, self::OPT_LONG_TYPE];
     }
 
     /**
@@ -87,26 +89,67 @@ class IndexBuilder extends App
         // * Pages
         // * Tiles
         // * Users
-        /** @var array<IBuilder> $indexBuilders */
-        $indexBuilders       = [
-            new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Badge\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Blog\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Event\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\File\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Forum\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Link\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+        /** @var array<string, IBuilder> $indexBuilders */
+        $indexBuilders = [
+            ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
         ];
+        $types = $this->getOpt(self::OPT_LONG_TYPE);
+        if (!isset($types)) {
+            $this->getLogger()->notice('Building search index for all result types');
+        } else {
+            $types = is_array($types) ? $types : [$types];
+            foreach ($types as $type) {
+                if (!isset($indexBuilders[$type])) {
+                    $this->getLogger()->error(
+                        sprintf(
+                            'Result type "%s" is not recognised (recognised types: %s): exiting',
+                            $type,
+                            implode(', ', array_keys($indexBuilders)),
+                        )
+                    );
+                    exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+                }
+            }
+            $this->getLogger()->notice(
+                sprintf(
+                    'Building search index for result types: %s',
+                    implode(', ', $types),
+                )
+            );
+        }
 
         // Run for as long as you need to?
         $this->getDatabaseInternal()->executeDirectly('SET MAX_STATEMENT_TIME=0');
 
+        // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
-            $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
-            if ($this->perform()) {
-                $this->getDatabaseInternal()->execute('TRUNCATE search_index');
+            if (empty($types)) {
+                $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
+                if ($this->perform()) {
+                    $this->getDatabaseInternal()->execute('TRUNCATE search_index');
+                }
+            } else {
+                $this->getLogger()->notice('Clearing indices for provided types before rebuilding!');
+                $deleteIndexQuery = $this->getDatabaseInternal()->prepareQuery(
+                    'DELETE FROM search_index WHERE type = :type OR type LIKE :typeLike',
+                );
+                foreach ($types as $type) {
+                    $this->getLogger()->notice(sprintf('Clearing indices for type: %s', $type));
+                    if ($this->perform()) {
+                        $deleteIndexQuery->execute([
+                            'type'     => $type,
+                            'typeLike' => $this->getDatabaseInternal()->getQuoter()->escapeForLike($type . '.') . '%',
+                        ]);
+                    }
+                }
             }
         }
 
@@ -137,7 +180,11 @@ class IndexBuilder extends App
         ");
 
         $time = microtime(true);
-        foreach ($indexBuilders as $indexBuilder) {
+        foreach ($indexBuilders as $indexBuilderType => $indexBuilder) {
+            // Not in the list of types to build? Skip
+            if (!empty($types) && !in_array($indexBuilderType, $types, true)) {
+                continue;
+            }
             foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
                 if (!$this->perform()) {
                     continue;
@@ -192,6 +239,20 @@ class IndexBuilder extends App
         $green      = self::COLOUR_GREEN;
         $white      = self::COLOUR_WHITE;
         $yellow     = self::COLOUR_YELLOW;
+        $indexTypes = implode(
+            "\n        * ",
+            [
+                ResultType\Assessment\Hydrator::BASE_TYPE,
+                ResultType\Badge\Hydrator::BASE_TYPE,
+                ResultType\Blog\Hydrator::BASE_TYPE,
+                ResultType\Event\Hydrator::BASE_TYPE,
+                ResultType\File\Hydrator::BASE_TYPE,
+                ResultType\Forum\Hydrator::BASE_TYPE,
+                ResultType\Link\Hydrator::BASE_TYPE,
+                ResultType\News\Hydrator::BASE_TYPE,
+                ResultType\Textbox\Hydrator::BASE_TYPE,
+            ]
+        );
         echo <<<HELP
 NAME:
     Search index builder
@@ -229,8 +290,16 @@ OPTIONS
 
     $yellow--clear$white
         If provided, clear all existing indices before rebuilding the index.
+        (If $yellow--type$white is provided, only clear this type of index.)
 
         Has no effect without the $yellow-p$white or $yellow--perform$white flags.
+
+    $yellow--type=TYPE$white
+        If provided, only rebuild indices of this type. (May be provided more
+        than once to rebuild multiple index types.)
+
+        The following index types are able to be built by this script:
+        * {$indexTypes}
 
 
 HELP;

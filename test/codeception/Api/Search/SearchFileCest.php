@@ -88,6 +88,17 @@ class SearchFileCest
     private function filterData(File $file): Generator
     {
         $title = $file->getTitle();
+
+        // Currently, search for a base type doesn't work:
+        // must provide all subtypes instead.
+        $subtypes = [
+            'file.document',
+            'file.image',
+            'file.video',
+            'file.audio',
+            'file.other',
+        ];
+
         yield [
             'keyword' => $title,
             'valid'   => true,
@@ -95,14 +106,14 @@ class SearchFileCest
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types' => ['file'],
+                'types' => $subtypes,
             ],
             'valid'   => true,
         ];
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types' => ['file'],
+                'types' => $subtypes,
                 'date'  => [
                     'from' => $file->getCreatedAt()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
@@ -112,7 +123,7 @@ class SearchFileCest
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types' => ['file'],
+                'types' => $subtypes,
                 'date'  => [
                     'to' => (\Alaress_Date_Format::now())->addDays(1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
@@ -122,7 +133,7 @@ class SearchFileCest
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types'   => ['file'],
+                'types'   => $subtypes,
                 'creator' => [
                     'id' => $file->getOwner()->getId(),
                 ],
