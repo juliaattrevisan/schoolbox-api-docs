@@ -111,8 +111,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             $params["cursorId$paramKeySuffix"]        = $cursor->id;
         }
 
-        $havingParts[] = "(titleRelevance + contentRelevance) > 0";
-
         // Build query and params
         $from = $this->buildFromStatement($paramKeySuffix);
         $query = (
@@ -126,7 +124,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $totalRelevancePart   AS relevance
             $from" .
             ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') .
-            ((count($havingParts) > 0) ? "\nHAVING " . implode(' AND ', $havingParts) : '')
+            "\nHAVING " . implode(' AND ', $havingParts) . " AND (titleRelevance + contentRelevance) > 0"
         );
 
         // Build order parts.
