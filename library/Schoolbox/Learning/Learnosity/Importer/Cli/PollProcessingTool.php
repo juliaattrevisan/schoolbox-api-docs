@@ -115,6 +115,28 @@ class PollProcessingTool extends CliTool\App
 
             if ($this->perform()) {
                 $this->duplicator->pollQuizStatus($processingQuiz);
+                $newStatus = $processingQuiz->getLearnosityJobStatus();
+                match ($newStatus) {
+                    QuizDomainModel::LEARNOSITY_JOB_STATUS_COMPLETED => $this->getLogger()->info(
+                        sprintf('Assessment #%d successfully processed', $processingQuiz->getId())
+                    ),
+                    QuizDomainModel::LEARNOSITY_JOB_STATUS_PROCESSING => $this->getLogger()->info(
+                        sprintf('Assessment #%d still processing', $processingQuiz->getId())
+                    ),
+                    QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED => $this->getLogger()->warning(
+                        sprintf('Assessment #%d processing failed', $processingQuiz->getId())
+                    ),
+                    QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING => $this->getLogger()->warning(
+                        sprintf('Assessment #%d somehow pending: should be impossible', $processingQuiz->getId())
+                    ),
+                    default => $this->getLogger()->warning(
+                        sprintf(
+                            'Assessment #%d unknown status (%s): should be impossible',
+                            $processingQuiz->getId(),
+                            $newStatus,
+                        )
+                    ),
+                };
             }
         }
     }
