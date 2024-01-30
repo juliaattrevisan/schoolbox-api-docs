@@ -21,7 +21,7 @@ input[type="range"]:focus {
 /* slider track */
 input[type="range"]::-webkit-slider-runnable-track {
     background-color: var(--content-ui-hover);
-    border-radius: 0rem;
+    border-radius: var(--roundness-inputs);
     height: 1rem;
 }
 

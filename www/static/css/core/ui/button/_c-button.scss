@@ -30,7 +30,7 @@ button.c-button {
     align-items: center;
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background-color: var(--content-ui-background);
-    border-radius: var(--roundness-interactibles);
+    border-radius: var(--roundness-inputs);
     color: var(--content-ui-foreground);
     display: inline-flex;
     gap: var(--spacing-xs);
