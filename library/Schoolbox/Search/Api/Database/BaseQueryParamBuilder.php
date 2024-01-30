@@ -34,8 +34,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         int $limit,
         string $paramKeySuffix = ''
     ): ?QueryParams {
-        ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
-
+        $params               = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
         $titleRelevancePart   = $this->buildTitleRelevanceExpression($keyword, $paramKeySuffix);
         $contentRelevancePart = $this->buildContentRelevanceExpression($keyword, $paramKeySuffix);
         $dateRelevancePart    = $this->buildDateRelevanceExpression($keyword, $paramKeySuffix);
@@ -46,6 +45,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $datePart             = $this->buildDateExpression($paramKeySuffix);
         $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
         $folderPart           = $this->buildFolderExpression($paramKeySuffix);
+        $whereParts           = [];
         $havingParts          = [];
 
         // Apply filter

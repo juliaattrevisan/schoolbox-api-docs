@@ -21,6 +21,26 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
     /**
+     * Prefix to use for SQL query parameter keys for tokens within the search keyword.
+     *
+     * E.g. If the search keyword is "Romeo and Juliet",
+     *      the tokens within the search keyword are:
+     *         {'Romeo', 'and', 'Juliet'}
+     *      and the SQL query parameters could be used like this:
+     *
+     *      SELECT *
+     *      FROM search_index
+     *      WHERE (
+     *          title LIKE :KEYWORD_TOKEN_LIKE_PREFIX_1 OR
+     *          title LIKE :KEYWORD_TOKEN_LIKE_PREFIX_2 OR
+     *          title LIKE :KEYWORD_TOKEN_LIKE_PREFIX_3
+     *      )
+     *
+     *      Where self::INDEX_KEYWORD_WORD_PREFIX is 'INDEX_KEYWORD_WORD_'.
+     */
+    private const KEYWORD_TOKEN_LIKE_PREFIX = 'KEYWORD_TOKEN_LIKE_PREFIX_';
+
+    /**
      * Constructor
      *
      * @param IQuoter $quoter
@@ -34,17 +54,31 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
-        $whereParts = [];
+        $quoter = $this->quoter;
+
+        // Remove all punctuation characters.
+        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
+
+        // Replace multiple spaces with single space.
+        $keywordMinusPunctuation = preg_replace('!\s+!', ' ', $keywordMinusPunctuation);
+
         $params = [
-            "indexNow$paramKeySuffix"         => Alaress_Date_Format::now()->getDatabase(),
-//            "indexKeyword$paramKeySuffix"     => $keyword,
-//            "indexKeywordLike$paramKeySuffix" => '%' . $this->quoter->escapeForLike($keyword) . '%',
+            "indexNow$paramKeySuffix"                   => Alaress_Date_Format::now()->getDatabase(),
+            "indexKeyword$paramKeySuffix"               => $keyword,
+            "indexKeywordLike$paramKeySuffix"           => '%' . $quoter->escapeForLike($keyword) . '%',
+            "indexKeywordMinusPunct$paramKeySuffix"     => $keywordMinusPunctuation,
+            "indexKeywordMinusPunctLike$paramKeySuffix" => '%' . $quoter->escapeForLike($keywordMinusPunctuation) . '%',
         ];
 
-        return [
-            'where'  => $whereParts,
-            'params' => $params,
-        ];
+        $keywordWords = explode(' ', $keywordMinusPunctuation);
+
+        foreach ($keywordWords as $i => $word) {
+            if (strlen($word) > 1) {
+                $params[self::KEYWORD_TOKEN_LIKE_PREFIX . "$i$paramKeySuffix"] = '%' . $quoter->escapeForLike(trim($word)) . '%';
+            }
+        }
+
+        return $params;
     }
 
     /**
@@ -52,28 +86,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
-        // Remove all punctuation characters.
-        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
-
-         // Replace multiple spaces with single space.
-        $keywordMinusPunctuation = preg_replace('!\s+!', ' ', $keywordMinusPunctuation);
-
-        $quoter = $this->quoter;
-
         $sqlSumTerms = [
             // NOTE: Must include punctuation for searches for filenames e.g. 'shutterstock_282889763'.
-            "IF(si.title = '" . $quoter->escapeForLike($keyword) . "', 250, 0)",
-            "IF(si.title = '" . $quoter->escapeForLike($keywordMinusPunctuation) . "', 200, 0)",
-            "IF(si.title LIKE '%" . $quoter->escapeForLike($keyword) . "%', 150, 0)",
-            "IF(si.title LIKE '%" . $quoter->escapeForLike($keywordMinusPunctuation) . "%', 100, 0)"
+            "IF(si.title = :indexKeyword$paramKeySuffix, 250, 0)",
+            "IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, 200, 0)",
+            "IF(si.title LIKE :indexKeywordLike$paramKeySuffix, 150, 0)",
+            "IF(si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix, 100, 0)"
         ];
 
-        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
-        $keywordWords = explode(' ', $keywordMinusPunctuation);
-
-        foreach ($keywordWords as $word) {
-            if (strlen($word) > 1) {
-                $sqlSumTerms[] = "IF(si.title LIKE '%" . $quoter->escapeForLike(trim($word)) . "%', 20, 0)";
+        foreach ($this->buildBaseWhereParams($keyword, $paramKeySuffix) as $key => $value) {
+            if (str_starts_with($key, self::KEYWORD_TOKEN_LIKE_PREFIX)) {
+                $sqlSumTerms[] = "IF(si.title LIKE :$key, 20, 0)";
             }
         }
 
@@ -85,8 +108,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildContentRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
-        $quoter = $this->quoter;
-        return "MATCH (si.fulltext_index) AGAINST ('" . $quoter->escapeForLike($keyword) . "' IN NATURAL LANGUAGE MODE)";
+        return "MATCH (si.fulltext_index) AGAINST (:indexKeywordLike$paramKeySuffix IN NATURAL LANGUAGE MODE)";
     }
 
     /**
