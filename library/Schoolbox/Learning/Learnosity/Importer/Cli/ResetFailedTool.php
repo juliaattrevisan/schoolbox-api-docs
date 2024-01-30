@@ -9,14 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
-use Interop\Queue\Exception as InteropQueueException;
-use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
-use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
 
 /**
@@ -64,23 +60,6 @@ class ResetFailedTool extends CliTool\App
         }
 
         $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
-
-        // Build duplicator
-        $this->duplicator = new Api\Duplicator(
-            new Api(
-                $baseUrl->getHost(),
-                $this->getConfig()->get('learnosity_version'),
-                $this->getConfig()->get('learnosity_consumer_key'),
-                $this->getConfig()->get('learnosity_consumer_secret'),
-                $this->getLogger(),
-            ),
-            $this->getDatabaseInternal(),
-            $baseUrl,
-            $this->getDi()->get('httpFactory'),
-            $this->getDi()->get('router.generator'),
-            $this->getDi()->get('taskd.httpRequestMessageFactory'),
-            $this->getDi()->get('taskd.messageProducer'),
-        );
 
         // Build assessment data source
         $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
