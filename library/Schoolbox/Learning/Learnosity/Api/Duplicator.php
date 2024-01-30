@@ -70,6 +70,11 @@ class Duplicator
      */
     public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
     {
+        // Return early if this is not a pending job
+        if ($source->getLearnosityJobStatus() !== QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING) {
+            return $source->getLearnosityJobReference();
+        }
+
         /* Clone a Learnosity Reference in Learnosity land
          */
         $oldLearnosityReference = $source->getLearnosityReference();
