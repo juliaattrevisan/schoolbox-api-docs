@@ -469,7 +469,7 @@ class External_Tass_User implements External_UserInterface
                 $subject['year_grp'] = '';
             }
             $subjectList[] = [
-                'code'       => $subject['year_grp'] . '-' . $subject['sub_code'] . '-' . $subject['class'],
+                'code'       => trim((string)$subject['year_grp']) . '-' . trim((string)$subject['sub_code']) . '-' . trim((string)$subject['class']),
                 'name'       => trim($subject['sub_desc']),
                 'classType'  => '',
                 'campusCode' => '',

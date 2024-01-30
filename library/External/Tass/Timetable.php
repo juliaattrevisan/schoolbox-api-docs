@@ -241,7 +241,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                 if (!$useYearInCode) {
                     $desc['year_grp'] = '';
                 }
-                $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
+                $code = trim((string)$desc['year_grp']) . '-' . trim((string)$desc['sub_code']) . '-' . trim((string)$desc['class']);
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
@@ -334,7 +334,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                 if (!$useYearInCode) {
                     $desc['year_grp'] = '';
                 }
-                $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
+                $code = trim((string)$desc['year_grp']) . '-' . trim((string)$desc['sub_code']) . '-' . trim((string)$desc['class']);
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
