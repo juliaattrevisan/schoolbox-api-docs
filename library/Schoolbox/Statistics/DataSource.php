@@ -199,7 +199,7 @@ class DataSource
             FROM        `{$this->folderLogMapper->getTable()}` AS `hl`
             JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
             JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
-            JOIN   {$this->folderLogMapper->getJoinSql('user.pronoun', 'u', 'op')}
+            LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.pronoun', 'u', 'op')}
             WHERE       hl.folder_id = :folderId AND
                         datetime BETWEEN :startDate AND :endDate
                         {$roleClause}
