@@ -7,34 +7,3 @@ import { Meta } from "@storybook/addon-docs";
 Design tokens are consistent, reusable, and well-defined global properties that capture the fundamental elements of a design system, such as colours, typography, spacing, and more.
 They serve as the atomic units of a design language, allowing designers and developers to maintain design consistency across different platforms and applications.
 By abstracting design decisions into tokens, design systems become more flexible, adaptable, and scalable, promoting cohesive branding and efficient development workflows.
-
-## Colours
-
-_Draft_
-
-## Typography
-
-_Draft_
-
-## Spacing
-
-In order to maintain consistency across the design system, we use a consistent set of spacing values.
-These values are based on the [8-point grid system](https://spec.fm/specifics/8-pt-grid) and are defined in `rem` units.
-As the default root text size is `16px`, `1rem` is equivalent to `16px`.
-These values are to be used for all spacing needs, including `margin`, `padding`, and `gap`.
-
-| Property   | Value     | Description         | CSS Custom Property |
-| ---------- | --------- | ------------------- | ------------------- |
-| spacing-xs | `0.25rem` | Extra Small Spacing | `var(--spacing-xs)` |
-| spacing-s  | `0.5rem`  | Small Spacing       | `var(--spacing-xs)` |
-| spacing-m  | `1rem`    | Medium Spacing      | `var(--spacing-m)`  |
-| spacing-l  | `1.5rem`  | Large Spacing       | `var(--spacing-l)`  |
-| spacing-xl | `2rem`    | Extra Large Spacing | `var(--spacing-xl)` |
-
-## Depth _(z-index)_
-
-_Draft_
-
-| Property    | Value | Description | CSS Custom Property  | Example                                        |
-| ----------- | ----- | ----------- | -------------------- | ---------------------------------------------- |
-| depth-modal | `40`  | For modals  | `var(--depth-modal)` | ![depth modal example](/depth/depth-modal.jpg) |
