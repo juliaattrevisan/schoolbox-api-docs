@@ -42,6 +42,14 @@ class Hydrator extends BaseHydrator
      */
     public const BASE_TYPE = 'user';
 
+    public const SUB_TYPES = [
+        // Filter types and subtypes are defined in ResultTypes.ts.  The subtypes below must match that file.
+        'user.guest',
+        'user.parent',
+        'user.staff',
+        'user.student',
+    ];
+
     /**
      * Constructor
      *
@@ -67,20 +75,6 @@ class Hydrator extends BaseHydrator
     public function getBaseType(): string
     {
         return self::BASE_TYPE;
-    }
-
-    /**
-     * @return array
-     */
-    public static function getFilterSubtypes(): array
-    {
-        return [
-            // Filter types and subtypes are defined in ResultTypes.ts.  The subtypes below must match that file.
-            'user.guest',
-            'user.parent',
-            'user.staff',
-            'user.student',
-        ];
     }
 
     /**

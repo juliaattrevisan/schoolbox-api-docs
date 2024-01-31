@@ -27,6 +27,8 @@ abstract class BaseHydrator implements IHydrator
      */
     public const DESCRIPTION_LENGTH = 300;
 
+    public const SUB_TYPES = [];
+
     /**
      * For use in multibyte string manipulations.
      */
@@ -49,14 +51,6 @@ abstract class BaseHydrator implements IHydrator
      * @return string
      */
     abstract protected function getBaseType(): string;
-
-    /**
-     * @return array
-     */
-    public static function getFilterSubtypes(): array
-    {
-        return []; // No subtypes by default.
-    }
 
     /**
      * Helper for building a base URL for use across hydrators.

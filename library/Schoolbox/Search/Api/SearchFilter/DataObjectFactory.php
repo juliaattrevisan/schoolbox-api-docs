@@ -53,10 +53,10 @@ class DataObjectFactory
                 $typesAsKeys = array_fill_keys($types, null);
                 foreach (array_keys($typesAsKeys) as $type) {
                     $subtypesToAdd = match ($type) {
-                        'assessment' => ResultType\Assessment\Hydrator::getFilterSubTypes(),
-                        'file' => ResultType\File\Hydrator::getFilterSubTypes(),
-                        'page' => ResultType\Page\Hydrator::getFilterSubTypes(),
-                        'user' => ResultType\User\Hydrator::getFilterSubTypes(),
+                        'assessment' => ResultType\Assessment\Hydrator::SUB_TYPES,
+                        'file' => ResultType\File\Hydrator::SUB_TYPES,
+                        'page' => ResultType\Page\Hydrator::SUB_TYPES,
+                        'user' => ResultType\User\Hydrator::SUB_TYPES,
                         default => [],
                     };
                     foreach ($subtypesToAdd as $subtypeToAdd) {
