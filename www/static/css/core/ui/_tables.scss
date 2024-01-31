@@ -368,8 +368,8 @@ $rotate-span-width: 11rem;
         > div {
             transform: skew(-#{$rotate-angle}deg, 0deg);
             overflow: hidden;
-            border: 0 solid #ccc;
-            border-right-width: 1px;
+            border: 0 solid $body-bg;
+            border-right-width: 2px;
             z-index: 1;
             position: relative;
             height: 100%;
@@ -377,6 +377,10 @@ $rotate-span-width: 11rem;
             left: $rotate-width + 0.5;
             filter: none !important;
             background-color: $white;
+
+            &:not(:empty) {
+                border-bottom-width: 2px;
+            }
 
             > span {
                 $rotate-angle-complement: 360 - $rotate-angle;
@@ -514,8 +518,7 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 #rubric-marksheet.diagonal-headings-table {
     /* To prevent vertical border lines from showing over the diagonal table headings. */
     thead th {
-        border-left: 0;
-        border-right: 0;
+        border: 0;
     }
 
     thead th:nth-child(1) div,
@@ -542,6 +545,12 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     th,
     td {
         border: 1px solid $body-bg;
+    }
+
+    /* The first row should have no border at the top. */
+    tbody tr:first-child th,
+    tbody tr:first-child td {
+        border-top: 0;
     }
 
     th:nth-child(1),
