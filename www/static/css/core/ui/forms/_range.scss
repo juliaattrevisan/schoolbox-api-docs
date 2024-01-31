@@ -30,7 +30,7 @@
     /******** Chrome, Safari, Opera and Edge Chromium styles ********/
     /* slider track */
     &__input::-webkit-slider-runnable-track {
-        background-color: var(--content-ui-hover);
+        background-color: var(--content-ui-background);
         border-radius: var(--roundness-inputs);
         height: 1rem;
     }
@@ -54,7 +54,7 @@
     /*********** Firefox styles ***********/
     /* slider track */
     &__input::-moz-range-track {
-        background-color: var(--content-ui-hover);
+        background-color: var(--content-ui-background);
         border-radius: 0rem;
         height: 1rem;
     }
