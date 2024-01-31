@@ -249,6 +249,9 @@ class IndexBuilder extends App
                 ResultType\Link\Hydrator::BASE_TYPE,
                 ResultType\News\Hydrator::BASE_TYPE,
                 ResultType\Textbox\Hydrator::BASE_TYPE,
+                ResultType\Page\Hydrator::BASE_TYPE,
+                ResultType\Tile\Hydrator::BASE_TYPE,
+                ResultType\User\Hydrator::BASE_TYPE,
             ]
         );
         echo <<<HELP
