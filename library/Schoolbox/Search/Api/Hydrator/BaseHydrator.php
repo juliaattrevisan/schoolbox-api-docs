@@ -43,7 +43,7 @@ abstract class BaseHydrator implements IHydrator
     public function accepts(RawResult $match): bool
     {
         // Using static:: instead of self:: ensures the value comes from the child class (if it is defined there).
-        return $match->type === static::BASE_TYPE || str_starts_with($match->type, static::BASE_TYPE. '.');
+        return $match->type === static::BASE_TYPE || str_starts_with($match->type, static::BASE_TYPE . '.');
     }
 
     /**
