@@ -100,10 +100,9 @@ class Kernel extends CliKernelAbstract
      * Run the app
      *
      * @param null|bool $forcePerform Allow invoking script to force the App to run in 'perform' mode
-     * @param bool      $useDefaultAppSetup Set to false to avoid app options set in CliTool\App->setup() being overridden.
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function runApp(bool $forcePerform = false, $useDefaultAppSetup = true): void
+    public function runApp(bool $forcePerform = false): void
     {
         $requiredUser = $this->app->getRequiredProcessUser();
         if ($requiredUser !== null) {
@@ -117,9 +116,7 @@ class Kernel extends CliKernelAbstract
             }
         }
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
-        if (!$useDefaultAppSetup) {
-            $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
-        }
+        $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
     }
 
