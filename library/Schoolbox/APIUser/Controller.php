@@ -13,6 +13,7 @@ namespace Schoolbox\APIUser;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
+use Schoolbox\Collection;
 use Schoolbox\Group\API\ModelToArray;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Campus;
@@ -30,6 +31,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
+use Schoolbox\YearLevel\Model as YearLevelModel;
 use Timetable_ColourMapper;
 use UnexpectedValueException;
 
@@ -104,6 +106,23 @@ class Controller extends Base
         // E.g. We want    JSON like this: [{id: 123, ...}, {id: 456, ...}]
         //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
         $groupsArr->reindex();
+
+        $linkedUserYearLevelIds = [];
+        foreach ($user->getLinkedUsers() as $linkedUser) {
+            $linkedUserYearLevelId = $linkedUser->getYear()?->getId();
+            if ($linkedUserYearLevelId !== null) {
+                $linkedUserYearLevelIds[] = $linkedUserYearLevelId;
+            }
+        }
+
+        // Hydrate year levels on linked user objects.
+        $yearLevelById = $this->getYearLevelById($linkedUserYearLevelIds);
+        foreach ($user->getLinkedUsers() as $linkedUser) {
+            $yearId = $linkedUser->getYear()?->getId();
+            if ($yearId !== null) {
+                $linkedUser->setYear($yearLevelById[$linkedUser->getYear()->getId()]);
+            }
+        }
 
         /**
          * build the whole thing
@@ -468,5 +487,34 @@ class Controller extends Base
                 ]
             ]
         );
+    }
+
+    /**
+     * Return a collection of hydrated YearLevel objects, indexed by id.
+     * @param array $yearLevelIds
+     * @return array
+     */
+    private function getYearLevelById(array $yearLevelIds): array
+    {
+        if (count($yearLevelIds) === 0) {
+            return [];
+        }
+
+        $yearLevels = new Collection();
+        foreach ($yearLevelIds as $yearLevelId) {
+            $yearLevel = new YearLevelModel();
+            $yearLevel->setId($yearLevelId);
+            $yearLevels[] = $yearLevel;
+        }
+
+        $yearLevelMapper = new YearLevelMapper();
+        $yearLevels = $yearLevelMapper->hydrateCollection($yearLevels);
+
+        $yearLevelById = [];
+        foreach ($yearLevels as $yearLevel) {
+            $yearLevelById[$yearLevel->getId()] = $yearLevel;
+        }
+
+        return $yearLevelById;
     }
 }

@@ -396,8 +396,6 @@ class UserMapper extends Mapper
         /** @var CampusMapper $campusMapper */
         $campusMapper = $this->getJoinMapper('userCampus');
 
-        $linkedUserYearLevelIds = [];
-
         foreach ($statement as $row) {
             $userId = $row['id'];
 
@@ -441,11 +439,6 @@ class UserMapper extends Mapper
             $linkedUser = $this->hydrate($row, 'lu');
 
             if ($linkedUser) {
-                $linkedUserYearLevelId = $linkedUser->getYear()?->getId();
-                if ($linkedUserYearLevelId !== null) {
-                    $linkedUserYearLevelIds[] = $linkedUserYearLevelId;
-                }
-
                 // Don't double add
                 $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
 
@@ -464,17 +457,6 @@ class UserMapper extends Mapper
 
                 $portrait->setMimetype($mime);
                 $users[$userId]->setPortrait($portrait);
-            }
-        }
-
-        // Hydrate year levels on linked user objects.
-        $yearLevelById = $this->getYearLevelById($linkedUserYearLevelIds);
-        foreach ($users as $user) {
-            foreach ($user->getLinkedUsers() as $linkedUser) {
-                $yearId = $linkedUser->getYear()?->getId();
-                if ($yearId !== null) {
-                    $linkedUser->setYear($yearLevelById[$linkedUser->getYear()->getId()]);
-                }
             }
         }
 
@@ -1142,34 +1124,5 @@ class UserMapper extends Mapper
         }
 
         return true;
-    }
-
-    /**
-     * Return a collection of hydrated YearLevel objects, indexed by id.
-     * @param array $yearLevelIds
-     * @return array
-     */
-    private function getYearLevelById(array $yearLevelIds): array
-    {
-        if (count($yearLevelIds) === 0) {
-            return [];
-        }
-
-        $yearLevels = new Collection();
-        foreach ($yearLevelIds as $yearLevelId) {
-            $yearLevel = new YearLevel\Model();
-            $yearLevel->setId($yearLevelId);
-            $yearLevels[] = $yearLevel;
-        }
-
-        $yearLevelMapper = new YearLevel\Mapper();
-        $yearLevels = $yearLevelMapper->hydrateCollection($yearLevels);
-
-        $yearLevelById = [];
-        foreach ($yearLevels as $yearLevel) {
-            $yearLevelById[$yearLevel->getId()] = $yearLevel;
-        }
-
-        return $yearLevelById;
     }
 }
