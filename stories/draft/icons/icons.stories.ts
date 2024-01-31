@@ -957,172 +957,1198 @@ export const Icons: Story = {
             </defs>
         </svg>
 
-        <div class="l-flex-row l-gap-m">
-            <svg class="icon-add"><use xlink:href="#icon-add"></use></svg>
-            <svg class="icon-advanced-list"><use xlink:href="#icon-advanced-list"></use></svg>
-            <svg class="icon-alert"><use xlink:href="#icon-alert"></use></svg>
-            <svg class="icon-anchor"><use xlink:href="#icon-anchor"></use></svg>
-            <svg class="icon-approve"><use xlink:href="#icon-approve"></use></svg>
-            <svg class="icon-archive"><use xlink:href="#icon-archive"></use></svg>
-            <svg class="icon-attach"><use xlink:href="#icon-attach"></use></svg>
-            <svg class="icon-audio"><use xlink:href="#icon-audio"></use></svg>
-            <svg class="icon-badge"><use xlink:href="#icon-badge"></use></svg>
-            <svg class="icon-boarder-leave"><use xlink:href="#icon-boarder-leave"></use></svg>
-            <svg class="icon-breadcrumbs"><use xlink:href="#icon-breadcrumbs"></use></svg>
-            <svg class="icon-calendar"><use xlink:href="#icon-calendar"></use></svg>
-            <svg class="icon-canvas-lms"><use xlink:href="#icon-canvas-lms"></use></svg>
-            <svg class="icon-chat"><use xlink:href="#icon-chat"></use></svg>
-            <svg class="icon-class-list"><use xlink:href="#icon-class-list"></use></svg>
-            <svg class="icon-click-view"><use xlink:href="#icon-click-view"></use></svg>
-            <svg class="icon-clipboard"><use xlink:href="#icon-clipboard"></use></svg>
-            <svg class="icon-close"><use xlink:href="#icon-close"></use></svg>
-            <svg class="icon-cloud"><use xlink:href="#icon-cloud"></use></svg>
-            <svg class="icon-collab-docs"><use xlink:href="#icon-collab-docs"></use></svg>
-            <svg class="icon-collapse"><use xlink:href="#icon-collapse"></use></svg>
-            <svg class="icon-comment"><use xlink:href="#icon-comment"></use></svg>
-            <svg class="icon-components"><use xlink:href="#icon-components"></use></svg>
-            <svg class="icon-copy"><use xlink:href="#icon-copy"></use></svg>
-            <svg class="icon-countdown"><use xlink:href="#icon-countdown"></use></svg>
-            <svg class="icon-course-builder"><use xlink:href="#icon-course-builder"></use></svg>
-            <svg class="icon-course-outline"><use xlink:href="#icon-course-outline"></use></svg>
-            <svg class="icon-criteria"><use xlink:href="#icon-criteria"></use></svg>
-            <svg class="icon-curriculum"><use xlink:href="#icon-curriculum"></use></svg>
-            <svg class="icon-curriculum-details"><use xlink:href="#icon-curriculum-details"></use></svg>
-            <svg class="icon-danger"><use xlink:href="#icon-danger"></use></svg>
-            <svg class="icon-day-view"><use xlink:href="#icon-day-view"></use></svg>
-            <svg class="icon-delete"><use xlink:href="#icon-delete"></use></svg>
-            <svg class="icon-directory"><use xlink:href="#icon-directory"></use></svg>
-            <svg class="icon-division"><use xlink:href="#icon-division"></use></svg>
-            <svg class="icon-document"><use xlink:href="#icon-document"></use></svg>
-            <svg class="icon-dollar"><use xlink:href="#icon-dollar"></use></svg>
-            <svg class="icon-down-arrow"><use xlink:href="#icon-down-arrow"></use></svg>
-            <svg class="icon-download"><use xlink:href="#icon-download"></use></svg>
-            <svg class="icon-drag-drop"><use xlink:href="#icon-drag-drop"></use></svg>
-            <svg class="icon-drop-box"><use xlink:href="#icon-drop-box"></use></svg>
-            <svg class="icon-dropdown"><use xlink:href="#icon-dropdown"></use></svg>
-            <svg class="icon-due-work"><use xlink:href="#icon-due-work"></use></svg>
-            <svg class="icon-edit-columns"><use xlink:href="#icon-edit-columns"></use></svg>
-            <svg class="icon-education-maintenance"><use xlink:href="#icon-education-maintenance"></use></svg>
-            <svg class="icon-email"><use xlink:href="#icon-email"></use></svg>
-            <svg class="icon-eng-second-lang"><use xlink:href="#icon-eng-second-lang"></use></svg>
-            <svg class="icon-engage-logo"><use xlink:href="#icon-engage-logo"></use></svg>
-            <svg class="icon-eportfolio"><use xlink:href="#icon-eportfolio"></use></svg>
-            <svg class="icon-equals"><use xlink:href="#icon-equals"></use></svg>
-            <svg class="icon-export"><use xlink:href="#icon-export"></use></svg>
-            <svg class="icon-external-link"><use xlink:href="#icon-external-link"></use></svg>
-            <svg class="icon-favourite"><use xlink:href="#icon-favourite"></use></svg>
-            <svg class="icon-favourite-hollow"><use xlink:href="#icon-favourite-hollow"></use></svg>
-            <svg class="icon-files"><use xlink:href="#icon-files"></use></svg>
-            <svg class="icon-filter"><use xlink:href="#icon-filter"></use></svg>
-            <svg class="icon-flame"><use xlink:href="#icon-flame"></use></svg>
-            <svg class="icon-folder"><use xlink:href="#icon-folder"></use></svg>
-            <svg class="icon-forms"><use xlink:href="#icon-forms"></use></svg>
-            <svg class="icon-forum"><use xlink:href="#icon-forum"></use></svg>
-            <svg class="icon-geosnapshot"><use xlink:href="#icon-geosnapshot"></use></svg>
-            <svg class="icon-goal"><use xlink:href="#icon-goal"></use></svg>
-            <svg class="icon-google-drive"><use xlink:href="#icon-google-drive"></use></svg>
-            <svg class="icon-grip"><use xlink:href="#icon-grip"></use></svg>
-            <svg class="icon-group"><use xlink:href="#icon-group"></use></svg>
-            <svg class="icon-group-managers"><use xlink:href="#icon-group-managers"></use></svg>
-            <svg class="icon-heart-like"><use xlink:href="#icon-heart-like"></use></svg>
-            <svg class="icon-help"><use xlink:href="#icon-help"></use></svg>
-            <svg class="icon-hidden"><use xlink:href="#icon-hidden"></use></svg>
-            <svg class="icon-history"><use xlink:href="#icon-history"></use></svg>
-            <svg class="icon-home"><use xlink:href="#icon-home"></use></svg>
-            <svg class="icon-homepagefeed"><use xlink:href="#icon-homepagefeed"></use></svg>
-            <svg class="icon-image"><use xlink:href="#icon-image"></use></svg>
-            <svg class="icon-image-gallery"><use xlink:href="#icon-image-gallery"></use></svg>
-            <svg class="icon-image-slideshow"><use xlink:href="#icon-image-slideshow"></use></svg>
-            <svg class="icon-info"><use xlink:href="#icon-info"></use></svg>
-            <svg class="icon-integration-student"><use xlink:href="#icon-integration-student"></use></svg>
-            <svg class="icon-intellischool"><use xlink:href="#icon-intellischool"></use></svg>
-            <svg class="icon-international-baccalaureate"><use xlink:href="#icon-international-baccalaureate"></use></svg>
-            <svg class="icon-international-student"><use xlink:href="#icon-international-student"></use></svg>
-            <svg class="icon-lesson-plan"><use xlink:href="#icon-lesson-plan"></use></svg>
-            <svg class="icon-link"><use xlink:href="#icon-link"></use></svg>
-            <svg class="icon-list"><use xlink:href="#icon-list"></use></svg>
-            <svg class="icon-list-view"><use xlink:href="#icon-list-view"></use></svg>
-            <svg class="icon-live-marks"><use xlink:href="#icon-live-marks"></use></svg>
-            <svg class="icon-location"><use xlink:href="#icon-location"></use></svg>
-            <svg class="icon-locked"><use xlink:href="#icon-locked"></use></svg>
-            <svg class="icon-logout"><use xlink:href="#icon-logout"></use></svg>
-            <svg class="icon-lti"><use xlink:href="#icon-lti"></use></svg>
-            <svg class="icon-match"><use xlink:href="#icon-match"></use></svg>
-            <svg class="icon-medical"><use xlink:href="#icon-medical"></use></svg>
-            <svg class="icon-menu"><use xlink:href="#icon-menu"></use></svg>
-            <svg class="icon-mic"><use xlink:href="#icon-mic"></use></svg>
-            <svg class="icon-mic-muted"><use xlink:href="#icon-mic-muted"></use></svg>
-            <svg class="icon-mic-recording"><use xlink:href="#icon-mic-recording"></use></svg>
-            <svg class="icon-microsoft-teams"><use xlink:href="#icon-microsoft-teams"></use></svg>
-            <svg class="icon-mobile"><use xlink:href="#icon-mobile"></use></svg>
-            <svg class="icon-modify-pen"><use xlink:href="#icon-modify-pen"></use></svg>
-            <svg class="icon-month-view"><use xlink:href="#icon-month-view"></use></svg>
-            <svg class="icon-more"><use xlink:href="#icon-more"></use></svg>
-            <svg class="icon-mostly-cloudy"><use xlink:href="#icon-mostly-cloudy"></use></svg>
-            <svg class="icon-mute"><use xlink:href="#icon-mute"></use></svg>
-            <svg class="icon-network"><use xlink:href="#icon-network"></use></svg>
-            <svg class="icon-news"><use xlink:href="#icon-news"></use></svg>
-            <svg class="icon-next"><use xlink:href="#icon-next"></use></svg>
-            <svg class="icon-notifications"><use xlink:href="#icon-notifications"></use></svg>
-            <svg class="icon-notifications-hollow"><use xlink:href="#icon-notifications-hollow"></use></svg>
-            <svg class="icon-office-365"><use xlink:href="#icon-office-365"></use></svg>
-            <svg class="icon-open"><use xlink:href="#icon-open"></use></svg>
-            <svg class="icon-pause"><use xlink:href="#icon-pause"></use></svg>
-            <svg class="icon-phone"><use xlink:href="#icon-phone"></use></svg>
-            <svg class="icon-phone"><use xlink:href="#icon-phone"></use></svg>
-            <svg class="icon-pin-hollow"><use xlink:href="#icon-pin-hollow"></use></svg>
-            <svg class="icon-pinterest"><use xlink:href="#icon-pinterest"></use></svg>
-            <svg class="icon-podcast"><use xlink:href="#icon-podcast"></use></svg>
-            <svg class="icon-poll"><use xlink:href="#icon-poll"></use></svg>
-            <svg class="icon-position"><use xlink:href="#icon-position"></use></svg>
-            <svg class="icon-previous"><use xlink:href="#icon-previous"></use></svg>
-            <svg class="icon-print"><use xlink:href="#icon-print"></use></svg>
-            <svg class="icon-progress"><use xlink:href="#icon-progress"></use></svg>
-            <svg class="icon-project"><use xlink:href="#icon-project"></use></svg>
-            <svg class="icon-quiz"><use xlink:href="#icon-quiz"></use></svg>
-            <svg class="icon-rain"><use xlink:href="#icon-rain"></use></svg>
-            <svg class="icon-random-image"><use xlink:href="#icon-random-image"></use></svg>
-            <svg class="icon-reach"><use xlink:href="#icon-reach"></use></svg>
-            <svg class="icon-refresh"><use xlink:href="#icon-refresh"></use></svg>
-            <svg class="icon-reply"><use xlink:href="#icon-reply"></use></svg>
-            <svg class="icon-resource-booking"><use xlink:href="#icon-resource-booking"></use></svg>
-            <svg class="icon-rss"><use xlink:href="#icon-rss"></use></svg>
-            <svg class="icon-schoolbox"><use xlink:href="#icon-schoolbox"></use></svg>
-            <svg class="icon-screen-capture"><use xlink:href="#icon-screen-capture"></use></svg>
-            <svg class="icon-search"><use xlink:href="#icon-search"></use></svg>
-            <svg class="icon-settings"><use xlink:href="#icon-settings"></use></svg>
-            <svg class="icon-share"><use xlink:href="#icon-share"></use></svg>
-            <svg class="icon-showcase"><use xlink:href="#icon-showcase"></use></svg>
-            <svg class="icon-shuffle"><use xlink:href="#icon-shuffle"></use></svg>
-            <svg class="icon-social-stream"><use xlink:href="#icon-social-stream"></use></svg>
-            <svg class="icon-sort-up"><use xlink:href="#icon-sort-up"></use></svg>
-            <svg class="icon-sport"><use xlink:href="#icon-sport"></use></svg>
-            <svg class="icon-staff"><use xlink:href="#icon-staff"></use></svg>
-            <svg class="icon-staff-students"><use xlink:href="#icon-staff-students"></use></svg>
-            <svg class="icon-sun"><use xlink:href="#icon-sun"></use></svg>
-            <svg class="icon-surveys"><use xlink:href="#icon-surveys"></use></svg>
-            <svg class="icon-synergetic"><use xlink:href="#icon-synergetic"></use></svg>
-            <svg class="icon-task"><use xlink:href="#icon-task"></use></svg>
-            <svg class="icon-teacher"><use xlink:href="#icon-teacher"></use></svg>
-            <svg class="icon-textbox"><use xlink:href="#icon-textbox"></use></svg>
-            <svg class="icon-thunder"><use xlink:href="#icon-thunder"></use></svg>
-            <svg class="icon-tiles"><use xlink:href="#icon-tiles"></use></svg>
-            <svg class="icon-time-value"><use xlink:href="#icon-time-value"></use></svg>
-            <svg class="icon-timetable"><use xlink:href="#icon-timetable"></use></svg>
-            <svg class="icon-twitter"><use xlink:href="#icon-twitter"></use></svg>
-            <svg class="icon-undo"><use xlink:href="#icon-undo"></use></svg>
-            <svg class="icon-unit"><use xlink:href="#icon-unit"></use></svg>
-            <svg class="icon-unlocked"><use xlink:href="#icon-unlocked"></use></svg>
-            <svg class="icon-up-arrow"><use xlink:href="#icon-up-arrow"></use></svg>
-            <svg class="icon-up-down"><use xlink:href="#icon-up-down"></use></svg>
-            <svg class="icon-upload"><use xlink:href="#icon-upload"></use></svg>
-            <svg class="icon-video"><use xlink:href="#icon-video"></use></svg>
-            <svg class="icon-video-error"><use xlink:href="#icon-video-error"></use></svg>
-            <svg class="icon-view"><use xlink:href="#icon-view"></use></svg>
-            <svg class="icon-week-view"><use xlink:href="#icon-week-view"></use></svg>
-            <svg class="icon-wiki"><use xlink:href="#icon-wiki"></use></svg>
-            <svg class="icon-withdraw-achievement"><use xlink:href="#icon-withdraw-achievement"></use></svg>
-            <svg class="icon-wolfram-alpha"><use xlink:href="#icon-wolfram-alpha"></use></svg>
+        <div class="l-flex-row align-center">
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-add"><use xlink:href="#icon-add"></use></svg>
+                </div>
+                <p>add</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-advanced-list"><use xlink:href="#icon-advanced-list"></use></svg>
+                </div>
+                <p>advanced-list</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-alert"><use xlink:href="#icon-alert"></use></svg>
+                </div>
+                <p>alert</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-anchor"><use xlink:href="#icon-anchor"></use></svg>
+                </div>
+                <p>anchor</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-approve"><use xlink:href="#icon-approve"></use></svg>
+                </div>
+                <p>approve</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-archive"><use xlink:href="#icon-archive"></use></svg>
+                </div>
+                <p>archive</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-attach"><use xlink:href="#icon-attach"></use></svg>
+                </div>
+                <p>attach</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-audio"><use xlink:href="#icon-audio"></use></svg>
+                </div>
+                <p>audio</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-badge"><use xlink:href="#icon-badge"></use></svg>
+                </div>
+                <p>badge</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-boarder-leave"><use xlink:href="#icon-boarder-leave"></use></svg>
+                </div>
+                <p>boarder-leave</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-breadcrumbs"><use xlink:href="#icon-breadcrumbs"></use></svg>
+                </div>
+                <p>breadcrumbs</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-calendar"><use xlink:href="#icon-calendar"></use></svg>
+                </div>
+                <p>calendar</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-chat"><use xlink:href="#icon-chat"></use></svg>
+                </div>
+                <p>chat</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-class-list"><use xlink:href="#icon-class-list"></use></svg>
+                </div>
+                <p>class-list</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-click-view"><use xlink:href="#icon-click-view"></use></svg>
+                </div>
+                <p>click-view</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-clipboard"><use xlink:href="#icon-clipboard"></use></svg>
+                </div>
+                <p>clipboard</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-close"><use xlink:href="#icon-close"></use></svg>
+                </div>
+                <p>close</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-cloud"><use xlink:href="#icon-cloud"></use></svg>
+                </div>
+                <p>cloud</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-collab-docs"><use xlink:href="#icon-collab-docs"></use></svg>
+                </div>
+                <p>collab-docs</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-collapse"><use xlink:href="#icon-collapse"></use></svg>
+                </div>
+                <p>collapse</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-comment"><use xlink:href="#icon-comment"></use></svg>
+                </div>
+                <p>comment</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-components"><use xlink:href="#icon-components"></use></svg>
+                </div>
+                <p>components</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-copy"><use xlink:href="#icon-copy"></use></svg>
+                </div>
+                <p>copy</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-countdown"><use xlink:href="#icon-countdown"></use></svg>
+                </div>
+                <p>countdown</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-course-builder"><use xlink:href="#icon-course-builder"></use></svg>
+                </div>
+                <p>course-builder</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-course-outline"><use xlink:href="#icon-course-outline"></use></svg>
+                </div>
+                <p>course-outline</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-criteria"><use xlink:href="#icon-criteria"></use></svg>
+                </div>
+                <p>criteria</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-curriculum"><use xlink:href="#icon-curriculum"></use></svg>
+                </div>
+                <p>curriculum</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-curriculum-details"><use xlink:href="#icon-curriculum-details"></use></svg>
+                </div>
+                <p>curriculum-details</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-danger"><use xlink:href="#icon-danger"></use></svg>
+                </div>
+                <p>danger</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-day-view"><use xlink:href="#icon-day-view"></use></svg>
+                </div>
+                <p>day-view</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-delete"><use xlink:href="#icon-delete"></use></svg>
+                </div>
+                <p>delete</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-directory"><use xlink:href="#icon-directory"></use></svg>
+                </div>
+                <p>directory</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-division"><use xlink:href="#icon-division"></use></svg>
+                </div>
+                <p>division</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-document"><use xlink:href="#icon-document"></use></svg>
+                </div>
+                <p>document</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-dollar"><use xlink:href="#icon-dollar"></use></svg>
+                </div>
+                <p>dollar</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-dollar"><use xlink:href="#icon-dollar"></use></svg>
+                </div>
+                <p>dollar</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-down-arrow"><use xlink:href="#icon-down-arrow"></use></svg>
+                </div>
+                <p>down-arrow</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-download"><use xlink:href="#icon-download"></use></svg>
+                </div>
+                <p>download</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-drag-drop"><use xlink:href="#icon-drag-drop"></use></svg>
+                </div>
+                <p>drag-drop</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-drop-box"><use xlink:href="#icon-drop-box"></use></svg>
+                </div>
+                <p>drop-box</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-dropdown"><use xlink:href="#icon-dropdown"></use></svg>
+                </div>
+                <p>dropdown</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-due-work"><use xlink:href="#icon-due-work"></use></svg>
+                </div>
+                <p>due-work</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-edit-columns"><use xlink:href="#icon-edit-columns"></use></svg>
+                </div>
+                <p>edit-columns</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-education-maintenance"><use xlink:href="#icon-education-maintenance"></use></svg>
+                </div>
+                <p>education-maintenance</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-education-maintenance"><use xlink:href="#icon-education-maintenance"></use></svg>
+                </div>
+                <p>education-maintenance</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-email"><use xlink:href="#icon-email"></use></svg>
+                </div>
+                <p>email</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-eng-second-lang"><use xlink:href="#icon-eng-second-lang"></use></svg>
+                </div>
+                <p>eng-second-lang</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-engage-logo"><use xlink:href="#icon-engage-logo"></use></svg>
+                </div>
+                <p>engage-logo</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-eportfolio"><use xlink:href="#icon-eportfolio"></use></svg>
+                </div>
+                <p>eportfolio</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-eng-second-lang"><use xlink:href="#icon-eng-second-lang"></use></svg>
+                </div>
+                <p>eng-second-lang</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-equals"><use xlink:href="#icon-equals"></use></svg>
+                </div>
+                <p>equals</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-export"><use xlink:href="#icon-export"></use></svg>
+                </div>
+                <p>export</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-external-link"><use xlink:href="#icon-external-link"></use></svg>
+                </div>
+                <p>external-link</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-favourite"><use xlink:href="#icon-favourite"></use></svg>
+                </div>
+                <p>favourite</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-favourite-hollow"><use xlink:href="#icon-favourite-hollow"></use></svg>
+                </div>
+                <p>favourite-hollow</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-files"><use xlink:href="#icon-files"></use></svg>
+                </div>
+                <p>files</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-filter"><use xlink:href="#icon-filter"></use></svg>
+                </div>
+                <p>filter</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-flame"><use xlink:href="#icon-flame"></use></svg>
+                </div>
+                <p>flame</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-folder"><use xlink:href="#icon-folder"></use></svg>
+                </div>
+                <p>folder</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-forms"><use xlink:href="#icon-forms"></use></svg>
+                </div>
+                <p>forms</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-forum"><use xlink:href="#icon-forum"></use></svg>
+                </div>
+                <p>forum</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-forum"><use xlink:href="#icon-forum"></use></svg>
+                </div>
+                <p>forum</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-geosnapshot"><use xlink:href="#icon-geosnapshot"></use></svg>
+                </div>
+                <p>geosnapshot</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-goal"><use xlink:href="#icon-goal"></use></svg>
+                </div>
+                <p>goal</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-google-drive"><use xlink:href="#icon-google-drive"></use></svg>
+                </div>
+                <p>google-drive</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-grip"><use xlink:href="#icon-grip"></use></svg>
+                </div>
+                <p>grip</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-group"><use xlink:href="#icon-group"></use></svg>
+                </div>
+                <p>group</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-group-managers"><use xlink:href="#icon-group-managers"></use></svg>
+                </div>
+                <p>group-managers</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-heart-like"><use xlink:href="#icon-heart-like"></use></svg>
+                </div>
+                <p>heart-like</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-help"><use xlink:href="#icon-help"></use></svg>
+                </div>
+                <p>help</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-week-view"><use xlink:href="#icon-week-view"></use></svg>
+                </div>
+                <p>week-view</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-wiki"><use xlink:href="#icon-wiki"></use></svg>
+                </div>
+                <p>wiki</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-withdraw-achievement"><use xlink:href="#icon-withdraw-achievement"></use></svg>
+                </div>
+                <p>withdraw-achievement</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-wolfram-alpha"><use xlink:href="#icon-wolfram-alpha"></use></svg>
+                </div>
+                <p>wolfram-alpha</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-hidden"><use xlink:href="#icon-hidden"></use></svg>
+                </div>
+                <p>hidden</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-history"><use xlink:href="#icon-history"></use></svg>
+                </div>
+                <p>history</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-home"><use xlink:href="#icon-home"></use></svg>
+                </div>
+                <p>home</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-homepagefeed"><use xlink:href="#icon-homepagefeed"></use></svg>
+                </div>
+                <p>homepagefeed</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-image"><use xlink:href="#icon-image"></use></svg>
+                </div>
+                <p>image</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-image-gallery"><use xlink:href="#icon-image-gallery"></use></svg>
+                </div>
+                <p>image-gallery</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-image-slideshow"><use xlink:href="#icon-image-slideshow"></use></svg>
+                </div>
+                <p>image-slideshow</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-info"><use xlink:href="#icon-info"></use></svg>
+                </div>
+                <p>info</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-integration-student"><use xlink:href="#icon-integration-student"></use></svg>
+                </div>
+                <p>integration-student</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-intellischool"><use xlink:href="#icon-intellischool"></use></svg>
+                </div>
+                <p>intellischool</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-international-baccalaureate"><use xlink:href="#icon-international-baccalaureate"></use></svg>
+                </div>
+                <p>international-baccalaureate</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-international-student"><use xlink:href="#icon-international-student"></use></svg>
+                </div>
+                <p>international-student</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-lesson-plan"><use xlink:href="#icon-lesson-plan"></use></svg>
+                </div>
+                <p>lesson-plan</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-link"><use xlink:href="#icon-link"></use></svg>
+                </div>
+                <p>link</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-list"><use xlink:href="#icon-list"></use></svg>
+                </div>
+                <p>list</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-list-view"><use xlink:href="#icon-list-view"></use></svg>
+                </div>
+                <p>list-view</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-live-marks"><use xlink:href="#icon-live-marks"></use></svg>
+                </div>
+                <p>live-marks</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-location"><use xlink:href="#icon-location"></use></svg>
+                </div>
+                <p>location</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-locked"><use xlink:href="#icon-locked"></use></svg>
+                </div>
+                <p>locked</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-logout"><use xlink:href="#icon-logout"></use></svg>
+                </div>
+                <p>logout</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-lti"><use xlink:href="#icon-lti"></use></svg>
+                </div>
+                <p>lti</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-match"><use xlink:href="#icon-match"></use></svg>
+                </div>
+                <p>match</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-medical"><use xlink:href="#icon-medical"></use></svg>
+                </div>
+                <p>medical</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-menu"><use xlink:href="#icon-menu"></use></svg>
+                </div>
+                <p>menu</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-mic"><use xlink:href="#icon-mic"></use></svg>
+                </div>
+                <p>mic</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-mic-muted"><use xlink:href="#icon-mic-muted"></use></svg>
+                </div>
+                <p>mic-muted</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-mic-recording"><use xlink:href="#icon-mic-recording"></use></svg>
+                </div>
+                <p>mic-recording</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-microsoft-teams"><use xlink:href="#icon-microsoft-teams"></use></svg>
+                </div>
+                <p>microsoft-teams</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-mobile"><use xlink:href="#icon-mobile"></use></svg>
+                </div>
+                <p>mobile</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-modify-pen"><use xlink:href="#icon-modify-pen"></use></svg>
+                </div>
+                <p>modify-pen</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-month-view"><use xlink:href="#icon-month-view"></use></svg>
+                </div>
+                <p>month-view</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-more"><use xlink:href="#icon-more"></use></svg>
+                </div>
+                <p>more</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-mostly-cloudy"><use xlink:href="#icon-mostly-cloudy"></use></svg>
+                </div>
+                <p>mostly-cloudy</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-mute"><use xlink:href="#icon-mute"></use></svg>
+                </div>
+                <p>mute</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-network"><use xlink:href="#icon-network"></use></svg>
+                </div>
+                <p>network</p>
+            </div>
+            <div class="box-icon-wrapper">
+            <div class="box-icon">
+                <svg class="icon-news"><use xlink:href="#icon-news"></use></svg>
+            </div>
+            <p>news</p>
+        </div>
+
+        <div class="box-icon-wrapper">
+            <div class="box-icon">
+                <svg class="icon-next"><use xlink:href="#icon-next"></use></svg>
+            </div>
+            <p>next</p>
+        </div>
+
+        <div class="box-icon-wrapper">
+            <div class="box-icon">
+                <svg class="icon-notifications"><use xlink:href="#icon-notifications"></use></svg>
+            </div>
+            <p>notifications</p>
+        </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-notifications-hollow"><use xlink:href="#icon-notifications-hollow"></use></svg>
+                </div>
+                <p>notifications-hollow</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-office-365"><use xlink:href="#icon-office-365"></use></svg>
+                </div>
+                <p>office-365</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-open"><use xlink:href="#icon-open"></use></svg>
+                </div>
+                <p>open</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-pause"><use xlink:href="#icon-pause"></use></svg>
+                </div>
+                <p>pause</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-phone"><use xlink:href="#icon-phone"></use></svg>
+                </div>
+                <p>phone</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-pin-hollow"><use xlink:href="#icon-pin-hollow"></use></svg>
+                </div>
+                <p>pin-hollow</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-pinterest"><use xlink:href="#icon-pinterest"></use></svg>
+                </div>
+                <p>pinterest</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-podcast"><use xlink:href="#icon-podcast"></use></svg>
+                </div>
+                <p>podcast</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-poll"><use xlink:href="#icon-poll"></use></svg>
+                </div>
+                <p>poll</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-position"><use xlink:href="#icon-position"></use></svg>
+                </div>
+                <p>position</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-previous"><use xlink:href="#icon-previous"></use></svg>
+                </div>
+                <p>previous</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-print"><use xlink:href="#icon-print"></use></svg>
+                </div>
+                <p>print</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-progress"><use xlink:href="#icon-progress"></use></svg>
+                </div>
+                <p>progress</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-project"><use xlink:href="#icon-project"></use></svg>
+                </div>
+                <p>project</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-quiz"><use xlink:href="#icon-quiz"></use></svg>
+                </div>
+                <p>quiz</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-rain"><use xlink:href="#icon-rain"></use></svg>
+                </div>
+                <p>rain</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-random-image"><use xlink:href="#icon-random-image"></use></svg>
+                </div>
+                <p>random-image</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-reach"><use xlink:href="#icon-reach"></use></svg>
+                </div>
+                <p>reach</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-refresh"><use xlink:href="#icon-refresh"></use></svg>
+                </div>
+                <p>refresh</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-reply"><use xlink:href="#icon-reply"></use></svg>
+                </div>
+                <p>reply</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-resource-booking"><use xlink:href="#icon-resource-booking"></use></svg>
+                </div>
+                <p>resource-booking</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-rss"><use xlink:href="#icon-rss"></use></svg>
+                </div>
+                <p>rss</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-schoolbox"><use xlink:href="#icon-schoolbox"></use></svg>
+                </div>
+                <p>schoolbox</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-screen-capture"><use xlink:href="#icon-screen-capture"></use></svg>
+                </div>
+                <p>screen-capture</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-search"><use xlink:href="#icon-search"></use></svg>
+                </div>
+                <p>search</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-settings"><use xlink:href="#icon-settings"></use></svg>
+                </div>
+                <p>settings</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-share"><use xlink:href="#icon-share"></use></svg>
+                </div>
+                <p>share</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-showcase"><use xlink:href="#icon-showcase"></use></svg>
+                </div>
+                <p>showcase</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-shuffle"><use xlink:href="#icon-shuffle"></use></svg>
+                </div>
+                <p>shuffle</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-social-stream"><use xlink:href="#icon-social-stream"></use></svg>
+                </div>
+                <p>social-stream</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-sort-up"><use xlink:href="#icon-sort-up"></use></svg>
+                </div>
+                <p>sort-up</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-sport"><use xlink:href="#icon-sport"></use></svg>
+                </div>
+                <p>sport</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-staff"><use xlink:href="#icon-staff"></use></svg>
+                </div>
+                <p>staff</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-staff-students"><use xlink:href="#icon-staff-students"></use></svg>
+                </div>
+                <p>staff-students</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-sun"><use xlink:href="#icon-sun"></use></svg>
+                </div>
+                <p>sun</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-surveys"><use xlink:href="#icon-surveys"></use></svg>
+                </div>
+                <p>surveys</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-synergetic"><use xlink:href="#icon-synergetic"></use></svg>
+                </div>
+                <p>synergetic</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-task"><use xlink:href="#icon-task"></use></svg>
+                </div>
+                <p>task</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-teacher"><use xlink:href="#icon-teacher"></use></svg>
+                </div>
+                <p>teacher</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-textbox"><use xlink:href="#icon-textbox"></use></svg>
+                </div>
+                <p>textbox</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-thunder"><use xlink:href="#icon-thunder"></use></svg>
+                </div>
+                <p>thunder</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-tiles"><use xlink:href="#icon-tiles"></use></svg>
+                </div>
+                <p>tiles</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-time-value"><use xlink:href="#icon-time-value"></use></svg>
+                </div>
+                <p>time-value</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-timetable"><use xlink:href="#icon-timetable"></use></svg>
+                </div>
+                <p>timetable</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-twitter"><use xlink:href="#icon-twitter"></use></svg>
+                </div>
+                <p>twitter</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-undo"><use xlink:href="#icon-undo"></use></svg>
+                </div>
+                <p>undo</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-unit"><use xlink:href="#icon-unit"></use></svg>
+                </div>
+                <p>unit</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-unlocked"><use xlink:href="#icon-unlocked"></use></svg>
+                </div>
+                <p>unlocked</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-up-arrow"><use xlink:href="#icon-up-arrow"></use></svg>
+                </div>
+                <p>up-arrow</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-up-down"><use xlink:href="#icon-up-down"></use></svg>
+                </div>
+                <p>up-down</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-upload"><use xlink:href="#icon-upload"></use></svg>
+                </div>
+                <p>upload</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-video"><use xlink:href="#icon-video"></use></svg>
+                </div>
+                <p>video</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-video-error"><use xlink:href="#icon-video-error"></use></svg>
+                </div>
+                <p>video-error</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-view"><use xlink:href="#icon-view"></use></svg>
+                </div>
+                <p>view</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-week-view"><use xlink:href="#icon-week-view"></use></svg>
+                </div>
+                <p>week-view</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-wiki"><use xlink:href="#icon-wiki"></use></svg>
+                </div>
+                <p>wiki</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-withdraw-achievement"><use xlink:href="#icon-withdraw-achievement"></use></svg>
+                </div>
+                <p>withdraw-achievement</p>
+            </div>
+
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
+                    <svg class="icon-wolfram-alpha"><use xlink:href="#icon-wolfram-alpha"></use></svg>
+                </div>
+                <p>wolfram-alpha</p>
+            </div>
         </div>
         `,
     }),
