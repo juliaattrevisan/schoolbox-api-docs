@@ -116,6 +116,7 @@ class Controller extends Base
         }
 
         // Hydrate year levels on linked user objects.
+        // Note linked users appear in the API as 'impersonableUsers'.
         $yearLevelById = $this->getYearLevelById($linkedUserYearLevelIds);
         foreach ($user->getLinkedUsers() as $linkedUser) {
             $yearId = $linkedUser->getYear()?->getId();
