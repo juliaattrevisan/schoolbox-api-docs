@@ -27,6 +27,7 @@ class IndexBuilder extends BaseBuilder
             SELECT
                 t.id,
                 t.title_text,
+                t.link,
                 t.modified_at,
                 tlf.folder_id
             FROM tile t
@@ -60,6 +61,7 @@ class IndexBuilder extends BaseBuilder
                 $row['folder_id'],
             );
             $index = $this->addFulltextIndex($index, $row['title_text'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['link'], self::INDEX_STRATEGY_TEXT);
             yield $index;
         }
     }
