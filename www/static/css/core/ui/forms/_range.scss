@@ -46,7 +46,7 @@
         width: 2rem;
     }
 
-    &__input:focus::-webkit-slider-thumb {
+    &__input:focus-visible::-webkit-slider-thumb {
         outline: 3px solid var(--content-ui-foreground);
         outline-offset: 0.125rem;
     }
@@ -68,7 +68,7 @@
         width: 2rem;
     }
 
-    &__input:focus::-moz-range-thumb {
+    &__input:focus-visible::-moz-range-thumb {
         outline: 3px solid var(--content-ui-foreground);
         outline-offset: 0.125rem;
     }
