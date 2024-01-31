@@ -93,11 +93,6 @@ class Hydrator extends BaseHydrator
                     return null;
                 }
 
-                // Note: Search results should include disabled users only if show_disabled_users is true.
-                if (!$this->config->get('show_disabled_users') && !$user->getEnabled()) {
-                    return null;
-                }
-
                 return new FullResult(
                     $match,
                     $match->id,
