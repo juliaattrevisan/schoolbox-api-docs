@@ -21,7 +21,7 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-export const Standard: Story = {
+export const Example: Story = {
     render: () => ({
         template: `
             <div class="c-range">
