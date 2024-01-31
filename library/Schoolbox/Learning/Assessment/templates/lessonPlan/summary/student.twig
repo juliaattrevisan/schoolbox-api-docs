@@ -99,14 +99,14 @@
         </div>
     {% endif %}
 
-    {% if assessment.linkedAssessments is not empty or isInstructor %}
+    {% if assessment.linkedAssessments is not empty or modifyRoute %}
         <div class="small-12 island">
             <div id="linked-activities-container">
                 <linked-activities
                     :source-id = '{{ assessment.id }}'
                     :course-assessments = '{{ courseAssessments |json_encode }}'
                     :linked-activities = '{{ linkedAssessments |json_encode }}'
-                    :is-instructor = '{% if isInstructor %}true{% else %}false{% endif %}'
+                    :can-modify = '{% if modifyRoute %}true{% else %}false{% endif %}'
                     :grade-gradient-enable='{{ config.grade_gradient_enable ? 'true' : 'false' }}'
                 />
             </div>

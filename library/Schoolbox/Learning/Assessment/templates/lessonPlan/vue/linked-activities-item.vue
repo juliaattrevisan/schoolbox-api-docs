@@ -6,7 +6,7 @@ import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
 interface Props {
     activity: Activity;
-    isInstructor: boolean;
+    canModify: boolean;
     returnUrl: string;
 }
 
@@ -114,7 +114,7 @@ function getDataProgressTickForm(activity: Activity) {
                 v-if="activity._links !== null"
                 class="title"
                 :href="
-                    props.isInstructor && !store.isStudentView
+                    props.canModify && !store.isStudentView
                         ? activity._links.status + '?returnUrl=' + returnUrl
                         : activity._links.summary + '?returnUrl=' + returnUrl
                 "
@@ -124,7 +124,7 @@ function getDataProgressTickForm(activity: Activity) {
         </h3>
         <p class="meta">
             {{ getActivityMeta(activity) }}
-            <template v-if="activity.dueAtFormatted && props.isInstructor && !store.isStudentView">
+            <template v-if="activity.dueAtFormatted && props.canModify && !store.isStudentView">
                 |
                 <span :class="getUrgency()"
                     >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
@@ -153,7 +153,7 @@ function getDataProgressTickForm(activity: Activity) {
             :title="getProgressTickMouseoverTitle(activity)"
         ></span>
     </nav>
-    <nav v-if="isInstructor">
+    <nav v-if="props.canModify">
         <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
     </nav>
 </template>

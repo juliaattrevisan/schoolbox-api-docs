@@ -11,7 +11,7 @@ import linkedActivitiesModalItem from "./linked-activities-modal-item.vue";
 interface Props {
     courseAssessments: CourseAssessments;
     linkedActivities: Activity[];
-    isInstructor: boolean;
+    canModify: boolean;
     sourceId: number;
     gradeGradientEnable: boolean; // whether to show the student completion colour gradient on linked activities
 }
@@ -116,24 +116,24 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <h3 v-if="isInstructor || store.linkedActivities.length > 0" class="subheader">Activities</h3>
+    <h3 v-if="props.canModify || store.linkedActivities.length > 0" class="subheader">Activities</h3>
     <section v-if="store.linkedActivities.length > 0">
         <ul class="information-list">
             <li v-for="activity in store.linkedActivities" :key="activity.id" class="actions-small-1">
                 <linked-activities-item
                     :activity="activity"
-                    :is-instructor="isInstructor"
+                    :can-modify="props.canModify"
                     :return-url="returnUrl"
                 ></linked-activities-item>
             </li>
         </ul>
-        <div v-if="isInstructor" class="component-action">
+        <div v-if="props.canModify" class="component-action">
             <section>
                 <a class="button" @click.prevent="store.isOpen = true">Link Activities</a>
             </section>
         </div>
     </section>
-    <div v-else-if="isInstructor" class="empty-state">
+    <div v-else-if="props.canModify" class="empty-state">
         <i class="icon-link"></i>
         <p>
             There are currently no activities linked to this lesson. You may
@@ -143,7 +143,7 @@ window.Vue.onMounted(() => {
     </div>
 
     <sequential-reveal-modal
-        v-if="isInstructor"
+        v-if="props.canModify"
         size="medium"
         :is-open="store.isOpen"
         :is-next-selected="store.isNextSelected"
@@ -238,7 +238,7 @@ window.Vue.onMounted(() => {
     </sequential-reveal-modal>
 
     <sequential-reveal-modal
-        v-if="isInstructor"
+        v-if="props.canModify"
         size="medium"
         :is-open="store.isSingleUnlinkOpen"
         @closed="store.isSingleUnlinkOpen = false"
