@@ -9,13 +9,22 @@ declare(strict_types=1);
 
 namespace Tests\Api\Search;
 
+use Alaress\Database\Test\TestConnectorTrait;
+use Alaress\Lumberjack\Logger;
+use Aura\Di;
+use Aura\Di\Exception;
+use Aura\Di\Exception\ContainerLocked;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Di\Exception\ServiceNotObject;
 use Generator;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Comms\News\Model as News;
 use Schoolbox\Role;
 use Symfony\Component\Yaml\Yaml;
 use Tests\Support\ApiTester;
 use Schoolbox\Application\CliTool\Kernel as CliToolKernel;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Search\Api\Database\Index\CommandLineTool\IndexBuilder;
 use Schoolbox\User;
 
@@ -24,6 +33,8 @@ use Schoolbox\User;
  */
 class SearchUserCest
 {
+    use TestConnectorTrait;
+
     private News $article;
 
     public function _before(ApiTester $i)
@@ -49,7 +60,13 @@ class SearchUserCest
      * Test /api/search for users
      * @param ApiTester $i
      * @param User      $user
+     * @throws Exception
+     * @throws ContainerLocked
+     * @throws ServiceNotObject
      * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \Schoolbox\External\Exception
      */
     private function testGet(ApiTester $i, User $user): void
     {
@@ -58,11 +75,21 @@ class SearchUserCest
 
         // Must rebuild search index because we have added new users.
         // Note we only need to rebuild the search index for result type 'user', but just rebuild everything for now.
+        $this->connectSchoolbox();
         $app = new IndexBuilder();
+        $app->setup(
+            ['type' => 'user'],
+            (new Di\ContainerBuilder())->newInstance()
+                ->set('config', new ConfigLoader())
+                ->set('databaseInternal', $this->schoolbox),
+            STDOUT,
+            new Logger(),
+            false
+        );
         /** @noinspection PhpUnhandledExceptionInspection */
-        (new CliToolKernel($app, []))->runApp(true);
+        (new CliToolKernel($app, []))->runApp(true, false);
 
-        $targetUsers   = [$targetStudent, $targetStaff];
+        $targetUsers = [$targetStudent, $targetStaff];
         $i->switchUser($user);
         foreach ($targetUsers as $targetUser) {
             foreach ($this->filterData($targetUser) as $filterData) {
