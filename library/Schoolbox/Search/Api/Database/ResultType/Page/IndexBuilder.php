@@ -26,6 +26,7 @@ class IndexBuilder extends BaseBuilder
             SELECT
                 f.id,
                 f.name,
+                fc.code,
                 f.updated_at,
                 f.created_by,
                 " . $this->buildTypeExpression() . " AS type
@@ -57,6 +58,11 @@ class IndexBuilder extends BaseBuilder
                 null,
             );
             $index = $this->addFulltextIndex($index, $row['name'], self::INDEX_STRATEGY_TEXT);
+
+            if ($row['code'] && strlen($row['code']) > 0) {
+                $index = $this->addFulltextIndex($index, $row['code'], self::INDEX_STRATEGY_TEXT);
+            }
+
             yield $index;
         }
     }
