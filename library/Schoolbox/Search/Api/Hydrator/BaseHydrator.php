@@ -51,6 +51,14 @@ abstract class BaseHydrator implements IHydrator
     abstract protected function getBaseType(): string;
 
     /**
+     * @return array
+     */
+    public static function getFilterSubtypes(): array
+    {
+        return []; // No subtypes by default.
+    }
+
+    /**
      * Helper for building a base URL for use across hydrators.
      *
      * @return UriInterface

@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Search\Api\Database\ResultType;
 
 /**
  * Factory for creating DataObjects.
@@ -49,37 +50,18 @@ class DataObjectFactory
 
                 // Expand parent types to include child types.
                 // This is done so API users can specify filter 'user' to mean "'user' plus all subtypes of 'user'", etc.
-                // Filter types and subtypes are defined in ResultTypes.ts.  Types/subtypes used below must match that file.
                 $typesAsKeys = array_fill_keys($types, null);
                 foreach (array_keys($typesAsKeys) as $type) {
-                    if ($type === 'assessment') {
-                        $typesAsKeys['assessment.dueWork'] = null;
-                        $typesAsKeys['assessment.lessonPlan'] = null;
-                        $typesAsKeys['assessment.project'] = null;
-                        $typesAsKeys['assessment.lti'] = null;
-                        $typesAsKeys['assessment.task'] = null;
-                        $typesAsKeys['assessment.quiz'] = null;
-                    }
-                    if ($type === 'file') {
-                        $typesAsKeys['file.audio'] = null;
-                        $typesAsKeys['file.document'] = null;
-                        $typesAsKeys['file.image'] = null;
-                        $typesAsKeys['file.video'] = null;
-                        $typesAsKeys['file.other'] = null;
-                    }
-                    if ($type === 'page') {
-                        $typesAsKeys['page.class'] = null;
-                        $typesAsKeys['page.course'] = null;
-                        $typesAsKeys['page.homepage'] = null;
-                        $typesAsKeys['page.unit'] = null;
-                        $typesAsKeys['page.folder'] = null;
-                        $typesAsKeys['page.group'] = null;
-                    }
-                    if ($type === 'user') {
-                        $typesAsKeys['user.guest'] = null;
-                        $typesAsKeys['user.parent'] = null;
-                        $typesAsKeys['user.staff'] = null;
-                        $typesAsKeys['user.student'] = null;
+                    $subtypesToAdd = match ($type) {
+                        'assessment' => ResultType\Assessment\Hydrator::getFilterSubTypes(),
+                        'file' => ResultType\File\Hydrator::getFilterSubTypes(),
+                        'page' => ResultType\Page\Hydrator::getFilterSubTypes(),
+                        'user' => ResultType\User\Hydrator::getFilterSubTypes(),
+                        default => [],
+                    };
+                    foreach ($subtypesToAdd as $subtypeToAdd) {
+                        // Subtypes are added as keys so as not to introduce duplicates.
+                        $typesAsKeys[$subtypeToAdd] = null;
                     }
                 }
                 $types = array_keys($typesAsKeys);

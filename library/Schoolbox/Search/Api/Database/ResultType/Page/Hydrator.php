@@ -62,6 +62,22 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * @return array
+     */
+    public static function getFilterSubtypes(): array
+    {
+        return [
+            // Filter types and subtypes are defined in ResultTypes.ts.  The subtypes below must match that file.
+            'page.class',
+            'page.course',
+            'page.homepage',
+            'page.unit',
+            'page.folder',
+            'page.group',
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array

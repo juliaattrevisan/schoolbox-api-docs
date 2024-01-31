@@ -68,6 +68,22 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * @return array
+     */
+    public static function getFilterSubtypes(): array
+    {
+        return [
+            // Filter types and subtypes are defined in ResultTypes.ts.  The subtypes below must match that file.
+            'assessment.dueWork',
+            'assessment.lessonPlan',
+            'assessment.project',
+            'assessment.lti',
+            'assessment.task',
+            'assessment.quiz'
+        ];
+    }
+
+    /**
      * @inheritdoc
      * @throws RouteNotFound
      */
