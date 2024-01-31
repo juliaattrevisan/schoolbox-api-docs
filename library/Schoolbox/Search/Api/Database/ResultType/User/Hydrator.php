@@ -72,14 +72,6 @@ class Hydrator extends BaseHydrator
     /**
      * @inheritdoc
      */
-    public function getBaseType(): string
-    {
-        return self::BASE_TYPE;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
         // Find all users which match $matches
