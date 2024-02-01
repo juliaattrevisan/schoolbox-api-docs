@@ -63,11 +63,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         $keywordMinusPunctuation = preg_replace('!\s+!', ' ', $keywordMinusPunctuation);
 
         $params = [
-            "indexNow$paramKeySuffix"                   => Alaress_Date_Format::now()->getDatabase(),
-            "indexKeyword$paramKeySuffix"               => $keyword,
-            "indexKeywordLike$paramKeySuffix"           => '%' . $quoter->escapeForLike($keyword) . '%',
-            "indexKeywordMinusPunct$paramKeySuffix"     => $keywordMinusPunctuation,
-            "indexKeywordMinusPunctLike$paramKeySuffix" => '%' . $quoter->escapeForLike($keywordMinusPunctuation) . '%',
+            "indexNow$paramKeySuffix"                     => Alaress_Date_Format::now()->getDatabase(),
+            "indexKeyword$paramKeySuffix"                 => $keyword,
+            "indexKeywordLike$paramKeySuffix"             => '%' . $quoter->escapeForLike($keyword) . '%',
+            "indexKeywordMinusPunct$paramKeySuffix"       => $keywordMinusPunctuation,
+            "indexKeywordMinusPunctLike$paramKeySuffix"   => '%' . $quoter->escapeForLike($keywordMinusPunctuation) . '%',
+            "relevanceWeightingTitle$paramKeySuffix"      => self::RELEVANCE_WEIGHTING_TITLE,
+            "relevanceWeightingContent$paramKeySuffix"    => self::RELEVANCE_WEIGHTING_CONTENT,
+            "relevanceWeightingRecentDate$paramKeySuffix" => self::RELEVANCE_WEIGHTING_RECENT_DATE,
         ];
 
         $keywordWords = explode(' ', $keywordMinusPunctuation);
@@ -88,15 +91,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         $sqlSumTerms = [
             // NOTE: Must include punctuation for searches for filenames e.g. 'shutterstock_282889763'.
-            "IF(si.title = :indexKeyword$paramKeySuffix, 250, 0)",
-            "IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, 200, 0)",
-            "IF(si.title LIKE :indexKeywordLike$paramKeySuffix, 150, 0)",
-            "IF(si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix, 100, 0)"
+            "IF(si.title = :indexKeyword$paramKeySuffix, :relevanceWeightingTitle$paramKeySuffix, 0)",
+            "IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, :relevanceWeightingTitle$paramKeySuffix * 0.8, 0)",
+            "IF(si.title LIKE :indexKeywordLike$paramKeySuffix, :relevanceWeightingTitle$paramKeySuffix * 0.6, 0)",
+            "IF(si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix, :relevanceWeightingTitle$paramKeySuffix * 0.4, 0)"
         ];
 
         foreach ($this->buildBaseWhereParams($keyword, $paramKeySuffix) as $key => $value) {
             if (str_starts_with($key, self::KEYWORD_TOKEN_LIKE_PREFIX)) {
-                $sqlSumTerms[] = "IF(si.title LIKE :$key, 20, 0)";
+                $sqlSumTerms[] = "IF(si.title LIKE :$key, :relevanceWeightingTitle$paramKeySuffix * 0.2, 0)";
             }
         }
 
@@ -111,7 +114,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
         //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
         // The same algorithm is used for BOOLEAN MODE and NATURAL LANGUAGE MODE.  I confirmed this by experiment.
-        return "MATCH (si.fulltext_index) AGAINST (:indexKeywordLike$paramKeySuffix IN NATURAL LANGUAGE MODE)";
+        return (
+            ":relevanceWeightingContent$paramKeySuffix * " .
+            "MATCH (si.fulltext_index) AGAINST (:indexKeywordLike$paramKeySuffix IN NATURAL LANGUAGE MODE)"
+        );
     }
 
     /**
@@ -126,7 +132,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             56,
         );
 
-        return "IF(si.is_relevance_date_affected, $datePart, 1)";
+        return ":relevanceWeightingRecentDate$paramKeySuffix * IF(si.is_relevance_date_affected, $datePart, 1)";
     }
 
     /**

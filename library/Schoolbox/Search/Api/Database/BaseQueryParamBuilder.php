@@ -25,6 +25,27 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     public const ENCODING = 'UTF-8';
 
     /**
+     * The maximum relevance bonus score for a perfect match on title.
+     * Less perfect matches on title will receive a fraction of this bonus score.
+     */
+    public const RELEVANCE_WEIGHTING_TITLE = 100;
+    /**
+     * The maximum relevance bonus score for the highest matching content.
+     * Note the result with the greatest MATCH...AGAINST relevance score will always be scaled up to this number,
+     * even if the greatest MATCH...AGAINST relevance score is not very great.
+     * This is because MATCH...AGAINST relevance scores are only meaningful when compared to other MATCH...AGAINST
+     * relevance scores.  We must normalise these scores somehow in order to produce a combined score, so this
+     * is the best we can do.  Set this low enough that strong title matches will always outrank strong content
+     * matches with an irrelevant title.
+     */
+    public const RELEVANCE_WEIGHTING_CONTENT = 1; // 1 for now.  Once we normalise MATCH relevance to between 0 and 1, a value of 20 might be appropriate.
+    /**
+     * The maximum relevance bonus score for a recently modified result.
+     * (This will apply to results whose updated_at date is today.)
+     */
+    public const RELEVANCE_WEIGHTING_RECENT_DATE = 1000;
+
+    /**
      * @inheritdoc
      */
     public function buildMatchQueryParams(
