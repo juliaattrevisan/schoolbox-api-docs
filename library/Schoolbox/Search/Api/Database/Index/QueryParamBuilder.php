@@ -54,18 +54,24 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
-        $quoter = $this->quoter;
+        $quoter          = $this->quoter;
+        $strlenKeyword   = strlen($keyword);
+        $keywordUnquoted = (
+            ($strlenKeyword >= 2 && $keyword[0] === '"' && $keyword[$strlenKeyword - 1] === '"')
+            ? substr($keyword, 1, $strlenKeyword - 2)
+            : $keyword
+        );
 
-        // Remove all punctuation characters (see comment 'Why strip punctuation?' below).
-        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
-
-        // Replace multiple spaces with single space (see comment 'Why strip punctuation?' below).
+        // Remove all punctuation characters and replace multiple spaces with single space.
+        // (see comment 'Why strip punctuation?' below)
+        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keywordUnquoted);
         $keywordMinusPunctuation = preg_replace('!\s+!', ' ', $keywordMinusPunctuation);
 
         $params = [
             "indexNow$paramKeySuffix"                        => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix"                    => $keyword,
-            "indexKeywordLike$paramKeySuffix"                => '%' . $quoter->escapeForLike($keyword) . '%',
+            "indexKeywordUnquoted$paramKeySuffix"            => $keywordUnquoted,
+            "indexKeywordUnquotedLike$paramKeySuffix"        => '%' . $quoter->escapeForLike($keywordUnquoted) . '%',
             "indexKeywordMinusPunct$paramKeySuffix"          => $keywordMinusPunctuation,
             "indexKeywordMinusPunctLike$paramKeySuffix"      => '%' . $quoter->escapeForLike($keywordMinusPunctuation) . '%',
             "RELEVANCE_WEIGHTING_TITLE$paramKeySuffix"       => self::RELEVANCE_WEIGHTING_TITLE,
@@ -115,9 +121,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // We want the above-described behaviour because that is how MATCH...AGAINST behaves, and because consistency is good.
 
         $sqlSumTerms = [
-            // NOTE: Must include punctuation for searches for filenames e.g. 'shutterstock_282889763'.
             "IF(si.title = :indexKeyword$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix, 0)",
-            "IF(si.title LIKE :indexKeywordLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.6, 0)",
+            "IF(si.title LIKE :indexKeywordUnquotedLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.6, 0)",
             "IF(
                  (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeyword$paramKeySuffix),
                  IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.8, 0) +
@@ -155,7 +160,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         return (
             ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix * " .
             "(
-                MATCH (si.fulltext_index) AGAINST (:indexKeywordLike$paramKeySuffix IN NATURAL LANGUAGE MODE) /
+                MATCH (si.fulltext_index) AGAINST (:indexKeywordUnquotedLike$paramKeySuffix IN NATURAL LANGUAGE MODE) /
                 maxContentRelevanceTable.maxContentRelevance
              )"
         );
