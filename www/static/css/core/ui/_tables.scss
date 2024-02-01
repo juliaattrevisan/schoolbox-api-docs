@@ -271,16 +271,6 @@ $rotate-span-width: 11rem;
                 top: 0;
             }
 
-            th:nth-child(n + 3) {
-                /* This is done so that the ths (which are not rotated) are invisible. */
-                visibility: hidden;
-
-                > div {
-                    /* This is done so that the divs inside the ths (which are rotated) are visible despite the parent being hidden. */
-                    visibility: visible;
-                }
-            }
-
             th:nth-child(1),
             th:nth-child(2),
             th:nth-child(1) > div {
@@ -519,11 +509,6 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
     /* To prevent vertical border lines from showing over the diagonal table headings. */
     thead th {
         border: 0;
-    }
-
-    thead th:nth-child(1) div,
-    thead th:nth-child(2) div {
-        border-right-width: 0 !important;
     }
 
     /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
