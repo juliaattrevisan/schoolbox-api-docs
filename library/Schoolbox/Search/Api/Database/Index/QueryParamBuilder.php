@@ -54,6 +54,9 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
     {
+        // Note: Do not trim the keyword.  Not trimming the keyword allows the user more flexibility when searching for
+        // titles.  E.g.  A search for titles containing ' board ' excludes titles like 'headboard', 'surfboards', 'boards'.
+
         $quoter          = $this->quoter;
         $strlenKeyword   = strlen($keyword);
         $keywordUnquoted = (
@@ -95,8 +98,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
-        $keyword = trim($keyword);
-
         // Why strip punctuation?
         // ----------------------
         // MATCH...AGAINST on the full-text index disregards punctuation.  We want the behaviour of the LIKE searches on
@@ -121,10 +122,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // We want the above-described behaviour because that is how MATCH...AGAINST behaves, and because consistency is good.
 
         $sqlSumTerms = [
-            "IF(si.title = :indexKeyword$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix, 0)",
+            "IF(si.title = :indexKeywordUnquoted$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix, 0)",
             "IF(si.title LIKE :indexKeywordUnquotedLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.6, 0)",
             "IF(
-                 (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeyword$paramKeySuffix),
+                 (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeywordUnquoted$paramKeySuffix),
                  IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.8, 0) +
                  IF(si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.4, 0),
                  0
@@ -132,7 +133,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         ];
 
         // If the keyword has not been surrounded by double-quotes...
-        if ($keyword[0] !== '"' || $keyword[strlen($keyword) - 1] !== '"') {
+        $strlenKeyword = strlen($keyword);
+        if ($strlenKeyword < 2 || $keyword[0] !== '"' || $keyword[$strlenKeyword - 1] !== '"') {
             // Search for each word individually to mimic the behaviour of MATCH...AGAINST
             // (MATCH...AGAINST is used in buildContentRelevanceExpression()).
             foreach ($this->buildBaseWhereParams($keyword, $paramKeySuffix) as $key => $value) {
@@ -160,7 +162,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         return (
             ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix * " .
             "(
-                MATCH (si.fulltext_index) AGAINST (:indexKeywordUnquotedLike$paramKeySuffix IN NATURAL LANGUAGE MODE) /
+                MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) /
                 maxContentRelevanceTable.maxContentRelevance
              )"
         );
