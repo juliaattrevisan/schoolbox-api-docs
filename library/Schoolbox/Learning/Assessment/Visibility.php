@@ -57,20 +57,6 @@ class Visibility
     {
         $now = $now ?? Alaress_Date_Format::now();
 
-        /**
-         * Lesson Plans have some specific logic for visibility:
-         * - Lesson Plans can be hidden from students via a Visibility switch
-         * If you're a student, hide any lesson plans that were hidden from you
-         * - Lesson Plans that are not hidden from students, should be visible to all students
-         */
-        if ($assessment instanceof LessonPlan\Model && $viewer->getRole()->isStudent()) {
-            if (\Schoolbox\Role::STUDENT !== $assessment->getVisibility()) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-
         /** @noinspection NotOptimalIfConditionsInspection */
         if ($viewer->getRole()->isStaff() && $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now)) {
             return true;
@@ -187,6 +173,17 @@ class Visibility
         if (!$participant) {
             return false;
         }
+
+        /**
+         * Lesson Plans have some specific logic for visibility:
+         * - Lesson Plans can be hidden from students via a Visibility switch
+         * If you're a student, hide any lesson plans that were hidden from you
+         * - Lesson Plans that are not hidden from students, should be visible to all students
+         */
+        if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getVisibility()) {
+            return false;
+        }
+
         $closeDate   = $participant->getCloseDate();
         $isPublished = $now->gte($participant->getPublishDate());
         return $isPublished && ($showClosed || $now->lte($closeDate));
