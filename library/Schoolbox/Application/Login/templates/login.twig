@@ -33,6 +33,68 @@
         body.login {
             background-image: url("{{ random(login_backgrounds) }}");
         }
+
+        {# Make these login "buttons" blocky,
+         # in expectation of a colour to be chosen and applied
+         #}
+        .samlbutton, .oidcbutton {
+            display: block;
+            padding: 0;
+        }
+
+
+        {# If a nontransparent colour was assigned, give it some nice padding
+         # for that extra duplo feel; otherwise, leave it as it is since it'll
+         # simply look like a text link
+         #}
+        {% if not (config.saml_login_colour ends with ', 0)') %}
+        .samlbutton {
+            padding: 1rem;
+        }
+        {% endif %}
+
+        {% if not (config.oidc_login_colour ends with ', 0)') %}
+        .oidcbutton {
+            padding: 1rem;
+        }
+        {% endif %}
+
+        {# If an icon was chosen, reconfigure padding and background images etc. #}
+        .saml-icon, .oidc-icon {
+            background-position-x: left;
+            background-repeat: no-repeat;
+            background-size: 4rem;
+            padding-left: 5rem;
+        }
+
+        .samlbutton {
+            background-color: {{ config.saml_login_colour|raw }};
+        }
+
+        {% if config.saml_login_icon ?? null %}
+        .samlbutton.saml-icon {
+            background-image: url('/storage/image.php?hash={{ config.saml_login_icon }}');
+        }
+        {% endif %}
+
+        .oidcbutton {
+            background-color: {{ config.oidc_login_colour|raw }};
+        }
+
+        {% if config.oidc_login_icon ?? null %}
+        .oidcbutton.oidc-icon {
+            background-image: url('/storage/image.php?hash={{ config.oidc_login_icon }}');
+        }
+        {% endif %}
+
+        {# Toggle default login form, in case you get locked out
+         # This is meant to be a bit discreet, intentionally, so
+         # that people don't think this is something they're
+         # meant to do
+         #}
+        .default-login-toggle {
+            opacity: 0.5;
+        }
     </style>
 {% endautoescape %}
 
@@ -78,7 +140,8 @@
                 <div class="small-12 column">
                     <p id="error-msg" class="alert-box alert">{{ error }}</p>
                 </div>
-                <div class="small-12 column">
+                {# Only show default login fields if Site settings allow it #}
+                <div class="small-12 column" {% if not config.show_default_login %}style="display:none"{% endif %} data-default-login>
                     <input type="text" name="username" id="username" placeholder="Username" />
                     <input type="password" name="password" id="password" placeholder="Password" />
                 </div>
@@ -99,41 +162,59 @@
                 </div>
                 {% endif %}
 
-                {% if config.forgotten_password_text and config.forgotten_password_url %}
-                <div class="small-12 column">
-                    <p><a href="{{ config.forgotten_password_url }}">{{ config.forgotten_password_text }}</a></p>
-                </div>
-                {% endif %}
+                {# Only show default login fields if Site settings allow it #}
+                {% if config.show_default_login %}
+                    {% if config.forgotten_password_text and config.forgotten_password_url %}
+                    <div class="small-12 column">
+                        <p><a href="{{ config.forgotten_password_url }}">{{ config.forgotten_password_text }}</a></p>
+                    </div>
+                    {% endif %}
 
-                {% if config.session_remember %}
-                <div class="small-12 column">
-                    <input id="rememberme" type="checkbox" name="rememberme" value="1" />
-                    <label for="rememberme">Remember me</label>
-                </div>
+                    {% if config.session_remember %}
+                    <div class="small-12 column">
+                        <input id="rememberme" type="checkbox" name="rememberme" value="1" />
+                        <label for="rememberme">Remember me</label>
+                    </div>
+                    {% endif %}
                 {% endif %}
                 <div class="small-12 column login-links">
-                    <input type="submit" name="Submit" value="Login" />
+                    {# Only show default login fields if Site settings allow it #}
+                    <input type="submit" name="Submit" value="Login" {% if not config.show_default_login %}style="display:none"{% endif %} data-default-login />
 
-                    {% if config.login_anonymous != '' or config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
-                    <p> - OR - </p>
+                    {% if config.show_default_login %}
+                        {% if config.login_anonymous != '' or config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
+                            <p class="separator"> - OR - </p>
+                        {% endif %}
                     {% endif %}
 
                     {% if config.login_anonymous != '' %}
-                    <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
+                        <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
                     {% endif %}
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                         {% block sso %}
-                    <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
+                            {# Interpret title setting forcing a meaningful default#}
+                            {% set samlTitle = config.saml_login_title ?? '' %}
+
+                            {% if '' == samlTitle %}
+                                {% set samlTitle = 'Login with Single Sign-On' %}
+                            {% endif %}
+                            <p><a href="/saml/index.php?{{ requestParams|escape }}" class="login-method samlbutton {% if config.saml_login_icon ?? null %}saml-icon{% endif %}">{{ samlTitle }}</a></p>
                         {% endblock %}
                     {% endif %}
 
                     {# Only show OIDC login if it's enabled #}
                     {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
                     {% if oidcUrl %}
-                    {% block oidc %}
-                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="oidcbutton">Login using OpenID Connect</a></p>
-                    {% endblock %}
+                        {% block oidc %}
+                            {# Interpret title setting forcing a meaningful default#}
+                            {% set oidcTitle = config.oidc_login_title ?? '' %}
+
+                            {% if '' == oidcTitle %}
+                                {% set oidcTitle = 'Login with OpenID Connect' %}
+                            {% endif %}
+                            <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="login-method oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">{{ oidcTitle }}</a></p>
+                        {% endblock %}
                     {% endif %}
 
                     {% if requestFromInternalIp %}
@@ -154,6 +235,19 @@
             {% if config.feedback_url and config.feedback_text %}
                 <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
             {% endif %}
+            {% if not config.show_default_login %}
+                <script>
+                    $(function() {
+                        $('[data-default-login-toggle]').on('click', function(event) {
+                            event.preventDefault();
+
+                           $('[data-default-login]').toggle();
+                        });
+                    });
+                </script>
+                <li class="default-login-toggle" data-default-login-toggle>Login</li>
+            {% endif %}
+            <li></li>
         </ul>
     </div>
 </div>
