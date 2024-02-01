@@ -359,7 +359,7 @@ $rotate-span-width: 11rem;
             transform: skew(-#{$rotate-angle}deg, 0deg);
             overflow: hidden;
             border: 0 solid $body-bg;
-            border-right-width: 2px;
+            border-right-width: 3px;
             z-index: 1;
             position: relative;
             height: 100%;
