@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -52,13 +53,12 @@ class Controller extends Base
         }
 
         try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(), [
-                'Authorization' => 'Bearer ' . $openAiKey,
-                'Content-Type'  => 'application/json',
-            ], $this->request->getBody()->getContents());
+            $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
+                $this->getAuthorization(),
+                ['Content-Type'  => 'application/json'],
+            ), $this->request->getBody()->getContents());
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
-
 
             // Handle the response when it arrives
             $promise->then(
@@ -81,8 +81,12 @@ class Controller extends Base
                     }
                 },
                 function ($reason) {
+                    /* @var ClientException $reason */
+                    //var_dump($reason);
+                    http_response_code($reason->getCode());
+                    echo $reason->getMessage();
                     // Handle error if the request fails
-                    $this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+                    //$this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
                 }
             );
 
@@ -113,6 +117,18 @@ class Controller extends Base
                     $this->getConfigLoader()->get('openai_azure_deployment_id')
                 );
         }
+        throw new \UnexpectedValueException('Endpoint must be configured');
+    }
+
+    private function getAuthorization(): array
+    {
+        switch ($this->getConfigLoader()->get('openai_endpoint')) {
+            case 'OpenAI':
+                return ['Authorization' => 'Bearer ' . $this->getConfigLoader()->get('openai_key')];
+            case 'Azure':
+                return ['api-key' => $this->getConfigLoader()->get('openai_key')];
+        }
+
         throw new \UnexpectedValueException('Endpoint must be configured');
     }
 }
