@@ -26,9 +26,10 @@ function checkFlexGap() {
 /**
  * Redirect to the upgrade.php page if browser is not supported
  * No IE versions are supported: `"ActiveXObject" in window` ought to detect IE
+ * @note - !checkFlexGap() has been pulled out as an issue in Safari 17.2 looks to have started failing this test
  */
 window.addEventListener("DOMContentLoaded", (event) => {
-    if ("ActiveXObject" in window || !checkFlexGap()) {
+    if ("ActiveXObject" in window) {
         window.location.href = "/upgrade.php";
     }
 });
