@@ -990,6 +990,62 @@ Search,"Search page",Superuser,https://vagrant.dev.schoolbox.cloud/search,200
 Search,"Search pages",Teacher,https://vagrant.dev.schoolbox.cloud/search,200
 Search,"Search page",Student,https://vagrant.dev.schoolbox.cloud/search,200
 Search,"Search page",Parent,https://vagrant.dev.schoolbox.cloud/search,200
+Search,"Search using date filters",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"date":{"from":"2023-12-31"}},200
+Search,"Search using date filters",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"date":{"from":"2023-12-31"}},200
+Search,"Search using date filters",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"date":{"from":"2023-12-31"}},200
+Search,"Search using date filters",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"date":{"from":"2023-12-31"}},200
+Search,"Search using creator filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"creator":{"id":1}},200
+Search,"Search using creator filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"creator":{"id":1}},200
+Search,"Search using creator filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"creator":{"id":1}},200
+Search,"Search using creator filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"creator":{"id":1}},200
+Search,"Search using badges filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["badge"]},200
+Search,"Search using badges filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["badge"]},200
+Search,"Search using badges filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["badge"]},200
+Search,"Search using badges filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["badge"]},200
+Search,"Search using blogs filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["blog"]},200
+Search,"Search using blogs filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["blog"]},200
+Search,"Search using blogs filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["blog"]},200
+Search,"Search using blogs filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["blog"]},200
+Search,"Search using events filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["event"]},200
+Search,"Search using events filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["event"]},200
+Search,"Search using events filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["event"]},200
+Search,"Search using events filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["event"]},200
+Search,"Search using files filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["file.image"]},200
+Search,"Search using files filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["file.image"]},200
+Search,"Search using files filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["file.image"]},200
+Search,"Search using files filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["file.image"]},200
+Search,"Search using forum filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=blame&filter={"types":["forum"]},200
+Search,"Search using forum filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=blame&filter={"types":["forum"]},200
+Search,"Search using forum filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=blame&filter={"types":["forum"]},200
+Search,"Search using forum filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=blame&filter={"types":["forum"]},200
+Search,"Search using learning activity filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=activity&filter={"types":["assessment.dueWork"]},200
+Search,"Search using learning activity filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=activity&filter={"types":["assessment.dueWork"]},200
+Search,"Search using learning activity filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=activity&filter={"types":["assessment.dueWork""]},200
+Search,"Search using learning activity filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=activity&filter={"types":["assessment.dueWork"]},200
+Search,"Search using links filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=romeo&filter={"types":["link"]},200
+Search,"Search using links filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=romeo&filter={"types":["link"]},200
+Search,"Search using links filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=romeo&filter={"types":["link"]},200
+Search,"Search using links filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=romeo&filter={"types":["link"]},200
+Search,"Search using news filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=schoolbox&filter={"types":["news"]},200
+Search,"Search using news filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=schoolbox&filter={"types":["news"]},200
+Search,"Search using news filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=schoolbox&filter={"types":["news"]},200
+Search,"Search using news filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=schoolbox&filter={"types":["news"]},200
+Search,"Search using pages filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=english&filter={"types":["page.homepage"]},200
+Search,"Search using pages filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=english&filter={"types":["page.homepage"]},200
+Search,"Search using pages filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=english&filter={"types":["page.homepage"]},200
+Search,"Search using pages filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=english&filter={"types":["page.homepage"]},200
+Search,"Search using textbox filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["textbox"]},200
+Search,"Search using textbox filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["textbox"]},200
+Search,"Search using textbox filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["textbox"]},200
+Search,"Search using textbox filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["textbox"]},200
+Search,"Search using tiles filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["tile"]},200
+Search,"Search using tiles filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["tile"]},200
+Search,"Search using tiles filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["tile"]},200
+Search,"Search using tiles filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["tile"]},200
+Search,"Search using users filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":['"user.student"']},200
+Search,"Search using users filter",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":['"user.student"']},200
+Search,"Search using users filter",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":['"user.student"']},200
+Search,"Search using users filter",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":['"user.student"']},200
 Search,"Search for user with results",Superuser,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed,200
 Search,"Search for user with results",Teacher,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed,200
 Search,"Search for user with results",Student,https://vagrant.dev.schoolbox.cloud/api/search?keyword=Reed,200

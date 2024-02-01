@@ -226,7 +226,8 @@ Fixtures,Assign players to team,https://vagrant.dev.schoolbox.cloud/fixtures/div
 Fixtures,Edit venue,https://vagrant.dev.schoolbox.cloud/fixtures/venues/3/edit
 Fixtures,Create a new season,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/new
 Fixtures,Create a new venue,https://vagrant.dev.schoolbox.cloud/fixtures/venues/new
-Fixtures,Create new sport,https://vagrant.dev.schoolbox.cloud/fixtures/sports/new
+Fixtures,Create new sport,https://vagrant.dev.schoolbox.cloud/fixtures/spSearch,"Search using users filter",Superuser,https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"date":{},"creator":{},"types":["user","user.guest","user.parent","user.staff","user.student"]}
+orts/new
 Fixtures,Add new division,https://vagrant.dev.schoolbox.cloud/fixtures/sports/2/divisions/new
 Fixtures,Add new team,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/teams/new
 Fixtures,View all matches in a division,https://vagrant.dev.schoolbox.cloud/fixtures/divisions/3/matches
@@ -248,6 +249,20 @@ ePortfolio,View a students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportf
 ePortfolio,view one of the pages,https://vagrant.dev.schoolbox.cloud/eportfolio/25/16
 ePortfolio,Create a page on the students ePortfolio,https://vagrant.dev.schoolbox.cloud/eportfolio/25/create
 Search Page,Access the search page,"https://vagrant.dev.schoolbox.cloud/search"
+Search,Search using date filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"date":{"from":"2023-12-31"}}"
+Search,Search using creator filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"creator":{"id":1}}"
+Search,Search using badges filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={types":["badge"]}"
+Search,Search using blogs filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["blog"]}"
+Search,Search using events filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["event"]}"
+Search,Search using files filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=school&filter={"types":["file.image"}"
+Search,Search using forum filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=blame&filter={"types":["forum"]}"
+Search,Search using learning activity filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=activity&filter={"types":["assessment.dueWork"]}"
+Search,Search using links filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=romeo&filter={"types":["link"]}"
+Search,Search using news filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=schoolbox&filter={"types":["news"]}"
+Search,Search using pages filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=english&filter={"types":["page.homepage"}"
+Search,Search using textbox filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["textbox"]}"
+Search,Search using tiles filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["tile"]}"
+Search,Search using users filter,"https://vagrant.dev.schoolbox.cloud/search?keyword=reed&filter={"types":["user.student"]}"
 Search,Search for user with results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#all"
 Search,View only users results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#user"
 Search,View only Textbox results,"https://vagrant.dev.schoolbox.cloud/search?keyword=Reed#textbox"
