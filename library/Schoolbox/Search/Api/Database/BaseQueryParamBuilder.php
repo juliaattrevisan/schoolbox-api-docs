@@ -38,7 +38,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * is the best we can do.  Set this low enough that strong title matches will always outrank strong content
      * matches with an irrelevant title.
      */
-    public const RELEVANCE_WEIGHTING_CONTENT = 1; // 1 for now.  Once we normalise MATCH relevance to between 0 and 1, a value of 20 might be appropriate.
+    public const RELEVANCE_WEIGHTING_CONTENT = 20;
     /**
      * The maximum relevance bonus score for a recently modified result.
      * (This will apply to results whose updated_at date is today.)
