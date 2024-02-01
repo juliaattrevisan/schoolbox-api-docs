@@ -198,7 +198,7 @@
 
                     {# Only show OIDC login if it's enabled #}
                     {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
-                    {% if oidcUrl or true %}
+                    {% if oidcUrl %}
                     {% block oidc %}
                         {# Interpret title setting forcing a meaningful default#}
                         {% set oidcTitle = config.oidc_login_title ?? '' %}
