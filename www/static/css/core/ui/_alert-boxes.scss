@@ -267,9 +267,11 @@ $alert-default-background: css-darken($body-bg, 10%);
 }
 
 // Accommodate for when the notifications are open
-.move-left,
-.right-open {
-    .toast {
-        right: 17.25rem;
+body:not(.disableNotifications) {
+    .move-left,
+    .right-open {
+        .toast {
+            right: 17.25rem;
+        }
     }
 }
