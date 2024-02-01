@@ -86,6 +86,15 @@
             background-image: url('/storage/image.php?hash={{ config.oidc_login_icon }}');
         }
         {% endif %}
+
+        {# Toggle default login form, in case you get locked out
+         # This is meant to be a bit discreet, intentionally, so
+         # that people don't think this is something they're
+         # meant to do
+         #}
+        .default-login-toggle {
+            opacity: 0.5;
+        }
     </style>
 {% endautoescape %}
 
@@ -132,12 +141,10 @@
                     <p id="error-msg" class="alert-box alert">{{ error }}</p>
                 </div>
                 {# Only show default login fields if Site settings allow it #}
-                {% if config.show_default_login %}
-                    <div class="small-12 column">
-                        <input type="text" name="username" id="username" placeholder="Username" />
-                        <input type="password" name="password" id="password" placeholder="Password" />
-                    </div>
-                {% endif %}
+                <div class="small-12 column" {% if not config.show_default_login %}style="display:none"{% endif %} data-default-login>
+                    <input type="text" name="username" id="username" placeholder="Username" />
+                    <input type="password" name="password" id="password" placeholder="Password" />
+                </div>
             </div>
             <div class="row collapse">
                 {% if config.login_terms_and_conditions != '' %}
@@ -172,9 +179,9 @@
                 {% endif %}
                 <div class="small-12 column login-links">
                     {# Only show default login fields if Site settings allow it #}
-                    {% if config.show_default_login %}
-                        <input type="submit" name="Submit" value="Login" />
+                    <input type="submit" name="Submit" value="Login" {% if not config.show_default_login %}style="display:none"{% endif %} data-default-login />
 
+                    {% if config.show_default_login %}
                         {% if config.login_anonymous != '' or config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                             <p class="separator"> - OR - </p>
                         {% endif %}
@@ -199,15 +206,15 @@
                     {# Only show OIDC login if it's enabled #}
                     {% set oidcUrl = routeLookup('loginOidc.getAuthorization') %}
                     {% if oidcUrl %}
-                    {% block oidc %}
-                        {# Interpret title setting forcing a meaningful default#}
-                        {% set oidcTitle = config.oidc_login_title ?? '' %}
+                        {% block oidc %}
+                            {# Interpret title setting forcing a meaningful default#}
+                            {% set oidcTitle = config.oidc_login_title ?? '' %}
 
-                        {% if '' == oidcTitle %}
-                            {% set oidcTitle = 'Login with OpenID Connect' %}
-                        {% endif %}
-                        <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="login-method oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">{{ oidcTitle }}</a></p>
-                    {% endblock %}
+                            {% if '' == oidcTitle %}
+                                {% set oidcTitle = 'Login with OpenID Connect' %}
+                            {% endif %}
+                            <p><a href="{{ oidcUrl }}?{{ requestParams|escape }}" class="login-method oidcbutton {% if config.oidc_login_icon ?? null %}oidc-icon{% endif %}">{{ oidcTitle }}</a></p>
+                        {% endblock %}
                     {% endif %}
 
                     {% if requestFromInternalIp %}
@@ -228,6 +235,19 @@
             {% if config.feedback_url and config.feedback_text %}
                 <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
             {% endif %}
+            {% if not config.show_default_login %}
+                <script>
+                    $(function() {
+                        $('[data-default-login-toggle]').on('click', function(event) {
+                            event.preventDefault();
+
+                           $('[data-default-login]').toggle();
+                        });
+                    });
+                </script>
+                <li class="default-login-toggle" data-default-login-toggle>Login</li>
+            {% endif %}
+            <li></li>
         </ul>
     </div>
 </div>
