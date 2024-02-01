@@ -63,7 +63,7 @@
         <table class="diagonal-headings-table marksheet" data-mark-sheet>
             <thead>
             <tr class="rotate-headers">
-                <th class="fixed-left"><div><span></span></div></th>
+                <th class="fixed-left"><div></div></th>
                 <th class="fixed-left"><div><span>Student Weighted Average</span></div></th>
                 {% if rankEnabled %}
                     <th>
@@ -114,12 +114,12 @@
                         {% set countUnitAssessments = countUnitAssessments + 1 %}
                     {% else %}
                         {# first column of next unit #}
-                        <th colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
+                        <th class="unit-title" colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
                         {% set currentUnitSpec = unitSpec %}
                         {% set countUnitAssessments = 1 %}
                     {% endif %}
                 {% endfor %}
-                <th colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
+                <th class="unit-title" colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
             </tr>
             </thead>
             <tbody>

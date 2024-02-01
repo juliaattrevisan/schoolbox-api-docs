@@ -10,9 +10,9 @@
 }
 
 #courseMarkbookContent,
-#report_content{
-   padding-left: 1rem;
-   padding-right: 1rem;
+#report_content {
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 #courseMarkbookContent td.course-ranking {
@@ -123,7 +123,6 @@
             background-color: white;
         }
 
-
         // Various rows and headers
         .course-row {
             background: $content-ui-background;
@@ -136,7 +135,7 @@
         .class-row-heading {
             font-weight: 700;
         }
-        .course-headers th {
+        .course-headers th.unit-title {
             background: $submit-button-bg-color;
             color: $submit-button-color;
             text-transform: uppercase;

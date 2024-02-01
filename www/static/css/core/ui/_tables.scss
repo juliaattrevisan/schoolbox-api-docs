@@ -349,11 +349,7 @@ $rotate-span-width: 11rem;
         }
 
         tr.course-headers {
-            th:nth-child(1) {
-                background-color: $body-bg !important;
-            }
-
-            th:nth-child(odd) {
+            th.unit-title:nth-child(even) {
                 filter: hue-rotate(-45deg);
             }
         }
@@ -511,11 +507,6 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         td {
             border: 1px solid $body-bg;
         }
-    }
-
-    /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
-    thead th:nth-child(2) > div {
-        background-color: $body-bg;
     }
 
     tbody th {
