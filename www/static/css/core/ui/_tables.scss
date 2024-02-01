@@ -270,14 +270,6 @@ $rotate-span-width: 11rem;
         background-color: $body-bg;
 
         tr.rotate-headers {
-            th:nth-child(1),
-            th:nth-child(2),
-            th:nth-child(1) > div {
-                background-color: $body-bg;
-            }
-
-            background-color: $body-bg;
-
             th,
             td {
                 border: 1px solid $body-bg;
@@ -292,19 +284,28 @@ $rotate-span-width: 11rem;
                 padding: 0 !important;
                 letter-spacing: 0.1ex;
 
+                // Prevent data showing under fixed cells when scrolling horizontally.
+                &:has(div:empty) {
+                    background-color: $body-bg;
+
+                    div {
+                        background-color: $body-bg;
+                    }
+                }
+
                 > div {
                     transform: skew(-#{$rotate-angle}deg, 0deg);
                     overflow: hidden;
-                    border: 0 solid $body-bg;
-                    border-right-width: 3px;
                     position: relative;
                     height: 100%;
                     top: 0;
                     left: $rotate-width + 0.5;
                     filter: none !important;
-                    background-color: $white;
 
                     &:not(:empty) {
+                        background-color: $white;
+                        border: 0 solid $body-bg;
+                        border-right-width: 3px;
                         border-bottom-width: 2px;
                     }
 
