@@ -66,6 +66,16 @@ class CacheHelper
      */
     public const DATASOURCE_FIELDS_CACHE_KEY = 'isams_register_datasource_%s';
 
+    /**
+     * Where to cache the record collections for the specific register
+     */
+    public const RECORD_COLLECTIONS_CACHE_KEY = 'isams_register_%s_recordCollections';
+
+    /**
+     * Where to cache the student records for the specified collection and student
+     */
+    public const RECORD_COLLECTION_STUDENT_CACHE_KEY = 'isams_register_%s_collection_%s_student_%s';
+
     private API $api;
 
     /**
@@ -106,7 +116,7 @@ class CacheHelper
                         'client_secret' => $this->configLoader->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_CLIENT_SECRET),
                         'grant_type'    => 'client_credentials',
                         'scope'         => 'restapi',
-                    ]
+                    ],
                 ]
             );
 
@@ -120,7 +130,7 @@ class CacheHelper
      *
      * @param string|null $registerCode if exists only return this register
      * @param array|null  $registersConfig if we are returning only 1 register, then confirm it is in the admin approved list
-     * @return ?array
+     * @return ?array [register,adminConfig]
      * @throws ClientExceptionInterface if something went wrong fetching JWKS
      * @throws GuzzleException
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
@@ -160,7 +170,50 @@ class CacheHelper
                 // the requested register Ignoring...
                 continue;
             }
-            return $register;
+            return [$register, $registersConfig[strtolower($register['code'])]];
+        }
+        return null;
+    }
+
+    /**
+     * For a specified register ID, retrieve the RegisterCollection from Isams
+     *
+     * @param int         $registerId
+     * @param string|null $reportingKey RecordCollection.reportingKey (optional)
+     * @return array|null
+     * @throws ClientExceptionInterface if something went wrong fetching JWKS
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     */
+    public function getRecordCollections(int $registerId, ?string $reportingKey = null): ?array
+    {
+        $recordCollections = $this->cache->get(sprintf(self::RECORD_COLLECTIONS_CACHE_KEY, $registerId));
+
+        if (!isset($recordCollections)) {
+            // This ought to be cacheable for a lot longer than student data
+            $apiResponseBody = $this->api->request(
+                '/Main/api/registers/' . $registerId . '/recordCollections',
+                'GET',
+                token: $this->getToken(),
+            );
+            $recordCollections = $apiResponseBody['recordCollections'];
+            $this->cache->set(sprintf(self::RECORD_COLLECTIONS_CACHE_KEY, $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+        }
+
+        // not fetching a specific register, get everything
+        if (null === $reportingKey) {
+            return $recordCollections;
+        }
+
+        // only return the specified registerCollection reporting Key
+        foreach ($recordCollections as $collection) {
+            if (strtolower($collection['reportingKey']) !== strtolower($reportingKey)) {
+                // the requested register Ignoring...
+                continue;
+            }
+            return $collection;
         }
         return null;
     }
@@ -285,5 +338,42 @@ class CacheHelper
             }
         }
         return $dataSource['items'];
+    }
+
+    /****
+     * debug options
+     */
+
+    /**
+     *
+     *
+     * @param int    $registerId
+     * @param string $externalId
+     * @param int    $collectionId
+     * @return array|mixed
+     * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
+     *                                  written to or read from cache
+     * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     */
+    public function getRecordCollectionsRecords(int $registerId, string $externalId, int $collectionId)
+    {
+        $recordCollections = $this->cache->get(sprintf(self::RECORD_COLLECTION_STUDENT_CACHE_KEY, $registerId, $collectionId, $externalId));
+
+        if (!isset($recordCollections)) {
+            // This ought to be cacheable for a lot longer than student data
+            try {
+                $recordCollections = $this->api->request(
+                    sprintf("/Main/api/registers/%s/students/%s/recordcollections/%s/records", $registerId, $externalId, $collectionId),
+                    'GET',
+                    token: $this->getToken(),
+                );
+                $this->cache->set(sprintf(self::RECORD_COLLECTION_STUDENT_CACHE_KEY, $registerId, $collectionId, $externalId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+            } catch (ClientExceptionInterface $e) {
+                // No metadata exists for this field: that's okay
+                return  [];
+            }
+        }
+        return $recordCollections['records'];
     }
 }

@@ -1,60 +1,54 @@
-<div class="l-flex-col l-gap-m l-pad-m">
-    {% for child in studentData %}
-    <div class="l-flex-col">
-        <div class="c-card">
-            <div class="l-flex-row l-gap-m l-pad-m">
-                <div class="c-img c-img--round">
-                    <div class="c-img__wrapper">
-                        <img
-                            src="/portrait.php?id={{ child.user.id }}&amp;size=square64"
-                            alt="Photo of {{ child.user.formatName }}"
-                        />
+<div class="small-12 island">
+    <h2 class="subheader">{{ register.name }} ({{ recordCollection.name }})</h2>
+        <div class="l-flex-col l-gap-m l-pad-m">
+            {% for child in studentData %}
+                <div class="l-flex-col">
+                    <div class="c-card">
+                        <div class="l-flex-row l-gap-m l-pad-m">
+                            <div class="c-img c-img--round">
+                                <div class="c-img__wrapper">
+                                    <img
+                                        src="/portrait.php?id={{ child.user.id }}&amp;size=square64"
+                                        alt="Photo of {{ child.user.formatName }}"
+                                    />
+                                </div>
+                            </div>
+                            <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                                <h3>{{ child.user.formatName }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-island l-pad-m--horiz">
+                        {% if child.data.userRecords is defined %}
+                            <table>
+                                <thead>
+                                {% for key,name in (child.data.knownFields ?? []) %}
+                                    <th data-field="{{ key }}">{{ name }}</th>
+                                {% endfor %}
+                                </thead>
+                                <tbody>
+                                {% for record in (child.data.userRecords ?? []) %}
+                                    <tr>
+                                        {% for key, field in record %}
+                                            <td>
+                                                {% if field.type == 'url' %}
+                                                    <a href="{{ field.value }}">{{ child.data.knownFields[key] }}</a>
+                                                {% elseif field.type == 'html' %}
+                                                    {{ field.value | purify }}
+                                                {% else %}
+                                                    {{ field.value }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p><em>No data available.</em></p>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
-                    <h3>{{ child.user.formatName }}</h3>
-                </div>
-            </div>
+            {% endfor %}
         </div>
-        <div class="c-island l-pad-m--horiz">
-            {% if child.data.fields is defined %}
-            <table>
-                <thead>
-                <tr>
-                    {% if child.data.hasDateRange %}
-                    <th>Date</th>
-                    {% endif %}
-                    <th>Name</th>
-                    <th>Result</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {% for field in (child.data.fields ?? []) %}
-                    <tr>
-                        {% if child.data.hasDateRange and child.data.dateRanges is defined and child.data.dateRanges %}
-                        <td>
-                        {%- for dateRange in child.data.dateRanges -%}
-                            {{ dateRange.from.localShort }}&mdash;{{ dateRange.to.localShort }}
-                            {% if not loop.last %}, {% endif %}
-                        {%- endfor -%}
-                        </td>
-                        {%  endif %}
-                        <td>{{ field.name }}</td>
-                        <td>
-                            {% if field.type == 'url' %}
-                            <a href="{{ field.value }}">Download</a>
-                            {% else %}
-                            {{ field.value }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p><em>No data available.</em></p>
-            {% endif %}
-        </div>
-    </div>
-    {% endfor %}
 </div>

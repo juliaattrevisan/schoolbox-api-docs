@@ -19,6 +19,8 @@ use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception as SchoolboxException;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Twig\Error\Error;
@@ -36,8 +38,13 @@ class Controller extends BaseController
      * @param HttpClient $httpClient for querying iSams
      * @param CacheInterface $cache for caching the api response
      */
-    public function __construct(private HttpClient $httpClient, private CacheInterface $cache)
+    public function __construct(private HttpClient $httpClient, private CacheInterface $cache, IConfigLoader $configLoader)
     {
+        // check if we have a valid register code
+        // Hit the iSams API:
+        $apiUrl = new Uri($configLoader->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
+        // first, need to exchange client id/secret for an access token
+        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $configLoader, $apiUrl);
     }
 
     /**
@@ -56,12 +63,42 @@ class Controller extends BaseController
      */
     public function getStudent(string $registerCode, User $student): void
     {
-        $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '';
+        $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
+
+        /**
+         * fetch both the register id / details and the admin settings for that register
+         * as specified by $registerCode
+         */
+        [$register, $config]       = $this->cacheHelper->getRegisters($registerCode, $adminConfig);
+        if (null === $register) {
+            /**
+             * Unable to find requested register...
+             */
+            throw new NotFound();
+        }
+
+        // we now have the correct register we are after
+        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
+        if (null === $recordCollection) {
+            /**
+             * Unable to find the specified Record Collections...
+             */
+            throw new NotFound();
+        }
+
+        $usersData = [
+            [
+                'user' => $student,
+                'data' => $this->getUsersData($student, $register, $recordCollection, $config),
+            ]
+        ];
 
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
             [
-                'studentData'   => $this->getUsersData([$student], $registerCode, $config), // need an array of students, dummy this here
+                'register' => $register,
+                'recordCollection' => $recordCollection,
+                'studentData'   => $usersData,
             ],
         );
     }
@@ -84,128 +121,172 @@ class Controller extends BaseController
      */
     public function getParent(string $registerCode)
     {
-        $config = $this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_FINANCIAL_REGISTERS) ?? '';
+        $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
 
-        // display to the parent
+        /**
+         * fetch both the register id / details and the admin settings for that register
+         * as specified by $registerCode
+         */
+        [$register, $config]       = $this->cacheHelper->getRegisters($registerCode, $adminConfig);
+        if (null === $register) {
+            /**
+             * Unable to find requested register...
+             */
+            throw new NotFound();
+        }
+
+        // we now have the correct register we are after
+        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
+        if (null === $recordCollection) {
+            /**
+             * Unable to find the specified Record Collections...
+             */
+            throw new NotFound();
+        }
+
+        $externalUser = new \Schoolbox\External\User();
+        $externalUser->loadChildren([$this->getUser()]);
+
+        $usersData = [];
+        foreach ($this->getUser()->getChildren() as $child) {
+            $usersData[] = [
+                'user' => $child,
+                'data' => $this->getUsersData($child, $register, $recordCollection, $config),
+            ];
+        }
+
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
             [
-                'studentData'   => $this->getUsersData($this->getUser()->getChildren(), $registerCode, $config)
+                'register' => $register,
+                'recordCollection' => $recordCollection,
+                'studentData'   => $usersData,
             ],
         );
     }
 
-    /**
-     * Fetch data for user from ISAMS Register endpoints
-     *
-     * @param User $user // the user we want data for
-     * @param array $register // array of the register object
-     * @param array $registersConfig // approved list of fields to show
-     * @return array
-     */
-    private function getDataFromRegister(User $user, array $register, array $registersConfig): array
-    {
-        $globalData  = $register;
-        $userData = ['hasDateRange' => false];
-
-        // Request 1.1.1: field data sources
-        foreach ($this->cacheHelper->getMetadataFields($register['id']) as $metadataField) {
-            // check if we are wanting this field...
-            if (!in_array(strtolower($metadataField['key']), $registersConfig[strtolower($register['code'])])) {
-                // not one of the requested field... ignoring
-                continue;
-            }
-            // Fetch data source only if it's a list
-            $metadataFieldValues = null;
-            $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
-            if (in_array($dataSource, ['private', 'shared'])) {
-                if ($metadataField['properties']['dataSourceUrl'] ?? null) {
-                    foreach ($this->cacheHelper->getDataSource($metadataField['properties']['dataSourceUrl']) as $item) {
-                        $metadataFieldValues[$item['value']] = $item['text'];
-                    }
-                }
-            }
-            $globalData['metadata'][strtolower($metadataField['key'])] = [
-                'name'   => $metadataField['name'],
-                'values' => $metadataFieldValues,
-                'type'   => $metadataField['type']
-            ];
-        }
-
-        // Collate student data
-        foreach ($this->cacheHelper->getStudentFields($register['id'], $user->getExternalId()) as $key => $fieldValue) {
-            $key = strtolower($key);
-            // check if we are wanting this field...
-            if (!in_array(strtolower($key), $registersConfig[strtolower($register['code'])])) {
-                // not one of the requested field... ignoring
-                continue;
-            }
-            if (isset($fieldValue)) {
-                // switch for types of fields??? and TextboxField can also be links?
-                $value = $globalData['metadata'][$key]['values'][$fieldValue] ?? $fieldValue;
-                $type = $globalData['metadata'][$key]['type'];
-                switch ($globalData['metadata'][$key]['type']) {
-                    case 'TextboxField':
-                        // am I a URL?
-                        $url = new \Url($value);
-                        if ($url->isUrl()) {
-                            $type = 'url';
-                        }
-                        break;
-                    case 'DateTimeField':
-                        $value = new Alaress_Date_Format($value, Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                        break;
-                    default:
-                }
-                $userData['fields'][$key] = [
-                    'name'  => $globalData['metadata'][$key]['name'],
-                    'value' => $value,
-                    'type' => $type,
-                ];
-            }
-        }
-        foreach ($this->cacheHelper->getStudentDateRanges($register['id'], $user->getExternalId()) as $dateRange) {
-            $userData['hasDateRange'] = true;
-            $userData['dateRanges'][] = [
-                'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
-            ];
-        }
-        return $userData;
-    }
+//     Currently unused, may be needed when we start using a register with `RegisterWithRanges`...
+//    /**
+//     * Fetch data for user from ISAMS Register endpoints
+//     *
+//     * @param User $user // the user we want data for
+//     * @param array $register // array of the register object
+//     * @param array $registersConfig // approved list of fields to show
+//     * @return array
+//     */
+//    private function getDataFromRegister(User $user, array $register, array $registersConfig): array
+//    {
+//        $globalData  = $register;
+//        $userData = ['hasDateRange' => false];
+//
+//        // Request 1.1.1: field data sources
+//        foreach ($this->cacheHelper->getMetadataFields($register['id']) as $metadataField) {
+//            // check if we are wanting this field...
+//            if (!in_array(strtolower($metadataField['key']), $registersConfig[strtolower($register['code'])])) {
+//                // not one of the requested field... ignoring
+//                continue;
+//            }
+//            // Fetch data source only if it's a list
+//            $metadataFieldValues = null;
+//            $dataSource          = strtolower($metadataField['properties']['dataSource'] ?? '');
+//            if (in_array($dataSource, ['private', 'shared'])) {
+//                if ($metadataField['properties']['dataSourceUrl'] ?? null) {
+//                    foreach ($this->cacheHelper->getDataSource($metadataField['properties']['dataSourceUrl']) as $item) {
+//                        $metadataFieldValues[$item['value']] = $item['text'];
+//                    }
+//                }
+//            }
+//            $globalData['metadata'][strtolower($metadataField['key'])] = [
+//                'name'   => $metadataField['name'],
+//                'values' => $metadataFieldValues,
+//                'type'   => $metadataField['type']
+//            ];
+//        }
+//
+//        // Collate student data
+//        foreach ($this->cacheHelper->getStudentFields($register['id'], $user->getExternalId()) as $key => $fieldValue) {
+//            $key = strtolower($key);
+//            // check if we are wanting this field...
+//            if (!in_array(strtolower($key), $registersConfig[strtolower($register['code'])])) {
+//                // not one of the requested field... ignoring
+//                continue;
+//            }
+//            if (isset($fieldValue)) {
+//                // switch for types of fields??? and TextboxField can also be links?
+//                $value = $globalData['metadata'][$key]['values'][$fieldValue] ?? $fieldValue;
+//                $type = $globalData['metadata'][$key]['type'];
+//                switch ($globalData['metadata'][$key]['type']) {
+//                    case 'TextboxField':
+//                        // am I a URL?
+//                        $url = new \Url($value);
+//                        if ($url->isUrl()) {
+//                            $type = 'url';
+//                        }
+//                        break;
+//                    case 'DateTimeField':
+//                        $value = new Alaress_Date_Format($value, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+//                        break;
+//                    default:
+//                }
+//                $userData['fields'][$key] = [
+//                    'name'  => $globalData['metadata'][$key]['name'],
+//                    'value' => $value,
+//                    'type' => $type,
+//                ];
+//            }
+//        }
+//        foreach ($this->cacheHelper->getStudentDateRanges($register['id'], $user->getExternalId()) as $dateRange) {
+//            $userData['hasDateRange'] = true;
+//            $userData['dateRanges'][] = [
+//                'from' => new Alaress_Date_Format($dateRange['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+//                'to'   => new Alaress_Date_Format($dateRange['endDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+//            ];
+//        }
+//        return $userData;
+//    }
 
     /**
      * Extract common config settings
      *
      *  Assumed structure of multi dimensional csv:
-     *  register1,field1,field2,field6
-     *  register2,field1
-     *  register6,field7,field12
+     *  register1;recordCollection3;field1,field2,field6
+     *  register2;recordCollection99;field1
+     *  register6;recordCollection2;field7,field12
      *
      * @param string $registerConfig a multi dimensional csv
      * @return array
+     * @throws SchoolboxException
      */
     private function extractRegisterConfig(string $registerConfig): array
     {
         $registersConfig = [];
         /**
          * Assumed structure of multi dimensional csv:
-         *   register1,field1,field2,field6
-         *   register2,field1
-         *   register6,field7,field12
+         *   register1;recordCollection3;field1,field2,field6
+         *   register2;recordCollection99;field1
+         *   register6;recordCollection2;field7,field12
          */
         // explode to find how many registers we will be working with...
-        foreach (preg_split('/\R/', strtolower($registerConfig)) as $config) {
+        foreach (preg_split('/\R/', $registerConfig) as $config) {
             // explode again to extract the registers, and their fields
             // first object entry is the register, later items are the allowed fields
             /**
              * this explode on `,` may really break... we haven't seen any codes with comma's in them just yet...
              * but that doesn't mean they don't exist
-             * we may need a different seperator... ; maybe, or something else???
+             * we may need to go to a dns and suds like config page
              */
-            $tmp = explode(',', $config);
-            $registerTitle = array_shift($tmp);
-            $registersConfig[$registerTitle] = $tmp;
+            $tmp = explode(';', $config);
+            //if we dont have 3 and exactly 3 items in this config, exit and error.
+            if (3 !== count($tmp)) {
+                throw new SchoolboxException("iSAMAS Register Config Invalid");
+            }
+            $registerCode = $tmp[0];
+            $registerCollection = $tmp[1];
+            $registersConfig[strtolower($registerCode)] = [
+                'register'          => $registerCode,
+                'recordCollection'  => $registerCollection,
+                'fields'            => explode(',', $tmp[2])
+            ];
         }
         return $registersConfig;
     }
@@ -213,9 +294,10 @@ class Controller extends BaseController
     /**
      * common function to fetch / build register info for an array of users
      *
-     * @param Collection|array $users   who are we building info for
-     * @param string $registerCode      what is the requested register we want to look into
-     * @param string $config            the admin approved register list
+     * @param User $user                who are we building info for
+     * @param array $register           what is the requested register we want to look into
+     * @param array $recordCollection   what is the requested register collection we are extracting the data out of
+     * @param array $config             the admin approved register list
      * @return array
      * @throws ClientExceptionInterface
      * @throws GuzzleException
@@ -223,33 +305,76 @@ class Controller extends BaseController
      * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    private function getUsersData(Collection|array $users, string $registerCode, string $config)
+    private function getUsersData(User $user, array $register, array $recordCollection, array $config)
     {
-        // check if we have a valid register code
-        // Hit the iSams API:
-        $apiUrl = new Uri($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_REST_API_HOST));
-        // first, need to exchange client id/secret for an access token
-        $this->cacheHelper = new CacheHelper($this->httpClient, $this->cache, $this->getConfigLoader(), $apiUrl);
+        // fetch user data
+        $userRecords = $this->cacheHelper->getRecordCollectionsRecords($register['id'], $user->getExternalId(), $recordCollection['id']);
 
+        // fetch the field metadata to join and clean the data
+        $fieldMetadata = $this->cacheHelper->getMetadataFields($register['id']);
 
-        $register       = $this->cacheHelper->getRegisters($registerCode, $this->extractRegisterConfig($config));
-        if (null === $register) {
-            /**
-             * Unable to find requested register...
-             */
-            throw new NotFound();
+        $out = [];
+        $knownFields = [];
+        // loop through each record
+        foreach ($userRecords as $record) {
+            $fields = [];
+            //in each record, loop through the metadata fields
+            foreach ($fieldMetadata as $metadata) {
+                //if the field exists then build it, else just continue
+                if (!isset($record['fields'][lcfirst($metadata['key'])])) {
+                    continue;
+                }
+                /**
+                 * If the field is not in the approved list, then build it, else continue
+                 *
+                 * NOTE:
+                 * register metadata fields keys all words are caps,
+                 * the student data fields first character is lowercase...
+                 *
+                 * Regarding the capitalisation, I know this happens elsewhere with OData filters – they always flip the capitals…
+                 * -Mark@EIM
+                 *
+                 * so we need to keep the config as 1 of the schemes,
+                 * I decided that the case should match the student record, not the metadata endpoints
+                 * -Justin
+                 */
+                if (!in_array(lcfirst($metadata['key']), $config['fields'])) {
+                    continue;
+                }
+                $sequence = array_search(lcfirst($metadata['key']), $config['fields']);
+                $knownFields[$sequence] = $metadata['name'];
+
+                // if TextboxField confirm the field type  (url / html?)
+                $value = $record['fields'][lcfirst($metadata['key'])];
+                $type = $metadata['type'];
+                if ('TextboxField' === $metadata['type']) {
+                    // is this a url, if so get twig to format as href
+                    $url = new \Url($value);
+                    if ($url->isUrl()) {
+                        $type = 'url';
+                    }
+
+                    // is html, then get twig to sanitise with `| purify`
+                    if (0 !== preg_match("/<[^<]+>/", $value, $m)) {
+                        $type = 'html';
+                    }
+                }
+
+                // join the record field to the metadata field and append to a new array
+                $fields[$sequence] = [
+                    'type' => $type,
+                    'value' => $value
+                ];
+            }
+            ksort($fields);
+            $out[] = $fields;
         }
-        $usersData = [];
 
-        // Get each student
-        foreach ($users as $user) {
-            // for each student get the data from that register
-            $usersData[] = [
-                'user' => $user,
-                'data' => $this->getDataFromRegister($user, $register, $this->extractRegisterConfig($config)),
-            ];
-        }
-        return $usersData;
+        ksort($knownFields);
+        return [
+            'knownFields' => $knownFields,
+            'userRecords'   => $out
+        ];
     }
 
     /**
