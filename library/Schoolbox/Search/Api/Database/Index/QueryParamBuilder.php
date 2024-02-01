@@ -92,9 +92,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         $sqlSumTerms = [
             // NOTE: Must include punctuation for searches for filenames e.g. 'shutterstock_282889763'.
             "IF(si.title = :indexKeyword$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix, 0)",
-            "IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.8, 0)",
             "IF(si.title LIKE :indexKeywordLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.6, 0)",
-            "IF(si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.4, 0)"
+            "IF(
+                 (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeyword$paramKeySuffix),
+                 IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.8, 0) +
+                 IF(si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.4, 0),
+                 0
+             )"
         ];
 
         foreach ($this->buildBaseWhereParams($keyword, $paramKeySuffix) as $key => $value) {
