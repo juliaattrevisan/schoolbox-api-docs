@@ -56,10 +56,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         $quoter = $this->quoter;
 
-        // Remove all punctuation characters.
+        // Remove all punctuation characters (see comment 'Why strip punctuation?' below).
         $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keyword);
 
-        // Replace multiple spaces with single space.
+        // Replace multiple spaces with single space (see comment 'Why strip punctuation?' below).
         $keywordMinusPunctuation = preg_replace('!\s+!', ' ', $keywordMinusPunctuation);
 
         $params = [
@@ -89,6 +89,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
+        $keyword = trim($keyword);
+
         // Why strip punctuation?
         // ----------------------
         // MATCH...AGAINST on the full-text index disregards punctuation.  We want the behaviour of the LIKE searches on
@@ -98,7 +100,19 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // containing underscores.  So we need LIKE conditions that include punctuation also.
         // With both sets of LIKE conditions in place, matches on title will work similarly to matches on content if
         // the user does not include punctuation, but also punctuation will be considered for matches on title only.
-        // I think this will result in less confusing behaviour than if we didn't have the stripped-punctuation checks.
+        // This will result in less confusing behaviour than if we didn't have the stripped-punctuation checks.
+        //
+        // Examples:
+        //  * Search for 'one, two' (without double-quotes).
+        //    Results should include:
+        //     * all items whose title contains 'one', (requires stripped-punctuation condition).
+        //     * all items whose title contains 'two',
+        //  * Search for '"one, two"' (with double-quotes).
+        //    Results should include:
+        //     * all items whose title contains 'one two', (requires stripped-punctuation condition).
+        //     * all items whose title contains 'one, two' (requires non-stripped-punctuation condition),
+        //
+        // We want the above-described behaviour because that is how MATCH...AGAINST behaves, and because consistency is good.
 
         $sqlSumTerms = [
             // NOTE: Must include punctuation for searches for filenames e.g. 'shutterstock_282889763'.
@@ -112,9 +126,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
              )"
         ];
 
-        foreach ($this->buildBaseWhereParams($keyword, $paramKeySuffix) as $key => $value) {
-            if (str_starts_with($key, self::KEYWORD_TOKEN_LIKE_PREFIX)) {
-                $sqlSumTerms[] = "IF(si.title LIKE :$key, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.2, 0)";
+        // If the keyword has not been surrounded by double-quotes...
+        if ($keyword[0] !== '"' || $keyword[strlen($keyword) - 1] !== '"') {
+            // Search for each word individually to mimic the behaviour of MATCH...AGAINST
+            // (MATCH...AGAINST is used in buildContentRelevanceExpression()).
+            foreach ($this->buildBaseWhereParams($keyword, $paramKeySuffix) as $key => $value) {
+                if (str_starts_with($key, self::KEYWORD_TOKEN_LIKE_PREFIX)) {
+                    $sqlSumTerms[] = "IF(si.title LIKE :$key, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.2, 0)";
+                }
             }
         }
 
