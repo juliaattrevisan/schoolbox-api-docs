@@ -264,17 +264,73 @@ $rotate-span-width: 11rem;
 
 .diagonal-headings-table {
     thead {
-        tr.rotate-headers {
-            th {
-                border: 0;
-                position: sticky;
-                top: 0;
-            }
+        position: sticky;
+        z-index: 5;
+        top: 0;
+        background-color: $body-bg;
 
+        tr.rotate-headers {
             th:nth-child(1),
             th:nth-child(2),
             th:nth-child(1) > div {
                 background-color: $body-bg;
+            }
+
+            background-color: $body-bg;
+
+            th,
+            td {
+                border: 1px solid $body-bg;
+            }
+            th {
+                border: 0;
+                font-size: $paragraph-font-size;
+                border-color: $vapor;
+                height: $rotate-width * 2 + 1;
+                min-width: $rotate-th-width;
+                vertical-align: bottom;
+                padding: 0 !important;
+                letter-spacing: 0.1ex;
+
+                > div {
+                    transform: skew(-#{$rotate-angle}deg, 0deg);
+                    overflow: hidden;
+                    border: 0 solid $body-bg;
+                    border-right-width: 3px;
+                    position: relative;
+                    height: 100%;
+                    top: 0;
+                    left: $rotate-width + 0.5;
+                    filter: none !important;
+                    background-color: $white;
+
+                    &:not(:empty) {
+                        border-bottom-width: 2px;
+                    }
+
+                    > span {
+                        $rotate-angle-complement: 360 - $rotate-angle;
+
+                        transform: skew(#{$rotate-angle}deg, 0deg) rotate(#{$rotate-angle-complement}deg);
+                        filter: none !important;
+                        position: absolute;
+                        top: auto;
+                        bottom: 3.75rem;
+                        left: -3.75rem;
+                        display: inline-block;
+                        width: $rotate-span-width;
+                        text-align: left;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        font-weight: normal;
+                        will-change: transform;
+                    }
+                }
+
+                .meta {
+                    font-style: normal;
+                }
             }
         }
 
@@ -339,62 +395,6 @@ $rotate-span-width: 11rem;
     th {
         min-width: $diagonal-cell-width;
         white-space: nowrap;
-    }
-}
-
-.rotate-headers {
-    background-color: $body-bg;
-
-    th {
-        font-size: $paragraph-font-size;
-        border-color: $vapor;
-        height: $rotate-width * 2 + 1;
-        min-width: $rotate-th-width;
-        position: relative;
-        vertical-align: bottom;
-        padding: 0 !important;
-        letter-spacing: 0.1ex;
-
-        > div {
-            transform: skew(-#{$rotate-angle}deg, 0deg);
-            overflow: hidden;
-            border: 0 solid $body-bg;
-            border-right-width: 3px;
-            z-index: 1;
-            position: relative;
-            height: 100%;
-            top: 0;
-            left: $rotate-width + 0.5;
-            filter: none !important;
-            background-color: $white;
-
-            &:not(:empty) {
-                border-bottom-width: 2px;
-            }
-
-            > span {
-                $rotate-angle-complement: 360 - $rotate-angle;
-
-                transform: skew(#{$rotate-angle}deg, 0deg) rotate(#{$rotate-angle-complement}deg);
-                filter: none !important;
-                position: absolute;
-                top: auto;
-                bottom: 3.75rem;
-                left: -3.75rem;
-                display: inline-block;
-                width: $rotate-span-width;
-                text-align: left;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                font-weight: normal;
-                will-change: transform;
-            }
-        }
-
-        .meta {
-            font-style: normal;
-        }
     }
 }
 
@@ -506,9 +506,11 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 }
 
 #rubric-marksheet.diagonal-headings-table {
-    /* To prevent vertical border lines from showing over the diagonal table headings. */
-    thead th {
-        border: 0;
+    tbody {
+        th,
+        td {
+            border: 1px solid $body-bg;
+        }
     }
 
     /* To prevent data rows from showing in the triangle to the left of the rotated headers when the user scrolls down to see lower rows. */
@@ -525,11 +527,6 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
         @media #{$medium-up} {
             left: 180px; /* 180px to match width of a .profile-cell table cell. */
         }
-    }
-
-    th,
-    td {
-        border: 1px solid $body-bg;
     }
 
     /* The first row should have no border at the top. */
