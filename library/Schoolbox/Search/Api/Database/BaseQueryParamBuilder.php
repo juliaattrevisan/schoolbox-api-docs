@@ -43,7 +43,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * The maximum relevance bonus score for a recently modified result.
      * (This will apply to results whose updated_at date is today.)
      */
-    public const RELEVANCE_WEIGHTING_RECENT_DATE = 1000;
+    public const RELEVANCE_WEIGHTING_RECENT_DATE = 1;
 
     /**
      * @inheritdoc
