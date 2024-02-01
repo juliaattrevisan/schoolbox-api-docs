@@ -89,6 +89,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
+        // Why strip punctuation?
+        // ----------------------
+        // MATCH...AGAINST on the full-text index disregards punctuation.  We want the behaviour of the LIKE searches on
+        // title to be as consistent as is practical with the behaviour of the MATCH...AGAINST searches on content, so we
+        // strip punctuation characters from the title before applying the LIKE conditions.
+        // However, in some cases we do need to consider punctuation characters - e.g. when searching for a filename
+        // containing underscores.  So we need LIKE conditions that include punctuation also.
+        // With both sets of LIKE conditions in place, matches on title will work similarly to matches on content if
+        // the user does not include punctuation, but also punctuation will be considered for matches on title only.
+        // I think this will result in less confusing behaviour than if we didn't have the stripped-punctuation checks.
+
         $sqlSumTerms = [
             // NOTE: Must include punctuation for searches for filenames e.g. 'shutterstock_282889763'.
             "IF(si.title = :indexKeyword$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix, 0)",
