@@ -122,14 +122,25 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // We want the above-described behaviour because that is how MATCH...AGAINST behaves, and because consistency is good.
 
         $sqlSumTerms = [
-            "IF(si.title = :indexKeywordUnquoted$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix, 0)",
-            "IF(si.title LIKE :indexKeywordUnquotedLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.6, 0)",
             "IF(
-                 (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeywordUnquoted$paramKeySuffix),
-                 IF(si.title = :indexKeywordMinusPunct$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.8, 0) +
-                 IF(si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.4, 0),
-                 0
-             )"
+                si.title = :indexKeywordUnquoted$paramKeySuffix,
+                :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix,
+                IF(
+                    (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeywordUnquoted$paramKeySuffix) AND
+                    si.title = :indexKeywordMinusPunct$paramKeySuffix,
+                    :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.8,
+                    IF(
+                        si.title LIKE :indexKeywordUnquotedLike$paramKeySuffix,
+                        :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.6,
+                        IF(
+                            (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeywordUnquoted$paramKeySuffix) AND
+                            si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix,
+                            :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.4,
+                            0
+                        )
+                    )
+                )
+            )",
         ];
 
         // If the keyword has not been surrounded by double-quotes...
