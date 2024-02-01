@@ -30,8 +30,8 @@ class IndexBuilder extends BaseBuilder
                 u.firstname,
                 u.preferred_name,
                 u.lastname,
-                CONCAT_WS(' ', u.title, u.firstname, u.lastname) AS nameFormat1,
-                CONCAT_WS(' ', u.firstname, u.lastname) AS nameFormat2,
+                CONCAT_WS(' ', u.firstname, u.lastname) AS nameFormat1,
+                CONCAT_WS(' ', u.title, u.firstname, u.lastname) AS nameFormat2,
                 CONCAT_WS(' ', u.title, u.preferred_name, u.lastname) AS nameFormat3,
                 CONCAT_WS(' ', u.preferred_name, u.lastname) AS nameFormat4,
                 CONCAT_WS(' ', u.title, u.lastname) AS nameFormat5,
@@ -56,7 +56,7 @@ class IndexBuilder extends BaseBuilder
         foreach ($query as $row) {
             $index = $this->buildIndex(
                 (string)$row['id'],
-                $row['nameFormat2'],
+                $row['nameFormat1'],
                 $row['type'],
                 $row['updated_at'],
                 false,
@@ -67,7 +67,6 @@ class IndexBuilder extends BaseBuilder
             $index = $this->addFulltextIndex($index, $row['firstname'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['preferred_name'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['lastname'], self::INDEX_STRATEGY_TEXT);
-            $index = $this->addFulltextIndex($index, $row['nameFormat1'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['nameFormat2'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['nameFormat3'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['nameFormat4'], self::INDEX_STRATEGY_TEXT);

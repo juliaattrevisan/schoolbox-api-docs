@@ -85,11 +85,11 @@ class IndexBuilder extends BaseBuilder
         ";
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND assessment.updated_at >= :fromDate';
+            $queryString .= ' AND assessment.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND assessment.updated_at <= :toDate';
+            $queryString .= ' AND assessment.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -110,7 +110,6 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 $row['folder_id'],
             );
-            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['description'], self::INDEX_STRATEGY_HTML);
             $index = $this->addFulltextIndex($index, $row['task_link'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['lti_assessment_url'], self::INDEX_STRATEGY_TEXT);

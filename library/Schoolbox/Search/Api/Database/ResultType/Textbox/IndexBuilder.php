@@ -101,7 +101,6 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 $row['folder_id'],
             );
-            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['fulltext_index'], self::INDEX_STRATEGY_HTML);
             yield $index;
         }
@@ -119,14 +118,16 @@ class IndexBuilder extends BaseBuilder
                 cci2.component_config_definition_id = (
                     SELECT id
                     FROM component_config_definition ccd2
-                    WHERE ccd2.key = '" . TextboxMapper::HOMEPAGE_COMPONENT_KEY . "'
+                    WHERE ccd2.key = :homepageComponentKey
                 ) AND
                 cci2.value = CAST(tb2.textBoxID AS NCHAR)
             )
             WHERE tb2.deleted_at IS NULL
             AND cci2.id IS NULL
         ";
-        $params = [];
+        $params = [
+            'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+        ];
         if ($fromDate) {
             $queryString .= ' AND tb2.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
@@ -149,7 +150,6 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 null,
             );
-            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['fulltext_index'], self::INDEX_STRATEGY_HTML);
             yield $index;
         }

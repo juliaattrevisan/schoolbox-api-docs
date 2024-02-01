@@ -57,7 +57,6 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 null,
             );
-            $index = $this->addFulltextIndex($index, $row['name'], self::INDEX_STRATEGY_TEXT);
 
             if ($row['code'] && strlen($row['code']) > 0) {
                 $index = $this->addFulltextIndex($index, $row['code'], self::INDEX_STRATEGY_TEXT);
