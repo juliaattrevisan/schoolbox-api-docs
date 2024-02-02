@@ -100,14 +100,27 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         // Why strip punctuation?
         // ----------------------
-        // MATCH...AGAINST on the full-text index disregards punctuation.  We want the behaviour of the LIKE searches on
-        // title to be as consistent as is practical with the behaviour of the MATCH...AGAINST searches on content, so we
-        // strip punctuation characters from the title before applying the LIKE conditions.
-        // However, in some cases we do need to consider punctuation characters - e.g. when searching for a filename
-        // containing underscores.  So we need LIKE conditions that include punctuation also.
-        // With both sets of LIKE conditions in place, matches on title will work similarly to matches on content if
-        // the user does not include punctuation, but also punctuation will be considered for matches on title only.
-        // This will result in less confusing behaviour than if we didn't have the stripped-punctuation checks.
+        // We want the behaviour of the LIKE searches on title to be as consistent as is practical with the behaviour
+        // of the MATCH...AGAINST searches on content.
+        //
+        // MATCH...AGAINST searching is based on words, not on characters, and so has some peculiar rules defining
+        // word boundaries.
+        //
+        // Quote from https://dev.mysql.com/doc/refman/8.0/en/fulltext-natural-language.html:
+        // "The MySQL FULLTEXT implementation regards any sequence of true word characters (letters, digits, and
+        // underscores) as a word. That sequence may also contain apostrophes ('), but not more than one in a row.
+        // This means that aaa'bbb is regarded as one word, but aaa''bbb is regarded as two words. Apostrophes at
+        // the beginning or the end of a word are stripped by the FULLTEXT parser; 'aaa'bbb' would be parsed as
+        // aaa'bbb."
+        //
+        // In practice, doing LIKE comparisons on the keyword as entered, and the keyword stripped of punctuation,
+        // provides a good approximation of MATCH...AGAINST behaviour, while allowing users to search for titles
+        // using the exact title including any punctuation characters.
+        //
+        // Thus, the inclusion of stripped-punctuation LIKE checks will hopefully result in less confusing behaviour
+        // than would result if stripped-punctuation LIKE searches were not included.
+        //
+        // This decision may be revisited.
         //
         // Examples:
         //  * Search for 'one, two' (without double-quotes).
@@ -118,8 +131,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         //    Results should include:
         //     * all items whose title contains 'one two', (requires stripped-punctuation condition).
         //     * all items whose title contains 'one, two' (requires non-stripped-punctuation condition),
-        //
-        // We want the above-described behaviour because that is how MATCH...AGAINST behaves, and because consistency is good.
 
         $sqlSumTerms = [
             "IF(
