@@ -76,7 +76,7 @@ class PipeWriter
             $this->log->error("$overhang bytes unflushed");
         }
 
-        $this->log->info(sprintf("Sent %d bytes to target (%d x %d-byte chunks)", $written, $written / $chunk, $chunk));
+        $this->log->debug(sprintf("Sent %d bytes to target (%d x %d-byte chunks)", $written, $written / $chunk, $chunk));
 
         if ($written < $strlen) {
             throw new IOException("Pipe communication terminated prematurely after $written bytes, " . ($strlen - $written) . " unsent");

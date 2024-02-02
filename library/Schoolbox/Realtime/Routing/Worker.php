@@ -55,7 +55,7 @@ class Worker extends AbstractProcess
 
         $this->log->debug(sprintf('Iterating %d frame%s provided', count($args), count($args) === 1 ? '' : 's'));
         $count = $this->txrx->receive($args);
-        $this->log->info("Rerouted $count message" . ($count === 1 ? '' : 's'));
+        $this->log->debug("Rerouted $count message" . ($count === 1 ? '' : 's'));
 
         return $count;
     }

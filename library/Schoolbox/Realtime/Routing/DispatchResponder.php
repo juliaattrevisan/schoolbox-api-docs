@@ -39,7 +39,7 @@ class DispatchResponder implements TaskResponseHandlerInterface
      */
     public function handleResponse($identifier, $command, $data)
     {
-        $this->log->notice("Reroute count: $data[0]");
+        $this->log->debug("Reroute count: $data[0]");
     }
 
 
