@@ -114,8 +114,13 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var null|HouseResidential */
     private $residentialHouse;
 
-    /** @var null|Collection|self[] */
-    private ?Collection $linkedUsers = null;
+    /**
+     * Note this variable should have a plural name, since it will contain a collection of linked users.
+     * The name cannot be fixed without causing serialized user objects to become incompatible with the class definition.
+     * So if the name is to be fixed to $linkedUsers, that problem must also be dealt with somehow.
+     * @var null|Collection|self[]
+     */
+    private ?Collection $linkedUser = null;
 
     /**
      * The hash value is actually a digest key and it will change
@@ -1176,12 +1181,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
 
     /**
-     * @param Collection|self[] $linkedUsers
+     * @param Collection|self[] $linkedUser
      * @return $this
      */
     public function setLinkedUsers(Collection $linkedUsers): self
     {
-        $this->linkedUsers = $linkedUsers;
+        $this->linkedUser = $linkedUsers; // Note the class variable name should be plural (see comment above variable declaration).
         return $this;
     }
 
@@ -1190,7 +1195,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function getLinkedUsers(): ?Collection
     {
-        return $this->linkedUsers;
+        return $this->linkedUser; // Note the class variable name should be plural (see comment above variable declaration).
     }
 
     /**
