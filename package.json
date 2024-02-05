@@ -63,7 +63,7 @@
         "dayjs": "^1.11.10",
         "dropzone": "~6.0.0-beta.2",
         "flatpickr": "~4.6.13",
-        "gsap": "npm:@gsap/business@^3.12.1",
+        "gsap": "npm:@gsap/business@^3.12.5",
         "highcharts": "~9.3.3",
         "highcharts-vue": "~1.4.0",
         "intro.js": "~2.9.3",

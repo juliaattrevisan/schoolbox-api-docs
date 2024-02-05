@@ -68,7 +68,7 @@
                 "dayjs": "^1.11.10",
                 "dropzone": "~6.0.0-beta.2",
                 "flatpickr": "~4.6.13",
-                "gsap": "npm:@gsap/business@^3.12.1",
+                "gsap": "npm:@gsap/business@^3.12.5",
                 "highcharts": "~9.3.3",
                 "highcharts-vue": "~1.4.0",
                 "intro.js": "~2.9.3",
@@ -17684,10 +17684,10 @@
         },
         "node_modules/gsap": {
             "name": "@gsap/business",
-            "version": "3.12.1",
-            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.1.tgz",
-            "integrity": "sha512-34k7zB81c2yAb4aOHUHo0qXmNMCXp6hMujVBdFn6asRI74ZH3vc1kx93SebksUZ8v/gZSJT4S3haWPB436nOjQ==",
-            "license": "This package should only be used by individuals/companies with an active Business Green Club GreenSock membership. See https://greensock.com/club/. Licensing: https://greensock.com/licensing/"
+            "version": "3.12.5",
+            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.5.tgz",
+            "integrity": "sha512-MaoS/j4c+ZHCzkA0C1hWah3E0PTBOaevgJCD4ccad7FePaFcVyC1RSXi67GZQNntMTb03crXB+8CKXL490L6GQ==",
+            "license": "This package should only be used by individuals/companies with an active Business Green Club GSAP membership. See https://gsap.com/pricing/. Licensing: https://gsap.com/licensing/"
         },
         "node_modules/gunzip-maybe": {
             "version": "1.4.2",
@@ -43868,9 +43868,9 @@
             "dev": true
         },
         "gsap": {
-            "version": "npm:@gsap/business@3.12.1",
-            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.1.tgz",
-            "integrity": "sha512-34k7zB81c2yAb4aOHUHo0qXmNMCXp6hMujVBdFn6asRI74ZH3vc1kx93SebksUZ8v/gZSJT4S3haWPB436nOjQ=="
+            "version": "npm:@gsap/business@3.12.5",
+            "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.12.5.tgz",
+            "integrity": "sha512-MaoS/j4c+ZHCzkA0C1hWah3E0PTBOaevgJCD4ccad7FePaFcVyC1RSXi67GZQNntMTb03crXB+8CKXL490L6GQ=="
         },
         "gunzip-maybe": {
             "version": "1.4.2",
