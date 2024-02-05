@@ -54,7 +54,7 @@
         "@microsoft/immersive-reader-sdk": "^1.4.0",
         "@phudak/ckeditor5-emoji": "~1.1.1",
         "@vueuse/components": "^10.7.2",
-        "@vueuse/core": "^10.2.1",
+        "@vueuse/core": "^10.7.2",
         "axios": "~1.6.0",
         "canvas-confetti": "~1.6.0",
         "clipboard": "~2.0.11",
