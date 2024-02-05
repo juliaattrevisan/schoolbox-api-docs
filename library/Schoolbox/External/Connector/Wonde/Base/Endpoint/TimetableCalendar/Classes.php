@@ -325,10 +325,6 @@ class Classes implements IStrategy
                 continue;
             }
 
-            if ($class['code'] != '24.10-11-211-72') {
-                return;
-            }
-
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $lesson, $startAt, $finishAt);
