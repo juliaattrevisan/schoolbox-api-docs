@@ -542,9 +542,26 @@ class Classes implements IStrategy
             /* Save a staff member's involvement for this instance of a class
              * This person teaches this particular instance of the class.
              * Sadly wonde won't tell you who this person is; just their id
+             * (and even that id isn't the one that schools use...)
              */
-            $externalId = trim((string)($lesson['employee'] ?? null));
+            $wondeIdentifier = trim((string)($lesson['employee'] ?? null));
 
+            $externalId = $this->lookup[$wondeIdentifier] ?? null;
+
+            if (null === $externalId) {
+                $this->log->debug(sprintf(
+                    '%s: unknown Wonde internal identifier %s; skipping',
+                    $class['code'],
+                    $wondeIdentifier
+                ));
+
+                return;
+            }
+
+            /* Otherwise continue like we always tried to do...we don't have a
+             * $name here so just use externalId in its place. You could update
+             * the IdToMisId lookup to also have names, though, if that helps
+             */
             $name = $externalId;
 
             $this->saveInvolvement($event, $classEntry, $name, $externalId);
