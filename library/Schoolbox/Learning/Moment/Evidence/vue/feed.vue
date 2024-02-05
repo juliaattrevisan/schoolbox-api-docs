@@ -501,7 +501,7 @@ export default {
                         <div class="checklist">
                             <label class="title">Filter to:</label>
                             <ul class="option-list">
-                                <li v-if="config.routes.getCreateEvidenceForm">
+                                <li>
                                     <input
                                         type="checkbox"
                                         data-filter-checkbox
