@@ -554,7 +554,7 @@ class TimetableUsers
                     /* Only care about events the current user is in today
                      */
                     if (array_key_exists($user->getExternalId(), $data['manifest'])) {
-                        $eventIds[] = $eventId;
+                        $eventIds[$eventId] = $data['manifest'];
                     }
                 }
 

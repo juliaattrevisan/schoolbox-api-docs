@@ -167,7 +167,7 @@ class Mapper extends \Schoolbox\Mapper
         /* Limit it to $eventIds
          */
         $pb = $this->getPredicateBuilder()
-            ->in('id', $eventIds);
+            ->in('id', array_keys($eventIds));
 
         $where = $pb->getWhere()[0];
         $params = $pb->getParams();
@@ -181,6 +181,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$folderColumnString},
                 {$folderCodeColumnString},
+                scu.external_id AS externalId,
                 u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`,
                 g.group_type as `g.group_type`
             FROM {$this->getTable()}
@@ -230,10 +231,16 @@ class Mapper extends \Schoolbox\Mapper
              * WHERE group_type = 'staff' these students-only classes won't appear in
              * the result set
              */
-            $id = (int)$row['u.id'];
+            $userId = (int)$row['u.id'];
+            $externalId = (string)$row['externalId'];
+            $eventId = $row['id'];
             $groupType = (string)$row['g.group_type'];
 
-            if (\Schoolbox\Role::STAFF === $groupType) {
+            /* Find out if this user is in the event manifest; the list of staff should
+             * only contain the people actually teaching the class instance (involvements)
+             * and not blindly assume "anyone associated with the class" (enrolments)
+             */
+            if (\Schoolbox\Role::STAFF === $groupType && isset($eventIds[$eventId][$externalId])) {
                 $name = implode(' ', array_filter([
                     $row['u.title'],
                     $row['u.firstname'],
@@ -244,7 +251,7 @@ class Mapper extends \Schoolbox\Mapper
 
                 /* Trickle it in
                  */
-                $stack->getOffset($row['id'])->addStaff($id, $name);
+                $stack->getOffset($row['id'])->addStaff($userId, $name);
             }
         }
 
