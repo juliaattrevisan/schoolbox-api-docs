@@ -16,6 +16,7 @@ interface Props {
     student: Student; // the student to display
     item: StudentItem; // the item to display
     isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
+    hasMarkVisibility: boolean; // whether marks and feedback are visible to the user
 }
 const props = defineProps<Props>();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
@@ -124,7 +125,7 @@ window.Vue.onUnmounted(async () => {
                 props.item.questions[0].response?.comment !== ''
             "
         >
-            <div>
+            <div class="comment-container l-pad-m--top" v-if="props.hasMarkVisibility">
                 <label>Comment</label>
                 <div v-html="props.item.questions[0].response.comment"></div>
             </div>
@@ -147,6 +148,10 @@ window.Vue.onUnmounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+.comment-container {
+    border-top: 2px solid var(--body-background);
+}
+
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
     transition: grid-template-rows 300ms;

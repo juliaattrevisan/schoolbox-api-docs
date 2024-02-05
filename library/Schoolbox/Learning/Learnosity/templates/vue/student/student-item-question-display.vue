@@ -184,7 +184,7 @@ const bottomBorder = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m l-pad-m--bottom question">
+    <div class="l-flex-col l-gap-m question">
         <template v-if="props.question.response">
             <div ref="responsesEl"></div>
             <template v-if="props.showFeedback">
@@ -248,9 +248,7 @@ const bottomBorder = window.Vue.computed(() => {
         overflow: hidden;
     }
 }
-.question {
-    border-bottom: v-bind(bottomBorder);
-}
+
 /* as it's readonly, but we still want to make it fully readable  */
 input[readonly] {
     background-color: var(--foreground-colour);
