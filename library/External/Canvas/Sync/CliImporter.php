@@ -513,9 +513,12 @@ class CliImporter extends CliTool\App
      */
     private function downloadDataFiles(array $tableList, string $tempDir, array $tablesToImport): void
     {
+
+        $promises = [];
         $client = new Client([
-            'timeout' => self::DEFAULT_TIMEOUT,
-        ]);
+                                 'timeout' => self::DEFAULT_TIMEOUT,
+                             ]);
+
         foreach ($tableList as $tableName => $tableData) {
             if (!in_array($tableName, $tablesToImport) || !count($tableData['files'])) {
                 continue;
@@ -526,6 +529,7 @@ class CliImporter extends CliTool\App
                 $fileName      = "$tempDir/$tableName.$index.gz";
                 $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName : '/dev/null', 'wb');
                 $this->getLogger()->debug("Downloading $tableName to $fileName");
+//                $this->getLogger()->debug(sprintf("URL: %s", var_export($tableFile, true)));
 
                 /* Mine out an error message if you try to access a thing that doesn't exist
                 */
@@ -538,7 +542,7 @@ class CliImporter extends CliTool\App
                     /* Any exception thrown by guzzle might as well be a reason to nap and retry
                      */
                     try {
-                        $client->get($tableFile['url'], ['sink' => $tableDataFile]);
+                        $promises[] = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
                         continue 2;
                     } catch (GuzzleException $e) {
                         $fails++;
@@ -556,6 +560,11 @@ class CliImporter extends CliTool\App
                 );
             }
         }
+
+        // Now wait until all the results are retrieved
+        $bulkPromise = \GuzzleHttp\Promise\Utils::all($promises);
+        $result      = $bulkPromise->wait();
+//        $this->getLogger()->debug(sprintf("downloadASYNC result %s", var_export($result, true)));
     }
 
 
