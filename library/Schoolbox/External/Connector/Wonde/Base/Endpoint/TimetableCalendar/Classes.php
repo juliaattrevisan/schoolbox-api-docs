@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Wonde\Base\Endpoint\Lookup\IdToMisId;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -118,6 +119,15 @@ class Classes implements IStrategy
 
 
     /**
+     * A set of (wonde internal identifier, sis external identifier) tuples
+     * because wonde misrepresents data like that...
+     *
+     * @var array
+     */
+    private array $lookup;
+
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface                            $log
@@ -167,7 +177,9 @@ class Classes implements IStrategy
     {
         $this->log->info('Processing timetables.');
 
-        $this->log->debug('Preloading student involvements for all the classes.');
+        $this->log->info('Preloading identifier tuples for all humans (this might take a while)');
+
+        $this->lookup = (new IdToMisId($this->api))->generate();
 
         $this->log->debug(sprintf(
             'Processing lessons between %s and %s',
