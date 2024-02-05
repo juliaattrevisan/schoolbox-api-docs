@@ -36,18 +36,22 @@ export default {
             required: true,
         },
         showLearningMoments: {
+            // whether to show learning moments within the feed
             type: Boolean,
             required: true,
         },
         showGoals: {
+            // whether to show goals within the feed
             type: Boolean,
             required: true,
         },
         showAchievements: {
+            // whether to show achievements within the feed
             type: Boolean,
             required: true,
         },
         showFeedback: {
+            // whether to show feedback within the feed
             type: Boolean,
             required: true,
         },
