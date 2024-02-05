@@ -193,19 +193,37 @@ const bottomBorder = window.Vue.computed(() => {
                     <p>{{ question.metadata.sample_answer }}</p>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
-                    <label v-if="props.item.questions.length > 1 || !props.isReadOnly"
-                        >Score (max score: {{ props.question.response.maxScore }})</label
-                    >
-                    <p v-if="props.isReadOnly && props.item.questions.length > 1">{{ score }}</p>
-                    <input
-                        v-else-if="props.item.questions.length > 1 || !props.isReadOnly"
-                        :id="`customise-score-${props.question.response.learnosityReference}`"
-                        ref="scoreEl"
-                        v-model="score"
-                        type="number"
-                        min="0"
-                        :max="props.question.response.maxScore"
-                    />
+                    <!--
+                    hasMarkVisibility determines what kind of label text you get
+                    since it removes some superfluous words when they have no
+                    contextual meaning - e.g. there's no point knowing "Score: "
+                    when you weren't able to see it, due to visibility being set
+                    to Staff Only. Also, when there's only one Question in the Item
+                    just rely on the bubble in the top right corner which tells you
+                    all this Score vs Max Score anyway
+                    -->
+                    <template v-if="props.isReadOnly">
+                        <p v-if="props.item.questions.length > 1">
+                            <template v-if="props.hasMarkVisibility">
+                                <label>Score (max score: {{ props.question.response.maxScore }})</label>
+                                {{ score }}
+                            </template>
+                            <template v-else>
+                                <label>Max score: {{ props.question.response.maxScore }}</label>
+                            </template>
+                        </p>
+                    </template>
+                    <template v-else>
+                        <label>Score (max score: {{ props.question.response.maxScore }})</label>
+                        <input
+                            :id="`customise-score-${props.question.response.learnosityReference}`"
+                            ref="scoreEl"
+                            v-model="score"
+                            type="number"
+                            min="0"
+                            :max="props.question.response.maxScore"
+                        />
+                    </template>
                     <div class="save-container l-grid">
                         <div class="save-container__inner-container">
                             <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
