@@ -90,7 +90,7 @@
                 {% endfor %}
             </tr>
             <tr class="course-headers">
-                <th class="fixed-left"></th>
+                <th class="fixed-left transparent"></th>
                 <th class="fixed-left white"></th>
                 {% if rankEnabled %}
                 <th class="white"></th>
@@ -209,7 +209,7 @@
                             {% endif %}
                         </th>
                         {% if rankEnabled %}
-                            <td class='course-ranking'>
+                            <td class="course-ranking">
                                 {% if rank[student.id] is defined and publishedNormMark %}
                                     {# check if the rank object exits, and there is / was a mean score #}
                                     {{ rank[student.id] }}

@@ -270,10 +270,6 @@ $rotate-span-width: 11rem;
         background-color: $body-bg;
 
         tr.rotate-headers {
-            th,
-            td {
-                border: 1px solid $body-bg;
-            }
             th {
                 border: 0;
                 font-size: $paragraph-font-size;
@@ -332,26 +328,6 @@ $rotate-span-width: 11rem;
                 .meta {
                     font-style: normal;
                 }
-            }
-        }
-
-        tr.average-headers,
-        tr.course-headers {
-            th {
-                position: sticky;
-                top: $rotate-width * 2 + 1; /* To match '.rotate-headers th' height set below. */
-            }
-        }
-
-        tr.average-headers {
-            th.average-expander {
-                padding: 0.5rem !important;
-            }
-        }
-
-        tr.course-headers {
-            th.unit-title:nth-child(even) {
-                filter: hue-rotate(-45deg);
             }
         }
 
@@ -436,26 +412,6 @@ $rotate-span-width: 11rem;
     }
 }
 
-// Prevent long names causing first column to be excessively wide.
-table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
-    max-width: 200px;
-    overflow: hidden;
-    white-space: normal;
-}
-
-// Prevent grades from wrapping over two lines
-.marksheet .student-grade-cell {
-    white-space: nowrap;
-}
-
-.marksheet [data-pop-out-menu] {
-    cursor: pointer;
-
-    &:hover {
-        background-color: var(--content-ui-hover);
-    }
-}
-
 // dataTables
 .island {
     table.dataTable.no-footer {
@@ -500,82 +456,4 @@ table.diagonal-headings-table.marksheet tbody tr th.profile-cell {
 // Tables in homepage components
 .component-container table {
     background: transparent;
-}
-
-#rubric-marksheet.diagonal-headings-table {
-    tbody {
-        th,
-        td {
-            border: 1px solid $body-bg;
-        }
-    }
-
-    tbody th {
-        white-space: normal !important;
-    }
-
-    /* This class needed because first child is a cell spanning multiple rows. */
-    tbody th.fixed-left.second-child {
-        @media #{$medium-up} {
-            left: 180px; /* 180px to match width of a .profile-cell table cell. */
-        }
-    }
-
-    /* The first row should have no border at the top. */
-    tbody tr:first-child th,
-    tbody tr:first-child td {
-        border-top: 0;
-    }
-
-    th:nth-child(1),
-    td:nth-child(1) {
-        min-width: 180px; /* 180px to match width of a .profile-cell table cell. */
-    }
-
-    th.second-child,
-    td.second-child {
-        max-width: 350px;
-        min-width: 250px;
-    }
-
-    .assessment {
-        font-weight: normal;
-    }
-
-    /* To override '.indicator' styles in _marksheet.css. */
-    .indicator {
-        font-weight: normal;
-        padding-left: 2rem;
-    }
-    .capability :last-child,
-    .indicator :last-child {
-        /** Remove unsightly margin from bottom of capability/indicator **/
-        margin-bottom: 0;
-    }
-    .capability,
-    .indicator {
-        p {
-            white-space: pre-wrap;
-        }
-    }
-
-    .mark {
-        white-space: nowrap;
-    }
-
-    .no-mark {
-        padding: 0.5rem 1.25rem 0.5rem 0; /* Makes it easier to click on the dashes */
-    }
-
-    .first-summated {
-        border-top: 2px solid #ededed; /* A gap between the body and overall sections */
-    }
-
-    .rubric-checklist > label {
-        margin-bottom: 0 !important;
-    }
-
-    [data-draft-mark] {
-        display: none;
-    }
 }
