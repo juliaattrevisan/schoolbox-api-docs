@@ -325,6 +325,10 @@ class Classes implements IStrategy
                 continue;
             }
 
+            if ($class['code'] != '24.10-11-211-72') {
+                return;
+            }
+
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $lesson, $startAt, $finishAt);
@@ -335,7 +339,7 @@ class Classes implements IStrategy
 
             /* Save the involvements
              */
-            $this->createInvolvements($class, $event, $classEntry);
+            $this->createInvolvements($class, $lesson, $event, $classEntry);
         }
     }
 
@@ -442,15 +446,17 @@ class Classes implements IStrategy
     /**
      * Create (or reuse) a ClassEntry corresponding to $event
      *
-     * @param array                           $class
-     * @param \Schoolbox\External\Event\Model $event
+     * @param array $class
+     * @param Model $event
      * @return ClassEntry
+     * @throws Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createClassEntry(array $class, \Schoolbox\External\Event\Model $event): ClassEntry
-    {
+    private function createClassEntry(
+        array $class,
+        \Schoolbox\External\Event\Model $event
+    ): ClassEntry {
         $name = trim((string)$class['name']);
         $code = trim((string)$class['code']);
 
@@ -475,8 +481,9 @@ class Classes implements IStrategy
     /**
      * Save all the involvements for a given $class
      *
-     * @param array      $class
-     * @param Model      $event
+     * @param array $class
+     * @param array $lesson
+     * @param Model $event
      * @param ClassEntry $classEntry
      * @return void
      * @throws Exception
@@ -485,34 +492,32 @@ class Classes implements IStrategy
      */
     private function createInvolvements(
         array $class,
+        array $lesson,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
-        /* Save sis_class_user involvements
-         * This is the teacher(s)
-         */
         if (!\count($class['employees']['data'])) {
+            /* There aren't any teachers enrolled in the subject.
+             * Note that this isn't necessarily the people conducting the class,
+             * just the guys who have something to do with it
+             */
             $this->log->debug(sprintf(
-                '%s: no staff involved',
+                '%s: no staff enrolled for this class',
+                $class['code']
+            ));
+        } elseif ('' === trim((string)($lesson['employee'] ?? null))) {
+            /* This is the employee currently conducting the lesson;
+             * a lesson is an "instance of a class" so to speak
+             * Without a teacher actually doing any teaching, warn and skip
+             */
+            $this->log->debug(sprintf(
+                '%s: no staff involved for an instance of this class',
                 $class['code']
             ));
         } else {
-            /* Clear all other staff out first
+            /* Save a staff member's regular enrolment in the class;
+             * These guys all have something to do with this class.
              */
-            /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
-             * and add the guy teaching this particular instance (even though they
-             * might end up being the same person sometimes)
-             */
-            $clearOverride = $this->overridesMapper->createModel()
-                ->setEventId($event->getId())
-                ->setExternalId(null)
-                ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
-                ->setSequence(1);
-
-            if ($this->perform) {
-                $this->overridesMapper->save($clearOverride);
-            }
-
             foreach ($class['employees']['data'] as $employee) {
                 $externalId = $employee['mis_id'];
 
@@ -523,8 +528,18 @@ class Classes implements IStrategy
                     $employee['surname']
                 );
 
-                $this->saveStaffInvolvement($event, $classEntry, $name, $externalId);
+                $this->saveEnrolment($event, $classEntry, $name, $externalId);
             }
+
+            /* Save a staff member's involvement for this instance of a class
+             * This person teaches this particular instance of the class.
+             * Sadly wonde won't tell you who this person is; just their id
+             */
+            $externalId = trim((string)($lesson['employee'] ?? null));
+
+            $name = $externalId;
+
+            $this->saveInvolvement($event, $classEntry, $name, $externalId);
         }
 
         /* Save sis_class_user involvements
@@ -545,7 +560,7 @@ class Classes implements IStrategy
                     $student['surname']
                 );
 
-                $this->saveRegularInvolvement($event, $classEntry, $name, $externalId);
+                $this->saveEnrolment($event, $classEntry, $name, $externalId);
             }
         }
     }
@@ -560,26 +575,21 @@ class Classes implements IStrategy
      * @param string     $name
      * @param string     $externalId
      * @return void
-     * @throws Exception
      * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveStaffInvolvement(
-        \Schoolbox\External\Event\Model $event,
+    private function saveInvolvement(
+        Model $event,
         ClassEntry $classEntry,
         string $name,
         string $externalId
     ): void {
-        /* Also save a staff member's regular enrolment
-         */
-        $this->saveRegularInvolvement($event, $classEntry, $name, $externalId);
-
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
         $this->log->debug(sprintf(
-            'Creating new override involvements for %s (%s) in timetable event %s - %s, %s, %s-%s',
-            $name,
+            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
             $externalId,
             $event->getTitle(),
             $event->getDay(),
@@ -588,9 +598,16 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
-        /* It doesn't actually matter that these are all sequence 2
-         * The only thing that matters is that it follows after CLEAR_STAFF
+        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
+         * and add the guy teaching this particular instance (even though they
+         * might end up being the same person sometimes)
          */
+        $clearOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId(null)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+            ->setSequence(1);
+
         $involvementOverride = $this->overridesMapper->createModel()
             ->setEventId($event->getId())
             ->setExternalId($externalId)
@@ -598,6 +615,7 @@ class Classes implements IStrategy
             ->setSequence(2);
 
         if ($this->perform) {
+            $this->overridesMapper->save($clearOverride);
             $this->overridesMapper->save($involvementOverride);
         }
     }
@@ -612,19 +630,19 @@ class Classes implements IStrategy
      * @param string     $name
      * @param string     $externalId
      * @return void
-     * @throws Exception
      * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveRegularInvolvement(
-        \Schoolbox\External\Event\Model $event,
+    private function saveEnrolment(
+        Model $event,
         ClassEntry $classEntry,
         string $name,
         string $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
-                'Reusing previous regular class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
@@ -645,7 +663,7 @@ class Classes implements IStrategy
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
             $this->log->debug(sprintf(
-                'Creating new regular class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
