@@ -154,9 +154,9 @@
                 "vue-style-loader": "~4.1.3",
                 "webpack": "^5.90.1",
                 "webpack-cli": "^5.1.4",
-                "webpack-merge": "^5.9.0",
+                "webpack-merge": "^5.10.0",
                 "webpack-merge-and-include-globally": "~2.3.4",
-                "webpack-remove-empty-scripts": "~1.0.3"
+                "webpack-remove-empty-scripts": "^1.0.4"
             }
         },
         "node_modules/@aashutoshrathi/word-wrap": {
@@ -17094,6 +17094,15 @@
                 "url": "https://github.com/sponsors/sindresorhus"
             }
         },
+        "node_modules/flat": {
+            "version": "5.0.2",
+            "resolved": "https://registry.npmjs.org/flat/-/flat-5.0.2.tgz",
+            "integrity": "sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==",
+            "dev": true,
+            "bin": {
+                "flat": "cli.js"
+            }
+        },
         "node_modules/flat-cache": {
             "version": "3.0.4",
             "resolved": "https://registry.npmjs.org/flat-cache/-/flat-cache-3.0.4.tgz",
@@ -30468,12 +30477,13 @@
             }
         },
         "node_modules/webpack-merge": {
-            "version": "5.9.0",
-            "resolved": "https://registry.npmjs.org/webpack-merge/-/webpack-merge-5.9.0.tgz",
-            "integrity": "sha512-6NbRQw4+Sy50vYNTw7EyOn41OZItPiXB8GNv3INSoe3PSFaHJEz3SHTrYVaRm2LilNGnFUzh0FAwqPEmU/CwDg==",
+            "version": "5.10.0",
+            "resolved": "https://registry.npmjs.org/webpack-merge/-/webpack-merge-5.10.0.tgz",
+            "integrity": "sha512-+4zXKdx7UnO+1jaN4l2lHVD+mFvnlZQP/6ljaJVb4SZiwIKeUnrT5l0gkT8z+n4hKpC+jpOv6O9R+gLtag7pSA==",
             "dev": true,
             "dependencies": {
                 "clone-deep": "^4.0.1",
+                "flat": "^5.0.2",
                 "wildcard": "^2.0.0"
             },
             "engines": {
@@ -30495,11 +30505,10 @@
             }
         },
         "node_modules/webpack-remove-empty-scripts": {
-            "version": "1.0.3",
-            "resolved": "https://registry.npmjs.org/webpack-remove-empty-scripts/-/webpack-remove-empty-scripts-1.0.3.tgz",
-            "integrity": "sha512-1+Gg43r+4REb+3AUWbgjM3LIlxxE8YIqMnGpOmmhnaYK2rv4q58WbHYhZ9IRhTyt/+1qWoKQoPz/ebze5RnRYA==",
+            "version": "1.0.4",
+            "resolved": "https://registry.npmjs.org/webpack-remove-empty-scripts/-/webpack-remove-empty-scripts-1.0.4.tgz",
+            "integrity": "sha512-W/Vd94oNXMsQam+W9G+aAzGgFlX1aItcJpkG3byuHGDaxyK3H17oD/b5RcqS/ZHzStIKepksdLDznejDhDUs+Q==",
             "dev": true,
-            "license": "ISC",
             "dependencies": {
                 "ansis": "1.5.2"
             },
@@ -43656,6 +43665,12 @@
                 "path-exists": "^4.0.0"
             }
         },
+        "flat": {
+            "version": "5.0.2",
+            "resolved": "https://registry.npmjs.org/flat/-/flat-5.0.2.tgz",
+            "integrity": "sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==",
+            "dev": true
+        },
         "flat-cache": {
             "version": "3.0.4",
             "resolved": "https://registry.npmjs.org/flat-cache/-/flat-cache-3.0.4.tgz",
@@ -53418,12 +53433,13 @@
             }
         },
         "webpack-merge": {
-            "version": "5.9.0",
-            "resolved": "https://registry.npmjs.org/webpack-merge/-/webpack-merge-5.9.0.tgz",
-            "integrity": "sha512-6NbRQw4+Sy50vYNTw7EyOn41OZItPiXB8GNv3INSoe3PSFaHJEz3SHTrYVaRm2LilNGnFUzh0FAwqPEmU/CwDg==",
+            "version": "5.10.0",
+            "resolved": "https://registry.npmjs.org/webpack-merge/-/webpack-merge-5.10.0.tgz",
+            "integrity": "sha512-+4zXKdx7UnO+1jaN4l2lHVD+mFvnlZQP/6ljaJVb4SZiwIKeUnrT5l0gkT8z+n4hKpC+jpOv6O9R+gLtag7pSA==",
             "dev": true,
             "requires": {
                 "clone-deep": "^4.0.1",
+                "flat": "^5.0.2",
                 "wildcard": "^2.0.0"
             }
         },
@@ -53439,9 +53455,9 @@
             }
         },
         "webpack-remove-empty-scripts": {
-            "version": "1.0.3",
-            "resolved": "https://registry.npmjs.org/webpack-remove-empty-scripts/-/webpack-remove-empty-scripts-1.0.3.tgz",
-            "integrity": "sha512-1+Gg43r+4REb+3AUWbgjM3LIlxxE8YIqMnGpOmmhnaYK2rv4q58WbHYhZ9IRhTyt/+1qWoKQoPz/ebze5RnRYA==",
+            "version": "1.0.4",
+            "resolved": "https://registry.npmjs.org/webpack-remove-empty-scripts/-/webpack-remove-empty-scripts-1.0.4.tgz",
+            "integrity": "sha512-W/Vd94oNXMsQam+W9G+aAzGgFlX1aItcJpkG3byuHGDaxyK3H17oD/b5RcqS/ZHzStIKepksdLDznejDhDUs+Q==",
             "dev": true,
             "requires": {
                 "ansis": "1.5.2"
