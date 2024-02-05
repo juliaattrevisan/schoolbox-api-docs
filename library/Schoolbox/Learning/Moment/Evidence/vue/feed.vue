@@ -151,11 +151,15 @@ export default {
         /**
          * Groups learning evidence / badges by the date which it was posted.
          *
-         * @param { Array } feedResults -
+         * @param { Array } $feedResults -
          * @returns { Array } -
          */
-        groupFeedResults(feedResults) {
+        groupFeedResults($feedResults) {
             let groupedEvidenceByDate = {};
+            let feedResults = $feedResults;
+            if (!this.showFeedback) {
+                feedResults = $feedResults.filter((result) => result.discriminator !== "dueWorkFeedback");
+            }
             feedResults.forEach((v) => {
                 let date = dayjs(v.date),
                     key = date.format("YYYYMMDD");
