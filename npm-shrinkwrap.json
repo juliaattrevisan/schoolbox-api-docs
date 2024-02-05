@@ -43,7 +43,7 @@
                 "@ckeditor/ckeditor5-widget": "~40.2.0",
                 "@ckeditor/ckeditor5-word-count": "~40.2.0",
                 "@floating-ui/dom": "^1.6.1",
-                "@floating-ui/vue": "~1.0.1",
+                "@floating-ui/vue": "^1.0.6",
                 "@fullcalendar/adaptive": "~6.1.8",
                 "@fullcalendar/core": "~6.1.8",
                 "@fullcalendar/daygrid": "~6.1.8",
@@ -4086,11 +4086,12 @@
             "integrity": "sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q=="
         },
         "node_modules/@floating-ui/vue": {
-            "version": "1.0.1",
-            "resolved": "https://registry.npmjs.org/@floating-ui/vue/-/vue-1.0.1.tgz",
-            "integrity": "sha512-HZmmNWaztKYKOQxXvMzJYCYtfgG07cL/bPQvZ92AFG3Ktw71bvvLKXsZDAyIxGpqRo9WiTPsYknnSuLV2H/riA==",
+            "version": "1.0.6",
+            "resolved": "https://registry.npmjs.org/@floating-ui/vue/-/vue-1.0.6.tgz",
+            "integrity": "sha512-EdrOljjkpkkqZnrpqUcPoz9NvHxuTjUtSInh6GMv3+Mcy+giY2cE2pHh9rpacRcZ2eMSCxel9jWkWXTjLmY55w==",
             "dependencies": {
-                "@floating-ui/dom": "^1.2.9",
+                "@floating-ui/dom": "^1.6.1",
+                "@floating-ui/utils": "^0.2.1",
                 "vue-demi": ">=0.13.0"
             }
         },
@@ -33619,11 +33620,12 @@
             "integrity": "sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q=="
         },
         "@floating-ui/vue": {
-            "version": "1.0.1",
-            "resolved": "https://registry.npmjs.org/@floating-ui/vue/-/vue-1.0.1.tgz",
-            "integrity": "sha512-HZmmNWaztKYKOQxXvMzJYCYtfgG07cL/bPQvZ92AFG3Ktw71bvvLKXsZDAyIxGpqRo9WiTPsYknnSuLV2H/riA==",
+            "version": "1.0.6",
+            "resolved": "https://registry.npmjs.org/@floating-ui/vue/-/vue-1.0.6.tgz",
+            "integrity": "sha512-EdrOljjkpkkqZnrpqUcPoz9NvHxuTjUtSInh6GMv3+Mcy+giY2cE2pHh9rpacRcZ2eMSCxel9jWkWXTjLmY55w==",
             "requires": {
-                "@floating-ui/dom": "^1.2.9",
+                "@floating-ui/dom": "^1.6.1",
+                "@floating-ui/utils": "^0.2.1",
                 "vue-demi": ">=0.13.0"
             },
             "dependencies": {
