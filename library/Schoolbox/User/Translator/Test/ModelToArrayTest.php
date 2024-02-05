@@ -14,8 +14,10 @@ use House;
 use HouseResidential;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\External\Normalise\User\Staff\Year;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -130,7 +132,44 @@ class ModelToArrayTest extends TestCase
             ->setDisplayGradeGraph(false)
             ->setEportfolioEnable(false)
             ->setUseInternalMail(false)
-            ->setCalendarView('week');
+            ->setCalendarView('week')
+            ->setLinkedUsers(
+                new Collection(
+                    [
+                        (new User())
+                        ->setId(2)
+                        ->setEmailDomain($configLoader->get(ConfigMapper::NAME_MAIL_ADDRESS))
+                        ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT))
+                        ->setTitle('Mrs')
+                        ->setFirstname('Kim')
+                        ->setPreferredName('Kimmy')
+                        ->setLastname('Impersonable')
+                        ->setRole(
+                            (new Role())
+                            ->setId(3)
+                            ->setName('Admin')
+                            ->setType(Role::STAFF)
+                        )
+                        ->setYear(
+                            (new YearLevel())
+                            ->setId(4)
+                            ->setName('12')
+                        ),
+                        (new User())
+                        ->setId(3)
+                        ->setEmailDomain($configLoader->get(ConfigMapper::NAME_MAIL_ADDRESS))
+                        ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT))
+                        ->setFirstname('Tim')
+                        ->setLastname('Impersonable')
+                        ->setRole(
+                            (new Role())
+                            ->setId(3)
+                            ->setName('Admin')
+                            ->setType(Role::STAFF)
+                        ),
+                    ]
+                )
+            );
         yield 'populated fields' => [
             $populatedUser,
             [
@@ -155,7 +194,43 @@ class ModelToArrayTest extends TestCase
                 ],
                 'guardians'        => null,
                 'students'         => null,
-                'impersonableUsers' => null,
+                'impersonableUsers' => [
+                    [
+                        'id' => 2,
+                        'externalId' => 2,
+                        'title' => 'Mrs',
+                        'firstname' => 'Kim',
+                        'preferredName' => 'Kimmy',
+                        'givenName' => 'Kimmy',
+                        'lastname' => 'Impersonable',
+                        'fullName' => 'Mrs Kim Impersonable',
+                        'role' => [
+                            'id' => 3,
+                            'name' => 'Admin',
+                            'type' => Role::STAFF
+                        ],
+                        'yearLevel' => [
+                            'id' => 4,
+                            'name' => '12'
+                        ]
+                    ],
+                    [
+                        'id' => 3,
+                        'externalId' => 3,
+                        'title' => null,
+                        'firstname' => 'Tim',
+                        'preferredName' => null,
+                        'givenName' => 'Tim',
+                        'lastname' => 'Impersonable',
+                        'fullName' => 'Tim Impersonable',
+                        'role' => [
+                            'id' => 3,
+                            'name' => 'Admin',
+                            'type' => Role::STAFF
+                        ],
+                        'yearLevel' => null
+                    ]
+                ],
                 'email'            => 'mrjohndoe@mail.com',
                 '_links'           => [
                     'profile' => '/search/user/1',
@@ -224,7 +299,6 @@ class ModelToArrayTest extends TestCase
             $superuser,
         ];
 
-
         $derivedEmail                   = $emptyResponse;
         $derivedEmail['username']       = 'test';
         $derivedEmail['isEmailDerived'] = true;
@@ -288,7 +362,6 @@ class ModelToArrayTest extends TestCase
             $campusIndexedById,
         ];
     }
-
 
     /**
      * @dataProvider getTestInvokeData
