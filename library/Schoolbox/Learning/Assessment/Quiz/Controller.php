@@ -11,8 +11,11 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use CFPropertyList\IOException;
+use CFPropertyList\PListException;
 use DomainException;
 use External\Canvas\Importer\CanvasDb;
+use LearnositySdk\Exceptions\ValidationException;
 use PDOException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\Exception;
@@ -32,6 +35,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -87,26 +91,27 @@ class Controller extends Assessment\Controller
     /**
      * Controller constructor.
      *
-     * @param UserMapper                            $userMapper
-     * @param ErrorMapper                           $errorMapper
-     * @param MapperProxy                           $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param BreadcrumbFactory                     $bakery
-     * @param QuizMapper                            $quizMapper
-     * @param QuizSectionMapper                     $quizSectionMapper
-     * @param QuizAttemptMapper                     $quizAttemptMapper
-     * @param Mapper                                $termMapper
-     * @param DataSource                            $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param Replicator                            $replicator
-     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
-     * @param LatestViewMapper                      $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param QuizMapper $quizMapper
+     * @param QuizSectionMapper $quizSectionMapper
+     * @param QuizAttemptMapper $quizAttemptMapper
+     * @param Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param Replicator $replicator
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param LatestViewMapper $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param QuizAttemptMapper $attemptMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -231,6 +236,7 @@ class Controller extends Assessment\Controller
      * @return void
      * @throws DefinitionException
      * @throws Deleted
+     * @throws DomainException
      * @throws Error
      * @throws Exception
      * @throws MapperException
@@ -238,11 +244,14 @@ class Controller extends Assessment\Controller
      * @throws RouteNotFound
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Exception
-     * @throws \CFPropertyList\IOException
-     * @throws \CFPropertyList\PListException
+     * @throws IOException
+     * @throws PListException
      * @throws \DOMException
      * @throws \InvalidArgumentException
+     * @throws \JsonException
+     * @throws ValidationException
      * @throws \LogicException
+     * @throws ApiException
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
