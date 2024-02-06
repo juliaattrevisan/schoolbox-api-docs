@@ -82,11 +82,8 @@ class Controller extends Base
                 },
                 function ($reason) {
                     /* @var ClientException $reason */
-                    //var_dump($reason);
                     http_response_code($reason->getCode());
                     echo $reason->getMessage();
-                    // Handle error if the request fails
-                    //$this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
                 }
             );
 
