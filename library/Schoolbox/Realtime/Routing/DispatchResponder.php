@@ -14,7 +14,6 @@ use Psr\Log\LoggerInterface;
 
 class DispatchResponder implements TaskResponseHandlerInterface
 {
-
     /** @var LoggerInterface */
     protected $log;
 

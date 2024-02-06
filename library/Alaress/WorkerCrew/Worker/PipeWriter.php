@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 
 class PipeWriter
 {
-
     /** @var ProtocolInterface */
     protected $proto;
 

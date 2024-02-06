@@ -21,7 +21,6 @@ use RuntimeException;
 
 class Worker extends AbstractProcess
 {
-
     /** @var TXRX */
     private $txrx;
 
