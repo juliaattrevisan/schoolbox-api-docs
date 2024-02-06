@@ -27,28 +27,23 @@
                     <fieldset class="content {% if not toursEnabled %}hide{% endif %}" id="available-tours">
                         <legend>Available Tours</legend>
 
-                        <ul class="information-list">
-                            {% for tour in tours %}
-                                <li>
-                                    <div class="list-item">
-                                        <div class="card small-2">
-                                            <div class="switch">
-                                                <input id="tour-enable-{{ tour.uuid }}" type="checkbox" name="tour-enable[]" value="{{ tour.uuid }}" {% if tour.active %}checked{% endif %}/>
-                                                <label for="tour-enable-{{ tour.uuid }}">
-                                                    <span>On</span>
-                                                    <span>Off</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="card small-10">
-                                            <h3>{{ tour.title }}</h3>
-                                            <p class="meta" title="Will be seen by Staff">
-                                                Staff
-                                            </p>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endfor %}
+                        {% for tour in tours %}
+                            <div class="small-12 columns">
+                                <label for="tour-enable-{{ tour.uuid }}">
+                                    {{ tour.title }}
+                                    <span class="pipe meta" title="Will be seen by Staff">
+                                        Staff
+                                    </span>
+                                </label>
+                                <div class="switch">
+                                    <input id="tour-enable-{{ tour.uuid }}" type="checkbox" name="tour-enable[]" value="{{ tour.uuid }}" {% if tour.active %}checked{% endif %}/>
+                                    <label for="tour-enable-{{ tour.uuid }}">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
                         </ul>
                     </fieldset>
                 </section>
@@ -73,4 +68,3 @@
         }
     });
 </script>
-
