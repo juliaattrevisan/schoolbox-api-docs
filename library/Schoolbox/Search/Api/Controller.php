@@ -338,7 +338,17 @@ class Controller extends Base
             return [];
         }
 
-        $rows = $this->connector->executeQuery('SELECT ' . implode(",\n", $subqueries), $params)->fetchAll();
+        $query = 'SELECT ' . implode(",\n", $subqueries);
+
+        if ($this->user->getId() === 1) {
+            echo "Running query to find whether more results are available for each parent folder...\n";
+            $t0 = microtime(true);
+        }
+        $rows = $this->connector->executeQuery($query, $params)->fetchAll();
+        if ($this->user->getId() === 1) {
+            $t1 = microtime(true);
+            echo "Done in " . round($t1 - $t0, 3) . "s.\n";
+        }
 
         if (count($rows) !== 1) {
             throw new LogicException('Expected one row from query.');

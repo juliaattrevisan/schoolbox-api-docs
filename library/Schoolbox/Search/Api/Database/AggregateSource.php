@@ -67,7 +67,18 @@ class AggregateSource implements ISource
         }
 
         $rawMatches = [];
-        foreach ($this->connector->executeQuery($queryString, $params) as $row) {
+
+        if ($loggedInUser->getId() === 1) {
+            echo "Running main search query...\n";
+            $t0 = microtime(true);
+        }
+        $queryResult = $this->connector->executeQuery($queryString, $params);
+        if ($loggedInUser->getId() === 1) {
+            $t1 = microtime(true);
+            echo "Done in " . round($t1 - $t0, 3) . "s.\n";
+        }
+
+        foreach ($queryResult as $row) {
             $rawMatches[] = new RawResult(
                 (string)$row['id'],
                 $row['title'],
@@ -130,7 +141,7 @@ class AggregateSource implements ISource
             return ['', []];
         }
 
-        [$maxTitleRelevance, $maxContentRelevance] = $this->getMaxTitleAndContentRelevanceForKeyword($keyword);
+        [$maxTitleRelevance, $maxContentRelevance] = $this->getMaxTitleAndContentRelevanceForKeyword($keyword, $loggedInUser);
 
         $queries = [];
         $params  = [];
@@ -196,11 +207,15 @@ class AggregateSource implements ISource
      * @param string $keyword
      * @return array
      */
-    private function getMaxTitleAndContentRelevanceForKeyword(string $keyword): array
+    private function getMaxTitleAndContentRelevanceForKeyword(string $keyword, User $loggedInUser): array
     {
         static $maxRelevanceByTypeByKeyword = [];
 
         if (!array_key_exists($keyword, $maxRelevanceByTypeByKeyword)) {
+            if ($loggedInUser->getId() === 1) {
+                echo "Running queries to get max title and content relevance...\n";
+                $t0 = microtime(true);
+            }
             $maxRelevanceByTypeByKeyword[$keyword] = [
                 $this->connector->executeQuery(
                     "SELECT MAX(MATCH (title) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
@@ -211,6 +226,10 @@ class AggregateSource implements ISource
                     ['keyword' => $keyword]
                 )->fetchColumn()
             ];
+            if ($loggedInUser->getId() === 1) {
+                $t1 = microtime(true);
+                echo "Done in " . round($t1 - $t0, 3) . "s.\n";
+            }
         }
 
         return $maxRelevanceByTypeByKeyword[$keyword];
