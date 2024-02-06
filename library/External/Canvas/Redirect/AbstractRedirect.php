@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace External\Canvas\Redirect;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as DatabaseException;
 use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -138,6 +139,7 @@ class AbstractRedirect
      * @param Folder $folder
      * @param Folder $parentFolder
      * @return int|null
+     * @throws DatabaseException if the Canvas database or tables don't exist
      */
     public function getCanvasCourseId(Folder $folder, Folder $parentFolder): ?int
     {

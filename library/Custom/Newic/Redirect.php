@@ -9,6 +9,7 @@
 namespace Custom\Newic;
 
 use Alaress\Database\Exception;
+use Alaress\Database\Exception as DatabaseException;
 use External\Canvas\Redirect\AbstractRedirect;
 use PDOException;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -220,6 +221,7 @@ class Redirect extends AbstractRedirect
      * @return array|null
      * @throws Exception
      * @throws PDOException
+     * @throws DatabaseException if the Canvas database or tables don't exist
      */
     private function buildAssessmentUrl(IAssessable $assessment, string $query, ?string $canvasId, string $canvasUrl): ?array
     {
