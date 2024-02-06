@@ -53,9 +53,11 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         int $limit,
+        float $maxTitleRelevance,
+        float $maxContentRelevance,
         string $paramKeySuffix = ''
     ): ?QueryParams {
-        $params               = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
+        $params               = $this->buildBaseWhereParams($keyword, $maxTitleRelevance, $maxContentRelevance, $paramKeySuffix);
         $titleRelevancePart   = $this->buildTitleRelevanceExpression($keyword, $paramKeySuffix);
         $contentRelevancePart = $this->buildContentRelevanceExpression($keyword, $paramKeySuffix);
         $dateRelevancePart    = $this->buildDateRelevanceExpression($keyword, $paramKeySuffix);
@@ -250,7 +252,12 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * @param string $paramKeySuffix
      * @return non-empty-array<non-falsy-string, string|null>
      */
-    abstract protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array;
+    abstract protected function buildBaseWhereParams(
+        string $keyword,
+        float $maxTitleRelevance,
+        float $maxContentRelevance,
+        string $paramKeySuffix = ''
+    ): array;
 
     /**
      * Build the expression for determining the relevance for an item in this

@@ -130,6 +130,16 @@ class AggregateSource implements ISource
             return ['', []];
         }
 
+        // These queries only need to be run each time the search_index table is rebuilt, so there is potential for optimisation here.
+        $maxTitleRelevance = $this->connector->executeQuery(
+            "SELECT MAX(MATCH (title) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
+            ['keyword' => $keyword]
+        )->fetchColumn();
+        $maxContentRelevance = $this->connector->executeQuery(
+            "SELECT MAX(MATCH (fulltext_index) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
+            ['keyword' => $keyword]
+        )->fetchColumn();
+
         $queries = [];
         $params  = [];
         $limit   ??= 1;
@@ -138,7 +148,15 @@ class AggregateSource implements ISource
                 continue;
             }
 
-            $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit, $paramKeySuffix);
+            $queryParams = $queryParamBuilder->buildMatchQueryParams(
+                $keyword,
+                $filter,
+                $cursor,
+                $limit,
+                $maxTitleRelevance,
+                $maxContentRelevance,
+                $paramKeySuffix
+            );
             if ($queryParams) {
                 $queries[] = $queryParams->query;
                 $params    = array_merge($params, $queryParams->params);

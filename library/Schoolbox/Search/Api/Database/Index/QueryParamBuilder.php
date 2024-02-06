@@ -52,7 +52,12 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritdoc
      */
-    protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array
+    protected function buildBaseWhereParams(
+        string $keyword,
+        float $maxTitleRelevance,
+        float $maxContentRelevance,
+        string $paramKeySuffix = ''
+    ): array
     {
         // Note: Do not trim the keyword.  Not trimming the keyword allows the user more flexibility when searching for
         // titles.  E.g.  A search for titles containing ' board ' excludes titles like 'headboard', 'surfboards', 'boards'.
@@ -77,6 +82,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             "indexKeywordUnquotedLike$paramKeySuffix"        => '%' . $quoter->escapeForLike($keywordUnquoted) . '%',
             "indexKeywordMinusPunct$paramKeySuffix"          => $keywordMinusPunctuation,
             "indexKeywordMinusPunctLike$paramKeySuffix"      => '%' . $quoter->escapeForLike($keywordMinusPunctuation) . '%',
+            "maxTitleRelevance$paramKeySuffix"               => $maxTitleRelevance,
+            "maxContentRelevance$paramKeySuffix"             => $maxContentRelevance,
             "RELEVANCE_WEIGHTING_TITLE$paramKeySuffix"       => self::RELEVANCE_WEIGHTING_TITLE,
             "RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix"     => self::RELEVANCE_WEIGHTING_CONTENT,
             "RELEVANCE_WEIGHTING_RECENT_DATE$paramKeySuffix" => self::RELEVANCE_WEIGHTING_RECENT_DATE,
@@ -98,75 +105,20 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
-        // Why strip punctuation?
-        // ----------------------
-        // We want the behaviour of the LIKE searches on title to be as consistent as is practical with the behaviour
-        // of the MATCH...AGAINST searches on content.
+        // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
+        //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
+        // The same algorithm is used for BOOLEAN MODE and NATURAL LANGUAGE MODE.  I confirmed this by experiment.
         //
-        // MATCH...AGAINST searching is based on words, not on characters, and so has some peculiar rules defining
-        // word boundaries.
-        //
-        // Quote from https://dev.mysql.com/doc/refman/8.0/en/fulltext-natural-language.html:
-        // "The MySQL FULLTEXT implementation regards any sequence of true word characters (letters, digits, and
-        // underscores) as a word. That sequence may also contain apostrophes ('), but not more than one in a row.
-        // This means that aaa'bbb is regarded as one word, but aaa''bbb is regarded as two words. Apostrophes at
-        // the beginning or the end of a word are stripped by the FULLTEXT parser; 'aaa'bbb' would be parsed as
-        // aaa'bbb."
-        //
-        // In practice, doing LIKE comparisons on the keyword as entered, and the keyword stripped of punctuation,
-        // provides a good approximation of MATCH...AGAINST behaviour, while allowing users to search for titles
-        // using the exact title including any punctuation characters.
-        //
-        // Thus, the inclusion of stripped-punctuation LIKE checks will hopefully result in less confusing behaviour
-        // than would result if stripped-punctuation LIKE searches were not included.
-        //
-        // This decision may be revisited.
-        //
-        // Examples:
-        //  * Search for 'one, two' (without double-quotes).
-        //    Results should include:
-        //     * all items whose title contains 'one', (requires stripped-punctuation condition).
-        //     * all items whose title contains 'two',
-        //  * Search for '"one, two"' (with double-quotes).
-        //    Results should include:
-        //     * all items whose title contains 'one two', (requires stripped-punctuation condition).
-        //     * all items whose title contains 'one, two' (requires non-stripped-punctuation condition),
-
-        $sqlSumTerms = [
-            "IF(
-                si.title = :indexKeywordUnquoted$paramKeySuffix,
-                :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix,
-                IF(
-                    (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeywordUnquoted$paramKeySuffix) AND
-                    si.title = :indexKeywordMinusPunct$paramKeySuffix,
-                    :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.8,
-                    IF(
-                        si.title LIKE :indexKeywordUnquotedLike$paramKeySuffix,
-                        :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.6,
-                        IF(
-                            (:indexKeywordMinusPunct$paramKeySuffix <> :indexKeywordUnquoted$paramKeySuffix) AND
-                            si.title LIKE :indexKeywordMinusPunctLike$paramKeySuffix,
-                            :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.4,
-                            0
-                        )
-                    )
-                )
-            )",
-        ];
-
-        // If the keyword has not been surrounded by double-quotes...
-        $strlenKeyword = strlen($keyword);
-        if ($strlenKeyword < 2 || $keyword[0] !== '"' || $keyword[$strlenKeyword - 1] !== '"') {
-            // Search for each word individually to mimic the behaviour of MATCH...AGAINST
-            // (MATCH...AGAINST is used in buildContentRelevanceExpression()).
-            foreach ($this->buildBaseWhereParams($keyword, $paramKeySuffix) as $key => $value) {
-                if (str_starts_with($key, self::KEYWORD_TOKEN_LIKE_PREFIX)) {
-                    $sqlSumTerms[] = "IF(si.title LIKE :$key, :RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * 0.2, 0)";
-                }
-            }
-        }
-
-        return '(' . implode(' + ', $sqlSumTerms) . ')';
+        // Dividing by the maxTitleRelevance results in a range for titleRelevance between 0 and 1.
+        // The titleRelevance (between 0 and 1) is then multiplied by the RELEVANCE_WEIGHTING_TITLE,
+        // which results in a range of [0, self::RELEVANCE_WEIGHTING_TITLE].
+        return (
+            ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * " .
+            "(
+                MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) /
+                :maxTitleRelevance
+             )"
+        );
     }
 
     /**
@@ -185,7 +137,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix * " .
             "(
                 MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) /
-                maxContentRelevanceTable.maxContentRelevance
+                :maxContentRelevance
              )"
         );
     }
@@ -296,13 +248,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildFromStatement(string $paramKeySuffix = ''): string
     {
-        return (
-            "FROM search_index si
-             JOIN (
-                 SELECT
-                 MAX(MATCH (si2.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)) AS maxContentRelevance
-                 FROM search_index AS si2
-             ) AS maxContentRelevanceTable ON (TRUE)"
-        );
+        return "FROM search_index si";
     }
 }
