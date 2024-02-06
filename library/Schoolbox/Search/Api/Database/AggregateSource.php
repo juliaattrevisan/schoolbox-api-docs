@@ -130,14 +130,7 @@ class AggregateSource implements ISource
             return ['', []];
         }
 
-        $maxTitleRelevance = $this->connector->executeQuery(
-            "SELECT MAX(MATCH (title) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
-            ['keyword' => $keyword]
-        )->fetchColumn();
-        $maxContentRelevance = $this->connector->executeQuery(
-            "SELECT MAX(MATCH (fulltext_index) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
-            ['keyword' => $keyword]
-        )->fetchColumn();
+        [$maxTitleRelevance, $maxContentRelevance] = $this->getMaxTitleAndContentRelevanceForKeyword($keyword);
 
         $queries = [];
         $params  = [];
@@ -197,5 +190,29 @@ class AggregateSource implements ISource
         }
 
         return [$queryString, $params];
+    }
+
+    /**
+     * @param string $keyword
+     * @return array
+     */
+    private function getMaxTitleAndContentRelevanceForKeyword(string $keyword): array
+    {
+        static $maxRelevanceByTypeByKeyword = [];
+
+        if (!array_key_exists($keyword, $maxRelevanceByTypeByKeyword)) {
+            $maxRelevanceByTypeByKeyword[$keyword] = [
+                $this->connector->executeQuery(
+                    "SELECT MAX(MATCH (title) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
+                    ['keyword' => $keyword]
+                )->fetchColumn(),
+                $this->connector->executeQuery(
+                    "SELECT MAX(MATCH (fulltext_index) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
+                    ['keyword' => $keyword]
+                )->fetchColumn()
+            ];
+        }
+
+        return $maxRelevanceByTypeByKeyword[$keyword];
     }
 }
