@@ -82,9 +82,20 @@ if ($this->getDi()->has('sentry')) {
 
 /**
  * Canvas custom redirect
+ *
+ * Ensure Canvas plan is enabled
+ * ensure canvas api creds (url, client id and url) are setup NOTE: we only need CD2 now
+ * and the folder you are looking at has the valid canvas checks:
+ * This folder has a code
  */
 $canvasUrl = $this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL);
-if (!empty($canvasUrl)) {
+
+if (
+    !empty($canvasUrl) &&
+    !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)) &&
+    !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_SECRET)) &&
+    '' !== $folder->getCodeString()
+) {
     $redirect    = (new \External\Canvas\Redirect\RedirectFactory(
         (string)$this->getDi()->get('config')->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
         (string)$canvasUrl,
