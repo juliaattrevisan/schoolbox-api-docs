@@ -87,6 +87,7 @@ class AbstractRedirect
      *
      * @param Folder $folder
      * @return string|null
+     * @throws DatabaseException if the Canvas database or tables don't exist
      */
     public function generateRedirect(Folder $folder): ?string
     {

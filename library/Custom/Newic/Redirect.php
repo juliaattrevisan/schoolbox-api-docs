@@ -57,6 +57,7 @@ class Redirect extends AbstractRedirect
      * @return array|null
      * @throws Exception
      * @throws PDOException
+     * @throws DatabaseException if the Canvas database or tables don't exist
      */
     public function generateAssessmentRedirect(
         User $user,
