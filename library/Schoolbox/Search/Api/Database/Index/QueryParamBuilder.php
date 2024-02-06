@@ -62,42 +62,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // Note: Do not trim the keyword.  Not trimming the keyword allows the user more flexibility when searching for
         // titles.  E.g.  A search for titles containing ' board ' excludes titles like 'headboard', 'surfboards', 'boards'.
 
-        $quoter          = $this->quoter;
-        $strlenKeyword   = strlen($keyword);
-        $keywordUnquoted = (
-            ($strlenKeyword >= 2 && $keyword[0] === '"' && $keyword[$strlenKeyword - 1] === '"')
-            ? substr($keyword, 1, $strlenKeyword - 2)
-            : $keyword
-        );
-
-        // Remove all punctuation characters and replace multiple spaces with single space.
-        // (see comment 'Why strip punctuation?' below)
-        $keywordMinusPunctuation = preg_replace("#[[:punct:]]#", "", $keywordUnquoted);
-        $keywordMinusPunctuation = preg_replace('!\s+!', ' ', $keywordMinusPunctuation);
-
-        $params = [
+        return [
             "indexNow$paramKeySuffix"                        => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix"                    => $keyword,
-            "indexKeywordUnquoted$paramKeySuffix"            => $keywordUnquoted,
-            "indexKeywordUnquotedLike$paramKeySuffix"        => '%' . $quoter->escapeForLike($keywordUnquoted) . '%',
-            "indexKeywordMinusPunct$paramKeySuffix"          => $keywordMinusPunctuation,
-            "indexKeywordMinusPunctLike$paramKeySuffix"      => '%' . $quoter->escapeForLike($keywordMinusPunctuation) . '%',
             "maxTitleRelevance$paramKeySuffix"               => $maxTitleRelevance,
             "maxContentRelevance$paramKeySuffix"             => $maxContentRelevance,
             "RELEVANCE_WEIGHTING_TITLE$paramKeySuffix"       => self::RELEVANCE_WEIGHTING_TITLE,
             "RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix"     => self::RELEVANCE_WEIGHTING_CONTENT,
             "RELEVANCE_WEIGHTING_RECENT_DATE$paramKeySuffix" => self::RELEVANCE_WEIGHTING_RECENT_DATE,
         ];
-
-        $keywordWords = explode(' ', $keywordMinusPunctuation);
-
-        foreach ($keywordWords as $i => $word) {
-            if (strlen($word) > 1) {
-                $params[self::KEYWORD_TOKEN_LIKE_PREFIX . "$i$paramKeySuffix"] = '%' . $quoter->escapeForLike(trim($word)) . '%';
-            }
-        }
-
-        return $params;
     }
 
     /**
@@ -116,7 +89,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * " .
             "(
                 MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) /
-                :maxTitleRelevance
+                :maxTitleRelevance$paramKeySuffix
              )"
         );
     }
@@ -137,7 +110,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix * " .
             "(
                 MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) /
-                :maxContentRelevance
+                :maxContentRelevance$paramKeySuffix
              )"
         );
     }
