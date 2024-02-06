@@ -1,10 +1,11 @@
+/* This is a copy of the demo data set skin config */
 :root {
-    --navigation-foreground-r: 127;
-    --navigation-foreground-g: 178;
-    --navigation-foreground-b: 215;
-    --navigation-foreground-h: 205.23;
-    --navigation-foreground-s: 52.38%;
-    --navigation-foreground-l: 67.06%;
+    --navigation-foreground-r: 255;
+    --navigation-foreground-g: 255;
+    --navigation-foreground-b: 255;
+    --navigation-foreground-h: 0;
+    --navigation-foreground-s: 0%;
+    --navigation-foreground-l: 100%;
     --navigation-foreground-a: 1;
     --navigation-foreground: hsla(
         var(--navigation-foreground-h),
@@ -12,12 +13,12 @@
         var(--navigation-foreground-l),
         var(--navigation-foreground-a)
     );
-    --navigation-foreground-contrast-r: 255;
-    --navigation-foreground-contrast-g: 255;
-    --navigation-foreground-contrast-b: 255;
+    --navigation-foreground-contrast-r: 0;
+    --navigation-foreground-contrast-g: 0;
+    --navigation-foreground-contrast-b: 0;
     --navigation-foreground-contrast-h: 0;
     --navigation-foreground-contrast-s: 0%;
-    --navigation-foreground-contrast-l: 100%;
+    --navigation-foreground-contrast-l: 0%;
     --navigation-foreground-contrast-a: 1;
     --navigation-foreground-contrast: hsla(
         var(--navigation-foreground-contrast-h),
@@ -51,12 +52,12 @@
         var(--navigation-background-contrast-l),
         var(--navigation-background-contrast-a)
     );
-    --navigation-hover-r: 25;
-    --navigation-hover-g: 117;
-    --navigation-hover-b: 184;
-    --navigation-hover-h: 205.28;
-    --navigation-hover-s: 76.08%;
-    --navigation-hover-l: 40.98%;
+    --navigation-hover-r: 0;
+    --navigation-hover-g: 158;
+    --navigation-hover-b: 178;
+    --navigation-hover-h: 186.74;
+    --navigation-hover-s: 100%;
+    --navigation-hover-l: 34.9%;
     --navigation-hover-a: 1;
     --navigation-hover: hsla(
         var(--navigation-hover-h),
@@ -181,12 +182,12 @@
         var(--accounts-menu-foreground-contrast-l),
         var(--accounts-menu-foreground-contrast-a)
     );
-    --accounts-menu-background-r: 204;
-    --accounts-menu-background-g: 224;
-    --accounts-menu-background-b: 239;
-    --accounts-menu-background-h: 205.71;
-    --accounts-menu-background-s: 52.24%;
-    --accounts-menu-background-l: 86.86%;
+    --accounts-menu-background-r: 255;
+    --accounts-menu-background-g: 255;
+    --accounts-menu-background-b: 255;
+    --accounts-menu-background-h: 0;
+    --accounts-menu-background-s: 0%;
+    --accounts-menu-background-l: 100%;
     --accounts-menu-background-a: 1;
     --accounts-menu-background: hsla(
         var(--accounts-menu-background-h),
@@ -311,12 +312,12 @@
         var(--content-ui-hover-contrast-l),
         var(--content-ui-hover-contrast-a)
     );
-    --content-ui-selected-r: 229;
-    --content-ui-selected-g: 239;
-    --content-ui-selected-b: 247;
-    --content-ui-selected-h: 206.67;
-    --content-ui-selected-s: 52.94%;
-    --content-ui-selected-l: 93.33%;
+    --content-ui-selected-r: 204;
+    --content-ui-selected-g: 249;
+    --content-ui-selected-b: 233;
+    --content-ui-selected-h: 158.67;
+    --content-ui-selected-s: 78.95%;
+    --content-ui-selected-l: 88.82%;
     --content-ui-selected-a: 1;
     --content-ui-selected: hsla(
         var(--content-ui-selected-h),
@@ -363,12 +364,12 @@
         var(--content-ui-submit-foreground-contrast-l),
         var(--content-ui-submit-foreground-contrast-a)
     );
-    --content-ui-submit-background-r: 28;
+    --content-ui-submit-background-r: 0;
     --content-ui-submit-background-g: 158;
-    --content-ui-submit-background-b: 28;
-    --content-ui-submit-background-h: 120;
-    --content-ui-submit-background-s: 69.89%;
-    --content-ui-submit-background-l: 36.47%;
+    --content-ui-submit-background-b: 178;
+    --content-ui-submit-background-h: 186.74;
+    --content-ui-submit-background-s: 100%;
+    --content-ui-submit-background-l: 34.9%;
     --content-ui-submit-background-a: 1;
     --content-ui-submit-background: hsla(
         var(--content-ui-submit-background-h),
@@ -540,12 +541,12 @@
         var(--login-form-background-contrast-l),
         var(--login-form-background-contrast-a)
     );
-    --form-border-color-r: 204;
-    --form-border-color-g: 224;
-    --form-border-color-b: 239;
-    --form-border-color-h: 205.71;
-    --form-border-color-s: 52.24%;
-    --form-border-color-l: 86.86%;
+    --form-border-color-r: 76;
+    --form-border-color-g: 148;
+    --form-border-color-b: 200;
+    --form-border-color-h: 205.16;
+    --form-border-color-s: 52.99%;
+    --form-border-color-l: 54.12%;
     --form-border-color-a: 1;
     --form-border-color: hsla(
         var(--form-border-color-h),
@@ -553,12 +554,12 @@
         var(--form-border-color-l),
         var(--form-border-color-a)
     );
-    --form-border-color-contrast-r: 0;
-    --form-border-color-contrast-g: 0;
-    --form-border-color-contrast-b: 0;
+    --form-border-color-contrast-r: 255;
+    --form-border-color-contrast-g: 255;
+    --form-border-color-contrast-b: 255;
     --form-border-color-contrast-h: 0;
     --form-border-color-contrast-s: 0%;
-    --form-border-color-contrast-l: 0%;
+    --form-border-color-contrast-l: 100%;
     --form-border-color-contrast-a: 1;
     --form-border-color-contrast: hsla(
         var(--form-border-color-contrast-h),

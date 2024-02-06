@@ -10,7 +10,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         () => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="c-island">
                     <story />
                 </div>
             `,
@@ -29,7 +29,7 @@ export const Default: Story = {
         template: `
             <div class="c-form-element">
                 <label for="news_default_expiry-field" class="c-label">Default News Archiving Period</label>
-                <input id="news_default_expiry-field" class="c-input-text" type="text" required />
+                <input id="news_default_expiry-field" class="c-input-text" type="text" />
             </div>
             `,
     }),
@@ -44,7 +44,23 @@ export const WithHint: Story = {
             <div class="c-form-element">
                 <label for="news_default_expiry-field" class="c-label">Default News Archiving Period</label>
                 <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
+                <input id="news_default_expiry-field" class="c-input-text" type="text" />
+            </div>
+            `,
+    }),
+};
+
+/**
+ * With an error message
+ */
+export const WithError: Story = {
+    render: () => ({
+        template: `
+            <div class="c-form-element">
+                <label for="news_default_expiry-field" class="c-label c-label--required">Default News Archiving Period</label>
+                <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
                 <input id="news_default_expiry-field" class="c-input-text" type="text" required />
+                <label id="news-title-error" class="error" for="news-title">This field is required.</label>
             </div>
             `,
     }),

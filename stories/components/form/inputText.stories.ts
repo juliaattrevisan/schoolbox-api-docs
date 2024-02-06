@@ -10,7 +10,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         () => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="c-island">
                     <story />
                 </div>
             `,
@@ -28,6 +28,28 @@ export const Default: Story = {
     render: () => ({
         template: `
             <input id="news_default_expiry-field" class="c-input-text" type="text" required />
+            `,
+    }),
+};
+
+/**
+ * Input disabled
+ */
+export const Disabled: Story = {
+    render: () => ({
+        template: `
+            <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm disabled" disabled />
+            `,
+    }),
+};
+
+/**
+ * Input read only
+ */
+export const ReadOnly: Story = {
+    render: () => ({
+        template: `
+            <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm readonly" readonly />
             `,
     }),
 };
