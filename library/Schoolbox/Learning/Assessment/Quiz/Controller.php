@@ -260,8 +260,20 @@ class Controller extends Assessment\Controller
          */
         $externalRedirectUrl = null;
 
-        if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getConfigLoader()->get('site_school_code'))) {
-            $canvasUrl = $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL);
+        /**
+         * Canvas custom redirect
+         *
+         * Ensure Canvas is enabled
+         * ensure canvas api creds (url, client id and url) are setup NOTE: we only need CD2 now
+         * and in this case is the schoolcode NEWIC
+         */
+        $canvasUrl = $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL);
+        if (
+            !empty($canvasUrl) &&
+            !empty($this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)) &&
+            !empty($this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA2_SECRET)) &&
+            \Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getConfigLoader()->get('site_school_code'))
+        ) {
             try {
                 $externalRedirectUrl = (new \Custom\Newic\Redirect(
                     $canvasUrl,
