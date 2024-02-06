@@ -62,9 +62,10 @@ HELP;
         $db = $this->getDatabaseInternal();
 
         // get list of quiz attempts to complete
-        /* As of SA-17127 we also skip any assessments that were implementations of
-         * 79541 User Experience (Level 1)
-         * 155962 News and Communication (Level 2)
+        /* As of SA-17127 (and SA-17197) we also skip any assessments that were implementations of
+         * the following assessment specifications:
+         *     163923 Quiz Assessment: User Experience (Level 1)
+         *     163920 Quiz Assessment: News and Communication (Level 2)
          */
         $completedAttempts = $db->prepareQuery("
             SELECT
@@ -79,7 +80,7 @@ HELP;
             WHERE aa.reviewed_at IS NULL
             AND aa.finish IS NOT NULL
             AND aa.deleted_at IS NULL
-            AND (asi.specification_assessment_id NOT IN (79541, 155962) OR asi.specification_assessment_id IS NULL)
+            AND (asi.specification_assessment_id NOT IN (163923, 163920) OR asi.specification_assessment_id IS NULL)
             ORDER BY aa.finish DESC
         ");
 
