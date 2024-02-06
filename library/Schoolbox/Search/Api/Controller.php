@@ -341,7 +341,7 @@ class Controller extends Base
         $query = 'SELECT ' . implode(",\n", $subqueries);
 
         if ($this->user->getId() === 1) {
-            echo "Running query to find whether more results are available for each parent folder...\n";
+            echo "Running query to find whether more results are available for each parent folder (" . count($subqueries) . " of them)...\n";
             $t0 = microtime(true);
         }
         $rows = $this->connector->executeQuery($query, $params)->fetchAll();
