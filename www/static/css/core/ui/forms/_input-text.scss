@@ -1,0 +1,25 @@
+/*
+    The <input type="text"> element is used to create a text input field that can be used to input data.
+*/
+
+.c-input-text[type="text"] {
+    background-color: var(--foreground-colour);
+    border: 0.0625rem solid var(--form-border-color);
+    border-radius: var(--roundness-inputs);
+    color: var(--primary-text-colour);
+    font-size: max(16px, 1rem);
+    font-family: inherit;
+    height: 2.25rem;
+    line-height: 1;
+    padding: var(--spacing-xs) var(--spacing-s);
+    width: 100%;
+    -webkit-font-smoothing: antialiased;
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+    &:focus {
+        outline: 3px solid var(--form-border-color);
+        outline-offset: 0.125rem;
+    }
+}

@@ -6,7 +6,7 @@
 </script>
 
 <template>
-    <div class="c-form-group">
+    <div class="c-form-element">
         <label for="news_default_expiry-field" class="c-label c-label--required">Default News Archiving Period</label>
         <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
         <input id="news_default_expiry-field" class="c-input-text" type="text" required />
@@ -20,14 +20,10 @@
     box-sizing: border-box;
 }
 
-:root {
-    --error-colour: #fa4a47;
-    --hint-color: #8d8d8d;
-}
-.c-form-group {
+.c-form-element {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-s);
+    gap: var(--spacing-xs);
 }
 
 .c-hint {
@@ -44,7 +40,7 @@
     &--required {
         &::after {
             content: " *";
-            color: var(--error-colour);
+            color: var(--error-color);
         }
     }
 }
