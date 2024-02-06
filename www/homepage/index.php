@@ -91,7 +91,6 @@ if ($this->getDi()->has('sentry')) {
 $canvasUrl = $this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL);
 
 if (
-    in_array(strtolower((string)$this->getDi()->get('config')->get(ConfigMapper::NAME_SITE_PLAN)), ['canvas', 'canvasplus']) &&
     !empty($canvasUrl) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_SECRET)) &&
