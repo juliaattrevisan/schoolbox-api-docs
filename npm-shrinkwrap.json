@@ -44,17 +44,17 @@
                 "@ckeditor/ckeditor5-word-count": "~40.2.0",
                 "@floating-ui/dom": "~1.6.1",
                 "@floating-ui/vue": "~1.0.6",
-                "@fullcalendar/adaptive": "^6.1.10",
-                "@fullcalendar/core": "^6.1.10",
-                "@fullcalendar/daygrid": "^6.1.10",
-                "@fullcalendar/interaction": "^6.1.10",
-                "@fullcalendar/list": "^6.1.10",
-                "@fullcalendar/resource": "^6.1.10",
-                "@fullcalendar/resource-daygrid": "^6.1.10",
-                "@fullcalendar/resource-timegrid": "^6.1.10",
-                "@fullcalendar/resource-timeline": "^6.1.10",
-                "@fullcalendar/timegrid": "^6.1.10",
-                "@fullcalendar/vue3": "^6.1.10",
+                "@fullcalendar/adaptive": "~6.1.10",
+                "@fullcalendar/core": "~6.1.10",
+                "@fullcalendar/daygrid": "~6.1.10",
+                "@fullcalendar/interaction": "~6.1.10",
+                "@fullcalendar/list": "~6.1.10",
+                "@fullcalendar/resource": "~6.1.10",
+                "@fullcalendar/resource-daygrid": "~6.1.10",
+                "@fullcalendar/resource-timegrid": "~6.1.10",
+                "@fullcalendar/resource-timeline": "~6.1.10",
+                "@fullcalendar/timegrid": "~6.1.10",
+                "@fullcalendar/vue3": "~6.1.10",
                 "@melloware/coloris": "~0.22.0",
                 "@microsoft/immersive-reader-sdk": "~1.4.0",
                 "@phudak/ckeditor5-emoji": "~1.1.1",
@@ -83,7 +83,7 @@
                 "qrcode.vue": "~3.4.1",
                 "qs": "~6.11.2",
                 "strtotime": "~1.0.0",
-                "swiper": "~11.0.5",
+                "swiper": "^11.0.6",
                 "tinycolor2": "~1.6.0",
                 "ts-ebml": "~2.0.2",
                 "v-tables-3-select-rows": "~0.4.9",
@@ -27930,9 +27930,9 @@
             "dev": true
         },
         "node_modules/swiper": {
-            "version": "11.0.5",
-            "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.0.5.tgz",
-            "integrity": "sha512-rhCwupqSyRnWrtNzWzemnBLMoyYuoDgGgspAm/8iBD3jCvAWycPLH4Z3TB0O5520DHLzMx94yUMH/B9Efpa48w==",
+            "version": "11.0.6",
+            "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.0.6.tgz",
+            "integrity": "sha512-W/Me7MQl5rNgdM5x9i3Gll76WsyVpnHn91GhBOyL7RCFUeg62aVnflzlVfIpXzZ/87FtJOfAoDH79ZH2Yq76zA==",
             "funding": [
                 {
                     "type": "patreon",
@@ -51509,9 +51509,9 @@
             }
         },
         "swiper": {
-            "version": "11.0.5",
-            "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.0.5.tgz",
-            "integrity": "sha512-rhCwupqSyRnWrtNzWzemnBLMoyYuoDgGgspAm/8iBD3jCvAWycPLH4Z3TB0O5520DHLzMx94yUMH/B9Efpa48w=="
+            "version": "11.0.6",
+            "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.0.6.tgz",
+            "integrity": "sha512-W/Me7MQl5rNgdM5x9i3Gll76WsyVpnHn91GhBOyL7RCFUeg62aVnflzlVfIpXzZ/87FtJOfAoDH79ZH2Yq76zA=="
         },
         "synchronous-promise": {
             "version": "2.0.17",
