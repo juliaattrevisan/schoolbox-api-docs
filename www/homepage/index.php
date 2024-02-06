@@ -77,15 +77,21 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
 /**
  * Canvas custom redirect
  */
-if (!empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL))) {
+$canvasUrl = $this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL);
+if (!empty($canvasUrl)) {
     $redirect    = (new \External\Canvas\Redirect\RedirectFactory(
         (string)$this->getDi()->get('config')->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
-        (string)$this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL),
+        (string)$canvasUrl,
         new CanvasDb($this->getDi()->get('config')),
         $folderMapper
     ))->produce();
 
-    $redirectUrl = $redirect?->generateRedirect($folder);
+    try {
+        $redirectUrl = $redirect?->generateRedirect($folder);
+    } catch (\Alaress\Database\Exception $e) {
+        // Don't know where to go: just go to Canvas
+        $redirectUrl = $canvasUrl;
+    }
 
     if (null !== $redirectUrl) {
         $this->localRedir($redirectUrl);
