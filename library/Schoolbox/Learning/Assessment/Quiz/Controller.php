@@ -21,6 +21,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term\Mapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -260,14 +261,21 @@ class Controller extends Assessment\Controller
         $externalRedirectUrl = null;
 
         if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getConfigLoader()->get('site_school_code'))) {
-            $externalRedirectUrl = (new \Custom\Newic\Redirect(
-                $this->getConfigLoader()->get('canvas_url'),
-                new CanvasDb($this->getConfigLoader()),
-                $this->folderMapper,
-            ))->generateAssessmentRedirect(
-                $this->getUser(),
-                $assessment
-            );
+            $canvasUrl = $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL);
+            try {
+                $externalRedirectUrl = (new \Custom\Newic\Redirect(
+                    $canvasUrl,
+                    new CanvasDb($this->getConfigLoader()),
+                    $this->folderMapper,
+                ))->generateAssessmentRedirect(
+                    $this->getUser(),
+                    $assessment
+                );
+            } catch (\Alaress\Database\Exception $e) {
+                // Don't know where to go: just go to Canvas
+                $this->captureException($e);
+                $externalRedirectUrl = $canvasUrl;
+            }
         }
 
         /* Check if this assessment has a SEB requirement
