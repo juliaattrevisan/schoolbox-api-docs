@@ -10,12 +10,17 @@ declare(strict_types=1);
 namespace External\Canvas\Sync;
 
 use Alaress\Database;
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use Alaress_Byte_Format;
 use External\Canvas\Importer\CanvasDb;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Promise\Promise;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliKernelAbstract;
@@ -146,13 +151,13 @@ class CliImporter extends CliTool\App
      * to work - instead of doing it manually, try insisting programmatically
      * waiting NAP_TIMEOUT seconds between each attempt
      */
-    private const NAP_TIMEOUT = 3;
+    private const ATTEMPT_BASE_TIMEOUT = 3;
 
     /**
      * Number of times to retry after having NAP_TIMEOUT seconds' rest before
      * finally giving up
      */
-    private const NUM_RETRY = 3;
+    private const MAX_ATTEMPTS = 3;
 
 
     /** @inheritdoc */
@@ -515,9 +520,19 @@ class CliImporter extends CliTool\App
     {
 
         $promises = [];
+        $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
+        $logger = $this->getLogger();
         $client = new Client([
                                  'timeout' => self::DEFAULT_TIMEOUT,
                              ]);
+//        $stack = \GuzzleHttp\HandlerStack::create();
+//        $stack->before(
+//            'http_errors',
+//            new \Alaress\Http\UnreliableMiddleware(0.8, new \Alaress\Random\FloatGenerator()),
+//        );
+//        $client = new Client([
+//                                 'handler' => $stack,
+//                             ]);
 
         foreach ($tableList as $tableName => $tableData) {
             if (!in_array($tableName, $tablesToImport) || !count($tableData['files'])) {
@@ -538,26 +553,64 @@ class CliImporter extends CliTool\App
                 /* Try multiple times in case sis dies for a random reason
                  */
                 $e = null;
-                while ($fails < self::NUM_RETRY) {
+
                     /* Any exception thrown by guzzle might as well be a reason to nap and retry
                      */
-                    try {
-                        $promises[] = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
-                        continue 2;
-                    } catch (GuzzleException $e) {
-                        $fails++;
 
-                        $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
-
-                        sleep(self::NAP_TIMEOUT);
-
-                        continue;
+//                        $promises[] = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
+                $promise = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
+//                        $promise = new Promise(function () use ($client, $tableFile, $tableDataFile) {
+//                            // request the file from Canvas, and poll until it's done
+//                            // Then, return the Guzzle async request
+//                            return $client->requestAsync('GET', $tableFile['url'], ['sink' => $tableDataFile]);
+//                        });
+                $promise->then(
+                    null,
+                    function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
+                        // retry download...
+                        $attempt = 0;
+                        $wait = (int)$jitter->calculateJitter($attempt);
+                        $logger->warning("Failed to download $fileName, attempt: $attempt: sleeping: $wait");
+                        usleep($wait * 1000);
+                        return $promise;
                     }
-                }
-                // If fallen through to here, there was an error
-                throw new \Schoolbox\Application\Exception\Exception(
-                    sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
+                )->then(
+                    null,
+                    function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
+                        // retry download...
+                        $attempt = 1;
+                        $wait = (int)$jitter->calculateJitter($attempt);
+                        $logger->warning("Failed to download $fileName, attempt: $attempt: sleeping: $wait");
+                        usleep($wait * 1000);
+                        return $promise;
+                    }
+                )->then(
+                    null,
+                    function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
+                        // retry download...
+                        $attempt = 2;
+                        $wait = (int)$jitter->calculateJitter($attempt);
+                        $logger->warning("Failed to download $fileName, attempt: $attempt: sleeping: $wait");
+                        usleep($wait * 1000);
+                        return $promise;
+                    }
+                )->then(
+                    null,
+                    function (RequestException $e) use ($jitter, $fileName) {
+                        // epic fail, just exit...
+                        // If fallen through to here, there was an error
+                        throw new \Schoolbox\Application\Exception\Exception(
+                            sprintf("Failed to download %s: #3 times. Error:%s", $fileName, $e->getMessage())
+                        );
+                    }
                 );
+                $promises[] = $promise;
+//                continue 2;
+//
+//                // If fallen through to here, there was an error
+//                throw new \Schoolbox\Application\Exception\Exception(
+//                    sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
+//                );
             }
         }
 
