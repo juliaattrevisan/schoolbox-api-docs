@@ -130,7 +130,6 @@ class AggregateSource implements ISource
             return ['', []];
         }
 
-        // These queries only need to be run each time the search_index table is rebuilt, so there is potential for optimisation here.
         $maxTitleRelevance = $this->connector->executeQuery(
             "SELECT MAX(MATCH (title) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
             ['keyword' => $keyword]
