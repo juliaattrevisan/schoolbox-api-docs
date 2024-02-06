@@ -74,6 +74,12 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     $this->localRedir("/homepage/$prefix/$code");
 }
 
+/** @var HubInterface|null $sentry */
+$sentry = null;
+if ($this->getDi()->has('sentry')) {
+    $sentry = $this->getDi()->get('sentry');
+}
+
 /**
  * Canvas custom redirect
  */
@@ -90,6 +96,8 @@ if (!empty($canvasUrl)) {
         $redirectUrl = $redirect?->generateRedirect($folder);
     } catch (\Alaress\Database\Exception $e) {
         // Don't know where to go: just go to Canvas
+        // Log first I guess
+        $sentry?->captureException($e);
         $redirectUrl = $canvasUrl;
     }
 
@@ -462,12 +470,7 @@ foreach ($componentCollection as $component) {
         if (Config::get('debug_mode')) {
             throw $e;
         }
-
-        if ($this->getDi()->has('sentry')) {
-            /** @var HubInterface $sentry */
-            $sentry = $this->getDi()->get('sentry');
-            $sentry->captureException($e);
-        }
+        $sentry?->captureException($e);
     }
 }
 

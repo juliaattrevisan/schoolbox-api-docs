@@ -325,6 +325,7 @@ class Controller extends Assessment\Controller
                 );
             } catch (\Alaress\Database\Exception $e) {
                 // Don't know where to go: just go to Canvas
+                $this->captureException($e);
                 $externalRedirectUrl = $canvasUrl;
             }
         }
