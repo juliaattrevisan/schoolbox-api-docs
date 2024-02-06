@@ -16,7 +16,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Components/Form/Range",
+    title: "Components/Form/Input Range",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -24,9 +24,9 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Example: Story = {
     render: () => ({
         template: `
-            <div class="c-range">
-                <label class="c-range__label" for="column-width">Column Width</label>
-                <input class="c-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
+            <div class="c-input-range">
+                <label class="c-input-range__label" for="column-width">Column Width</label>
+                <input class="c-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
             </div>
         `,
     }),
