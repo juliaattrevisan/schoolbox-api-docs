@@ -118,4 +118,5 @@
 // to identify 'islands' of content, sitting on --foreground-colour
 .c-island {
     background-color: var(--foreground-colour);
+    padding: var(--spacing-m);
 }
