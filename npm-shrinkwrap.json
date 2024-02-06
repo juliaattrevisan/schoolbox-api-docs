@@ -63,8 +63,8 @@
                 "axios": "~1.6.7",
                 "canvas-confetti": "~1.9.2",
                 "clipboard": "~2.0.11",
-                "datatables.net": "~1.13.4",
-                "datatables.net-fixedcolumns": "~4.2.2",
+                "datatables.net": "^1.13.8",
+                "datatables.net-fixedcolumns": "^4.3.0",
                 "dayjs": "~1.11.10",
                 "dropzone": "~6.0.0-beta.2",
                 "flatpickr": "~4.6.13",
@@ -83,7 +83,7 @@
                 "qrcode.vue": "~3.4.1",
                 "qs": "~6.11.2",
                 "strtotime": "~1.0.0",
-                "swiper": "^11.0.6",
+                "swiper": "~11.0.6",
                 "tinycolor2": "~1.6.0",
                 "ts-ebml": "~2.0.2",
                 "v-tables-3-select-rows": "~0.4.9",
@@ -14571,19 +14571,19 @@
             "integrity": "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw=="
         },
         "node_modules/datatables.net": {
-            "version": "1.13.4",
-            "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.13.4.tgz",
-            "integrity": "sha512-yzhArTOB6tPO2QFKm1z3hA4vabtt2hRvgw8XLsT1xqEirinfGYqWDiWXlkTPTaJv2e7gG+Kf985sXkzBFlGrGQ==",
+            "version": "1.13.8",
+            "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.13.8.tgz",
+            "integrity": "sha512-2pDamr+GUwPTby2OgriVB9dR9ftFKD2AQyiuCXzZIiG4d9KkKFQ7gqPfNmG7uj9Tc5kDf+rGj86do4LAb/V71g==",
             "dependencies": {
                 "jquery": ">=1.7"
             }
         },
         "node_modules/datatables.net-fixedcolumns": {
-            "version": "4.2.2",
-            "resolved": "https://registry.npmjs.org/datatables.net-fixedcolumns/-/datatables.net-fixedcolumns-4.2.2.tgz",
-            "integrity": "sha512-Ml4aaBd3BjT2tho2oWREH1utFGklosckjunQwmvppRv5EwKpDWuGBzRsV1+tpdl+CJsldYRyw55C/lN2avBtew==",
+            "version": "4.3.0",
+            "resolved": "https://registry.npmjs.org/datatables.net-fixedcolumns/-/datatables.net-fixedcolumns-4.3.0.tgz",
+            "integrity": "sha512-H2otCswJDHufI4A8k7HUDj25HCB3a44KFnBlYEwYFWdrJayLcYB3I79kBjS8rSCu4rFEp0I9nVLKvWgKlZZgCQ==",
             "dependencies": {
-                "datatables.net": ">=1.12.1",
+                "datatables.net": ">=1.13.4",
                 "jquery": ">=1.7"
             }
         },
@@ -41708,19 +41708,19 @@
             "integrity": "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw=="
         },
         "datatables.net": {
-            "version": "1.13.4",
-            "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.13.4.tgz",
-            "integrity": "sha512-yzhArTOB6tPO2QFKm1z3hA4vabtt2hRvgw8XLsT1xqEirinfGYqWDiWXlkTPTaJv2e7gG+Kf985sXkzBFlGrGQ==",
+            "version": "1.13.8",
+            "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.13.8.tgz",
+            "integrity": "sha512-2pDamr+GUwPTby2OgriVB9dR9ftFKD2AQyiuCXzZIiG4d9KkKFQ7gqPfNmG7uj9Tc5kDf+rGj86do4LAb/V71g==",
             "requires": {
                 "jquery": ">=1.7"
             }
         },
         "datatables.net-fixedcolumns": {
-            "version": "4.2.2",
-            "resolved": "https://registry.npmjs.org/datatables.net-fixedcolumns/-/datatables.net-fixedcolumns-4.2.2.tgz",
-            "integrity": "sha512-Ml4aaBd3BjT2tho2oWREH1utFGklosckjunQwmvppRv5EwKpDWuGBzRsV1+tpdl+CJsldYRyw55C/lN2avBtew==",
+            "version": "4.3.0",
+            "resolved": "https://registry.npmjs.org/datatables.net-fixedcolumns/-/datatables.net-fixedcolumns-4.3.0.tgz",
+            "integrity": "sha512-H2otCswJDHufI4A8k7HUDj25HCB3a44KFnBlYEwYFWdrJayLcYB3I79kBjS8rSCu4rFEp0I9nVLKvWgKlZZgCQ==",
             "requires": {
-                "datatables.net": ">=1.12.1",
+                "datatables.net": ">=1.13.4",
                 "jquery": ">=1.7"
             }
         },
