@@ -96,7 +96,7 @@ class DataIOListener extends AbstractIOStreamListener
 
         switch ($status) {
             case Worker::READY: // ready for another task
-                $this->log->info("Worker {{$pid}} READY for new task");
+                $this->log->debug("Worker {{$pid}} READY for new task");
                 break;
 
             case Worker::BUSY: // data sent, but not finished yet
@@ -109,12 +109,12 @@ class DataIOListener extends AbstractIOStreamListener
                 break;
 
             case Worker::ENDED: // process has closed. Primarily this will happen if fatal errors are hit
-                $this->log->info("Worker {{$pid}} has ENDED");
+                $this->log->debug("Worker {{$pid}} has ENDED");
                 $pool->releaseWorker($pid);
                 break;
 
             case Worker::DONE: // job done, ready for another task
-                $this->log->info("Worker {{$pid}} is DONE, parsing response");
+                $this->log->debug("Worker {{$pid}} is DONE, parsing response");
                 // append the final batch of data
                 $task->append($data);
 
@@ -128,7 +128,7 @@ class DataIOListener extends AbstractIOStreamListener
                     $newStatus = $pool->setWorkerStatus($pid, Worker::READY);
 
                     if ($newStatus == Worker::READY) {
-                        $this->log->info("Worker {{$pid}} READY for new task");
+                        $this->log->debug("Worker {{$pid}} READY for new task");
                     }
                 } catch (Exception $e) {
                     // your reactor will explode if you don't catch exceptions coming from your response handler

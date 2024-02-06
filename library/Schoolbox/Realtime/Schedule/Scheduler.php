@@ -253,7 +253,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     public function handleResponse($trigger, $command, $data)
     {
-        $this->log->notice("Received worker response to handle: '$command'");
+        $this->log->debug("Received worker response to handle: '$command'");
 
         // will throw RuntimeException if unserialization fails
         $bundle = unserialize($data[0]);

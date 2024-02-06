@@ -198,7 +198,7 @@ class Pool extends EventEmitter implements PoolInterface
      */
     protected function attachWorker()
     {
-        $this->log->notice("Attaching worker to {$this->strat->getName()} pool", array('char' => '+'));
+        $this->log->debug("Attaching worker to {$this->strat->getName()} pool", array('char' => '+'));
         $cmd = $this->strat->getCommand();
 
         $descriptorSpec = array(

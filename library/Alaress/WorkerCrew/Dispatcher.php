@@ -102,7 +102,7 @@ class Dispatcher implements DispatcherInterface
 
         // store the element locally
         $this->q->enqueue([ $identifier, $command, $data ]);
-        $this->log->info("Enqueued '$command': queue length is " . $this->q->count());
+        $this->log->debug("Enqueued '$command': queue length is " . $this->q->count());
 
         if ($qLength >= $this->strat->getWarningQueueLength()) {
             $this->log->warning("Queue is getting large");
@@ -209,7 +209,7 @@ class Dispatcher implements DispatcherInterface
             // we obtained the data from q::bottom() so just drop the reference
             $this->q->dequeue();
             $pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
-            $this->log->info("Command '$cmd' pushed to worker {{$pid}}", [ 'char' => '>' ]);
+            $this->log->debug("Command '$cmd' pushed to worker {{$pid}}", [ 'char' => '>' ]);
         } catch (IOException $e) {
             $this->log->warning("Could not communicate with worker: " . $e->getMessage());
         } catch (RuntimeException $e) {

@@ -102,7 +102,7 @@ abstract class AbstractProcess implements WorkerInterface
      */
     public function onTerminate()
     {
-        $this->log->info("GOT SIGTERM", array('char' => '>'));
+        $this->log->debug("GOT SIGTERM", array('char' => '>'));
         $this->loop->stop();
     }
 
@@ -131,7 +131,7 @@ abstract class AbstractProcess implements WorkerInterface
         }
 
         $response = $this->process($cmd, $args);
-        $this->log->info("Processing successful");
+        $this->log->debug("Processing successful");
         gc_collect_cycles();
         $flat = $this->strat->getProtocol()
                             ->flatten($response);
