@@ -36,8 +36,6 @@ interface IQueryParamBuilder
         FilterDataObject $filter,
         ?CursorDataObject $cursor,
         int $limit,
-        float $maxTitleRelevance,
-        float $maxContentRelevance,
         string $paramKeySuffix = ''
     ): ?QueryParams;
 

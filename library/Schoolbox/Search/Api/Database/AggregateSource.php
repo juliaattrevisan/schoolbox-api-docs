@@ -161,7 +161,6 @@ class AggregateSource implements ISource
             echo "Aggregate->getQueryStringAndParams() t0: " . round($t0 - $t0, 3) . "s\n";
         }
 
-        [$maxTitleRelevance, $maxContentRelevance] = $this->getMaxTitleAndContentRelevanceForKeyword($keyword, $loggedInUser);
         if ($loggedInUser->getId() === 1) {
             $t1 = microtime(true);
             echo "Aggregate->getQueryStringAndParams() t1: " . round($t1 - $t0, 3) . "s\n";
@@ -180,8 +179,6 @@ class AggregateSource implements ISource
                 $filter,
                 $cursor,
                 $limit,
-                $maxTitleRelevance,
-                $maxContentRelevance,
                 $paramKeySuffix
             );
             if ($queryParams) {
@@ -233,37 +230,5 @@ class AggregateSource implements ISource
         }
 
         return [$queryString, $params];
-    }
-
-    /**
-     * @param string $keyword
-     * @return array
-     */
-    private function getMaxTitleAndContentRelevanceForKeyword(string $keyword, User $loggedInUser): array
-    {
-        static $maxRelevanceByTypeByKeyword = [];
-
-        if (!array_key_exists($keyword, $maxRelevanceByTypeByKeyword)) {
-            if ($loggedInUser->getId() === 1) {
-                echo "Running queries to get max title and content relevance...\n";
-                $t0 = microtime(true);
-            }
-            $maxRelevanceByTypeByKeyword[$keyword] = [
-                $this->connector->executeQuery(
-                    "SELECT MAX(MATCH (title) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
-                    ['keyword' => $keyword]
-                )->fetchColumn(),
-                $this->connector->executeQuery(
-                    "SELECT MAX(MATCH (fulltext_index) AGAINST (:keyword IN NATURAL LANGUAGE MODE)) FROM search_index",
-                    ['keyword' => $keyword]
-                )->fetchColumn()
-            ];
-            if ($loggedInUser->getId() === 1) {
-                $t1 = microtime(true);
-                echo "Done in " . round($t1 - $t0, 3) . "s.\n";
-            }
-        }
-
-        return $maxRelevanceByTypeByKeyword[$keyword];
     }
 }

@@ -54,8 +54,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      */
     protected function buildBaseWhereParams(
         string $keyword,
-        float $maxTitleRelevance,
-        float $maxContentRelevance,
         string $paramKeySuffix = ''
     ): array
     {
@@ -65,8 +63,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         return [
             "indexNow$paramKeySuffix"                        => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix"                    => $keyword,
-            "maxTitleRelevance$paramKeySuffix"               => $maxTitleRelevance,
-            "maxContentRelevance$paramKeySuffix"             => $maxContentRelevance,
             "RELEVANCE_WEIGHTING_TITLE$paramKeySuffix"       => self::RELEVANCE_WEIGHTING_TITLE,
             "RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix"     => self::RELEVANCE_WEIGHTING_CONTENT,
             "RELEVANCE_WEIGHTING_RECENT_DATE$paramKeySuffix" => self::RELEVANCE_WEIGHTING_RECENT_DATE,
@@ -81,16 +77,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
         //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
         // The same algorithm is used for BOOLEAN MODE and NATURAL LANGUAGE MODE.  I confirmed this by experiment.
-        //
-        // Dividing by the maxTitleRelevance results in a range for titleRelevance between 0 and 1.
-        // The titleRelevance (between 0 and 1) is then multiplied by the RELEVANCE_WEIGHTING_TITLE,
-        // which results in a range of [0, self::RELEVANCE_WEIGHTING_TITLE].
+
         return (
-            ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * " .
-            "(
-                MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) /
-                :maxTitleRelevance$paramKeySuffix
-             )"
+            ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix *" .
+            " MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)"
         );
     }
 
@@ -102,16 +92,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
         //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
         // The same algorithm is used for BOOLEAN MODE and NATURAL LANGUAGE MODE.  I confirmed this by experiment.
-        //
-        // Dividing by the maxContentRelevance results in a range for contentRelevance between 0 and 1.
-        // The contentRelevance (between 0 and 1) is then multiplied by the RELEVANCE_WEIGHTING_CONTENT,
-        // which results in a range of [0, self::RELEVANCE_WEIGHTING_CONTENT].
+
         return (
-            ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix * " .
-            "(
-                MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) /
-                :maxContentRelevance$paramKeySuffix
-             )"
+            ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix *" .
+            " MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)"
         );
     }
 
