@@ -338,9 +338,7 @@ class Controller extends Base
             return [];
         }
 
-        $query = 'SELECT ' . implode(",\n", $subqueries);
-
-        $rows = $this->connector->executeQuery($query, $params)->fetchAll();
+        $rows = $this->connector->executeQuery('SELECT ' . implode(",\n", $subqueries), $params)->fetchAll();
 
         if (count($rows) !== 1) {
             throw new LogicException('Expected one row from query.');
