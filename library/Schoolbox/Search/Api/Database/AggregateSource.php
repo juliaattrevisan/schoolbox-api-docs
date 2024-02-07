@@ -140,13 +140,13 @@ class AggregateSource implements ISource
         if (empty($this->queryParamBuilders)) {
             return ['', []];
         }
-        if ($this->user->getId() === 1) {
+        if ($loggedInUser->getId() === 1) {
             $t0 = microtime(true);
             echo "Aggregate->getQueryStringAndParams() t0: " . round($t0 - $t0, 3) . "s\n";
         }
 
         [$maxTitleRelevance, $maxContentRelevance] = $this->getMaxTitleAndContentRelevanceForKeyword($keyword, $loggedInUser);
-        if ($this->user->getId() === 1) {
+        if ($loggedInUser->getId() === 1) {
             $t1 = microtime(true);
             echo "Aggregate->getQueryStringAndParams() t1: " . round($t1 - $t0, 3) . "s\n";
         }
@@ -173,7 +173,7 @@ class AggregateSource implements ISource
                 $params    = array_merge($params, $queryParams->params);
             }
         }
-        if ($this->user->getId() === 1) {
+        if ($loggedInUser->getId() === 1) {
             $t2 = microtime(true);
             echo "Aggregate->getQueryStringAndParams() t2: " . round($t2 - $t0, 3) . "s\n";
         }
@@ -211,7 +211,7 @@ class AggregateSource implements ISource
             ";
             $params["overallLimit$paramKeySuffix"] = $limit;
         }
-        if ($this->user->getId() === 1) {
+        if ($loggedInUser->getId() === 1) {
             $t3 = microtime(true);
             echo "Aggregate->getQueryStringAndParams() t3: " . round($t3 - $t0, 3) . "s\n";
         }
