@@ -147,7 +147,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 $typePart           AS type,
                 $totalRelevancePart AS relevance
             $from" .
-            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '')
+            "\nWHERE " . implode(' AND ', $whereParts)
         );
 
         // Build order parts.
