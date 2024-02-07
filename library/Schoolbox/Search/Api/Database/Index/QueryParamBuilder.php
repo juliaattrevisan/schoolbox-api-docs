@@ -21,26 +21,6 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
     /**
-     * Prefix to use for SQL query parameter keys for tokens within the search keyword.
-     *
-     * E.g. If the search keyword is "Romeo and Juliet",
-     *      the tokens within the search keyword are:
-     *         {'Romeo', 'and', 'Juliet'}
-     *      and the SQL query parameters could be used like this:
-     *
-     *      SELECT *
-     *      FROM search_index
-     *      WHERE (
-     *          title LIKE :KEYWORD_TOKEN_LIKE_PREFIX_1 OR
-     *          title LIKE :KEYWORD_TOKEN_LIKE_PREFIX_2 OR
-     *          title LIKE :KEYWORD_TOKEN_LIKE_PREFIX_3
-     *      )
-     *
-     *      Where self::INDEX_KEYWORD_WORD_PREFIX is 'INDEX_KEYWORD_WORD_'.
-     */
-    private const KEYWORD_TOKEN_LIKE_PREFIX = 'KEYWORD_TOKEN_LIKE_PREFIX_';
-
-    /**
      * Constructor
      *
      * @param IQuoter $quoter
