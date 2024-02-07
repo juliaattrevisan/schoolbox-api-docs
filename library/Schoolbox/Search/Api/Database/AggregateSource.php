@@ -51,10 +51,6 @@ class AggregateSource implements ISource
      */
     public function search(User $loggedInUser, string $keyword, FilterDataObject $filter, ?CursorDataObject $cursor, int $limit): array
     {
-        if ($loggedInUser->getId() === 1) {
-            $t0 = microtime(true);
-            echo "AggregateSource->search() t0: " . round($t0 - $t0, 3) . "s\n";
-        }
         [$queryString, $params] = $this->getQueryStringAndParams(
             $loggedInUser,
             $keyword,
@@ -63,10 +59,6 @@ class AggregateSource implements ISource
             $limit,
             'select'
         );
-        if ($loggedInUser->getId() === 1) {
-            $t1 = microtime(true);
-            echo "AggregateSource->search() t1: " . round($t1 - $t0, 3) . "s\n";
-        }
 
         if ($queryString === '') {
             // This can happen if a filter has been specified that guarantees the query will return no results.
@@ -76,20 +68,8 @@ class AggregateSource implements ISource
 
         $rawMatches = [];
 
-        if ($loggedInUser->getId() === 1) {
-            echo "Running main search query...\n";
-            $t0 = microtime(true);
-        }
         $queryResult = $this->connector->executeQuery($queryString, $params);
-        if ($loggedInUser->getId() === 1) {
-            $t1 = microtime(true);
-            echo "Done in " . round($t1 - $t0, 3) . "s.\n";
-        }
 
-        if ($loggedInUser->getId() === 1) {
-            $t2 = microtime(true);
-            echo "AggregateSource->search() t2: " . round($t2 - $t0, 3) . "s\n";
-        }
         foreach ($queryResult as $row) {
             $rawMatches[] = new RawResult(
                 (string)$row['id'],
@@ -97,10 +77,6 @@ class AggregateSource implements ISource
                 $row['type'],
                 (float)$row['relevance'],
             );
-        }
-        if ($loggedInUser->getId() === 1) {
-            $t3 = microtime(true);
-            echo "AggregateSource->search() t3: " . round($t3 - $t0, 3) . "s\n";
         }
 
         return $rawMatches;
@@ -156,15 +132,7 @@ class AggregateSource implements ISource
         if (empty($this->queryParamBuilders)) {
             return ['', []];
         }
-        if ($loggedInUser->getId() === 1) {
-            $t0 = microtime(true);
-            echo "Aggregate->getQueryStringAndParams() t0: " . round($t0 - $t0, 3) . "s\n";
-        }
 
-        if ($loggedInUser->getId() === 1) {
-            $t1 = microtime(true);
-            echo "Aggregate->getQueryStringAndParams() t1: " . round($t1 - $t0, 3) . "s\n";
-        }
 
         $queries = [];
         $params  = [];
@@ -185,10 +153,6 @@ class AggregateSource implements ISource
                 $queries[] = $queryParams->query;
                 $params    = array_merge($params, $queryParams->params);
             }
-        }
-        if ($loggedInUser->getId() === 1) {
-            $t2 = microtime(true);
-            echo "Aggregate->getQueryStringAndParams() t2: " . round($t2 - $t0, 3) . "s\n";
         }
 
         if (empty($queries)) {
@@ -228,10 +192,6 @@ class AggregateSource implements ISource
                 LIMIT :overallLimit$paramKeySuffix
             ";
             $params["overallLimit$paramKeySuffix"] = $limit;
-        }
-        if ($loggedInUser->getId() === 1) {
-            $t3 = microtime(true);
-            echo "Aggregate->getQueryStringAndParams() t3: " . round($t3 - $t0, 3) . "s\n";
         }
 
         return [$queryString, $params];
