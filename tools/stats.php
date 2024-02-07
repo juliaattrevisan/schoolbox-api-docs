@@ -7,6 +7,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Permission\Access\UserAccess;
@@ -234,11 +235,12 @@ $app = new class extends CliTool\App {
         ];
 
         $result['instance_id'] = INSTANCE_ID;
-        $result['school_code'] = $config->get('site_school_code');
+        $result['school_code'] = $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE);
         $result['type'] = $config->get('site_type');
-        $result['version'] = $config->get('site_version');
-        $result['plan'] = $config->get('site_plan');
+        $result['version'] = $config->get(ConfigMapper::NAME_SITE_VERSION);
+        $result['plan'] = strtolower($config->get(ConfigMapper::NAME_SITE_PLAN));
 
+        $db->executeDirectly('SET MAX_STATEMENT_TIME=300');
 
         foreach ($queryList as $name => $query) {
             $statement = $db->executeQuery($query);
