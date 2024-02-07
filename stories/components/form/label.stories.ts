@@ -16,7 +16,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Components/Form/Label",
+    title: "Draft/Form/Label",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
