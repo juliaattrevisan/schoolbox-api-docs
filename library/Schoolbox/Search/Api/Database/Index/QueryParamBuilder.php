@@ -64,8 +64,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // The same algorithm for generating relevance scores is used for BOOLEAN MODE and NATURAL LANGUAGE MODE (this
         // has been confirmed by experiment).
 
-        // This is a simplified version of the expression returned by buildTitleRelevanceExpression(), that excludes the
-        // scaling factors and bonuses that should apply only to records that already meet the basic matching criteria.
+        // This is a simplified version of the expression returned by buildTitleRelevanceExpression(), that only
+        // includes computations that determine whether a row will be included in the search result.
         // The 'exact match on title' test is required so that searches for filenames such as 'shutterstock_282889763'
         // will return expected results.  MATCH...AGAINST alone will not work in that case because of the underscore.
         return "IF(
@@ -121,8 +121,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // The same algorithm for generating relevance scores is used for BOOLEAN MODE and NATURAL LANGUAGE MODE (this
         // has been confirmed by experiment).
 
-        // This is a simplified version of the expression returned by buildContentRelevanceExpression(), that excludes the
-        // scaling factors and bonuses that should apply only to records that already meet the basic matching criteria.
+        // This is a simplified version of the expression returned by buildContentRelevanceExpression(), that only
+        // includes computations that determine whether a row will be included in the search result.
         return " MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)";
     }
 
