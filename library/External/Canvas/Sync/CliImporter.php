@@ -142,7 +142,7 @@ class CliImporter extends CliTool\App
     /**
      * Request timeout
      */
-    private const DEFAULT_TIMEOUT = 300;
+    public const DEFAULT_TIMEOUT = 300;
 
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
@@ -151,13 +151,13 @@ class CliImporter extends CliTool\App
      * to work - instead of doing it manually, try insisting programmatically
      * waiting NAP_TIMEOUT seconds between each attempt
      */
-    private const ATTEMPT_BASE_TIMEOUT = 3;
+    public const ATTEMPT_BASE_TIMEOUT = 3;
 
     /**
      * Number of times to retry after having NAP_TIMEOUT seconds' rest before
      * finally giving up
      */
-    private const MAX_ATTEMPTS = 3;
+    public const MAX_ATTEMPTS = 3;
 
 
     /** @inheritdoc */
@@ -224,9 +224,9 @@ class CliImporter extends CliTool\App
             if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
                 $this->getLogger()->notice("File download skipped");
             } else {
-                $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT);
-                $this->getLogger()->notice('Downloading latest data.');
-                $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT);
+                $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT, $tempDir, $this->perform());
+//                $this->getLogger()->notice('Downloading latest data.');
+//                $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT);
             }
             $dataRestorer = new Data2Restorer(
                 $canvasDb,
