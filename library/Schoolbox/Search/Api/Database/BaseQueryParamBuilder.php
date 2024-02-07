@@ -55,18 +55,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         int $limit,
         string $paramKeySuffix = ''
     ): ?QueryParams {
-        $params               = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
-        $titleRelevancePart   = $this->buildTitleRelevanceExpression($keyword, $paramKeySuffix);
-        $contentRelevancePart = $this->buildContentRelevanceExpression($keyword, $paramKeySuffix);
-        $dateRelevancePart    = $this->buildDateRelevanceExpression($keyword, $paramKeySuffix);
-        $totalRelevancePart   = "($titleRelevancePart + $contentRelevancePart + $dateRelevancePart)";
-        $titlePart            = $this->buildTitleExpression($paramKeySuffix);
-        $typePart             = $this->buildTypeExpression($paramKeySuffix);
-        $idPart               = $this->buildIdExpression($paramKeySuffix);
-        $datePart             = $this->buildDateExpression($paramKeySuffix);
-        $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
-        $folderPart           = $this->buildFolderExpression($paramKeySuffix);
-        $whereParts           = [];
+        $params     = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
+        $typePart   = $this->buildTypeExpression($paramKeySuffix);
+        $datePart   = $this->buildDateExpression($paramKeySuffix);
+        $whereParts = [];
 
         // Apply filter
         if ($filter->types) {
@@ -94,6 +86,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         if ($filter->creator) {
             // No creator part? Exclude this type of result entirely
+            $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
             if (isset($creatorPart)) {
                 $whereParts[] = "$creatorPart = :filterCreator$paramKeySuffix";
                 $params["filterCreator$paramKeySuffix"] = $filter->creator->getId();
@@ -103,6 +96,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         if ($filter->folder) {
             // No folder part? Exclude this type of result entirely
+            $folderPart           = $this->buildFolderExpression($paramKeySuffix);
             if (isset($folderPart)) {
                 $whereParts[] = "$folderPart = :filterFolder$paramKeySuffix";
                 $params["filterFolder$paramKeySuffix"] = $filter->folder->getId();
@@ -111,9 +105,18 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             }
         }
 
-        $whereParts[] = (
-            "({$this->buildTitleRelevanceExpressionForWhereClause($keyword, $paramKeySuffix)} > 0 OR $contentRelevancePart > 0)"
-        );
+        $whereParts[] = "(
+            {$this->buildTitleRelevanceExpressionForWhereClause($keyword, $paramKeySuffix)} > 0 OR
+            {$this->buildContentRelevanceExpressionForWhereClause($keyword, $paramKeySuffix)} > 0
+        )";
+
+        $titlePart          = $this->buildTitleExpression($paramKeySuffix);
+        $idPart             = $this->buildIdExpression($paramKeySuffix);
+        $totalRelevancePart = "(
+            {$this->buildTitleRelevanceExpression($keyword, $paramKeySuffix)} +
+            {$this->buildContentRelevanceExpression($keyword, $paramKeySuffix)} +
+            {$this->buildDateRelevanceExpression($keyword, $paramKeySuffix)}
+        )";
 
         // Apply cursor
         if ($cursor) {
@@ -255,6 +258,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     /**
      * Build the expression for determining the relevance for an item in this
      * search, as used in the `SELECT` and `ORDER BY` parts of the query.
+     * This should return a non-zero number if the record should be included based on its title, and the number should
+     * be higher for better matches and lower for lesser matches.
      *
      * This should evaluate to a decimal number - the greater the
      * number, the more relevant the result.
@@ -268,6 +273,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     /**
      * Build the expression for determining the relevance for an item in this
      * search, as used in the `WHERE` part of the query.
+     * This should return a non-zero number if the record should be included based on its title.
      *
      * One may wish for the relevance used in the WHERE part to differ from the
      * relevance used in the SELECT or ORDER BY part for efficiency reasons.
@@ -279,6 +285,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     abstract protected function buildTitleRelevanceExpressionForWhereClause(string $keyword, string $paramKeySuffix = ''): string;
 
     abstract protected function buildContentRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
+
+    abstract protected function buildContentRelevanceExpressionForWhereClause(string $keyword, string $paramKeySuffix = ''): string;
 
     abstract protected function buildDateRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
 
