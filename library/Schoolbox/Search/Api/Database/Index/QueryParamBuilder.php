@@ -22,10 +22,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 {
     /**
      * Constructor
-     *
-     * @param IQuoter $quoter
      */
-    public function __construct(private IQuoter $quoter)
+    public function __construct()
     {
     }
 
