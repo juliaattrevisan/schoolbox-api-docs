@@ -72,6 +72,22 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     /**
      * @inheritdoc
      */
+    protected function buildTitleRelevanceExpressionForWhereClause(string $keyword, string $paramKeySuffix = ''): string
+    {
+        // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
+        //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
+        // The same algorithm for generating relevance scores is used for BOOLEAN MODE and NATURAL LANGUAGE MODE (this
+        // has been confirmed by experiment).
+
+        return (
+            ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * " .
+            "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)"
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string
     {
         // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
@@ -80,8 +96,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // has been confirmed by experiment).
 
         return (
-            ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix *" .
-            " MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)"
+            ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * (" .
+               "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) + " .
+               "IF(si.title = :indexKeyword$paramKeySuffix, 100, 0)" .
+            ")"
         );
     }
 
