@@ -93,12 +93,20 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
 
         $eventIds = $this->eventMapper->findIdsByPredicates($pb);
 
+        /* Forcibly rebuild a data struct
+         */
+        $eventTuples = [];
+
+        foreach ($eventIds as $eventId) {
+            $eventTuples[$eventId] = [];
+        }
+
         /* Then pop out the collection as a subscription that can be used
          * among all the other calendar subscription
          *
          * Also provide all the modal's usual info
          */
-        $timetableEvents = $this->eventMapper->findWithCheapStaff($eventIds);
+        $timetableEvents = $this->eventMapper->findWithCheapStaff($eventTuples);
 
         /* Lowercase the room codes provided in constructor
          * so it's case insensitive matching
