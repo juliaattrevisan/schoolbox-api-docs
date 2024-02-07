@@ -33,6 +33,29 @@ class Data2Connector
     // seconds to wait for the job to finish
     private const RETRY_TIME_PERIOD = 60;
 
+    /**
+     * Guzzle requests consts
+     */
+    /**
+     * Request timeout
+     */
+    private const DEFAULT_TIMEOUT = 300;
+
+    /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     */
+    private const ATTEMPT_BASE_TIMEOUT = 3;
+
+    /**
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
+     */
+    private const MAX_ATTEMPTS = 3;
+
     private ?string $accessToken = null;
 
     /**
@@ -64,19 +87,27 @@ class Data2Connector
 
     /**
      * Downloads data from CanvasData API and saves to local temp files
+     *
+     * Loops through all tables, for each table it will:
+     * first spawns jobs to generate a presigned url
+     * then once that job is finished
+     * download all the files for that table
+     *
      * Moved from CLIImporter to easily be replaced with Data2Connector
-     * @param array $tablesToImport
-     * @return array
+     * @param array  $tablesToImport
+     * @param string $tempDir
+     * @param bool   $perform
+     * @return void
      */
-    public function fetchCanvasDataFilesFromApi(array $tablesToImport, string $tempDir, bool $perform = false): array
+    public function fetchCanvasDataFilesFromApi(array $tablesToImport, string $tempDir, bool $perform = false): void
     {
         $this->logger->notice('Getting latest data urls.');
 
         $promises = [];
-        $jitter     = new Jitter(new FloatGenerator(), CliImporter::MAX_ATTEMPTS, CliImporter::ATTEMPT_BASE_TIMEOUT);
+        $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
         $logger = $this->logger;
         $client = new Client([
-                                 'timeout' => CliImporter::DEFAULT_TIMEOUT,
+                                 'timeout' => self::DEFAULT_TIMEOUT,
                              ]);
 //        $stack = \GuzzleHttp\HandlerStack::create();
 //        $stack->before(
@@ -100,14 +131,13 @@ class Data2Connector
 
                 // poll for job to finish
                 $jobCheckCount = 0;
-                while ($jobCheckCount < self::MAX_JOB_CHECK_COUNTS && !empty($this->jobs['table'])) {
-                    $this->logger->debug(sprintf('%d jobs remaining. Sleeping %d seconds before re-fetching.', count($this->jobs['table']), self::RETRY_TIME_PERIOD));
+                while ($jobCheckCount < self::MAX_JOB_CHECK_COUNTS && !empty($this->jobs[$table])) {
+                    $this->logger->debug(sprintf('Sleeping %d seconds before re-fetching.', self::RETRY_TIME_PERIOD));
                     sleep(self::RETRY_TIME_PERIOD);
                     $this->fetchJobData($table, $this->jobs[$table]);
                     $jobCheckCount++;
                 }
                 // when jobs for this table are complete
-
                 // download jobs async
                 // there can be multiple files
                 $tableFiles = $this->urls[$table]['files'];
@@ -117,17 +147,6 @@ class Data2Connector
                     $this->logger->debug("Downloading $table to $fileName");
 //                $this->getLogger()->debug(sprintf("URL: %s", var_export($tableFile, true)));
 
-                    /* Mine out an error message if you try to access a thing that doesn't exist
-                    */
-                    $fails = 0;
-
-                    /* Try multiple times in case sis dies for a random reason
-                     */
-                    $e = null;
-
-                    /* Any exception thrown by guzzle might as well be a reason to nap and retry
-                     */
-
 //                        $promises[] = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
                     $promise = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
 //                        $promise = new Promise(function () use ($client, $tableFile, $tableDataFile) {
@@ -135,6 +154,9 @@ class Data2Connector
 //                            // Then, return the Guzzle async request
 //                            return $client->requestAsync('GET', $tableFile['url'], ['sink' => $tableDataFile]);
 //                        });
+
+                    /* Any exception thrown by guzzle might as well be a reason to nap and retry
+                     */
                     $promise->then(
                         null,
                         function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
@@ -176,19 +198,12 @@ class Data2Connector
                         }
                     );
                     $promises[] = $promise;
-//                continue 2;
-//
-//                // If fallen through to here, there was an error
-//                throw new \Schoolbox\Application\Exception\Exception(
-//                    sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
-//                );
                 }
 
 
-                // Now wait until all the results are retrieved
+                // Now wait until all the files for that table are downloaded
                 $bulkPromise = \GuzzleHttp\Promise\Utils::all($promises);
                 $result      = $bulkPromise->wait();
-
 
                 // move onto the next table
             }
@@ -197,21 +212,6 @@ class Data2Connector
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-//        while ($jobCheckCount < self::MAX_JOB_CHECK_COUNTS && !empty($this->jobs)) {
-//            $this->logger->debug(sprintf('%d jobs remaining. Sleeping %d seconds before re-fetching.', count($this->jobs), self::RETRY_TIME_PERIOD));
-//            sleep(self::RETRY_TIME_PERIOD);
-//            foreach ($this->jobs as $table => $jobId) {
-//                $this->fetchJobData($table, $jobId);
-//            }
-//            $jobCheckCount++;
-//        }
-//        if (!empty($this->jobs)) {
-//            foreach ($this->jobs as $table => $jobId) {
-//                $this->logger->warning(sprintf('Could not complete job for table: %s job:%s', $table, $jobId));
-//            }
-//            $this->logger->critical('Could not download all data');
-//            exit();
-//        }
         return $this->urls;
     }
 

@@ -142,7 +142,7 @@ class CliImporter extends CliTool\App
     /**
      * Request timeout
      */
-    public const DEFAULT_TIMEOUT = 300;
+    private const DEFAULT_TIMEOUT = 300;
 
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
@@ -151,13 +151,13 @@ class CliImporter extends CliTool\App
      * to work - instead of doing it manually, try insisting programmatically
      * waiting NAP_TIMEOUT seconds between each attempt
      */
-    public const ATTEMPT_BASE_TIMEOUT = 3;
+    private const ATTEMPT_BASE_TIMEOUT = 3;
 
     /**
      * Number of times to retry after having NAP_TIMEOUT seconds' rest before
      * finally giving up
      */
-    public const MAX_ATTEMPTS = 3;
+    private const MAX_ATTEMPTS = 3;
 
 
     /** @inheritdoc */
@@ -224,9 +224,7 @@ class CliImporter extends CliTool\App
             if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
                 $this->getLogger()->notice("File download skipped");
             } else {
-                $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT, $tempDir, $this->perform());
-//                $this->getLogger()->notice('Downloading latest data.');
-//                $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT);
+                $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT, $tempDir, $this->perform());
             }
             $dataRestorer = new Data2Restorer(
                 $canvasDb,
@@ -525,14 +523,6 @@ class CliImporter extends CliTool\App
         $client = new Client([
                                  'timeout' => self::DEFAULT_TIMEOUT,
                              ]);
-//        $stack = \GuzzleHttp\HandlerStack::create();
-//        $stack->before(
-//            'http_errors',
-//            new \Alaress\Http\UnreliableMiddleware(0.8, new \Alaress\Random\FloatGenerator()),
-//        );
-//        $client = new Client([
-//                                 'handler' => $stack,
-//                             ]);
 
         foreach ($tableList as $tableName => $tableData) {
             if (!in_array($tableName, $tablesToImport) || !count($tableData['files'])) {
@@ -544,18 +534,7 @@ class CliImporter extends CliTool\App
                 $fileName      = "$tempDir/$tableName.$index.gz";
                 $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName : '/dev/null', 'wb');
                 $this->getLogger()->debug("Downloading $tableName to $fileName");
-//                $this->getLogger()->debug(sprintf("URL: %s", var_export($tableFile, true)));
 
-                /* Mine out an error message if you try to access a thing that doesn't exist
-                */
-                $fails = 0;
-
-                /* Try multiple times in case sis dies for a random reason
-                 */
-                $e = null;
-
-                    /* Any exception thrown by guzzle might as well be a reason to nap and retry
-                     */
 
 //                        $promises[] = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
                 $promise = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
@@ -564,6 +543,9 @@ class CliImporter extends CliTool\App
 //                            // Then, return the Guzzle async request
 //                            return $client->requestAsync('GET', $tableFile['url'], ['sink' => $tableDataFile]);
 //                        });
+
+                /* Any exception thrown by guzzle might as well be a reason to nap and retry
+                */
                 $promise->then(
                     null,
                     function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
@@ -605,19 +587,12 @@ class CliImporter extends CliTool\App
                     }
                 );
                 $promises[] = $promise;
-//                continue 2;
-//
-//                // If fallen through to here, there was an error
-//                throw new \Schoolbox\Application\Exception\Exception(
-//                    sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
-//                );
             }
         }
 
         // Now wait until all the results are retrieved
         $bulkPromise = \GuzzleHttp\Promise\Utils::all($promises);
         $result      = $bulkPromise->wait();
-//        $this->getLogger()->debug(sprintf("downloadASYNC result %s", var_export($result, true)));
     }
 
 
