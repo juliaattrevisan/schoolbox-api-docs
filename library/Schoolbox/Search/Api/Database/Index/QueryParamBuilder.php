@@ -37,9 +37,17 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // Note: Do not trim the keyword.  Not trimming the keyword allows the user more flexibility when searching for
         // titles.  E.g.  A search for titles containing ' board ' excludes titles like 'headboard', 'surfboards', 'boards'.
 
+        $strlenKeyword   = strlen($keyword);
+        $keywordUnquoted = (
+            ($strlenKeyword >= 2 && $keyword[0] === '"' && $keyword[$strlenKeyword - 1] === '"')
+            ? substr($keyword, 1, $strlenKeyword - 2)
+            : $keyword
+        );
+
         return [
             "indexNow$paramKeySuffix"                        => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix"                    => $keyword,
+            "indexKeywordUnquoted$paramKeySuffix"            => $keywordUnquoted,
             "RELEVANCE_WEIGHTING_TITLE$paramKeySuffix"       => self::RELEVANCE_WEIGHTING_TITLE,
             "RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix"     => self::RELEVANCE_WEIGHTING_CONTENT,
             "RELEVANCE_WEIGHTING_RECENT_DATE$paramKeySuffix" => self::RELEVANCE_WEIGHTING_RECENT_DATE,
@@ -88,7 +96,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
             ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * (" .
                "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) + " .
-               "IF(si.title = :indexKeyword$paramKeySuffix, 100, 0)" . // Bonus for exact match (see comment above).
+               "IF(si.title = :indexKeywordUnquoted$paramKeySuffix, 100, 0)" . // Bonus for exact match (see comment above).
             ") * " .
             "IF(LENGTH(si.title) <= 1.5 * LENGTH(:indexKeyword$paramKeySuffix), 1.1, 1)" // Bonus for short matching titles (see comment above).
         );
