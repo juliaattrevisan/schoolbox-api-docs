@@ -67,12 +67,11 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
         $folderPart           = $this->buildFolderExpression($paramKeySuffix);
         $whereParts           = [];
-        $havingParts          = [];
 
         // Apply filter
         if ($filter->types) {
             $bindings = Builder::getBindings($filter->types, "filterType$paramKeySuffix");
-            $havingParts[] = "`type` IN ({$bindings->getPlaceholder()})";
+            $whereParts[] = "$typePart IN ({$bindings->getPlaceholder()})";
             $params = array_merge($params, $bindings->getParams());
         }
         if ($filter->fromDate) {
@@ -112,6 +111,8 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             }
         }
 
+        $whereParts[] = "($titleRelevancePart > 0 OR $contentRelevancePart > 0)";
+
         // Apply cursor
         if ($cursor) {
             $cursorSearchParts = [
@@ -132,21 +133,16 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             $params["cursorId$paramKeySuffix"]        = $cursor->id;
         }
 
-        $havingParts[] = "(titleRelevance + contentRelevance) > 0";
-
         // Build query and params
         $from = $this->buildFromStatement($paramKeySuffix);
         $query = (
             "SELECT DISTINCT
-                $idPart               AS id,
-                $titlePart            AS title,
-                $typePart             AS type,
-                $titleRelevancePart   AS titleRelevance,
-                $contentRelevancePart AS contentRelevance,
-                $totalRelevancePart   AS relevance
+                $idPart             AS id,
+                $titlePart          AS title,
+                $typePart           AS type,
+                $totalRelevancePart AS relevance
             $from" .
-            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') .
-            "\nHAVING " . implode(' AND ', $havingParts)
+            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '')
         );
 
         // Build order parts.
