@@ -201,6 +201,11 @@ class AggregateSource implements ISource
             default => throw new InvalidArgumentException("Unexpected queryType '$queryType'."),
         };
 
+        if (count($queries) === 1 && !$existsOnly) {
+            // If there is only one query, no need to wrap it in another SELECT.
+            return [$queries[0], $params];
+        }
+
         // UNION all queries together.
         $queryString = (
             ($existsOnly ? 'IF(EXISTS(' : 'SELECT DISTINCT * FROM (') .
