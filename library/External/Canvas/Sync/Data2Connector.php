@@ -75,6 +75,14 @@ class Data2Connector
                     continue;
                 }
                 $this->fetchTableData($table);
+
+                // poll for job to finish
+
+                // when jobs for this table are complete
+
+                // download jobs async
+
+                // move onto the next table
             }
         } catch (ExternalException $e) {
             $this->logger->warning('Could not get dump file.' . $e->getMessage());
