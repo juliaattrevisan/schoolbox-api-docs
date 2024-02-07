@@ -72,11 +72,19 @@ class Controller extends Base
      */
     public function getSearch(): void
     {
+        if ($this->user->getId() === 1) {
+            $t0 = microtime(true);
+            echo "Controller->getSearch() t0: " . round($t0 - $t0, 3) . "s\n";
+        }
         $keyword = trim((string)$this->requestQuery->get('keyword', ''));
         $dataObjectFactory = new SearchFilter\DataObjectFactory($this->userMapper);
         $filter = $dataObjectFactory->build($this->requestQuery->get('filter'), null);
         $limit = (int)($this->requestQuery->get('limit', self::MAX_RESULT_LIMIT));
         $cursor = null;
+        if ($this->user->getId() === 1) {
+            $t1 = microtime(true);
+            echo "Controller->getSearch() t1: " . round($t1 - $t0, 3) . "s\n";
+        }
 
         if (mb_strlen($keyword) >= self::MIN_CHARACTER_LIMIT) {
             ['results' => $results, 'nextCursor' => $nextCursor] = $this->populateResultSet(
@@ -85,6 +93,10 @@ class Controller extends Base
                 $limit,
                 $this->requestQuery->get('cursor')
             );
+            if ($this->user->getId() === 1) {
+                $t2 = microtime(true);
+                echo "Controller->getSearch() t2: " . round($t2 - $t0, 3) . "s\n";
+            }
 
             $translatedResults = [];
             foreach ($results as $result) {
@@ -184,6 +196,10 @@ class Controller extends Base
                     $translatedResults[$resultKey] = $translatedResult;
                 }
             }
+            if ($this->user->getId() === 1) {
+                $t3 = microtime(true);
+                echo "Controller->getSearch() t3: " . round($t3 - $t0, 3) . "s\n";
+            }
 
             // If $nextCursor is null, there are no more results on the main query, and so we can be sure that there
             // are no more results on the folder queries too (this case has been dealt with above, inside the foreach loop).
@@ -203,6 +219,10 @@ class Controller extends Base
                     }
                 }
             }
+            if ($this->user->getId() === 1) {
+                $t4 = microtime(true);
+                echo "Controller->getSearch() t4: " . round($t4 - $t0, 3) . "s\n";
+            }
 
             $translatedResults = array_values($translatedResults);
 
@@ -221,6 +241,10 @@ class Controller extends Base
             );
         } else {
             $this->sendJsonError('Search keyword must be at least ' . self::MIN_CHARACTER_LIMIT . ' characters', 400);
+        }
+        if ($this->user->getId() === 1) {
+            $t5 = microtime(true);
+            echo "Controller->getSearch() t5: " . round($t5 - $t0, 3) . "s\n";
         }
     }
 
@@ -368,6 +392,10 @@ class Controller extends Base
      */
     private function populateResultSet(string $keyword, SearchFilter\DataObject $filter, int $limit, ?string $cursorCode): array
     {
+        if ($this->user->getId() === 1) {
+            $t0 = microtime(true);
+            echo "Controller->populateResultSet() t0: " . round($t0 - $t0, 3) . "s\n";
+        }
         // Instead of iteratively backfilling the result set with more results
         // if it hasn't reached the limit:
         // allow the cursor itself to fetch more results than the limit, and
@@ -379,11 +407,27 @@ class Controller extends Base
             $filter,
             $limit * 10,
         );
+        if ($this->user->getId() === 1) {
+            $t1 = microtime(true);
+            echo "Controller->populateResultSet() t1: " . round($t1 - $t0, 3) . "s\n";
+        }
 
         // Fetch results from cursor and hydrate
         $nextRawResults = $cursor->retrieveResults($cursorCode);
+        if ($this->user->getId() === 1) {
+            $t2 = microtime(true);
+            echo "Controller->populateResultSet() t2: " . round($t2 - $t0, 3) . "s\n";
+        }
         $nextCursor     = $cursor->next($nextRawResults);
+        if ($this->user->getId() === 1) {
+            $t3 = microtime(true);
+            echo "Controller->populateResultSet() t3: " . round($t3 - $t0, 3) . "s\n";
+        }
         $fullResults    = $this->hydrator->hydrate($keyword, $filter, $nextRawResults->getAll(), $this->user);
+        if ($this->user->getId() === 1) {
+            $t4 = microtime(true);
+            echo "Controller->populateResultSet() t4: " . round($t4 - $t0, 3) . "s\n";
+        }
 
         // Too many full results now?
         // Slice off excess results, and get a cursor to the last remaining
@@ -407,6 +451,10 @@ class Controller extends Base
                     $nextCursor = null;
                 }
             }
+        }
+        if ($this->user->getId() === 1) {
+            $t5 = microtime(true);
+            echo "Controller->populateResultSet() t5: " . round($t5 - $t0, 3) . "s\n";
         }
 
         return ['results' => $fullResults, 'nextCursor' => $nextCursor];

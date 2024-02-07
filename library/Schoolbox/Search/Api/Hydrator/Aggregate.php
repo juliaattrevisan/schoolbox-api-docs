@@ -57,6 +57,10 @@ class Aggregate implements IHydrator
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
+        if ($viewer->getId() === 1) {
+            $t0 = microtime(true);
+            echo "Aggregate->hydrate() t0: " . round($t0 - $t0, 3) . "s\n";
+        }
         // Group matches by the hydrator which accepts them
         $groupedRawResults = [];
         foreach ($matches as $i => $match) {
@@ -69,20 +73,39 @@ class Aggregate implements IHydrator
                 }
             }
         }
+        if ($viewer->getId() === 1) {
+            $t1 = microtime(true);
+            echo "Aggregate->hydrate() t1: " . round($t1 - $t0, 3) . "s\n";
+        }
 
         // Hydrate each result, grouping it into the set of full results
         $fullResults = [];
         foreach ($this->hydrators as $hydrator) {
             $hydratorId = spl_object_id($hydrator);
             if (isset($groupedRawResults[$hydratorId])) {
+                if ($viewer->getId() === 1) {
+                    $t00 = microtime(true);
+                }
                 // Rely on $hydrator->hydrate() to preserve the keys from $groupedRawResults[$hydratorId].
                 $hydratedResults = $hydrator->hydrate($keyword, $filter, $groupedRawResults[$hydratorId], $viewer);
                 $fullResults = $fullResults + $hydratedResults; // Use union operator so keys are preserved.
+                if ($viewer->getId() === 1) {
+                    $t11 = microtime(true);
+                    echo "Aggregate->hydrate() time spent hydrating " . count($groupedRawResults[$hydratorId]) . ' items by ' . get_class($hydrator) . ": " . round($t11 - $t00, 3) . "s\n";
+                }
             }
+        }
+        if ($viewer->getId() === 1) {
+            $t2 = microtime(true);
+            echo "Aggregate->hydrate() t2: " . round($t2 - $t0, 3) . "s\n";
         }
 
         // Sort $fullResults by key to ensure the order of results is the same as in $matches.
         ksort($fullResults);
+        if ($viewer->getId() === 1) {
+            $t3 = microtime(true);
+            echo "Aggregate->hydrate() t3: " . round($t3 - $t0, 3) . "s\n";
+        }
 
         // Filter out any results that are null, and flatten
         return array_values(array_filter($fullResults, fn ($x) => isset($x)));
