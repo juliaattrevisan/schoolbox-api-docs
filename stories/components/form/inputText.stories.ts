@@ -49,7 +49,7 @@ export const Disabled: Story = {
 export const ReadOnly: Story = {
     render: () => ({
         template: `
-            <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm readonly" readonly />
+            <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm read only" readonly />
             `,
     }),
 };
