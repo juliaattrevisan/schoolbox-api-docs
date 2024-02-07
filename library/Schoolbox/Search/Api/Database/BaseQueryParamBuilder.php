@@ -28,7 +28,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * The maximum relevance bonus score for a perfect match on title.
      * Less perfect matches on title will receive a fraction of this bonus score.
      */
-    public const RELEVANCE_WEIGHTING_TITLE = 100;
+    public const RELEVANCE_WEIGHTING_TITLE = 20;
     /**
      * The maximum relevance bonus score for the highest matching content.
      * Note the result with the greatest MATCH...AGAINST relevance score will always be scaled up to this number,
@@ -38,7 +38,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      * is the best we can do.  Set this low enough that strong title matches will always outrank strong content
      * matches with an irrelevant title.
      */
-    public const RELEVANCE_WEIGHTING_CONTENT = 20;
+    public const RELEVANCE_WEIGHTING_CONTENT = 10;
     /**
      * The maximum relevance bonus score for a recently modified result.
      * (This will apply to results whose updated_at date is today.)
