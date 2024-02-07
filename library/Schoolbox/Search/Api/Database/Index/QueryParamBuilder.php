@@ -76,7 +76,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
         //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
-        // The same algorithm is used for BOOLEAN MODE and NATURAL LANGUAGE MODE.  I confirmed this by experiment.
+        // The same algorithm for generating relevance scores is used for BOOLEAN MODE and NATURAL LANGUAGE MODE (this
+        // has been confirmed by experiment).
 
         return (
             ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix *" .
@@ -91,7 +92,8 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     {
         // The algorithm used by MATCH...AGAINST to generate relevance scores is detailed here:
         //  * https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
-        // The same algorithm is used for BOOLEAN MODE and NATURAL LANGUAGE MODE.  I confirmed this by experiment.
+        // The same algorithm for generating relevance scores is used for BOOLEAN MODE and NATURAL LANGUAGE MODE (this
+        // has been confirmed by experiment).
 
         return (
             ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix *" .
