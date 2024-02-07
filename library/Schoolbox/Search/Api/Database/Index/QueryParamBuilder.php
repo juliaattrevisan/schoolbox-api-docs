@@ -33,8 +33,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
     protected function buildBaseWhereParams(
         string $keyword,
         string $paramKeySuffix = ''
-    ): array
-    {
+    ): array {
         // Note: Do not trim the keyword.  Not trimming the keyword allows the user more flexibility when searching for
         // titles.  E.g.  A search for titles containing ' board ' excludes titles like 'headboard', 'surfboards', 'boards'.
 
