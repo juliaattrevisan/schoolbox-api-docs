@@ -66,7 +66,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
 
         // This is a simplified version of the expression returned by buildTitleRelevanceExpression(), that excludes the
         // scaling factors and bonuses that should apply only to records that already meet the basic matching criteria.
-        return "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)";
+        // The 'exact match on title' test is required so that searches for filenames such as 'shutterstock_282889763'
+        // will return expected results.  MATCH...AGAINST alone will not work in that case because of the underscore.
+        return "IF(
+            si.title = :indexKeyword$paramKeySuffix OR
+            MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) > 0,
+            1,
+            0
+        )";
     }
 
     /**
