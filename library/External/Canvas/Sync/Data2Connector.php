@@ -211,8 +211,6 @@ class Data2Connector
             $this->logger->warning('Could not get dump file.' . $e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
-
-        return $this->urls;
     }
 
     /**
