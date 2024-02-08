@@ -214,8 +214,9 @@ class QuizSubmission extends SubmissionAbstract
         /** @var Quiz\Model $quiz */
         $quiz = $iAssessable;
         $this->log->debug(sprintf('Processing marks for quiz: assess_id:%s', $quiz->getId()));
+        $mark = $canvasSubmission['mark'];
         if (is_numeric($canvasSubmission['norm_mark'])) {
-            $normMark = $canvasSubmission['norm_mark'];
+            $normMark = (float)$canvasSubmission['norm_mark'];
         } else {
             $this->log->debug(sprintf('Converting norm mark: [%s] to null for %s', (string)$canvasSubmission['norm_mark'], $quiz->getId()));
             $normMark = null;
@@ -275,7 +276,8 @@ class QuizSubmission extends SubmissionAbstract
                                            ->setQuiz($quiz)
                                            ->setReviewer($reviewer)
                                            ->setUser($reviewee)
-                                           ->setMark($normMark)
+                                           ->setMark($mark)
+                                           ->setNormalisedMark($normMark)
                                            ->setMaxMark($maxMark)
                                            ->setAnswers($answers)
                                            ->setReviewed($feedbackTime)
