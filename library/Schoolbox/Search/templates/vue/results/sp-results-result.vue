@@ -44,7 +44,7 @@ async function onBadgeSelected() {
     <div ref="resultEl" class="l-flex-col" :data-test="`sp-results-result-${props.result.id}`">
         <div :class="`c-card ${hasSubResults ? 'c-card--border-end' : ''}`">
             <div class="l-flex-col l-gap-m l-pad-m">
-                <div class="l-flex-row l-gap-m">
+                <div class="l-flex l-gap-m">
                     <sp-results-result-image
                         v-if="props.result.image || props.result.icon"
                         :result="props.result"

@@ -62,7 +62,7 @@ window.Vue.onMounted(async () => {
             <hm-items-header />
             <!-- hm-students has to be available before store is loaded as the Learnosity Report API's look for the student elements to put the reports in -->
             <hm-students />
-            <div class="l-flex-row l-flex--no-wrap l-gap-m">
+            <div class="l-flex l-flex--no-wrap l-gap-m">
                 <hm-previous-item />
                 <hm-next-item />
                 <hm-finalise-review />

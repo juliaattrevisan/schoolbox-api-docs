@@ -99,7 +99,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="l-flex-row l-flex--no-wrap l-gap-m">
+    <div class="l-flex l-flex--no-wrap l-gap-m">
         <div class="l-flex-col l-flex__item--1">
             <label for="sp-start-date-input">Start date</label>
             <input

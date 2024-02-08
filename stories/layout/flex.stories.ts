@@ -28,8 +28,8 @@ export const Classes: Story = {
     render: () => ({
         template: `
             <fieldset class="story-fieldset">
-                <legend class="story-legend">.l-flex-row</legend>
-                <div class="story-demo-boxes l-flex-row l-gap-m">
+                <legend class="story-legend">.l-flex</legend>
+                <div class="story-demo-boxes l-flex l-gap-m">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
@@ -51,7 +51,7 @@ export const Classes: Story = {
             </fieldset>
             <fieldset class="story-fieldset">
                 <legend class="story-legend">.l-flex--wrap-reverse</legend>
-                <div class="story-demo-boxes l-flex-row l-flex--wrap-reverse l-gap-m">
+                <div class="story-demo-boxes l-flex l-flex--wrap-reverse l-gap-m">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
@@ -65,7 +65,7 @@ export const Classes: Story = {
             </fieldset>
             <fieldset class="story-fieldset">
                 <legend class="story-legend">.l-flex--center</legend>
-                <div class="story-demo-boxes l-flex-row l-flex--center l-gap-m" style="height: 200px;">
+                <div class="story-demo-boxes l-flex l-flex--center l-gap-m" style="height: 200px;">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
@@ -73,7 +73,7 @@ export const Classes: Story = {
             </fieldset>
             <fieldset class="story-fieldset">
                 <legend class="story-legend">.l-flex--align-center</legend>
-                <div class="story-demo-boxes l-flex-row l-flex--align-center l-gap-m" style="height: 200px;">
+                <div class="story-demo-boxes l-flex l-flex--align-center l-gap-m" style="height: 200px;">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
@@ -81,7 +81,7 @@ export const Classes: Story = {
             </fieldset>
             <fieldset class="story-fieldset">
                 <legend class="story-legend">.l-flex--justify-center</legend>
-                <div class="story-demo-boxes l-flex-row l-flex--justify-center l-gap-m">
+                <div class="story-demo-boxes l-flex l-flex--justify-center l-gap-m">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
@@ -89,7 +89,7 @@ export const Classes: Story = {
             </fieldset>
             <fieldset class="story-fieldset">
                 <legend class="story-legend">.l-flex--justify-end</legend>
-                <div class="story-demo-boxes l-flex-row l-flex--justify-end l-gap-m">
+                <div class="story-demo-boxes l-flex l-flex--justify-end l-gap-m">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
@@ -97,7 +97,7 @@ export const Classes: Story = {
             </fieldset>
             <fieldset class="story-fieldset">
                 <legend class="story-legend">.l-flex--justify-space</legend>
-                <div class="story-demo-boxes l-flex-row l-flex--justify-space l-gap-m">
+                <div class="story-demo-boxes l-flex l-flex--justify-space l-gap-m">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
@@ -105,7 +105,7 @@ export const Classes: Story = {
             </fieldset>
             <fieldset class="story-fieldset">
                 <legend class="story-legend">.l-flex__item--1</legend>
-                <div class="story-demo-boxes l-flex-row l-gap-m">
+                <div class="story-demo-boxes l-flex l-gap-m">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center l-flex__item--1"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>

@@ -251,7 +251,7 @@ const searchButtonText = window.Vue.computed(() => {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex-row l-flex--align-center l-gap-s l-pad-s">
+                    <div class="l-flex l-flex--align-center l-gap-s l-pad-s">
                         <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <img
@@ -276,7 +276,7 @@ const searchButtonText = window.Vue.computed(() => {
                     View all {{ totalCount }} users
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="l-flex-row l-gap-s l-pad-s">
+                    <div class="l-flex l-gap-s l-pad-s">
                         <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>

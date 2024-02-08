@@ -120,7 +120,7 @@ window.Vue.watch(
                     <sp-filter-date-range />
                     <sp-filter-creator />
                     <sp-filter-types />
-                    <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                    <div class="l-flex l-flex--no-wrap l-gap-m">
                         <button
                             class="button l-flex__item--1 icon-close f-no-margins"
                             data-test="sp-filter-clear-button"

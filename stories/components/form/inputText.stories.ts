@@ -53,3 +53,18 @@ export const ReadOnly: Story = {
             `,
     }),
 };
+
+/**
+ * With a button, typically when an action following the button selection fills the input
+ * For example a date picker or resource browser
+ */
+export const WithButton: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex">
+                <input id="news_default_expiry-field" class="c-input-text l-flex__item--1" type="text" />
+                <button class="button icon-folder">Browser Resources</button>
+            </div>
+            `,
+    }),
+};

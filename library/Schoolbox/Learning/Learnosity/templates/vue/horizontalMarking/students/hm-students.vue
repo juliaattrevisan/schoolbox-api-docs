@@ -15,7 +15,7 @@ const studentsStore = useStudentsStore();
 <template>
     <div class="l-flex-col l-gap-s f-no-margins">
         <h2 class="subheader f-no-margins">Students</h2>
-        <div class="l-flex-row l-flex--align-center l-gap-m">
+        <div class="l-flex l-flex--align-center l-gap-m">
             <hm-students-toggle />
             <hm-students-show-reviewed-attempts />
         </div>

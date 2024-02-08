@@ -40,7 +40,7 @@ function onRemoveSelected() {
 
 <template>
     <div
-        :class="`selected-item l-flex-row l-flex--align-center l-pad-s l-gap-s ${
+        :class="`selected-item l-flex l-flex--align-center l-pad-s l-gap-s ${
             props.isSingleSelect ? 'l-flex__item--1' : ''
         }`"
     >

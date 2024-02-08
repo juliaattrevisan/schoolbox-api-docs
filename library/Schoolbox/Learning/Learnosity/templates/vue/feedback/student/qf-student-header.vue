@@ -15,8 +15,8 @@ const store = useStore();
 </script>
 
 <template>
-    <div class="c-island l-flex-row l-flex--justify-space l-gap-m l-pad-m f-no-margins">
-        <div class="l-flex-row l-flex--align-center l-gap-m f-no-margins">
+    <div class="c-island l-flex l-flex--justify-space l-gap-m l-pad-m f-no-margins">
+        <div class="l-flex l-flex--align-center l-gap-m f-no-margins">
             <span v-if="!props.student.isReportLoaded" class="loader"></span>
             <div class="c-img c-img--round c-img--s">
                 <div class="c-img__wrapper">
