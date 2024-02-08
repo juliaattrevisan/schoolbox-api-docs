@@ -1,0 +1,75 @@
+/*
+    The <select> HTML element represents a control that provides a menu of options.
+    Styled primarily based from https://moderncss.dev/custom-select-styles-with-pure-css/
+*/
+
+.c-select {
+    align-items: center;
+    background-color: var(--foreground-colour);
+    background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
+    border: 1px solid var(--form-border-color);
+    border-radius: var(--roundness-inputs);
+    cursor: pointer;
+    display: grid; // to allow for the pseudo-element ::after to be positioned correctly
+    font-size: max(16px, 1rem);
+    grid-template-areas: "select";
+    line-height: 1.1;
+    padding: var(--spacing-s);
+    width: 100%;
+    &::after,
+    select {
+        grid-area: select;
+    }
+    &::after {
+        content: "";
+        width: 0.8rem;
+        height: 0.5rem;
+        background-color: var(--form-border-color);
+        clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+    }
+    select {
+        appearance: none; // A reset of styles, including removing the default dropdown arrow
+        background-color: transparent; // Additional resets for further consistency
+        border: none;
+        cursor: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        justify-self: end;
+        line-height: inherit;
+        margin: 0;
+        outline: none;
+        padding: 0 1em 0 0;
+        width: 100%;
+    }
+    // background-color: var(--foreground-colour);
+    // border: 1px solid var(--form-border-color);
+    // border-radius: var(--roundness-inputs);
+    // color: var(--primary-text-colour);
+    // font-size: max(16px, 1rem);
+    // font-family: inherit;
+    // height: 2.25rem;
+    // line-height: 1;
+    // margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    // padding: var(--spacing-s);
+    // transition: none; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    // width: 100%;
+    // -webkit-font-smoothing: antialiased;
+    // &:disabled {
+    //     background: var(--disabled-input-background-colour);
+    //     cursor: not-allowed;
+    //     opacity: 0.8;
+    // }
+    // &:hover {
+    //     background: var(--foreground-colour); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    //     color: var(--primary-text-colour); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    //     border-color: var(--form-border-color); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    // }
+    // &:focus {
+    //     background: var(--foreground-colour); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    //     outline: 2px solid var(--form-border-color);
+    //     outline-offset: 0px;
+    // }
+    // &[readonly] {
+    //     border: 2px dotted var(--form-border-color);
+    // }
+}
