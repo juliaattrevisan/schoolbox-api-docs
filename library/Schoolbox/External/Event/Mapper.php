@@ -135,15 +135,18 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Find all the events which have ids in the $eventIds array,
+     * Find all the events which have ids in the $eventTuples array,
      * returning a collection of Model instances which also have
      * their Staff array populated.
+     *
+     * The $eventTuples array also has an Overrides manifest to tell you
+     * exactly which humans are involved in a particular event instance.
      *
      * The Staff array is a set of (user id, title + fullname) tuples
      * whose sole purpose was to show and link names in the calendar modal
      * e.g. (22, Mr Jack Coles), (24, Ms Rebecca White)
      *
-     * @param array $eventIds
+     * @param array $eventTuples
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
@@ -151,11 +154,11 @@ class Mapper extends \Schoolbox\Mapper
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function findWithCheapStaff(array $eventIds): GenericCollection
+    public function findWithCheapStaff(array $eventTuples): GenericCollection
     {
         $stack = $this->createCollection();
 
-        if (!\count($eventIds)) {
+        if (!\count($eventTuples)) {
             return $stack;
         }
 
@@ -167,7 +170,7 @@ class Mapper extends \Schoolbox\Mapper
         /* Limit it to $eventIds
          */
         $pb = $this->getPredicateBuilder()
-            ->in('id', $eventIds);
+            ->in('id', array_keys($eventTuples));
 
         $where = $pb->getWhere()[0];
         $params = $pb->getParams();
@@ -181,6 +184,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$folderColumnString},
                 {$folderCodeColumnString},
+                scu.external_id AS externalId,
                 u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`,
                 g.group_type as `g.group_type`
             FROM {$this->getTable()}
@@ -230,10 +234,16 @@ class Mapper extends \Schoolbox\Mapper
              * WHERE group_type = 'staff' these students-only classes won't appear in
              * the result set
              */
-            $id = (int)$row['u.id'];
+            $userId = (int)$row['u.id'];
+            $externalId = (string)$row['externalId'];
+            $eventId = $row['id'];
             $groupType = (string)$row['g.group_type'];
 
-            if (\Schoolbox\Role::STAFF === $groupType) {
+            /* Find out if this user is in the event manifest; the list of staff should
+             * only contain the people actually teaching the class instance (involvements)
+             * and not blindly assume "anyone associated with the class" (enrolments)
+             */
+            if (\Schoolbox\Role::STAFF === $groupType && isset($eventTuples[$eventId][$externalId])) {
                 $name = implode(' ', array_filter([
                     $row['u.title'],
                     $row['u.firstname'],
@@ -244,7 +254,7 @@ class Mapper extends \Schoolbox\Mapper
 
                 /* Trickle it in
                  */
-                $stack->getOffset($row['id'])->addStaff($id, $name);
+                $stack->getOffset($row['id'])->addStaff($userId, $name);
             }
         }
 
