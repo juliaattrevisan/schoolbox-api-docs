@@ -1,8 +1,8 @@
 <div class="small-12 island">
     <h2 class="subheader">{{ register.name }} ({{ recordCollection.name }})</h2>
-        <div class="l-flex--col l-gap-m l-pad-m">
+        <div class="l-flex l-flex--col l-gap-m l-pad-m">
             {% for child in studentData %}
-                <div class="l-flex--col">
+                <div class="l-flex l-flex--col">
                     <div class="c-card">
                         <div class="l-flex l-gap-m l-pad-m">
                             <div class="c-img c-img--round">
@@ -13,7 +13,7 @@
                                     />
                                 </div>
                             </div>
-                            <div class="l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                            <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
                                 <h3>{{ child.user.formatName }}</h3>
                             </div>
                         </div>

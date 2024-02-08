@@ -92,7 +92,7 @@ const isSomeSubTypesSelected = window.Vue.computed(() => {
 </script>
 
 <template>
-    <li class="l-flex--col f-min-btn-height">
+    <li class="l-flex l-flex--col f-min-btn-height">
         <div class="l-flex l-flex--align-center f-min-btn-height f-no-margins">
             <div class="l-flex__item--1">
                 <input

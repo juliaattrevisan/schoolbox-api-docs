@@ -59,7 +59,7 @@ function onCommentUpdated(comment: string) {
 </script>
 
 <template>
-    <div ref="itemEl" class="c-island l-flex--col l-gap-m l-pad-m">
+    <div ref="itemEl" class="c-island l-flex l-flex--col l-gap-m l-pad-m">
         <student-item-mark
             :item="item"
             :container="(container as HTMLDivElement)"
@@ -67,7 +67,7 @@ function onCommentUpdated(comment: string) {
             :show-title="true"
         />
         <student-no-score-note v-if="!store.isReadOnly" :item="props.item" />
-        <div class="item-questions l-flex--col l-gap-l">
+        <div class="item-questions l-flex l-flex--col l-gap-l">
             <student-item-question-display
                 v-for="(question, index) in props.item.questions"
                 :key="question.response_id"

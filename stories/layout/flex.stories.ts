@@ -42,8 +42,8 @@ export const Classes: Story = {
                 </div>
             </fieldset>
             <fieldset class="story-fieldset">
-                <legend class="story-legend">.l-flex--col</legend>
-                <div class="story-demo-boxes l-flex--col l-gap-m">
+                <legend class="story-legend">.l-flex l-flex--col</legend>
+                <div class="story-demo-boxes l-flex l-flex--col l-gap-m">
                     <div class="story-demo-box l-flex l-flex--center"><span>1</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>2</span></div>
                     <div class="story-demo-box l-flex l-flex--center"><span>3</span></div>
