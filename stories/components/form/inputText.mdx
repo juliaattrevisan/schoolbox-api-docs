@@ -6,10 +6,18 @@ import * as InputTextStories from "./inputText.stories";
 
 # Input Text
 
+**Styles**: `www/static/css/core/ui/forms/_input-text.scss`
+
 [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/text)
 
 `<input>` elements of type text create basic single-line text fields.
 
-Styles: `www/static/css/core/ui/forms/_input-text.scss`
+**Usage notes**:
+- Must always be accompanied by a `<label>` element.
+- Avoid using `placeholder` moving forward, consider adding a [Hint](?path=/docs/draft-form-hint--docs) instead.
+    - https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/placeholder#accessibility_concerns
+    - https://medium.com/simple-human/10-reasons-why-placeholders-are-problematic-f8079412b960
+- Avoid using `type="number"` moving forward:
+    - https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#accessibility_concerns
 
 <Stories />
