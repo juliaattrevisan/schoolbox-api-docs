@@ -16,7 +16,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Draft/Icons",
+    title: "Getting Started/Design Tokens/Icons",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
