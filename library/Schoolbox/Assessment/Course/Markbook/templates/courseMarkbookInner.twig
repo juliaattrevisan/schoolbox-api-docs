@@ -63,7 +63,7 @@
         <table class="diagonal-headings-table marksheet" data-mark-sheet>
             <thead>
             <tr class="rotate-headers">
-                <th class="fixed-left"><div><span></span></div></th>
+                <th class="fixed-left"><div></div></th>
                 <th class="fixed-left"><div><span>Student Weighted Average</span></div></th>
                 {% if rankEnabled %}
                     <th>
@@ -90,7 +90,7 @@
                 {% endfor %}
             </tr>
             <tr class="course-headers">
-                <th class="fixed-left"></th>
+                <th class="fixed-left transparent"></th>
                 <th class="fixed-left white"></th>
                 {% if rankEnabled %}
                 <th class="white"></th>
@@ -114,12 +114,12 @@
                         {% set countUnitAssessments = countUnitAssessments + 1 %}
                     {% else %}
                         {# first column of next unit #}
-                        <th colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
+                        <th class="unit-title" colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
                         {% set currentUnitSpec = unitSpec %}
                         {% set countUnitAssessments = 1 %}
                     {% endif %}
                 {% endfor %}
-                <th colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
+                <th class="unit-title" colspan="{{ countUnitAssessments }}">{{ currentUnitSpec.title }}</th>
             </tr>
             </thead>
             <tbody>
@@ -209,7 +209,7 @@
                             {% endif %}
                         </th>
                         {% if rankEnabled %}
-                            <td class='course-ranking'>
+                            <td class="course-ranking">
                                 {% if rank[student.id] is defined and publishedNormMark %}
                                     {# check if the rank object exits, and there is / was a mean score #}
                                     {{ rank[student.id] }}
