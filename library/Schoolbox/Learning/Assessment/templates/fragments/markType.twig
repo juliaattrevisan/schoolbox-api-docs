@@ -45,50 +45,48 @@
 
 <div class="row">
     <div class="small-12 medium-6 columns">
-        <div class="c-form-element">
-        <label for="{{ context }}markType" class="c-label">{{ markTypeLabel | default('Mark Type') }}</label>
-        <select id="{{ context }}markType" name="{{ context }}markType" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
-            {% for index, title in allMarkTypes %}
-                <option value="{{ index }}"
-                    {% if index == (selectedMarkType ?? markTypeNone) %}
-                        selected
-                    {% elseif courseManagedReadonly ?? false %}
-                        disabled
-                    {% endif %}
-                >{{ title }}</option>
-            {% endfor %}
-        </select>
-        </div>
+        <label>
+            {{ markTypeLabel | default('Mark Type') }}
+            <select id="{{ context }}markType" name="{{ context }}markType" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
+                {% for index, title in allMarkTypes %}
+                    <option value="{{ index }}"
+                        {% if index == (selectedMarkType ?? markTypeNone) %}
+                            selected
+                        {% elseif courseManagedReadonly ?? false %}
+                            disabled
+                        {% endif %}
+                    >{{ title }}</option>
+                {% endfor %}
+            </select>
+        </label>
     </div>
 
     {% if renderMaxMark %}
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark="{{ context }}">
-        <div class="c-form-element">
-            <label for="{{ context }}maxMark" class="c-label">Maximum Available Marks</label>
-            <input id="{{ context }}maxMark" type="text" class="c-text-input" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" {% if courseManagedReadonly ?? false %}readonly{% endif %} />
-        </div>
+        <label for="{{ context }}maxMark">
+            Maximum Available Marks
+            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" {% if courseManagedReadonly ?? false %}readonly{% endif %} />
+        </label>
     </div>
     {% endif %}
 
     <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme="{{ context }}">
-        <div class="c-form-element">
-            <label for="{{ context }}gradingScheme" class="c-label">{{ locale.grading.proper }} Scheme</label>
-            <div class="input-group">
-                {% include 'sub/select.twig' with {
-                    selectData: {
-                        id: context ~ 'gradingScheme'
-                    },
-                    name: context ~ 'gradingScheme',
-                    options: allGradeSchemes,
-                    preselected: selectedGradeGroup ?: defaultGradeGroup,
-                    readonly: courseManagedReadonly ?? false,
-                    pairs: {
-                        value: 'id',
-                        label: 'name'
-                    }
-                } %}
-                <button type="button" class="button" data-reveal-id="{{ context }}gradeScale">Show {{ locale.grades.proper }} Scale</button>
-            </div>
+        <label for="{{ context }}gradingScheme">{{ locale.grading.proper }} Scheme</label>
+        <div class="input-group">
+            {% include 'sub/select.twig' with {
+                selectData: {
+                    id: context ~ 'gradingScheme'
+                },
+                name: context ~ 'gradingScheme',
+                options: allGradeSchemes,
+                preselected: selectedGradeGroup ?: defaultGradeGroup,
+                readonly: courseManagedReadonly ?? false,
+                pairs: {
+                    value: 'id',
+                    label: 'name'
+                }
+            } %}
+            <button type="button" class="button" data-reveal-id="{{ context }}gradeScale">Show {{ locale.grades.proper }} Scale</button>
         </div>
     </div>
 </div>

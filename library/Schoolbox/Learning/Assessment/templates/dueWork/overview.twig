@@ -21,7 +21,7 @@
                             Show Drafts
                         </label>
                     </div>
-                    <nav class="c-nav-actions l-flex">
+                    <nav class="c-nav-actions l-flex-row">
                         <a href="{{ routeLookup('learningAssessment.downloadOverview', { assessmentId: dueWork.id }) }}?format=csv" class="icon-download" title="Download CSV" data-download-spreadsheet></a>
                     </nav>
                 </div>
@@ -69,7 +69,7 @@
                     <tr>
                         <td>
                             <div class="wrap-down small-12 ">
-                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="l-flex l-flex l-flex--col l-flex--center">
+                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile" class="l-flex l-flex-col l-flex--center">
                                     <div class="c-img c-img--m c-img--round">
                                         <div class="c-img__wrapper">
                                             {% include 'include/portrait.twig' with {user: participant, description: participant.fullName, class: "rubric-profile"} only %}

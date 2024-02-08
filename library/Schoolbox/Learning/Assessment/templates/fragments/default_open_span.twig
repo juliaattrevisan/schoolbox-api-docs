@@ -8,9 +8,9 @@
 {% set context = context ?? assessment.context %}
 
 {% if context.baseContext is unitSpecification %}
-    <div class="c-form-element">
-        <label class="c-label">Activity Duration</label>
-        <div class="c-hint">Enter the number of days you expect the activity to take. This will be used to automatically populate due dates when importing this course</div>
+    <label>
+        Activity Duration
+        <span class="hint has-tip tip-top" data-tooltip title="Enter the number of days you expect the activity to take. This will be used to automatically populate due dates when importing this course.">?</span>
         <input type="number" inputmode="numeric" min="0" name="default_open_span" value="{{ assessment.defaultOpenSpan }}">
-    </div>
+    </label>
 {% endif %}
