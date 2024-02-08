@@ -10,5 +10,5 @@
 <div class="c-form-element">
     <label class="c-label">Weight</label>
     <div class="c-hint">This value indicates how much this assessment's outcome contributes to the final overall grade - a value of 0 indicates this assessment has no impact on the overall grade. Generally, this is a number between 0 and 100.</div>
-    <input type="number" inputmode="numeric" class="c-text-input" name="weight" value="{{ assessment.weight }}" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
+    <input type="text" inputmode="numeric" class="c-input-text" name="weight" value="{{ assessment.weight }}" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
 </div>
