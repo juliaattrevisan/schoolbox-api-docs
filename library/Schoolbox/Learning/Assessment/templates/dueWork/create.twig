@@ -17,8 +17,10 @@
 {# Basic Details #}
 {# ----------------------------------------------------------- #}
 <fieldset>
-    <label class="required" for="title">Title</label>
-    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
+    <div class="c-form-element">
+        <label class="c-label required" for="title">Title</label>
+        <input type="text" class="c-input-text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
+    </div>
 
     <div class="row">
 
@@ -32,26 +34,28 @@
         {% endif %}
 
         <div class="small-12 {{ columnCss }} columns">
-            <label>
-                Work Type
-                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %}>
-                    <option value="" selected
-                        {% if courseManaged.isReadonly %}
-                            disabled
-                        {% endif %}
-                    >None
-                    </option>
-                    {% for workType in allWorkTypes %}
-                        <option value="{{ workType.id }}"
-                            {% if assessment.workType.id ?? '' == workType.id %}
-                                selected="selected"
-                            {% elseif courseManaged.isReadonly %}
+            <div class="c-form-element">
+                <label class="c-label">
+                    Work Type
+                    <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %}>
+                        <option value="" selected
+                            {% if courseManaged.isReadonly %}
                                 disabled
                             {% endif %}
-                        >{{ workType.name }}</option>
-                    {% endfor %}
-                </select>
-            </label>
+                        >None
+                        </option>
+                        {% for workType in allWorkTypes %}
+                            <option value="{{ workType.id }}"
+                                {% if assessment.workType.id ?? '' == workType.id %}
+                                    selected="selected"
+                                {% elseif courseManaged.isReadonly %}
+                                    disabled
+                                {% endif %}
+                            >{{ workType.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
         </div>
 
         {% if courseManaged.isVisible %}
@@ -63,23 +67,24 @@
              # If it's been disabled, preserve whatever setting it currently has
              #}
             <input type="hidden" name="courseManaged" value="{% if not courseManaged.isMutable %}{{ assessment.courseManaged }}{% else %}0{% endif %}" />
-
-            <label for="courseManaged" class="checkbox-label inline-block">Common Assessment <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span></label>
-
-            <div class="switch">
-                <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
-                <label for="courseManaged">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
-                </label>
+            <div class="c-form-element">
+                <label for="courseManaged" class="c-label checkbox-label inline-block">Common Assessment</label>
+                <div class="c-hint">To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric.</div>
+                <div class="switch">
+                    <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
+                    <label for="courseManaged">
+                        <span class="icon-approve"></span>
+                        <span class="icon-cancel"></span>
+                    </label>
+                </div>
             </div>
         </div>
         {% endif %}
     </div>
-
-    <label for="assessment-description">Description</label>
-    <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
-
+    <div class="c-form-element">
+        <label for="assessment-description" class="c-label">Description</label>
+        <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
+    </div>
 
     {% include 'sub/attachzone.twig' %}
 
@@ -98,42 +103,45 @@
     <legend>Submissions</legend>
     <div class="row">
         <div class="medium-6 columns">
-            <label for="acceptOnline">Accepts Online Submissions?</label>
-            <select name="acceptOnline" id="acceptOnline" {% if courseManaged.isReadonly %}readonly{% endif %}>
-                {% set options = {
-                    0: 'None',
-                    1: 'Single',
-                    2: 'Multiple'
-                } %}
-                {% for index, title in options %}
-                    <option value="{{ index }}"
-                        {% if assessment.acceptOnline == index %}
-                            selected="selected"
-                        {% elseif courseManaged.isReadonly %}
-                            disabled
-                        {% endif %}
-                    >{{ title }}</option>
-                {% endfor %}
-            </select>
+            <div class="c-form-element">
+                <label for="acceptOnline" class="c-label">Accepts Online Submissions?</label>
+                <select name="acceptOnline" id="acceptOnline" {% if courseManaged.isReadonly %}readonly{% endif %}>
+                    {% set options = {
+                        0: 'None',
+                        1: 'Single',
+                        2: 'Multiple'
+                    } %}
+                    {% for index, title in options %}
+                        <option value="{{ index }}"
+                            {% if assessment.acceptOnline == index %}
+                                selected="selected"
+                            {% elseif courseManaged.isReadonly %}
+                                disabled
+                            {% endif %}
+                        >{{ title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
 
         <div class="medium-6 columns" id="similarityRow"{% if not assessment.acceptOnline %} style="display: none"{% endif %}>
             <input type="hidden" name="similarityCheckEnabled" value="{% if assessment.courseManaged %}{{ assessment.similarityCheckEnabled }}{% else %}0{% endif %}" />
-
-            <label for="similarityCheckEnabled" class="inline-block">Similarity Check <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span></label>
-            <div class="switch">
-                <input id="similarityCheckEnabled"
-                       name="similarityCheckEnabled"
-                       type="checkbox"
-                        {{ assessment.similarityCheckEnabled ? 'checked' : '' }}
-                        {% if courseManaged.isReadonly %}
-                            disabled
-                        {% endif %}
-                >
-                <label for="similarityCheckEnabled">
-                    <span>On</span>
-                    <span>Off</span>
-                </label>
+            <div class="c-form-element">
+                <label for="similarityCheckEnabled" class="inline-block">Similarity Check <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span></label>
+                <div class="switch">
+                    <input id="similarityCheckEnabled"
+                        name="similarityCheckEnabled"
+                        type="checkbox"
+                            {{ assessment.similarityCheckEnabled ? 'checked' : '' }}
+                            {% if courseManaged.isReadonly %}
+                                disabled
+                            {% endif %}
+                    >
+                    <label for="similarityCheckEnabled">
+                        <span>On</span>
+                        <span>Off</span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -158,7 +166,9 @@
     } %}
 
     {% if selfAssessmentEnabled %}
-        <label>{{ locale.selfReflection.proper }} <span data-tooltip class="hint has-tip tip-top"  title="Enabling '{{ locale.selfReflection.proper }}' allows students to reflect on their work with a comment, and rubric if provided. Also enabling '{{ locale.selfAssessment.proper }}' gives students the ability to provide themselves a grade.">?</span>
+        <div class="c-form-element">
+            <label for="self_reviewable" class="c-label">{{ locale.selfReflection.proper }}</label>
+            <div class="c-hint">Enabling '{{ locale.selfReflection.proper }}' allows students to reflect on their work with a comment, and rubric if provided. Also enabling '{{ locale.selfAssessment.proper }}' gives students the ability to provide themselves a grade.</div>
             <select name="self_reviewable" {% if courseManaged.isReadonly %}readonly{% endif %}>
                 {% for selfReviewType in selfReviewTypes %}
                     <option value="{{ selfReviewType.value }}"
@@ -170,7 +180,7 @@
                     >{{ selfReviewType.label }}</option>
                 {% endfor %}
             </select>
-        </label>
+        </div>
     {% endif %}
 
     {% import 'sub/visibility.twig' as visibility %}

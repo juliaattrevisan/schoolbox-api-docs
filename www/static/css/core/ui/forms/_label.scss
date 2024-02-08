@@ -5,7 +5,7 @@
 .c-label {
     display: block;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: normal;
     &--required {
         &::after {
             content: " *";

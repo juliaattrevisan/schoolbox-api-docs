@@ -9,14 +9,15 @@
         <legend>Curriculum</legend>
         <div class="row">
             <div class="small-12 columns">
-                <label>Curriculum Codes
-                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this {{ entityType }} with a corresponding curriculum code, you can link multiple curriculum codes to this {{ entityType }}">?</span>
-                </label>
-                    {% include 'sub/curriculumCodeSelector.twig' with {
-                        'codeList': curriculumNodes,
-                        'renderButton': true,
-                        courseManagedReadonly: courseManagedReadonly ?? false
-                    } %}
+                <div class="c-form-element">
+                    <label class="c-label">Curriculum Codes</label>
+                    <div class="c-hint">Link this {{ entityType }} with a corresponding curriculum code, you can link multiple curriculum codes to this {{ entityType }}</div>
+                        {% include 'sub/curriculumCodeSelector.twig' with {
+                            'codeList': curriculumNodes,
+                            'renderButton': true,
+                            courseManagedReadonly: courseManagedReadonly ?? false
+                        } %}
+                </div>
             </div>
         </div>
     </fieldset>

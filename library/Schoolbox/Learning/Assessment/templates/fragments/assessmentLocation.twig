@@ -32,13 +32,15 @@
 {% endautoescape %}
 <div class="row">
     <div class="small-12 columns">
-        <label>{{ locale.activity.proper }} Location</label>
-        <div class="input-group">
-            <input type="hidden" id="locationId" name="locationId" value="{{ assessment.context.locationId }}">
-            <input id="locationTitle" name="locationTitle" type="text" value="{{ assessment.context.locationTitle }}"
-                   class="valid"
-                   aria-invalid="false" readonly="readonly">
-            <a class="adtp-btn" data-adtp-btn="" id="change-location">Change Location</a>
+        <div class="c-form-element">
+            <label>{{ locale.activity.proper }} Location</label>
+            <div class="input-group">
+                <input type="hidden" id="locationId" name="locationId" value="{{ assessment.context.locationId }}">
+                <input id="locationTitle" name="locationTitle" type="text" value="{{ assessment.context.locationTitle }}"
+                    class="valid"
+                    aria-invalid="false" readonly="readonly">
+                <a class="adtp-btn" data-adtp-btn="" id="change-location">Change Location</a>
+            </div>
         </div>
     </div>
 </div>
