@@ -95,6 +95,14 @@
         .default-login-toggle {
             opacity: 0.5;
         }
+
+        /* Special one-click tricks to get you in
+         */
+        .instance-registry-button, .guest {
+            display: block;
+            text-align: center;
+            width: 100%;
+        }
     </style>
 {% endautoescape %}
 
@@ -188,7 +196,7 @@
                     {% endif %}
 
                     {% if config.login_anonymous != '' %}
-                        <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
+                        <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="login-method guest">Login as guest</a></p>
                     {% endif %}
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
@@ -219,7 +227,7 @@
 
                     {% if requestFromInternalIp %}
                         {% block internalSso %}
-                            <p><a href="{{ internalSsoUrl }}" class="instance-registry-button">Login using Instance Registry</a></p>
+                            <p><a href="{{ internalSsoUrl }}" class="login-method instance-registry-button">Login using Instance Registry</a></p>
                         {% endblock %}
                     {% endif %}
                 </div>
