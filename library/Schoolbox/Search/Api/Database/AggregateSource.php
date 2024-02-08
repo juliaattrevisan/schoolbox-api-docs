@@ -130,7 +130,6 @@ class AggregateSource implements ISource
             return ['', []];
         }
 
-
         $queries = [];
         $params  = [];
         $limit   ??= 1;

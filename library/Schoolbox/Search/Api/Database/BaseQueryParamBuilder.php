@@ -25,23 +25,22 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     public const ENCODING = 'UTF-8';
 
     /**
-     * The maximum relevance bonus score for a perfect match on title.
-     * Less perfect matches on title will receive a fraction of this bonus score.
+     * Weighting factor for title relevance scores.
+     * Title relevance needs to be weighted higher than content relevance to offset the inherent bias towards long
+     * content exhibited by the fulltext matching algorithm.
+     * (See 'Learnings about fulltext searches' in this PR: https://github.com/alaress/schoolbox/pull/29773)
      */
     public const RELEVANCE_WEIGHTING_TITLE = 10;
     /**
-     * The maximum relevance bonus score for the highest matching content.
-     * Note the result with the greatest MATCH...AGAINST relevance score will always be scaled up to this number,
-     * even if the greatest MATCH...AGAINST relevance score is not very great.
-     * This is because MATCH...AGAINST relevance scores are only meaningful when compared to other MATCH...AGAINST
-     * relevance scores.  We must normalise these scores somehow in order to produce a combined score, so this
-     * is the best we can do.  Set this low enough that strong title matches will always outrank strong content
-     * matches with an irrelevant title.
+     * Weighting factor for content relevance scores.
+     * Content relevance needs to be weighted lower than title relevance to offset the inherent bias towards long
+     * content exhibited by the fulltext matching algorithm.
+     * (See 'Learnings about fulltext searches' in this PR: https://github.com/alaress/schoolbox/pull/29773)
      */
     public const RELEVANCE_WEIGHTING_CONTENT = 1;
     /**
-     * The maximum relevance bonus score for a recently modified result.
-     * (This will apply to results whose updated_at date is today.)
+     * Weighting factor for results whose relevant date (modification date for most result types) is recent.
+     * Note that this relevance score must hae no bearing on whether an item is included in search results.
      */
     public const RELEVANCE_WEIGHTING_RECENT_DATE = 5;
 
