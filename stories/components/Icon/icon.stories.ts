@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
+import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
  * Storybook meta data, any default properties that are passed into every story
  * https://storybook.js.org/docs/vue/writing-stories/introduction
  */
 const meta: Meta<typeof SbxIcon> = {
-    component: SbxIcon,
+    component: StorybookSlot,
     decorators: [
         () => ({
             template: `
@@ -19,61 +19,40 @@ const meta: Meta<typeof SbxIcon> = {
     title: "Components/Icon",
 };
 export default meta;
-type Story = StoryObj<typeof SbxIcon>;
+type Story = StoryObj<typeof StorybookSlot>;
 
 /**
- * `<sbx-icon name="add"></sbx-icon>`
+ *
  */
 export const Default: Story = {
-    render: (args) => ({
-        components: { SbxIcon },
-        setup() {
-            return { args };
-        },
+    render: () => ({
+        components: { StorybookSlot },
         template: `
-            <sbx-icon v-bind="args" />
+            <sbx-icon name="add"></sbx-icon>
         `,
     }),
-    args: {
-        name: "add",
-    },
 };
 
 /**
- * `<sbx-icon name="help" size="xl"></sbx-icon>`
+ * Changing the size
  */
 export const Size: Story = {
-    render: (args) => ({
-        components: { SbxIcon },
-        setup() {
-            return { args };
-        },
+    render: () => ({
+        components: { StorybookSlot },
         template: `
-            <sbx-icon v-bind="args" />
+            <sbx-icon name="help" size="xl"></sbx-icon>
         `,
     }),
-    args: {
-        name: "help",
-        size: "xl",
-    },
 };
 
 /**
- * `<sbx-icon name="danger" size="l" color="red"></sbx-icon>`
+ * Changing the color
  */
 export const Color: Story = {
-    render: (args) => ({
-        components: { SbxIcon },
-        setup() {
-            return { args };
-        },
+    render: () => ({
+        components: { StorybookSlot },
         template: `
-            <sbx-icon v-bind="args" />
+            <sbx-icon name="danger" size="200px" color="red"></sbx-icon>
         `,
     }),
-    args: {
-        name: "danger",
-        size: "100px",
-        color: "red",
-    },
 };
