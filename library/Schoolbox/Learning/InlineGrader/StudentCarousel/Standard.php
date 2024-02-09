@@ -132,18 +132,22 @@ class Standard
                 }
             }
 
+            /* Scrub it
+             */
+            $fullname = \Scrub::text($currentParticipant->getUser()->getFullName());
+
             $html = "
                 <div class=\"row\">
                     <div class=\"card small-10\">
                         <img src=\"/portrait.php?id={$currentParticipant->getUser()->getId()}&size=square64\" alt=\"View Profile\" />
-                        <p>{$currentParticipant->getUser()->getFullName()}</p>
+                        <p>{$fullname}</p>
                         <span class=\"label status {$css}\">{$label}</span>
                     </div>
                 </div>
             ";
 
             $person = [
-                'text' => $currentParticipant->getUser()->getFullname(),
+                'text' => $fullname,
                 'value' => $this->getUrl($currentParticipant->getUser()),
                 'html' => $html,
                 'submitted' => $currentParticipant->isFeedbackRequired(),
