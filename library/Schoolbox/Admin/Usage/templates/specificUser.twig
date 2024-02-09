@@ -7,10 +7,9 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-
         <div id="usage-specific-container">
             <usage-specific 
-                :full-name="'{{ user.fullname }}'" 
+                :full-name="'{{ user.fullname|purify }}'"
                 :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserTotalPayload', {userId: user.id}) }}'" 
                 :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserSystemPayload', {userId: user.id}) }}'" 
                 :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFileTypePayload', {userId: user.id}) }}'" 
@@ -19,7 +18,5 @@
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/usageSpecific.js?v={{ config.site_version }}"></script>
-
     </div>
-
 </div>
