@@ -22,37 +22,58 @@ export default meta;
 type Story = StoryObj<typeof SbxIcon>;
 
 /**
- *
+ * `<sbx-icon name="add"></sbx-icon>`
  */
 export const Default: Story = {
-    render: () => ({
+    render: (args) => ({
         components: { SbxIcon },
+        setup() {
+            return { args };
+        },
         template: `
-            <sbx-icon name="add"></sbx-icon>
+            <sbx-icon v-bind="args" />
         `,
     }),
+    args: {
+        name: "add",
+    },
 };
 
 /**
- *
+ * `<sbx-icon name="help" size="xl"></sbx-icon>`
  */
 export const Size: Story = {
-    render: () => ({
+    render: (args) => ({
         components: { SbxIcon },
+        setup() {
+            return { args };
+        },
         template: `
-            <sbx-icon name="approve" size="xl"></sbx-icon>
+            <sbx-icon v-bind="args" />
         `,
     }),
+    args: {
+        name: "help",
+        size: "xl",
+    },
 };
 
 /**
- *
+ * `<sbx-icon name="danger" size="l" color="red"></sbx-icon>`
  */
 export const Color: Story = {
-    render: () => ({
+    render: (args) => ({
         components: { SbxIcon },
+        setup() {
+            return { args };
+        },
         template: `
-            <sbx-icon name="close" color="red"></sbx-icon>
+            <sbx-icon v-bind="args" />
         `,
     }),
+    args: {
+        name: "danger",
+        size: "100px",
+        color: "red",
+    },
 };

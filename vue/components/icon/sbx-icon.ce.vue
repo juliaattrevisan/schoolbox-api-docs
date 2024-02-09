@@ -1701,7 +1701,7 @@ const computedSize = window.Vue.computed(() => {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .c-icon {
     color: v-bind(color);
     height: v-bind(computedSize);
