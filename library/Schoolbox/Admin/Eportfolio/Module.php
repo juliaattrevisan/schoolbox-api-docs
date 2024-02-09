@@ -12,7 +12,6 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Eportfolio\PageMapper as EportfolioPageMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
