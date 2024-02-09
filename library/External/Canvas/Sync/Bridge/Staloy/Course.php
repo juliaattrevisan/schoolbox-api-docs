@@ -42,7 +42,7 @@ class Course extends \External\Canvas\Sync\Bridge\Course
             ->notLike("{$sectionAlias}.sis_source_id", "Y%C%TEACHNOT")
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
         $sbTestCourses = (new Builder($this->canvasDb->getConnector()->getQuoter(), ''))
-            ->equals("{$courseAlias}.canvas_id", 3137)
+            ->equals("{$courseAlias}.id", 3137)
             ->notNull("{$sectionAlias}.sis_source_id");
 
         // Uncomment this line to just import the StAloy Schoolbox test course
