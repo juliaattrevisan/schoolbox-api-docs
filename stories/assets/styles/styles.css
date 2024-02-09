@@ -72,28 +72,22 @@ table tr td {
     stroke: var(--content-ui-foreground);
 }
 
-.box-icon {
-    background-color: #fff;
-    background-color: #fff;
-    border: 1px solid var(--content-ui-background);
-    box-shadow: 0 0 0 1px var(--n-color-border), 0 1px 5px rgba(12, 12, 12, 0.05), 0 0 40px rgba(12, 12, 12, 0.015);
-    color: var(--content-ui-foreground);
-    height: 3em;
-    line-height: inherit;
-    margin: auto;
-    padding-top: 1em;
-    text-align: center;
-    vertical-align: middle;
-    width: 6em;
-}
 .box-icon-wrapper {
     color: var(--content-ui-foreground);
-    height: 6em;
-    margin: 0.25em;
-    width: 6em;
+    height: 5rem;
     text-align: center;
+    width: 6rem;
 }
-.align-center {
-    align-items: center;
-    justify-content: center;
+
+.box-icon-wrapper p {
+    line-height: 1.1;
+    margin: 0;
+}
+
+.box-icon {
+    background-color: #fff;
+    border: 1px solid var(--content-ui-background);
+    color: var(--content-ui-foreground);
+    line-height: inherit;
+    padding: var(--spacing-s);
 }

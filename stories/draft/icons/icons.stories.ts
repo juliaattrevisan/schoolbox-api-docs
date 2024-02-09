@@ -957,7 +957,7 @@ export const Icons: Story = {
             </defs>
         </svg>
 
-        <div class="l-flex-row align-center">
+        <div class="l-flex-row l-flex--center l-gap-s">
             <div class="box-icon-wrapper">
                 <div class="box-icon">
                     <svg class="icon-add"><use xlink:href="#icon-add"></use></svg>
@@ -1212,13 +1212,6 @@ export const Icons: Story = {
 
             <div class="box-icon-wrapper">
                 <div class="box-icon">
-                    <svg class="icon-dollar"><use xlink:href="#icon-dollar"></use></svg>
-                </div>
-                <p>dollar</p>
-            </div>
-
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
                     <svg class="icon-down-arrow"><use xlink:href="#icon-down-arrow"></use></svg>
                 </div>
                 <p>down-arrow</p>
@@ -1383,13 +1376,6 @@ export const Icons: Story = {
                     <svg class="icon-forms"><use xlink:href="#icon-forms"></use></svg>
                 </div>
                 <p>forms</p>
-            </div>
-
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <svg class="icon-forum"><use xlink:href="#icon-forum"></use></svg>
-                </div>
-                <p>forum</p>
             </div>
 
             <div class="box-icon-wrapper">
