@@ -4,7 +4,7 @@
  *  pulling in all our CSS,
  *  MSW (https://storybook.js.org/addons/msw-storybook-addon) to be able to load dummy data into stories
  *  v-tables-3-select-rows so we can use it in stories
- *  adding window.Vue references as we load Vue globally in our vendors.js file in Schoobox browser context
+ *  adding window.Vue references as we load Vue globally in our vendors.js file in Schoolbox browser context
  */
 
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
@@ -15,7 +15,7 @@ import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to 
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
-import { ref, computed, watch, onMounted, onUnmounted, nextTick, defineCustomElement } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
 import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
 window.Vue = {};
@@ -24,6 +24,7 @@ window.Vue.computed = computed;
 window.Vue.watch = watch;
 window.Vue.onMounted = onMounted;
 window.Vue.onUnmounted = onUnmounted;
+window.Vue.onBeforeUnmount = onBeforeUnmount;
 window.Vue.nextTick = nextTick;
 window.Vue.defineCustomElement = defineCustomElement;
 

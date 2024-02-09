@@ -21,11 +21,11 @@ To toggle the display of further navigation or control actions.
 
 ## Slots
 
-An `#icon` slot is provided to allow for custom icons to be used. If no slot is provided, the default icon will be used.
+An `icon` slot is provided to allow for custom icons to be used. If no slot is provided, the default icon will be used.
 
 ```
 <sbx-pop-out content-id="dropdown-2">
-    <template #icon>
+    <div slot="icon">
         <svg
             version="1.2"
             xmlns="http://www.w3.org/2000/svg"
@@ -44,13 +44,12 @@ An `#icon` slot is provided to allow for custom icons to be used. If no slot is 
             />
             <path d="m12 8c0 0.6-0.4 1-1 1h-6c-0.6 0-1-0.4-1-1 0-0.6 0.4-1 1-1h6c0.6 0 1 0.4 1 1z" />
         </svg>
-    </template>
+    </div>
 </sbx-pop-out>
 ```
 
 ## Please note
 
--   There are currently some style variations when comparing Storybook/Schoolbox. This is due to some complications so Storybook's Webpack is not yet set up exactly as our Schoolbox Webpack is. As such styles will vary slightly, so be sure to also review in Schoolbox.
 -   Only the dropdown button is currently contained within the component. The dropdown content is not.
 -   The central SBX div `#container` is currently used to determine the position of the dropdown content, so the component must be contained wiithin this container
 

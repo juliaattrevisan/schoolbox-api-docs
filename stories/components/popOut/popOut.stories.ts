@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
+import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
  * Storybook meta data, any default properties that are passed into every story
  * https://storybook.js.org/docs/vue/writing-stories/introduction
  */
-const meta: Meta<typeof SbxPopOut> = {
-    component: SbxPopOut,
+const meta: Meta<typeof StorybookSlot> = {
+    component: StorybookSlot,
     decorators: [
         () => ({
             template: `
@@ -19,20 +19,20 @@ const meta: Meta<typeof SbxPopOut> = {
     title: "Components/Pop Out",
 };
 export default meta;
-type Story = StoryObj<typeof SbxPopOut>;
+type Story = StoryObj<typeof StorybookSlot>;
 
 /**
  * Shows the dropdown sitting in different regions of the viewport, which will determine which direction the dropdown opens.
  */
 export const Default: Story = {
     render: () => ({
-        components: { SbxPopOut },
+        components: { StorybookSlot },
         template: `
-            <div id="container" class="l-flex-col l-flex--justify-space" style="height: 600px;">
+            <div id="container" class="l-flex-col l-flex--justify-space" style="height: 300px; min-height: 300px;">
                 <div class="l-flex-row l-flex--justify-space">
                     <sbx-pop-out content-id="dropdown-1" is-close-on-content-click></sbx-pop-out>
                     <sbx-pop-out content-id="dropdown-2">
-                        <template #icon>
+                        <div slot="icon">
                             <svg
                                 version="1.2"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@ export const Default: Story = {
                                 />
                                 <path d="m12 8c0 0.6-0.4 1-1 1h-6c-0.6 0-1-0.4-1-1 0-0.6 0.4-1 1-1h6c0.6 0 1 0.4 1 1z" />
                             </svg>
-                        </template>
+                        </div>
                     </sbx-pop-out>
                     <sbx-pop-out content-id="dropdown-5" button-text="Filter" is-arrow-icon></sbx-pop-out>
                 </div>
