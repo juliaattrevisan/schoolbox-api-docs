@@ -45,7 +45,7 @@ const computedSize = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="c-icon" aria-hidden="true">
+    <div class="c-icon" aria-hidden="true" data-test="sbx-icon">
         <svg v-if="props.name === 'add'" class="c-icon__svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <path d="M32 14h-14v-14h-4v14h-14v4h14v14h4v-14h14z"></path>
         </svg>

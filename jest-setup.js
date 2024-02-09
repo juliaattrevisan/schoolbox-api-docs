@@ -1,9 +1,12 @@
 import "@testing-library/jest-dom"; // so we can use jest-dom in any test file https://github.com/testing-library/jest-dom
 
+import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
+import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
+
 /**
  * As Vue is now stored globally, provide reference to these functions so tests can still run without browser context
  */
-import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue";
 window.Vue = {};
 window.Vue.ref = ref;
 window.Vue.computed = computed;
@@ -12,6 +15,7 @@ window.Vue.onMounted = onMounted;
 window.Vue.onUnmounted = onUnmounted;
 window.Vue.onBeforeUnmount = onBeforeUnmount;
 window.Vue.nextTick = nextTick;
+window.Vue.defineCustomElement = defineCustomElement;
 
 /**
  * This is to handle any date display / manipulation within Schoolbox
@@ -42,3 +46,16 @@ window.days = dayjs;
 
 // Simulate jQuery's global $ and window.$
 global.$ = global.window.$ = require("jquery");
+
+/**
+ * Register all web components here
+ * We currently can't use the same initWebComponents as imports are automatically
+ * hoisted to the top of the file, and window.Vue is not defined at that point
+ */
+export function register() {
+    const SbxPopOutCE = window.Vue.defineCustomElement(SbxPopOut);
+    window.customElements.define("sbx-pop-out", SbxPopOutCE);
+    const SbxIconCE = window.Vue.defineCustomElement(SbxIcon);
+    window.customElements.define("sbx-icon", SbxIconCE);
+}
+register();
