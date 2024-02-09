@@ -12,7 +12,6 @@ use Schoolbox\User;
 
 class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Schoolbox\Resource\File\Mapper
      */
