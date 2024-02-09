@@ -14,7 +14,6 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Assessment\Participant\Finder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
