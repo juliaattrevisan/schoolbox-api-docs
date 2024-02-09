@@ -172,6 +172,10 @@ class Blind
                 $label = $multipleResponses ? 'Resubmitted late' : 'Submitted late';
             }
 
+            /* Scrub it
+             */
+            $fullname = \Scrub::text($currentParticipant->getUser()->getFullName());
+
             /* Decide if we need an obfuscating class for Blind Mode
              * This keeps the image blur from expanding beyond the dimensions we wanted
              */
@@ -181,14 +185,14 @@ class Blind
                         <div class='blind-container'>
                             <img src=\"/portrait.php?id={$currentParticipant->getUser()->getId()}&size=square64\" class=\"blind\" alt=\"View Profile\" />
                         </div>
-                        <p class=\"blind\" >{$currentParticipant->getUser()->getFullName()}</p>
+                        <p class=\"blind\" >{$fullname}</p>
                         <span class=\"label status {$css}\">{$label}</span>
                     </div>
                 </div>
             ";
 
             $person = [
-                'text' => $currentParticipant->getUser()->getFullname(),
+                'text' => $fullname,
                 'value' => $this->getUrl($currentParticipant->getUser()),
                 'html' => $html,
                 'submitted' => $currentParticipant->isFeedbackRequired(),
