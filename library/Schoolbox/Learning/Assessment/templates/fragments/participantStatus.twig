@@ -19,7 +19,7 @@
         <h3>
             <a href="/search/user/{{ participant.user.id }}" title="View Profile">{{ participant.user.fullName }}</a>
             {% if not participant.plan.isDynamic %}
-                <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
+                <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name|purify}} ({{ participant.plan.duedate.short}})">i</span>
             {% endif %}
         </h3>
     {% else %}
