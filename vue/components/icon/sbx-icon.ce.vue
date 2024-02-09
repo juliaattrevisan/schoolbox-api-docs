@@ -17,6 +17,16 @@ interface Props {
      */
     color?: string;
 }
+
+const props = withDefaults(defineProps<Props>(), {
+    name: "",
+    size: "m",
+    color: "var(--content-ui-foreground)",
+});
+
+/**
+ * The primary size options of the icon
+ */
 const sizeMap: Record<string, string> = {
     xs: "0.25rem",
     s: "0.5rem",
@@ -25,13 +35,12 @@ const sizeMap: Record<string, string> = {
     xl: "2rem",
 };
 
-const props = withDefaults(defineProps<Props>(), {
-    name: "",
-    size: "m",
-    color: "var(--content-ui-foreground)",
-});
-const size = window.Vue.computed(() => {
-    return sizeMap[props.size] || props.size || "1rem";
+/**
+ * The computed size of the icon
+ * @returns {string} The size of the icon
+ */
+const computedSize = window.Vue.computed(() => {
+    return sizeMap[props.size as string] || (props.size as string) || sizeMap.m;
 });
 </script>
 
@@ -1695,12 +1704,12 @@ const size = window.Vue.computed(() => {
 <style lang="scss" scoped>
 .c-icon {
     color: v-bind(color);
-    height: v-bind(size);
-    width: v-bind(size);
+    height: v-bind(computedSize);
+    width: v-bind(computedSize);
     &__svg {
         fill: currentColor;
-        height: v-bind(size);
-        width: v-bind(size);
+        height: v-bind(computedSize);
+        width: v-bind(computedSize);
     }
 }
 </style>
