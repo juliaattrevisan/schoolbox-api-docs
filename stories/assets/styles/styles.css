@@ -65,9 +65,29 @@ table tr td {
 [class^="icon-"],
 [class*=" icon-"] {
     display: inline-block;
-    width: 1em;
+    fill: var(--content-ui-foreground);
     height: 1em;
+    width: 1em;
     stroke-width: 0;
     stroke: var(--content-ui-foreground);
-    fill: var(--content-ui-foreground);
+}
+
+.box-icon-wrapper {
+    color: var(--content-ui-foreground);
+    height: 5rem;
+    text-align: center;
+    width: 6rem;
+}
+
+.box-icon-wrapper p {
+    line-height: 1.1;
+    margin: 0;
+}
+
+.box-icon {
+    background-color: #fff;
+    border: 1px solid var(--content-ui-background);
+    color: var(--content-ui-foreground);
+    line-height: inherit;
+    padding: var(--spacing-s);
 }
