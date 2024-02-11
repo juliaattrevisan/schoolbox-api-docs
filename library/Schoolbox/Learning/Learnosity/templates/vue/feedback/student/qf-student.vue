@@ -50,7 +50,7 @@ function onAttemptCommentUpdated(comment: string) {
                         :key="item.reference"
                         :student="props.student"
                         :item="item"
-                        :container="responseContentEl as HTMLDivElement"
+                        :container="(responseContentEl as HTMLDivElement)"
                     />
                     <qf-student-all-marked />
                 </div>

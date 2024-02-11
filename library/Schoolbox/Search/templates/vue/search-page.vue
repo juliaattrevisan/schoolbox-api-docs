@@ -34,7 +34,7 @@ store.init(
     props.filterDateRange,
     props.filterCreator as Creator,
     props.filterTypesAvailable,
-    props.filterTypesSelected,
+    props.filterTypesSelected
 ); // initialise the store
 
 const searchStore = useSearchStore();

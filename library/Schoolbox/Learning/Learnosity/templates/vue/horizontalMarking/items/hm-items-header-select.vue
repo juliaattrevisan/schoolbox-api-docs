@@ -17,7 +17,7 @@ const { currentLabel, isOpen, onButtonSelected, close } = usePopOut(
     "Actions",
     "item-list",
     "bottom-start",
-    true,
+    true
 );
 
 /**

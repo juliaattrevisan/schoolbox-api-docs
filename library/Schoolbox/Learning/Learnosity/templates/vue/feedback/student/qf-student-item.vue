@@ -37,7 +37,7 @@ window.Vue.watch(
             // hide those that are marked
             await slideUp(itemEl.value as HTMLElement);
         }
-    },
+    }
 );
 
 /**
@@ -60,7 +60,12 @@ function onCommentUpdated(comment: string) {
 
 <template>
     <div ref="itemEl" class="c-island l-flex-col l-gap-m l-pad-m">
-        <student-item-mark :item="item" :container="container as HTMLDivElement" :is-shown="true" :show-title="true" />
+        <student-item-mark
+            :item="item"
+            :container="(container as HTMLDivElement)"
+            :is-shown="true"
+            :show-title="true"
+        />
         <student-no-score-note v-if="!store.isReadOnly" :item="props.item" />
         <div class="item-questions l-flex-col l-gap-l">
             <student-item-question-display

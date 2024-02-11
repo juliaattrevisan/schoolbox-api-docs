@@ -95,7 +95,7 @@ watchDebounced(
     () => {
         void saveComment();
     },
-    { debounce: 1000 },
+    { debounce: 1000 }
 );
 
 /**

@@ -33,7 +33,7 @@ function onToggleSelected() {
         <div class="l-flex-row l-flex--align-center l-gap-m f-no-margins">
             <button
                 v-if="props.student.isReportLoaded"
-                :class="`toggle-button l-flex-row l-flex--align-center l-flex--justify-center ${
+                :class="`toggle-button l-flex l-flex--align-center l-flex--justify-center ${
                     props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
                 }`"
                 :disabled="!props.student.isReportLoaded"
@@ -59,7 +59,7 @@ function onToggleSelected() {
                 v-for="item in props.student.items"
                 :key="item.reference"
                 :item="item"
-                :container="container as HTMLElement"
+                :container="(container as HTMLElement)"
                 :is-shown="item.reference === itemsStore.activeItem.reference"
                 :show-title="false"
             />

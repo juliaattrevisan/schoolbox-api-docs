@@ -30,7 +30,7 @@ window.Vue.watch(
             $("#sp-start-date-input").val(EMPTY_DATE);
             clearErrorMessage("#sp-start-date-input-error");
         }
-    },
+    }
 );
 
 /**
@@ -43,7 +43,7 @@ window.Vue.watch(
             $("#sp-end-date-input").val(EMPTY_DATE);
             clearErrorMessage("#sp-end-date-input-error");
         }
-    },
+    }
 );
 
 /**
@@ -59,7 +59,7 @@ window.Vue.watch(
         if (isSearching && filterDateRangeStore.endDate === INVALID_DATE) {
             filterDateRangeStore.endDate = EMPTY_DATE;
         }
-    },
+    }
 );
 
 /**
