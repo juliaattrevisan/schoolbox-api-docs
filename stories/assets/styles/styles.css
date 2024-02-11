@@ -61,17 +61,8 @@ table tr td {
     height: 100%;
     width: 100%;
 }
-/* Icons Page Styles */
-[class^="icon-"],
-[class*=" icon-"] {
-    display: inline-block;
-    fill: var(--content-ui-foreground);
-    height: 1em;
-    width: 1em;
-    stroke-width: 0;
-    stroke: var(--content-ui-foreground);
-}
 
+/* Icons Page Styles */
 .box-icon-wrapper {
     color: var(--content-ui-foreground);
     height: 5rem;
@@ -90,4 +81,14 @@ table tr td {
     color: var(--content-ui-foreground);
     line-height: inherit;
     padding: var(--spacing-s);
+}
+
+.box-icon [class^="icon-"],
+.box-icon [class*=" icon-"] {
+    display: inline-block;
+    fill: var(--content-ui-foreground);
+    height: 1em;
+    width: 1em;
+    stroke-width: 0;
+    stroke: var(--content-ui-foreground);
 }
