@@ -39,7 +39,7 @@ export const Standard: Story = {
                             <h3 class=""><a href="">School Musical Auditions & Rehearsals</a></h3>
                             <span class="meta">By <a href="/search/user/6">Willow Tenorio</a> —<time title="Monday August 7th 2023 5:00am">1 week ago</time> in <a>Extra-Curricular</a></span>
                         </div>
-                        <nav class="c-nav-actions l-flex">
+                        <nav class="c-nav-actions l-flex-row">
                             <a class="icon-view no-text" href="" title="Hide"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-favourite no-text" href="" title="Favourite"></a>
@@ -56,7 +56,7 @@ export const Standard: Story = {
                         </blockquote>
                         <p>Of course tours are available at any time. Please&nbsp;<a href="http://www.schoolbox.com.au" target="_self">contact us</a>&nbsp;to arrange an appointment.</p>
                     </article>
-                    <div class="c-card__actions l-flex">
+                    <div class="c-card__actions l-flex-row">
                         <a>READ MORE</a>
                         <a>ANOTHER ACTION</a>
                     </div>
@@ -111,7 +111,7 @@ export const SlimlineCentered: Story = {
                         <span class="meta">Some more meta</span>
                         <span class="meta">And even more meta</span>
                     </div>
-                    <nav class="c-nav-actions l-flex">
+                    <nav class="c-nav-actions l-flex-row">
                         <a class="icon-view no-text" href="" title="Hide"></a>
                         <a class="icon-modify no-text" href="" title="Modify"></a>
                         <a class="icon-favourite no-text" href="" title="Favourite"></a>
@@ -269,7 +269,7 @@ export const Grouped: Story = {
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
-                        <nav class="c-nav-actions l-flex">
+                        <nav class="c-nav-actions l-flex-row">
                             <a class="icon-view no-text" href="" title="Hide"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-favourite no-text" href="" title="Favourite"></a>
@@ -287,7 +287,7 @@ export const Grouped: Story = {
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
-                        <nav class="c-nav-actions l-flex">
+                        <nav class="c-nav-actions l-flex-row">
                             <a class="icon-view no-text" href="" title="Hide"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-favourite no-text" href="" title="Favourite"></a>
@@ -305,7 +305,7 @@ export const Grouped: Story = {
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
-                        <nav class="c-nav-actions l-flex">
+                        <nav class="c-nav-actions l-flex-row">
                             <a class="icon-view no-text" href="" title="Hide"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-favourite no-text" href="" title="Favourite"></a>
@@ -323,7 +323,7 @@ export const Grouped: Story = {
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
-                        <nav class="c-nav-actions l-flex">
+                        <nav class="c-nav-actions l-flex-row">
                             <a class="icon-view no-text" href="" title="Hide"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-favourite no-text" href="" title="Favourite"></a>
@@ -341,7 +341,7 @@ export const Grouped: Story = {
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
-                        <nav class="c-nav-actions l-flex">
+                        <nav class="c-nav-actions l-flex-row">
                             <a class="icon-view no-text" href="" title="Hide"></a>
                             <a class="icon-modify no-text" href="" title="Modify"></a>
                             <a class="icon-favourite no-text" href="" title="Favourite"></a>
