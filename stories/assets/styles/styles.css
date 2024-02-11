@@ -85,13 +85,3 @@ table tr td {
     line-height: inherit;
     padding: var(--spacing-s);
 }
-
-/* .box-icon [class^="icon-"],
-.box-icon [class*=" icon-"] {
-    display: inline-block;
-    fill: var(--content-ui-foreground);
-    height: 1em;
-    width: 1em;
-    stroke-width: 0;
-    stroke: var(--content-ui-foreground);
-} */
