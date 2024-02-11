@@ -35,3 +35,7 @@
         border: 2px dotted var(--form-border-color);
     }
 }
+
+.c-input-text--error[type="text"] {
+    border: 1px solid var(--error-color);
+}

@@ -59,7 +59,7 @@ export const WithError: Story = {
             <div class="c-form-element">
                 <label for="news_default_expiry-field" class="c-label c-label--required">Default News Archiving Period</label>
                 <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
-                <input id="news_default_expiry-field" class="c-input-text" type="text" required />
+                <input id="news_default_expiry-field" class="c-input-text c-input-text--error" type="text" required />
                 <label id="news-title-error" class="error" for="news-title">This field is required.</label>
             </div>
             `,

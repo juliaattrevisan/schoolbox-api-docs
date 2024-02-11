@@ -55,6 +55,17 @@ export const ReadOnly: Story = {
 };
 
 /**
+ * Has a validation error
+ */
+export const HasError: Story = {
+    render: () => ({
+        template: `
+            <input id="news_default_expiry-field" class="c-input-text c-input-text--error" type="text" value="I'm invalid" />
+            `,
+    }),
+};
+
+/**
  * With a button, typically when an action following the button selection fills the input
  * For example a date picker or resource browser
  */
