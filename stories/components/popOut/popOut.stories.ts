@@ -28,8 +28,8 @@ export const Default: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <div id="container" class="l-flex l-flex--col l-flex--justify-space" style="height: 300px; min-height: 300px;">
-                <div class="l-flex l-flex--justify-space">
+            <div id="container" class="l-flex-col l-flex--justify-space" style="height: 300px; min-height: 300px;">
+                <div class="l-flex-row l-flex--justify-space">
                     <sbx-pop-out content-id="dropdown-1" is-close-on-content-click></sbx-pop-out>
                     <sbx-pop-out content-id="dropdown-2">
                         <div slot="icon">
@@ -55,7 +55,7 @@ export const Default: Story = {
                     </sbx-pop-out>
                     <sbx-pop-out content-id="dropdown-5" button-text="Filter" is-arrow-icon></sbx-pop-out>
                 </div>
-                <div class="l-flex l-flex--justify-space">
+                <div class="l-flex-row l-flex--justify-space">
                     <sbx-pop-out content-id="dropdown-3" button-text="Modify Participation"></sbx-pop-out>
                     <sbx-pop-out content-id="dropdown-4"></sbx-pop-out>
                 </div>

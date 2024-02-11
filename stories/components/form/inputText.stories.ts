@@ -61,7 +61,7 @@ export const ReadOnly: Story = {
 export const WithButton: Story = {
     render: () => ({
         template: `
-            <div class="l-flex l-flex--col">
+            <div class="l-flex-col">
                 <input id="news_default_expiry-field" class="c-input-text l-flex__item--1" type="text" />
                 <button class="button l-width-100 l-mar--0">Browse Resources</button>
             </div>

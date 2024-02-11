@@ -30,7 +30,7 @@ window.Vue.watch(
             $("#sp-start-date-input").val(EMPTY_DATE);
             clearErrorMessage("#sp-start-date-input-error");
         }
-    }
+    },
 );
 
 /**
@@ -43,7 +43,7 @@ window.Vue.watch(
             $("#sp-end-date-input").val(EMPTY_DATE);
             clearErrorMessage("#sp-end-date-input-error");
         }
-    }
+    },
 );
 
 /**
@@ -59,7 +59,7 @@ window.Vue.watch(
         if (isSearching && filterDateRangeStore.endDate === INVALID_DATE) {
             filterDateRangeStore.endDate = EMPTY_DATE;
         }
-    }
+    },
 );
 
 /**
@@ -99,8 +99,8 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="l-flex l-flex--no-wrap l-gap-m">
-        <div class="l-flex l-flex--col l-flex__item--1">
+    <div class="l-flex-row l-flex--no-wrap l-gap-m">
+        <div class="l-flex-col l-flex__item--1">
             <label for="sp-start-date-input">Start date</label>
             <input
                 id="sp-start-date-input"
@@ -112,7 +112,7 @@ window.Vue.onMounted(() => {
                 data-datepicker-hide-timetable="true"
             />
         </div>
-        <div class="l-flex l-flex--col l-flex__item--1">
+        <div class="l-flex-col l-flex__item--1">
             <label for="sp-end-date-input">End date</label>
             <input
                 id="sp-end-date-input"

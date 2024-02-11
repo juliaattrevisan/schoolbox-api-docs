@@ -28,14 +28,14 @@ export const Standard: Story = {
     render: () => ({
         template: `
             <div class="c-card">
-                <div class="l-flex l-flex--col l-gap-m l-pad-m">
-                    <div class="l-flex l-gap-m">
+                <div class="l-flex-col l-gap-m l-pad-m">
+                    <div class="l-flex-row l-gap-m">
                         <div class="c-img c-img--xl">
                             <div class="c-img__wrapper">
                                 <img src="/news.jpg" alt="Band playing music" />
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                             <h3 class=""><a href="">School Musical Auditions & Rehearsals</a></h3>
                             <span class="meta">By <a href="/search/user/6">Willow Tenorio</a> —<time title="Monday August 7th 2023 5:00am">1 week ago</time> in <a>Extra-Curricular</a></span>
                         </div>
@@ -75,13 +75,13 @@ export const Slimline: Story = {
     render: () => ({
         template: `
             <div class="c-card">
-                <div class="l-flex l-gap-m l-pad-m">
+                <div class="l-flex-row l-gap-m l-pad-m">
                     <div class="c-img">
                         <div class="c-img__wrapper">
                             <div class="icon icon-calendar"></div>
                         </div>
                     </div>
-                    <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                    <div class="l-flex-col l-flex--justify-center f-no-margins">
                         <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                         <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                     </div>
@@ -98,13 +98,13 @@ export const SlimlineCentered: Story = {
     render: () => ({
         template: `
             <div class="c-card">
-                <div class="l-flex l-flex--align-center l-gap-m l-pad-m">
+                <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
                     <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
                             <img src="/user.jpg" alt="Jana Reed profile photo" />
                         </div>
                     </div>
-                    <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                         <h3 class=""><a href="">Jana Reed</a></h3>
                         <span class="meta">Friday April 12th 2015 11:11am</span>
                         <span class="meta">Edited five days ago</span>
@@ -129,13 +129,13 @@ export const Link: Story = {
     render: () => ({
         template: `
             <div class="c-card c-card--link">
-                <div class="l-flex l-gap-m l-pad-m">
+                <div class="l-flex-row l-gap-m l-pad-m">
                     <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
                             <img src="https://schoolbox-static.cloud/23.0.5-1/images/badges/education/85.svg"/>
                         </div>
                     </div>
-                    <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                    <div class="l-flex-col l-flex--justify-center f-no-margins">
                         <h3 class=""><a href="#first-link">Critical and Creative Thinking - Level 1</a></h3>
                         <span class="meta">Learning</span>
                     </div>
@@ -152,13 +152,13 @@ export const Loading: Story = {
     render: () => ({
         template: `
             <div class="c-card c-card--loading">
-                <div class="l-flex l-gap-m l-pad-m">
+                <div class="l-flex-row l-gap-m l-pad-m">
                     <div class="c-img">
                         <div class="c-img__wrapper">
                             <div class="img-placeholder"></div>
                         </div>
                     </div>
-                    <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 l-gap-m">
+                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-m">
                         <h3></h3>
                         <span></span>
                     </div>
@@ -175,13 +175,13 @@ export const Child: Story = {
     render: () => ({
         template: `
             <div class="c-card c-card--child">
-                <div class="l-flex l-gap-s l-pad-s">
+                <div class="l-flex-row l-gap-s l-pad-s">
                     <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
                             <div class="icon icon-unit"></div>
                         </div>
                     </div>
-                    <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                    <div class="l-flex-col l-flex--justify-center f-no-margins">
                         <h6 class=""><a href="">Romeo and Juliet</a></h6>
                     </div>
                 </div>
@@ -196,52 +196,52 @@ export const Child: Story = {
 export const ParentWithChildren: Story = {
     render: () => ({
         template: `
-            <div class="l-flex l-flex--col">
+            <div class="l-flex-col">
                 <div class="c-card c-card--border-end">
-                    <div class="l-flex l-gap-m l-pad-m">
+                    <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-house"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h3 class=""><a href="">Year 9 English</a></h3>
                             <span class="meta"><a href="">Courses</a> > <a href="">Senior Courses</a> > <a href="">English</a></span>
                         </div>
                     </div>
                 </div>
                 <div class="c-card c-card--child c-card--border-end">
-                    <div class="l-flex l-gap-s l-pad-s">
+                    <div class="l-flex-row l-gap-s l-pad-s">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-unit"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h6 class=""><a href="">Romeo and Juliet</a></h6>
                         </div>
                     </div>
                 </div>
                 <div class="c-card c-card--child c-card--border-end">
-                    <div class="l-flex l-gap-s l-pad-s">
+                    <div class="l-flex-row l-gap-s l-pad-s">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-unit"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h6 class=""><a href="">Persuasion and the Media</a></h6>
                         </div>
                     </div>
                 </div>
                 <div class="c-card c-card--child">
-                    <div class="l-flex l-gap-s l-pad-s">
+                    <div class="l-flex-row l-gap-s l-pad-s">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-unit"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h6 class=""><a href="">To Kill a Mockingbird</a></h6>
                         </div>
                     </div>
@@ -257,15 +257,15 @@ export const ParentWithChildren: Story = {
 export const Grouped: Story = {
     render: () => ({
         template: `
-            <div class="l-flex l-flex--col">
+            <div class="l-flex-col">
                 <div class="c-card c-card--border-end">
-                    <div class="l-flex l-gap-m l-pad-m">
+                    <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-calendar"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
@@ -277,13 +277,13 @@ export const Grouped: Story = {
                     </div>
                 </div>
                 <div class="c-card c-card--alt-bkg c-card--border-end">
-                    <div class="l-flex l-gap-m l-pad-m">
+                    <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-calendar"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
@@ -295,13 +295,13 @@ export const Grouped: Story = {
                     </div>
                 </div>
                 <div class="c-card c-card--border-end">
-                    <div class="l-flex l-gap-m l-pad-m">
+                    <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-calendar"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
@@ -313,13 +313,13 @@ export const Grouped: Story = {
                     </div>
                 </div>
                 <div class="c-card c-card--alt-bkg c-card--border-end">
-                    <div class="l-flex l-gap-m l-pad-m">
+                    <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-calendar"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>
@@ -331,13 +331,13 @@ export const Grouped: Story = {
                     </div>
                 </div>
                 <div class="c-card">
-                    <div class="l-flex l-gap-m l-pad-m">
+                    <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
                                 <div class="icon icon-calendar"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                             <h3 class=""><a href="">Class Cancelled - 21st June</a></h3>
                             <span class="meta">Posted by <a href="">Ms. Celia Glenn</a> 2 days ago</span>
                         </div>

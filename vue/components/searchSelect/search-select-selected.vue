@@ -36,7 +36,7 @@ function onRemoveItem(result: Result) {
 </script>
 
 <template>
-    <div v-if="props.selected.length > 0" class="selected-container l-flex l-gap-s l-pad-s">
+    <div v-if="props.selected.length > 0" class="selected-container l-flex-row l-gap-s l-pad-s">
         <search-select-selected-item
             v-for="result in props.selected"
             :key="result.id"

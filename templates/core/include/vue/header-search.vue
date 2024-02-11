@@ -238,7 +238,7 @@ const searchButtonText = window.Vue.computed(() => {
             @click="onClicked"
         />
         <div v-show="isSelected" class="c-header-search__results">
-            <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex l-flex--col">
+            <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
                 <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end l-pad-s">
                     <em>Showing {{ results.length }} of {{ totalCount }} matching users</em>
                 </div>
@@ -251,7 +251,7 @@ const searchButtonText = window.Vue.computed(() => {
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
-                    <div class="l-flex l-flex--align-center l-gap-s l-pad-s">
+                    <div class="l-flex-row l-flex--align-center l-gap-s l-pad-s">
                         <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <img
@@ -260,7 +260,7 @@ const searchButtonText = window.Vue.computed(() => {
                                 />
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center f-no-margins">
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h3>
                                 {{ result.formattedName }}
                             </h3>
@@ -276,13 +276,13 @@ const searchButtonText = window.Vue.computed(() => {
                     View all {{ totalCount }} users
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
-                    <div class="l-flex l-gap-s l-pad-s">
+                    <div class="l-flex-row l-gap-s l-pad-s">
                         <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
                                 <div class="img-placeholder"></div>
                             </div>
                         </div>
-                        <div class="l-flex l-flex--col l-flex--justify-center l-flex__item--1 l-gap-s">
+                        <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-s">
                             <h3></h3>
                             <span></span>
                         </div>
@@ -292,7 +292,7 @@ const searchButtonText = window.Vue.computed(() => {
                     <em>No users were found matching "{{ keyword }}"</em>
                 </div>
             </div>
-            <div class="l-flex l-flex--col">
+            <div class="l-flex-col">
                 <a class="button f-no-margins t-lh--normal icon-search" :href="searchButtonHref">
                     {{ searchButtonText }}
                 </a>

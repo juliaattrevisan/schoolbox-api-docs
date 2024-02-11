@@ -24,7 +24,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Standard: Story = {
     render: () => ({
         template: `
-            <div class="l-flex l-gap-m">
+            <div class="l-flex-row l-gap-m">
                 <a href="javascript:;" class="c-button">Button Link</a>
                 <button class="c-button" type="button">Real Button</button>
                 <button class="c-button c-button--submit" type="button">Real Button</button>

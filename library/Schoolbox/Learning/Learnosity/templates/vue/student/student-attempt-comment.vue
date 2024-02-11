@@ -95,7 +95,7 @@ watchDebounced(
     () => {
         void saveComment();
     },
-    { debounce: 1000 }
+    { debounce: 1000 },
 );
 
 /**
@@ -107,7 +107,7 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div class="c-island l-flex l-flex--col l-gap-m l-pad-m">
+    <div class="c-island l-flex-col l-gap-m l-pad-m">
         <div>
             <p
                 v-if="

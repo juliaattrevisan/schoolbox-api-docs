@@ -4,7 +4,7 @@
     b) leverage other classes for this purpose that probably *shouldn't be used*
 
     "Isn't this the same as using inline styles" I hear you ask?
-    No. Firstly, it's abundantly clear that these classes are applying the explicit styles
+    No. Firstly, it's abundantly clear that these classes are applying the explict styles
     you're seeing via the naming convention and structure. More importantly though, all
     implementations of these flex containers using these classes can have their styles
     updated and controlled from this specific file. Let's say flex changes a property in
@@ -14,15 +14,22 @@
 
 .l-flex {
     display: flex;
-    flex-wrap: wrap; // always allow flex items to wrap
 
     > * {
         max-width: 100%; // prevent flex items from overflowing the container
     }
 
-    &--col {
+    &-col,
+    &-row {
+        display: flex;
+    }
+
+    &-col {
         flex-direction: column;
-        flex-wrap: nowrap;
+    }
+    &-row {
+        flex-direction: row;
+        flex-wrap: wrap; // always allow flex items to wrap
     }
 
     &--wrap-reverse {

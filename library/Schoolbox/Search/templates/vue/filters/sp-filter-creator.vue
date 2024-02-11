@@ -41,7 +41,7 @@ function onRemoved() {
 </script>
 <section></section>
 <template>
-    <div class="l-flex l-flex--col">
+    <div class="l-flex-col">
         <label for="creator">Creator</label>
         <search-select
             endpoint="/ajax/user.php?groupID=0&query="

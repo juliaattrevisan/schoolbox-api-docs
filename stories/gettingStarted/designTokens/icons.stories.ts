@@ -957,7 +957,7 @@ export const Icons: Story = {
             </defs>
         </svg>
 
-        <div class="l-flex l-flex--center l-gap-s">
+        <div class="l-flex-row l-flex--center l-gap-s">
             <div class="box-icon-wrapper">
                 <div class="box-icon">
                     <svg class="icon-add"><use xlink:href="#icon-add"></use></svg>

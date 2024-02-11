@@ -109,7 +109,7 @@ function onMouseOut(event: MouseEvent) {
 </script>
 
 <template>
-    <div class="l-flex l-flex--col">
+    <div class="l-flex-col">
         <div class="c-filter-search-term">
             <input
                 id="search-field"
