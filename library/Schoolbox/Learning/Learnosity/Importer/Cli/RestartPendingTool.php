@@ -20,32 +20,21 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class RestartPendingTool extends BaseTool
 {
-    private const OPT_SHORT_HELP = 'h';
-    private const OPT_LONG_HELP  = 'help';
-
     /**
-     * Short options:
-     * * -h: help
+     * This tool works upon pending quizzes.
      */
-    public function getShortOpts(): array
+    protected function getTargetedQuizStatus(): string
     {
-        return [self::OPT_SHORT_HELP];
+        return QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING;
     }
 
     /**
-     * Long options:
-     * * --help:  help
-     */
-    public function getLongOpts(): array
-    {
-        return [self::OPT_LONG_HELP];
-    }
-
-    /**
+     * This tool processes `$quiz` by finding its source assessment if possible,
+     * and then triggering a copy from its source into `$quiz`.
+     *
      * @param QuizDomainModel $quiz
      * @return void
      * @throws MapperException
-     * @throws MapperException\Deleted
      */
     protected function processQuiz(QuizDomainModel $quiz): void
     {
