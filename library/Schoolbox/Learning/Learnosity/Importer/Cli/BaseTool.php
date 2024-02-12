@@ -11,7 +11,9 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -20,8 +22,20 @@ use Schoolbox\Url\Factory;
 
 abstract class BaseTool extends CliTool\App
 {
+    /**
+     * -h, --help
+     *
+     * Print help text for those who don't know how to use this tool
+     */
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP  = 'help';
+
+    /**
+     * --assessment
+     *
+     * Process a particular quiz
+     */
+    private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
 
     /**
      * Short options:
@@ -34,11 +48,12 @@ abstract class BaseTool extends CliTool\App
 
     /**
      * Long options:
-     * * --help:  help
+     * * --help:       help
+     * * --assessment: a particular quiz to process
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_ASSESSMENT_ID];
     }
 
     /**
@@ -83,14 +98,7 @@ abstract class BaseTool extends CliTool\App
 
         // Build assessment data source
         $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-        // Find quiz domain models
-        $quizQuery = $this->getDatabaseInternal()->prepareQuery(
-            "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
-        );
-        $quizQuery->execute(['status' => $this->getTargetedQuizStatus()]);
-        $quizIds = $quizQuery->fetchColumnArray('assessment_id');
-        $quizzes = $this->assessmentDataSource->findAllByIds($quizIds);
+        $quizzes                    = $this->findQuizzes();
 
         $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
         foreach ($quizzes as $quiz) {
@@ -112,6 +120,25 @@ abstract class BaseTool extends CliTool\App
     }
 
     /**
+     * Find quizzes which match this tool's targeted quiz status, and which are
+     * also within the date span or assessment ID list.
+     *
+     * @return GenericCollection<IAssessable>
+     */
+    private function findQuizzes(): GenericCollection
+    {
+        $logMessageParts = [
+            'learnosity_job_status: ' . $this->getTargetedQuizStatus(),
+        ];
+        $quizQuery = $this->getDatabaseInternal()->prepareQuery(
+            "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
+        );
+        $quizQuery->execute(['status' => $this->getTargetedQuizStatus()]);
+        $quizIds = $quizQuery->fetchColumnArray('assessment_id');
+        return $this->assessmentDataSource->findAllByIds($quizIds);
+    }
+
+    /**
      * Which quiz status does this tool target?
      *
      * @return QuizDomainModel::LEARNOSITY_JOB_STATUS_*
@@ -128,10 +155,48 @@ abstract class BaseTool extends CliTool\App
     abstract protected function processQuiz(QuizDomainModel $quiz): void;
 
     /**
+     * Print the name of the tool in the help text.
+     *
+     * @return string
+     */
+    abstract protected function getToolName(): string;
+
+    /**
+     * Print the help text's description.
+     *
+     * @return string
+     */
+    abstract protected function getToolDescription(): string;
+
+    /**
      * Print help text
      *
      * @return void
      */
-    abstract protected function printHelp(): void;
+    private function printHelp(): void
+    {
+        $file       = $this->getToolFilename();
+        $green      = self::COLOUR_GREEN;
+        $white      = self::COLOUR_WHITE;
+        $yellow     = self::COLOUR_YELLOW;
+        echo <<<HELP
+NAME:
+    {$this->getToolName()}
 
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+{$this->getToolDescription()}
+
+OPTIONS
+    $yellow-h, --help$white
+        Print this help and exit
+
+    $yellow-p, --perform$white
+        Actually perform changes on quizzes: otherwise, only output which quizzes would be changed.
+
+
+HELP;
+    }
 }

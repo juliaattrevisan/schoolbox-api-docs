@@ -112,24 +112,19 @@ class RestartPendingTool extends BaseTool
     }
 
     /**
-     * Print help text
-     *
-     * @return void
+     * @return string
      */
-    protected function printHelp(): void
+    protected function getToolName(): string
     {
-        $file       = $this->getToolFilename();
-        $green      = self::COLOUR_GREEN;
-        $white      = self::COLOUR_WHITE;
-        $yellow     = self::COLOUR_YELLOW;
-        echo <<<HELP
-NAME:
-    Restart pending quiz duplication tool
+        return 'Restart pending quiz duplication tool';
+    }
 
-SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
-
-DESCRIPTION
+    /**
+     * @return string
+     */
+    protected function getToolDescription(): string
+    {
+        return <<<DESC
     Attempts to restart any pending quiz duplication jobs.
 
     A quiz duplication will be pending if:
@@ -141,16 +136,7 @@ DESCRIPTION
     * create a new job in Learnosity for copying the contents of the source quiz into the pending quiz
     * set the quiz's status to "processing"
     * initiate polling for the status of the Learnosity job: when it is finished, it will be marked as complete
-
-OPTIONS
-    $yellow-h, --help$white
-        Print this help and exit
-
-    $yellow-p, --perform$white
-        Actually restart duplication jobs: otherwise, only output what would be restarted.
-
-
-HELP;
+DESC;
     }
 
     /**

@@ -47,37 +47,23 @@ class ResetFailedTool extends BaseTool
     }
 
     /**
-     * Print help text
-     *
-     * @return void
+     * @return string
      */
-    protected function printHelp(): void
+    protected function getToolName(): string
     {
-        $file       = $this->getToolFilename();
-        $green      = self::COLOUR_GREEN;
-        $white      = self::COLOUR_WHITE;
-        $yellow     = self::COLOUR_YELLOW;
-        echo <<<HELP
-NAME:
-    Reset failed quiz duplication tool
+        return 'Reset failed quiz duplication tool';
+    }
 
-SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
-
-DESCRIPTION
+    /**
+     * @return string
+     */
+    protected function getToolDescription(): string
+    {
+        return <<<DESC
     Resets any failed quiz duplication jobs.
 
     These jobs will be set back to the pending status, and their job reference will be cleared;
     note this does not address any possible underlying cause for the failure.
-
-OPTIONS
-    $yellow-h, --help$white
-        Print this help and exit
-
-    $yellow-p, --perform$white
-        Actually reset failed duplication jobs: otherwise, only output what would be reset.
-
-
-HELP;
+DESC;
     }
 }

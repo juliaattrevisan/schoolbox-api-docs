@@ -72,39 +72,25 @@ class PollProcessingTool extends BaseTool
     }
 
     /**
-     * Print help text
-     *
-     * @return void
+     * @return string
      */
-    protected function printHelp(): void
+    protected function getToolName(): string
     {
-        $file       = $this->getToolFilename();
-        $green      = self::COLOUR_GREEN;
-        $white      = self::COLOUR_WHITE;
-        $yellow     = self::COLOUR_YELLOW;
-        echo <<<HELP
-NAME:
-    Poll processing quiz duplication tool
+        return 'Poll processing quiz duplication tool';
+    }
 
-SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
-
-DESCRIPTION
+    /**
+     * @return string
+     */
+    protected function getToolDescription(): string
+    {
+        return <<<DESC
     Poll any quiz duplication jobs currently processing.
 
     This tool will manually poll Learnosity for the status of the quiz's duplication job:
     * if it is finished, it will mark the quiz as complete, and set its tags
     * if it has an error, it will mark it as failed
     * if it hasn't finished yet, it will not be changed
-
-OPTIONS
-    $yellow-h, --help$white
-        Print this help and exit
-
-    $yellow-p, --perform$white
-        Actually poll duplication jobs: otherwise, only output what would be polled.
-
-
-HELP;
+DESC;
     }
 }
