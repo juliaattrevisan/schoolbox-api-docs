@@ -41,7 +41,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     props.contentId,
     props.isFullWidth ? "bottom-start" : "bottom-end",
     props.isFullWidth,
-    props.isCloseOnContentClick
+    props.isCloseOnContentClick,
 );
 </script>
 
@@ -49,11 +49,9 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     <button
         ref="button"
         type="button"
-        :class="`c-button c-button--no-bkg ${
-            props.buttonText
-                ? `f-match-existing-button-styles`
-                : `c-button--icon-only f-match-existing-icon-only-styles`
-        } ${props.isFullWidth ? `c-button--block` : ``}`"
+        :class="`sbx-button ${
+            props.buttonText ? `` : `sbx-button--icon-only`
+        } ${props.isFullWidth ? `sbx-button--block` : ``}`"
         :title="currentLabel"
         :aria-label="currentLabel"
         aria-haspopup="menu"
@@ -106,6 +104,73 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
 // One current complication of using Vue and Web components is the inability to avoid the shadow DOM
 // This means that we cannot use the global styles to style the component
 // It looks like the ability to opt out of the shadow DOM is hopefully coming soon however
-@import "../../../www/static/css/core/ui/button/_c-button.scss";
-@import "../../../www/static/css/core/components/pop-out/_pop-out.scss";
+
+// Inherits colour from the parent element
+.c-icon {
+    fill: currentcolor;
+}
+
+.sbx-button {
+    align-items: center;
+    align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
+    background: none;
+    border: none;
+    border-radius: var(--roundness-inputs);
+    color: var(--content-ui-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    gap: var(--spacing-s);
+    justify-content: center;
+    line-height: 1;
+    font-family: inherit;
+    font-size: var(--font-size-m);
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+    padding: var(--spacing-s) var(--spacing-m);
+    text-align: center;
+    &:hover,
+    &:active {
+        &:not([disabled]) {
+            background-color: var(--content-ui-hover);
+        }
+    }
+    &:focus {
+        &:not([disabled]) {
+            background-color: var(
+                --content-ui-background
+            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+            outline: 3px solid var(--content-ui-foreground);
+            outline-offset: 2px;
+        }
+    }
+    &:disabled {
+        opacity: 0.7;
+        &:hover {
+            cursor: default;
+        }
+    }
+    &--icon-only {
+        padding: var(--spacing-s);
+    }
+}
+
+// To match the typical background colour of the dropdown content
+// and better visually connect the button to the content
+.sbx-button[aria-expanded="true"] {
+    background-color: var(--content-ui-background);
+    opacity: 1;
+    &:hover,
+    &:active {
+        background-color: var(--content-ui-background);
+    }
+    &:focus {
+        &:not([disabled]) {
+            box-shadow: none;
+        }
+    }
+    // rotate when open
+    .c-icon--dropdown {
+        transform: rotate(0deg);
+    }
+}
 </style>
