@@ -216,7 +216,6 @@ class Duplicator
                 $setTags   = true;
                 $jobStatus = QuizDomainModel::LEARNOSITY_JOB_STATUS_COMPLETED;
             } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
-                $setTags   = true;
                 $jobStatus = QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED;
             }
 
