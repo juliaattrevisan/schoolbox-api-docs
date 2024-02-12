@@ -499,6 +499,11 @@ class Controller extends Base
                  * Force hard time limits, kicking you out at the expiry
                  */
                 'time' => [
+                    /* Learnosity didn't code for their default value; this allows is to
+                     * forcibly dodge around a misimplementation on their end.
+                     * https://schoolbox.atlassian.net/browse/SA-17209
+                     */
+                    'countdown_option' => !(\Schoolbox\Learning\Quiz\Model::DURATION_UNLIMITED === $quiz->getDuration()),
                     'max_time' => $quiz->getDuration(),
                     'limit_type' => 'hard',
                     'warning_time' => self::LEARNOSITY_WARNING_TIME,
@@ -516,7 +521,7 @@ class Controller extends Base
                         /* Note: Whilst looking into this, I also experimented with the "hard" type which requires a "value" prop.
                          * Learnosity wants this value given in UTC with an unusual format, which can be achieved with "Ymd-His"
                          * The Learnosity docs do not include seconds as a valid attribute, however, I found that this both works and is
-                         * requried to ensure that the start time is not off by a few seconds when starting the quiz
+                         * required to ensure that the start time is not off by a few seconds when starting the quiz
                          */
                     ]
                 ],
