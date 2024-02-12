@@ -197,14 +197,6 @@ class RestartPendingTool extends CliTool\App
      */
     private function findFromLearnositySourceAssessment(QuizDomainModel $destination): QuizDomainModel
     {
-        $this->getLogger()->debug(
-            sprintf(
-                'Assessment #%d has source assessment #%d: copying from that assessment',
-                $destination->getId(),
-                $destination->getLearnositySourceAssessmentId(),
-            )
-        );
-
         // Find the assessment
         try {
             $source = $this->assessmentDataSource->findById($destination->getLearnositySourceAssessmentId());
