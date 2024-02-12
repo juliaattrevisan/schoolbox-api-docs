@@ -185,7 +185,7 @@ abstract class BaseTool extends CliTool\App
             " . implode(' AND ', $whereParts),
         );
         $quizQuery->execute($params);
-        $quizIds = $quizQuery->fetchColumnArray('assessment_id');
+        $quizIds = $quizQuery->fetchColumnArray('id');
         return $this->assessmentDataSource->findAllByIds($quizIds);
     }
 

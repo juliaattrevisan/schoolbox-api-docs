@@ -219,29 +219,26 @@ class Duplicator
             // https://reference.learnosity.com/data-api/endpoints/jobs_endpoints
             $learnosityJobStatus = $learnosityJobResponse['data'][0]['status'] ?? null;
             $setTags             = false;
+            $updateStatus        = false;
             if ($learnosityJobStatus === Api::JOB_STATUS_COMPLETED) {
-                $setTags   = true;
-                $jobStatus = QuizDomainModel::LEARNOSITY_JOB_STATUS_COMPLETED;
+                $setTags      = true;
+                $updateStatus = true;
+                $jobStatus    = QuizDomainModel::LEARNOSITY_JOB_STATUS_COMPLETED;
             } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
                 // TODO determine if this can be set to FAILED or UNPROCESSABLE
                 // There may be some status code which marks the job as
                 // containing bad data (and thus will never complete), as
                 // opposed to a transient error (which may complete later).
                 // Just mark as unprocessable after enough failures.
-                $jobStatus = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
+                $updateStatus = true;
+                $jobStatus    = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
                     ? QuizDomainModel::LEARNOSITY_JOB_STATUS_UNPROCESSABLE
                     : QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED
                 ;
             }
 
-            // If complete or failed:
-            // update status and set the tags
-            if ($setTags) {
-                $newTags = $this->tagFactory->produceFromAssessment($quiz);
-                if ($quiz->getContext()->isImplementationContext()) {
-                    $newTags[] = $this->tagFactory->produceImplFlag();
-                }
-
+            // If complete or failed: set status
+            if ($updateStatus) {
                 $query = $this->database->prepareQuery(
                     "
                         UPDATE assess
@@ -252,6 +249,14 @@ class Duplicator
                 );
                 $quiz->setLearnosityJobStatus($jobStatus);
                 $query->execute();
+            }
+
+            // If complete: set tags
+            if ($setTags) {
+                $newTags = $this->tagFactory->produceFromAssessment($quiz);
+                if ($quiz->getContext()->isImplementationContext()) {
+                    $newTags[] = $this->tagFactory->produceImplFlag();
+                }
 
                 /* Fetch this activity from Learnosity; we need to assign tags to each of its items
                  * because they appear in the global Item Bank. Unless we assign the classCode tag
