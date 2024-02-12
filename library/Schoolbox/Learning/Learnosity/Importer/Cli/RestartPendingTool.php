@@ -87,7 +87,7 @@ class RestartPendingTool extends BaseTool
                 )
             );
             if ($this->perform()) {
-                $quiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED);
+                $quiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_SOURCE_NOT_FOUND);
                 $this->assessmentDataSource->save($quiz, $quiz->getCreator());
             }
         } catch (InteropQueueException $e) {
