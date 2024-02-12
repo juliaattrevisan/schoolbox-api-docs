@@ -5,16 +5,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-/**
- * Steps:
- * 1. Provision legacy.tar.gz data
- * 2. vagrant ssh
- * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest
- *
- * To run a specific test:
- *  ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest:<test method name>
- */
-
 namespace Tests\Acceptance\Duework;
 
 use Tests\Support\AcceptanceTester;
@@ -23,8 +13,17 @@ use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Page\Duework\AssessmentPage;
 use Tests\Support\Page\Duework\SubmitForm;
 use Tests\Support\Page\Duework\StatusPage;
-use Codeception\Util\Locator;
 use Exception;
+
+/**
+ * creates due work activities via due work component, deletes a due work activity, the student views the activity,
+ * submits it in person, the teacher views and marks the submission via inline grader and due work status page,
+ * the students views the marked submission, the teacher and submits a due work by typing in the ckeditor
+ *
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Duework/DueWorkInitialCest
+ */
 
 class FeedbackCest
 {
@@ -43,6 +42,9 @@ class FeedbackCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
+     *
+     * creates and submits a due work, marks the due work via inline grader, checks the notifications for it for all the steps
+     *
      */
     public function testDueworkBasic(AcceptanceTester $i)
     {
@@ -112,6 +114,9 @@ class FeedbackCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
+     *
+     * creates and submits a due work, marks the due work via activity status page, checks the notifications for it for all the steps
+     *
      */
     public function testDueworkStatusPage(AcceptanceTester $i)
     {

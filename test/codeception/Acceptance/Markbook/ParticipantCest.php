@@ -8,13 +8,14 @@
 namespace Tests\Acceptance\Markbook;
 
 /**
+ *
+ * creates a due work, remove participants and check the excluded user for that activity is no longer presented in the class markbook
+ *
  * Steps:
  * 1. Provision legacy.tar.gz data
  * 2. vagrant ssh
- * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run acceptance Markbook/ParticipantCest
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance Markbook/ParticipantCest
  *
- * To run a specific test:
- *  ./vendor/codeception/codeception/codecept --steps run acceptance Markbook/ParticipantCest:<test method name>
  */
 
 use Tests\Support\AcceptanceTester;
@@ -38,11 +39,10 @@ class ParticipantCest
     {
         $i->logout();
         $i->loginAsAdmin();
-        //adding a due work component into the homepage
+        $i->amGoingTo('add a due work component into the homepage');
         $i->amOnPage('/homepage/106');
         $addComponent = new Homepage($i);
         $addComponent->addComponent($addComponent::ELEMENT_ADD_COMPONENT_SECTION_LEARNING, 'Due Work');
-        // TODO: Delete something already in markbook
     }
 
     /**
@@ -57,7 +57,7 @@ class ParticipantCest
         $teacher = Common::USER_JACKCOLES;
         $teacherId = Common::USER_ID_JACKCOLES;
 
-        // As Jack Coles, create a due work
+        $i->amGoingTo('As Jack Coles, create a due work');
         $i->impersonate($teacher);
         $dueworkTitle1 = 'Cest One ' . Common::gentext(6);
         $filename = __DIR__ . '/../News/upload/test.jpg';
@@ -72,8 +72,7 @@ class ParticipantCest
             ->setOpenDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
             ->create();
 
-        // As Jack Coles, create submission
-        // TODO: need something nicer
+        $i->amGoingTo('As Jack Coles, create submission');
         $i->click($dueworkTitle1, '#content');
         $i->click('Create submission', '#content');
 
@@ -82,56 +81,38 @@ class ParticipantCest
             ->setAttachment($filename)
             ->submit();
 
-        // open markbook
+        $i->amGoingTo('open the markbook and check if I can see my submission');
         $markbookPage = new MarkbookPage($i);
         $markbookPage->open($classId);
-
-        // check the existence
         $markbookPage->canSeeParticipant($teacher);
         $markbookPage->canSeeAssessment($dueworkTitle1);
 
-        // exclude the user from the duework
+        $i->amGoingTo('exclude Jack Coles from the due work participants list');
         $i->click($dueworkTitle1);
         $i->waitForText('Status of ' . $dueworkTitle1);
-
-        // exclude the user from the task
         $i->clickElementInWebComponent('[data-test=sbx-pop-out-header-options]', '[data-test=sbx-pop-out-header-options-button]');
         $i->click(StatusPage::LINK_MODIFY);
-
-        // remove Jack Coles from participants
         $dueworkForm->modifyParticipation($teacherId, true, true)
             ->update();
 
-        // open course mark book
+        $i->amGoingTo('open course mark book and check that Jack Coles is not presented and the student is presented');
         $markbookPage->open($classId);
-
-        // check the existence
         $markbookPage->canSeeAssessment($dueworkTitle1);
-        // teacher should disappear
         $markbookPage->cantSeeParticipant($teacher);
-        // student should remain
         $markbookPage->canSeeParticipant($student);
 
-        // exclude the user from the duework
+        $i->amGoingTo('exclude a student (Louisa Smith) from the due work participants list');
         $i->click($dueworkTitle1);
         $i->waitForText('Status of ' . $dueworkTitle1);
-
-        // exclude the user from the task
         $i->clickElementInWebComponent('[data-test=sbx-pop-out-header-options]', '[data-test=sbx-pop-out-header-options-button]');
         $i->click(StatusPage::LINK_MODIFY);
-
-        // remove Louisa Smith from participants
         $dueworkForm->modifyParticipation($studentId, false, false)
             ->update();
 
-        // open course mark book
+        $i->amGoingTo('open course mark book and check that Jack Coles and he student(Louisa Smith) are not presented');
         $markbookPage->open($classId);
-
-        // check the existence
         $markbookPage->canSeeAssessment($dueworkTitle1);
-        // teacher should disappear
         $markbookPage->cantSeeParticipant($teacher);
-        // student should remain
         $markbookPage->canSeeParticipant($student);
     }
 }

@@ -7,11 +7,18 @@
 
 namespace Tests\Acceptance\Homepage;
 
+use Codeception\Exception\ModuleException;
+use Exception;
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
 
 /**
- * Test for attaching a textbox to a page.
+ * test if the homepage is created only when user clicks the save button, add a few components(textbox, news and blog) into the homepage,
+ * add content to the components and check its contents as different users, delete the component,
+ * delete the homepage(by clicking cancel in the confirmation dialog it is not deleted, by confirming it is deleted)
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Homepage/ComponentsCest
  */
 class HomepageInitialCest
 {
@@ -23,6 +30,8 @@ class HomepageInitialCest
 
     /**
      * @param AcceptanceTester $i
+     * when creating a homepage by filling all the mandatory fields the user forgets to click the save button
+     * ensure the homepage was not created
      */
     public function createHomepageFail(AcceptanceTester $i): void
     {
@@ -45,6 +54,7 @@ class HomepageInitialCest
 
     /**
      * @param AcceptanceTester $i
+     * creates a homepage successfully
      */
     public function createHomepage(AcceptanceTester $i): void
     {
@@ -67,7 +77,10 @@ class HomepageInitialCest
     /**
      * @depends createHomepage
      * @param AcceptanceTester $i
-     * @throws \Exception
+     * @throws Exception
+     *
+     * add a few components(textbox, news and blog) into the homepage and check it is added successfully
+     *
      */
     public function createElement(AcceptanceTester $i): void
     {
@@ -108,8 +121,12 @@ class HomepageInitialCest
      * @depends createHomepage
      * @depends createElement
      * @param AcceptanceTester $i
-     * @throws \Codeception\Exception\ModuleException
-     * @throws \Exception
+     * @throws ModuleException
+     * @throws Exception
+     *
+     * adds content into the components: blog, textbox and news
+     * check the content is successfully added
+     *
      */
     public function useElement(AcceptanceTester $i): void
     {
@@ -161,8 +178,11 @@ class HomepageInitialCest
      * @depends createHomepage
      * @depends useElement
      * @param AcceptanceTester $i
-     * @throws \Codeception\Exception\ModuleException
-     * @throws \Exception
+     * @throws ModuleException
+     * @throws Exception
+     *
+     * as a student navigate to the homepage and check if they can see the components and its contents
+     *
      */
     public function viewElement(AcceptanceTester $i): void
     {
@@ -193,7 +213,10 @@ class HomepageInitialCest
      * @depends createHomepage
      * @depends viewElement
      * @param AcceptanceTester $i
-     * @throws \Codeception\Exception\ModuleException
+     * @throws ModuleException
+     *
+     * delete the component and checks it is no longer presented in the page
+     *
      */
     public function deleteElement(AcceptanceTester $i): void
     {
@@ -234,7 +257,10 @@ class HomepageInitialCest
      * @depends createHomepage
      * @depends deleteElement
      * @param AcceptanceTester $i
-     * @throws \Exception
+     * @throws Exception
+     *
+     * click Cancel in the dialog when attempting to delete a homepage and ensure the homepage is not deleted
+     *
      */
     public function deleteHomepageFail(AcceptanceTester $i): void
     {
@@ -255,7 +281,10 @@ class HomepageInitialCest
      * @depends createHomepage
      * @depends deleteElement
      * @param AcceptanceTester $i
-     * @throws \Exception
+     * @throws Exception
+     *
+     * click Delete in the dialog when attempting to delete a homepage and ensure the homepage is deleted
+     *
      */
     public function deleteHomepage(AcceptanceTester $i): void
     {

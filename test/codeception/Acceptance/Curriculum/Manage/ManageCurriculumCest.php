@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Curriculum\Manage;
@@ -14,6 +19,14 @@ use Tests\Support\Page\Curriculum\Manage\Action\SearchNodes;
 use Tests\Support\Page\Curriculum\Manage\Action\UpdateNode;
 use Tests\Support\Page\Curriculum\Manage\Action\NavigateWithBrowserButtons;
 use Exception;
+
+/**
+ * This test creates a curriculum, adds a subsection, disable, updates and delete nodes, search nodes (with disabled nodes toggle on and off),
+ * check the nodes sorting, navigates through the nodes by clicking the nodes and using the browser buttons (back and forward)
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Curriculum/Manage/ManageCurriculumCest
+ */
 
 class ManageCurriculumCest
 {
@@ -162,7 +175,7 @@ class ManageCurriculumCest
      * @param AcceptanceTester $i
      * @throws Exception
      *
-     * on https://vagrant.dev.schoolbox.cloud/curriculum
+     * on https://vagrant.dev.schoolbox.cloud/curriculum searches for a node with disabled nodes toggle on and off
      *
      */
     public function hideDisabledNodesAndSearch(AcceptanceTester $i)
@@ -188,7 +201,7 @@ class ManageCurriculumCest
      * @param AcceptanceTester $i
      * @throws Exception
      *
-     * on https://vagrant.dev.schoolbox.cloud/curriculum
+     * on https://vagrant.dev.schoolbox.cloud/curriculum checks the curriculum nodes sorting
      */
     public function checkNodeSort(AcceptanceTester $i)
     {
@@ -214,7 +227,8 @@ class ManageCurriculumCest
      * @param AcceptanceTester $i
      * @throws Exception
      *
-     * on https://vagrant.dev.schoolbox.cloud/curriculum update a node
+     * on https://vagrant.dev.schoolbox.cloud/curriculum
+     * navigates through the nodes by clicking the nodes and using the browser buttons (back and forward)
      */
     public function navigateWithBrowserButtons(AcceptanceTester $i)
     {

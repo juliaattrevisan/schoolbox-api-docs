@@ -13,6 +13,16 @@ use Exception;
 use Tests\Support\Page\Resources\Resources;
 use Tests\Support\Page\Resources\ResourcesMyFilesPicker;
 
+/**
+ *
+ * uploads files into schoolbox by attaching files via Resources, My Files, recording an audio and video, taking a picture
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance ModalFilePicker/UpoloadFilesCest
+ *
+ */
 class UpoloadFilesCest
 {
     /**

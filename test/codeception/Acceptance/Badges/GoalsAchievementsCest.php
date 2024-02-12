@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Badges;
@@ -11,6 +16,13 @@ use Exception;
 use Tests\Support\Page\Badges\CreateBadge;
 use Tests\Support\Page\ProfilePage\ProfilePage;
 
+/**
+ * This test sets a goal, award an achievement, remove the goal, withdraw the achievement, adds an evidence
+ * Steps:
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Badges/GoalsAchievementsCest
+ */
 class GoalsAchievementsCest
 {
     /**

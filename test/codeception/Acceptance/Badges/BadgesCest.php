@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Badges;
@@ -9,6 +14,13 @@ use Tests\Support\Page\Badges\Badges;
 use Tests\Support\Page\Badges\CreateBadge;
 use Exception;
 
+/**
+ * This test adds, updates and deletes a badge
+ * Steps:
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Badges/BadgesCest
+ */
 class BadgesCest
 {
     /**

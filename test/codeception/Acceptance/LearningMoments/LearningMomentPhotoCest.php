@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Tests\Acceptance\LearningMoments;
 
 use Tests\Support\AcceptanceTester;
@@ -8,6 +13,12 @@ use Exception;
 use Tests\Support\Page\Common;
 use Tests\Support\Page\LearningMoments\LearningMoments;
 
+/**
+ * creates, modifies and delete a learning moment, add a comment and delete it
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance LearningMoments/LearningMomentPhotoCest
+ */
 class LearningMomentPhotoCest
 {
     /**

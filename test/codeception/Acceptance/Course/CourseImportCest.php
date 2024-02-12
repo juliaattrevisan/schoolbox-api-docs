@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Course;
@@ -11,6 +16,12 @@ use Tests\Support\Page\Courses\CourseList;
 use Tests\Support\Page\Courses\ImportCourseIntoClass;
 use Tests\Support\Page\Folder\CreateFolder;
 
+/**
+ * This test imports the course into a class, copies an activity into a class
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Course/CourseImportCest
+ */
 class CourseImportCest
 {
     /**

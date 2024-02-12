@@ -17,7 +17,11 @@ use Tests\Support\Page\Resources\Resources;
 use Tests\Support\Page\Search\SearchPage;
 
 /**
- * Test for attaching a textbox to a page.
+ * creates various textboxes, add a textbox in a homepage and keep a few hidden,
+ * logged in as different users check whether they are able to view the textboxes or not
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Homepage/TextboxCest
  */
 class TextboxCest
 {
@@ -46,6 +50,14 @@ class TextboxCest
         $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Test TextBox Homepage%"]);
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @throws Exception
+     *
+     * create a homepage
+     *
+     */
     public function createHomepage(AcceptanceTester $i): void
     {
         $i->loginAsAdmin();
@@ -71,7 +83,6 @@ class TextboxCest
     }
 
     /**
-     * Test that a textbox I create retains the settings I chose
      *
      * as alaress I will navigate to a homepage,
      * add a textbox component with heading and content

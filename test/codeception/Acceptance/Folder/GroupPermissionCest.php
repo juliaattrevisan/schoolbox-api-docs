@@ -1,14 +1,25 @@
 <?php
 
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 namespace Tests\Acceptance\Folder;
 
 use Tests\Support\AcceptanceTester;
 use Exception;
-use Tests\Support\Page\Common;
 use Tests\Support\Page\Group\ManageGroup;
 use Tests\Support\Page\Folder\CreateFolder;
 use Tests\Support\Page\Resources\Resources;
 
+/**
+ * This test creates various groups with different group permissions
+ * check wheter the group is presented or not for the user that is logged in
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Folder/GroupPermissionCest
+ */
 class GroupPermissionCest
 {
     /**
@@ -18,11 +29,12 @@ class GroupPermissionCest
      * @throws Exception
      *
      * get logged in
-     * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
+     * navigate to https://vagrant.dev.schoolbox.cloud/resource/folder/0/create
+     * create a folder
      */
     public function _before(AcceptanceTester $i): void
     {
-        $i->amGoingTo('Get logged in and navigate to learning/badge page');
+        $i->amGoingTo('Get logged in and create a new folder');
         $i->logout();
         $i->loginAsAdmin();
         $createFolder = new createFolder($i);

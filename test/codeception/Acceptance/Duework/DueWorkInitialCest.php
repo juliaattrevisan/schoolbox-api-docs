@@ -1,10 +1,23 @@
 <?php
 
+/**
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 namespace Tests\Acceptance\Duework;
 
 use Exception;
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
+
+/**
+ * This test creates due work activities, deletes a due work activity, the student views the activity, submits it in person,
+ * the teacher views and marks the submission, the students views the marked submission, the teacher and submits a due work by typing in the ckeditor
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Duework/DueWorkInitialCest
+ */
 
 class DueWorkInitialCest
 {
@@ -26,6 +39,9 @@ class DueWorkInitialCest
      * @param AcceptanceTester $i
      * @return void
      * @throws Exception
+     *
+     * create a homepage, add a few group members into it, add 2 due work activities via due work component
+     *
      */
     public function create2Assessments(AcceptanceTester $i): void
     {
@@ -199,6 +215,9 @@ class DueWorkInitialCest
      * @return void
      * @throws Exception
      * @depends submitWorkInPersonByStudent
+     *
+     * teacher marks the assessment and ensure its status is displayed as Reviewed
+     *
      */
     public function markSubmission(AcceptanceTester $i): void
     {
@@ -240,6 +259,9 @@ class DueWorkInitialCest
      * @return void
      * @throws Exception
      * @depends markSubmission
+     *
+     * the student can view the mark and feedback given by the teacher
+     *
      */
     public function viewMarkedSubmission(AcceptanceTester $i): void
     {
