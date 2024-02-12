@@ -63,18 +63,53 @@ a.c-button {
     &--block {
         width: 100%;
     }
-    // Used to further highlight a primary action
+    // Used to further highlight the primary action of a page
     &--primary {
         background-color: var(--content-ui-submit-background);
         color: var(--content-ui-submit-foreground);
         font-weight: 600;
+        &:hover,
+        &:active {
+            &:not([disabled]) {
+                background-color: rgba(
+                    calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+                    calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+                    calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+                    var(--content-ui-submit-background-a)
+                );
+                color: var(--content-ui-submit-foreground);
+            }
+        }
         &:focus {
             &:not([disabled]) {
                 background-color: var(
                     --content-ui-submit-background
                 ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
-                outline: 3px solid var(--content-ui-foreground);
-                outline-offset: 2px;
+            }
+        }
+    }
+    // To highlight that this action has a destructive effect
+    &--alert {
+        background-color: var(--error-color);
+        color: var(--content-ui-submit-foreground);
+        font-weight: 600;
+        &:hover,
+        &:active {
+            &:not([disabled]) {
+                background-color: rgba(
+                    calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+                    calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+                    calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+                    var(--content-ui-submit-background-a)
+                );
+                color: var(--content-ui-submit-foreground);
+            }
+        }
+        &:focus {
+            &:not([disabled]) {
+                background-color: var(
+                    --content-ui-submit-background
+                ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
             }
         }
     }

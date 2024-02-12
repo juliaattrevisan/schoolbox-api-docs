@@ -94,6 +94,19 @@ export const Primary: Story = {
 };
 
 /**
+ * To highlight that this action has a destructive effect
+ */
+export const Alert: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button c-button--alert">
+                <span>Submit form</span>
+            </button>
+        `,
+    }),
+};
+
+/**
  * Just an icon button
  * Ensure the `aria-label` attribute is set to describe the action
  */
