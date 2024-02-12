@@ -132,6 +132,7 @@ class Overwriter
             ->setLearnosityReference(null)
             ->setLearnosityJobReference(null)
             ->setLearnosityJobStatus(Quiz::LEARNOSITY_JOB_STATUS_PENDING)
+            ->setLearnositySourceAssessmentId($destination->getId())
         ;
     }
 
