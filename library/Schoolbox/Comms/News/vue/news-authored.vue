@@ -185,7 +185,7 @@ export default {
         <section>
             <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
                 <dd
-                    v-for="(stausCount, status) in activeStatuses"
+                    v-for="(statusCount, status) in activeStatuses"
                     :class="{ active: activeTabSelected === status }"
                     :key="status"
                 >
