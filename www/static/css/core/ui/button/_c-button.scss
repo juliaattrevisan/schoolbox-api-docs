@@ -3,60 +3,52 @@
     as well as some custom tweaks
 */
 
-// Inherits colour from the parent element
-.c-icon {
-    fill: currentcolor;
-}
-
 // Reset default link styles
 a.c-button {
     text-decoration: none;
 }
 
 // Reset default button styles
-button.c-button {
+.c-button {
     background-color: transparent;
     border: none;
     cursor: pointer;
     font-family: inherit;
-    padding: 0;
     @media screen and (-ms-high-contrast: active) {
         border: 2px solid currentcolor;
     }
 }
 
-a.c-button,
-button.c-button {
+.c-button {
     align-items: center;
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background-color: var(--content-ui-background);
     border-radius: var(--roundness-inputs);
     color: var(--content-ui-foreground);
     display: inline-flex;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-s);
     justify-content: center;
-    line-height: 1.1;
+    line-height: 1;
+    font-size: var(--font-size-m);
+    margin: 0; // ^foundation-fixes^ - margins should be set by the parent
     min-height: 2.5rem;
     min-width: 2.5rem;
-    padding: var(--spacing-xs) var(--spacing-m);
+    overflow: auto; // ^foundation-fixes^ - remove overflow hidden, a buttons text should always be visible
+    padding: var(--spacing-s) var(--spacing-m);
+    position: static; // ^foundation-fixes^ - to override the position: relative, which could impact the display inline-flex
     text-align: center;
-
-    // ^foundation-fixes^
-    margin: 0;
-    overflow: auto;
-    position: static;
-    vertical-align: baseline;
-
+    transition: none; // ^foundation-fixes^ - remove the transition on a tags
     &:hover,
     &:active {
         &:not([disabled]) {
             background-color: var(--content-ui-hover);
         }
     }
-    // Using both a foreground and background for focus should increase the likelihood of the
-    // focus ring being visible regardless of the background the button is sitting within
     &:focus {
         &:not([disabled]) {
+            background-color: var(
+                --content-ui-background
+            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
             outline: 3px solid var(--content-ui-foreground);
             outline-offset: 2px;
         }
@@ -72,36 +64,18 @@ button.c-button {
         width: 100%;
     }
     // Used to further highlight a primary action
-    &--submit {
+    &--primary {
         background-color: var(--content-ui-submit-background);
         color: var(--content-ui-submit-foreground);
         font-weight: 600;
-        &:hover,
-        &:active {
-            &:not([disabled]) {
-                background-color: rgba(
-                    calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-                    calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-                    calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-                    var(--content-ui-submit-background-a)
-                );
-            }
-        }
         &:focus {
-            box-shadow:
-                0 0 0 1px var(--content-ui-submit-foreground),
-                0 0 0 2px var(--content-ui-submit-background);
-        }
-    }
-    &--icon-only {
-        height: 2.5rem;
-        min-width: auto;
-        padding: var(--spacing-xs);
-        width: 2.5rem;
-        &__icon {
-            width: 100%;
-            height: 100%;
-            fill: currentColor;
+            &:not([disabled]) {
+                background-color: var(
+                    --content-ui-submit-background
+                ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+                outline: 3px solid var(--content-ui-foreground);
+                outline-offset: 2px;
+            }
         }
     }
     // rely on the background it sits on

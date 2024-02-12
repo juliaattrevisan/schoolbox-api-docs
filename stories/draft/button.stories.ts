@@ -67,14 +67,41 @@ export const LinkButton: Story = {
 };
 
 /**
- * With an icon
+ * With an `<sbx-icon/>`
  */
 export const WithIcon: Story = {
     render: () => ({
         template: `
             <button type="button" class="c-button">
-                <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+                <sbx-icon name="advanced-list"></sbx-icon>
                 <span>Real Button</span>
+            </button>
+        `,
+    }),
+};
+
+/**
+ * Typically to identify the primary action on a page
+ */
+export const Primary: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button c-button--primary">
+                <span>Submit form</span>
+            </button>
+        `,
+    }),
+};
+
+/**
+ * Just an icon button
+ * Ensure the `aria-label` attribute is set to describe the action
+ */
+export const IconOnly: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button l-pad-s" aria-label="Add Curriculum">
+                <sbx-icon name="add"></sbx-icon>
             </button>
         `,
     }),
