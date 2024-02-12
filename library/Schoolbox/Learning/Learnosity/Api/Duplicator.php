@@ -30,6 +30,12 @@ use Schoolbox\User;
 class Duplicator
 {
     /**
+     * The maximum number of times a job for the duplication of a quiz may fail
+     * before being marked as unprocessable.
+     */
+    private const FAILURE_THRESHOLD = 5;
+
+    /**
      * Constructor
      *
      * @param Api                     $api             Learnosity API connection.
