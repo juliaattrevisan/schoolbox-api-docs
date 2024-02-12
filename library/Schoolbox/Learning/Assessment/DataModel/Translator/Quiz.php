@@ -95,6 +95,7 @@ class Quiz implements IAssessmentTypeTranslator
             ->setLearnosityReference($domainObject->getLearnosityReference())
             ->setLearnosityJobReference($domainObject->getLearnosityJobReference())
             ->setLearnosityJobStatus($domainObject->getLearnosityJobStatus())
+            ->setLearnosityJobAttemptCount($domainObject->getLearnosityJobAttemptCount())
             ->setLearnositySourceAssessmentId($domainObject->getLearnositySourceAssessmentId())
         ;
 
@@ -135,6 +136,7 @@ class Quiz implements IAssessmentTypeTranslator
             ->setLearnosityReference($dataModel->getLearnosityReference())
             ->setLearnosityJobReference($dataModel->getLearnosityJobReference())
             ->setLearnosityJobStatus($dataModel->getLearnosityJobStatus())
+            ->setLearnosityJobAttemptCount($dataModel->getLearnosityJobAttemptCount())
             ->setLearnositySourceAssessmentId($dataModel->getLearnositySourceAssessmentId())
         ;
 

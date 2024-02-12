@@ -99,6 +99,7 @@ class Mapper extends BaseMapper
                 Model::LEARNOSITY_JOB_STATUS_UNPROCESSABLE,
             ],
         );
+        $this->uses('learnosity_job_attempt_count', self::TYPE_INTEGER);
         // This column has an FK onto `assessment.id`,
         // but there's no need to map that
         $this->uses('learnosity_source_assessment_id', self::TYPE_INTEGER);

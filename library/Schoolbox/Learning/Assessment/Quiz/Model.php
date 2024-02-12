@@ -94,6 +94,12 @@ class Model extends AbstractAssessment
 
 
     /**
+     * The number of attempts of this Learnosity job.
+     */
+    private ?int $learnosityJobAttemptCount = null;
+
+
+    /**
      * The assessment ID from which this assessment's Learnosity data was
      * copied, if any.
      */
@@ -708,6 +714,25 @@ class Model extends AbstractAssessment
         return $this;
     }
 
+
+    /**
+     * @return int|null
+     */
+    public function getLearnosityJobAttemptCount(): ?int
+    {
+        return $this->learnosityJobAttemptCount;
+    }
+
+
+    /**
+     * @param int|null $learnosityJobAttemptCount
+     * @return $this
+     */
+    public function setLearnosityJobAttemptCount(?int $learnosityJobAttemptCount): self
+    {
+        $this->learnosityJobAttemptCount = $learnosityJobAttemptCount;
+        return $this;
+    }
 
     /**
      * @return int|null

@@ -231,6 +231,12 @@ class Model implements ISoftDeletable, IAssessableDataModel
 
 
     /**
+     * The number of attempts of this Learnosity job.
+     */
+    private ?int $learnosityJobAttemptCount = null;
+
+
+    /**
      * The assessment ID of the source quiz being copied into this quiz.
      */
     private ?int $learnositySourceAssessmentId = null;
@@ -879,6 +885,26 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public function setLearnosityJobStatus(?string $learnosityJobStatus): self
     {
         $this->learnosityJobStatus = $learnosityJobStatus;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getLearnosityJobAttemptCount(): ?int
+    {
+        return $this->learnosityJobAttemptCount;
+    }
+
+
+    /**
+     * @param int|null $learnosityJobAttemptCount
+     * @return $this
+     */
+    public function setLearnosityJobAttemptCount(?int $learnosityJobAttemptCount): self
+    {
+        $this->learnosityJobAttemptCount = $learnosityJobAttemptCount;
         return $this;
     }
 
