@@ -52,9 +52,9 @@ class RestartPendingTool extends BaseTool
             if ($quiz->getLearnositySourceAssessmentId()) {
                 $sourceQuiz = $this->findFromLearnositySourceAssessment($quiz);
             } elseif ($quiz->isImplementation()) {
-                $sourceQuiz = $this->findFromSpecificationAssessment($quiz);
+                $sourceQuiz = $this->findFromImplementationSpecification($quiz);
             } elseif ($quiz->isSpecification()) {
-                $sourceQuiz = $this->findFromImplementationAssessment($quiz);
+                $sourceQuiz = $this->findFromSpecificationImplementations($quiz);
             } else {
                 // If somehow this isn't an assessment:
                 // mark it as failed
@@ -212,7 +212,7 @@ HELP;
      * @return QuizDomainModel
      * @throws SourceAssociationException
      */
-    private function findFromSpecificationAssessment(QuizDomainModel $destination): QuizDomainModel
+    private function findFromImplementationSpecification(QuizDomainModel $destination): QuizDomainModel
     {
         $this->getLogger()->debug(
             sprintf(
@@ -257,7 +257,7 @@ HELP;
      * @return QuizDomainModel
      * @throws SourceAssociationException
      */
-    private function findFromImplementationAssessment(QuizDomainModel $destination): QuizDomainModel
+    private function findFromSpecificationImplementations(QuizDomainModel $destination): QuizDomainModel
     {
         $this->getLogger()->debug(
             sprintf(
