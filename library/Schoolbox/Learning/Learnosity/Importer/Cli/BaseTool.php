@@ -54,6 +54,64 @@ abstract class BaseTool extends CliTool\App
     protected MapperProxy $assessmentDataSource;
 
     /**
+     * @inheritdoc
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->printHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
+        $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
+
+        // Build duplicator
+        $this->duplicator = new Api\Duplicator(
+            new Api(
+                $baseUrl->getHost(),
+                $this->getConfig()->get('learnosity_version'),
+                $this->getConfig()->get('learnosity_consumer_key'),
+                $this->getConfig()->get('learnosity_consumer_secret'),
+                $this->getLogger(),
+            ),
+            $this->getDatabaseInternal(),
+            $baseUrl,
+            $this->getDi()->get('httpFactory'),
+            $this->getDi()->get('router.generator'),
+            $this->getDi()->get('taskd.httpRequestMessageFactory'),
+            $this->getDi()->get('taskd.messageProducer'),
+            new TagFactory($this->getConfig()->get('site_school_code')),
+        );
+
+        // Build assessment data source
+        $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+        // Find pending quiz domain models
+        $quizQuery = $this->getDatabaseInternal()->prepareQuery(
+            "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
+        );
+        $quizQuery->execute(['status' => QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING]);
+        $quizIds = $quizQuery->fetchColumnArray('assessment_id');
+        $pendingQuizzes = $this->assessmentDataSource->findAllByIds($quizIds);
+
+        $this->getLogger()->info(sprintf('Found %d quizzes currently pending copy', count($pendingQuizzes)));
+        foreach ($pendingQuizzes as $pendingQuiz) {
+            // Not a quiz somehow? Skip
+            if (!$pendingQuiz instanceof QuizDomainModel) {
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Assessment #%d (%s) is not a quiz: skipping',
+                        $pendingQuiz->getTitle(),
+                        $pendingQuiz->getId(),
+                    )
+                );
+                return;
+            }
+            $this->processQuiz($pendingQuiz);
+        }
+    }
+
+    /**
      * Process the quiz, in whichever way this tool processes quizzes.
      *
      * @param QuizDomainModel $quiz
