@@ -42,7 +42,6 @@
             padding: 0;
         }
 
-
         {# If a nontransparent colour was assigned, give it some nice padding
          # for that extra duplo feel; otherwise, leave it as it is since it'll
          # simply look like a text link
@@ -62,6 +61,7 @@
         {# If an icon was chosen, reconfigure padding and background images etc. #}
         .saml-icon, .oidc-icon {
             background-position-x: left;
+            background-position-y: center;
             background-repeat: no-repeat;
             background-size: 4rem;
             padding-left: 5rem;
@@ -188,7 +188,7 @@
                     {% endif %}
 
                     {% if config.login_anonymous != '' %}
-                        <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
+                        <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="login-method guest">Login as guest</a></p>
                     {% endif %}
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
@@ -219,7 +219,7 @@
 
                     {% if requestFromInternalIp %}
                         {% block internalSso %}
-                            <p><a href="{{ internalSsoUrl }}" class="instance-registry-button">Login using Instance Registry</a></p>
+                            <p><a href="{{ internalSsoUrl }}" class="login-method instance-registry-button">Login using Instance Registry</a></p>
                         {% endblock %}
                     {% endif %}
                 </div>
