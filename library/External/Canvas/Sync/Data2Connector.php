@@ -109,15 +109,6 @@ class Data2Connector
         $client = new Client([
                                  'timeout' => self::DEFAULT_TIMEOUT,
                              ]);
-//        $stack = \GuzzleHttp\HandlerStack::create();
-//        $stack->before(
-//            'http_errors',
-//            new \Alaress\Http\UnreliableMiddleware(0.8, new \Alaress\Random\FloatGenerator()),
-//        );
-//        $client = new Client([
-//                                 'handler' => $stack,
-//                             ]);
-
 
         try {
             $tableNames = $this->fetchTableNames();
@@ -145,15 +136,8 @@ class Data2Connector
                     $fileName      = "$tempDir/$table.$index.gz";
                     $tableDataFile = fopen(($perform || !file_exists($fileName)) ? $fileName : '/dev/null', 'wb');
                     $this->logger->debug("Downloading $table to $fileName");
-//                $this->getLogger()->debug(sprintf("URL: %s", var_export($tableFile, true)));
 
-//                        $promises[] = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
                     $promise = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
-//                        $promise = new Promise(function () use ($client, $tableFile, $tableDataFile) {
-//                            // request the file from Canvas, and poll until it's done
-//                            // Then, return the Guzzle async request
-//                            return $client->requestAsync('GET', $tableFile['url'], ['sink' => $tableDataFile]);
-//                        });
 
                     /* Any exception thrown by guzzle might as well be a reason to nap and retry
                      */

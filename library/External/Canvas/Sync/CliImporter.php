@@ -531,14 +531,7 @@ class CliImporter extends CliTool\App
                 $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName : '/dev/null', 'wb');
                 $this->getLogger()->debug("Downloading $tableName to $fileName");
 
-
-//                        $promises[] = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
                 $promise = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
-//                        $promise = new Promise(function () use ($client, $tableFile, $tableDataFile) {
-//                            // request the file from Canvas, and poll until it's done
-//                            // Then, return the Guzzle async request
-//                            return $client->requestAsync('GET', $tableFile['url'], ['sink' => $tableDataFile]);
-//                        });
 
                 /* Any exception thrown by guzzle might as well be a reason to nap and retry
                 */
