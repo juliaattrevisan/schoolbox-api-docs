@@ -40,7 +40,6 @@ button.c-button {
     min-width: 2.5rem;
     padding: var(--spacing-xs) var(--spacing-m);
     text-align: center;
-    transition: 200ms all ease-out;
 
     // ^foundation-fixes^
     margin: 0;
@@ -54,35 +53,29 @@ button.c-button {
             background-color: var(--content-ui-hover);
         }
     }
-
     // Using both a foreground and background for focus should increase the likelihood of the
-    // focus ring being visible regardless of the background the button is sittin within
+    // focus ring being visible regardless of the background the button is sitting within
     &:focus {
         &:not([disabled]) {
-            box-shadow: 0 0 0 1px var(--content-ui-foreground), 0 0 0 2px var(--content-ui-background);
-            outline-color: transparent;
-            outline-style: solid;
+            outline: 3px solid var(--content-ui-foreground);
+            outline-offset: 2px;
         }
     }
-
     &:disabled {
         opacity: 0.7;
         &:hover {
             cursor: default;
         }
     }
-
     // To extend the button to the full width of its container
     &--block {
         width: 100%;
     }
-
     // Used to further highlight a primary action
     &--submit {
         background-color: var(--content-ui-submit-background);
         color: var(--content-ui-submit-foreground);
         font-weight: 600;
-
         &:hover,
         &:active {
             &:not([disabled]) {
@@ -94,12 +87,12 @@ button.c-button {
                 );
             }
         }
-
         &:focus {
-            box-shadow: 0 0 0 1px var(--content-ui-submit-foreground), 0 0 0 2px var(--content-ui-submit-background);
+            box-shadow:
+                0 0 0 1px var(--content-ui-submit-foreground),
+                0 0 0 2px var(--content-ui-submit-background);
         }
     }
-
     &--icon-only {
         height: 2.5rem;
         min-width: auto;
@@ -111,7 +104,6 @@ button.c-button {
             fill: currentColor;
         }
     }
-
     // rely on the background it sits on
     &--no-bkg {
         background: none;

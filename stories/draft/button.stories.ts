@@ -21,28 +21,61 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-export const Standard: Story = {
+// export const Standard: Story = {
+//     render: () => ({
+//         template: `
+//             <div class="l-flex-row l-gap-m">
+//                 <a href="javascript:;" class="c-button">Button Link</a>
+//                 <button class="c-button" type="button">Real Button</button>
+//                 <button class="c-button c-button--submit" type="button">Real Button</button>
+//                 <button type="button" class="c-button">
+//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+//                     <span>Real Button</span>
+//                 </button>
+//                 <button type="button" class="c-button c-button--icon-only" aria-label="Icon-only Button">
+//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+//                 </button>
+//                 <button type="button" class="c-button c-button--submit">
+//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+//                     <span>Real Button</span>
+//                 </button>
+//                 <button type="button" class="c-button c-button--icon-only c-button--no-bkg" aria-label="Icon-only Button">
+//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+//                 </button>
+//             </div>
+//         `,
+//     }),
+// };
+
+export const Default: Story = {
     render: () => ({
         template: `
-            <div class="l-flex-row l-gap-m">
-                <a href="javascript:;" class="c-button">Button Link</a>
-                <button class="c-button" type="button">Real Button</button>
-                <button class="c-button c-button--submit" type="button">Real Button</button>
-                <button type="button" class="c-button">
-                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-                    <span>Real Button</span>
-                </button>
-                <button type="button" class="c-button c-button--icon-only" aria-label="Icon-only Button">
-                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-                </button>
-                <button type="button" class="c-button c-button--submit">
-                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-                    <span>Real Button</span>
-                </button>
-                <button type="button" class="c-button c-button--icon-only c-button--no-bkg" aria-label="Icon-only Button">
-                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-                </button>
-            </div>
+            <button class="c-button" type="button">Real Button</button>
+        `,
+    }),
+};
+
+/**
+ * An `<a>` tag styled as a button
+ */
+export const LinkButton: Story = {
+    render: () => ({
+        template: `
+            <a href="javascript:;" class="c-button">Button Link</a>
+        `,
+    }),
+};
+
+/**
+ * With an icon
+ */
+export const WithIcon: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button">
+                <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
+                <span>Real Button</span>
+            </button>
         `,
     }),
 };
