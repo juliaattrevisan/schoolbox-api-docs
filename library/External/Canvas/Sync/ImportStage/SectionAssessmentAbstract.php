@@ -176,7 +176,12 @@ abstract class SectionAssessmentAbstract
 
         foreach ($coursesSectionData as $courseCanvasId => $courseSectionsData) {
             $this->log->info("Processing Canvas Course '{$courseSectionsData['name']}' (CanvasId: $courseCanvasId)");
-            $unitSpec = $this->unitSpecMapper->findOneByPredicates($this->courseBridge->equalsCanvasCourse($courseCanvasId, 'f'));
+            try {
+                $unitSpec = $this->unitSpecMapper->findOneByPredicates($this->courseBridge->equalsCanvasCourse($courseCanvasId, 'f'));
+            } catch (Mapper\Exception\NotFound $e) {
+                $this->log->warning("Unable to find folder for course.canvasId '$courseCanvasId'");
+                continue;
+            }
             if (!array_key_exists($courseCanvasId, $coursesAssessmentData)) {
                 continue;
             }

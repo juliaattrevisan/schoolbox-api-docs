@@ -173,6 +173,7 @@ class DataSync
             $this->syncClassQuiz($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
         } catch (\Exception $e) {
             $this->log->critical(sprintf("Sync Failure: %s", $e->getMessage()));
+            $this->log->debug($e->getTraceAsString());
             $this->schoolboxDb->rollBack();
             exit(1);
         }

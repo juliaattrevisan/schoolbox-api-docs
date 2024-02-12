@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace External\Canvas\Sync;
 
 use Alaress\Database;
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use Alaress_Byte_Format;
 use External\Canvas\Importer\CanvasDb;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliKernelAbstract;
@@ -26,7 +28,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External;
 use Schoolbox\External\Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -146,13 +147,13 @@ class CliImporter extends CliTool\App
      * to work - instead of doing it manually, try insisting programmatically
      * waiting NAP_TIMEOUT seconds between each attempt
      */
-    private const NAP_TIMEOUT = 3;
+    private const ATTEMPT_BASE_TIMEOUT = 3;
 
     /**
      * Number of times to retry after having NAP_TIMEOUT seconds' rest before
      * finally giving up
      */
-    private const NUM_RETRY = 3;
+    private const MAX_ATTEMPTS = 3;
 
 
     /** @inheritdoc */
@@ -219,9 +220,7 @@ class CliImporter extends CliTool\App
             if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
                 $this->getLogger()->notice("File download skipped");
             } else {
-                $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT);
-                $this->getLogger()->notice('Downloading latest data.');
-                $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT);
+                $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT, $tempDir, $this->perform());
             }
             $dataRestorer = new Data2Restorer(
                 $canvasDb,
@@ -513,9 +512,14 @@ class CliImporter extends CliTool\App
      */
     private function downloadDataFiles(array $tableList, string $tempDir, array $tablesToImport): void
     {
+
+        $promises = [];
+        $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
+        $logger = $this->getLogger();
         $client = new Client([
-            'timeout' => self::DEFAULT_TIMEOUT,
-        ]);
+                                 'timeout' => self::DEFAULT_TIMEOUT,
+                             ]);
+
         foreach ($tableList as $tableName => $tableData) {
             if (!in_array($tableName, $tablesToImport) || !count($tableData['files'])) {
                 continue;
@@ -527,35 +531,57 @@ class CliImporter extends CliTool\App
                 $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName : '/dev/null', 'wb');
                 $this->getLogger()->debug("Downloading $tableName to $fileName");
 
-                /* Mine out an error message if you try to access a thing that doesn't exist
+                $promise = $client->getAsync($tableFile['url'], ['sink' => $tableDataFile]);
+
+                /* Any exception thrown by guzzle might as well be a reason to nap and retry
                 */
-                $fails = 0;
-
-                /* Try multiple times in case sis dies for a random reason
-                 */
-                $e = null;
-                while ($fails < self::NUM_RETRY) {
-                    /* Any exception thrown by guzzle might as well be a reason to nap and retry
-                     */
-                    try {
-                        $client->get($tableFile['url'], ['sink' => $tableDataFile]);
-                        continue 2;
-                    } catch (GuzzleException $e) {
-                        $fails++;
-
-                        $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
-
-                        sleep(self::NAP_TIMEOUT);
-
-                        continue;
+                $promise->then(
+                    null,
+                    function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
+                        // retry download...
+                        $attempt = 0;
+                        $wait = (int)$jitter->calculateJitter($attempt);
+                        $logger->warning("Failed to download $fileName, attempt: $attempt: sleeping: $wait");
+                        usleep($wait * 1000);
+                        return $promise;
                     }
-                }
-                // If fallen through to here, there was an error
-                throw new \Schoolbox\Application\Exception\Exception(
-                    sprintf("Failed to download %s: #%s times. Error:%s", $fileName, $fails, $e->getMessage())
+                )->then(
+                    null,
+                    function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
+                        // retry download...
+                        $attempt = 1;
+                        $wait = (int)$jitter->calculateJitter($attempt);
+                        $logger->warning("Failed to download $fileName, attempt: $attempt: sleeping: $wait");
+                        usleep($wait * 1000);
+                        return $promise;
+                    }
+                )->then(
+                    null,
+                    function (RequestException $e) use ($jitter, $fileName, $logger, $promise) {
+                        // retry download...
+                        $attempt = 2;
+                        $wait = (int)$jitter->calculateJitter($attempt);
+                        $logger->warning("Failed to download $fileName, attempt: $attempt: sleeping: $wait");
+                        usleep($wait * 1000);
+                        return $promise;
+                    }
+                )->then(
+                    null,
+                    function (RequestException $e) use ($fileName) {
+                        // epic fail, just exit...
+                        // If fallen through to here, there was an error
+                        throw new \Schoolbox\Application\Exception\Exception(
+                            sprintf("Failed to download %s: #3 times. Error:%s", $fileName, $e->getMessage())
+                        );
+                    }
                 );
+                $promises[] = $promise;
             }
         }
+
+        // Now wait until all the results are retrieved
+        $bulkPromise = \GuzzleHttp\Promise\Utils::all($promises);
+        $result      = $bulkPromise->wait();
     }
 
 

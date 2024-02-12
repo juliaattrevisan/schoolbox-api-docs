@@ -214,6 +214,7 @@ class QuizSubmission extends SubmissionAbstract
         /** @var Quiz\Model $quiz */
         $quiz = $iAssessable;
         $this->log->debug(sprintf('Processing marks for quiz: assess_id:%s', $quiz->getId()));
+        $mark = $canvasSubmission['mark']; // submissions.published_grade as mark this should be safe to use as a string|null so just add that in
         if (is_numeric($canvasSubmission['norm_mark'])) {
             $normMark = (float)$canvasSubmission['norm_mark'];
         } else {
@@ -275,7 +276,8 @@ class QuizSubmission extends SubmissionAbstract
                                            ->setQuiz($quiz)
                                            ->setReviewer($reviewer)
                                            ->setUser($reviewee)
-                                           ->setMark($normMark)
+                                           ->setMark($mark)
+                                           ->setNormalisedMark($normMark)
                                            ->setMaxMark($maxMark)
                                            ->setAnswers($answers)
                                            ->setReviewed($feedbackTime)
