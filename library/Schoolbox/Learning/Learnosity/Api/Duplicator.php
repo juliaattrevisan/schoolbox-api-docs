@@ -142,6 +142,7 @@ class Duplicator
                         SET learnosity_reference = ?,
                             learnosity_job_reference = ?,
                             learnosity_job_status = ?,
+                            learnosity_job_attempt_count = COALESCE(learnosity_job_attempt_count, 0) + 1,
                             learnosity_source_assessment_id = ?
                         WHERE assessment_id = ?
                     ",
@@ -226,9 +227,11 @@ class Duplicator
                 // There may be some status code which marks the job as
                 // containing bad data (and thus will never complete), as
                 // opposed to a transient error (which may complete later).
-                // Possibly this should be marked unprocessable after enough
-                // failures?
-                $jobStatus = QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED;
+                // Just mark as unprocessable after enough failures.
+                $jobStatus = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
+                    ? QuizDomainModel::LEARNOSITY_JOB_STATUS_UNPROCESSABLE
+                    : QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED
+                ;
             }
 
             // If complete or failed:
