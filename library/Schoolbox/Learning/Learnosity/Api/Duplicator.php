@@ -216,6 +216,12 @@ class Duplicator
                 $setTags   = true;
                 $jobStatus = QuizDomainModel::LEARNOSITY_JOB_STATUS_COMPLETED;
             } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
+                // TODO determine if this can be set to FAILED or UNPROCESSABLE
+                // There may be some status code which marks the job as
+                // containing bad data (and thus will never complete), as
+                // opposed to a transient error (which may complete later).
+                // Possibly this should be marked unprocessable after enough
+                // failures?
                 $jobStatus = QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED;
             }
 
