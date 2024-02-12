@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
-use Interop\Queue\Exception as InteropQueueException;
-use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -86,36 +84,46 @@ abstract class BaseTool extends CliTool\App
         // Build assessment data source
         $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
-        // Find pending quiz domain models
+        // Find quiz domain models
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
             "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
         );
-        $quizQuery->execute(['status' => QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING]);
+        $quizQuery->execute(['status' => $this->getTargetedQuizStatus()]);
         $quizIds = $quizQuery->fetchColumnArray('assessment_id');
-        $pendingQuizzes = $this->assessmentDataSource->findAllByIds($quizIds);
+        $quizzes = $this->assessmentDataSource->findAllByIds($quizIds);
 
-        $this->getLogger()->info(sprintf('Found %d quizzes currently pending copy', count($pendingQuizzes)));
-        foreach ($pendingQuizzes as $pendingQuiz) {
+        $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
+        foreach ($quizzes as $quiz) {
             // Not a quiz somehow? Skip
-            if (!$pendingQuiz instanceof QuizDomainModel) {
+            if (!$quiz instanceof QuizDomainModel) {
                 $this->getLogger()->warning(
                     sprintf(
                         'Assessment #%d (%s) is not a quiz: skipping',
-                        $pendingQuiz->getTitle(),
-                        $pendingQuiz->getId(),
+                        $quiz->getTitle(),
+                        $quiz->getId(),
                     )
                 );
                 return;
             }
-            $this->processQuiz($pendingQuiz);
+
+            /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
+            $this->processQuiz($quiz);
         }
     }
+
+    /**
+     * Which quiz status does this tool target?
+     *
+     * @return QuizDomainModel::LEARNOSITY_JOB_STATUS_*
+     */
+    abstract protected function getTargetedQuizStatus(): string;
 
     /**
      * Process the quiz, in whichever way this tool processes quizzes.
      *
      * @param QuizDomainModel $quiz
      * @return void
+     * @throws MapperException if `$quiz` couldn't be saved
      */
     abstract protected function processQuiz(QuizDomainModel $quiz): void;
 
@@ -125,4 +133,5 @@ abstract class BaseTool extends CliTool\App
      * @return void
      */
     abstract protected function printHelp(): void;
+
 }
