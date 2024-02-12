@@ -93,7 +93,7 @@ class Overwriter
                 ->setCloseAt(null);
         }
 
-        $this->preprocessQuiz($destination);
+        $this->preprocessQuiz($source, $destination);
 
         // Delete quiz constituents and rubric
         $this->deleteDueWorkRubric($updatedDestination);
@@ -117,13 +117,16 @@ class Overwriter
 
 
     /**
-     * Preprocess `$destination` if it's a quiz: setting its Learnosity
-     * references to null, and its job status to Pending.
+     * Preprocess `$destination` if it's a quiz: setting its:
+     * * Learnosity references to null
+     * * its job status to Pending
+     * * its source assessment as `$source`
      *
+     * @param IAssessable $source
      * @param IAssessable $destination
      * @return void
      */
-    private function preprocessQuiz(IAssessable $destination): void
+    private function preprocessQuiz(IAssessable $source, IAssessable $destination): void
     {
         if (!$destination instanceof Quiz) {
             return;
@@ -132,7 +135,7 @@ class Overwriter
             ->setLearnosityReference(null)
             ->setLearnosityJobReference(null)
             ->setLearnosityJobStatus(Quiz::LEARNOSITY_JOB_STATUS_PENDING)
-            ->setLearnositySourceAssessmentId($destination->getId())
+            ->setLearnositySourceAssessmentId($source->getId())
         ;
     }
 
