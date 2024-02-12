@@ -115,6 +115,7 @@ class Controller extends Base
             WHERE cus.folder_id = :unitFolderId
             AND rc.deleted_at IS NULL
             AND ri.deleted_at IS NULL
+            AND sb.use_rubric = 1
             ORDER BY rc.id, riu.sequence, ri.name
         ");
     }
