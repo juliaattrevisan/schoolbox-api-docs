@@ -230,7 +230,7 @@ class Hydrator extends BaseHydrator
             $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Timetable', 'icon-timetable');
         }
 
-        return array_filter($links);
+        return array_values(array_filter($links));
     }
 
     /**
