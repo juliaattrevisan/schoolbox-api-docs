@@ -305,44 +305,6 @@ OPTIONS
 HELP;
     }
 
-    /**
-     * Build a date from the value of a command-line argument; will attempt to
-     * parse according to the following rules:
-     * * as a database date (YYYY-MM-DD HH:MM:SS)
-     * * as a Unix timestamp
-     * * via `strtotime`
-     *
-     * @param string|null $date
-     * @return Alaress_Date_Format|null
-     * @throws InvalidArgumentException if the date could not be parsed
-     */
-    private function buildDate(?string $date): ?Alaress_Date_Format
-    {
-        if (isset($date)) {
-            try {
-                return new Alaress_Date_Format(
-                    $date,
-                    [
-                        Alaress_Date_Format::DATABASE_FORMAT,
-                        Alaress_Date_Format::TIMESTAMP
-                    ]
-                );
-            } catch (InvalidArgumentException) {
-                // Attempt to parse date via strtotime
-                $this->getLogger()->debug(sprintf('Parsing date "%s" using strtotime', $date));
-                $strtotime = strtotime($date);
-                if ($strtotime) {
-                    return new Alaress_Date_Format($strtotime, Alaress_Date_Format::TIMESTAMP);
-                } else {
-                    throw new InvalidArgumentException(
-                        sprintf('Could not parse date "%s" as a database date, timestamp or with strtotime', $date)
-                    );
-                }
-            }
-        }
-        return null;
-    }
-
     public function runAsRoot(): ?bool
     {
         return null;

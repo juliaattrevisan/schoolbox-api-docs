@@ -38,6 +38,19 @@ abstract class BaseTool extends CliTool\App
     private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
 
     /**
+     * --from
+     *
+     * Process only quizzes created on or after this date.
+     */
+    private const OPT_LONG_FROM = 'from:';
+
+    /**
+     * --to
+     *
+     * Process only quizzes created on or before this date.
+     */
+    private const OPT_LONG_TO = 'to:';
+    /**
      * Short options:
      * * -h: help
      */
@@ -49,11 +62,13 @@ abstract class BaseTool extends CliTool\App
     /**
      * Long options:
      * * --help:       help
+     * * --from:       from date
+     * * --to:         to date
      * * --assessment: a particular quiz to process
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_ASSESSMENT_ID];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_FROM, self::OPT_LONG_TO, self::OPT_LONG_ASSESSMENT_ID];
     }
 
     /**
@@ -127,13 +142,49 @@ abstract class BaseTool extends CliTool\App
      */
     private function findQuizzes(): GenericCollection
     {
-        $logMessageParts = [
-            'learnosity_job_status: ' . $this->getTargetedQuizStatus(),
+        $whereParts = [
+            "quiz.learnosity_job_status = :learnosityJobStatus",
         ];
+        $params = [
+            'learnosityJobStatus' => $this->getTargetedQuizStatus(),
+        ];
+        $this->getLogger()->info('Filtering quizzes to those which match:');
+        $this->getLogger()->info(sprintf('* learnosity_job_status = %s', $params['learnosityJobStatus']));
+
+        $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
+        if ($fromDate) {
+            $whereParts[] = 'assessment.created_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+            $this->getLogger()->info(
+                sprintf('* created >= %s (%s)', $this->getOpt(self::OPT_LONG_FROM), $params['fromDate']),
+            );
+        }
+        $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
+        if ($toDate) {
+            $whereParts[] = 'assessment.created_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+            $this->getLogger()->info(
+                sprintf('* created <= %s (%s)', $this->getOpt(self::OPT_LONG_TO), $params['toDate']),
+            );
+        }
+        $assessmentId = $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID);
+        if ($assessmentId) {
+            $whereParts[] = 'quiz.assessment_id = :assessmentId';
+            $params['assessmentId'] = $assessmentId;
+            $this->getLogger()->info(
+                sprintf('* assessment_id = %d', $params['assessmentId']),
+            );
+        }
+
         $quizQuery = $this->getDatabaseInternal()->prepareQuery(
-            "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
+            "
+                SELECT assessment.id
+                FROM assess AS quiz
+                INNER JOIN assessment ON quiz.assessment_id = assessment.id
+                WHERE
+            " . implode(' AND ', $whereParts),
         );
-        $quizQuery->execute(['status' => $this->getTargetedQuizStatus()]);
+        $quizQuery->execute($params);
         $quizIds = $quizQuery->fetchColumnArray('assessment_id');
         return $this->assessmentDataSource->findAllByIds($quizIds);
     }
@@ -195,6 +246,24 @@ OPTIONS
 
     $yellow-p, --perform$white
         Actually perform changes on quizzes: otherwise, only output which quizzes would be changed.
+
+    $yellow--assessment=ASSESSMENT_ID$white
+        If provided: only perform changes on the quiz with this assessment ID.
+
+    $yellow--from=FROM_DATE$white
+        If provided, only perform changes on quizzes created from {$yellow}FROM_DATE{$white} onward.
+
+        {$yellow}FROM_DATE{$white} will be parsed according to the following rules:
+        * as a database date (YYYY-MM-DD HH:MM:SS)
+        * as a Unix timestamp
+        * via `strtotime`
+
+        This script will fail if {$yellow}FROM_DATE{$white} is not parseable.
+
+    $yellow--to=TO_DATE$white
+        If provided, only only perform changes on quizzes created on {$yellow}TO_DATE{$white} and before.
+
+        {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
 
 
 HELP;
