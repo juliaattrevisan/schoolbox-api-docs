@@ -9,11 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
-use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
-use Schoolbox\Url\Factory;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * CLI tool for resetting sync of Learnosity data for quizzes in the failed
@@ -21,84 +18,31 @@ use Schoolbox\Url\Factory;
  *
  * This will set their status back to pending, and clear their job reference.
  */
-class ResetFailedTool extends CliTool\App
+class ResetFailedTool extends BaseTool
 {
-    private const OPT_SHORT_HELP = 'h';
-    private const OPT_LONG_HELP  = 'help';
-
     /**
-     * Short options:
-     * * -h: help
+     * This tool works upon quizzes currently being processed.
      */
-    public function getShortOpts(): array
+    protected function getTargetedQuizStatus(): string
     {
-        return [self::OPT_SHORT_HELP];
+        return QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED;
     }
 
     /**
-     * Long options:
-     * * --help:  help
+     * This tool processes `$quiz` by setting it back to pending, and clearing
+     * its Learnosity job reference,
+     *
+     * @param QuizDomainModel $quiz
+     * @return void
+     * @throws MapperException
      */
-    public function getLongOpts(): array
+    protected function processQuiz(QuizDomainModel $quiz): void
     {
-        return [self::OPT_LONG_HELP];
-    }
-
-    /**
-     * Data source for assessments.
-     */
-    private MapperProxy $assessmentDataSource;
-
-    /**
-     * @inheritdoc
-     */
-    public function run(): void
-    {
-        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
-            $this->printHelp();
-            exit(CliKernelAbstract::EXIT_STATUS_OK);
-        }
-
-        $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
-
-        // Build assessment data source
-        $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-        // Find pending quiz domain models
-        $quizQuery = $this->getDatabaseInternal()->prepareQuery(
-            "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
-        );
-        $quizQuery->execute(['status' => QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED]);
-        $quizIds = $quizQuery->fetchColumnArray('assessment_id');
-        $failedQuizzes = $this->assessmentDataSource->findAllByIds($quizIds);
-
-        $this->getLogger()->info(sprintf('Found %d quizzes currently failed', count($failedQuizzes)));
-        foreach ($failedQuizzes as $failedQuiz) {
-            // Not a quiz somehow? Skip
-            if (!$failedQuiz instanceof QuizDomainModel) {
-                $this->getLogger()->warning(
-                    sprintf(
-                        'Assessment #%d (%s) is not a quiz: skipping',
-                        $failedQuiz->getTitle(),
-                        $failedQuiz->getId(),
-                    )
-                );
-                continue;
-            }
-
-            $this->getLogger()->info(
-                sprintf(
-                    'Resetting assessment #%d (%s)',
-                    $failedQuiz->getId(),
-                    $failedQuiz->getTitle(),
-                )
-            );
-            if ($this->perform()) {
-                $failedQuiz
-                    ->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING)
-                    ->setLearnosityJobReference(null);
-                $this->assessmentDataSource->save($failedQuiz, $failedQuiz->getCreator());
-            }
+        if ($this->perform()) {
+            $quiz
+                ->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING)
+                ->setLearnosityJobReference(null);
+            $this->assessmentDataSource->save($quiz, $quiz->getCreator());
         }
     }
 
@@ -107,7 +51,7 @@ class ResetFailedTool extends CliTool\App
      *
      * @return void
      */
-    private function printHelp(): void
+    protected function printHelp(): void
     {
         $file       = $this->getToolFilename();
         $green      = self::COLOUR_GREEN;
