@@ -45,13 +45,13 @@ const computedSize = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="c-icon" aria-hidden="true" data-test="sbx-icon">
-        <svg v-if="props.name === 'add'" class="c-icon__svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <div class="sbx-icon" aria-hidden="true" data-test="sbx-icon">
+        <svg v-if="props.name === 'add'" class="sbx-icon__svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <path d="M32 14h-14v-14h-4v14h-14v4h14v14h4v-14h14z"></path>
         </svg>
         <svg
             v-else-if="props.name === 'advanced-list'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -61,7 +61,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'alert'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -69,7 +69,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'anchor'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -79,7 +79,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'approve'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -87,7 +87,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'archive'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -97,7 +97,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'attach'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -107,7 +107,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'audio'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -117,7 +117,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'badge'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -130,7 +130,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'boarder-leave'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -138,7 +138,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'breadcrumbs'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -146,7 +146,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'calendar'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -156,7 +156,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'canvas-lms'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -211,7 +211,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'chat'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -221,7 +221,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'class-list'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -231,7 +231,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'click-view'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -239,7 +239,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'clipboard'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -255,7 +255,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'close'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -263,7 +263,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'cloud'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -273,7 +273,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'collab-docs'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -283,7 +283,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'collapse'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -291,7 +291,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'comment'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -299,7 +299,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'components'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -307,7 +307,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'copy'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -315,7 +315,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'countdown'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -325,7 +325,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'course-builder'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -335,7 +335,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'course-outline'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -345,7 +345,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'criteria'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -353,7 +353,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'curriculum'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -361,7 +361,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'curriculum-details'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -371,7 +371,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'danger'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -379,7 +379,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'day-view'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -387,7 +387,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'delete'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -395,7 +395,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'directory'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -405,7 +405,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'division'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -413,7 +413,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'document'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -421,7 +421,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'dollar'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -431,7 +431,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'down-arrow'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -439,7 +439,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'download'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -447,7 +447,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'drag-drop'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -457,7 +457,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'drop-box'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -465,7 +465,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'dropdown'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -473,7 +473,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'due-work'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -483,7 +483,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'edit-columns'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -491,7 +491,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'education-maintenance'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -499,7 +499,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'email'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -507,7 +507,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'eng-second-lang'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -517,7 +517,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'engage-logo'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -546,7 +546,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'eportfolio'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -554,7 +554,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'equals'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -562,7 +562,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'export'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -570,7 +570,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'external-link'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -579,7 +579,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'favourite'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -589,7 +589,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'favourite-hollow'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -599,7 +599,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'files'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -607,7 +607,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'filter'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -617,7 +617,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'flame'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -627,7 +627,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'folder'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -635,7 +635,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'forms'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -643,7 +643,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'forum'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -651,7 +651,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'geosnapshot'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -665,7 +665,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'goal'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -681,7 +681,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'google-drive'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -691,7 +691,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'grip'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -701,7 +701,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'group'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -711,7 +711,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'group-managers'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -721,7 +721,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'heart-like'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -729,7 +729,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'help'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -739,7 +739,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'hidden'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -752,7 +752,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'history'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -762,7 +762,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'home'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -770,7 +770,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'homepagefeed'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -780,7 +780,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'image'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -790,7 +790,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'image-gallery'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -800,7 +800,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'image-slideshow'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -810,7 +810,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'info'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -820,7 +820,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'integration-student'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -830,7 +830,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'intellischool'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -840,7 +840,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'international-baccalaureate'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -850,7 +850,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'international-student'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -866,7 +866,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'lesson-plan'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -882,7 +882,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'link'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -892,7 +892,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'list'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -902,7 +902,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'list-view'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -910,7 +910,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'live-marks'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -924,7 +924,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'location'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -934,7 +934,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'locked'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -944,7 +944,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'logout'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -952,7 +952,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'lti'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -962,7 +962,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'match'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -971,7 +971,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'medical'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -981,7 +981,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'menu'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -989,7 +989,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'mic'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -999,7 +999,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'mic-muted'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1009,7 +1009,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'mic-recording'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1019,7 +1019,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'microsoft-teams'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1029,7 +1029,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'mobile'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1037,7 +1037,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'modify-pen'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1045,7 +1045,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'month-view'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1055,7 +1055,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'more'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1063,7 +1063,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'mostly-cloudy'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1076,7 +1076,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'mute'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1084,7 +1084,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'network'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1092,7 +1092,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'news'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1102,7 +1102,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'next'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1110,7 +1110,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'notifications'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1120,7 +1120,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'notifications-hollow'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1132,7 +1132,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'office-365'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1142,7 +1142,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'open'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1150,7 +1150,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'pause'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1160,7 +1160,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'phone'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1170,7 +1170,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'pin'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1178,7 +1178,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'pin-hollow'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1188,7 +1188,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'pinterest'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1198,7 +1198,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'podcast'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1208,7 +1208,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'poll'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1216,7 +1216,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'position'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1227,7 +1227,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'previous'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1235,7 +1235,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'print'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1243,7 +1243,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'progress'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1251,7 +1251,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'project'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1261,7 +1261,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'quiz'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1271,7 +1271,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'rain'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1284,7 +1284,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'random-image'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1294,7 +1294,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'reach'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1307,7 +1307,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'refresh'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1317,7 +1317,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'reply'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1325,7 +1325,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'resource-booking'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1335,7 +1335,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'rss'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1345,7 +1345,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'schoolbox'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1355,7 +1355,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'screen-capture'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1369,7 +1369,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'search'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1379,7 +1379,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'settings'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1389,7 +1389,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'share'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1399,7 +1399,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'showcase'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1409,7 +1409,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'shuffle'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1425,7 +1425,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'social-stream'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1433,7 +1433,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'sort-up'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1441,7 +1441,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'sport'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1451,7 +1451,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'staff'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1461,7 +1461,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'staff-students'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1471,7 +1471,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'sun'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1481,7 +1481,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'surveys'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1491,7 +1491,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'synergetic'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1501,7 +1501,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'task'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1509,7 +1509,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'teacher'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1519,7 +1519,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'textbox'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1527,7 +1527,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'thunder'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1538,7 +1538,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'tiles'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1548,7 +1548,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'time-value'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1558,7 +1558,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'timetable'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1568,7 +1568,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'twitter'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1578,7 +1578,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'undo'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1586,7 +1586,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'unit'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1596,7 +1596,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'unlocked'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1606,7 +1606,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'up-arrow'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1614,7 +1614,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'up-down'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1623,7 +1623,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'upload'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1631,7 +1631,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'video'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1639,7 +1639,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'video-error'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1648,7 +1648,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'view'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1658,7 +1658,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'week-view'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1666,7 +1666,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'wiki'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1676,7 +1676,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'withdraw-achievement'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1690,7 +1690,7 @@ const computedSize = window.Vue.computed(() => {
         </svg>
         <svg
             v-else-if="props.name === 'wolfram-alpha'"
-            class="c-icon__svg"
+            class="sbx-icon__svg"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -1702,7 +1702,7 @@ const computedSize = window.Vue.computed(() => {
 </template>
 
 <style lang="scss" scoped>
-.c-icon {
+.sbx-icon {
     color: v-bind(color);
     height: v-bind(computedSize);
     width: v-bind(computedSize);
