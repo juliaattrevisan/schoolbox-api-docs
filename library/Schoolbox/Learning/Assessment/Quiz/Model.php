@@ -48,7 +48,18 @@ class Model extends AbstractAssessment
 
 
     /**
-     * Possible statuses for Learnosity jobs.
+     * Possible statuses for the Learnosity job for duplicating this quiz's
+     * content from another quiz.
+     * * PENDING: the Learnosity job hasn't started yet; it must be started and
+     *   set to PROCESSING
+     * * PROCESSING: the Learnosity job is currently running; its status must be
+     *   checked and set to either COMPLETED or FAILED
+     * * COMPLETED: the Learnosity job ran successfully, and the content has
+     *   been duplicated
+     * * FAILED: the Learnosity job did not run successfully; its status may be
+     *   set back to PENDING to try again
+     * * UNPROCESSABLE: the Learnosity job either could not start, or it has
+     *   been determined it will never run successfully
      */
     public const LEARNOSITY_JOB_STATUS_PENDING = 'pending';
     public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';

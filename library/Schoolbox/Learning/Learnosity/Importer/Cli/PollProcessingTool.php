@@ -57,6 +57,9 @@ class PollProcessingTool extends BaseTool
                 QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED => $this->getLogger()->warning(
                     sprintf('Assessment #%d processing failed', $quiz->getId())
                 ),
+                QuizDomainModel::LEARNOSITY_JOB_STATUS_UNPROCESSABLE => $this->getLogger()->warning(
+                    sprintf('Assessment #%d has been determined to be unprocessable', $quiz->getId())
+                ),
                 QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING => $this->getLogger()->warning(
                     sprintf('Assessment #%d somehow pending: should be impossible', $quiz->getId())
                 ),
