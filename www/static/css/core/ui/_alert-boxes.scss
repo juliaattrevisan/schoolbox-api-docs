@@ -275,3 +275,14 @@ body:not(.disableNotifications) {
         }
     }
 }
+// Adjust styles when notifications are open and the notification panel isn't displayed on small screens
+@media screen and (max-width: 1440px) {
+    body:not(.disableNotifications) {
+        .move-left,
+        .right-open {
+            .toast {
+                right: 1rem;
+            }
+        }
+    }
+}
