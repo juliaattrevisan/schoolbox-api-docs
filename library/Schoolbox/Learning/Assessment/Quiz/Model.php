@@ -54,7 +54,7 @@ class Model extends AbstractAssessment
     public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';
     public const LEARNOSITY_JOB_STATUS_COMPLETED = 'completed';
     public const LEARNOSITY_JOB_STATUS_FAILED = 'failed';
-    public const LEARNOSITY_JOB_STATUS_SOURCE_NOT_FOUND = 'source-not-found';
+    public const LEARNOSITY_JOB_STATUS_UNPROCESSABLE = 'unprocessable';
 
 
     /**

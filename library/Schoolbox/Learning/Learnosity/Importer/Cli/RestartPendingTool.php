@@ -57,7 +57,7 @@ class RestartPendingTool extends BaseTool
                 $sourceQuiz = $this->findFromSpecificationImplementations($quiz);
             } else {
                 // If somehow this isn't an assessment:
-                // mark it as failed
+                // mark it as unprocessable
                 throw new SourceAssociationException(
                     sprintf(
                         'Assessment #%d is somehow neither an implementation nor specification: skipping',
@@ -79,15 +79,15 @@ class RestartPendingTool extends BaseTool
             }
         } catch (SourceAssociationException $e) {
             // This pending quiz couldn't be associated with a source:
-            // mark it as failed.
+            // mark it as unprocessable.
             $this->getLogger()->warning(
                 sprintf(
-                    'Could not associate assessment with source (message: %s): marking as failed',
+                    'Could not associate assessment with source (message: %s): marking as unprocessable',
                     $e->getMessage(),
                 )
             );
             if ($this->perform()) {
-                $quiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_SOURCE_NOT_FOUND);
+                $quiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_UNPROCESSABLE);
                 $this->assessmentDataSource->save($quiz, $quiz->getCreator());
             }
         } catch (InteropQueueException $e) {

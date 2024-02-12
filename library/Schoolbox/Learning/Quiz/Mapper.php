@@ -96,6 +96,7 @@ class Mapper extends BaseMapper
                 Model::LEARNOSITY_JOB_STATUS_PROCESSING,
                 Model::LEARNOSITY_JOB_STATUS_COMPLETED,
                 Model::LEARNOSITY_JOB_STATUS_FAILED,
+                Model::LEARNOSITY_JOB_STATUS_UNPROCESSABLE,
             ],
         );
         // This column has an FK onto `assessment.id`,

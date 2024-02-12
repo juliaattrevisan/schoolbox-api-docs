@@ -67,6 +67,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';
     public const LEARNOSITY_JOB_STATUS_COMPLETED = 'completed';
     public const LEARNOSITY_JOB_STATUS_FAILED = 'failed';
+    public const LEARNOSITY_JOB_STATUS_UNPROCESSABLE = 'unprocessable';
 
 
     /**
