@@ -40,24 +40,19 @@ a.c-button {
     transition: none; // ^foundation-fixes^ - remove the transition on a tags
     &:hover,
     &:active {
-        &:not([disabled]) {
-            background-color: var(--content-ui-hover);
-        }
+        background-color: var(--content-ui-background); // ^foundation-fixes^ - remove the use of --content-ui-hover
+        filter: brightness(1.1);
     }
     &:focus {
-        &:not([disabled]) {
-            background-color: var(
-                --content-ui-background
-            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
-            outline: 3px solid var(--content-ui-foreground);
-            outline-offset: 2px;
-        }
+        background-color: var(
+            --content-ui-background
+        ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+        outline: 3px solid var(--content-ui-foreground);
+        outline-offset: 2px;
     }
     &:disabled {
-        opacity: 0.7;
-        &:hover {
-            cursor: default;
-        }
+        cursor: not-allowed;
+        pointer-events: initial; // ^foundation-fixes^ - allow pointer events to show cursor: not-allowed
     }
     // To extend the button to the full width of its container
     &--block {
@@ -70,57 +65,32 @@ a.c-button {
         font-weight: 600;
         &:hover,
         &:active {
-            &:not([disabled]) {
-                background-color: rgba(
-                    calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-                    calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-                    calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-                    var(--content-ui-submit-background-a)
-                );
-                color: var(--content-ui-submit-foreground);
-            }
+            background-color: var(
+                --content-ui-submit-background
+            ); // ^foundation-fixes^ - remove the use of --content-ui-hovers
+            color: var(--content-ui-submit-foreground);
         }
         &:focus {
-            &:not([disabled]) {
-                background-color: var(
-                    --content-ui-submit-background
-                ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
-            }
+            background-color: var(
+                --content-ui-submit-background
+            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
     }
     // To highlight that this action has a destructive effect
     &--alert {
         background-color: var(--error-color);
-        color: var(--content-ui-submit-foreground);
-        font-weight: 600;
+        color: var(--foreground-colour);
         &:hover,
         &:active {
-            &:not([disabled]) {
-                background-color: rgba(
-                    calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-                    calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-                    calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-                    var(--content-ui-submit-background-a)
-                );
-                color: var(--content-ui-submit-foreground);
-            }
+            background-color: var(--error-color);
+            color: var(--foreground-colour);
         }
         &:focus {
-            &:not([disabled]) {
-                background-color: var(
-                    --content-ui-submit-background
-                ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
-            }
+            background-color: var(--error-color); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
     }
     // rely on the background it sits on
     &--no-bkg {
         background: none;
-        &:hover,
-        &:active {
-            &:not([disabled]) {
-                background-color: rgba(0, 0, 0, 0.1);
-            }
-        }
     }
 }

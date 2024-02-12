@@ -21,7 +21,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     name: "",
     size: "m",
-    color: "var(--content-ui-foreground)",
+    color: "currentColor",
 });
 
 /**

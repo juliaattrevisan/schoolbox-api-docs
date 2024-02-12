@@ -10,7 +10,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         () => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="l-pad-m">
                     <story />
                 </div>
             `,
@@ -21,42 +21,28 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-// export const Standard: Story = {
-//     render: () => ({
-//         template: `
-//             <div class="l-flex-row l-gap-m">
-//                 <a href="javascript:;" class="c-button">Button Link</a>
-//                 <button class="c-button" type="button">Real Button</button>
-//                 <button class="c-button c-button--submit" type="button">Real Button</button>
-//                 <button type="button" class="c-button">
-//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-//                     <span>Real Button</span>
-//                 </button>
-//                 <button type="button" class="c-button c-button--icon-only" aria-label="Icon-only Button">
-//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-//                 </button>
-//                 <button type="button" class="c-button c-button--submit">
-//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-//                     <span>Real Button</span>
-//                 </button>
-//                 <button type="button" class="c-button c-button--icon-only c-button--no-bkg" aria-label="Icon-only Button">
-//                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" class="c-icon"><path  d="m6 0h4v4h-4z"/><path  d="m6 6h4v4h-4z"/><path  d="m6 12h4v4h-4z"/></svg>
-//                 </button>
-//             </div>
-//         `,
-//     }),
-// };
-
 export const Default: Story = {
     render: () => ({
         template: `
-            <button class="c-button" type="button">Real Button</button>
+            <button class="c-button" type="button">Button</button>
         `,
     }),
 };
 
 /**
- * An `<a>` tag styled as a button
+ * Disabled buttons typically have poor contrast and can confuse some users, so avoid them if possible.
+ */
+export const Disabled: Story = {
+    render: () => ({
+        template: `
+            <button class="c-button" type="button" disabled aria-disabled="true">Disabled Button</button>
+        `,
+    }),
+};
+
+/**
+ * An `<a>` tag styled as a button. Historically we've used `<a>` tags where a `<button>` would have been more appropriate.
+ * Moving forward we should use `<button>` tags for actions and `<a>` tags for navigation.
  */
 export const LinkButton: Story = {
     render: () => ({
@@ -81,13 +67,27 @@ export const WithIcon: Story = {
 };
 
 /**
+ * To stretch full width of the parent container
+ */
+export const FullWidth: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button l-width-100">
+                <span>Button</span>
+            </button>
+        `,
+    }),
+};
+
+/**
  * Typically to identify the primary action on a page
  */
 export const Primary: Story = {
     render: () => ({
         template: `
             <button type="button" class="c-button c-button--primary">
-                <span>Submit form</span>
+                <sbx-icon name="approve"></sbx-icon>
+                <span>Save</span>
             </button>
         `,
     }),
@@ -100,20 +100,34 @@ export const Alert: Story = {
     render: () => ({
         template: `
             <button type="button" class="c-button c-button--alert">
-                <span>Submit form</span>
+                <sbx-icon name="delete"></sbx-icon>
+                <span>Delete</span>
             </button>
         `,
     }),
 };
 
 /**
- * Just an icon button
+ * Just an icon button.
  * Ensure the `aria-label` attribute is set to describe the action
  */
 export const IconOnly: Story = {
     render: () => ({
         template: `
             <button type="button" class="c-button l-pad-s" aria-label="Add Curriculum">
+                <sbx-icon name="favourite"></sbx-icon>
+            </button>
+        `,
+    }),
+};
+
+/**
+ * Rely on the background it sits on, typically used when the button is an icon only
+ */
+export const NoBackground: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button c-button--no-bkg l-pad-s">
                 <sbx-icon name="add"></sbx-icon>
             </button>
         `,
