@@ -11,20 +11,14 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
 use Interop\Queue\Exception as InteropQueueException;
 use LearnositySdk\Exceptions\ValidationException;
-use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
-use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Url\Factory;
 
 /**
  * CLI tool for restarting sync of Learnosity data for quizzes in the pending
  * status.
  */
-class RestartPendingTool extends CliTool\App
+class RestartPendingTool extends BaseTool
 {
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP  = 'help';
@@ -48,142 +42,126 @@ class RestartPendingTool extends CliTool\App
     }
 
     /**
-     * Duplicator for quiz data.
+     * @param QuizDomainModel $quiz
+     * @return void
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
-    private Api\Duplicator $duplicator;
-
-    /**
-     * Data source for assessments.
-     */
-    private MapperProxy $assessmentDataSource;
-
-    /**
-     * @inheritdoc
-     */
-    public function run(): void
+    protected function processQuiz(QuizDomainModel $quiz): void
     {
-        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
-            $this->printHelp();
-            exit(CliKernelAbstract::EXIT_STATUS_OK);
-        }
-
-        $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
-
-        // Build duplicator
-        $this->duplicator = new Api\Duplicator(
-            new Api(
-                $baseUrl->getHost(),
-                $this->getConfig()->get('learnosity_version'),
-                $this->getConfig()->get('learnosity_consumer_key'),
-                $this->getConfig()->get('learnosity_consumer_secret'),
-                $this->getLogger(),
-            ),
-            $this->getDatabaseInternal(),
-            $baseUrl,
-            $this->getDi()->get('httpFactory'),
-            $this->getDi()->get('router.generator'),
-            $this->getDi()->get('taskd.httpRequestMessageFactory'),
-            $this->getDi()->get('taskd.messageProducer'),
-            new TagFactory($this->getConfig()->get('site_school_code')),
+        $this->getLogger()->info(
+            sprintf(
+                'Force-copying assessment #%d (%s)',
+                $quiz->getId(),
+                $quiz->getTitle(),
+            )
         );
 
-        // Build assessment data source
-        $this->assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-        // Find pending quiz domain models
-        $quizQuery = $this->getDatabaseInternal()->prepareQuery(
-            "SELECT assessment_id FROM assess WHERE learnosity_job_status = :status",
-        );
-        $quizQuery->execute(['status' => QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING]);
-        $quizIds = $quizQuery->fetchColumnArray('assessment_id');
-        $pendingQuizzes = $this->assessmentDataSource->findAllByIds($quizIds);
-
-        $this->getLogger()->info(sprintf('Found %d quizzes currently pending copy', count($pendingQuizzes)));
-        foreach ($pendingQuizzes as $pendingQuiz) {
-            // Not a quiz somehow? Skip
-            if (!$pendingQuiz instanceof QuizDomainModel) {
-                $this->getLogger()->warning(
+        // Does this quiz already have a Learnosity source assessment?
+        // If so, use that
+        try {
+            if ($quiz->getLearnositySourceAssessmentId()) {
+                $sourceQuiz = $this->findFromLearnositySourceAssessment($quiz);
+            } elseif ($quiz->isImplementation()) {
+                $sourceQuiz = $this->findFromSpecificationAssessment($quiz);
+            } elseif ($quiz->isSpecification()) {
+                $sourceQuiz = $this->findFromImplementationAssessment($quiz);
+            } else {
+                // If somehow this isn't an assessment:
+                // mark it as failed
+                throw new SourceAssociationException(
                     sprintf(
-                        'Assessment #%d (%s) is not a quiz: skipping',
-                        $pendingQuiz->getTitle(),
-                        $pendingQuiz->getId(),
+                        'Assessment #%d is somehow neither an implementation nor specification: skipping',
+                        $quiz->getId(),
                     )
                 );
-                continue;
             }
 
-            $this->getLogger()->info(
+            // Restart the copy process
+            $this->getLogger()->debug(
                 sprintf(
-                    'Force-copying assessment #%d (%s)',
-                    $pendingQuiz->getId(),
-                    $pendingQuiz->getTitle(),
+                    'Assessment #%d has source assessment #%d: copying from that assessment',
+                    $quiz->getId(),
+                    $sourceQuiz->getId(),
                 )
             );
-
-            // Does this quiz already have a Learnosity source assessment?
-            // If so, use that
-            try {
-                if ($pendingQuiz->getLearnositySourceAssessmentId()) {
-                    $sourceQuiz = $this->findFromLearnositySourceAssessment($pendingQuiz);
-                } elseif ($pendingQuiz->isImplementation()) {
-                    $sourceQuiz = $this->findFromSpecificationAssessment($pendingQuiz);
-                } elseif ($pendingQuiz->isSpecification()) {
-                    $sourceQuiz = $this->findFromImplementationAssessment($pendingQuiz);
-                } else {
-                    // If somehow this isn't an assessment:
-                    // mark it as failed
-                    throw new SourceAssociationException(
-                        sprintf(
-                            'Assessment #%d is somehow neither an implementation nor specification: skipping',
-                            $pendingQuiz->getId(),
-                        )
-                    );
-                }
-
-                // Restart the copy process
-                $this->getLogger()->debug(
-                    sprintf(
-                        'Assessment #%d has source assessment #%d: copying from that assessment',
-                        $pendingQuiz->getId(),
-                        $sourceQuiz->getId(),
-                    )
-                );
-                if ($this->perform()) {
-                    $this->restartCopyProcess($sourceQuiz, $pendingQuiz);
-                }
-            } catch (SourceAssociationException $e) {
-                // This pending quiz couldn't be associated with a source:
-                // mark it as failed.
-                $this->getLogger()->warning(
-                    sprintf(
-                        'Could not associate assessment with source (message: %s): marking as failed',
-                        $e->getMessage(),
-                    )
-                );
-                if ($this->perform()) {
-                    $pendingQuiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED);
-                    $this->assessmentDataSource->save($pendingQuiz, $pendingQuiz->getCreator());
-                }
-            } catch (InteropQueueException $e) {
-                // Something went wrong when sending message to taskd:
-                // this is likely a transient error, try again later
-                $this->getLogger()->warning(
-                    sprintf(
-                        'Possible error occurred when sending to task daemon: %s',
-                        $e->getMessage(),
-                    ),
-                );
-            } catch (ValidationException $e) {
-                // Something went wrong when sending message to Learnosity:
-                // this is likely a transient error, try again later
-                $this->getLogger()->warning(
-                    sprintf(
-                        'Possible error occurred when sending to Learnosity: %s',
-                        $e->getMessage(),
-                    ),
-                );
+            if ($this->perform()) {
+                $this->restartCopyProcess($sourceQuiz, $quiz);
             }
+        } catch (SourceAssociationException $e) {
+            // This pending quiz couldn't be associated with a source:
+            // mark it as failed.
+            $this->getLogger()->warning(
+                sprintf(
+                    'Could not associate assessment with source (message: %s): marking as failed',
+                    $e->getMessage(),
+                )
+            );
+            if ($this->perform()) {
+                $quiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED);
+                $this->assessmentDataSource->save($quiz, $quiz->getCreator());
+            }
+        } catch (InteropQueueException $e) {
+            // Something went wrong when sending message to taskd:
+            // this is likely a transient error, try again later
+            $this->getLogger()->warning(
+                sprintf(
+                    'Possible error occurred when sending to task daemon: %s',
+                    $e->getMessage(),
+                ),
+            );
+        } catch (ValidationException $e) {
+            // Something went wrong when sending message to Learnosity:
+            // this is likely a transient error, try again later
+            $this->getLogger()->warning(
+                sprintf(
+                    'Possible error occurred when sending to Learnosity: %s',
+                    $e->getMessage(),
+                ),
+            );
         }
+    }
+
+    /**
+     * Print help text
+     *
+     * @return void
+     */
+    protected function printHelp(): void
+    {
+        $file       = $this->getToolFilename();
+        $green      = self::COLOUR_GREEN;
+        $white      = self::COLOUR_WHITE;
+        $yellow     = self::COLOUR_YELLOW;
+        echo <<<HELP
+NAME:
+    Restart pending quiz duplication tool
+
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+    Attempts to restart any pending quiz duplication jobs.
+
+    A quiz duplication will be pending if:
+    * it has been either imported from a course to a class, or exported from a class back into its course, and;
+    * it has not been marked as processing yet (i.e. it does not have a Learnosity job reference)
+
+    This tool will:
+    * attempt to find the source quiz from which each pending quiz was copied from
+    * create a new job in Learnosity for copying the contents of the source quiz into the pending quiz
+    * set the quiz's status to "processing"
+    * initiate polling for the status of the Learnosity job: when it is finished, it will be marked as complete
+
+OPTIONS
+    $yellow-h, --help$white
+        Print this help and exit
+
+    $yellow-p, --perform$white
+        Actually restart duplication jobs: otherwise, only output what would be restarted.
+
+
+HELP;
     }
 
     /**
@@ -350,47 +328,5 @@ class RestartPendingTool extends CliTool\App
     {
         $this->duplicator->copyQuizConstituents($source, $destination);
         $this->duplicator->initiatePollingForQuizStatus($destination->getCreator(), $destination);
-    }
-
-    /**
-     * Print help text
-     *
-     * @return void
-     */
-    private function printHelp(): void
-    {
-        $file       = $this->getToolFilename();
-        $green      = self::COLOUR_GREEN;
-        $white      = self::COLOUR_WHITE;
-        $yellow     = self::COLOUR_YELLOW;
-        echo <<<HELP
-NAME:
-    Restart pending quiz duplication tool
-
-SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
-
-DESCRIPTION
-    Attempts to restart any pending quiz duplication jobs.
-
-    A quiz duplication will be pending if:
-    * it has been either imported from a course to a class, or exported from a class back into its course, and;
-    * it has not been marked as processing yet (i.e. it does not have a Learnosity job reference)
-
-    This tool will:
-    * attempt to find the source quiz from which each pending quiz was copied from
-    * create a new job in Learnosity for copying the contents of the source quiz into the pending quiz
-    * set the quiz's status to "processing"
-    * initiate polling for the status of the Learnosity job: when it is finished, it will be marked as complete
-
-OPTIONS
-    $yellow-h, --help$white
-        Print this help and exit
-
-    $yellow-p, --perform$white
-        Actually restart duplication jobs: otherwise, only output what would be restarted.
-
-
-HELP;
     }
 }
