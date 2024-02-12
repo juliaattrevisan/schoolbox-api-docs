@@ -74,7 +74,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
                 height="16"
                 aria-hidden="true"
                 focusable="false"
-                class="c-icon c-icon--dropdown"
+                class="sbx-button__icon sbx-button__icon--dropdown"
             >
                 <path d="M0 24h32l-16-16z"></path>
             </svg>
@@ -89,7 +89,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
                     height="16"
                     aria-hidden="true"
                     focusable="false"
-                    class="c-icon"
+                    class="sbx-button__icon"
                 >
                     <path d="m6 0h4v4h-4z" />
                     <path d="m6 6h4v4h-4z" />
@@ -101,15 +101,6 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
 </template>
 
 <style lang="scss" scoped>
-// One current complication of using Vue and Web components is the inability to avoid the shadow DOM
-// This means that we cannot use the global styles to style the component
-// It looks like the ability to opt out of the shadow DOM is hopefully coming soon however
-
-// Inherits colour from the parent element
-.c-icon {
-    fill: currentcolor;
-}
-
 .sbx-button {
     align-items: center;
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
@@ -152,24 +143,22 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     &--icon-only {
         padding: var(--spacing-s);
     }
+    &--block {
+        width: 100%;
+    }
+    &__icon {
+        fill: currentColor;
+    }
+    &__icon--dropdown {
+        transform: rotate(180deg);
+    }
 }
 
 // To match the typical background colour of the dropdown content
 // and better visually connect the button to the content
 .sbx-button[aria-expanded="true"] {
-    background-color: var(--content-ui-background);
-    opacity: 1;
-    &:hover,
-    &:active {
-        background-color: var(--content-ui-background);
-    }
-    &:focus {
-        &:not([disabled]) {
-            box-shadow: none;
-        }
-    }
     // rotate when open
-    .c-icon--dropdown {
+    .sbx-button__icon--dropdown {
         transform: rotate(0deg);
     }
 }
