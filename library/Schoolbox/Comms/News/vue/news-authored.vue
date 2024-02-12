@@ -183,7 +183,7 @@ export default {
 <template>
     <div>
         <section>
-            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
+            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId" v-bind:style="(isArticlesLoaded && !allArticles.length) ? 'display:none' : ''">
                 <dd
                     v-for="(statusCount, status) in activeStatuses"
                     :class="{ active: activeTabSelected === status }"
