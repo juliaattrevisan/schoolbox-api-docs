@@ -17,6 +17,11 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
 /**
  * Index builder for text boxes.
+ *
+ * Indices are built for:
+ * * extant textboxes with an associated component
+ * * extant textboxes with no associated component: these get a special
+ *   "no component" result
  */
 class IndexBuilder extends BaseBuilder
 {
@@ -151,7 +156,18 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
-     * @inheritdoc
+     * Deletes textbox search indices which are no longer relevant, e.g. for:
+     * * deleted textboxes: all indices are deleted
+     * * textboxes with no component: all indices for components are deleted
+     * * textboxes with a component: the "no component" index is deleted
+     *
+     * Note that index deletion for textboxes is not date-boxed: there's no
+     * benefit to date-boxing, because this query needs to search the entire set
+     * of textbox components to find whether a search index should be deleted.
+     *
+     * @param Alaress_Date_Format|null $fromDate Ignored
+     * @param Alaress_Date_Format|null $toDate   Ignored
+     * @return iterable
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
@@ -167,17 +183,9 @@ class IndexBuilder extends BaseBuilder
             WHERE deleted_at IS NULL
             AND textBoxID = :textboxId
         ";
-        $textboxExistsParams = [];
-        if ($fromDate) {
-            $textboxExistsQueryString        .= ' AND deleted_at >= :fromDate';
-            $textboxExistsParams['fromDate'] = $fromDate->getDatabase();
-        }
-        if ($toDate) {
-            $textboxExistsQueryString      .= ' AND deleted_at <= :toDate';
-            $textboxExistsParams['toDate'] = $toDate->getDatabase();
-        }
-        $textboxExistsQuery = $this->connector->prepareQuery($textboxExistsQueryString);
-        $textboxExistsCache = [];
+        $textboxExistsParams  = [];
+        $textboxExistsQuery   = $this->connector->prepareQuery($textboxExistsQueryString);
+        $textboxExistsCache   = [];
         $componentExistsQuery = $this->connector->prepareQuery("
             SELECT cci.component_instance_id
             FROM component_config_instance cci
