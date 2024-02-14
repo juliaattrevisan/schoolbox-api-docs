@@ -125,6 +125,7 @@ class MapperProxy
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
+     * @throws MapperException if the assessment does not exist at all
      * @throws MapperException\Deleted if the assessment was deleted
      * @throws UnexpectedValueException If unable to derive project participant collections
      */

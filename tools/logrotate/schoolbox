@@ -28,7 +28,8 @@
 /var/log/schoolbox/*/clipboard-importer.log
 /var/log/schoolbox/*/expired-storage-removal.log
 /var/log/schoolbox/*/storage-usageCache.log
-/var/log/schoolbox/*/intellischool.log {
+/var/log/schoolbox/*/learnosity-restart-pending.log
+/var/log/schoolbox/*/learnosity-poll-processing.log {
     weekly
     missingok
     rotate 4
@@ -44,7 +45,8 @@
 /var/log/schoolbox/*/transcode.log
 /var/log/schoolbox/*/image-processor.log
 /var/log/schoolbox/*/reload-relations.log
-/var/log/schoolbox/*/search-build-index.log {
+/var/log/schoolbox/*/search-build-index.log
+/var/log/schoolbox/*/learnosity-reset-failed.log {
     monthly
     missingok
     rotate 6

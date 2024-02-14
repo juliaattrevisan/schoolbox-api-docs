@@ -30,7 +30,6 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
-use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -1771,28 +1770,11 @@ class Controller extends Base
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
-        $jobId = $this->quizMapper->copyQuizConstituents($source, $destination);
+        // Start duplicating and polling status of duplication
+        $duplicator = $this->buildDuplicator();
+        $jobId = $duplicator->copyQuizConstituents($source, $destination);
+        $duplicator->initiatePollingForQuizStatus($this->getUser(), $destination);
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
-
-        // Start polling status of duplication
-        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
-        $message = $this->messageFactory
-            ->setUser($this->getUser())
-            ->setRequest(
-                $this->httpFactory
-                    ->createRequest(
-                        'POST',
-                        $baseUrl->withPath(
-                            $this->routeGenerator->generate(
-                                'learnosity.postPollQuizStatus',
-                                ['assessmentId' => $destination->getId()]
-                            )
-                        )
-                    )
-                    ->withHeader('accept', 'application/json')
-            )
-            ->build();
-        $this->messageProducer->send($message, delay: 5, maxRequeues: 10);
     }
 
     /**
@@ -1819,127 +1801,15 @@ class Controller extends Base
         // complete: set and return status 200
 
         // Not a quiz, or no Learnosity job reference? error
-        $quiz = $this->getQuizForAssessmentId($assessment->getId());
-        if (!$quiz->getLearnosityJobReference()) {
+        if (!$assessment->getLearnosityJobReference()) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        // Already complete or failed: don't bother re-checking
-        $jobStatus = $quiz->getLearnosityJobStatus();
-        if ($jobStatus === Quiz::LEARNOSITY_JOB_STATUS_PROCESSING) {
-            // Check the API for this job's status
-            $learnosityJobResponse = $this->api->dataGetRequest(
-                '/jobs',
-                ["references" => [$quiz->getLearnosityJobReference()],],
-            );
-
-            // Possible statuses: queued, running, halted, completed
-            // https://reference.learnosity.com/data-api/endpoints/jobs_endpoints
-            $learnosityJobStatus = $learnosityJobResponse['data'][0]['status'] ?? null;
-            $setTags             = false;
-            if ($learnosityJobStatus === Api::JOB_STATUS_COMPLETED) {
-                $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_COMPLETED;
-                $setTags   = true;
-                $quiz->setLearnosityJobStatus($jobStatus);
-                $this->quizMapper->save($quiz);
-            } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
-                $setTags   = true;
-                $jobStatus = Quiz::LEARNOSITY_JOB_STATUS_FAILED;
-                $quiz->setLearnosityJobStatus($jobStatus);
-                $this->quizMapper->save($quiz);
-            }
-
-            // If complete or failed: set the tags
-            if ($setTags) {
-                $tagFactory = new TagFactory($this->getConfigLoader()->get('site_school_code'));
-                $newTags    = $tagFactory->produceFromAssessment($assessment);
-
-                /* Specifically denote this assessment and its contents as implementations
-                 * that we can universally distinguish
-                 */
-                if ($assessment->getContext()->isImplementationContext()) {
-                    $newTags[] = $tagFactory->produceImplFlag();
-                }
-
-                /* Fetch this activity from Learnosity; we need to assign tags to each of its items
-                 * because they appear in the global Item Bank. Unless we assign the classCode tag
-                 * here, we'll never know if items are for a spec or an impl when users search
-                 */
-                $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
-                    'references' => [
-                        $quiz->getLearnosityReference()
-                    ]
-                ])['data'][0]['data']['items'] ?? null;
-
-                if (null !== $itemReferences) {
-                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
-                     */
-                    if (is_array($itemReferences[0])) {
-                        /* Forcibly mutate this, because learnosity insanity
-                         */
-                        $itemReferenceList = array_column($itemReferences, 'id');
-                    } else {
-                        /* Presume it was a list of reference strings already
-                         */
-                        $itemReferenceList = $itemReferences;
-                    }
-
-                    /* Initialise payload container
-                     */
-                    $emptyPayload = [
-                        'items' => []
-                    ];
-
-                    $payload = $emptyPayload;
-
-                    /* Assign tags to each item
-                     */
-                    foreach ($itemReferenceList as $item) {
-                        /* Maxed out? Send it.
-                         */
-                        if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                            $this->api->dataSetRequest('/itembank/items/tags', $payload);
-
-                            /* Reset this for the next cycle
-                             */
-                            $payload = $emptyPayload;
-                        }
-
-                        /* Keep accumulating until we max out
-                         */
-                        $payload['items'][] = [
-                            'reference' => $item,
-                            'tags' => $newTags
-                        ];
-                    }
-
-                    /* Send the last payload if anything is in it
-                     */
-                    if (\count($payload['items'])) {
-                        $this->api->dataSetRequest('/itembank/items/tags', $payload);
-                    }
-                }
-
-                /* Assign tags to the activity itself
-                 */
-                $this->api->dataSetRequest(
-                    '/itembank/activities/tags',
-                    [
-                        'activities' => [
-                            [
-                                'reference' => $quiz->getLearnosityReference(),
-                                'tags'      => $newTags,
-                            ],
-                        ],
-                    ],
-                );
-            }
-        }
+        $this->buildDuplicator()->pollQuizStatus($assessment);
 
         // What's in the response: just a "status" callback,
         // possibly an API problem?
-        $jobStatus    = $quiz->getLearnosityJobStatus();
+        $jobStatus    = $assessment->getLearnosityJobStatus();
         $responseCode = match ($jobStatus) {
             Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
             Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
@@ -2123,5 +1993,26 @@ class Controller extends Base
     {
         return (new TokenReplacer\Student(new TokenReplacer\Simple()))
             ->replace(trim((string)($comment ?? '')), $student);
+    }
+
+
+    /**
+     * Build assessment duplicator upon request, because it cannot be built
+     * in the constructor.
+     *
+     * @return Api\Duplicator
+     */
+    private function buildDuplicator(): Api\Duplicator
+    {
+        return new Api\Duplicator(
+            $this->api,
+            $this->quizMapper->getDatabase(),
+            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->httpFactory,
+            $this->routeGenerator,
+            $this->messageFactory,
+            $this->messageProducer,
+            new TagFactory($this->getConfigLoader()->get('site_school_code')),
+        );
     }
 }

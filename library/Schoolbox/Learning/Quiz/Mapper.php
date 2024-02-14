@@ -12,7 +12,6 @@ use Alaress\Lumberjack\Logger;
 use LearnositySdk\Exceptions\ValidationException;
 use PDO;
 use PDOStatement;
-use Ramsey\Uuid\Uuid;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
@@ -97,8 +96,13 @@ class Mapper extends BaseMapper
                 Model::LEARNOSITY_JOB_STATUS_PROCESSING,
                 Model::LEARNOSITY_JOB_STATUS_COMPLETED,
                 Model::LEARNOSITY_JOB_STATUS_FAILED,
+                Model::LEARNOSITY_JOB_STATUS_UNPROCESSABLE,
             ],
         );
+        $this->uses('learnosity_job_attempt_count', self::TYPE_INTEGER);
+        // This column has an FK onto `assessment.id`,
+        // but there's no need to map that
+        $this->uses('learnosity_source_assessment_id', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
 
@@ -234,113 +238,6 @@ class Mapper extends BaseMapper
         return true;
     }
 
-
-    /**
-     * Copies Sections, Questions and Solutions from source Quiz to destination Quiz
-     *
-     * For now, this call will throw an exception if the destination Quiz already has Sections.
-     *
-     * @param QuizDomainModel $source
-     * @param QuizDomainModel $destination
-     * @return string|null The Learnosity job ID for duplicating activities
-     * @throws \DomainException
-     * @throws ValidationException
-     * @throws \RuntimeException
-     */
-    public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
-    {
-        $learnosityVersion = $this->getConfigLoader()->get('learnosity_version');
-        $learnosityConsumerKey = $this->getConfigLoader()->get('learnosity_consumer_key');
-        $learnosityConsumerSecret = $this->getConfigLoader()->get('learnosity_consumer_secret');
-
-        $api = new Api(
-            (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->getHost(),
-            $learnosityVersion,
-            $learnosityConsumerKey,
-            $learnosityConsumerSecret,
-            new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity')
-        );
-
-        /* Clone a Learnosity Reference in Learnosity land
-         */
-        $oldLearnosityReference = $source->getLearnosityReference();
-
-        /* See if there are any items in it;
-         * Learnosity crashes when you try to clone an itemless quiz
-         */
-        $activity = $api->dataGetRequest('/itembank/activities', [
-            'references' => [
-                $oldLearnosityReference
-            ]
-        ]);
-
-        /* Only try to clone activities with items;
-         * skip duplicating activities without items for now
-         * (You can still add items after this though)
-         */
-        if (\count($activity['data'])) {
-            /* Get the new learnosity reference and return that
-             *
-             * TODO We could either Poll Learnosity to find out when it's cloned,
-             *  or assign a random uuidv4() arbitrarily, and use that instead...
-             *  ...and hope that Learnosity is okay with it
-             */
-            $newLearnosityReference = (string)Uuid::uuid4();
-
-            /* Make a massive assumption that this _just worked_
-             * You could lean on the polling system to find out when this cloning has finished,
-             * or just blindly assume the uuidv4() was unique
-             *
-             * TODO make this safer
-             */
-            $response = $api->dataSetRequest('/itembank/activities/duplicate', [
-                'activities' => [
-                    [
-                        'reference' => $oldLearnosityReference,
-                        'new_reference' => $newLearnosityReference
-                    ]
-                ]
-            ]);
-            $learnosityJobReference = $response['data']['job_reference'] ?? null;
-
-            // Assign and save Learnosity reference
-            /* FIXME projects need some special treatment of some kind,
-             *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
-             *  which won't have a Learnosity Reference field...weird behaviours
-             *  But Why?
-             */
-            $destination->setLearnosityReference($newLearnosityReference);
-            $destination->setLearnosityJobReference($learnosityJobReference);
-            if ($destination->getId()) {
-                $this->database->prepareQuery(
-                    "
-                        UPDATE {$this->database->getQuoter()->quoteIdentifier($this->table)}
-                        SET learnosity_reference = ?,
-                            learnosity_job_reference = ?,
-                            learnosity_job_status = ?
-                        WHERE assessment_id = ?
-                    ",
-                    [
-                        $newLearnosityReference,
-                        $learnosityJobReference,
-                        Model::LEARNOSITY_JOB_STATUS_PROCESSING,
-                        $destination->getId(),
-                    ],
-                )->execute();
-            }
-
-            /* TODO Also redefine the tags in the cloned thing...but how?
-             *  You don't know when it finishes the cloning.
-             *
-             * FIXME Add Polling Mechanism
-             */
-
-            // Return whatever the job ID from Learnosity was
-            return $learnosityJobReference;
-        }
-
-        return null;
-    }
 
     /**
      * Deletes all constituents (sections and questions) from the quiz whose
