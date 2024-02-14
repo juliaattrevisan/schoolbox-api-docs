@@ -256,7 +256,9 @@ class Classes implements IStrategy
          * Every other school should presume usage of $class['code']
          */
         $class['code'] = $class['code'] ?? $class['mis_id'];
-
+        if ('12 BUCON 63' !== $class['name']) {
+            return;
+        }
         foreach ($class['lessons']['data'] as $lesson) {
             /* Decide if we need to process this lesson
              * Outside the window? Skip it
@@ -278,13 +280,6 @@ class Classes implements IStrategy
 
             $finishAt = (new \Alaress_Date_Format(explode('.', $lesson['end_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
                 ->setTimezone($this->timezone);
-
-            $this->log->info(sprintf(
-                '%s %s on %s',
-                $class['name'],
-                $class['code'],
-                $startAt->getDatabase()
-            ));
 
             /* Starts too far in the past
              */
@@ -513,15 +508,6 @@ class Classes implements IStrategy
                 '%s: no staff enrolled for this class',
                 $class['code']
             ));
-        } elseif ('' === trim((string)($lesson['employee'] ?? null))) {
-            /* This is the employee currently conducting the lesson;
-             * a lesson is an "instance of a class" so to speak
-             * Without a teacher actually doing any teaching, warn and skip
-             */
-            $this->log->debug(sprintf(
-                '%s: no staff involved for an instance of this class',
-                $class['code']
-            ));
         } else {
             /* Save a staff member's regular enrolment in the class;
              * These guys all have something to do with this class.
@@ -536,9 +522,26 @@ class Classes implements IStrategy
                     $employee['surname']
                 );
 
+                $this->log->debug(sprintf(
+                    '%s: created enrolment for %s',
+                    $externalId,
+                    $class['code']
+                ));
+
                 $this->saveEnrolment($event, $classEntry, $name, $externalId);
             }
+        }
 
+        if ('' === trim((string)($lesson['employee'] ?? null))) {
+            /* This is the employee currently conducting the lesson;
+             * a lesson is an "instance of a class" so to speak
+             * Without a teacher actually doing any teaching, warn and skip
+             */
+            $this->log->debug(sprintf(
+                '%s: no staff involved for an instance of this class',
+                $class['code']
+            ));
+        } else {
             /* Save a staff member's involvement for this instance of a class
              * This person teaches this particular instance of the class.
              * Sadly wonde won't tell you who this person is; just their id
@@ -565,6 +568,12 @@ class Classes implements IStrategy
             $name = $externalId;
 
             $this->saveInvolvement($event, $classEntry, $name, $externalId);
+
+            $this->log->debug(sprintf(
+                '%s: created involvement override for %s for an instance of this class',
+                $class['code'],
+                $externalId
+            ));
         }
 
         /* Save sis_class_user involvements
