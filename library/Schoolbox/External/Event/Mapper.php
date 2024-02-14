@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 
 /**
@@ -191,7 +192,7 @@ class Mapper extends \Schoolbox\Mapper
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute($params));
+        $statement->execute($params);
 
         /* This creates all the events and their relevant folder(s)
          */
@@ -222,88 +223,88 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         /* Sometimes you just have teachers involved via overrides and they're not
-         * actually enrolled in this class at all. Grab them specially and pop th em
+         * actually enrolled in this class at all. Grab them specially and pop them
          * all on top of whatever we might have derived previously to ensure nobody
          * gets left out
          *
          * This covers the following use cases:
          *     * has students, no enrolled staff from sis_class_user
-         *     * has students, some enrolled staff that survived SUBTRACT overrides
+         *     * has students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF overrides
          *     * has students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF
          *       overrides but also got added via ADD overrides
          *
          *     * no students, no enrolled staff from sis_class_user
-         *     * ha students, some enrolled staff that survived SUBTRACT overrides
-         *     * ha students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF
+         *     * no students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF overrides
+         *     * no students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF
          *       overrides but also got added via ADD overrides
          */
 
         /* First, to save egregious amounts of queries, we can compile a micro local lookup
          * by collating all the staff external ids out of the manifest first
          */
+        $staffExternalIds = [];
+
+        foreach ($eventTuples as $eventId => $externalIds) {
+            $staffExternalIds = array_merge($staffExternalIds, $externalIds);
+        }
+
+        /* Mega list
+         */
+        $staffExternalIds = array_unique($staffExternalIds);
+
+        /* Grab the names for everyone in the mega list
+         */
+        $placeholders = Builder::getArrayPlaceholders($staffExternalIds, 'externalId');
+        $params = Builder::getArrayParameters($staffExternalIds, 'externalId');
+
+        $query = "
+            SELECT
+                u.synergy_id AS externalId,
+                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`,
+                g.group_type as `g.group_type`
+            FROM `user` u
+            LEFT JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
+            WHERE u.deleted_at IS NULL
+            AND g.group_type = :staffRoleType
+            AND u.synergy_id IN {$placeholders}
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array_merge([
+            'staffRoleType' => \Schoolbox\Role::STAFF
+        ], $params));
+
+        /* Shank into a hash table
+         */
+        $staffLookup = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $staffLookup[$row['externalId']] = [
+                'id' => $row['u.id'],
+                'name' => implode(' ', array_filter([
+                    $row['u.title'],
+                    $row['u.firstname'],
+                    $row['u.lastname']
+                ], static function ($val) {
+                    return '' !== trim((string)$val);
+                }))
+            ];
+        }
 
         /* Then assign them procedurally with a second loop - saving us an O(n^2) complexity
-         * algorithm and a boatload of db queries
+         * algorithm with a boatload of db queries
          */
+        foreach ($stack as $eventId => $event) {
+            foreach ($eventTuples[$eventId] as $staffExternalId) {
+                $person = $staffLookup[$staffExternalId];
 
-
-            /* Populate staff members in a cheap hydraty way
-             * Note that some classes could potentially have students-only; if we use
-             * WHERE group_type = 'staff' these students-only classes won't appear in
-             * the result set
-             */
-//            $userId = (int)$row['u.id'];
-//            $externalId = (string)$row['externalId'];
-//            $eventId = $row['id'];
-//            $groupType = (string)$row['g.group_type'];
-//
-//            /* Find out if this user is in the event manifest; the list of staff should
-//             * only contain the people actually teaching the class instance (involvements)
-//             * and not blindly assume "anyone associated with the class" (enrolments)
-//             */
-//            if (\Schoolbox\Role::STAFF === $groupType && isset($eventTuples[$eventId][$externalId])) {
-//                $name = implode(' ', array_filter([
-//                    $row['u.title'],
-//                    $row['u.firstname'],
-//                    $row['u.lastname']
-//                ], static function ($val) {
-//                    return '' !== trim((string)$val);
-//                }));
-//
-//                /* Trickle it in
-//                 */
-//                $stack->getOffset($row['id'])->addStaff($userId, $name);
-//            }
-//
-//            /* Sometimes you just have teachers involved via overrides and they're not
-//             * actually enrolled in this class at all. Grab them specially and pop th em
-//             * all on top of whatever we might have derived previously to ensure nobody
-//             * gets left out
-//             *
-//             * This covers the following use cases:
-//             *     * has students, no enrolled staff from sis_class_user
-//             *     * has students, some enrolled staff that survived SUBTRACT overrides
-//             *     * has students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF
-//             *       overrides but also got added via ADD overrides
-//             *
-//             *     * no students, no enrolled staff from sis_class_user
-//             *     * ha students, some enrolled staff that survived SUBTRACT overrides
-//             *     * ha students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF
-//             *       overrides but also got added via ADD overrides
-//             */
-//            $overrideQuery = "
-//            SELECT
-//                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`,
-//                g.group_type as `g.group_type`
-//            FROM  `user` u
-//            LEFT JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
-//            WHERE u.synergy_id = :externalId
-//            AND u.deleted_at IS NULL
-//            AND g.deleted_at IS NULL
-//        ";
-//
-//            $overrideStatement = $this->getDatabase()->prepare($overrideQuery);
-//        }
+                /* $eventId for some reason wasn't hydrated; skip past it
+                 */
+                if ($stack->getOffset($eventId)) {
+                    $stack->getOffset($eventId)->addStaff($person['id'], $person['name']);
+                }
+            }
+        }
 
         return $stack;
     }
