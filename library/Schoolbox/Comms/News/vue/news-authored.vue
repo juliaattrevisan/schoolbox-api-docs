@@ -79,7 +79,7 @@ export default {
                     this.allArticles = response;
                     this.filteredArticles = response;
 
-                    //populate stauses for tab selections
+                    //populate statuses for tab selections
                     response.forEach((article) => {
                         this.statuses["All"]++;
                         this.statuses[article.status]++;
