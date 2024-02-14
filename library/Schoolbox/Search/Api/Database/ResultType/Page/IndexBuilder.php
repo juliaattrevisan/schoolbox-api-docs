@@ -51,7 +51,7 @@ class IndexBuilder extends BaseBuilder
         foreach ($query as $row) {
             $index = $this->buildIndex(
                 (string)$row['id'],
-                $row['name'] . ((strlen($row['folderCodes'] ?? '') > 0) ? " ({$row['folderCodes']})": ''),
+                $row['name'] . ((strlen($row['folderCodes'] ?? '') > 0) ? " ({$row['folderCodes']})" : ''),
                 $row['type'],
                 $row['updated_at'],
                 false, // Pages/folders are always maximally relevant.
