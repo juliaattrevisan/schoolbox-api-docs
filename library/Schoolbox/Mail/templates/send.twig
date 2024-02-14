@@ -51,7 +51,7 @@
                 render: {
                     item: function (data, escape) {
                         // Render invalid emails with error styling, if they somehow make it past create()
-                        var value = data[this.settings.valueField];
+                        let value = data[this.settings.valueField];
                         if (!validateEmail(value)) {
                             return '<div class="item error">' + escape(value) + ' - Invalid email format</div>';
                         }
@@ -65,7 +65,15 @@
                             return '';
                         }
                         return '<div class="create">Add <strong>' + escape(data.input) + '</strong>&hellip;</div>';
-                    }
+                    },
+                    option: function (item, escape) {
+                        // Display the user's role name as metadata beneath their name
+                        let value = item[this.settings.valueField],
+                            role  = item.role ?? '',
+                            meta  = role === '' ? '' : ('<p class="meta">' + escape(item.role) + '</p>')
+                        ;
+                        return '<div class="item">' + escape(value) + meta + '</div>';
+                    },
                 }
             }
         }
