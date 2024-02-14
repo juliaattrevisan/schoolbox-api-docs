@@ -29,6 +29,15 @@ class Hydrator extends BaseHydrator
      */
     public const BASE_TYPE = 'file';
 
+    public const SUB_TYPES = [
+        // Filter types and subtypes are defined in ResultTypes.ts.  The subtypes below must match that file.
+        'file.audio',
+        'file.document',
+        'file.image',
+        'file.video',
+        'file.other',
+    ];
+
     /**
      * Constructor
      *
@@ -40,14 +49,6 @@ class Hydrator extends BaseHydrator
         private Access $access,
         private PrefixGenerator $prefixGenerator
     ) {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getBaseType(): string
-    {
-        return self::BASE_TYPE;
     }
 
     /**

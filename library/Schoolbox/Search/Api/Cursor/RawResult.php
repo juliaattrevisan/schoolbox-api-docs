@@ -23,7 +23,7 @@ class RawResult
      *
      * @param string $id        The ID of the search result subject.
      *                          (string not int because we need to accommodate compound IDs).
-     *                          (See /Search/Api/Database/ResultType/Textbox/QueryParamBuilder.php).
+     *                          (See /Search/Api/Database/ResultType/Textbox/IndexBuilder.php).
      * @param string $title     The title of the search result.
      * @param string $type      The type of search result.
      * @param float  $relevance A relevancy score for this result: should be between 0 and 1

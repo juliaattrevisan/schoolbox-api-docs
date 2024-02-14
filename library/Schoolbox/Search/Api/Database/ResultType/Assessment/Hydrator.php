@@ -40,6 +40,16 @@ class Hydrator extends BaseHydrator
      */
     public const BASE_TYPE = 'assessment';
 
+    public const SUB_TYPES = [
+        // Filter types and subtypes are defined in ResultTypes.ts.  The subtypes below must match that file.
+        'assessment.dueWork',
+        'assessment.lessonPlan',
+        'assessment.project',
+        'assessment.lti',
+        'assessment.task',
+        'assessment.quiz'
+    ];
+
     /**
      * Constructor
      *
@@ -57,14 +67,6 @@ class Hydrator extends BaseHydrator
         private Authorizer $authorizer,
         private ServerRequestInterface $request
     ) {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getBaseType(): string
-    {
-        return self::BASE_TYPE;
     }
 
     /**

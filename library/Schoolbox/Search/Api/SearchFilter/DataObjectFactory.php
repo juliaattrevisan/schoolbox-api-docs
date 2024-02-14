@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Search\Api\Database\ResultType;
 
 /**
  * Factory for creating DataObjects.
@@ -46,6 +47,24 @@ class DataObjectFactory
         if (isset($decodedFilter['types'])) {
             if (is_array($decodedFilter['types']) && array_is_list($decodedFilter['types'])) {
                 $types = $decodedFilter['types'];
+
+                // Expand parent types to include child types.
+                // This is done so API users can specify filter 'user' to mean "'user' plus all subtypes of 'user'", etc.
+                $typesAsKeys = array_fill_keys($types, null);
+                foreach (array_keys($typesAsKeys) as $type) {
+                    $subtypesToAdd = match ($type) {
+                        'assessment' => ResultType\Assessment\Hydrator::SUB_TYPES,
+                        'file' => ResultType\File\Hydrator::SUB_TYPES,
+                        'page' => ResultType\Page\Hydrator::SUB_TYPES,
+                        'user' => ResultType\User\Hydrator::SUB_TYPES,
+                        default => [],
+                    };
+                    foreach ($subtypesToAdd as $subtypeToAdd) {
+                        // Subtypes are added as keys so as not to introduce duplicates.
+                        $typesAsKeys[$subtypeToAdd] = null;
+                    }
+                }
+                $types = array_keys($typesAsKeys);
             } else {
                 throw new Exception('Invalid filter: types is not a list of valid types');
             }

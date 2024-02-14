@@ -25,6 +25,26 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     public const ENCODING = 'UTF-8';
 
     /**
+     * Weighting factor for title relevance scores.
+     * Title relevance needs to be weighted higher than content relevance to offset the inherent bias towards long
+     * content exhibited by the fulltext matching algorithm.
+     * (See 'Learnings about fulltext searches' in this PR: https://github.com/alaress/schoolbox/pull/29773)
+     */
+    public const RELEVANCE_WEIGHTING_TITLE = 10;
+    /**
+     * Weighting factor for content relevance scores.
+     * Content relevance needs to be weighted lower than title relevance to offset the inherent bias towards long
+     * content exhibited by the fulltext matching algorithm.
+     * (See 'Learnings about fulltext searches' in this PR: https://github.com/alaress/schoolbox/pull/29773)
+     */
+    public const RELEVANCE_WEIGHTING_CONTENT = 1;
+    /**
+     * Weighting factor for results whose relevant date (modification date for most result types) is recent.
+     * Note that this relevance score must hae no bearing on whether an item is included in search results.
+     */
+    public const RELEVANCE_WEIGHTING_RECENT_DATE = 5;
+
+    /**
      * @inheritdoc
      */
     public function buildMatchQueryParams(
@@ -34,45 +54,16 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         int $limit,
         string $paramKeySuffix = ''
     ): ?QueryParams {
-        ['where' => $whereParts, 'params' => $params] = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
-
-        $relevancePart = $this->buildRelevanceExpression($paramKeySuffix);
-        $titlePart     = $this->buildTitleExpression($paramKeySuffix);
-        $typePart      = $this->buildTypeExpression($paramKeySuffix);
-        $idPart        = $this->buildIdExpression($paramKeySuffix);
-        $datePart      = $this->buildDateExpression($paramKeySuffix);
-        $creatorPart   = $this->buildCreatorExpression($paramKeySuffix);
-        $folderPart    = $this->buildFolderExpression($paramKeySuffix);
-        $havingParts   = [];
+        $params     = $this->buildBaseWhereParams($keyword, $paramKeySuffix);
+        $typePart   = $this->buildTypeExpression($paramKeySuffix);
+        $datePart   = $this->buildDateExpression($paramKeySuffix);
+        $whereParts = [];
 
         // Apply filter
         if ($filter->types) {
-            $handledSubtypes = array_filter($filter->types, [$this, 'handlesSubtype']);
-            if (!empty($handledSubtypes)) {
-                $bindings = Builder::getBindings($handledSubtypes, "filterType$paramKeySuffix");
-
-                // Why introduce a HAVING clause?
-                // ------------------------------
-                // Variable `type` is the result of an expression, and so will not be available in the WHERE clause.
-                // It will be available in the HAVING clause however, so let's put it there instead.
-                // (Note `type` comes from the SELECT clause, defined in this function below).
-                // We ought to be able to use the expression itself in the WHERE clause, like this:
-                //    Example: $whereParts = "$typePart IN ({$bindings->getPlaceholder()})";
-                // But that does not produce expected results for unknown reasons.  So we introduce a HAVING clause.
-                // @see https://github.com/alaress/schoolbox/pull/28994
-                $havingParts[] = "`type` IN ({$bindings->getPlaceholder()})";
-
-                $params = array_merge($params, $bindings->getParams());
-            } else {
-                // Does this handle any of the filter's types directly?
-                // If so, don't apply a having part.
-                $handledTypes = array_filter($filter->types, [$this, 'handlesType']);
-
-                // Otherwise, there are no relevant types in this filter: skip
-                if (empty($handledTypes)) {
-                    return null;
-                }
-            }
+            $bindings = Builder::getBindings($filter->types, "filterType$paramKeySuffix");
+            $whereParts[] = "$typePart IN ({$bindings->getPlaceholder()})";
+            $params = array_merge($params, $bindings->getParams());
         }
         if ($filter->fromDate) {
             // No date part? Exclude this type of result entirely
@@ -94,6 +85,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         if ($filter->creator) {
             // No creator part? Exclude this type of result entirely
+            $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
             if (isset($creatorPart)) {
                 $whereParts[] = "$creatorPart = :filterCreator$paramKeySuffix";
                 $params["filterCreator$paramKeySuffix"] = $filter->creator->getId();
@@ -103,6 +95,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         if ($filter->folder) {
             // No folder part? Exclude this type of result entirely
+            $folderPart           = $this->buildFolderExpression($paramKeySuffix);
             if (isset($folderPart)) {
                 $whereParts[] = "$folderPart = :filterFolder$paramKeySuffix";
                 $params["filterFolder$paramKeySuffix"] = $filter->folder->getId();
@@ -111,6 +104,19 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
             }
         }
 
+        $whereParts[] = "(
+            {$this->buildTitleRelevanceExpressionForWhereClause($keyword, $paramKeySuffix)} > 0 OR
+            {$this->buildContentRelevanceExpressionForWhereClause($keyword, $paramKeySuffix)} > 0
+        )";
+
+        $titlePart          = $this->buildTitleExpression($paramKeySuffix);
+        $idPart             = $this->buildIdExpression($paramKeySuffix);
+        $totalRelevancePart = "(
+            {$this->buildTitleRelevanceExpression($keyword, $paramKeySuffix)} +
+            {$this->buildContentRelevanceExpression($keyword, $paramKeySuffix)} +
+            {$this->buildDateRelevanceExpression($keyword, $paramKeySuffix)}
+        )";
+
         // Apply cursor
         if ($cursor) {
             $cursorSearchParts = [
@@ -118,10 +124,10 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
                 //  * The direction of the comparisons here (> or <) must match the directions used in the ORDER BY clause below, in the following way:
                 //     * ORDER BY ASC  below implies < here.
                 //     * ORDER BY DESC below implies > here.
-                "($relevancePart < :cursorRelevance$paramKeySuffix)", // < because ORDER BY relevance DESC.
-                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart > :cursorTitle$paramKeySuffix)", // > because ORDER BY title ASC.
-                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart > :cursorType$paramKeySuffix)", // > because ORDER BY type ASC.
-                "($relevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart = :cursorType$paramKeySuffix AND $idPart < :cursorId$paramKeySuffix)", // < because ORDER BY id DESC.
+                "($totalRelevancePart < :cursorRelevance$paramKeySuffix)", // < because ORDER BY relevance DESC.
+                "($totalRelevancePart = :cursorRelevance$paramKeySuffix AND $titlePart > :cursorTitle$paramKeySuffix)", // > because ORDER BY title ASC.
+                "($totalRelevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart > :cursorType$paramKeySuffix)", // > because ORDER BY type ASC.
+                "($totalRelevancePart = :cursorRelevance$paramKeySuffix AND $titlePart = :cursorTitle$paramKeySuffix AND $typePart = :cursorType$paramKeySuffix AND $idPart < :cursorId$paramKeySuffix)", // < because ORDER BY id DESC.
             ];
 
             $whereParts[] = '(' . implode(' OR ', $cursorSearchParts) . ')';
@@ -135,13 +141,12 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         $from = $this->buildFromStatement($paramKeySuffix);
         $query = (
             "SELECT DISTINCT
-                $idPart        AS id,
-                $titlePart     AS title,
-                $typePart      AS type,
-                $relevancePart AS relevance
+                $idPart             AS id,
+                $titlePart          AS title,
+                $typePart           AS type,
+                $totalRelevancePart AS relevance
             $from" .
-            ((count($whereParts) > 0) ? "\nWHERE " . implode(' AND ', $whereParts) : '') .
-            ((count($havingParts) > 0) ? "\nHAVING " . implode(' AND ', $havingParts) : '')
+            "\nWHERE " . implode(' AND ', $whereParts)
         );
 
         // Build order parts.
@@ -149,13 +154,12 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         //  * Order here must match order in library/Schoolbox/Search/Api/Database/AggregateSource->search().
         //  * The order of `id` is DESC because all other things being equal, we want more recently created rows to
         //    appear before less recently created rows.
-        $orderParts = [];
-        if ($this->isOrderedByRelevance()) {
-            $orderParts[] = "$relevancePart DESC";
-        }
-        $orderParts[] = "$titlePart ASC";
-        $orderParts[] = "`type` ASC";
-        $orderParts[] = "$idPart DESC";
+        $orderParts = [
+            'relevance DESC',
+            'title ASC',
+            'type ASC',
+            'id DESC',
+        ];
         $query .= ' ORDER BY ' . implode(', ', $orderParts);
         $query .= " LIMIT :limit$paramKeySuffix";
 
@@ -243,25 +247,47 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
      *
      * @param string $keyword The search term from `buildMatchQueryParams`.
      * @param string $paramKeySuffix
-     * @return array{where: array<string>, params: array}
+     * @return non-empty-array<non-falsy-string, string|null>
      */
-    abstract protected function buildBaseWhereParams(string $keyword, string $paramKeySuffix = ''): array;
+    abstract protected function buildBaseWhereParams(
+        string $keyword,
+        string $paramKeySuffix = ''
+    ): array;
 
     /**
      * Build the expression for determining the relevance for an item in this
-     * search, as used in the `SELECT` and `WHERE` parts of the query.
+     * search, as used in the `SELECT` and `ORDER BY` parts of the query.
+     * This should return a non-zero number if the record should be included based on its title, and the number should
+     * be higher for better matches and lower for lesser matches.
      *
-     * This should evaluate to a decimal number between 0 and 1: the greater the
+     * This should evaluate to a decimal number - the greater the
      * number, the more relevant the result.
      *
-     * Currently, the relevance of a result is not dependent on how closely it
-     * matches the search term: thus, this doesn't take the `$keyword` from
-     * `buildMatchQueryParams`.
-     *
+     * @param string $keyword
      * @param string $paramKeySuffix
      * @return string An SQL expression for determining
      */
-    abstract protected function buildRelevanceExpression(string $paramKeySuffix = ''): string;
+    abstract protected function buildTitleRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
+
+    /**
+     * Build the expression for determining the relevance for an item in this
+     * search, as used in the `WHERE` part of the query.
+     * This should return a non-zero number if the record should be included based on its title.
+     *
+     * One may wish for the relevance used in the WHERE part to differ from the
+     * relevance used in the SELECT or ORDER BY part for efficiency reasons.
+     *
+     * @param string $keyword
+     * @param string $paramKeySuffix
+     * @return string
+     */
+    abstract protected function buildTitleRelevanceExpressionForWhereClause(string $keyword, string $paramKeySuffix = ''): string;
+
+    abstract protected function buildContentRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
+
+    abstract protected function buildContentRelevanceExpressionForWhereClause(string $keyword, string $paramKeySuffix = ''): string;
+
+    abstract protected function buildDateRelevanceExpression(string $keyword, string $paramKeySuffix = ''): string;
 
     /**
      * Does the relevance of an item depend on the evaluation of an expression?
@@ -300,18 +326,6 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
     protected function handlesType(string $type): bool
     {
         return $type === $this->getType();
-    }
-
-    /**
-     * By default, a query+param builder handles a type if `$type` starts with
-     * `$this->getType()`
-     *
-     * @param string $type
-     * @return bool
-     */
-    protected function handlesSubtype(string $type): bool
-    {
-        return str_starts_with($type, $this->getType() . '.');
     }
 
     /**

@@ -17,8 +17,7 @@ use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
 /**
- * Base hydrator, with a simple implementation of `accepts` which requires a
- * `getBaseType` method be implemented.
+ * Base hydrator, with a simple implementation of `accepts`.
  */
 abstract class BaseHydrator implements IHydrator
 {
@@ -27,6 +26,10 @@ abstract class BaseHydrator implements IHydrator
      */
     public const DESCRIPTION_LENGTH = 300;
 
+    public const BASE_TYPE = 'TO_BE_OVERRIDDEN';
+
+    public const SUB_TYPES = [];
+
     /**
      * For use in multibyte string manipulations.
      */
@@ -34,21 +37,14 @@ abstract class BaseHydrator implements IHydrator
 
     /**
      * This hydrator accepts any raw result whose:
-     * * type matches `$this->getBaseType()`
-     * * type starts with `$this->getBaseType() . '.'`
+     * * type matches self::BASE_TYPE
+     * * type starts with self::BASE_TYPE . '.'
      */
     public function accepts(RawResult $match): bool
     {
-        $baseType = $this->getBaseType();
-        return $match->type === $baseType || str_starts_with($match->type, $baseType . '.');
+        // Using static:: instead of self:: ensures the value comes from the child class (if it is defined there).
+        return $match->type === static::BASE_TYPE || str_starts_with($match->type, static::BASE_TYPE . '.');
     }
-
-    /**
-     * What is the base type this hydrator accepts?
-     *
-     * @return string
-     */
-    abstract protected function getBaseType(): string;
 
     /**
      * Helper for building a base URL for use across hydrators.

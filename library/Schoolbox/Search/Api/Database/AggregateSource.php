@@ -138,7 +138,13 @@ class AggregateSource implements ISource
                 continue;
             }
 
-            $queryParams = $queryParamBuilder->buildMatchQueryParams($keyword, $filter, $cursor, $limit, $paramKeySuffix);
+            $queryParams = $queryParamBuilder->buildMatchQueryParams(
+                $keyword,
+                $filter,
+                $cursor,
+                $limit,
+                $paramKeySuffix
+            );
             if ($queryParams) {
                 $queries[] = $queryParams->query;
                 $params    = array_merge($params, $queryParams->params);
@@ -154,6 +160,11 @@ class AggregateSource implements ISource
             'exists' => true,
             default => throw new InvalidArgumentException("Unexpected queryType '$queryType'."),
         };
+
+        if (count($queries) === 1 && !$existsOnly) {
+            // If there is only one query, no need to wrap it in another SELECT.
+            return [$queries[0], $params];
+        }
 
         // UNION all queries together.
         $queryString = (

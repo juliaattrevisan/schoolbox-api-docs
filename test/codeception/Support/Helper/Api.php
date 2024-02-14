@@ -245,7 +245,7 @@ class Api extends \Codeception\Module
         $user = $this->userMapper->createModel()
                                  ->setUsername($username)
                                  ->setFirstname($username)
-                                 ->setLastname($this->generateText(8))
+                                 ->setLastname($this->generateText(8, true))
                                  ->setRole($this->getRole($roleType))
                                  ->setCampusCollection($this->getCampuses())
                                  ->setLocalEmail(false)

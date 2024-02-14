@@ -76,11 +76,11 @@ class IndexBuilder extends BaseBuilder
         ";
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND f.modified >= :fromDate';
+            $queryString .= ' AND f.modified >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND f.modified <= :toDate';
+            $queryString .= ' AND f.modified <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -97,7 +97,6 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 $row['folder_id'],
             );
-            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['fulltext_index1'], self::INDEX_STRATEGY_HTML);
             $index = $this->addFulltextIndex($index, $row['fulltext_index2'], self::INDEX_STRATEGY_HTML);
             yield $index;

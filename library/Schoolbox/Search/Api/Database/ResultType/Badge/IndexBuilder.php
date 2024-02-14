@@ -34,11 +34,11 @@ class IndexBuilder extends BaseBuilder
         ";
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND b.updated_at >= :fromDate';
+            $queryString .= ' AND b.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND b.updated_at <= :toDate';
+            $queryString .= ' AND b.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -55,7 +55,6 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 null,
             );
-            $index = $this->addFulltextIndex($index, $row['title'], self::INDEX_STRATEGY_TEXT);
             $index = $this->addFulltextIndex($index, $row['fulltext_index'], self::INDEX_STRATEGY_HTML);
             yield $index;
         }

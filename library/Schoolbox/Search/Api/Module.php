@@ -104,10 +104,7 @@ class Module extends BaseModule
         $httpRequest = $this->injector->get('httpRequest');
 
         $queryParamBuilders = [
-            new Database\Index\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\User\QueryParamBuilder($config, $database->getQuoter()),
-            new Database\ResultType\Page\QueryParamBuilder($database->getQuoter()),
-            new Database\ResultType\Tile\QueryParamBuilder($database->getQuoter()),
+            new Database\Index\QueryParamBuilder(),
         ];
 
         $hydrators = [
@@ -169,10 +166,9 @@ class Module extends BaseModule
 
         // See similar check in Search/Controller->getFiltersRawArray().
         if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
-            // Note that the QueryParamBuilder and Hydrator added here might be removed in the controller if it turns
-            // out that the user does not have access to badges.  User permission based checks cannot be done here
-            // because the logged-in user object is not available here.
-            // @see Search/Api/Controller->pruneDependenciesDueToUserPermissions().
+            // Ideally we would only add the Badge\Hydrator if the user has permission to see badges.  However, user
+            // permission based checks cannot be done here because the logged-in user object is not available here.
+            // So instead user permission checks are applied within in the Badge\Hydrator.
             $hydrators[] = new Database\ResultType\Badge\Hydrator(
                 $mapperFactory->get(BadgeMapper::class),
                 new PrefixGenerator($this->getConfig()),

@@ -67,9 +67,6 @@ class SearchFileCest
                 continue;
             }
 
-//            $count = $i->grabDataFromResponseByJsonPath('$.metadata.count');
-//            $i->comment("$count[0] found.");
-
             $schemaFile = '/tmp/schoolbox-api-docs/openapi/components/schemas/search/resultTypes/common.yaml';
             if (file_exists($schemaFile)) {
                 $schema           = Yaml::parseFile($schemaFile);
@@ -89,16 +86,6 @@ class SearchFileCest
     {
         $title = $file->getTitle();
 
-        // Currently, search for a base type doesn't work:
-        // must provide all subtypes instead.
-        $subtypes = [
-            'file.document',
-            'file.image',
-            'file.video',
-            'file.audio',
-            'file.other',
-        ];
-
         yield [
             'keyword' => $title,
             'valid'   => true,
@@ -106,14 +93,14 @@ class SearchFileCest
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types' => $subtypes,
+                'types' => ['file']
             ],
             'valid'   => true,
         ];
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types' => $subtypes,
+                'types' => ['file'],
                 'date'  => [
                     'from' => $file->getCreatedAt()->addDays(-1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
@@ -123,7 +110,7 @@ class SearchFileCest
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types' => $subtypes,
+                'types' => ['file'],
                 'date'  => [
                     'to' => (\Alaress_Date_Format::now())->addDays(1)->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT),
                 ],
@@ -133,7 +120,7 @@ class SearchFileCest
         yield [
             'keyword' => $title,
             'filter'  => [
-                'types'   => $subtypes,
+                'types'   => ['file'],
                 'creator' => [
                     'id' => $file->getOwner()->getId(),
                 ],
