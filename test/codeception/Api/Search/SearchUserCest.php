@@ -160,7 +160,7 @@ class SearchUserCest
             'filter'  => [
                 'types' => 'user',
             ],
-            'valid'   => false, // not array
+            'valid'   => false, // Not array.
         ];
     }
 }
