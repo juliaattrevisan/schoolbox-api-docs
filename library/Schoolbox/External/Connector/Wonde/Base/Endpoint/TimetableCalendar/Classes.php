@@ -256,9 +256,7 @@ class Classes implements IStrategy
          * Every other school should presume usage of $class['code']
          */
         $class['code'] = $class['code'] ?? $class['mis_id'];
-        if ('12 BUCON 63' !== $class['name']) {
-            return;
-        }
+
         foreach ($class['lessons']['data'] as $lesson) {
             /* Decide if we need to process this lesson
              * Outside the window? Skip it
