@@ -12,7 +12,6 @@ use Schoolbox\User;
 
 class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Schoolbox\Resource\File\Mapper
      */
@@ -162,7 +161,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         'FILE_ID'              => $file->getId(),
                         'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
                         'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
-                        'FILE_POSTED_BY'       => $mostRecentEditor->getFullName(),
+                        'FILE_POSTED_BY'       => Scrub::text($mostRecentEditor->getFullName()),
                         'FILE_POSTED_BY_ID'    => $mostRecentEditor->getId(),
                         'FILE_POSTED_DATE'     => $mostRecentDate->getShort(),
                         'FILE_POSTED_RELATIVE' => $mostRecentDate->getRelativeTime(),

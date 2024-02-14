@@ -82,7 +82,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         'POLL_QUESTION'     => Scrub::text($poll['question']),
                         'POLL_AUTHOR_ID'    => $author->getId(),
                         'POLL_AUTHOR_THUMB' => "/portrait.php?id={$author->getId()}&size=square64",
-                        'POLL_AUTHOR_NAME'  => $author->getFullName(),
+                        'POLL_AUTHOR_NAME'  => \Scrub::text($author->getFullName()),
                         'POLL_CREATED'      => $created->getRelativeTime(),
                     ]
                 );

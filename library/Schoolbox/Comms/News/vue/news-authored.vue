@@ -79,7 +79,7 @@ export default {
                     this.allArticles = response;
                     this.filteredArticles = response;
 
-                    //populate stauses for tab selections
+                    //populate statuses for tab selections
                     response.forEach((article) => {
                         this.statuses["All"]++;
                         this.statuses[article.status]++;
@@ -183,9 +183,9 @@ export default {
 <template>
     <div>
         <section>
-            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
+            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId" v-bind:style="(isArticlesLoaded && !allArticles.length) ? 'display:none' : ''">
                 <dd
-                    v-for="(stausCount, status) in activeStatuses"
+                    v-for="(statusCount, status) in activeStatuses"
                     :class="{ active: activeTabSelected === status }"
                     :key="status"
                 >

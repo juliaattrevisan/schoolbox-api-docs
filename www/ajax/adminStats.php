@@ -252,7 +252,7 @@ switch ($_POST['module']) {
                 $output[] = [
                     'date' => $date->getShort(),
                     'action' => $action,
-                    'name' => "{$log['firstname']} {$log['lastname']}"
+                    'name' => \Scrub::text("{$log['firstname']} {$log['lastname']}")
                 ];
             }
         }

@@ -203,7 +203,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                         'VIDEO_LIST_COMMENT'   => Scrub::text($video->getFile()->getDescription()),
                         'VIDEO_LIST_HIDDEN'    => $video->getFile()->getHidden() ? 'hidden' : '',
                         'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
-                        'VIDEO_LIST_POSTER'    => $video->getFile()->getOwner()->getFullName(),
+                        'VIDEO_LIST_POSTER'    => \Scrub::text($video->getFile()->getOwner()->getFullName()),
                     ]
                 );
 

@@ -269,7 +269,7 @@ class Controller extends Base
     private function importSingleUser($post, $logId, User $srcUser, User $destUser, $eportfolioList)
     {
         $dryRun = $post->getBool('dryRun', false);
-        $this->log('Importing ePortfolio pages from ' . $srcUser->getFullName() . ' to ' . $destUser->getFullName(), $logId);
+        $this->log('Importing ePortfolio pages from ' . \Scrub::text($srcUser->getFullName()) . ' to ' . \Scrub::text($destUser->getFullName()), $logId);
 
         $destUserId = $destUser->getId();
 

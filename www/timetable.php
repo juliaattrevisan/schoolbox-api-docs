@@ -153,7 +153,7 @@ foreach ($userList as $user) {
                 /* Only display subnav elements for timetables that contain data
                  */
                 $this->setVar([
-                                  'TIMETABLE_PERSON'  => $user->formatName(),
+                                  'TIMETABLE_PERSON'  => \Scrub::text($user->formatName()),
                                   'TIMETABLE_YEAR'    => $user->getYear() ? ', ' . $user->getYear()->getLongName($yearPrefix) : '',
                                   'TIMETABLE_USER_ID' => $user->getId(),
                                   'CAMPUS_ID'         => $campus->getId(),

@@ -32,7 +32,7 @@ if (is_array($superuserList)) {
         $loginLog = $userHandler->getUserLogins($superuser['username'], 1);
 
         $output = array(
-            'SUPERUSER_NAME' => $userHandler->formatName($superuser),
+            'SUPERUSER_NAME' => \Scrub::text($userHandler->formatName($superuser)),
             'SUPERUSER_LOGIN' => (
                 // Login logs are often purged to save space, so we must handle the case where no login logs exist.
                 empty($loginLog) ? '' : date(Config::get('date_short'), strtotime($loginLog[0]['date']))

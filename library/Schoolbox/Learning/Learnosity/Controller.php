@@ -716,7 +716,7 @@ class Controller extends Base
      * @param Model $attempt
      * @return array
      */
-    private function getStudentData(\Schoolbox\Learning\Quiz\Attempt\Model $attempt)
+    private function getStudentData(\Schoolbox\Learning\Quiz\Attempt\Model $attempt): array
     {
         return [
             'id' => $attempt->getUser()->getId(),
