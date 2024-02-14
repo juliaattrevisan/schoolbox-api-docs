@@ -279,6 +279,13 @@ class Classes implements IStrategy
             $finishAt = (new \Alaress_Date_Format(explode('.', $lesson['end_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
                 ->setTimezone($this->timezone);
 
+            $this->log->info(sprintf(
+                '%s %s on %s',
+                $class['name'],
+                $class['code'],
+                $startAt->getDatabase()
+            ));
+
             /* Starts too far in the past
              */
             if ($startAt->lt($this->fromDate)) {
