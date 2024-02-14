@@ -26,13 +26,14 @@ class IndexBuilder extends BaseBuilder
             SELECT
                 f.id,
                 f.name,
-                fc.code,
+                GROUP_CONCAT(fc.code ORDER BY fc.code ASC SEPARATOR ',') AS folderCodes,
                 f.updated_at,
                 f.created_by,
                 " . $this->buildTypeExpression() . " AS type
             FROM folder f
             " . $this->getJoinsFromFolderForTypeExpression() . "
             WHERE f.deleted_at IS NULL
+            GROUP BY f.id
         ";
         $params = [];
         if ($fromDate) {
@@ -50,17 +51,13 @@ class IndexBuilder extends BaseBuilder
         foreach ($query as $row) {
             $index = $this->buildIndex(
                 (string)$row['id'],
-                $row['name'],
+                $row['name'] . ((strlen($row['folderCodes'] ?? '') > 0) ? " ({$row['folderCodes']})": ''),
                 $row['type'],
                 $row['updated_at'],
                 false, // Pages/folders are always maximally relevant.
                 $row['created_by'],
                 null,
             );
-
-            if ($row['code'] && strlen($row['code']) > 0) {
-                $index = $this->addFulltextIndex($index, $row['code'], self::INDEX_STRATEGY_TEXT);
-            }
 
             yield $index;
         }
