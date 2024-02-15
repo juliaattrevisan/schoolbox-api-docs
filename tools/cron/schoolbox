@@ -111,6 +111,16 @@ MAILTO="support@schoolbox.com.au"
 #   the build queries to time out.
 */5 0-2,6-23 * * * www-data /usr/local/bin/jitter 150 php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-10 minute" >> /var/log/schoolbox/search-build-index.log 2>&1
 
+# 3:30: Last build before optimize
+0,5,10,15,20,25,30 3 * * * www-data /usr/local/bin/jitter 150 php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-10 minute" >> /var/log/schoolbox/search-build-index.log 2>&1
+
+# 5:30: First build after optimize
+# Build data which wouldn't have been built in the window
+30 5 * * * www-data /usr/local/bin/jitter 150 php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-130 minute" >> /var/log/schoolbox/search-build-index.log 2>&1
+
+# 5:35: Restart regular build cadence
+35,40,45,50,55 5 * * * www-data /usr/local/bin/jitter 150 php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-10 minute" >> /var/log/schoolbox/search-build-index.log 2>&1
+
 # Intellischool
 # sync data every 5min
 */5 * * * *     www-data    php /usr/share/schoolbox/tools/intellischool/intellischoolSync.php >> /var/log/schoolbox/intellischool.log 2>&1
