@@ -6,6 +6,20 @@ import { Meta } from "@storybook/addon-docs";
 
 _Draft_
 
-| Property    | Value | Description | CSS Custom Property | Example                                        |
-| ----------- | ----- | ----------- | ------------------- | ---------------------------------------------- |
-| depth-modal | `40`  | For modals  | `--depth-modal`     | ![depth modal example](/depth/depth-modal.jpg) |
+| Property         | Value  | Description                                                                                                                                | CSS Custom Property  | Example |
+| -----------      | -----  | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------- | |
+| depth-background | `0`    | The lowest depth level for elements that form the background of the UI, such as the page background or decorative elements.                | `--depth-background` | |
+| depth-base       | `1`    | Text, buttons, and basic content containers like paragraphs or divs.                                                                       | `--depth-base`       | |
+| depth-menu       | `10`   | Dropdown menus that appear when clicking on a navigation item or a context menu that appears on right-click.                               | `--depth-menu`       | |
+| depth-popover    | `30`   | Tooltips that appear when hovering over an icon or popovers that display additional information when clicking on a button.                 | `--depth-popover`    | |
+| depth-toast      | `50`   | Temporary notifications that appear at the top or bottom of the screen to indicate a successful action or an error message.                | `--depth-toast`      | |
+| depth-modals     | `70`   | Modal dialogs that prompt the user for confirmation or display additional information.                                                     | `--depth-modal`      | |
+| depth-fixedmenu  | `90`   | A fixed navigation bar that stays at the top of the screen even when scrolling or a fixed footer that remains at the bottom.               | `--depth-fixedMenu`  | |
+| depth-banner     | `110`  | A persistent banner at the top of the page displaying important announcements or a header containing the site's logo and navigation links. | `--depth-banner`     | |
+| depth-sidebar    | `130`  | A sidebar menu that slides in from the left/right side of the screen to provide additional navigation options.                             | `--depth-sidebar`    | |
+| depth-stepper    | `150`  | A step-by-step wizard that guides the user through a multi-step process or a progress bar indicating the completion status of a task.      | `--depth-stepper`    | |
+| depth-tabs       | `170`  | Tabbed navigation at the top of a page to switch between different sections or a tab bar at the bottom of a mobile app for navigation.     | `--depth-tabs`       | |
+| depth-card       | `190`  | A card component displaying an image, title, and description or a tile layout showing thumbnails of images.                                | `--depth-card`       | |
+| depth-footer     | `210`  | A footer containing copyright information, contact details, and links to other pages on the site.                                          | `--depth-footer`     | |
+| depth-deopdown   | `230`  | A dropdown menu that appears on top of other content when clicking on a button or a select dropdown that overlays other UI elements.       | `--depth-dropDown`   | |
+| depth-fullscreen | `250`  | A video player that expands to fill the entire screen when playing a video or a fullscreen text editor for distraction-free writing.       | `--depth-fullScreen` | |
