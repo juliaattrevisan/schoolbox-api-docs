@@ -35,6 +35,22 @@ export default {
             type: Boolean,
             required: true,
         },
+        showLearningMoments: {
+            type: Boolean,
+            required: true,
+        },
+        showGoals: {
+            type: Boolean,
+            required: true,
+        },
+        showAchievements: {
+            type: Boolean,
+            required: true,
+        },
+        showFeedback: {
+            type: Boolean,
+            required: true,
+        },
     },
     data() {
         return {
@@ -501,49 +517,49 @@ export default {
                         <div class="checklist">
                             <label class="title">Filter to:</label>
                             <ul class="option-list">
-                                <li v-if="config.routes.getCreateEvidenceForm">
+                                <li v-if="showLearningMoments">
                                     <input
+                                        id="filter-learningMoments"
+                                        v-model="selectedFilters.learningMoments"
                                         type="checkbox"
                                         data-filter-checkbox
-                                        id="filter-learningMoments"
                                         name="includeLearningMoments"
                                         @click="loadFilteredContent('', true)"
-                                        v-model="selectedFilters.learningMoments"
                                     />
                                     <label for="filter-learningMoments">Learning Moments</label>
                                 </li>
-                                <li>
+                                <li v-if="showGoals">
                                     <input
+                                        id="filter-goals"
+                                        v-model="selectedFilters.goals"
                                         type="checkbox"
                                         data-filter-checkbox
-                                        id="filter-goals"
                                         name="includeGoals"
-                                        @click="loadFilteredContent('', true)"
-                                        v-model="selectedFilters.goals"
                                         :true-value="true"
                                         :false-value="false"
+                                        @click="loadFilteredContent('', true)"
                                     />
                                     <label for="filter-goals">Goals</label>
                                 </li>
-                                <li>
+                                <li v-if="showAchievements">
                                     <input
+                                        id="filter-achievements"
+                                        v-model="selectedFilters.achievements"
                                         type="checkbox"
                                         data-filter-checkbox
-                                        id="filter-achievements"
                                         name="includeAchievements"
                                         @click="loadFilteredContent('', true)"
-                                        v-model="selectedFilters.achievements"
                                     />
                                     <label for="filter-achievements">Achievements</label>
                                 </li>
-                                <li>
+                                <li v-if="showFeedback">
                                     <input
+                                        id="filter-feedback"
+                                        v-model="selectedFilters.feedback"
                                         type="checkbox"
                                         data-filter-checkbox
-                                        id="filter-feedback"
                                         name="includeDueWork"
                                         @click="loadFilteredContent('', true)"
-                                        v-model="selectedFilters.feedback"
                                     />
                                     <label for="filter-feedback">Feedback</label>
                                 </li>
