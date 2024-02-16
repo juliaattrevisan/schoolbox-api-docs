@@ -225,10 +225,16 @@ class IndexBuilder extends App
 
         $this->getLogger()->notice(sprintf("Search indices rebuilt in %0.2fs", microtime(true) - $time));
 
-        $time = microtime(true);
-        $this->getLogger()->notice("Running ANALYZE TABLE search_index...");
-        $this->getDatabaseInternal()->execute('ANALYZE TABLE search_index')
-        $this->getLogger()->notice(sprintf("Finished running ANALYZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
+        // Run ANALYZE TABLE after fully rebuilding the search_index table.
+        // The purpose is to prevent errors of the type described in the link below from occurring.
+        // Those types of errors have been seen in testing.
+        // https://stackoverflow.com/questions/64397678/mysql-match-relevance-score-causes-double-value-is-out-of-range-error
+        if ($fromDate === null && $toDate === null) {
+            $time = microtime(true);
+            $this->getLogger()->notice("Running ANALYZE TABLE search_index...");
+            $this->getDatabaseInternal()->execute('ANALYZE TABLE search_index');
+            $this->getLogger()->notice(sprintf("Finished running ANALYZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
+        }
     }
 
     /**
