@@ -266,8 +266,6 @@ class External_DatabaseFactory
                         return new External_Synergetic_Scc_Class();
                     case "SMCS":
                         return new External_Synergetic_Smcs_Class();
-                    case "THS":
-                        return new External_Synergetic_Ths_Class();
                 }
                 return new External_Synergetic_Class();
             case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
