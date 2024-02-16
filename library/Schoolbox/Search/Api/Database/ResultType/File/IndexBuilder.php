@@ -59,15 +59,19 @@ class IndexBuilder extends BaseBuilder
     {
         $subtypeExpression = self::SUBTYPE_EXPRESSION;
         $joinStatement     = self::JOIN_STATEMENT;
-        $queryString       = "
+
+        // IMPORTANT:
+        //  * file.description is the title of the file as seen by Schoolbox users.
+        //  * file.realname is the name of the uploaded file.  Schoolbox users only see this name if they download the file.
+        $queryString = "
             SELECT
                 f.id,
-                f.realname AS title,
+                f.description AS title,
                 $subtypeExpression AS sub_type,
                 f.modified AS date,
                 f.owner AS created_by,
                 f.category AS folder_id,
-                f.description AS fulltext_index1,
+                f.realname AS fulltext_index1,
                 f.comment AS fulltext_index2
             FROM file f
             $joinStatement
@@ -97,8 +101,8 @@ class IndexBuilder extends BaseBuilder
                 $row['created_by'],
                 $row['folder_id'],
             );
-            $index = $this->addFulltextIndex($index, $row['fulltext_index1'], self::INDEX_STRATEGY_HTML);
-            $index = $this->addFulltextIndex($index, $row['fulltext_index2'], self::INDEX_STRATEGY_HTML);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index1'], self::INDEX_STRATEGY_TEXT);
+            $index = $this->addFulltextIndex($index, $row['fulltext_index2'], self::INDEX_STRATEGY_TEXT);
             yield $index;
         }
     }
