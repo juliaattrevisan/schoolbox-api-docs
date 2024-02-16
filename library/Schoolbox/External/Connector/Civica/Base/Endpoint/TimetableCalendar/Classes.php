@@ -136,6 +136,39 @@ class Classes implements IStrategy
     private function processClass(array $class): void
     {
         foreach ($class['sessions'] as $classInstance) {
+            /* Sometimes civica doesn't have a date and/or time for a class instance
+             * because civica reasons...they don't seem to know
+             */
+            if ('' === trim((string)$classInstance['date'])) {
+                $this->log->debug(sprintf(
+                    'Class instance for %s (%s) missing date: skipping',
+                    $class['subjectFullName'],
+                    $class['className']
+                ));
+
+                continue;
+            }
+
+            if ('' === trim((string)$classInstance['startTime'])) {
+                $this->log->debug(sprintf(
+                    'Class instance for %s (%s) missing start time: skipping',
+                    $class['subjectFullName'],
+                    $class['className']
+                ));
+
+                continue;
+            }
+
+            if ('' === trim((string)$classInstance['endTime'])) {
+                $this->log->debug(sprintf(
+                    'Class instance for %s (%s) missing end time: skipping',
+                    $class['subjectFullName'],
+                    $class['className']
+                ));
+
+                continue;
+            }
+
             /* Do a lookahead to see whether this classInstance is relevant
              * to $externalId or not
              */
