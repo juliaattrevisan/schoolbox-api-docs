@@ -14,7 +14,7 @@ module.exports = {
     },
     framework: {
         name: "@storybook/vue3-webpack5",
-        options: {},
+        options: { builder: { useSWC: true } }
     },
     staticDirs: ["../stories/assets"],
     stories: [
