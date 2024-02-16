@@ -1606,11 +1606,6 @@ parameters:
 			path: library/External/Synergetic/Smcs/Class.php
 
 		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/External/Synergetic/Ths/Class.php
-
-		-
 			message: "#^Method External_Synergetic_Timetable\\:\\:setDatabase\\(\\) is unused\\.$#"
 			count: 1
 			path: library/External/Synergetic/Timetable.php

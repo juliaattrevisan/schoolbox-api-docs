@@ -412,8 +412,6 @@ class External_DatabaseFactory
         switch ($siteSchoolCode) {
             case 'SMCS':
                 return new External_Synergetic_Smcs_Pastoral();
-            case 'THS':
-                return new External_Synergetic_Ths_Pastoral();
         }
         return new External_Synergetic_Pastoral();
     }
