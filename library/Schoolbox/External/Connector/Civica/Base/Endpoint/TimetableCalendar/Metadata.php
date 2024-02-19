@@ -44,9 +44,9 @@ class Metadata
      *
      * @param array $class
      * @param array $classInstance
-     * @return null|string
+     * @return string
      */
-    private function buildAttendanceLink(array $class, array $classInstance): ?string
+    private function buildAttendanceLink(array $class, array $classInstance): string
     {
         /* FIXME Is attendance link mandatory for every class, or just some?
          *  Find optionality
