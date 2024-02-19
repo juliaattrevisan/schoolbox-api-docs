@@ -81,6 +81,17 @@
             }
         }));
 
+        /**
+         * Initialise the simple editor.
+         * Also note the use of addToToolbar which adds the custom Blank plugin to the toolbar
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ["#inlineCKEditor"],
+                type: "inline",
+            }
+        }));
+
         /* Schoolbox Link Modal
          */
         $('#modalLinkButton').schoolboxLink({
@@ -177,6 +188,29 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <textarea id='simpleCKEditor'></textarea>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Inline Editor</h2>
+        <p class="meta">
+            This is the <b>inline</b> usage of our ckeditor.
+        </p>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <div id="inlineCKEditor">
+                            <p>Inline editor comes with a floating toolbar that becomes visible when the editor is focused (for example, by clicking it). Unlike classic editor, inline editor does not render instead of the given element, it simply makes it editable. As a consequence the styles of the edited content will be exactly the same before and after the editor is created.</p>
+                            <p>A common scenario for using inline editor is offering users the possibility to edit content in its real location on a web page instead of doing it in a separate administration section.</p>
+                        </div>
                     </div>
                 </fieldset>
             </section>

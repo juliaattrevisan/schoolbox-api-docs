@@ -3,7 +3,7 @@
  */
 export enum EditorType {
     CLASSIC = "classic",
-    INLINE = "INLINE",
+    INLINE = "inline",
 }
 
 /**
