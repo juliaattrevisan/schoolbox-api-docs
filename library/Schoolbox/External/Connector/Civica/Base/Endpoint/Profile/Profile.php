@@ -439,9 +439,9 @@ class Profile implements IStrategy
      * details, return null I guess, and let UPS sort them out
      *
      * @param array $enrolmentDetails
-     * @return null|array
+     * @return array
      */
-    private function sortEnrolmentDetails(array $enrolmentDetails): ?array
+    private function sortEnrolmentDetails(array $enrolmentDetails): array
     {
         $stack = [];
 
