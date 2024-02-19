@@ -242,7 +242,7 @@ class IndexBuilder extends App
             $time = microtime(true);
             $this->getLogger()->notice("Running OPTIMIZE TABLE search_index...");
             $this->getDatabaseInternal()->execute('OPTIMIZE TABLE search_index');
-            $this->getLogger()->notice(sprintf("Finished running ANALYZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
+            $this->getLogger()->notice(sprintf("Finished running OPTIMIZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
         }
     }
 
