@@ -106,9 +106,9 @@ class Model
      *
      * Each connector will implement a metadata payload specially
      *
-     * @var string|null
+     * @var array|null
      */
-    private ?string $metadata = null;
+    private ?array $metadata = null;
 
 
     /**
@@ -358,19 +358,19 @@ class Model
 
 
     /**
-     * @return string|null
+     * @return array|null
      */
-    public function getMetadata(): ?string
+    public function getMetadata(): ?array
     {
         return $this->metadata;
     }
 
 
     /**
-     * @param string|null $metadata
+     * @param array|null $metadata
      * @return Model
      */
-    public function setMetadata(?string $metadata): self
+    public function setMetadata(?array $metadata): self
     {
         $this->metadata = $metadata;
         return $this;
