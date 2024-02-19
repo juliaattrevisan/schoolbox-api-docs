@@ -35,7 +35,8 @@ class ValidUsesScheduleTimetable
         Factory::TASS_API,
         Factory::COMPASS,
         Factory::WONDE,
-        Factory::VERACROSS
+        Factory::VERACROSS,
+        Factory::CIVICA
     ];
 
 
