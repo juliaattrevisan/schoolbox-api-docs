@@ -225,14 +225,23 @@ class IndexBuilder extends App
 
         $this->getLogger()->notice(sprintf("Search indices rebuilt in %0.2fs", microtime(true) - $time));
 
-        // Run ANALYZE TABLE after fully rebuilding the search_index table.
-        // The purpose is to prevent errors of the type described in the link below from occurring.
-        // Those types of errors have been seen in testing.
-        // https://stackoverflow.com/questions/64397678/mysql-match-relevance-score-causes-double-value-is-out-of-range-error
+        // Run OPTIMIZE TABLE after fully rebuilding the search_index table.
+        // Note running OPTIMIZE TABLE on an InnoDB table is equivalent to:
+        //  1. Recreating the table
+        //  2. Running ANALYZE TABLE
+        // The purpose of running OPTIMIZE TABLE is to prevent errors of two types from occurring:
+        //  * This error: https://stackoverflow.com/questions/64397678/mysql-match-relevance-score-causes-double-value-is-out-of-range-error
+        //    (This will be fixed by the 'ANALYZE TABLE' command)
+        //  * Another type of error where if the FULLTEXT index is missing or broken, MySQL will just silently disregard
+        //    it, and return zero for any related MATCH...AGAINST commands instead of the expected non-zero return value.
+        //    (This type of error will not be fixed by ANALYZE TABLE alone - it requires that the table be rebuilt as well,
+        //     which is why we run OPTIMIZE instead of ANALYZE).
+        // Both types of errors described above have been seen in testing.
+
         if ($fromDate === null && $toDate === null) {
             $time = microtime(true);
-            $this->getLogger()->notice("Running ANALYZE TABLE search_index...");
-            $this->getDatabaseInternal()->execute('ANALYZE TABLE search_index');
+            $this->getLogger()->notice("Running OPTIMIZE TABLE search_index...");
+            $this->getDatabaseInternal()->execute('OPTIMIZE TABLE search_index');
             $this->getLogger()->notice(sprintf("Finished running ANALYZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
         }
     }
