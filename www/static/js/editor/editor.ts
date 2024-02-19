@@ -6,7 +6,7 @@ import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
-import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { EditorConfig, EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
 import { EditorDeleteEventInfo, EditorEvent } from "@js/editor/event/editorEvent";
 import { initCheckData } from "@js/editor/config/editorCheckData";
 import { modifyEditor } from "@js/editor/config/editorCreated";
@@ -38,6 +38,9 @@ function addDefaultConfig(config: EditorConfig) {
     if (config.toolbar === undefined) {
         config.toolbar = EditorToolbar.DEFAULT;
     }
+    if (config.type === undefined) {
+        config.type = EditorType.CLASSIC;
+    }
     if (config.maxCharCount === undefined) {
         config.maxCharCount = window.sbProps.MAX_BYTES_MYSQL_TEXT;
     }
@@ -50,13 +53,23 @@ function addDefaultConfig(config: EditorConfig) {
  */
 function create(sourceElement: HTMLElement, config: EditorConfig) {
     addDefaultConfig(config);
-    ClassicEditor.create(sourceElement, getConfig(config))
-        .then((editor) => {
-            void onCreated(sourceElement, editor, config);
-        })
-        .catch((error) => {
-            console.error(error.stack);
-        });
+    if (config.type === EditorType.CLASSIC) {
+        ClassicEditor.create(sourceElement, getConfig(config))
+            .then((editor) => {
+                void onCreated(sourceElement, editor, config);
+            })
+            .catch((error) => {
+                console.error(error.stack);
+            });
+    } else if (config.type === EditorType.INLINE) {
+        InlineEditor.create(sourceElement, getConfig(config))
+            .then((editor) => {
+                void onCreated(sourceElement, editor, config);
+            })
+            .catch((error) => {
+                console.error(error.stack);
+            });
+    }
 }
 
 /**
