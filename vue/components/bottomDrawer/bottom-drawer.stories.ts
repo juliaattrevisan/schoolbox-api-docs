@@ -1,43 +1,70 @@
+import type { Meta, StoryObj } from "@storybook/vue3";
 import BottomDrawer from "./bottom-drawer.vue";
 
-// More on default export: https://storybook.js.org/docs/vue/writing-stories/introduction#default-export
-export default {
-    title: "Components/Drawers/Bottom Drawer",
+/**
+ * To display content that appears when requested from the bottom of the window.
+ * Usually contains actions in response to selections on the page, for example choosing some users to edit.
+ * Once +1 users is selected the drawer will slide in from the bottom of the window.
+ *
+ * **Vue**: `vue/components/bottomDrawer/bottom-drawer.vue`
+ *
+ * **Note**: Due to this component using `getBoundingClientRect()` for positioning, it's best to view this component within the individual stories.
+ * Viewing it within the preview windows will not show the correct positioning.
+ */
+const meta: Meta<typeof BottomDrawer> = {
     component: BottomDrawer,
-    // More on argTypes: https://storybook.js.org/docs/vue/api/argtypes
+    decorators: [
+        () => ({
+            template: `
+            <div style="width: 100%; height: 500px">
+                <div style="width: 80%; margin: 0 auto;">
+                    <story />
+                </div>
+            </div>
+            `,
+        }),
+    ],
+    render: (args) => ({
+        components: {
+            BottomDrawer,
+        },
+        setup() {
+            return { args };
+        },
+        template: `
+            <bottom-drawer v-bind="args">
+                ${args.default}
+            </bottom-drawer>
+        `,
+    }),
     argTypes: {
         default: {
-            control: { type: "text" },
-            defaultValue: "<strong>Bottom drawer content goes here</strong>",
+            control: "text",
         },
     },
-    //wrap the component in some html: https://storybook.js.org/docs/vue/writing-stories/introduction#using-decorators
-    decorators: [() => ({ template: '<div style="width: 80%; margin: 0 auto;"><story /></div>' })],
-};
-
-// More on component templates: https://storybook.js.org/docs/vue/writing-stories/introduction#using-args
-const Template = (args, { argTypes }) => ({
-    components: { BottomDrawer },
-    setup() {
-        //👇 The args will now be passed down to the template
-        return { args };
+    args: {
+        default: "Any content can go here.",
+        showDrawer: true,
+        isAlwaysAnchored: true,
+        unanchorWidth: 2000,
     },
-    template: `
-        <bottom-drawer v-bind="args">
-            ${args.default}
-        </bottom-drawer>
-        `,
-});
-
-export const Default = Template.bind({});
-// More on args: https://storybook.js.org/docs/vue/writing-stories/args
-Default.args = {
-    showDrawer: false,
+    title: "Components/Drawers/Bottom Drawer",
 };
+export default meta;
+type Story = StoryObj<typeof BottomDrawer>;
 
-export const Unanchored = Template.bind({});
-Unanchored.args = {
-    showDrawer: true,
-    isAlwaysAnchored: false,
-    unanchorWidth: 2000,
+/**
+ * Displays the default `<bottom-drawer/>`
+ */
+export const Default: Story = {};
+
+/**
+ * Shows the drawer unanchored from the bottom of the page
+ */
+export const Unanchored: Story = {
+    args: {
+        showDrawer: true,
+        isAlwaysAnchored: false,
+        unanchorWidth: 2000,
+    },
 };
