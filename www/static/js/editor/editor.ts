@@ -1,5 +1,6 @@
 /**
- * To create a default CKEditor instances
+ * To create CKEditor instances.
+ * Refer to templates/core/pantry/editor.htm for further details on how to use this script.
  */
 
 import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
