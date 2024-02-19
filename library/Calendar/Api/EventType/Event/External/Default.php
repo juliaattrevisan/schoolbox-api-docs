@@ -148,16 +148,16 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             if (strlen(strip_tags($externalEvent['comment'] ?? '')) > 0) {
                 $eventDetail .= strip_tags($externalEvent['comment']);
             }
-            if (!empty($externalEvent['team'])) {
+            if (strlen($externalEvent['team'] ?? '') > 0) {
                 $eventDetail .= '<br />Team: ' . $externalEvent['team'];
             }
-            if (!empty($eventDetail)) {
+            if (strlen($eventDetail) > 0) {
                 $event->setDetail('<p>' . $eventDetail . '</p>');
             }
 
             /* Determine event location
              */
-            if (!empty(($externalEvent['location']))) {
+            if (strlen($externalEvent['location'] ?? '')) {
                 $location = $externalEvent['location'];
             } else {
                 $location = $externalEvent['room'];
