@@ -67,6 +67,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('finish_at', self::TYPE_DATETIME);
         $this->uses('allday', self::TYPE_BOOLEAN);
         $this->uses('type', self::TYPE_STRING);
+        $this->uses('metadata', self::TYPE_JSON);
         $this->uses('classification', self::TYPE_STRING);
         $this->uses('guid', self::TYPE_STRING);
         $this->uses('source', self::TYPE_STRING);
