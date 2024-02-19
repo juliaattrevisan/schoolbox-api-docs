@@ -8,13 +8,14 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-storysource",
         "@storybook/addon-mdx-gfm",
+        "storybook-addon-vue-slots",
     ],
     features: {
         postcss: false,
     },
     framework: {
         name: "@storybook/vue3-webpack5",
-        options: { builder: { useSWC: true } }
+        options: { builder: { useSWC: true } },
     },
     staticDirs: ["../stories/assets"],
     stories: [
@@ -33,7 +34,7 @@ module.exports = {
         config.resolve.alias["@schoolboxVue"] = path.resolve(__dirname, "../vue");
         config.resolve.alias["@schoolboxCurriculum"] = path.resolve(
             __dirname,
-            "../library/Schoolbox/Curriculum/templates/"
+            "../library/Schoolbox/Curriculum/templates/",
         );
         config.resolve.alias["@css"] = path.resolve(__dirname, "../www/static/css");
         config.resolve.alias["@library"] = path.resolve(__dirname, "../library");
