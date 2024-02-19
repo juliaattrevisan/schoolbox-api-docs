@@ -94,14 +94,22 @@ class Metadata
     /**
      * Extract the attendance url from the metdata
      *
-     * @param string $metadata
+     * @param array|string $metadata
      * @return string|null
      * @throws \JsonException
      */
-    public function getAttendanceLink(string $metadata): ?string
+    public function getAttendanceLink(array|string $metadata): ?string
     {
-        $metadata = json_decode($metadata, true, 512, JSON_THROW_ON_ERROR);
+        /* Accept both the json-encoded metadata and string formats
+         * for interchangeability. You could be working with either the
+         * mapper-decoded version or the db-encoded versions...
+         */
+        $deserialized = $metadata;
 
-        return $metadata['links']['attendance'] ?? null;
+        if (is_string($metadata)) {
+            $deserialized = json_decode($deserialized, true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        return $deserialized['links']['attendance'] ?? null;
     }
 }

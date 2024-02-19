@@ -33,15 +33,17 @@ class AttendanceFactory
      */
     public function produce(): ?IAttendanceLink
     {
-        switch ($this->configLoader->get('schooldata_import_data_source')) {
-            case \Schoolbox\External\Importer\Endpoint\Factory::TASS_API:
-                return new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\AttendanceLink(
-                    (bool)$this->configLoader->get('external_attendance'),
-                    (int)$this->configLoader->get('external_attendance_days'),
-                    (bool)$this->configLoader->get('external_tass_attendance_show_prod_menu')
-                );
-        }
-
-        return null;
+        return match ($this->configLoader->get('schooldata_import_data_source')) {
+            \Schoolbox\External\Importer\Endpoint\Factory::TASS_API => new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\AttendanceLink(
+                (bool)$this->configLoader->get('external_attendance'),
+                (int)$this->configLoader->get('external_attendance_days'),
+                (bool)$this->configLoader->get('external_tass_attendance_show_prod_menu')
+            ),
+            \Schoolbox\External\Importer\Endpoint\Factory::CIVICA => new \Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata\AttendanceLink(
+                (bool)$this->configLoader->get('external_attendance'),
+                (int)$this->configLoader->get('external_attendance_days')
+            ),
+            default => null,
+        };
     }
 }
