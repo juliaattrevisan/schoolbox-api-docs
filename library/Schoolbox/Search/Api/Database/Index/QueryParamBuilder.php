@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\Index;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
 
@@ -20,6 +19,37 @@ use Schoolbox\Search\Api\Database\BaseQueryParamBuilder;
  */
 class QueryParamBuilder extends BaseQueryParamBuilder
 {
+    /**
+     * Floating-point to integer multiplier.
+     * (Used when converting floating-point numbers to integers for comparison purposes)
+     *
+     * In order to avoid having to do comparisons on floating-point relevance scores, we convert floating-point
+     * relevance scores to integers by first multiplying by FP_TO_INT_MULTIPLIER, and then rounding to the nearest integer.
+     * Comparisons of floating-point numbers should be avoided for reasons given here:
+     *  - https://floating-point-gui.de/errors/comparison/
+     *
+     * Comparisons (= <=, >=, etc.) are done on relevance scores in cursor-related calculations.
+     * (see BaseQueryParamBuilder->buildMatchQueryParams()).
+     *
+     * Choosing a value for FP_TO_INT_MULTIPLIER
+     *  - Floating-point relevance scores are the return values of MATCH...AGAINST operations.
+     *  - MATCH...AGAINST operations typically return values between 0 and 10,000 for commonly searched document sizes.
+     *    (The upper limit was found by: 1) taking a small passage of text, and doubling its size by copying and pasting
+     *     many times until its size was 650kb, and its word count was over 100,000. 2) Running MATCH...AGAINST queries
+     *     on some of the less-common words in the initial small passage of text. 3) Choosing the highest observed return
+     *     value (8048.390625), and then just rounding up to 10,000.)
+     *  - We want to convert floating point numbers in the range 0 to 10,000 to integers, while mostly preserving their
+     *    sort order.
+     *  - The range of the resulting integers should be representable by the standard MySQL INT data type.
+     *  - If we choose FP_TO_INT_MULTIPLIER as 10,000, we get a maximum value of 100,000,000, which is well below
+     *    MySQL INT max value (2,147,483,647).  So 10,000 will do.
+     *    https://dev.mysql.com/doc/refman/8.0/en/integer-types.html
+     *
+     * Note we must use this FP_TO_INT_MULTIPLIER on all three relevance scores, to preserve their proportionality,
+     * (so the effect of self::RELEVANCE_WEIGHTING_TITLE, etc. will be unchanged).
+     */
+    const FP_TO_INT_MULTIPLIER = 10000;
+
     /**
      * Constructor
      */
@@ -51,6 +81,7 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             "RELEVANCE_WEIGHTING_TITLE$paramKeySuffix"       => self::RELEVANCE_WEIGHTING_TITLE,
             "RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix"     => self::RELEVANCE_WEIGHTING_CONTENT,
             "RELEVANCE_WEIGHTING_RECENT_DATE$paramKeySuffix" => self::RELEVANCE_WEIGHTING_RECENT_DATE,
+            "FP_TO_INT_MULTIPLIER$paramKeySuffix"            => self::FP_TO_INT_MULTIPLIER,
         ];
     }
 
@@ -68,12 +99,14 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // includes computations that determine whether a row will be included in the search result.
         // The 'exact match on title' test is required so that searches for filenames such as 'shutterstock_282889763'
         // will return expected results.  MATCH...AGAINST alone will not work in that case because of the underscore.
-        return "IF(
-            si.title = :indexKeywordUnquoted$paramKeySuffix OR
-            MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) > 0,
-            1,
-            0
-        )";
+        return (
+            "IF(" .
+                "si.title = :indexKeywordUnquoted$paramKeySuffix OR " .
+                "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) > 0," .
+                "1, " .
+                "0" .
+            ")"
+        );
     }
 
     /**
@@ -101,11 +134,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             // content).  Also, because the sort matching title bonus is multiplicative, the value to leave the score
             // unchanged is 1, not 0.
 
-            ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * (" .
-               "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) + " .
-               "IF(si.title = :indexKeywordUnquoted$paramKeySuffix, 100, 0)" . // Bonus for exact match (see comment above).
-            ") * " .
-            "IF(LENGTH(si.title) <= 1.5 * LENGTH(:indexKeyword$paramKeySuffix), 1.1, 1)" // Bonus for short matching titles (see comment above).
+            "ROUND(:FP_TO_INT_MULTIPLIER$paramKeySuffix * (" .
+                ":RELEVANCE_WEIGHTING_TITLE$paramKeySuffix * (" .
+                    "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) + " .
+                    "IF(si.title = :indexKeywordUnquoted$paramKeySuffix, 100, 0)" . // Bonus for exact match (see comment above).
+                ") * " .
+                "IF(LENGTH(si.title) <= 1.5 * LENGTH(:indexKeyword$paramKeySuffix), 1.1, 1)" . // Bonus for short matching titles (see comment above).
+            "))"
         );
     }
 
@@ -137,8 +172,10 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // has been confirmed by experiment).
 
         return (
-            ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix *" .
-            " MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)"
+            "ROUND(:FP_TO_INT_MULTIPLIER$paramKeySuffix * (" .
+                ":RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix *" .
+                " MATCH (si.fulltext_index) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE)" .
+            "))"
         );
     }
 
@@ -154,7 +191,11 @@ class QueryParamBuilder extends BaseQueryParamBuilder
             56,
         );
 
-        return ":RELEVANCE_WEIGHTING_RECENT_DATE$paramKeySuffix * IF(si.is_relevance_date_affected, $datePart, 1)";
+        return (
+            "ROUND(:FP_TO_INT_MULTIPLIER$paramKeySuffix * (" .
+                ":RELEVANCE_WEIGHTING_RECENT_DATE$paramKeySuffix * IF(si.is_relevance_date_affected, $datePart, 1)" .
+            "))"
+        );
     }
 
     /**

@@ -85,7 +85,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         if ($filter->creator) {
             // No creator part? Exclude this type of result entirely
-            $creatorPart          = $this->buildCreatorExpression($paramKeySuffix);
+            $creatorPart = $this->buildCreatorExpression($paramKeySuffix);
             if (isset($creatorPart)) {
                 $whereParts[] = "$creatorPart = :filterCreator$paramKeySuffix";
                 $params["filterCreator$paramKeySuffix"] = $filter->creator->getId();
@@ -95,7 +95,7 @@ abstract class BaseQueryParamBuilder implements IQueryParamBuilder
         }
         if ($filter->folder) {
             // No folder part? Exclude this type of result entirely
-            $folderPart           = $this->buildFolderExpression($paramKeySuffix);
+            $folderPart = $this->buildFolderExpression($paramKeySuffix);
             if (isset($folderPart)) {
                 $whereParts[] = "$folderPart = :filterFolder$paramKeySuffix";
                 $params["filterFolder$paramKeySuffix"] = $filter->folder->getId();
