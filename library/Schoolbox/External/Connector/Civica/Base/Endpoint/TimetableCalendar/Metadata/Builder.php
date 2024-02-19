@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata;
 
-class Provider
+class Builder
 {
     /**
      * Constructor
@@ -88,28 +88,5 @@ class Provider
             $singleSession,
             $schoolContextId
         );
-    }
-
-
-    /**
-     * Extract the attendance url from the metdata
-     *
-     * @param array|string $metadata
-     * @return string|null
-     * @throws \JsonException
-     */
-    public function getAttendanceLink(array|string $metadata): ?string
-    {
-        /* Accept both the json-encoded metadata and string formats
-         * for interchangeability. You could be working with either the
-         * mapper-decoded version or the db-encoded versions...
-         */
-        $deserialized = $metadata;
-
-        if (is_string($metadata)) {
-            $deserialized = json_decode($deserialized, true, 512, JSON_THROW_ON_ERROR);
-        }
-
-        return $deserialized['links']['attendance'] ?? null;
     }
 }

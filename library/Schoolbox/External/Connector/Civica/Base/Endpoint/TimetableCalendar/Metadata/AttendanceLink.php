@@ -65,7 +65,7 @@ class AttendanceLink implements IAttendanceLink
             return '';
         }
 
-        return (new Provider())->getAttendanceLink($event->getMetadata());
+        return (new Reader())->getAttendanceLink($event->getMetadata());
     }
 
 

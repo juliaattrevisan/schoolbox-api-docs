@@ -316,7 +316,7 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
-            ->setMetadata((new Metadata\Provider())->build($class, $classInstance))
+            ->setMetadata((new Metadata\Builder())->build($class, $classInstance))
             ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);
