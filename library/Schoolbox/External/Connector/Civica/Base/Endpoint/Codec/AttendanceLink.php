@@ -7,8 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata;
+namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Codec;
 
+use Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata\Reader;
 use Schoolbox\External\Connector\IAttendanceLink;
 use Schoolbox\External\Event\Model;
 use Schoolbox\User;

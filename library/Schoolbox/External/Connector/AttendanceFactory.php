@@ -39,7 +39,7 @@ class AttendanceFactory
                 (int)$this->configLoader->get('external_attendance_days'),
                 (bool)$this->configLoader->get('external_tass_attendance_show_prod_menu')
             ),
-            \Schoolbox\External\Importer\Endpoint\Factory::CIVICA => new \Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata\AttendanceLink(
+            \Schoolbox\External\Importer\Endpoint\Factory::CIVICA => new \Schoolbox\External\Connector\Civica\Base\Endpoint\Codec\AttendanceLink(
                 (bool)$this->configLoader->get('external_attendance'),
                 (int)$this->configLoader->get('external_attendance_days')
             ),
