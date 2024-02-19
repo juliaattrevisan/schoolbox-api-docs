@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Firebase;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Kreait\Firebase\Factory;
 use Schoolbox\MobileApp\Registry;
 
 /**
@@ -22,7 +23,9 @@ class Service extends AbstractService
      */
     protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
-        return true;
+        $factory = (new Factory());
+
+        $messageClient = $factory->createMessaging();
     }
 
     /**
