@@ -250,6 +250,10 @@ webCrawlerOff() {
     mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='0' WHERE name='web_crawlers_enabled'";
 }
 
+intellischoolSyncDisable() {
+    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value = '' WHERE name = 'intellischool_deployment_secret'";
+}
+
 liveCheck() {
   echo "Checking site_type of instance being restored to..."
 
@@ -864,6 +868,7 @@ if [ "$destination_site_type" = 'dev' ]; then
 	setdebugstacktrace;
 	truncateTables;
 	webCrawlerOff;
+	intellischoolSyncDisable;
 fi
 if [ "$destination_site_type" = 'stg' ]; then
 	titleprefix='[Staging]';
@@ -873,6 +878,7 @@ if [ "$destination_site_type" = 'stg' ]; then
 	setdebugstacktrace;
 	truncateTables;
 	webCrawlerOff;
+	intellischoolSyncDisable;
 fi
 
 # Truncate storage_transform table if it is a DB only sync
