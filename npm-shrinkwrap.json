@@ -14,9 +14,9 @@
                 "@ckeditor/ckeditor5-alignment": "~40.2.0",
                 "@ckeditor/ckeditor5-basic-styles": "~40.2.0",
                 "@ckeditor/ckeditor5-block-quote": "~40.2.0",
-                "@ckeditor/ckeditor5-build-inline": "^40.2.0",
                 "@ckeditor/ckeditor5-core": "~40.2.0",
                 "@ckeditor/ckeditor5-editor-classic": "~40.2.0",
+                "@ckeditor/ckeditor5-editor-inline": "^40.2.0",
                 "@ckeditor/ckeditor5-engine": "~40.2.0",
                 "@ckeditor/ckeditor5-essentials": "~40.2.0",
                 "@ckeditor/ckeditor5-find-and-replace": "~40.2.0",
@@ -2758,14 +2758,6 @@
             "integrity": "sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==",
             "dev": true
         },
-        "node_modules/@ckeditor/ckeditor5-adapter-ckfinder": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-adapter-ckfinder/-/ckeditor5-adapter-ckfinder-40.2.0.tgz",
-            "integrity": "sha512-YKdydg4DzaMk91saOL55KBNQE3St2NEj1E9hlk9CzHKQaHc79dYzHDNBolSE7ZmzkNJ4ToVbY7kRW5CDGfG5Rg==",
-            "dependencies": {
-                "ckeditor5": "40.2.0"
-            }
-        },
         "node_modules/@ckeditor/ckeditor5-ai": {
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-ai/-/ckeditor5-ai-40.2.0.tgz",
@@ -2781,14 +2773,6 @@
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-alignment/-/ckeditor5-alignment-40.2.0.tgz",
             "integrity": "sha512-OMvOdgEWBzFQbcHLu4CYMe/LONSmn07BxrXQ4Uxd++Wr45U2ElrbkKcJldARa+J97YGEzaaCI3igXDh6g4fkRA==",
-            "dependencies": {
-                "ckeditor5": "40.2.0"
-            }
-        },
-        "node_modules/@ckeditor/ckeditor5-autoformat": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-autoformat/-/ckeditor5-autoformat-40.2.0.tgz",
-            "integrity": "sha512-F3w5k7ti5l6V8U07eSQ3gup3ivltRZQXdtvstBXMmTzDb2ceazNcUDLb6TKSHp5y30ETN0dRGgbhx9xiDL0TXg==",
             "dependencies": {
                 "ckeditor5": "40.2.0"
             }
@@ -2809,51 +2793,6 @@
                 "ckeditor5": "40.2.0"
             }
         },
-        "node_modules/@ckeditor/ckeditor5-build-inline": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-build-inline/-/ckeditor5-build-inline-40.2.0.tgz",
-            "integrity": "sha512-7xHEIJ6k15r89ElCEO7NeLGZN/A1O1ezc+seSX3VJZIOY2KDDjgTR8kAlyt/hY8Q5NXCrCrwwnp4OpQ+ZM8lCA==",
-            "dependencies": {
-                "@ckeditor/ckeditor5-adapter-ckfinder": "40.2.0",
-                "@ckeditor/ckeditor5-autoformat": "40.2.0",
-                "@ckeditor/ckeditor5-basic-styles": "40.2.0",
-                "@ckeditor/ckeditor5-block-quote": "40.2.0",
-                "@ckeditor/ckeditor5-ckbox": "40.2.0",
-                "@ckeditor/ckeditor5-ckfinder": "40.2.0",
-                "@ckeditor/ckeditor5-cloud-services": "40.2.0",
-                "@ckeditor/ckeditor5-easy-image": "40.2.0",
-                "@ckeditor/ckeditor5-editor-inline": "40.2.0",
-                "@ckeditor/ckeditor5-essentials": "40.2.0",
-                "@ckeditor/ckeditor5-heading": "40.2.0",
-                "@ckeditor/ckeditor5-image": "40.2.0",
-                "@ckeditor/ckeditor5-indent": "40.2.0",
-                "@ckeditor/ckeditor5-link": "40.2.0",
-                "@ckeditor/ckeditor5-list": "40.2.0",
-                "@ckeditor/ckeditor5-media-embed": "40.2.0",
-                "@ckeditor/ckeditor5-paragraph": "40.2.0",
-                "@ckeditor/ckeditor5-paste-from-office": "40.2.0",
-                "@ckeditor/ckeditor5-table": "40.2.0",
-                "@ckeditor/ckeditor5-typing": "40.2.0"
-            }
-        },
-        "node_modules/@ckeditor/ckeditor5-ckbox": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-ckbox/-/ckeditor5-ckbox-40.2.0.tgz",
-            "integrity": "sha512-w/A3RA7qpR7Scl4hgUTt8j+oV7oD9IFPNGTpp0xoyfWEV8Ymm2NrMAvV0PAJiavYS3+FT4GO4RBOM6BvLHuV3w==",
-            "dependencies": {
-                "blurhash": "2.0.5",
-                "ckeditor5": "40.2.0",
-                "lodash-es": "4.17.21"
-            }
-        },
-        "node_modules/@ckeditor/ckeditor5-ckfinder": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-ckfinder/-/ckeditor5-ckfinder-40.2.0.tgz",
-            "integrity": "sha512-kiW5TZOLHYd6hhWeDIrep8FXLo0q14b0e0Jit0XSi3z4PQfdDSRk9UuMJPkkf4EdF3PUSdMJ9bccJG76DYXzFQ==",
-            "dependencies": {
-                "ckeditor5": "40.2.0"
-            }
-        },
         "node_modules/@ckeditor/ckeditor5-clipboard": {
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-clipboard/-/ckeditor5-clipboard-40.2.0.tgz",
@@ -2865,14 +2804,6 @@
                 "@ckeditor/ckeditor5-utils": "40.2.0",
                 "@ckeditor/ckeditor5-widget": "40.2.0",
                 "lodash-es": "4.17.21"
-            }
-        },
-        "node_modules/@ckeditor/ckeditor5-cloud-services": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-cloud-services/-/ckeditor5-cloud-services-40.2.0.tgz",
-            "integrity": "sha512-xrPQjFGGy1ZfXyKIMw0uzn7OIriSv13YMw0M2ZTh+V1jRN1HW9KzzNb2DlQc+6wQfRk0bq69XGLp3M296/cVTQ==",
-            "dependencies": {
-                "ckeditor5": "40.2.0"
             }
         },
         "node_modules/@ckeditor/ckeditor5-core": {
@@ -3256,14 +3187,6 @@
                 "node": ">=10.13.0"
             }
         },
-        "node_modules/@ckeditor/ckeditor5-easy-image": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-easy-image/-/ckeditor5-easy-image-40.2.0.tgz",
-            "integrity": "sha512-bE9YHGYEY1ql5mIqZSI2fkoBA4th28M0GDaJutwJYKM3t+Bost3Zh1UfmYKE2kvYgmeLY1L3hjQpN9w7NYyLpw==",
-            "dependencies": {
-                "ckeditor5": "40.2.0"
-            }
-        },
         "node_modules/@ckeditor/ckeditor5-editor-classic": {
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-classic/-/ckeditor5-editor-classic-40.2.0.tgz",
@@ -3360,14 +3283,6 @@
                 "@ckeditor/ckeditor5-ui": "40.2.0",
                 "ckeditor5": "40.2.0",
                 "lodash-es": "4.17.21"
-            }
-        },
-        "node_modules/@ckeditor/ckeditor5-indent": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-indent/-/ckeditor5-indent-40.2.0.tgz",
-            "integrity": "sha512-gSlRGoyAslB2OpqghimIY6Oiflf3Z2/MdLBzvFipU5N4X66cL29HuWZc/bOkcFzWwNeDK5LgzfLdvXNzkdv5Xw==",
-            "dependencies": {
-                "ckeditor5": "40.2.0"
             }
         },
         "node_modules/@ckeditor/ckeditor5-inspector": {
@@ -13219,11 +13134,6 @@
                 "inherits": "^2.0.4",
                 "readable-stream": "^3.4.0"
             }
-        },
-        "node_modules/blurhash": {
-            "version": "2.0.5",
-            "resolved": "https://registry.npmjs.org/blurhash/-/blurhash-2.0.5.tgz",
-            "integrity": "sha512-cRygWd7kGBQO3VEhPiTgq4Wc43ctsM+o46urrmPOiuAe+07fzlSB9OJVdpgDL0jPqXUVQ9ht7aq7kxOeJHRK+w=="
         },
         "node_modules/body-parser": {
             "version": "1.20.1",
@@ -33175,14 +33085,6 @@
             "integrity": "sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==",
             "dev": true
         },
-        "@ckeditor/ckeditor5-adapter-ckfinder": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-adapter-ckfinder/-/ckeditor5-adapter-ckfinder-40.2.0.tgz",
-            "integrity": "sha512-YKdydg4DzaMk91saOL55KBNQE3St2NEj1E9hlk9CzHKQaHc79dYzHDNBolSE7ZmzkNJ4ToVbY7kRW5CDGfG5Rg==",
-            "requires": {
-                "ckeditor5": "40.2.0"
-            }
-        },
         "@ckeditor/ckeditor5-ai": {
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-ai/-/ckeditor5-ai-40.2.0.tgz",
@@ -33198,14 +33100,6 @@
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-alignment/-/ckeditor5-alignment-40.2.0.tgz",
             "integrity": "sha512-OMvOdgEWBzFQbcHLu4CYMe/LONSmn07BxrXQ4Uxd++Wr45U2ElrbkKcJldARa+J97YGEzaaCI3igXDh6g4fkRA==",
-            "requires": {
-                "ckeditor5": "40.2.0"
-            }
-        },
-        "@ckeditor/ckeditor5-autoformat": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-autoformat/-/ckeditor5-autoformat-40.2.0.tgz",
-            "integrity": "sha512-F3w5k7ti5l6V8U07eSQ3gup3ivltRZQXdtvstBXMmTzDb2ceazNcUDLb6TKSHp5y30ETN0dRGgbhx9xiDL0TXg==",
             "requires": {
                 "ckeditor5": "40.2.0"
             }
@@ -33226,51 +33120,6 @@
                 "ckeditor5": "40.2.0"
             }
         },
-        "@ckeditor/ckeditor5-build-inline": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-build-inline/-/ckeditor5-build-inline-40.2.0.tgz",
-            "integrity": "sha512-7xHEIJ6k15r89ElCEO7NeLGZN/A1O1ezc+seSX3VJZIOY2KDDjgTR8kAlyt/hY8Q5NXCrCrwwnp4OpQ+ZM8lCA==",
-            "requires": {
-                "@ckeditor/ckeditor5-adapter-ckfinder": "40.2.0",
-                "@ckeditor/ckeditor5-autoformat": "40.2.0",
-                "@ckeditor/ckeditor5-basic-styles": "40.2.0",
-                "@ckeditor/ckeditor5-block-quote": "40.2.0",
-                "@ckeditor/ckeditor5-ckbox": "40.2.0",
-                "@ckeditor/ckeditor5-ckfinder": "40.2.0",
-                "@ckeditor/ckeditor5-cloud-services": "40.2.0",
-                "@ckeditor/ckeditor5-easy-image": "40.2.0",
-                "@ckeditor/ckeditor5-editor-inline": "40.2.0",
-                "@ckeditor/ckeditor5-essentials": "40.2.0",
-                "@ckeditor/ckeditor5-heading": "40.2.0",
-                "@ckeditor/ckeditor5-image": "40.2.0",
-                "@ckeditor/ckeditor5-indent": "40.2.0",
-                "@ckeditor/ckeditor5-link": "40.2.0",
-                "@ckeditor/ckeditor5-list": "40.2.0",
-                "@ckeditor/ckeditor5-media-embed": "40.2.0",
-                "@ckeditor/ckeditor5-paragraph": "40.2.0",
-                "@ckeditor/ckeditor5-paste-from-office": "40.2.0",
-                "@ckeditor/ckeditor5-table": "40.2.0",
-                "@ckeditor/ckeditor5-typing": "40.2.0"
-            }
-        },
-        "@ckeditor/ckeditor5-ckbox": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-ckbox/-/ckeditor5-ckbox-40.2.0.tgz",
-            "integrity": "sha512-w/A3RA7qpR7Scl4hgUTt8j+oV7oD9IFPNGTpp0xoyfWEV8Ymm2NrMAvV0PAJiavYS3+FT4GO4RBOM6BvLHuV3w==",
-            "requires": {
-                "blurhash": "2.0.5",
-                "ckeditor5": "40.2.0",
-                "lodash-es": "4.17.21"
-            }
-        },
-        "@ckeditor/ckeditor5-ckfinder": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-ckfinder/-/ckeditor5-ckfinder-40.2.0.tgz",
-            "integrity": "sha512-kiW5TZOLHYd6hhWeDIrep8FXLo0q14b0e0Jit0XSi3z4PQfdDSRk9UuMJPkkf4EdF3PUSdMJ9bccJG76DYXzFQ==",
-            "requires": {
-                "ckeditor5": "40.2.0"
-            }
-        },
         "@ckeditor/ckeditor5-clipboard": {
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-clipboard/-/ckeditor5-clipboard-40.2.0.tgz",
@@ -33282,14 +33131,6 @@
                 "@ckeditor/ckeditor5-utils": "40.2.0",
                 "@ckeditor/ckeditor5-widget": "40.2.0",
                 "lodash-es": "4.17.21"
-            }
-        },
-        "@ckeditor/ckeditor5-cloud-services": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-cloud-services/-/ckeditor5-cloud-services-40.2.0.tgz",
-            "integrity": "sha512-xrPQjFGGy1ZfXyKIMw0uzn7OIriSv13YMw0M2ZTh+V1jRN1HW9KzzNb2DlQc+6wQfRk0bq69XGLp3M296/cVTQ==",
-            "requires": {
-                "ckeditor5": "40.2.0"
             }
         },
         "@ckeditor/ckeditor5-core": {
@@ -33571,14 +33412,6 @@
                 }
             }
         },
-        "@ckeditor/ckeditor5-easy-image": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-easy-image/-/ckeditor5-easy-image-40.2.0.tgz",
-            "integrity": "sha512-bE9YHGYEY1ql5mIqZSI2fkoBA4th28M0GDaJutwJYKM3t+Bost3Zh1UfmYKE2kvYgmeLY1L3hjQpN9w7NYyLpw==",
-            "requires": {
-                "ckeditor5": "40.2.0"
-            }
-        },
         "@ckeditor/ckeditor5-editor-classic": {
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-classic/-/ckeditor5-editor-classic-40.2.0.tgz",
@@ -33675,14 +33508,6 @@
                 "@ckeditor/ckeditor5-ui": "40.2.0",
                 "ckeditor5": "40.2.0",
                 "lodash-es": "4.17.21"
-            }
-        },
-        "@ckeditor/ckeditor5-indent": {
-            "version": "40.2.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-indent/-/ckeditor5-indent-40.2.0.tgz",
-            "integrity": "sha512-gSlRGoyAslB2OpqghimIY6Oiflf3Z2/MdLBzvFipU5N4X66cL29HuWZc/bOkcFzWwNeDK5LgzfLdvXNzkdv5Xw==",
-            "requires": {
-                "ckeditor5": "40.2.0"
             }
         },
         "@ckeditor/ckeditor5-inspector": {
@@ -40941,11 +40766,6 @@
                 "inherits": "^2.0.4",
                 "readable-stream": "^3.4.0"
             }
-        },
-        "blurhash": {
-            "version": "2.0.5",
-            "resolved": "https://registry.npmjs.org/blurhash/-/blurhash-2.0.5.tgz",
-            "integrity": "sha512-cRygWd7kGBQO3VEhPiTgq4Wc43ctsM+o46urrmPOiuAe+07fzlSB9OJVdpgDL0jPqXUVQ9ht7aq7kxOeJHRK+w=="
         },
         "body-parser": {
             "version": "1.20.1",

@@ -2,7 +2,8 @@
  * To create a default CKEditor instances
  */
 
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+// import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import InlineEditor from "@ckeditor/ckeditor5-build-inline";
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
@@ -25,7 +26,7 @@ async function onCreated(sourceElement: HTMLElement, editor: Editor, config: Edi
                 editor,
                 sourceElement,
             },
-        })
+        }),
     );
 }
 
@@ -49,7 +50,7 @@ function addDefaultConfig(config: EditorConfig) {
  */
 function create(sourceElement: HTMLElement, config: EditorConfig) {
     addDefaultConfig(config);
-    ClassicEditor.create(sourceElement, getConfig(config))
+    InlineEditor.create(sourceElement, getConfig(config))
         .then((editor) => {
             void onCreated(sourceElement, editor, config);
         })
@@ -78,7 +79,7 @@ function onCreate(event: CustomEvent) {
                 console.warn(
                     `CKEditor: Element "${sourceElement.tagName}" is not allowed to be replaced by CKEditor.` +
                         ` Targeted element by selector "${targetElement}":`,
-                    sourceElement
+                    sourceElement,
                 );
                 return;
             }
@@ -119,7 +120,7 @@ function onDelete(event: CustomEvent) {
                     containingFormId: "lesson-plan-template-form",
                     submitButtons: [document.getElementById("save-button")],
                 },
-            })
+            }),
         );
     }
 }
