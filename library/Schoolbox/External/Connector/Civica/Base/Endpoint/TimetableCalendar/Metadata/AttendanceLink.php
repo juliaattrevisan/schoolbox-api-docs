@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata;
 
-use Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata;
 use Schoolbox\External\Connector\IAttendanceLink;
 use Schoolbox\External\Event\Model;
 use Schoolbox\User;
@@ -66,7 +65,7 @@ class AttendanceLink implements IAttendanceLink
             return '';
         }
 
-        return (new Metadata())->getAttendanceLink($event->getMetadata());
+        return (new Provider())->getAttendanceLink($event->getMetadata());
     }
 
 

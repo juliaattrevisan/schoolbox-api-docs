@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar;
+namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata;
 
-class Metadata
+class Provider
 {
     /**
      * Constructor
