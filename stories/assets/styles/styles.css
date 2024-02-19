@@ -6,22 +6,18 @@
  * These styles overwrite the heavy handed table styles in our core.css file,
  * so the tables display better in the Storybook docs using the dark theme
  */
-#storybook-docs table,
 table.docblock-argstable {
     background: none !important;
     border: none !important;
 }
 
-#storybook-docs table thead,
 table.docblock-argstable thead,
-table tr:nth-of-type(2n) {
+table.docblock-argstable tr:nth-of-type(2n) {
     background: none !important;
 }
 
-#storybook-docs table thead tr th,
-#storybook-docs table thead tr td,
 table.docblock-argstable tr th,
-table tr td {
+table.docblock-argstable tr td {
     color: #c9cdcf !important;
 }
 
