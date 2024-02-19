@@ -1,4 +1,12 @@
 /**
+ * The different types of editors that can be used
+ */
+export enum EditorType {
+    CLASSIC = "classic",
+    INLINE = "INLINE",
+}
+
+/**
  * The different types of toolbars that can be used for the editor
  */
 export enum EditorToolbar {
@@ -12,6 +20,7 @@ export enum EditorToolbar {
  */
 export interface EditorConfig {
     targetElements: string[]; // the elements to target for the editor
+    type?: EditorType.CLASSIC | EditorType.INLINE; // the type of editor to use
     toolbar?: EditorToolbar.DEFAULT | EditorToolbar.COMMENT | EditorToolbar.SIMPLE; // the toolbar to use for the editor
     hasTokens?: boolean; // whether or not to enable the tokens plugin
     tokenList?: string[]; // the list of tokens to use for the ckeditor

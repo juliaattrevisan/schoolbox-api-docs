@@ -2,8 +2,8 @@
  * To create a default CKEditor instances
  */
 
-// import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import InlineEditor from "@ckeditor/ckeditor5-build-inline";
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
@@ -50,7 +50,7 @@ function addDefaultConfig(config: EditorConfig) {
  */
 function create(sourceElement: HTMLElement, config: EditorConfig) {
     addDefaultConfig(config);
-    InlineEditor.create(sourceElement, getConfig(config))
+    ClassicEditor.create(sourceElement, getConfig(config))
         .then((editor) => {
             void onCreated(sourceElement, editor, config);
         })
