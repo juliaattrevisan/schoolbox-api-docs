@@ -219,8 +219,8 @@ class ServiceManager implements IServiceManager
                     return new Cloud\Firebase\Service(
                         $this->registryMapper,
                         $identifier,
+                        $key,
                         $appTitle,
-                        $this->config->get(Schoolbox\Config\ConfigMapper::NAME_FIREBASE_PRIVATE_KEY),
                     );
             }
 
