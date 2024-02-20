@@ -1,0 +1,41 @@
+/*
+    The <input type="text"> element is used to create a text input field that can be used to input data.
+*/
+
+.c-input-text[type="text"] {
+    background-color: var(--foreground-colour);
+    border: 1px solid var(--form-border-color);
+    border-radius: var(--roundness-inputs);
+    color: var(--primary-text-colour);
+    font-size: max(16px, 1rem);
+    font-family: inherit;
+    height: 2.25rem;
+    line-height: 1;
+    margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    padding: var(--spacing-s);
+    transition: none; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    width: 100%;
+    -webkit-font-smoothing: antialiased;
+    &:disabled {
+        background: var(--disabled-input-background-colour);
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+    &:hover {
+        background: var(--foreground-colour); // ^foundation-fixes^ - won't need once _forms.scss is removed
+        color: var(--primary-text-colour); // ^foundation-fixes^ - won't need once _forms.scss is removed
+        border-color: var(--form-border-color); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    }
+    &:focus {
+        background: var(--foreground-colour); // ^foundation-fixes^ - won't need once _forms.scss is removed
+        outline: 3px solid var(--form-border-color);
+        outline-offset: 2px;
+    }
+    &[readonly] {
+        border: 2px dotted var(--form-border-color);
+    }
+}
+
+.c-input-text--error[type="text"] {
+    border: 1px solid var(--error-color);
+}

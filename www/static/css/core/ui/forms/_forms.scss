@@ -641,7 +641,9 @@ td {
         margin: 0 0 $checkbox-margin 0;
         &:before,
         &:after {
-            transition: color 360ms cubic-bezier(0.2, 1, 0, 1), background-color 360ms cubic-bezier(0.2, 1, 0, 1);
+            transition:
+                color 360ms cubic-bezier(0.2, 1, 0, 1),
+                background-color 360ms cubic-bezier(0.2, 1, 0, 1);
         }
 
         &:before {
@@ -1243,3 +1245,8 @@ input.invalid-data:focus {
     color: #fff;
     opacity: 1;
 }
+
+@import "form-element";
+@import "label";
+@import "hint";
+@import "input-text";

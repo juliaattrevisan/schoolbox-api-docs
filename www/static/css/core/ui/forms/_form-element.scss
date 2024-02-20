@@ -1,0 +1,10 @@
+/*
+    A single form element, such as a label and input, or a label and textarea.
+*/
+
+.c-form-element {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-l); // ^foundation-fixes^ - won't need once using flex gap
+}
