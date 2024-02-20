@@ -27,9 +27,20 @@ class Service extends AbstractService
      * @param string         $appIdentifier
      * @param string         $privateKey
      */
+    /**
+     * Constructor
+     *
+     * @param RegistryMapper $registryMapper Mapper for fetching registrations.
+     * @param string         $appIdentifier  Identifying string for the app: matches `mobile_app.app_identifier`.
+     * @param string         $appTitle       Title of the app: matches `config.title`.
+     * @param string         $privateKey     Private key for Firebase's service: matches `config.firebase_private_key`.
+     *                                       See https://firebase-php.readthedocs.io/en/stable/setup.html for how to get
+     *                                       a private key.
+     */
     public function __construct(
         RegistryMapper $registryMapper,
         $appIdentifier,
+        private string $appTitle,
         #[SensitiveParameter] private string $privateKey,
     ) {
         parent::__construct($registryMapper, $appIdentifier);
