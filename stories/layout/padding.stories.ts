@@ -10,7 +10,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         () => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="l-flex-row l-pad-m">
                     <story />
                 </div>
             `,
@@ -22,83 +22,171 @@ export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
 /**
- *
+ * `.l-pad-xs`
  */
-export const Classes: Story = {
+export const PaddingXS: Story = {
     render: () => ({
         template: `
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-xs</legend>
-                <div class="story-demo-box l-pad-xs">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-s</legend>
-                <div class="story-demo-box l-pad-s">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-m</legend>
-                <div class="story-demo-box l-pad-m">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-l</legend>
-                <div class="story-demo-box l-pad-l">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-xl</legend>
-                <div class="story-demo-box l-pad-xl">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-m--horiz</legend>
-                <div class="story-demo-box l-pad-m--horiz">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-m--vert</legend>
-                <div class="story-demo-box l-pad-m--vert">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-m--top</legend>
-                <div class="story-demo-box l-pad-m--top">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-m--bottom</legend>
-                <div class="story-demo-box l-pad-m--bottom">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-m--left</legend>
-                <div class="story-demo-box l-pad-m--left">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad-m--right</legend>
-                <div class="story-demo-box l-pad-m--right">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-pad--0</legend>
-                <div class="story-demo-box l-pad--0">
-                    <div class="story-demo-box__inside"></div>
-                </div>
-            </fieldset>
+            <div class="story-demo-box l-pad-xs">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-s`
+ */
+export const PaddingS: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-s">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-m`
+ */
+export const PaddingM: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-l`
+ */
+export const PaddingL: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-l">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-xl`
+ */
+export const PaddingXL: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-xl">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-m--horiz`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const PaddingHorizontal: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m--horiz">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-m--vert`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const PaddingVertical: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m--vert">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-m--top`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const PaddingTop: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m--top">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-m--bottom`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const PaddingBottom: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m--bottom">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-m--left`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const PaddingLeft: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m--left">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad-m--right`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const PaddingRight: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m--right">
+                <div class="story-demo-box__inside"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-pad--0`
+ *
+ * _Clear any existing padding on an element_
+ */
+export const Padding0: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-box l-pad-m l-pad--0">
+                <div class="story-demo-box__inside"></div>
+            </div>
         `,
     }),
 };

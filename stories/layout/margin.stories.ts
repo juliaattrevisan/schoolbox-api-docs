@@ -10,7 +10,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         () => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="l-flex-row l-pad-m">
                     <story />
                 </div>
             `,
@@ -22,77 +22,172 @@ export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
 /**
- *
+ * `.l-mar-xs`
  */
-export const Classes: Story = {
+export const MarginXS: Story = {
     render: () => ({
         template: `
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-xs</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-xs"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-s</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-s"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-m</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-m"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-l</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-l"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-xl</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-xl"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-m--horiz</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-m--horiz"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-m--vert</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-m--vert"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-m--top</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-m--top"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-m--bottom</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-m--bottom"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-m--left</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-m--left"></div>
-                </div>
-            </fieldset>
-            <fieldset class="story-fieldset l-flex-row">
-                <legend class="story-legend">.l-mar-m--right</legend>
-                <div class="story-demo-boxes l-flex-row">
-                    <div class="story-demo-box l-mar-m--right"></div>
-                </div>
-            </fieldset>
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-xs"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-s`
+ */
+export const MarginS: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-s"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-m`
+ */
+export const MarginM: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-l`
+ */
+export const MarginL: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-l"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-xl`
+ *
+ */
+export const MarginXL: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-xl"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-m--horiz`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const MarginHorizontals: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m--horiz"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-m--vert`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const MarginVertical: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m--vert"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-m--top`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const MarginTop: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m--top"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-m--bottom`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const MarginBottom: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m--bottom"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-m--left`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const MarginLeft: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m--left"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar-m--right`
+ *
+ * _Can be used with any of the sizes above_
+ */
+export const MarginRight: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m--right"></div>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * `.l-mar--0`
+ *
+ * _Clear any existing margins on an element_
+ */
+export const Margin0: Story = {
+    render: () => ({
+        template: `
+            <div class="story-demo-boxes l-flex-row">
+                <div class="story-demo-box l-mar-m l-mar--0"></div>
+            </div>
         `,
     }),
 };
