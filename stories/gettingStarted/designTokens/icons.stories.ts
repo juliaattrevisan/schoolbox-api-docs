@@ -429,30 +429,6 @@ export const Icons: Story = {
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
-                    <sbx-icon name="week-view"></sbx-icon>
-                </div>
-                <p>week-view</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="wiki"></sbx-icon>
-                </div>
-                <p>wiki</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="withdraw-achievement"></sbx-icon>
-                </div>
-                <p>withdraw-achievement</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="wolfram-alpha"></sbx-icon>
-                </div>
-                <p>wolfram-alpha</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
                     <sbx-icon name="hidden"></sbx-icon>
                 </div>
                 <p>hidden</p>

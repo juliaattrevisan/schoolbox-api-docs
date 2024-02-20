@@ -24,8 +24,8 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Example: Story = {
     render: () => ({
         template: `
-            <div class="c-input-range">
-                <label class="c-input-range__label" for="column-width">Column Width</label>
+            <div class="c-form-element c-input-range">
+                <label class="c-label" for="column-width">Column Width</label>
                 <input class="c-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
             </div>
         `,
