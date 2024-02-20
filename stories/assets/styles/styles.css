@@ -56,7 +56,9 @@ table.docblock-argstable tr td,
     width: 100%;
 }
 
-/* Icons Page Styles */
+/**
+ * Specific styles for the icon stories
+ */
 .box-icon-wrapper {
     color: var(--content-ui-foreground);
     height: 5rem;
