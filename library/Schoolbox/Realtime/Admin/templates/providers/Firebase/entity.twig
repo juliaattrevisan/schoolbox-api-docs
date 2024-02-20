@@ -6,26 +6,26 @@
         <dd class="small-12 medium-4"><a class="right icon-delete" data-id="{{ app.id }}" href="#" title="Delete" data-delete-provider ></a></dd>
 
         <dt class="small-12 medium-4">Provider</dt>
-        <dd class="small-12 medium-8"><p>Google</p></dd>
+        <dd class="small-12 medium-8"><p>Firebase</p></dd>
 
-        <dt class="small-12 medium-4">Google Cloud Messaging API Key</dt>
+        <dt class="small-12 medium-4">Firebase Private Key</dt>
         <dd class="small-12 medium-8">
             <p>
                 <code>{{ app.key }}</code>
-                (<a href="#" data-open="change-gcm-{{ appId }}">Change</a>)
+                (<a href="#" data-open="change-firebase-{{ appId }}">Change</a>)
             </p>
         </dd>
     </dl>
     <div class="row">
         <div class="small-12 column">
-            <form style="display:none;" id="change-gcm-{{ appId }}" action="{{ routeLookup('adminMessages.postModifyApp') }}" method="post">
+            <form style="display:none;" id="change-firebase-{{ appId }}" action="{{ routeLookup('adminMessages.postModifyApp') }}" method="post">
                 <input type="hidden" name="id" value="{{ app.id }}" />
                 <input type="hidden" name="app" value="{{ app.appIdentifier }}" />
                 <input type="hidden" name="provider" value="{{ app.providerName }}" />
                 <div class="row">
                     <div class="small-12 column">
-                        <label>New GCM API Key
-                            <input type="text" name="key" value="" />
+                        <label>New Firebase Private Key
+                            <textarea name="key"></textarea>
                         </label>
                     </div>
                     <div class="small-12 column">
