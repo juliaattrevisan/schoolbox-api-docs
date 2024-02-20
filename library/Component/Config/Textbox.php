@@ -54,7 +54,7 @@ class Component_Config_Textbox extends Component_Config_Abstract
              */
             $textBoxHeading = $currentTextbox->getHeading();
 
-            if (strlen($textBoxHeading)) {
+            if (strlen($textBoxHeading ?? '')) {
                 $selectText = $textBoxHeading;
             } else {
                 $selectText = substr(Scrub::html2text($currentTextbox->getBody()), 0, 75) . '...';

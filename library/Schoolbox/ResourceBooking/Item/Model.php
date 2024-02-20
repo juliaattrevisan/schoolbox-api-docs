@@ -53,7 +53,7 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $roomCode;
 
@@ -278,7 +278,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param  string $roomCode
+     * @param  string|null $roomCode
      * @return $this
      */
     public function setRoomCode($roomCode)
@@ -288,7 +288,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRoomCode()
     {

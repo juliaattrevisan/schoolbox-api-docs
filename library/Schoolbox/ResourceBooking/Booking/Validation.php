@@ -463,7 +463,7 @@ class Validation
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
             $errors[self::START_DATETIME][] = self::ERROR_CONFLICT;
-        } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
+        } elseif (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
             $roomEvents = $this->getTimetableRoomEvents(
                 $resource->getRoomCode(),
