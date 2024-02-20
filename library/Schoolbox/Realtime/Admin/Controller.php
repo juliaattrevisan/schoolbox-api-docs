@@ -540,7 +540,7 @@ class Controller extends BaseController
             $log,
             MobileApp\RegistryMapper::getInstance(),
             $this->getDi()->get('instance'),
-            $this->getConfigLoader()->get('title'),
+            $this->getConfigLoader(),
             $this->filesystemProxy,
             $liveMessage
                 ? MobileApp\ServiceManager::SERVICE_TYPE_PRODUCTION

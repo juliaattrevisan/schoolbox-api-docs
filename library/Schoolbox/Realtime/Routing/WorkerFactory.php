@@ -97,7 +97,7 @@ class WorkerFactory
             $this->log,
             $this->registryMapper,
             $this->instance,
-            $this->conf->get('title'),
+            $this->conf,
             $this->filesystemProxy,
             MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );

@@ -52,8 +52,8 @@ class ServiceManager implements IServiceManager
      * @param LoggerInterface         $log             Logger.
      * @param RegistryMapper          $registryMapper  Mapper for fetching registrations.
      * @param Schoolbox\Instance      $serverInstance  Struct within which instance data is stored.
-     * @param string                  $appTitle        The app's title: matches `config.title`.
-     *                                                 May be used as the title of notifications.
+     * @param Schoolbox\IConfigLoader $config          Config loader: used to load app's title and service-specific
+     *                                                 configuration.
      * @param Storage\FilesystemProxy $filesystemProxy The file system on which the APNS config is stored.
      * @param self::SERVICE_TYPE_*    $serviceType     Service type to use: test, production or based on instance type.
      */
@@ -61,9 +61,9 @@ class ServiceManager implements IServiceManager
         private LoggerInterface $log,
         private RegistryMapper $registryMapper,
         private Schoolbox\Instance $serverInstance,
-        private string $appTitle,
+        private Schoolbox\IConfigLoader $config,
         private Storage\FilesystemProxy $filesystemProxy,
-        private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE
+        private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
     ) {
     }
 
@@ -171,6 +171,7 @@ class ServiceManager implements IServiceManager
      */
     public function getService(Service $service)
     {
+        $appTitle   = $this->config->get(Schoolbox\Config\ConfigMapper::NAME_TITLE);
         $provider   = $service->getProviderName();
         $identifier = $service->getAppIdentifier();
 
@@ -193,7 +194,7 @@ class ServiceManager implements IServiceManager
                     return new Cloud\Apple\ApnService(
                         $this->registryMapper,
                         $identifier,
-                        $this->appTitle,
+                        $appTitle,
                         $this->getPemPath($storageObj),
                         $key,
                     );
@@ -203,7 +204,7 @@ class ServiceManager implements IServiceManager
                         $this->registryMapper,
                         $identifier,
                         $key,
-                        $this->appTitle
+                        $appTitle,
                     );
 
                 case Registry::PROVIDER_DIGISTORM:
@@ -211,7 +212,7 @@ class ServiceManager implements IServiceManager
                         $this->registryMapper,
                         $identifier,
                         $key,
-                        $this->appTitle
+                        $appTitle,
                     );
             }
 
