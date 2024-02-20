@@ -246,6 +246,10 @@ class Controller extends BaseController
                 $template = '@adminMessages/providers/Digistorm/create.twig';
                 break;
 
+            case MobileApp\Registry::PROVIDER_FIREBASE:
+                $template = '@adminMessages/providers/Firebase/create.twig';
+                break;
+
             default:
                 $this->sendError('Service does not exist');
                 return;
@@ -297,6 +301,14 @@ class Controller extends BaseController
                 }
                 break;
 
+            case MobileApp\Registry::PROVIDER_FIREBASE:
+                // require key for Firebase
+                if (empty($key)) {
+                    $this->sendError("Unable to setup Firebase service, please provide a key");
+                    return;
+                }
+                break;
+
             default:
                 $this->sendError('Service does not exist');
                 return;
@@ -310,7 +322,7 @@ class Controller extends BaseController
         $serviceMapper = MobileApp\ServiceMapper::getInstance();
 
         // Find the existing app, if one was passed
-        $id = trim($post->get('id', null));
+        $id = trim($post->get('id', ''));
         if ($id) {
             //check id, if exists use that record (update), else find if it was deleted, or create new
             try {
