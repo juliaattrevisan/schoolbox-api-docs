@@ -448,7 +448,6 @@ class Controller extends BaseController
      */
     public function postFolderSequence(Model $folder): void
     {
-        $errorMapper = $this->errorMapper;
         $folderSequence = $this->requestPost->get('sequence');
 
         // ensure there is actually data in the post
@@ -458,14 +457,32 @@ class Controller extends BaseController
         }
 
         // fetch all children folders of $folder (parent)
+        $children = $this->folderMapper->findByParent($folder->getId());
+
+        $updates = $this->folderMapper->createCollection();
 
         // for each folder (in sequence $POST)
-
-        // ensure the folder is a child of the $folder (parent)
-
-        // set the sequence of the child folder to its new sequence
-
+        // sequence is desc sort, so we need the max sequence
+        $sequence = count($folderSequence);
+        foreach ($folderSequence as $childFolder) {
+            /** @var Folder\Model $move */
+            $move = $children->getBy('id', $childFolder);
+            // ensure the folder is a child of the $folder (parent)
+            if ($move) {
+                // set the sequence of the child folder to its new sequence
+                $move->setSequence($sequence);
+                $updates->add($move);
+                $sequence--;
+            }
+        }
         // all un sequenced folders set their value to 0
+        foreach ($children->diff($updates) as $missing) {
+            $missing->setSequence(0);
+            $updates->add($missing);
+        }
+
+        // save all the folder sequences (once)
+        $this->folderMapper->save($updates);
 
         $this->response = $this->responseAsJson(true)->withStatus(200);
     }
