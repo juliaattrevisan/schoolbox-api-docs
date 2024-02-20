@@ -20,8 +20,7 @@ $app = new class extends CliTool\App {
     {
         $dbc = $this->getDatabaseInternal();
         // if NOT prod
-        if ('prod' !== $dbc->executeQuery("SELECT value FROM config WHERE name = 'site_type'")->fetchColumn())
-        {
+        if ('prod' !== $dbc->executeQuery("SELECT value FROM config WHERE name = 'site_type'")->fetchColumn()) {
             // update config
             $dbc->execute("UPDATE config SET value = '' WHERE name = 'intellischool_deployment_secret'");
         }
