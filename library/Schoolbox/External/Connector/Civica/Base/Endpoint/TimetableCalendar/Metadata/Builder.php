@@ -96,8 +96,12 @@ class Builder
         $singleSession = 'false';               // FIXME What's this?
         $schoolContextId = $class['schoolId'];  // FIXME Made an assumption here
 
+        /* This is a secret thing that loads actual students; without it, you get nobody
+         */
+        $fromIframe = 'true';
+
         return sprintf(
-            '%s/%s?attendance=%s&type=%s&session=%s&date=%s&singlesession=%s&schoolContextId=%s',
+            '%s/%s?attendance=%s&type=%s&session=%s&date=%s&singlesession=%s&schoolContextId=%s&fromIframe=%s',
             self::HOST,
             $teachingGroupId,
             $hasAttendance,
@@ -105,7 +109,8 @@ class Builder
             $session,
             $date,
             $singleSession,
-            $schoolContextId
+            $schoolContextId,
+            $fromIframe
         );
     }
 }
