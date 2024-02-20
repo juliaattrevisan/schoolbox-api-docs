@@ -10,7 +10,8 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Firebase;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
-use Kreait\Firebase\Factory;
+use Kreait\Firebase;
+use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use SensitiveParameter;
@@ -21,12 +22,10 @@ use SensitiveParameter;
 class Service extends AbstractService
 {
     /**
-     * Constructor
-     *
-     * @param RegistryMapper $registryMapper
-     * @param string         $appIdentifier
-     * @param string         $privateKey
+     * Messaging client: created only once, and only when required.
      */
+    private ?Firebase\Contract\Messaging $messagingClient = null;
+
     /**
      * Constructor
      *
@@ -52,8 +51,71 @@ class Service extends AbstractService
      */
     protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
-        $factory = (new Factory())
-            ->withServiceAccount($this->privateKey);
+        // Create messaging client
+        $this->messagingClient ??= (new Firebase\Factory())
+            ->withServiceAccount($this->privateKey)
+            ->createMessaging();
+
+        // Create message
+        $message = Firebase\Messaging\CloudMessage::new()
+            ->withNotification(Firebase\Messaging\Notification::create($this->appTitle, $title));
+
+        // Try to send it to all recipients
+        $report = null;
+        try {
+            $report = $this->messagingClient->sendMulticast($message, $tokens);
+        } catch (Firebase\Exception\InvalidArgumentException $e) {
+            // Invalid message or empty token list
+            $this->getLog()->warning('Invalid message: ' . $e->getMessage());
+        } catch (Firebase\Exception\MessagingException $e) {
+            // API request failed
+            $this->getLog()->warning('Firebase API request failed: ' . $e->getMessage());
+        } catch (Firebase\Exception\FirebaseException $e) {
+            // Something unexpected happened
+            $this->getLog()->warning('Unexpected error: ' . $e->getMessage());
+        }
+        if (!$report) {
+            return false;
+        }
+
+        // Iterate and log report
+        foreach ($report->getItems() as $item) {
+            $token       = $item->target()->value();
+            $reportToken = "$id@$token";
+            $error       = $item->error()?->getMessage();
+            if ($item->messageWasInvalid()) {
+                $status   = 'Invalid message';
+                $severity = Logger::INFO;
+            } elseif ($item->messageTargetWasInvalid()) {
+                $status   = 'Invalid message target';
+                $severity = Logger::INFO;
+            } elseif ($item->messageWasSentToUnknownToken()) {
+                $status   = 'Unknown recipient';
+                $severity = Logger::INFO;
+            } elseif ($item->isFailure()) {
+                $status   = 'Unknown error';
+                $severity = Logger::INFO;
+            } else {
+                // Presumed valid
+                $status   = 'OK';
+                $severity = Logger::DEBUG;
+            }
+            if (isset($error)) {
+                $status .= ': ' . $error;
+            }
+            $this->report($reportToken, $status, $severity);
+        }
+        foreach ($report->validTokens() as $token) {
+            $this->report("$id@$token", 'OK', Logger::DEBUG);
+        }
+        foreach ($report->invalidTokens() as $token) {
+            $this->report("$id@$token", 'Error', Logger::INFO);
+        }
+        foreach ($report->unknownTokens() as $token) {
+            $this->report("$id@$token", 'Unknown', Logger::INFO);
+        }
+
+        return !$report->hasFailures();
     }
 
     /**
