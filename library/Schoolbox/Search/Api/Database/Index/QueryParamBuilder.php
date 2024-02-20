@@ -41,14 +41,15 @@ class QueryParamBuilder extends BaseQueryParamBuilder
      *  - We want to convert floating point numbers in the range 0 to 10,000 to integers, while mostly preserving their
      *    sort order.
      *  - The range of the resulting integers should be representable by the standard MySQL INT data type.
-     *  - If we choose FP_TO_INT_MULTIPLIER as 10,000, we get a maximum value of 100,000,000, which is well below
-     *    MySQL INT max value (2,147,483,647).  So 10,000 will do.
+     *  - If we choose FP_TO_INT_MULTIPLIER as 1,000, we get a maximum value of 10,000,000, which is well below
+     *    MySQL INT max value (2,147,483,647).  With this value, even if relevance scores in the wild are 200 times
+     *    greater than I was able to achieve above, we will have no problems.  So 1,000 will do.
      *    https://dev.mysql.com/doc/refman/8.0/en/integer-types.html
      *
      * Note we must use this FP_TO_INT_MULTIPLIER on all three relevance scores, to preserve their proportionality,
      * (so the effect of self::RELEVANCE_WEIGHTING_TITLE, etc. will be unchanged).
      */
-    const FP_TO_INT_MULTIPLIER = 10000;
+    const FP_TO_INT_MULTIPLIER = 1000;
 
     /**
      * Constructor
