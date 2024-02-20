@@ -11,6 +11,7 @@
         "@ckeditor/ckeditor5-block-quote": "~40.2.0",
         "@ckeditor/ckeditor5-core": "~40.2.0",
         "@ckeditor/ckeditor5-editor-classic": "~40.2.0",
+        "@ckeditor/ckeditor5-editor-inline": "~40.2.0",
         "@ckeditor/ckeditor5-engine": "~40.2.0",
         "@ckeditor/ckeditor5-essentials": "~40.2.0",
         "@ckeditor/ckeditor5-find-and-replace": "~40.2.0",

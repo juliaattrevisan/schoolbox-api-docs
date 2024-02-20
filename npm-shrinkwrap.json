@@ -1,12 +1,12 @@
 {
     "name": "schoolbox",
-    "version": "23.1.0",
+    "version": "24.0.0",
     "lockfileVersion": 2,
     "requires": true,
     "packages": {
         "": {
             "name": "schoolbox",
-            "version": "23.1.0",
+            "version": "24.0.0",
             "license": "UNLICENSED",
             "dependencies": {
                 "@andxor/jquery-ui-touch-punch-fix": "~1.0.2",
@@ -16,6 +16,7 @@
                 "@ckeditor/ckeditor5-block-quote": "~40.2.0",
                 "@ckeditor/ckeditor5-core": "~40.2.0",
                 "@ckeditor/ckeditor5-editor-classic": "~40.2.0",
+                "@ckeditor/ckeditor5-editor-inline": "^40.2.0",
                 "@ckeditor/ckeditor5-engine": "~40.2.0",
                 "@ckeditor/ckeditor5-essentials": "~40.2.0",
                 "@ckeditor/ckeditor5-find-and-replace": "~40.2.0",
@@ -88,7 +89,7 @@
                 "ts-ebml": "~2.0.2",
                 "v-tables-3-select-rows": "~0.4.9",
                 "videojs-record": "~4.6.0",
-                "vue": "^3.4.18",
+                "vue": "~3.4.18",
                 "vue-select": "~4.0.0-beta.6",
                 "vuejs-paginate-next": "~1.0.2"
             },
@@ -3190,6 +3191,15 @@
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-classic/-/ckeditor5-editor-classic-40.2.0.tgz",
             "integrity": "sha512-dftfDBxANOgqgQZ4SB3YTsEV/XX1u0g9jopbOBwqIABnVVa8zoGcktgFdGnLUFk51sL65baSx2z8Z1NNYdZcFQ==",
+            "dependencies": {
+                "ckeditor5": "40.2.0",
+                "lodash-es": "4.17.21"
+            }
+        },
+        "node_modules/@ckeditor/ckeditor5-editor-inline": {
+            "version": "40.2.0",
+            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-inline/-/ckeditor5-editor-inline-40.2.0.tgz",
+            "integrity": "sha512-Ox9lQiCSv0acyKaQLCcoebBjAMRE6L6iCBN8XVeQ3u91KZV6/LOhP+CJ314c8AuH+UHPeJt9MHP6eGU0trKHGQ==",
             "dependencies": {
                 "ckeditor5": "40.2.0",
                 "lodash-es": "4.17.21"
@@ -33406,6 +33416,15 @@
             "version": "40.2.0",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-classic/-/ckeditor5-editor-classic-40.2.0.tgz",
             "integrity": "sha512-dftfDBxANOgqgQZ4SB3YTsEV/XX1u0g9jopbOBwqIABnVVa8zoGcktgFdGnLUFk51sL65baSx2z8Z1NNYdZcFQ==",
+            "requires": {
+                "ckeditor5": "40.2.0",
+                "lodash-es": "4.17.21"
+            }
+        },
+        "@ckeditor/ckeditor5-editor-inline": {
+            "version": "40.2.0",
+            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-inline/-/ckeditor5-editor-inline-40.2.0.tgz",
+            "integrity": "sha512-Ox9lQiCSv0acyKaQLCcoebBjAMRE6L6iCBN8XVeQ3u91KZV6/LOhP+CJ314c8AuH+UHPeJt9MHP6eGU0trKHGQ==",
             "requires": {
                 "ckeditor5": "40.2.0",
                 "lodash-es": "4.17.21"
