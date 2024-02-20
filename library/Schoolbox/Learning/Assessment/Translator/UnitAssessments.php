@@ -112,6 +112,7 @@ class UnitAssessments
         }
 
         $progressTick = $this->getProgressTick($assessment);
+        $dueAt = $assessment->getDueAt();
 
         return [
             'id'                   => $assessment->getId(),
@@ -120,8 +121,11 @@ class UnitAssessments
             'course'               => $this->getCourseName($assessment),
             'unit'                 => $assessment->getBaseContext()->getTitle(),
             'projectName'          => $projectName,
-            'dueAt'                => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
-            'dueAtFormatted'       => $assessment->getDueAt()?->getRelativeDayWithoutMidnight(),
+            'dueAt'                => $dueAt ? [
+                'atom' => $dueAt->getUsingFormat(DATE_ATOM),
+                'long' => $dueAt->getLong(),
+                'relative' => $dueAt->getRelativeDayWithoutMidnight(),
+            ] : null,
             '_links'               => $links,
             'assessments'          => $assessments?->reindex()->map($this),
             'completionCount'      => $completionCount,

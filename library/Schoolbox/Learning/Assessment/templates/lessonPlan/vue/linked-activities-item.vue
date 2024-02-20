@@ -124,14 +124,16 @@ function getDataProgressTickForm(activity: Activity) {
         </h3>
         <p class="meta">
             {{ getActivityMeta(activity) }}
-            <template v-if="activity.dueAtFormatted && props.canModify && !store.isStudentView">
+            <template v-if="activity.dueAt && props.canModify && !store.isStudentView">
                 |
                 <span :class="getUrgency()"
                     >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
                 >
             </template>
         </p>
-        <p v-if="activity.dueAtFormatted" class="meta">Due {{ activity.dueAtFormatted }}</p>
+        <p v-if="activity.dueAt" class="meta" :title="activity.dueAt.long">
+            Due <time :datetime="activity.dueAt.atom || undefined">{{ activity.dueAt.relative }}</time>
+        </p>
     </div>
     <nav v-if="activity.progressTick !== null" class="progress-tick-container">
         <form

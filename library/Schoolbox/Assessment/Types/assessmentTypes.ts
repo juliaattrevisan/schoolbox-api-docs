@@ -5,8 +5,11 @@ export type Activity = {
     projectName: string;
     assessmentType: string;
     assessments: Activity[] | null;
-    dueAt: string | null;
-    dueAtFormatted: string | null;
+    dueAt: {
+        atom: string;
+        long: string;
+        relative: string;
+    } | null;
     isSelfAssessableTask: boolean;
     _links: {
         status: string;
