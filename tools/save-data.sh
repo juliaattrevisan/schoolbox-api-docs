@@ -217,44 +217,15 @@ upload_tarball(){
   if [ -z "$upload" ]; then
     return;
   fi
-  S3KEY=$(grep -E '^aws_iam_key:' /usr/share/schoolbox/vagrant.yaml | sed -E "s/(aws_iam_key:|[ \"'])//g")
-  if [ -z "$S3KEY" ]; then
-    error "Error: an AWS S3 Key must be supplied";
-    restart_services;
-    exit 1;
+  if ! aws configure list > /dev/null; then
+    aws sso login --no-browser
   fi
-  S3SECRET=$(grep -E '^aws_iam_secret:' /usr/share/schoolbox/vagrant.yaml | sed -E "s/(aws_iam_secret:|[ \"'])//g")
-  if [ -z "$S3SECRET" ]; then
-    error "Error: an AWS S3 Secret must be supplied";
-    restart_services;
-    exit 1;
-  fi
-  # below is based on: https://gist.github.com/chrismdp/6c6b6c825b07f680e710
   path=$CACHE_DIR;
-  date=$(date +"%a, %d %b %Y %T %z");
-  acl="x-amz-acl:public-read";
-  content_type='application/x-compressed-tar';
-  string="PUT\n\n$content_type\n$date\n$acl\n/${BUCKET}/${filename}";
-  signature=$(echo -en "${string}" | openssl sha1 -hmac "${S3SECRET}" -binary | base64)
-
-  if response=$(curl $long_verbose -X PUT -T "$path/$filename" \
-      -H "Host: $BUCKET.s3-ap-southeast-2.amazonaws.com" \
-      -H "Date: $date" \
-      -H "Content-Type: $content_type" \
-      -H "$acl" \
-      -H "Authorization: AWS ${S3KEY}:$signature" \
-      -H "Accept: application/json" \
-      "https://$BUCKET.s3-ap-southeast-2.amazonaws.com/${filename}"); then
-    if [[ -z $response ]]; then
-      log "Upload of $filename to S3 completed";
-    else
-      error "Error: an error occurred uploading to S3";
-      echo -e "$response" >&2;
-    fi
+  if aws s3 cp "$path/$filename" "s3://$BUCKET/$filename" --acl public-read; then
+    log "Upload of $filename to S3 completed";
   else
     error "Error: an error occurred uploading to S3";
   fi
-
   log "Uploading storage files to S3"
   INSTANCE_ID=vagrantx /usr/share/schoolbox/tools/s3-migration.php --quiet --perform
 }
