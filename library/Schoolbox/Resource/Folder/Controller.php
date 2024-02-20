@@ -437,7 +437,6 @@ class Controller extends BaseController
      *
      * @api   POST /resource/folder/{folderId}/sequence
      * @since 24.0
-     * @var int[] $_POST['sequence'] FolderIds, indexed by sequence
      * @param Model $folder
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -465,7 +464,7 @@ class Controller extends BaseController
         // sequence is desc sort, so we need the max sequence
         $sequence = count($folderSequence);
         foreach ($folderSequence as $childFolder) {
-            /** @var Folder\Model $move */
+            /** @var null|Folder\Model $move */
             $move = $children->getBy('id', $childFolder);
             // ensure the folder is a child of the $folder (parent)
             if ($move) {
