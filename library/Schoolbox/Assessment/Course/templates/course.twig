@@ -412,7 +412,7 @@ Usage:
                     <div class="small-12 column no-pad"{% if not courseSpec %} style="display:none;"{% endif %} data-mage-collapsed>
                         <ul class="information-list">
                             {% if courseSpec %}
-                            {% for unitSpec in courseSpec.units %}
+                            {% for unitSpec in courseSpec.units|sort((a,b) => b.folder.sequence <=> a.folder.sequence) %}
                                 {% if folderAccess[unitSpec.folder.id] > 0 %}
                                     {% include '@course/unit.twig' with {
                                         unitSpec:         unitSpec,
