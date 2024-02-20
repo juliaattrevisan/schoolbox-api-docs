@@ -2,8 +2,13 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/layout/_gap.scss`
+ *
+ * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/gap)
+ *
+ * Used with `.l-flex-*` and `.l-grid-*`, `gap` is the preferred method for adding space between elements.
+ *
+ * Compared to using `margin`, it allows the parent to control spacing. Have a read of [**this article**](https://markus.oberlehner.net/blog/css-the-spacing-between-elements-should-be-determined-by-the-parent-element/) if you'd like to know why this is preferred.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -16,6 +21,13 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
+    parameters: {
+        docs: {
+            controls: {
+                exclude: ["default"],
+            },
+        },
+    },
     title: "Layout/Gap",
 };
 export default meta;

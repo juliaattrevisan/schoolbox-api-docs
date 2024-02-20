@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/layout/_padding.scss`
+ *
+ * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/padding)
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -16,6 +17,13 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
+    parameters: {
+        docs: {
+            controls: {
+                exclude: ["default"],
+            },
+        },
+    },
     title: "Layout/Padding",
 };
 export default meta;
