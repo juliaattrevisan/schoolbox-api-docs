@@ -432,6 +432,33 @@ class Controller extends BaseController
         }
     }
 
+    /**
+     * Update a folder's childrens sequence
+     *
+     * @api   POST /resource/folder/{folderId}/sequence
+     * @since 24.0
+     * @var int[] $_POST['sequence'] FolderIds, indexed by sequence
+     * @param Model $folder
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws SchoolboxException
+     * @throws PDOException
+     * @throws DefinitionException
+     * @throws Router\Exception\RouteNotFound
+     */
+    public function postFolderSequence(Model $folder): void
+    {
+        $errorMapper = $this->errorMapper;
+        $folderSequence = $this->requestPost->get('sequence');
+
+        if (!count($folderSequence)) {
+            $this->response = $this->responseAsJson(false)->withStatus(400);
+            return;
+        }
+
+        $this->response = $this->responseAsJson(true)->withStatus(200);
+    }
+
 
     /**
      * Creates a new, or updates an existing, folder.
