@@ -29,7 +29,7 @@ class DueWorkInitialCest
      * @return void
      * @throws Exception
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();

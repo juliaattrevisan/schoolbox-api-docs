@@ -15,7 +15,7 @@ use Tests\Support\Page\Resources\Resources;
 
 /**
  * This test creates various groups with different group permissions
- * check wheter the group is presented or not for the user that is logged in
+ * check whether the group is presented or not for the user that is logged in
  * 1. Provision sales.tar.gz data
  * 2. vagrant ssh
  * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Folder/GroupPermissionCest

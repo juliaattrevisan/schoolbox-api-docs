@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Search;
@@ -8,6 +13,18 @@ use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Search\SearchPage;
 use Exception;
 
+/**
+ * check 2 characters warning, search terms and check the number of results presented, search without passing filters,
+ * search by passing filters(news), search by creator, search by passing dates,
+ * view search results by passing filters in the URL
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Search/SearchPageCest
+ *
+ *
+ */
 class SearchPageCest
 {
     /**
@@ -32,7 +49,7 @@ class SearchPageCest
      * @return void
      * @throws Exception
      */
-    public function searchEmptyKeyword(AcceptanceTester $i)
+    public function searchEmptyKeyword(AcceptanceTester $i): void
     {
         $searchPage = new SearchPage($i);
 
@@ -48,7 +65,7 @@ class SearchPageCest
      * @return void
      * @throws Exception
      */
-    public function searchValidKeyword(AcceptanceTester $i)
+    public function searchValidKeyword(AcceptanceTester $i): void
     {
         $searchPage = new SearchPage($i);
 
@@ -68,7 +85,7 @@ class SearchPageCest
      * @return void
      * @throws Exception
      */
-    public function searchNoFiltersAndCheckSubResults(AcceptanceTester $i)
+    public function searchNoFiltersAndCheckSubResults(AcceptanceTester $i): void
     {
         $searchPage = new SearchPage($i);
 
@@ -90,7 +107,7 @@ class SearchPageCest
      * @return void
      * @throws Exception
      */
-    public function searchFilterTypeNews(AcceptanceTester $i)
+    public function searchFilterTypeNews(AcceptanceTester $i): void
     {
         $searchPage = new SearchPage($i);
 
@@ -109,7 +126,7 @@ class SearchPageCest
      * @return void
      * @throws Exception
      */
-    public function searchFilterCreator(AcceptanceTester $i)
+    public function searchFilterCreator(AcceptanceTester $i): void
     {
         $searchPage = new SearchPage($i);
 
@@ -133,7 +150,7 @@ class SearchPageCest
      * @return void
      * @throws Exception
      */
-    public function searchFilterEndDate(AcceptanceTester $i)
+    public function searchFilterEndDate(AcceptanceTester $i): void
     {
         $searchPage = new SearchPage($i);
 
@@ -154,7 +171,7 @@ class SearchPageCest
      * @return void
      * @throws Exception
      */
-    public function visitSearchPageWithPrefilledKeyword(AcceptanceTester $i)
+    public function visitSearchPageWithPrefilledKeyword(AcceptanceTester $i): void
     {
         $searchPage = new SearchPage($i);
 

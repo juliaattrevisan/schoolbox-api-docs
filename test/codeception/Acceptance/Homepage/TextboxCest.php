@@ -30,7 +30,7 @@ class TextboxCest
      * @throws Exception
      * @return void
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
     }

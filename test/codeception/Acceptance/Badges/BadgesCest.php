@@ -62,7 +62,7 @@ class BadgesCest
      * Click Create Badge
      * Ensure the Badge is presented in the /learning/badge screen
      */
-    public function createBadge(AcceptanceTester $i)
+    public function createBadge(AcceptanceTester $i): void
     {
         $badges = new Badges($i);
         $createBadge = new CreateBadge($i);
@@ -95,7 +95,7 @@ class BadgesCest
      * Click Modify Badge
      * Ensure the Badge title and category are properly presented in the /learning/badge screen
      */
-    public function modifyBadge(AcceptanceTester $i)
+    public function modifyBadge(AcceptanceTester $i): void
     {
         $badges = new Badges($i);
         $createBadge = new CreateBadge($i);
@@ -123,7 +123,7 @@ class BadgesCest
      * Click Delete and confirm it
      * Ensure the Badge is no longer presented in the /learning/badge screen
      */
-    public function deleteBadge(AcceptanceTester $i)
+    public function deleteBadge(AcceptanceTester $i): void
     {
         $badges = new Badges($i);
         $i->amGoingTo('click the badge dropdown and click Delete');

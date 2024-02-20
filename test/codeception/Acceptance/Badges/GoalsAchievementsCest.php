@@ -34,7 +34,7 @@ class GoalsAchievementsCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();

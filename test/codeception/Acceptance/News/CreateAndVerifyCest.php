@@ -27,6 +27,11 @@ use Schoolbox\User;
  * Test that a news item I create retains the settings I chose
  * creates a news article and checks the contents is properly recorded, ensure the proper audience can view the article
  *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance News/CreateAndVerifyCest
+ *
  */
 
 class CreateAndVerifyCest

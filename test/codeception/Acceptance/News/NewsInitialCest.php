@@ -16,6 +16,12 @@ use Exception;
  * create a news article, unpublish it, publish it, audience view the article, enable comments,
  * add comments, delete comments, disable comments, delete the news article
  *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance News/NewsInitialCest
+ *
+ *
  */
 class NewsInitialCest
 {

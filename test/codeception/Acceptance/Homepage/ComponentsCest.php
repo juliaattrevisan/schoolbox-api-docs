@@ -28,7 +28,7 @@ class ComponentsCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/homepage/83
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();

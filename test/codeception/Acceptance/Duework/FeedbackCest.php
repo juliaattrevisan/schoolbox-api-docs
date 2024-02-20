@@ -33,7 +33,7 @@ class FeedbackCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -46,7 +46,7 @@ class FeedbackCest
      * creates and submits a due work, marks the due work via inline grader, checks the notifications for it for all the steps
      *
      */
-    public function testDueworkBasic(AcceptanceTester $i)
+    public function testDueworkBasic(AcceptanceTester $i): void
     {
         $className = Common::CLASS_9AENG;
         $classId = Common::CLASS_ID_9AENG;
@@ -118,7 +118,7 @@ class FeedbackCest
      * creates and submits a due work, marks the due work via activity status page, checks the notifications for it for all the steps
      *
      */
-    public function testDueworkStatusPage(AcceptanceTester $i)
+    public function testDueworkStatusPage(AcceptanceTester $i): void
     {
         $className = Common::CLASS_9AENG;
         $classId = Common::CLASS_ID_9AENG;

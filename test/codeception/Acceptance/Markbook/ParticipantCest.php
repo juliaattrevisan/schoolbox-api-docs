@@ -35,7 +35,7 @@ class ParticipantCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -49,7 +49,7 @@ class ParticipantCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
-    public function testMarkbookBasic(AcceptanceTester $i)
+    public function testMarkbookBasic(AcceptanceTester $i): void
     {
         $classId = Common::CLASS_ID_DEMO2;
         $student = Common::USER_LOUISASMITH;

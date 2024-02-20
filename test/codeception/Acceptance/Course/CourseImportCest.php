@@ -32,7 +32,7 @@ class CourseImportCest
      *
      * get logged in
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -63,7 +63,7 @@ class CourseImportCest
      * untick a quiz, due work and task before importing
      * ensure the course is presented in the homepage
      */
-    public function importCourseIntoClass(AcceptanceTester $i)
+    public function importCourseIntoClass(AcceptanceTester $i): void
     {
         $createFolder = new CreateFolder($i);
         $courseList = new CourseList($i);
@@ -130,7 +130,7 @@ class CourseImportCest
      * fill the dates fields and click export to selected class
      * ensure the assessment is presented in that class
      */
-    public function copyActivityIntoClass(AcceptanceTester $i)
+    public function copyActivityIntoClass(AcceptanceTester $i): void
     {
         $courseModify = new CourseModify($i);
         $folder_id = $i->grabFromDatabase('folder', 'id', ['name' => 'Automation Course Import Folder1','deleted_at' => null]);

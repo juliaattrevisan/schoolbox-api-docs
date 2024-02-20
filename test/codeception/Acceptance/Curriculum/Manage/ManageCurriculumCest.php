@@ -39,7 +39,7 @@ class ManageCurriculumCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/curriculum
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -52,7 +52,7 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum create a new curriculum
      */
-    public function addNewCurriculum(AcceptanceTester $i)
+    public function addNewCurriculum(AcceptanceTester $i): void
     {
         $i->amGoingTo('add a new curriculum');
         $addNew = new AddNewCurriculum($i);
@@ -74,7 +74,7 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum create a new subsection
      */
-    public function addNewSubsection(AcceptanceTester $i)
+    public function addNewSubsection(AcceptanceTester $i): void
     {
         $i->amGoingTo('add a new subsection to English');
         $addNew = new AddNewSubsection($i);
@@ -96,7 +96,7 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum disable some nodes
      */
-    public function disableNodes(AcceptanceTester $i)
+    public function disableNodes(AcceptanceTester $i): void
     {
         $i->amGoingTo('disable Year 4 History and Year 9 History');
         $mc = new ManageCurriculum($i);
@@ -117,7 +117,7 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum delete a node
      */
-    public function deleteNode(AcceptanceTester $i)
+    public function deleteNode(AcceptanceTester $i): void
     {
         $i->amGoingTo('delete the Year 12 French Node');
         $mc = new ManageCurriculum($i);
@@ -138,7 +138,7 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum search for nodes
      */
-    public function searchNodes(AcceptanceTester $i)
+    public function searchNodes(AcceptanceTester $i): void
     {
         $i->amGoingTo('search for nodes containing "historical" in Year 4 History');
         $mc = new ManageCurriculum($i);
@@ -155,7 +155,7 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum update a node
      */
-    public function updateNode(AcceptanceTester $i)
+    public function updateNode(AcceptanceTester $i): void
     {
         $i->amGoingTo('update Year 9 History');
         $updateNode = new UpdateNode($i);
@@ -178,7 +178,7 @@ class ManageCurriculumCest
      * on https://vagrant.dev.schoolbox.cloud/curriculum searches for a node with disabled nodes toggle on and off
      *
      */
-    public function hideDisabledNodesAndSearch(AcceptanceTester $i)
+    public function hideDisabledNodesAndSearch(AcceptanceTester $i): void
     {
         $i->amGoingTo('navigate to First Contacts in Year 4 History');
         $mc = new ManageCurriculum($i);
@@ -203,7 +203,7 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum checks the curriculum nodes sorting
      */
-    public function checkNodeSort(AcceptanceTester $i)
+    public function checkNodeSort(AcceptanceTester $i): void
     {
         $i->amGoingTo('check nodes are sorted by order, code, then name');
         $i->amGoingTo('add order: 1 to Year 4 History so it appears at the top of the list');
@@ -230,7 +230,7 @@ class ManageCurriculumCest
      * on https://vagrant.dev.schoolbox.cloud/curriculum
      * navigates through the nodes by clicking the nodes and using the browser buttons (back and forward)
      */
-    public function navigateWithBrowserButtons(AcceptanceTester $i)
+    public function navigateWithBrowserButtons(AcceptanceTester $i): void
     {
         $i->amGoingTo('use the browser backward and forward buttons to traverse the curriculum');
         $i->amGoingTo('traverse to "Curricula > English > Year 9 > Literature > Creating literature" and ensure "ACELT1773" is visible');

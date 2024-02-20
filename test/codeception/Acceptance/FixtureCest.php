@@ -7,16 +7,19 @@
 
 namespace Tests\Acceptance;
 
-/**
- * Steps:
- * 1. Provision legacy.tar.gz data
- * 2. vagrant ssh
- * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run acceptance FixtureCest
- */
-
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Fixture;
 use Exception;
+
+/**
+ *
+ * creates and modify fixtures and ensure the notification is sent according to the match date/time
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance FixtureCest
+ */
 
 class FixtureCest
 {
@@ -28,18 +31,10 @@ class FixtureCest
      */
     public function _before(AcceptanceTester $i)
     {
+        $i->amGoingTo('clear all the notifications');
         exec('cd /usr/share/schoolbox/tools/notif; sudo php /usr/share/schoolbox/test/socket/destroy-rabbit-data.php;');
         $i->logout();
         $i->loginAsAdmin();
-    }
-
-    /**
-     * Clean up after every test
-     *
-     * @param AcceptanceTester $i
-     */
-    public function _after(AcceptanceTester $i)
-    {
     }
 
     /**
