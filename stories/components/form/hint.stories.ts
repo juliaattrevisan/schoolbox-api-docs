@@ -2,8 +2,11 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/ui/forms/_hint.scss`
+ *
+ * To provide additional context or guidance to users, use a hint.
+ *
+ * Hints are typically used to provide additional information about a form field, such as the expected format of the input or the purpose of the field.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,

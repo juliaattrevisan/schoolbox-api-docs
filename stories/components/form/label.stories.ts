@@ -2,8 +2,14 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/ui/forms/_label.scss`
+ *
+ * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label)
+ *
+ * The `<label>` HTML element represents a caption for an item in a user interface.
+ *
+ * **Usage notes**:
+ * - Ensure `for="id"` attribute matches the `id` of the input it is labelling.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,

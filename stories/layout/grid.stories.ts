@@ -19,13 +19,6 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    parameters: {
-        docs: {
-            controls: {
-                exclude: ["default"],
-            },
-        },
-    },
     title: "Layout/Grid",
 };
 export default meta;

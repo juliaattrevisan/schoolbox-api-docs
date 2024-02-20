@@ -17,13 +17,6 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    parameters: {
-        docs: {
-            controls: {
-                exclude: ["default"],
-            },
-        },
-    },
     title: "Layout/Flex",
 };
 export default meta;

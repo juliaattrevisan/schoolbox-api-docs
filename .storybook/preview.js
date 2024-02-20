@@ -10,6 +10,7 @@
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
 import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import { themes } from "@storybook/theming";
+import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
 import "../stories/assets/styles/styles.css"; // add in any other styles we want to use in storybook only
 import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to load mock data into stories
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
@@ -71,6 +72,7 @@ export const parameters = {
     },
     docs: {
         theme: themes.dark,
+        page: DocumentationTemplate, // use our own custom documentation template
     },
     layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
     options: {

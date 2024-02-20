@@ -2,8 +2,20 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/ui/forms/_input-range.scss`
+ *
+ * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range)
+ *
+ * `<input>` elements of type range let the user specify a numeric value which must be no less than a given value, and no more than another given value.
+ *
+ * ## Properties
+ *
+ * | Property   | Type     | Description                                                                                 |
+ * | ---------- | -------- | ------------------------------------------------------------------------------------------- |
+ * | `min` \*   | `number` | The lowest value in the range of permitted values                                           |
+ * | `max` \*   | `number` | The greatest value in the range of permitted values                                         |
+ * | `value` \* | `number` | Current value of the range input                                                            |
+ * | `step`     | `number` | The step attribute is a number that specifies the granularity that the value must adhere to |
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -21,7 +33,7 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-export const Example: Story = {
+export const Default: Story = {
     render: () => ({
         template: `
             <div class="c-form-element c-input-range">

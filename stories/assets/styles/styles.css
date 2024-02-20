@@ -7,7 +7,8 @@
  * so the tables display better in the Storybook docs using the dark theme
  */
 table.docblock-argstable,
-.sbdocs > table {
+.sbdocs > table,
+.sbdocs > div > table {
     background: none !important;
     border: none !important;
 }
@@ -15,14 +16,18 @@ table.docblock-argstable,
 table.docblock-argstable thead,
 table.docblock-argstable tr:nth-of-type(2n),
 .sbdocs > table thead,
-.sbdocs > table tr:nth-of-type(2n) {
+.sbdocs > table tr:nth-of-type(2n),
+.sbdocs > div > table thead,
+.sbdocs > div > table tr:nth-of-type(2n) {
     background: none !important;
 }
 
 table.docblock-argstable tr th,
 table.docblock-argstable tr td,
 .sbdocs > table tr th,
-.sbdocs > table tr td {
+.sbdocs > table tr td,
+.sbdocs > div > table tr th,
+.sbdocs > div > table tr td {
     color: #c9cdcf !important;
 }
 

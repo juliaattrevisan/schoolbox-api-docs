@@ -2,8 +2,17 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Source**: `vue/components/icon/sbx-icon.ce.vue`
+ *
+ * To show an icon
+ *
+ * ## Properties
+ *
+ * | Property | Type     | Description                                                                                      | Default        | Options                                                                   |
+ * | -------- | -------- | ------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------- |
+ * | `name`   | `string` | The name of the icon, as specified [here](?path=/docs/getting-started-design-tokens-icons--docs) | `""`           | Any string name linked to an icon                                         |
+ * | `size`   | `string` | The size of the icon                                                                             | `m`            | `xs`, `s`, `m`, `l`, `xl`, or any other approriate size value like `36px` |
+ * | `color`  | `string` | The color of the icon.                                                                           | `currentColor` | Can accept any valid CSS colour value, including custom properties.       |
  */
 const meta: Meta<typeof SbxIcon> = {
     component: StorybookSlot,

@@ -18,13 +18,6 @@ const meta: Meta<typeof StorybookSlot> = {
         }),
     ],
     title: "Core/Island",
-    parameters: {
-        docs: {
-            controls: {
-                exclude: ["default"],
-            },
-        },
-    },
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

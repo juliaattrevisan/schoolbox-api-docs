@@ -2,8 +2,20 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Source**: `vue/components/generic/sbx-free-style.ce.vue`
+ *
+ * This space can be used to style new components quickly without our existing styles interfering. Use the linked Vue component to add the relevant html markup within the `<template>` and the new styles within the `<style>`.
+ *
+ * Once the new component is appropriately set up:
+ *
+ * 1. The `<style>` can also be copied into a new `.scss` file
+ * 2. The new `.scss` file can be added where appropriate within `www/static/css/core/core.scss`
+ * 3. The markup within `<template>` can also be added to the `InsideSchoolboxStyles` story within `stories/gettingStarted/freeStyle.stories.ts`
+ *
+ * This way we can see both how the new component looks **outside** and **inside** our current style setup. This will help us to add any relevant overrides to ensure the new styles are still completely respected within our current style setup.
+ * When adding any overrides, please ensure they are marked with a comment to explain why they are needed and are prefiexed with the `^foundation-fixes^` comment. This will help us to keep track of any overrides and ensure they are removed when they are no longer needed.
+ *
+ * Once both **outside** and **inside** are consistent, the component can be brought into its own space within Storybook to finalise and document.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -16,6 +28,13 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
+    parameters: {
+        docs: {
+            controls: {
+                exclude: ["default"],
+            },
+        },
+    },
     title: "Getting Started/Contributing/Free Style",
 };
 export default meta;

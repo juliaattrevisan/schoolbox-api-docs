@@ -21,13 +21,6 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    parameters: {
-        docs: {
-            controls: {
-                exclude: ["default"],
-            },
-        },
-    },
     title: "Layout/Gap",
 };
 export default meta;

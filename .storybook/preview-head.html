@@ -2,11 +2,3 @@
 <script src="vendors.js"></script>
 <!-- main.js matches that found in webpack.common.js EXCEPT initWebComponents.ts and imageLightboxInit.ts to avoid web component / loading issues -->
 <script src="main.js"></script>
-<style>
-  /* insane selector to hide empty argstables */
-  .sbdocs-content
-    div.sb-anchor:has(+ div:not(.sb-anchor))
-    + div:not(:has(table)) {
-    display: none;
-  }
-</style>

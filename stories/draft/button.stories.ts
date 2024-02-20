@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/ui/button/_c-button.scss`
+ *
+ * [mdn](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button)
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
