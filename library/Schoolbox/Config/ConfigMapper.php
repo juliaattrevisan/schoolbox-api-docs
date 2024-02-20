@@ -276,6 +276,8 @@ class ConfigMapper extends Mapper
     public const NAME_REPORT_STAFF_ACCESS = 'report_staff_access';
     public const NAME_REPORT_STAFF_DIRECTORY_ENABLED = 'staff_directory_enabled';
 
+    // Firebase-specific
+    public const NAME_FIREBASE_PRIVATE_KEY = 'firebase_private_key';
 
     /**
      * Isams specific
