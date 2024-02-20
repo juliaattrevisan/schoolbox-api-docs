@@ -12,6 +12,26 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Me
 class Builder
 {
     /**
+     * Apparently everyone is going to be using this
+     */
+    private const HOST = 'https://cetas-test.civica.education/TeacherToolkit/attendance';
+
+
+    /**
+     * Apparently this is hardcoded too - we only use
+     * TeachingGroup (1)
+     *
+     * Other variations are:
+     *      0 RollGroup
+     *      1 TeachingGroup
+     *      2 EventGroup
+     *      3 DetentionGroup
+     *      4 SchoolGroup
+     */
+    private const GROUP_TYPE = 1;
+
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -61,8 +81,7 @@ class Builder
          *
          * FIXME Find the missing parts
          */
-        $prefix = 'https://ces-n.civicaed.com.au/TeacherToolkit/attendance'; // FIXME is this hardcoded or dynamic?
-        $teachingGroupId = $class['teachingGroupId'];                        // FIXME What's this? Group Id, maybe
+        $teachingGroupId = $class['teachingGroupId'];      // FIXME What's this? Group Id, maybe
         $date = $classInstance['date'];
 
         /* These aren't in the api specs; hardcoding for now
@@ -72,14 +91,14 @@ class Builder
          *  I made various best-guesses here
          */
         $hasAttendance = 'true';                // FIXME What's this?
-        $type = 0;                              // FIXME What's this? Group Type, maybe - but where does it come from
+        $type = self::GROUP_TYPE;               // FIXME What's this? Group Type, maybe - but where does it come from
         $session = $classInstance['sessionId']; // FIXME Made an assumption here, but what is Session Number?
         $singleSession = 'false';               // FIXME What's this?
         $schoolContextId = $class['schoolId'];  // FIXME Made an assumption here
 
         return sprintf(
             '%s/%s?attendance=%s&type=%s&session=%s&date=%s&singlesession=%s&schoolContextId=%s',
-            $prefix,
+            self::HOST,
             $teachingGroupId,
             $hasAttendance,
             $type,
