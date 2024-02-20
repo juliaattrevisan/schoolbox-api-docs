@@ -28,4 +28,5 @@ export type Unit = {
     rubricCapabilities: RubricCapability[];
     textboxes: Record<string, TextboxContent | null>;
     extraTextboxes: number;
+    sequence: number;
 };

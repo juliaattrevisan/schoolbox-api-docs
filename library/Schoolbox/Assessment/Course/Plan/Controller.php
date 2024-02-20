@@ -202,7 +202,8 @@ class Controller extends Base
                 /* All the unique curriculum nodes that are in use by all the assessment specs
                  * in this unit
                  */
-                'curriculumCodes' => $curriculumNodes
+                'curriculumCodes' => $curriculumNodes,
+                'sequence'  => $unit->getFolder()->getSequence()
             ];
 
             // add this units data to the whole course units collection.
