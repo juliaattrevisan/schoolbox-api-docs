@@ -90,8 +90,6 @@ class ConfigMapper extends Mapper
     public const TYPE_DOC_MANAGE    = 20;
     public const TYPE_SAML          = 21;
 
-    public const NAME_TITLE = 'title';
-
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const _GLOBAL_MODERATION              = 'global_moderation';
     public const _PUBLISH_DATE_OFFSET            = 'publish_date_offset';
