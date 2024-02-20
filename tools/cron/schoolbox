@@ -130,12 +130,12 @@ MAILTO="support@schoolbox.com.au"
 
 # Learnosity:
 # restart pending quiz imports every 15 minutes?
-*/15 * * * *     www-data    /usr/local/bin/jitter 60 php /usr/share/schoolbox/tools/learnosity/restart-pending.php >> /var/log/schoolbox/learnosity-restart-pending.log 2>&1
+*/15 * * * *     www-data    /usr/local/bin/jitter 60 php /usr/share/schoolbox/tools/learnosity/restart-pending.php -p >> /var/log/schoolbox/learnosity-restart-pending.log 2>&1
 
 # poll processing quiz imports every 5 minutes?
-*/5 * * * *     www-data    /usr/local/bin/jitter 60 php /usr/share/schoolbox/tools/learnosity/poll-processing.php >> /var/log/schoolbox/learnosity-poll-processing.log 2>&1
+*/5 * * * *     www-data    /usr/local/bin/jitter 60 php /usr/share/schoolbox/tools/learnosity/poll-processing.php -p >> /var/log/schoolbox/learnosity-poll-processing.log 2>&1
 
 # reset failed quiz imports: every 15 minutes?
-*/15 * * * *    www-data    php /usr/share/schoolbox/tools/learnosity/reset-failed.php >> /var/log/schoolbox/learnosity-reset-failed.log 2>&1
+*/15 * * * *    www-data    php /usr/share/schoolbox/tools/learnosity/reset-failed.php -p >> /var/log/schoolbox/learnosity-reset-failed.log 2>&1
 
 # End of file - do not delete
