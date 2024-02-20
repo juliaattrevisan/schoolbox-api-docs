@@ -143,6 +143,7 @@ class Module extends BaseModule
         $this->register('PUT', '/folder/{id:\d+}/move/{parentId:\d+}', 'putMoveFolder', $permWriteBoth, $preloadBoth);
         $this->register('DELETE', '/folder/{id:\d+}', 'deleteFolder', $canDelete, $preloadFolder);
         $this->register('POST', '/folder/{id:\d+}/reset', 'postFolderReset', $writeAccessAndNotRoot, $preloadFolder);
+        $this->register('POST', '/folder/{id:\d+}/sequence', 'postFolderSequence', $writeAccessAndNotRoot, $preloadFolder);
     }
 
     /**

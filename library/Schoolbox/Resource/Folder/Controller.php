@@ -432,6 +432,60 @@ class Controller extends BaseController
         }
     }
 
+    /**
+     * Update a folder's childrens sequence
+     *
+     * @api   POST /resource/folder/{folderId}/sequence
+     * @since 24.0
+     * @param Model $folder
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws SchoolboxException
+     * @throws PDOException
+     * @throws DefinitionException
+     * @throws Router\Exception\RouteNotFound
+     */
+    public function postFolderSequence(Model $folder): void
+    {
+        $folderSequence = $this->requestPost->get('sequence');
+
+        // ensure there is actually data in the post
+        if (!count($folderSequence)) {
+            $this->response = $this->responseAsJson(false)->withStatus(400);
+            return;
+        }
+
+        // fetch all children folders of $folder (parent)
+        $children = $this->folderMapper->findByParent($folder->getId());
+
+        $updates = $this->folderMapper->createCollection();
+
+        // for each folder (in sequence $POST)
+        // sequence is desc sort, so we need the max sequence
+        $sequence = count($folderSequence);
+        foreach ($folderSequence as $childFolder) {
+            /** @var null|Folder\Model $move */
+            $move = $children->getBy('id', $childFolder);
+            // ensure the folder is a child of the $folder (parent)
+            if ($move) {
+                // set the sequence of the child folder to its new sequence
+                $move->setSequence($sequence);
+                $updates->add($move);
+                $sequence--;
+            }
+        }
+        // all un sequenced folders set their value to 0
+        foreach ($children->diff($updates) as $missing) {
+            $missing->setSequence(0);
+            $updates->add($missing);
+        }
+
+        // save all the folder sequences (once)
+        $this->folderMapper->save($updates);
+
+        $this->response = $this->responseAsJson(true)->withStatus(200);
+    }
+
 
     /**
      * Creates a new, or updates an existing, folder.
