@@ -6,40 +6,38 @@
  * These styles overwrite the heavy handed table styles in our core.css file,
  * so the tables display better in the Storybook docs using the dark theme
  */
-table.docblock-argstable {
+table.docblock-argstable,
+.sbdocs > table {
     background: none !important;
     border: none !important;
 }
 
 table.docblock-argstable thead,
-table.docblock-argstable tr:nth-of-type(2n) {
+table.docblock-argstable tr:nth-of-type(2n),
+.sbdocs > table thead,
+.sbdocs > table tr:nth-of-type(2n) {
     background: none !important;
 }
 
 table.docblock-argstable tr th,
-table.docblock-argstable tr td {
+table.docblock-argstable tr td,
+.sbdocs > table tr th,
+.sbdocs > table tr td {
     color: #c9cdcf !important;
+}
+
+/**
+ * To overwrite our foundation styles making the buttons look funky
+ */
+.docblock-code-toggle:hover,
+.docblock-code-toggle:focus {
+    background-color: #1b1c1d;
+    color: #c9cdcf;
 }
 
 /**
  * These story styles are currently used in the Layout stories to help show the utility classes
  */
-.story-fieldset {
-    border: 2px dashed darkorchid;
-    padding: 15px 25px;
-}
-
-.story-legend {
-    color: white;
-    background: darkorchid;
-    font-weight: normal;
-    font-family: ui-monospace, Menlo, Monaco, "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
-        "Droid Sans Mono", "Courier New", monospace;
-    margin-left: -15px;
-    padding: 2px 15px;
-    vertical-align: baseline;
-}
-
 .story-demo-boxes {
     background-color: #00a9fe;
 }
