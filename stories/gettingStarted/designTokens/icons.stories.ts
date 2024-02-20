@@ -2,8 +2,7 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * Below is a list of all icons, which can be referenced by their name and used within the `<sbx-icon>` [component](?path=/docs/components-icon--docs).
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -21,7 +20,7 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-export const Icons: Story = {
+export const Default: Story = {
     render: () => ({
         template: `
         <div class="l-flex-row l-flex--center l-gap-s">

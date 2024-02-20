@@ -8,7 +8,6 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-storysource",
         "@storybook/addon-mdx-gfm",
-        "storybook-addon-vue-slots",
     ],
     features: {
         postcss: false,
@@ -20,8 +19,9 @@ module.exports = {
     staticDirs: ["../stories/assets"],
     stories: [
         "../stories/**/*.mdx",
-        "../stories/**/*.stories.@(js|jsx|ts|tsx)",
-        "../vue/components/**/*.stories.@(js|jsx|ts|tsx)",
+        "../stories/**/*.stories.@(js|ts)",
+        "../vue/components/**/*.mdx",
+        "../vue/components/**/*.stories.@(js|ts)",
     ],
     webpackFinal: async (config, { configType }) => {
         // Add in the required matched rules from webpack.common.js

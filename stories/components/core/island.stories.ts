@@ -17,7 +17,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Core/Island",
+    title: "Components/Core/Island",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

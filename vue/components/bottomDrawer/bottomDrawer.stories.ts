@@ -2,14 +2,8 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import BottomDrawer from "./bottom-drawer.vue";
 
 /**
- * **Source**: `vue/components/bottomDrawer/bottom-drawer.vue`
- *
- * To display content that appears when requested from the bottom of the window.
- * Usually contains actions in response to selections on the page, for example choosing some users to edit.
- * Once +1 users is selected the drawer will slide in from the bottom of the window.
- *
- * **Note**: Due to this component using `getBoundingClientRect()` for positioning, it's best to view this component within the individual stories.
- * Viewing it within the preview windows will not show the correct positioning.
+ * Storybook meta data, any default properties that are passed into every story
+ * https://storybook.js.org/docs/vue/writing-stories/introduction
  */
 const meta: Meta<typeof BottomDrawer> = {
     component: BottomDrawer,

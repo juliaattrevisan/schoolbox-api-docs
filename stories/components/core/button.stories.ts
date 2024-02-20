@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import StorybookSlot from "../../vue/components/storybook-slot.vue";
+import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
  * **Styles**: `www/static/css/core/ui/button/_c-button.scss`
