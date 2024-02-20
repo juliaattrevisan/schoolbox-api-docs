@@ -134,3 +134,33 @@ export const NoBackground: Story = {
         `,
     }),
 };
+
+/**
+ * A group of buttons
+ */
+export const ButtonGroup: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex-row l-gap-s">
+                <button class="c-button" type="button">Button 1</button>
+                <button class="c-button" type="button">Button 2</button>
+                <button class="c-button" type="button">Button 3</button>
+            </div>
+        `,
+    }),
+};
+
+/**
+ * A group of buttons stretched to fill the parent container
+ */
+export const ButtonGroupStretch: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex-row l-gap-s">
+                <button class="c-button l-flex__item--1" type="button">Button 1</button>
+                <button class="c-button l-flex__item--1" type="button">Button 2</button>
+                <button class="c-button l-flex__item--1" type="button">Button 3</button>
+            </div>
+        `,
+    }),
+};
