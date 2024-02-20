@@ -18,6 +18,7 @@ import { createPinia } from "pinia";
 import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
 import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
+import SbxFreeStyle from "@schoolboxVue/components/generic/sbx-free-style.ce.vue";
 window.Vue = {};
 window.Vue.ref = ref;
 window.Vue.computed = computed;
@@ -50,6 +51,8 @@ export function register() {
     window.customElements.define("sbx-pop-out", SbxPopOutCE);
     const SbxIconCE = window.Vue.defineCustomElement(SbxIcon);
     window.customElements.define("sbx-icon", SbxIconCE);
+    const SbxFreeStyleCE = window.Vue.defineCustomElement(SbxFreeStyle);
+    window.customElements.define("sbx-free-style", SbxFreeStyleCE);
 }
 register();
 
