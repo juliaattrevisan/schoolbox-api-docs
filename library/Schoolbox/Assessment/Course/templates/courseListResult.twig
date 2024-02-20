@@ -74,7 +74,7 @@ Usage:
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="{{ collapsePrefix }}-{{ courseSpec.id }}">
             <ul class="unit-list">
-                    {% for unit in courseSpec.units %}
+                    {% for unit in courseSpec.units|sort((a,b) => b.folder.sequence <=> a.folder.sequence) %}
                 <li>
                     <div class="tiny card small-12">
                         {% if linkToUnits %}
