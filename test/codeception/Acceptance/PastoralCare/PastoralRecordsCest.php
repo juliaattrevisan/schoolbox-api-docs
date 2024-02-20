@@ -16,6 +16,17 @@ use Tests\Support\Page\ProfilePage\ProfilePage;
 use Tests\Support\Page\PastoralCare\CreatePastoralRecord;
 use Tests\Support\Page\PastoralCare\PastoralProfile;
 
+/**
+ * creates a pastoral record, check the pastoral record details, comments it,
+ * deletes the comment, modify the record, delete the record
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Pastoral/PastoralRecordsCest
+ *
+ */
+
 class PastoralRecordsCest
 {
     /**
@@ -24,8 +35,7 @@ class PastoralRecordsCest
      * @param AcceptanceTester $i
      * @throws Exception
      *
-     * get logged in
-     * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
+     * get logged in as admin
      */
     public function _before(AcceptanceTester $i): void
     {

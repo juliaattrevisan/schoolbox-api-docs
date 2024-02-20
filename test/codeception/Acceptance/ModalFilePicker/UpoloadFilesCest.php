@@ -13,6 +13,16 @@ use Exception;
 use Tests\Support\Page\Resources\Resources;
 use Tests\Support\Page\Resources\ResourcesMyFilesPicker;
 
+/**
+ *
+ * uploads files into schoolbox by attaching files via Resources, My Files, recording an audio and video, taking a picture
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance ModalFilePicker/UpoloadFilesCest
+ *
+ */
 class UpoloadFilesCest
 {
     /**
@@ -24,7 +34,7 @@ class UpoloadFilesCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/resources
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -46,7 +56,7 @@ class UpoloadFilesCest
      * select Spelling tips file
      * ensure the files are presented under the admin folder
      */
-    public function attachFilesViaResources(AcceptanceTester $i)
+    public function attachFilesViaResources(AcceptanceTester $i): void
     {
         $resources = new ResourcesMyFilesPicker($i);
         $resourcesPage = new Resources($i);
@@ -89,7 +99,7 @@ class UpoloadFilesCest
      * select Abby file
      * ensure the file is presented under the admin folder
      */
-    public function attachFilesViaMyFiles(AcceptanceTester $i)
+    public function attachFilesViaMyFiles(AcceptanceTester $i): void
     {
         $resources = new ResourcesMyFilesPicker($i);
         $resourcesPage = new Resources($i);
@@ -115,7 +125,7 @@ class UpoloadFilesCest
      * click Audio
      * ensure the file is presented under the admin folder
      */
-    public function attachFilesByRecordingAudio(AcceptanceTester $i)
+    public function attachFilesByRecordingAudio(AcceptanceTester $i): void
     {
         $resources = new ResourcesMyFilesPicker($i);
         $resourcesPage = new Resources($i);
@@ -149,7 +159,7 @@ class UpoloadFilesCest
      * click video
      * ensure the file is presented under the admin folder
      */
-    public function attachFilesByRecordingAVideo(AcceptanceTester $i)
+    public function attachFilesByRecordingAVideo(AcceptanceTester $i): void
     {
         $resources = new ResourcesMyFilesPicker($i);
         $resourcesPage = new Resources($i);
@@ -183,7 +193,7 @@ class UpoloadFilesCest
      * click Photo
      * ensure the file is presented under the admin folder
      */
-    public function attachFilesByTakingPhoto(AcceptanceTester $i)
+    public function attachFilesByTakingPhoto(AcceptanceTester $i): void
     {
         $resources = new ResourcesMyFilesPicker($i);
         $resourcesPage = new Resources($i);

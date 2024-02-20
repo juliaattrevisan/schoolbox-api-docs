@@ -1,13 +1,28 @@
 <?php
 
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Tests\Acceptance\News;
 
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
 use Exception;
 
-//TODO: add verification after the actions
-
+/**
+ *
+ * create a news article, unpublish it, publish it, audience view the article, enable comments,
+ * add comments, delete comments, disable comments, delete the news article
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance News/NewsInitialCest
+ *
+ *
+ */
 class NewsInitialCest
 {
     /**
@@ -23,6 +38,9 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     *
+     * creates a news article, publish it and verify this is presented in the news feed
+     *
      */
     public function createNews(AcceptanceTester $i): void
     {
@@ -51,6 +69,9 @@ class NewsInitialCest
     /**
      * @throws Exception
      * @depends createNews
+     *
+     * unpublish the news article
+     *
      */
     public function unpublishNews(AcceptanceTester $i): void
     {
@@ -70,6 +91,9 @@ class NewsInitialCest
     /**
      * @throws Exception
      * @depends unpublishNews
+     *
+     * publishes the news article again
+     *
      */
     public function publishNews(AcceptanceTester $i): void
     {
@@ -83,6 +107,9 @@ class NewsInitialCest
     /**
      * @throws Exception
      * @depends publishNews
+     *
+     * check the student that is part of the audience can view the news article in the news feed
+     *
      */
     public function audienceViewsNewsFeed(AcceptanceTester $i): void
     {
@@ -96,6 +123,9 @@ class NewsInitialCest
     /**
      * @throws Exception
      * @depends publishNews
+     *
+     * check the student that is part of the audience can view the news article
+     *
      */
     public function audienceViewsNewsItem(AcceptanceTester $i): void
     {

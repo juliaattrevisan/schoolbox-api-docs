@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 namespace Tests\Acceptance\Admin\LMS\LessonPlanTemplates;
 
 use Tests\Support\AcceptanceTester;
@@ -8,6 +13,13 @@ use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\CreateLessonPlanTemplate;
 use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\LessonPlanTemplateList;
 use Tests\Support\Page\Admin\LMS\LessonPlanTemplates\UpdateLessonPlanTemplate;
 
+/**
+ * This test adds, updates and deletes a lesson plan template
+ * Steps:
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Admin/LMS/LessonPlanTemplates/LessonPlanTemplatesCest
+ */
 class LessonPlanTemplatesCest
 {
     /**

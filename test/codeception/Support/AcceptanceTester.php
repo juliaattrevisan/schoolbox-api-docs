@@ -41,6 +41,7 @@ class AcceptanceTester extends Actor
     public function logout(): void
     {
         $i = $this;
+        $i->amGoingTo('logout');
         $i->deleteSessionSnapshot('login:' . 'alaress');
         $i->amOnPage(self::$logoutURL);
         $i->waitForText('Parents, forgotten your password?', 3);
@@ -52,6 +53,7 @@ class AcceptanceTester extends Actor
      */
     public function loginAsAdmin(): void
     {
+        $this->amGoingTo('get logged in as alaress admin');
         $this->login('alaress', 'alaress');
         $this->waitForElementVisible(['css' => 'a[title=Schoolbox\ Admin]']);
     }
@@ -66,6 +68,7 @@ class AcceptanceTester extends Actor
     public function login(string $username, #[SensitiveParameter] string $password): void
     {
         $i = $this;
+        $i->amGoingTo('get logged  in as' . $username);
 
         // if snapshot exists - skipping login
         $snapshotName = 'login:' . $username;
@@ -107,6 +110,7 @@ class AcceptanceTester extends Actor
     public function impersonate($fullname): void
     {
         $i = $this;
+        $i->amGoingTo('impersonate a user' . $fullname);
         $i->logout();
         $i->loginAsAdmin();
         $i->click(['css' => 'a[title=Schoolbox\ Admin]']);
@@ -128,6 +132,7 @@ class AcceptanceTester extends Actor
     {
         $i = $this;
         // $i->amOnPage('/user/recoverSession');
+        $i->amGoingTo('impersonate a user' . $fullname);
         $i->click('#profile-drop');
         $i->executeJS("var scrollableDiv = document.getElementById('account-content');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
@@ -146,6 +151,7 @@ class AcceptanceTester extends Actor
     public function impersonateViaModifyUserPage($fullname): void
     {
         $i = $this;
+        $i->amGoingTo('impersonate a user' . $fullname);
         $i->logout();
         $i->loginAsAdmin();
         $i->searchBar($fullname);
@@ -166,6 +172,7 @@ class AcceptanceTester extends Actor
     public function searchBar($fullname): void
     {
         $i = $this;
+        $i->amGoingTo('search for an user' . $fullname);
         $i->click('button.icon-search.no-text');
         $i->fillField('input#search-field', $fullname);
         $i->click(['css' => 'a[data-test="header-search-user-result-link-' . $fullname . '"]']);

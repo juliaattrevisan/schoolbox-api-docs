@@ -22,31 +22,20 @@ use Tests\Support\Page\News\Index;
 use Tests\Support\Page\News\Item;
 use Schoolbox\User;
 
+/**
+ *
+ * Test that a news item I create retains the settings I chose
+ * creates a news article and checks the contents is properly recorded, ensure the proper audience can view the article
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run Acceptance News/CreateAndVerifyCest
+ *
+ */
+
 class CreateAndVerifyCest
 {
-    /**
-     * Test that a news item I create retains the settings I chose
-     *
-     * as alaress:
-     * * go to http://192.168.36.10/news
-     * * create a new news item, with:
-     * ** headline
-     * ** article
-     * ** blurb
-     * ** feature image
-     * ** topic
-     * ** limit its audience to teachers
-     * * save it
-     * * verify that:
-     * ** it shows in the All topic
-     * ** it shows in the topic I put it in
-     * ** it doesn't show in other topics
-     * ** its blurb (not article) shows in the topic view
-     * ** its headline matches what I entered
-     * ** in the article view, its article matches what I entered
-     * ** when I modify it, everything I submitted is there
-     *
-
     /**
      * Preparations
      *
@@ -79,6 +68,27 @@ class CreateAndVerifyCest
      * @param Form             $formPage
      * @param Index            $indexPage
      * @param Item             $itemPage
+     * @throws Exception
+     *
+     * as alaress:
+     * go to http://192.168.36.10/news
+     * create a new news item, with:
+     ** headline
+     ** article
+     ** blurb
+     ** feature image
+     ** topic
+     ** limit its audience to teachers
+     * save it
+     * verify that:
+     ** it shows in the All topic
+     ** it shows in the topic I put it in
+     ** it doesn't show in other topics
+     ** its blurb (not article) shows in the topic view
+     ** its headline matches what I entered
+     ** in the article view, its article matches what I entered
+     ** when I modify it, everything I submitted is there
+     *
      */
     public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
     {
@@ -205,6 +215,12 @@ class CreateAndVerifyCest
      * @param Form             $formPage
      * @param Index            $indexPage
      * @param Item             $itemPage
+     *
+     * creates a news article via news/create
+     * check the draft is properly saved with the proper audience
+     * modify the audience a couple of times ensure it is properly updated
+     * publish the article and ensure the proper audience is presented
+     *
      */
     public function newsAudienceTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
     {
@@ -293,6 +309,13 @@ class CreateAndVerifyCest
      * @param Form             $formPage
      * @param Index            $indexPage
      * @param Item             $itemPage
+     * @throws Exception
+     *
+     * creates a news article via news component in a class page
+     * check the draft is properly saved with the proper audience
+     * modify the audience a couple of times ensure it is properly updated
+     * publish the article and ensure the proper audience is presented
+     *
      */
     public function newsAudienceViaClassPageTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
     {

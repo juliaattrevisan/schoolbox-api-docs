@@ -1,11 +1,22 @@
 <?php
 
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 namespace Tests\Acceptance\Homepage;
 
 use Tests\Support\AcceptanceTester;
 use Exception;
 use Tests\Support\Page\Homepage;
 
+/**
+ * This test checks if the components are presented under the proper tab in a homepage
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Homepage/ComponentsCest
+ */
 class ComponentsCest
 {
     /**
@@ -17,7 +28,7 @@ class ComponentsCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/homepage/83
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();

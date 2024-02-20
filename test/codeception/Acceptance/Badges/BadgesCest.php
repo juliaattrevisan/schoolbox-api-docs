@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Badges;
@@ -9,6 +14,13 @@ use Tests\Support\Page\Badges\Badges;
 use Tests\Support\Page\Badges\CreateBadge;
 use Exception;
 
+/**
+ * This test adds, updates and deletes a badge
+ * Steps:
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Badges/BadgesCest
+ */
 class BadgesCest
 {
     /**
@@ -50,7 +62,7 @@ class BadgesCest
      * Click Create Badge
      * Ensure the Badge is presented in the /learning/badge screen
      */
-    public function createBadge(AcceptanceTester $i)
+    public function createBadge(AcceptanceTester $i): void
     {
         $badges = new Badges($i);
         $createBadge = new CreateBadge($i);
@@ -83,7 +95,7 @@ class BadgesCest
      * Click Modify Badge
      * Ensure the Badge title and category are properly presented in the /learning/badge screen
      */
-    public function modifyBadge(AcceptanceTester $i)
+    public function modifyBadge(AcceptanceTester $i): void
     {
         $badges = new Badges($i);
         $createBadge = new CreateBadge($i);
@@ -111,7 +123,7 @@ class BadgesCest
      * Click Delete and confirm it
      * Ensure the Badge is no longer presented in the /learning/badge screen
      */
-    public function deleteBadge(AcceptanceTester $i)
+    public function deleteBadge(AcceptanceTester $i): void
     {
         $badges = new Badges($i);
         $i->amGoingTo('click the badge dropdown and click Delete');

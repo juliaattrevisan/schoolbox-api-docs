@@ -11,6 +11,17 @@ namespace Tests\Acceptance;
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Login as LoginPage;
 
+/**
+ * login successfully, login with invalid password,
+ * there are tests to SAML but commented out as we are unable to set up it locally at the moment
+ *
+ * Steps:
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance LoginCest
+ *
+ */
+
 class LoginCest
 {
     /**
@@ -79,6 +90,7 @@ class LoginCest
      */
     public function loginSuccessfully(AcceptanceTester $i, LoginPage $loginPage)
     {
+        $i->amGoingTo('get logged in successfully');
         $loginPage->login('alaress', 'alaress', true);
         $loginPage->verifyLoginSuccess();
     }
@@ -91,6 +103,7 @@ class LoginCest
      */
     public function loginWithInvalidPassword(AcceptanceTester $i, LoginPage $loginPage)
     {
+        $i->amGoingTo('attempting to login with invalid username and password');
         $loginPage->login('wrong', 'wrong', true);
         $loginPage->verifyLoginFailure();
 

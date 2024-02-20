@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Tests\Acceptance\LessonPlan;
 
 use Tests\Support\AcceptanceTester;
@@ -15,6 +20,12 @@ use Tests\Support\Page\Group\ManageGroup;
 use Tests\Support\Page\LessonPlan\CreateLessonPlan;
 use Tests\Support\Page\LessonPlan\TemplateList;
 
+/**
+ * create a lesson plan, check if the teacher and student can view the fields as per its visibility configuration
+ * 1. Provision sales.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance LessonPlan/LessonPlanCest
+ */
 class LessonPlanCest
 {
     /**

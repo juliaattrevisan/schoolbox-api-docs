@@ -16,20 +16,29 @@ use Tests\Support\Page\Group\ManageGroup;
 use Tests\Support\Page\Homepage;
 use Tests\Support\Page\Resources\ResourcesMyFilesPicker;
 
+/**
+ * creates a task with participation and learning plan
+ * check as admin that the learning plan is presented in the assessment modify page
+ * impersonates a student in the learning plan and check the proper due date is presented
+ * impersonates a student not in the learning plan and check the proper due date is presented
+ *
+ * Steps:
+ * 1. Provision legacy.tar.gz data
+ * 2. vagrant ssh
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Task/ParticipationPlanCest
+ *
+ *
+ */
+
 class ParticipationPlanCest
 {
     /**
-     *
-     * creates a task with participation and learning plan
-     * check as admin that the learning plan is presented in the assessment modify page
-     * impersonates a student in the learning plan and check the proper due date is presented
-     * impersonates a student not in the learning plan and check the proper due date is presented
      *
      * @param AcceptanceTester $i
      * @return void
      * @throws Exception
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
