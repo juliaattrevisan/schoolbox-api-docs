@@ -451,10 +451,21 @@ class Controller extends BaseController
         $errorMapper = $this->errorMapper;
         $folderSequence = $this->requestPost->get('sequence');
 
+        // ensure there is actually data in the post
         if (!count($folderSequence)) {
             $this->response = $this->responseAsJson(false)->withStatus(400);
             return;
         }
+
+        // fetch all children folders of $folder (parent)
+
+        // for each folder (in sequence $POST)
+
+        // ensure the folder is a child of the $folder (parent)
+
+        // set the sequence of the child folder to its new sequence
+
+        // all un sequenced folders set their value to 0
 
         $this->response = $this->responseAsJson(true)->withStatus(200);
     }
