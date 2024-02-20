@@ -219,7 +219,7 @@ class ServiceManager implements IServiceManager
                         $this->registryMapper,
                         $identifier,
                         $key,
-                        $appTitle,
+                        $this->appTitle,
                     );
             }
 
