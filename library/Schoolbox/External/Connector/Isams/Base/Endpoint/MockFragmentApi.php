@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+
 /**
  * Class MockFragmentApi
  *
@@ -21,21 +23,19 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 class MockFragmentApi implements IApi
 {
     /**
-     * A chunk of xml from which to read
-     *
-     * @var string
+     * @var array
      */
-    private string $fragment;
+    private array $options = [];
 
 
     /**
      * MockFragmentApi constructor.
      *
-     * @param string $fragment
+     * @param string $fragment  A chunk of xml from which to read
+     * @param string $apiKey
      */
-    public function __construct(string $fragment)
+    public function __construct(private string $fragment, private string $apiKey)
     {
-        $this->fragment = $fragment;
     }
 
 
@@ -43,9 +43,27 @@ class MockFragmentApi implements IApi
      * Retrieves a XML document representing the result from the API call.
      *
      * @return string|null
+     * @throws \DomainException
      */
     public function retrieveDocument(): ?string
     {
+        $credentials = (new DSN())->decode($this->apiKey);
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $credentials['options'] ?? [];
+
         return $this->fragment;
+    }
+
+
+    /**
+     * Used to apply instance-specific configuration options
+     *
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

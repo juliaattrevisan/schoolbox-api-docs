@@ -55,6 +55,12 @@ class Api implements IApi
 
 
     /**
+     * @var array
+     */
+    private array $options = [];
+
+
+    /**
      * Constructor
      *
      * @param string $host
@@ -99,6 +105,19 @@ class Api implements IApi
 
 
     /**
+     * Set up curl instance
+     *
+     * @return Alaress_Curl_Url
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     */
+    private function initCurl(): \Alaress_Curl_Url
+    {
+        return new Alaress_Curl_Url((string)$this->getUrl());
+    }
+
+
+    /**
      * Cache a url definition then return its value
      *
      * @return Uri
@@ -108,6 +127,10 @@ class Api implements IApi
     public function getUrl(): Uri
     {
         $credentials = (new DSN())->decode($this->apiKey);
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $credentials['options'] ?? [];
 
         if (!$this->url) {
             /* Find the path corresponding to the module we found
@@ -130,15 +153,11 @@ class Api implements IApi
 
 
     /**
-     * Set up curl instance
-     *
-     * @return Alaress_Curl_Url
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
+     * @return array
      */
-    private function initCurl(): \Alaress_Curl_Url
+    public function getOptions(): array
     {
-        return new Alaress_Curl_Url((string)$this->getUrl());
+        return $this->options;
     }
 
 

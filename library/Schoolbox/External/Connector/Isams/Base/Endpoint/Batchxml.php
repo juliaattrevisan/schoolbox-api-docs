@@ -150,6 +150,15 @@ class Batchxml
 
 
     /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->api->getOptions();
+    }
+
+
+    /**
      * Use this to print a vaguely-formatted version to a file for manual inspection
      *
      * e.g. php sisImporter.php > test.xml

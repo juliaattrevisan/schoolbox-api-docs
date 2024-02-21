@@ -81,6 +81,14 @@ class CycleUnroller
          */
         $timetableAllocations = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/TimetableAllocations/TimetableAllocation[ISOYear = {$year} and Week >= {$pastThreshold} and Week <= {$futureThreshold}]");
 
+        /* Sometimes iSAMS will incorrectly tell you a school's Day Number which the school
+         * can artificially adjust via the suds control panel. Incorporate that offset.
+         */
+        $options = $this->api[DSN::MODULE_BATCHXML]->getOptions();
+        print_r($options);die();
+
+        $dayNumberOffset = 0;
+
         /* For each of those nodes, find the WeekId that corresponds to that
          * particular week so we can start populating its Days and Periods
          * TimetableAllocation WeekId corresponds to a Structure node <Week Id="...">
@@ -105,7 +113,7 @@ class CycleUnroller
                     'index' => $weekIndex,
                     'name' => (string)$week->Name
                 ],
-                'days' => $this->findDays($week, $weekIndex, $year)
+                'days' => $this->findDays($week, $weekIndex, $year, $dayNumberOffset)
             ];
         }
 
@@ -121,7 +129,7 @@ class CycleUnroller
      * @param int              $year
      * @return array
      */
-    private function findDays(SimpleXMLElement $week, int $weekIndex, int $year): array
+    private function findDays(SimpleXMLElement $week, int $weekIndex, int $year, int $dayNumberOffset): array
     {
         $dayStruct = [];
 
@@ -141,12 +149,17 @@ class CycleUnroller
 
             $date = (new \DateTime())->setISODate($year, $weekIndex, $dayIndex + 1)->format('Y-m-d');
 
+            /* Sometimes iSAMS will incorrectly tell you a school's Day Number which the school
+             * can artificially adjust via the suds control panel. Incorporate that offset.
+             */
+            $adjustedDayNumber = (int)$day->Day + $dayNumberOffset;
+
             /* Assemble into stack
              */
             $dayStruct[$dayIndex] = [
                 'isamsId' => $dayId,
                 'name' => (string)$day->Name,
-                'dayNumber' => (string)$day->Day,
+                'dayNumber' => (string)$adjustedDayNumber,
                 'date' => $date,
                 'periods' => $this->findPeriods($day, $date)
             ];
