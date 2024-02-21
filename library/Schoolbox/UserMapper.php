@@ -133,7 +133,7 @@ class UserMapper extends Mapper
         $this->joins('pronoun', Schoolbox\User\Pronoun\Mapper::class, 'id', null, null, 'pronoun', 'pronoun');
         $this->joins('group_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->joins('year_id', YearLevel\Mapper::class, 'id', null, null, 'year', 'year');
-        $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
+        $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUsers');
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
 
         $this->hasJoin(
@@ -419,7 +419,7 @@ class UserMapper extends Mapper
                                        ->setRole($role)
                                        ->setYear($year)
                                        ->setSchoolHouse($schoolHouse)
-                                       ->setLinkedUser($this->createCollection())
+                                       ->setLinkedUsers($this->createCollection())
                                        ->setPronoun($pronoun)
                                        ->setCampusCollection($campusMapper->createCollection());
             }
@@ -441,7 +441,8 @@ class UserMapper extends Mapper
             if ($linkedUser) {
                 // Don't double add
                 $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
-                $users[$userId]->getLinkedUser()->setOffset($linkedUser->getId(), $linkedUser);
+
+                $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
             }
 
             /* Portrait Image
@@ -556,7 +557,7 @@ class UserMapper extends Mapper
         }
 
         $roleMapper = new RoleMapper();
-        $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
+        $yearLevelMapper = YearLevel\Mapper::getInstance();
 
         $pb = $this->getPredicateBuilder();
         $pb->any(

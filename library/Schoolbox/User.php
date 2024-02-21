@@ -114,7 +114,13 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var null|HouseResidential */
     private $residentialHouse;
 
-    /** @var Collection|self[] */
+    /**
+     * Note this variable should have a plural name, since it will contain a collection of linked users.
+     * The name cannot be fixed without causing serialized user objects to become incompatible with the class definition.
+     * So if the name is to be fixed to $linkedUsers, that problem must also be dealt with somehow.
+     * Note we can't set the initial value to null without dealing with this extra problem for the same reason.
+     * @var Collection|self[]
+     */
     private $linkedUser;
 
     /**
@@ -1176,21 +1182,21 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
 
     /**
-     * @param Collection|self[] $linkedUser
+     * @param Collection|self[] $linkedUsers
      * @return $this
      */
-    public function setLinkedUser($linkedUser): self
+    public function setLinkedUsers(Collection $linkedUsers): self
     {
-        $this->linkedUser = $linkedUser;
+        $this->linkedUser = $linkedUsers; // Note the class variable name should be plural (see comment above variable declaration).
         return $this;
     }
 
     /**
      * @return Collection|self[]
      */
-    public function getLinkedUser()
+    public function getLinkedUsers(): ?Collection
     {
-        return $this->linkedUser;
+        return $this->linkedUser; // Note the class variable name should be plural (see comment above variable declaration).
     }
 
     /**
@@ -1354,10 +1360,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function setPastoralGroupIds(array $pastoralGroupIds): self
     {
-        if (!$this->pastoralGroupIds) {
-            $this->pastoralGroupIds = [];
-        }
-
         $this->pastoralGroupIds = $pastoralGroupIds;
         return $this;
     }
