@@ -10,6 +10,7 @@ import ActivitiesList from "./activities-list.vue";
 
 interface Props {
     units: Unit[];
+    routeFolderSequence: string | null;
 }
 
 const props = defineProps<Props>();
@@ -47,20 +48,23 @@ const orderedUnits = window.Vue.computed(() => {
 window.Vue.onMounted(async () => {
     store.init(props.units, props.routeFolderSequence);
 
-    await window.Vue.nextTick();
+    // Whether to allow the user to resequence the units
+    if (props.routeFolderSequence) {
+        await window.Vue.nextTick();
 
-    const sortableTarget = $("[data-sortable]");
-    sortableTarget.sortable({
-        handle: ".grip",
-        axis: "y",
-        update: () => {
-            // Adjust the sequence of the units
-            const unitIds: Unit["id"][] = sortableTarget
-                .sortable("toArray", { attribute: "data-unit-id" })
-                .map(Number);
-            store.resequenceUnits(unitIds);
-        },
-    });
+        const sortableTarget = $("[data-sortable]");
+        sortableTarget.sortable({
+            handle: ".grip",
+            axis: "y",
+            update: () => {
+                // Adjust the sequence of the units
+                const unitIds: Unit["id"][] = sortableTarget
+                    .sortable("toArray", { attribute: "data-unit-id" })
+                    .map(Number);
+                store.resequenceUnits(unitIds);
+            },
+        });
+    }
 });
 </script>
 
@@ -71,7 +75,7 @@ window.Vue.onMounted(async () => {
         </dd>
     </dl>
     <div class="scrollable">
-        <table class="sortable unit-planner">
+        <table class="unit-planner" :class="{ sortable: props.routeFolderSequence }">
             <thead>
                 <tr>
                     <th>Unit</th>
@@ -85,7 +89,7 @@ window.Vue.onMounted(async () => {
                     <th v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'">Curriculum Overview</th>
                 </tr>
             </thead>
-            <tbody data-sortable class="ui-sortable">
+            <tbody v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
                 <tr
                     v-for="unit in orderedUnits"
                     :key="unit.id"
@@ -94,7 +98,7 @@ window.Vue.onMounted(async () => {
                 >
                     <td>
                         <div class="unit-wrapper">
-                            <i class="icon-grip ui-sortable-handle grip"></i>
+                            <i v-if="props.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
                             <div>
                                 <a :href="unit.homepage">
                                     <strong>{{ unit.title }}</strong>

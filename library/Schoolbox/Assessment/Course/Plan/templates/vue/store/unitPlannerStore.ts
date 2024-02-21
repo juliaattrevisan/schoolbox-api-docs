@@ -4,13 +4,16 @@ import { Unit } from "../unitPlannerTypes";
 export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const expandedUnits = window.Vue.ref<Unit["id"][]>([]);
     const units = window.Vue.ref<Unit[]>([]);
+    const routeFolderSequence = window.Vue.ref<string | null>(null);
 
     /**
      * store any passed through properties
      * @param { Unit[] } $units - the units to store
+     * @param { string|null } $routeFolderSequence - the route to use when resequencing, if the user has access to do so
      */
-    function init($units: Unit[]) {
+    function init($units: Unit[], $routeFolderSequence: string | null) {
         units.value = $units;
+        routeFolderSequence.value = $routeFolderSequence;
     }
 
     /**
@@ -43,6 +46,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     return {
         init,
         expandedUnits,
+        routeFolderSequence,
         toggleExpanded,
         units,
         resequenceUnits,
