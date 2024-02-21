@@ -182,6 +182,14 @@ $cdn-prefix: "../..";
 @import "/node_modules/jquery-ui/themes/base/draggable";
 @import "/node_modules/jquery-ui/themes/base/sortable";
 
+// Utility classes
+@import "layout/l-grid";
+@import "layout/l-flex";
+@import "layout/position";
+@import "layout/padding";
+@import "layout/margin";
+@import "layout/gap";
+
 //Override classes
 @import "ui/profile-image-override";
 @import "utils/fixes";

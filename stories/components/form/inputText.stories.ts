@@ -2,8 +2,19 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/ui/forms/_input-text.scss`
+ *
+ * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/text)
+ *
+ * `<input>` elements of type text create basic single-line text fields.
+ *
+ * **Usage notes**:
+ * - Must always be accompanied by a `<label>` element.
+ * - Avoid using `placeholder` moving forward, consider adding a [Hint](?path=/docs/draft-form-hint--docs) instead.
+ *     - https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/placeholder#accessibility_concerns
+ *     - https://medium.com/simple-human/10-reasons-why-placeholders-are-problematic-f8079412b960
+ * - Avoid using `type="number"` moving forward:
+ *     - https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#accessibility_concerns
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -74,7 +85,10 @@ export const WithButton: Story = {
         template: `
             <div class="l-flex-col">
                 <input id="news_default_expiry-field" class="c-input-text l-flex__item--1" type="text" />
-                <button class="button l-width-100 l-mar--0">Browse Resources</button>
+                <button class="c-button l-width-100 l-mar--0">
+                    <sbx-icon name="folder"></sbx-icon>
+                    <span>Browse Resources</span>
+                </button>
             </div>
             `,
     }),

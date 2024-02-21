@@ -2,8 +2,11 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/layout/_l-grid.scss`
+ *
+ * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/CSS/grid)
+ *
+ * _Further details coming soon_
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,

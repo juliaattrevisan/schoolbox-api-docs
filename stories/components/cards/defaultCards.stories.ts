@@ -2,15 +2,18 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * **Styles**: `www/static/css/core/ui/_card.scss`
+ *
+ * Styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
+ *
+ * As this is also flex based, we can leverage flex modifying classes like `l-flex--center` or `l-gap` without a problem.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
     decorators: [
         () => ({
             template: `
-                <div class="l-pad-xl">
+                <div class="l-pad-m">
                     <story />
                 </div>
             `,

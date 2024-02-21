@@ -14,13 +14,14 @@ module.exports = {
     },
     framework: {
         name: "@storybook/vue3-webpack5",
-        options: {},
+        options: { builder: { useSWC: true } },
     },
     staticDirs: ["../stories/assets"],
     stories: [
         "../stories/**/*.mdx",
-        "../stories/**/*.stories.@(js|jsx|ts|tsx)",
-        "../vue/components/**/*.stories.@(js|jsx|ts|tsx)",
+        "../stories/**/*.stories.@(js|ts)",
+        "../vue/components/**/*.mdx",
+        "../vue/components/**/*.stories.@(js|ts)",
     ],
     webpackFinal: async (config, { configType }) => {
         // Add in the required matched rules from webpack.common.js
@@ -33,7 +34,7 @@ module.exports = {
         config.resolve.alias["@schoolboxVue"] = path.resolve(__dirname, "../vue");
         config.resolve.alias["@schoolboxCurriculum"] = path.resolve(
             __dirname,
-            "../library/Schoolbox/Curriculum/templates/"
+            "../library/Schoolbox/Curriculum/templates/",
         );
         config.resolve.alias["@css"] = path.resolve(__dirname, "../www/static/css");
         config.resolve.alias["@library"] = path.resolve(__dirname, "../library");

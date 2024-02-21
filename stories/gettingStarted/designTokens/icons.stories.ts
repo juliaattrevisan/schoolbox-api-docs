@@ -2,8 +2,7 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * Storybook meta data, any default properties that are passed into every story
- * https://storybook.js.org/docs/vue/writing-stories/introduction
+ * Below is a list of all icons, which can be referenced by their name and used within the `<sbx-icon>` [component](?path=/docs/components-icon--docs).
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -21,7 +20,7 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-export const Icons: Story = {
+export const Default: Story = {
     render: () => ({
         template: `
         <div class="l-flex-row l-flex--center l-gap-s">
@@ -426,30 +425,6 @@ export const Icons: Story = {
                     <sbx-icon name="help"></sbx-icon>
                 </div>
                 <p>help</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="week-view"></sbx-icon>
-                </div>
-                <p>week-view</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="wiki"></sbx-icon>
-                </div>
-                <p>wiki</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="withdraw-achievement"></sbx-icon>
-                </div>
-                <p>withdraw-achievement</p>
-            </div>
-            <div class="box-icon-wrapper">
-                <div class="box-icon">
-                    <sbx-icon name="wolfram-alpha"></sbx-icon>
-                </div>
-                <p>wolfram-alpha</p>
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">

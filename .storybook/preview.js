@@ -10,6 +10,7 @@
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
 import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import { themes } from "@storybook/theming";
+import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
 import "../stories/assets/styles/styles.css"; // add in any other styles we want to use in storybook only
 import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to load mock data into stories
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
@@ -18,6 +19,7 @@ import { createPinia } from "pinia";
 import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
 import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
+import SbxFreeStyle from "@schoolboxVue/components/generic/sbx-free-style.ce.vue";
 window.Vue = {};
 window.Vue.ref = ref;
 window.Vue.computed = computed;
@@ -50,6 +52,8 @@ export function register() {
     window.customElements.define("sbx-pop-out", SbxPopOutCE);
     const SbxIconCE = window.Vue.defineCustomElement(SbxIcon);
     window.customElements.define("sbx-icon", SbxIconCE);
+    const SbxFreeStyleCE = window.Vue.defineCustomElement(SbxFreeStyle);
+    window.customElements.define("sbx-free-style", SbxFreeStyleCE);
 }
 register();
 
@@ -68,6 +72,7 @@ export const parameters = {
     },
     docs: {
         theme: themes.dark,
+        page: DocumentationTemplate, // use our own custom documentation template
     },
     layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
     options: {

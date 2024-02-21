@@ -1,12 +1,14 @@
 /*
-    Global values to control the roundness of objects within our platform. They're currently broken down into three categories...
+    Global values to control the roundness of objects within our platform. They're currently broken down into four categories...
+    - islands, which are the main content areas
     - images or image-type things
     - cards (specifically the borders)
     - inputs (buttons, input fields, chips, etc.)
 */
 
 :root {
+    --roundness-islands: 0px;
     --roundness-images: 0px;
     --roundness-cards: 0px;
-    --roundness-inputs: 4px;
+    --roundness-inputs: 5px;
 }
