@@ -316,6 +316,13 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
+            ->setMetadata(json_encode([
+                'key1' => 'value1',
+                'key2' => [
+                    ['key21' => 'value21'],
+                    'value22'
+                ]
+            ], JSON_THROW_ON_ERROR))
             ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);
