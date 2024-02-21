@@ -16,7 +16,7 @@
         "@ckeditor/ckeditor5-block-quote": "~40.2.0",
         "@ckeditor/ckeditor5-core": "~40.2.0",
         "@ckeditor/ckeditor5-editor-classic": "~40.2.0",
-        "@ckeditor/ckeditor5-editor-inline": "^40.2.0",
+        "@ckeditor/ckeditor5-editor-inline": "~40.2.0",
         "@ckeditor/ckeditor5-engine": "~40.2.0",
         "@ckeditor/ckeditor5-essentials": "~40.2.0",
         "@ckeditor/ckeditor5-find-and-replace": "~40.2.0",
@@ -115,6 +115,7 @@
         "@testing-library/jest-dom": "~6.4.2",
         "@types/jest": "~29.5.12",
         "@types/jquery": "~3.5.29",
+        "@types/jqueryui": "^1.12.21",
         "@typescript-eslint/eslint-plugin": "~6.21.0",
         "@typescript-eslint/parser": "~6.21.0",
         "@vue/test-utils": "~2.4.4",
@@ -9459,6 +9460,15 @@
       "dev": true,
       "dependencies": {
         "@types/sizzle": "*"
+      }
+    },
+    "node_modules/@types/jqueryui": {
+      "version": "1.12.21",
+      "resolved": "https://registry.npmjs.org/@types/jqueryui/-/jqueryui-1.12.21.tgz",
+      "integrity": "sha512-hsTOaWPg963smNdoHbEN2anu4vVWj9k2xuaZMIajWERPikaBRG49RmaDA/tb2HldX9/a0qHvQYKipXHSLhM3qA==",
+      "dev": true,
+      "dependencies": {
+        "@types/jquery": "*"
       }
     },
     "node_modules/@types/js-levenshtein": {
@@ -37163,6 +37173,15 @@
       "dev": true,
       "requires": {
         "@types/sizzle": "*"
+      }
+    },
+    "@types/jqueryui": {
+      "version": "1.12.21",
+      "resolved": "https://registry.npmjs.org/@types/jqueryui/-/jqueryui-1.12.21.tgz",
+      "integrity": "sha512-hsTOaWPg963smNdoHbEN2anu4vVWj9k2xuaZMIajWERPikaBRG49RmaDA/tb2HldX9/a0qHvQYKipXHSLhM3qA==",
+      "dev": true,
+      "requires": {
+        "@types/jquery": "*"
       }
     },
     "@types/js-levenshtein": {
