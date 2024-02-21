@@ -160,7 +160,11 @@ class CycleUnroller
             /* Sometimes iSAMS will incorrectly tell you a school's Day Number which the school
              * can artificially adjust via the suds control panel. Incorporate that offset.
              */
-            $adjustedDayNumber = (int)$day->Day + $dayNumberOffset;
+            if (is_numeric($day->Day)) {
+                $adjustedDayNumber = (int)$day->Day + $dayNumberOffset;
+            } else {
+                $adjustedDayNumber = $day->Day;
+            }
 
             /* Assemble into stack
              */
