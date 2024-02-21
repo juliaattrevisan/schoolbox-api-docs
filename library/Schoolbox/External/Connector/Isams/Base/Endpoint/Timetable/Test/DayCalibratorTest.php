@@ -163,11 +163,12 @@ class DayCalibratorTest extends TestCase
      */
     public function testValidDayCalibrator(string $xml, int $isamsDay, int $schoolboxDay): void
     {
+        $apiKey = 'batchxml:key=asdfg?dayNumberOffset=0';
 
         /* Build the thing which gets the stuff
          */
         $api = [
-            DSN::MODULE_BATCHXML => new Batchxml(new MockFragmentApi($xml))
+            DSN::MODULE_BATCHXML => new Batchxml(new MockFragmentApi($xml, $apiKey))
         ];
 
         /* Figure out which schoolbox day corresponds to the given isams day
