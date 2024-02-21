@@ -50,7 +50,7 @@ window.Vue.onMounted(() => {
         </dd>
     </dl>
     <div class="scrollable">
-        <table>
+        <table class="sortable unit-planner">
             <thead>
                 <tr>
                     <th>Unit</th>
@@ -64,19 +64,24 @@ window.Vue.onMounted(() => {
                     <th v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'">Curriculum Overview</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody data-sortable class="ui-sortable">
                 <tr
                     v-for="unit in store.units"
                     :key="unit.id"
                     :class="{ collapsed: !store.expandedUnits.includes(unit.id) }"
                 >
                     <td>
-                        <a :href="unit.homepage">
-                            <strong>{{ unit.title }}</strong>
-                        </a>
-                        <p v-if="unit.extraTextboxes > 0" class="meta">
-                            {{ unit.extraTextboxes }} extra textbox{{ unit.extraTextboxes === 1 ? "" : "es" }}
-                        </p>
+                        <div class="unit-wrapper">
+                            <i class="icon-grip ui-sortable-handle grip"></i>
+                            <div>
+                                <a :href="unit.homepage">
+                                    <strong>{{ unit.title }}</strong>
+                                </a>
+                                <p v-if="unit.extraTextboxes > 0" class="meta">
+                                    {{ unit.extraTextboxes }} extra textbox{{ unit.extraTextboxes === 1 ? "" : "es" }}
+                                </p>
+                            </div>
+                        </div>
                     </td>
                     <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
                         <td v-for="(textbox, textboxKey) in unit.textboxes" :key="textboxKey">
@@ -108,38 +113,68 @@ window.Vue.onMounted(() => {
     </div>
 </template>
 
-<style scoped>
-table th:first-child {
-    min-width: 200px;
-    width: 200px;
-}
+<style scoped lang="scss">
+/* Use :deep to ensure elements created by sortable are styled correctly.
+ *
+ * > is used to ensure the styles are only applied to the direct children of the unit-planner
+ * component. Otherwise, they may apply to other tables nested within content containers too.
+ */
+.unit-planner:deep() {
+    > thead > tr,
+    > tbody > tr {
+        /* Fix the unit title column to the left */
+        > th,
+        > td {
+            background-color: white;
 
-/* Fix the unit title column to the left */
-table th:first-child,
-table tbody td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    background-color: white;
-    border-right: 1px solid var(--body-background);
-}
+            &:first-child {
+                border-right: 1px solid var(--body-background);
+                min-width: 200px;
+                left: 0;
+                position: sticky;
+                width: 200px;
+                z-index: 2;
+            }
 
-table th:not(:first-child) {
-    min-width: 400px;
-    width: 400px;
-    border-left: 1px solid var(--body-background);
-}
+            &:not(:first-child) {
+                border-left: 1px solid var(--body-background);
+                min-width: 400px;
+                width: 400px;
+            }
+        }
+    }
 
-table tbody td:not(:first-child) {
-    padding: 0px;
-    border-left: 1px solid var(--body-background);
-}
+    > tbody {
+        > tr {
+            height: 300px;
 
-table tbody tr {
-    height: 300px;
-}
+            > td:not(:first-child) {
+                padding: 0px;
+            }
 
-.curriculum-codes-container {
-    max-width: 500px;
+            &.ui-sortable-helper {
+                display: table; /* Keep widths consistent */
+                border: 1px solid var(--body-background);
+            }
+
+            &.ui-sortable-placeholder {
+                visibility: visible !important;
+
+                > td {
+                    background-color: #dddddd;
+                    border-left: none;
+                    border-right: none;
+                }
+            }
+        }
+    }
+
+    .curriculum-codes-container {
+        max-width: 500px;
+    }
+
+    .unit-wrapper {
+        display: flex;
+    }
 }
 </style>
