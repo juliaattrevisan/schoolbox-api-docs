@@ -24,31 +24,6 @@ use SensitiveParameter;
 class Api implements IApi
 {
     /**
-     * The host of the iSAMS server
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * The API key for this call, provided by the school
-     *
-     * @var string
-     */
-    private string $apiKey;
-
-
-    /**
-     * The iSAMS module that you're accessing;
-     * corresponds to one of the DSN consts
-     *
-     * @var string
-     */
-    private string $module;
-
-
-    /**
      * @var Uri|null
      */
     private ?Uri $url = null;
@@ -63,15 +38,15 @@ class Api implements IApi
     /**
      * Constructor
      *
-     * @param string $host
-     * @param string $apiKey
-     * @param string $module
+     * @param string $host    The host of the iSAMS server
+     * @param string $apiKey  The API key for this call, provided by the school
+     * @param string $module  The iSAMS module that you're accessing; corresponds to one of the DSN consts
      */
-    public function __construct(string $host, #[SensitiveParameter] string $apiKey, string $module)
-    {
-        $this->host   = $host;
-        $this->apiKey = $apiKey;
-        $this->module = $module;
+    public function __construct(
+        private string $host,
+        #[SensitiveParameter] private string $apiKey,
+        private string $module
+    ) {
     }
 
 
