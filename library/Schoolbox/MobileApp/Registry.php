@@ -24,6 +24,7 @@ class Registry implements ISoftDeletable
     const PROVIDER_GOOGLE    = 'GCM';
     const PROVIDER_APPLE     = 'APNS';
     const PROVIDER_DIGISTORM = 'Digistorm';
+    const PROVIDER_FIREBASE  = 'Firebase';
 
 
     /** @var User */

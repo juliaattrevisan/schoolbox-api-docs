@@ -112,7 +112,8 @@
         "fileeye/pel": "^0.9",
         "ramsey/uuid": "^4.7",
         "steverhoades/oauth2-openid-connect-client": "^2.0",
-        "cache/simple-cache-bridge": "^1.2"
+        "cache/simple-cache-bridge": "^1.2",
+        "kreait/firebase-php": "^7.9"
     },
     "autoload-dev": {
       "psr-4": {

@@ -42,58 +42,29 @@ class ServiceManager implements IServiceManager
     public const SERVICE_TYPE_BASED_ON_INSTANCE_TYPE = 2;
 
     /**
-     * Always use the test service: never use a production service.
+     * Always use a production service: never use the test service.
      */
     public const SERVICE_TYPE_PRODUCTION = 3;
-
-    /** @var RegistryMapper */
-    protected $registryMapper;
-
-    /** @var ServiceInterface[][] */
-    protected $serviceCache = [];
-
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var Schoolbox\Instance */
-    protected $serverInstance;
-
-    /**
-     * The app's title: this title may be used as the title of notifications.
-     */
-    private string $appTitle;
-
-    /**
-     * One of the `self::SERVICE_TYPE_*` constants: controls whether to use a
-     * test or production service.
-     *
-     * By default, this depends on the instance type.
-     */
-    private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE;
 
     /**
      * Constructor
      *
-     * @param LoggerInterface         $log
-     * @param RegistryMapper          $registryMapper
-     * @param Schoolbox\Instance      $serverInstance
-     * @param string                  $appTitle
-     * @param Storage\FilesystemProxy $filesystemProxy
-     * @param int                     $serviceType
+     * @param LoggerInterface         $log             Logger.
+     * @param RegistryMapper          $registryMapper  Mapper for fetching registrations.
+     * @param Schoolbox\Instance      $serverInstance  Struct within which instance data is stored.
+     * @param string                  $appTitle        The app's title: matches `config.title`.
+     *                                                 May be used as the title of notifications.
+     * @param Storage\FilesystemProxy $filesystemProxy The file system on which the APNS config is stored.
+     * @param self::SERVICE_TYPE_*    $serviceType     Service type to use: test, production or based on instance type.
      */
     public function __construct(
-        LoggerInterface $log,
-        RegistryMapper $registryMapper,
-        Schoolbox\Instance $serverInstance,
-        string $appTitle,
+        private LoggerInterface $log,
+        private RegistryMapper $registryMapper,
+        private Schoolbox\Instance $serverInstance,
+        private string $appTitle,
         private Storage\FilesystemProxy $filesystemProxy,
-        int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE
+        private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE
     ) {
-        $this->registryMapper = $registryMapper;
-        $this->log            = $log;
-        $this->serverInstance = $serverInstance;
-        $this->appTitle       = $appTitle;
-        $this->serviceType    = $serviceType;
     }
 
 
@@ -241,6 +212,14 @@ class ServiceManager implements IServiceManager
                         $identifier,
                         $key,
                         $this->appTitle
+                    );
+
+                case Registry::PROVIDER_FIREBASE:
+                    return new Cloud\Firebase\Service(
+                        $this->registryMapper,
+                        $identifier,
+                        $key,
+                        $this->appTitle,
                     );
             }
 

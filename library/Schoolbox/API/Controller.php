@@ -90,6 +90,7 @@ class Controller extends Base
             Registry::PROVIDER_APPLE,
             Registry::PROVIDER_GOOGLE,
             Registry::PROVIDER_DIGISTORM,
+            Registry::PROVIDER_FIREBASE,
         ];
 
         // check the provider is valid
