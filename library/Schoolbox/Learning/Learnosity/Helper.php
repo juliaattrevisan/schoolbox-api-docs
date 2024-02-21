@@ -310,16 +310,16 @@ class Helper
      *                                                deriving a human-readable mark.
      * @param QuizDomainModel   $assessment           The assessment to which `$attempt` belongs: required for deriving
      *                                                a human-readable mark.
-     * @param float             $mark
-     * @param float             $maxMark
+     * @param null|float        $mark
+     * @param null|float        $maxMark
      * @return void
      */
     public function assignMarksToAttempt(
         Model $attempt,
         QuizResponse $responseDomainObject,
         QuizDomainModel $assessment,
-        float $mark,
-        float $maxMark
+        ?float $mark,
+        ?float $maxMark
     ): void {
         /* Update normalised and human-readable marks
          */

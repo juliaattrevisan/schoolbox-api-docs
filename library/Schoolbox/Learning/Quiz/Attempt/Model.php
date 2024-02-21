@@ -339,12 +339,20 @@ class Model implements ISoftDeletable
      * and $this->>getMaxMark(), saving you manually calculating
      * this percentage everywhere else
      *
-     * @param float $numerator
-     * @param float $denominator
+     * @param null|float $numerator
+     * @param null|float $denominator
      * @return float|null
      */
-    public function calculateNormalisedMark(float $numerator, float $denominator): ?float
+    public function calculateNormalisedMark(?float $numerator, ?float $denominator): ?float
     {
+        /* Unknown error scenario, usually via SanitiseScores' edge cases
+         * where we couldn't detect inputs in an expected manner; this should
+         * never happen intentionally
+         */
+        if ((null === $numerator) || (null === $denominator)) {
+            return null;
+        }
+
         /* No marks available
          */
         if (0.0 === $denominator) {
