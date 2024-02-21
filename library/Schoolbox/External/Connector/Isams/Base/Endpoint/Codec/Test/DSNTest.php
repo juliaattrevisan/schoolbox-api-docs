@@ -45,6 +45,21 @@ class DSNTest extends TestCase
                 ]
             ],
 
+            'Valid DSN 1b' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h?dayNumberOffset=-3',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                    ],
+                    'options' => [
+                        'dayNumberOffset' => -3
+                    ]
+                ]
+            ],
+
+
             /* Batch XML and Staff Photos
              */
             'Valid DSN 2' => [
@@ -62,10 +77,27 @@ class DSNTest extends TestCase
                 ]
             ],
 
+            'Valid DSN 2b' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777?dayNumberOffset=-3',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'staffphoto' => [
+                            'key' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
+                        ],
+                    ],
+                    'options' => [
+                        'dayNumberOffset' => -3
+                    ]
+                ]
+            ],
+
             /* Batch XML and Student Photos
              */
             'Valid DSN 3' => [
-                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a?dayNumberOffset=-3',
                 [
                     'modules' => [
                         'batchxml' => [
@@ -75,14 +107,16 @@ class DSNTest extends TestCase
                             'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
                         ]
                     ],
-                    'options' => []
+                    'options' => [
+                        'dayNumberOffset' => -3
+                    ]
                 ]
             ],
 
             /* Batch XML, Staff Photos, Student Photos
              */
             'Valid DSN 4' => [
-                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a?dayNumberOffset=-3',
                 [
                     'modules' => [
                         'batchxml' => [
@@ -95,7 +129,9 @@ class DSNTest extends TestCase
                             'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
                         ]
                     ],
-                    'options' => []
+                    'options' => [
+                        'dayNumberOffset' => -3
+                    ]
                 ]
             ],
         ];
