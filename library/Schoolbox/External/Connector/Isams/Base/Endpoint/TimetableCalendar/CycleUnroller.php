@@ -30,6 +30,12 @@ class CycleUnroller
 
 
     /**
+     * If it was never set, use 0
+     */
+    private const DEFAULT_DAY_NUMBER_OFFSET = 0;
+
+
+    /**
      * Constructor.
      *
      * @param array $api
@@ -85,9 +91,10 @@ class CycleUnroller
          * can artificially adjust via the suds control panel. Incorporate that offset.
          */
         $options = $this->api[DSN::MODULE_BATCHXML]->getOptions();
-        print_r($options);die();
 
-        $dayNumberOffset = 0;
+        /* Use 0 if it never existed
+         */
+        $dayNumberOffset = (int)($options['dayNumberOffset'] ?? self::DEFAULT_DAY_NUMBER_OFFSET);
 
         /* For each of those nodes, find the WeekId that corresponds to that
          * particular week so we can start populating its Days and Periods
@@ -125,8 +132,9 @@ class CycleUnroller
      * Find the Days' data corresponding to $week
      *
      * @param SimpleXMLElement $week
-     * @param int              $weekIndex
-     * @param int              $year
+     * @param int $weekIndex
+     * @param int $year
+     * @param int $dayNumberOffset
      * @return array
      */
     private function findDays(SimpleXMLElement $week, int $weekIndex, int $year, int $dayNumberOffset): array
