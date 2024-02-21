@@ -103,7 +103,7 @@ class DSN implements IDSN
 
         /* Break apart module config
          */
-        $dsnParts = explode(self::TUPLE_SEPARATOR, $credentials);
+        $dsnParts = explode(self::MODULE_SEPARATOR, $credentials);
 
         foreach ($dsnParts as $dsnPart) {
             $matches = [];

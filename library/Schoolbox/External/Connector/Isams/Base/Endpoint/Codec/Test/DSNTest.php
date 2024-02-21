@@ -40,7 +40,8 @@ class DSNTest extends TestCase
                         'batchxml' => [
                             'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
                         ],
-                    ]
+                    ],
+                    'options' => []
                 ]
             ],
 
@@ -56,7 +57,8 @@ class DSNTest extends TestCase
                         'staffphoto' => [
                             'key' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
                         ],
-                    ]
+                    ],
+                    'options' => []
                 ]
             ],
 
@@ -72,7 +74,8 @@ class DSNTest extends TestCase
                         'studentphoto' => [
                             'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
                         ]
-                    ]
+                    ],
+                    'options' => []
                 ]
             ],
 
@@ -91,7 +94,8 @@ class DSNTest extends TestCase
                         'studentphoto' => [
                             'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
                         ]
-                    ]
+                    ],
+                    'options' => []
                 ]
             ],
         ];
