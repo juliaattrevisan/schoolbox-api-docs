@@ -115,6 +115,7 @@ class Cursor implements ICursor
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getAccessEvidence());
         $this->badgeAwardsEnabled     = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
         $this->gradesEnabled          = $config->get(ConfigMapper::NAME_GRADES_ENABLED)
+            && $config->get(ConfigMapper::NAME_ACTIVITY_FEED_FEEDBACK_ENABLED)
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getViewStudentGrades());
     }
 
