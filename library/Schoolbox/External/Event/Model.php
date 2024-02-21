@@ -101,6 +101,17 @@ class Model
 
 
     /**
+     * A json string corresponding to usually-idiosyncratic connector-specific data
+     * (stuff like random misc ids, attendance urls, deeplinking data for attendance, etc)
+     *
+     * Each connector will implement a metadata payload specially
+     *
+     * @var array|null
+     */
+    private ?array $metadata = null;
+
+
+    /**
      * @var string|null
      */
     private ?string $classification = null;
@@ -342,6 +353,26 @@ class Model
     public function setType(?string $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+
+    /**
+     * @return array|null
+     */
+    public function getMetadata(): ?array
+    {
+        return $this->metadata;
+    }
+
+
+    /**
+     * @param array|null $metadata
+     * @return Model
+     */
+    public function setMetadata(?array $metadata): self
+    {
+        $this->metadata = $metadata;
         return $this;
     }
 

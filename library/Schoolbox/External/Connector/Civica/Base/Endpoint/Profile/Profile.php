@@ -443,16 +443,16 @@ class Profile implements IStrategy
      */
     private function sortEnrolmentDetails(array $enrolmentDetails): array
     {
+        $stack = [];
+
         /* No campus? No trabajo
          */
         if (!\count($enrolmentDetails)) {
-            return [];
+            return $stack;
         }
 
         /* Pre-sort the list
          */
-        $stack = [];
-
         foreach ($enrolmentDetails as $enrolmentDetail) {
             if ($this->isValid->isSatisifiedBy($enrolmentDetail, 'enrolmentDetailStartDate', 'enrolmentDetailEndDate')) {
                 $stack[] = $enrolmentDetail;
