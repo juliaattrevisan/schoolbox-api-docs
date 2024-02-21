@@ -48,8 +48,11 @@ function toggleActivitySelection() {
                 <template v-if="props.projectActivity"> {{ props.projectActivity.title }} | </template>
                 {{ props.activity.title }}
             </p>
-            <p v-if="props.activity.dueAt !== null" class="meta">
-                <span class="unit-task-due-date"> Due {{ props.activity.dueAtFormatted }} </span>
+            <p v-if="props.activity.dueAt" class="meta" :title="props.activity.dueAt.long">
+                <span class="unit-task-due-date">
+                    Due
+                    <time :datetime="props.activity.dueAt.atom || undefined">{{ props.activity.dueAt.relative }}</time>
+                </span>
             </p>
         </div>
     </div>
