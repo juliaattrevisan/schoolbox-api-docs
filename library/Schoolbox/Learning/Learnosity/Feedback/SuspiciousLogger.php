@@ -33,7 +33,10 @@ class SuspiciousLogger
         (new \Alaress_Log_File('/tmp/test.txt', 'mog'))->log('did it', (int)$suspicious);
 
         if ($suspicious) {
-            $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
+//            $write = fopen('php://memory', 'rb+');
+            $write = fopen('/var/log/schoolbox/learnosity_suspicious_scores.log', 'rb+');
+
+            $logger = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
 
             ob_start();
             var_dump($postData);
@@ -96,10 +99,13 @@ class SuspiciousLogger
         }
 
         if ($suspicious) {
-            $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
+//            $write = fopen('php://memory', 'rb+');
+            $write = fopen('/var/log/schoolbox/learnosity_suspicious_scores.log', 'rb+');
+
+            $logger = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
 
             $logger->debug(sprintf(
-                'Attempt %s received (float)%s/(float)%s (%s; %s)',
+                'Attempt %s received (float)%s/(float)%s (norm: %s; hr: %s)',
                 $attemptLearnosityReference,
                 $mark,
                 $maxMark,
