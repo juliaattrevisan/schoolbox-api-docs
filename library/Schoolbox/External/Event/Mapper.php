@@ -297,11 +297,13 @@ class Mapper extends \Schoolbox\Mapper
          */
         foreach ($stack as $eventId => $event) {
             foreach ($eventTuples[$eventId] as $staffExternalId) {
-                $person = $staffLookup[$staffExternalId];
+                /* Sometimes a person doesn't exist...?
+                 */
+                $person = $staffLookup[$staffExternalId] ?? null;
 
                 /* $eventId for some reason wasn't hydrated; skip past it
                  */
-                if ($stack->getOffset($eventId)) {
+                if ($person && $stack->getOffset($eventId)) {
                     $stack->getOffset($eventId)->addStaff($person['id'], $person['name']);
                 }
             }
