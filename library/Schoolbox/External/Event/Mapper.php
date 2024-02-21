@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 
 /**
@@ -183,27 +184,18 @@ class Mapper extends \Schoolbox\Mapper
             SELECT
                 {$this->getColumnString()},
                 {$folderColumnString},
-                {$folderCodeColumnString},
-                scu.external_id AS externalId,
-                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`,
-                g.group_type as `g.group_type`
+                {$folderCodeColumnString}
             FROM {$this->getTable()}
             LEFT JOIN {$this->folderCodeMapper->getTable()} fc ON {$this->getTable()}.code = fc.code AND fc.deleted_at IS NULL
             LEFT JOIN {$this->folderMapper->getTable()} f ON fc.folder_id = f.id AND f.deleted_at IS NULL
-            LEFT JOIN sis_class sc ON sis_event.code = sc.code
-            LEFT JOIN sis_class_user scu ON sc.id = scu.class_id
-            LEFT JOIN `user` u ON scu.external_id = u.synergy_id AND u.deleted_at IS NULL
-            LEFT JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
             WHERE {$where}
-            AND (group_type = :studentRoleType OR group_type = :staffRoleType)
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array_merge([
-            'studentRoleType' => \Schoolbox\Role::STUDENT,
-            'staffRoleType' => \Schoolbox\Role::STAFF
-        ], $params));
+        $statement->execute($params);
 
+        /* This creates all the events and their relevant folder(s)
+         */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /* If we haven't seen this event yet, spawn it and stash it in the stack
              */
@@ -219,7 +211,7 @@ class Mapper extends \Schoolbox\Mapper
                     /** @var \Schoolbox\Resource\Folder\Code\Model|null $folderCode */
                     $folderCode = $this->folderCodeMapper->hydrate($row, 'fc');
 
-                    $folder->setCodes($this->folderCodeMapper->createCollection([ $folderCode ]));
+                    $folder->setCodes($this->folderCodeMapper->createCollection([$folderCode]));
 
                     $event->setFolder($folder);
                 }
@@ -228,33 +220,89 @@ class Mapper extends \Schoolbox\Mapper
                  */
                 $stack->setOffset($event->getId(), $event);
             }
+        }
 
-            /* Populate staff members in a cheap hydraty way
-             * Note that some classes could potentially have students-only; if we use
-             * WHERE group_type = 'staff' these students-only classes won't appear in
-             * the result set
-             */
-            $userId = (int)$row['u.id'];
-            $externalId = (string)$row['externalId'];
-            $eventId = $row['id'];
-            $groupType = (string)$row['g.group_type'];
+        /* Sometimes you just have teachers involved via overrides and they're not
+         * actually enrolled in this class at all. Grab them specially and pop them
+         * all on top of whatever we might have derived previously to ensure nobody
+         * gets left out
+         *
+         * This covers the following use cases:
+         *     * has students, no enrolled staff from sis_class_user
+         *     * has students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF overrides
+         *     * has students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF
+         *       overrides but also got added via ADD overrides
+         *
+         *     * no students, no enrolled staff from sis_class_user
+         *     * no students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF overrides
+         *     * no students, some enrolled staff that survived SUBTRACT/CLEAR_STAFF
+         *       overrides but also got added via ADD overrides
+         */
 
-            /* Find out if this user is in the event manifest; the list of staff should
-             * only contain the people actually teaching the class instance (involvements)
-             * and not blindly assume "anyone associated with the class" (enrolments)
-             */
-            if (\Schoolbox\Role::STAFF === $groupType && isset($eventTuples[$eventId][$externalId])) {
-                $name = implode(' ', array_filter([
+        /* First, to save egregious amounts of queries, we can compile a micro local lookup
+         * by collating all the staff external ids out of the manifest first
+         */
+        $staffExternalIds = [];
+
+        foreach ($eventTuples as $eventId => $externalIds) {
+            $staffExternalIds = array_merge($staffExternalIds, $externalIds);
+        }
+
+        /* Mega list
+         */
+        $staffExternalIds = array_unique($staffExternalIds);
+
+        /* Grab the names for everyone in the mega list
+         */
+        $placeholders = Builder::getArrayPlaceholders($staffExternalIds, 'externalId');
+        $params = Builder::getArrayParameters($staffExternalIds, 'externalId');
+
+        $query = "
+            SELECT
+                u.synergy_id AS externalId,
+                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`,
+                g.group_type as `g.group_type`
+            FROM `user` u
+            LEFT JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
+            WHERE u.deleted_at IS NULL
+            AND g.group_type = :staffRoleType
+            AND u.synergy_id IN {$placeholders}
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array_merge([
+            'staffRoleType' => \Schoolbox\Role::STAFF
+        ], $params));
+
+        /* Shank into a hash table
+         */
+        $staffLookup = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $staffLookup[$row['externalId']] = [
+                'id' => $row['u.id'],
+                'name' => implode(' ', array_filter([
                     $row['u.title'],
                     $row['u.firstname'],
                     $row['u.lastname']
                 ], static function ($val) {
                     return '' !== trim((string)$val);
-                }));
+                }))
+            ];
+        }
 
-                /* Trickle it in
+        /* Then assign them procedurally with a second loop - saving us an O(n^2) complexity
+         * algorithm with a boatload of db queries
+         */
+        foreach ($stack as $eventId => $event) {
+            foreach ($eventTuples[$eventId] as $staffExternalId) {
+                $person = $staffLookup[$staffExternalId];
+
+                /* $eventId for some reason wasn't hydrated; skip past it
                  */
-                $stack->getOffset($row['id'])->addStaff($userId, $name);
+                if ($stack->getOffset($eventId)) {
+                    $stack->getOffset($eventId)->addStaff($person['id'], $person['name']);
+                }
             }
         }
 
