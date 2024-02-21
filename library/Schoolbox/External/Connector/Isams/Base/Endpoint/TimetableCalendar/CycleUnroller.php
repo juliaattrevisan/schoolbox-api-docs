@@ -156,11 +156,10 @@ class CycleUnroller
             $dayId = (string)$day->xpath('@Id')[0];
 
             $date = (new \DateTime())->setISODate($year, $weekIndex, $dayIndex + 1)->format('Y-m-d');
-
             /* Sometimes iSAMS will incorrectly tell you a school's Day Number which the school
              * can artificially adjust via the suds control panel. Incorporate that offset.
              */
-            if (is_numeric($day->Day)) {
+            if (is_numeric((string)$day->Day)) {
                 $adjustedDayNumber = (int)$day->Day + $dayNumberOffset;
             } else {
                 $adjustedDayNumber = $day->Day;
