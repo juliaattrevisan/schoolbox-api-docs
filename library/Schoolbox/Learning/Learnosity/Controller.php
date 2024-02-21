@@ -1038,6 +1038,10 @@ class Controller extends Base
         $mark = $sanitisedScore['score'];
         $maxMark = $sanitisedScore['max_score'];
 
+        /* Log data that seems suspiciously broken
+         */
+        (new Feedback\SuspiciousLogger())->logSanitisedScore($attempt->getLearnosityReference(), $sanitisedScore, $postData);
+
         // As with posting a feedback:
         // need the existing response to determine a human-readable mark.
         $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);

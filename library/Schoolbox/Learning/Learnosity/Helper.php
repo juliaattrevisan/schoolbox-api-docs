@@ -335,6 +335,10 @@ class Helper
 
         $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
 
+        /* Log data that seems suspiciously broken
+         */
+        (new Feedback\SuspiciousLogger())->logHumanReadable($attempt->getLearnosityReference(), $mark, $maxMark, $normalisedMark, $humanReadableMark);
+
         /* Update the columns with newly-derived values
          */
         $attempt
