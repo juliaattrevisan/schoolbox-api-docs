@@ -75,6 +75,7 @@ class Api implements IApi
      * @return string|null
      * @throws RuntimeException if the retrieval of the XML doc failed
      * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function retrieveDocument(): ?string
     {
@@ -101,6 +102,8 @@ class Api implements IApi
      * Cache a url definition then return its value
      *
      * @return Uri
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function getUrl(): Uri
     {
@@ -131,6 +134,7 @@ class Api implements IApi
      *
      * @return Alaress_Curl_Url
      * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     private function initCurl(): \Alaress_Curl_Url
     {
@@ -143,6 +147,8 @@ class Api implements IApi
      *
      * @param string $filename
      * @throws RuntimeException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function saveToFile(string $filename): void
     {
