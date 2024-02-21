@@ -14,8 +14,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Factory;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
@@ -316,6 +316,7 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
+            ->setMetadata((new Metadata\Builder())->build($class, $classInstance))
             ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);
