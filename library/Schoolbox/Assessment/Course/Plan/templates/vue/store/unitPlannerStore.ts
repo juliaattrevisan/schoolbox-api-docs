@@ -17,7 +17,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * toggle the expanded state of a unit
      * @param { number } unitId - the id of the unit to toggle
      */
-    function toggleExpanded(unitId: number) {
+    function toggleExpanded(unitId: Unit["id"]) {
         if (expandedUnits.value.includes(unitId)) {
             expandedUnits.value = expandedUnits.value.filter((id) => id !== unitId);
         } else {
@@ -25,10 +25,26 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         }
     }
 
+    /**
+     * Resequences the units
+     * @param { number[] } unitIDs - the ids of the units to resequence
+     */
+    function resequenceUnits(unitIDs: Unit["id"][]) {
+        const newUnits = units.value.slice();
+        unitIDs.forEach((id, index) => {
+            const unit = newUnits.find((u) => u.id === id);
+            if (unit) {
+                unit.sequence = index;
+            }
+        });
+        units.value = newUnits;
+    }
+
     return {
         init,
         expandedUnits,
         toggleExpanded,
         units,
+        resequenceUnits,
     };
 });

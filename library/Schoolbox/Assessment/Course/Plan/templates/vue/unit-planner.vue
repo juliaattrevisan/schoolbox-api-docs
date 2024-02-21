@@ -38,8 +38,29 @@ const allTextboxKeys = window.Vue.computed(() => {
     return [...keysSet];
 });
 
-window.Vue.onMounted(() => {
-    store.init(props.units);
+const orderedUnits = window.Vue.computed(() => {
+    return store.units.sort((a, b) => {
+        return a.sequence - b.sequence;
+    });
+});
+
+window.Vue.onMounted(async () => {
+    store.init(props.units, props.routeFolderSequence);
+
+    await window.Vue.nextTick();
+
+    const sortableTarget = $("[data-sortable]");
+    sortableTarget.sortable({
+        handle: ".grip",
+        axis: "y",
+        update: () => {
+            // Adjust the sequence of the units
+            const unitIds: Unit["id"][] = sortableTarget
+                .sortable("toArray", { attribute: "data-unit-id" })
+                .map(Number);
+            store.resequenceUnits(unitIds);
+        },
+    });
 });
 </script>
 
@@ -66,8 +87,9 @@ window.Vue.onMounted(() => {
             </thead>
             <tbody data-sortable class="ui-sortable">
                 <tr
-                    v-for="unit in store.units"
+                    v-for="unit in orderedUnits"
                     :key="unit.id"
+                    :data-unit-id="unit.id"
                     :class="{ collapsed: !store.expandedUnits.includes(unit.id) }"
                 >
                     <td>
