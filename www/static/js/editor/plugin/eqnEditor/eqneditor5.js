@@ -73,7 +73,7 @@ export default class Eqneditor5 extends Plugin {
             return view;
         });
 
-        // // Listen for double click
+        // Listen for double click
         const view = editor.editing.view;
         const viewDocument = view.document;
 
