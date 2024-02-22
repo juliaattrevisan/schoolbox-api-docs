@@ -17,6 +17,20 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 class PollProcessingTool extends BaseTool
 {
     /**
+     * Name of this tool's lock.
+     */
+    public const LOCK_NAME = 'learnosity_poll_processing';
+
+    /**
+     * Expected maximum seconds for this lock to be held per iteration of
+     * `processQuiz`.
+     *
+     * This allows 3 minutes for the polling of a quiz's Learnosity job, and
+     * the setting of its tags.
+     */
+    private const LOCK_TIMEOUT = 180;
+
+    /**
      * This tool works upon quizzes currently being processed.
      */
     protected function getTargetedQuizStatus(): string
@@ -80,6 +94,22 @@ class PollProcessingTool extends BaseTool
     protected function getToolName(): string
     {
         return 'Poll processing quiz duplication tool';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockName(): string
+    {
+        return self::LOCK_NAME;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getLockTimeout(): int
+    {
+        return self::LOCK_TIMEOUT;
     }
 
     /**
