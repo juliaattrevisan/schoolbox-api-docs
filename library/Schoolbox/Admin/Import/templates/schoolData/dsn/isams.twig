@@ -31,7 +31,14 @@
                             {% for i in range(-3, 3) %}
                                 {% set selected = '' %}
 
-                                {% if (options ?? false) and options.dayNumberOffset == i %}
+                                {% if (options.dayNumberOffset ?? null) is null and 0 == i %}
+                                    {# dayNumberOffset didn't exist; avoid a weird twig behaviour
+                                     # where it checks options existing inside every if/else branch
+                                     # when it's not necessary at all
+                                     #}
+                                    {% set selected = 'selected="selected"' %}
+                                {% elseif (options ?? null) and options.dayNumberOffset == i %}
+                                    {# Preselect the one you chose previously #}
                                     {% set selected = 'selected="selected"' %}
                                 {% endif %}
 
