@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
+use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\GenericCollection;
@@ -96,6 +97,18 @@ abstract class BaseTool extends CliTool\App
         } else {
             $this->getLogger()->notice('Running in planning mode: use -p to commit changes to quizzes.');
         }
+
+        // Firstly, check if the importer is running: if it is, exit.
+        // Can't let these tools run whilst the importer is running, because it
+        // is possible this tool will attempt to duplicate a quiz which has a
+        // Learnosity reference, but its content has not yet synced across.
+        try {
+            $lock = $this->acquireLock(ImporterTool::LOCK_NAME, 1);
+        } catch (RuntimeException $e) {
+            $this->getLogger()->warning($e->getMessage());
+            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+        }
+        $lock->release();
 
         $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
 
