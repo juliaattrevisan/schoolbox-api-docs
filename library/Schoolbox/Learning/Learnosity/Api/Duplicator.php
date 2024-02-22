@@ -18,6 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
+use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
@@ -73,6 +74,8 @@ class Duplicator
      * @throws \DomainException
      * @throws ValidationException
      * @throws \RuntimeException
+     * @throws SourceAssociationException if `$source` has no Learnosity reference: an empty source can't be copied to
+     *                                    a destination.
      */
     public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
     {
@@ -84,6 +87,13 @@ class Duplicator
         /* Clone a Learnosity Reference in Learnosity land
          */
         $oldLearnosityReference = $source->getLearnosityReference();
+
+        // Does this not have a Learnosity reference at all? That's an error.
+        // I've seen empty but not null Learnosity references: not sure why they
+        // happen, though.
+        if (($oldLearnosityReference ?? '') === '') {
+            throw new SourceAssociationException('Destination assessment has no Learnosity reference');
+        }
 
         /* See if there are any items in it;
          * Learnosity crashes when you try to clone an itemless quiz
