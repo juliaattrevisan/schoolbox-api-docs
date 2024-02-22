@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Toast from "@schoolboxVue/components/toast.vue";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { Unit } from "./unitPlannerTypes";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
 
 const selectedTab = window.Vue.ref("all");
@@ -39,14 +41,8 @@ const allTextboxKeys = window.Vue.computed(() => {
     return [...keysSet];
 });
 
-const orderedUnits = window.Vue.computed(() => {
-    return store.units.sort((a, b) => {
-        return a.sequence - b.sequence;
-    });
-});
-
 window.Vue.onMounted(async () => {
-    store.init(props.units, props.routeFolderSequence);
+    store.init(props.units, props.routeFolderSequence, toastEl);
 
     // Whether to allow the user to resequence the units
     if (props.routeFolderSequence) {
@@ -91,7 +87,7 @@ window.Vue.onMounted(async () => {
             </thead>
             <tbody v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
                 <tr
-                    v-for="unit in orderedUnits"
+                    v-for="unit in store.orderedUnits"
                     :key="unit.id"
                     :data-unit-id="unit.id"
                     :class="{ collapsed: !store.expandedUnits.includes(unit.id) }"
@@ -137,6 +133,8 @@ window.Vue.onMounted(async () => {
             </tbody>
         </table>
     </div>
+
+    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped lang="scss">

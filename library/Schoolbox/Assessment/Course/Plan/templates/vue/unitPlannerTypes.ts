@@ -23,6 +23,7 @@ export type Unit = {
     id: number;
     title: string;
     homepage: string;
+    folderId: number;
     activities: Activity[];
     curriculumCodes: Node[];
     rubricCapabilities: RubricCapability[];

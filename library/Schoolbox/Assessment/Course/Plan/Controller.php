@@ -181,6 +181,7 @@ class Controller extends Base
                 'id' => $unit->getId(),
                 'title' => $unit->getTitle(),
                 'homepage' => "/homepage/{$unit->getFolder()->getId()}",
+                'folderId' => $unit->getFolder()->getId(),
                 /* Textboxes in the Unit that circumstantially match ones in the Template
                  */
                 'textboxes' => $textboxData['textboxes'],
@@ -203,7 +204,7 @@ class Controller extends Base
                  * in this unit
                  */
                 'curriculumCodes' => $curriculumNodes,
-                'sequence'  => $unit->getFolder()->getSequence()
+                'sequence' => $unit->getFolder()->getSequence()
             ];
 
             // add this units data to the whole course units collection.
