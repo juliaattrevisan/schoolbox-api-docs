@@ -54,10 +54,6 @@ a.c-button {
         cursor: not-allowed;
         pointer-events: initial; // ^foundation-fixes^ - allow pointer events to show cursor: not-allowed
     }
-    // To extend the button to the full width of its container
-    &--block {
-        width: 100%;
-    }
     // Used to further highlight the primary action of a page
     &--primary {
         background-color: var(--content-ui-submit-background);
