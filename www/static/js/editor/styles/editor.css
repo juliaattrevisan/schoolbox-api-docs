@@ -380,8 +380,3 @@ turned on */
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
     background-color: var(--sb-ck-active-grey) !important;
 }
-
-/* Ensure the toolbar container sits below the various modal pop ups within the toolbar */
-.ck.ck-toolbar-container {
-    z-index: (var(--ck-z-modal) - 1);
-}
