@@ -9,7 +9,6 @@
 namespace Schoolbox\Fixtures\Component\Dashboard;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Session\Session;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use RuntimeException;
@@ -81,11 +80,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $userIds = [$this->getUser()->getId()];
 
         if ($this->getUser()->getRole()->isParent()) {
+            $parent = $this->getUser();
+            (new \Schoolbox\External\User())->loadChildren([$parent]);
 
-            /** @var Session $session */
-            $session  = $this->getSitePage()->getDi()->get('session');
-
-            $children = $session->get('children') ?: [];
+            $children = $parent->getChildren();
 
             foreach ($children as $child) {
                 $userIds[] = $child['id'];
