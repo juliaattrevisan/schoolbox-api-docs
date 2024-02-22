@@ -91,6 +91,12 @@ abstract class BaseTool extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        if ($this->perform()) {
+            $this->getLogger()->notice('Running in perform mode (-p): quizzes will be changed.');
+        } else {
+            $this->getLogger()->notice('Running in planning mode: use -p to commit changes to quizzes.');
+        }
+
         $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
 
         // Build duplicator
@@ -132,6 +138,8 @@ abstract class BaseTool extends CliTool\App
             /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
             $this->processQuiz($quiz);
         }
+
+        $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
     }
 
     /**
