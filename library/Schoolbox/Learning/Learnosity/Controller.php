@@ -30,6 +30,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
+use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -1772,7 +1773,15 @@ class Controller extends Base
     {
         // Start duplicating and polling status of duplication
         $duplicator = $this->buildDuplicator();
-        $jobId = $duplicator->copyQuizConstituents($source, $destination);
+        try {
+            $jobId = $duplicator->copyQuizConstituents($source, $destination);
+        } catch (SourceAssociationException $e) {
+            // Not able to be associated?
+            // Set destination as unprocessable, save and rethrow exception
+            $destination->setLearnosityJobStatus(QuizDomainObject::LEARNOSITY_JOB_STATUS_UNPROCESSABLE);
+            $this->assessmentDataSource->save($destination, $this->getUser());
+            throw $e;
+        }
         $duplicator->initiatePollingForQuizStatus($this->getUser(), $destination);
         $this->response = $this->responseAsJson(['jobId' => $jobId]);
     }
