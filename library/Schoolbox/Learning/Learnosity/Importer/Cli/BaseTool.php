@@ -109,7 +109,12 @@ abstract class BaseTool extends CliTool\App
         try {
             $importerLock = $this->acquireLock(ImporterTool::LOCK_NAME, 1);
         } catch (RuntimeException $e) {
-            $this->getLogger()->warning($e->getMessage());
+            $this->getLogger()->warning(
+                sprintf(
+                    'Importer lock is likely held by the importer: aborting due to possible conflict (message: %s)',
+                    $e->getMessage(),
+                ),
+            );
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
         $importerLock->release();
