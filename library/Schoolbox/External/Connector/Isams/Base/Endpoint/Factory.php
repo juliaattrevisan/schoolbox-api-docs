@@ -109,7 +109,7 @@ class Factory
              * Only the xml files can/should be stored and read locally afaict
              */
             $api = [
-                DSN::MODULE_BATCHXML => new Batchxml(new MockFileApi($this->file)),
+                DSN::MODULE_BATCHXML => new Batchxml(new MockFileApi($this->file, $this->key)),
             ];
         } else {
             $this->log->info('Accessing api endpoint');

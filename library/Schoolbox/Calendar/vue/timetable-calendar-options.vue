@@ -54,7 +54,7 @@ export default {
 </script>
 
 <template>
-    <div class="row">
+    <div class="row" v-if="options['userOptions'].length">
         <div class="small-12 columns">
             <dl class="sub-nav">
                 <dd

@@ -24,48 +24,29 @@ use SensitiveParameter;
 class Api implements IApi
 {
     /**
-     * The host of the iSAMS server
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * The API key for this call, provided by the school
-     *
-     * @var string
-     */
-    private string $apiKey;
-
-
-    /**
-     * The iSAMS module that you're accessing;
-     * corresponds to one of the DSN consts
-     *
-     * @var string
-     */
-    private string $module;
-
-
-    /**
      * @var Uri|null
      */
     private ?Uri $url = null;
 
 
     /**
+     * @var array
+     */
+    private array $options = [];
+
+
+    /**
      * Constructor
      *
-     * @param string $host
-     * @param string $apiKey
-     * @param string $module
+     * @param string $host    The host of the iSAMS server
+     * @param string $apiKey  The API key for this call, provided by the school
+     * @param string $module  The iSAMS module that you're accessing; corresponds to one of the DSN consts
      */
-    public function __construct(string $host, #[SensitiveParameter] string $apiKey, string $module)
-    {
-        $this->host   = $host;
-        $this->apiKey = $apiKey;
-        $this->module = $module;
+    public function __construct(
+        private string $host,
+        #[SensitiveParameter] private string $apiKey,
+        private string $module
+    ) {
     }
 
 
@@ -75,6 +56,7 @@ class Api implements IApi
      * @return string|null
      * @throws RuntimeException if the retrieval of the XML doc failed
      * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function retrieveDocument(): ?string
     {
@@ -98,13 +80,32 @@ class Api implements IApi
 
 
     /**
+     * Set up curl instance
+     *
+     * @return Alaress_Curl_Url
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     */
+    private function initCurl(): \Alaress_Curl_Url
+    {
+        return new Alaress_Curl_Url((string)$this->getUrl());
+    }
+
+
+    /**
      * Cache a url definition then return its value
      *
      * @return Uri
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function getUrl(): Uri
     {
         $credentials = (new DSN())->decode($this->apiKey);
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $credentials['options'] ?? [];
 
         if (!$this->url) {
             /* Find the path corresponding to the module we found
@@ -127,14 +128,11 @@ class Api implements IApi
 
 
     /**
-     * Set up curl instance
-     *
-     * @return Alaress_Curl_Url
-     * @throws \DomainException
+     * @return array
      */
-    private function initCurl(): \Alaress_Curl_Url
+    public function getOptions(): array
     {
-        return new Alaress_Curl_Url((string)$this->getUrl());
+        return $this->options;
     }
 
 
@@ -143,6 +141,8 @@ class Api implements IApi
      *
      * @param string $filename
      * @throws RuntimeException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function saveToFile(string $filename): void
     {

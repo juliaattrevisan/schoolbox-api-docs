@@ -18,6 +18,35 @@
                         <input type="text" class='required suds-crypto' name="dsn[isams][modules][batchxml][key]" value="{{ modules.batchxml.key ?? ''}}" />
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label class="required">Day Number Offset</label>
+                        <span class="meta">If iSAMS calendar is aligned to the wrong day number at the start of the week, use this to realign them. Use zero if your day numbers don't need any alteration.</span>
+                        <select name="dsn[isams][options][dayNumberOffset]">
+                            {# Day Number offset arbitrarily hardcoded to be between [-3, 3]
+                             # which is used by schools to artificially adjust Day Numbers due
+                             # to isams bug; have to endure it in the meantime
+                             #}
+                            {% for i in range(-3, 3) %}
+                                {% set selected = '' %}
+
+                                {% if (options.dayNumberOffset ?? null) is null and 0 == i %}
+                                    {# dayNumberOffset didn't exist; avoid a weird twig behaviour
+                                     # where it checks options existing inside every if/else branch
+                                     # when it's not necessary at all
+                                     #}
+                                    {% set selected = 'selected="selected"' %}
+                                {% elseif (options ?? null) and options.dayNumberOffset == i %}
+                                    {# Preselect the one you chose previously #}
+                                    {% set selected = 'selected="selected"' %}
+                                {% endif %}
+
+                                <option value="{{ i }}"{{ selected }}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
             </div>
         </fieldset>
     </section>

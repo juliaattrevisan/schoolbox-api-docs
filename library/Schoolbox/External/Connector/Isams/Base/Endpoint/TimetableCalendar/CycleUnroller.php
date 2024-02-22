@@ -30,6 +30,12 @@ class CycleUnroller
 
 
     /**
+     * If it was never set, use 0
+     */
+    private const DEFAULT_DAY_NUMBER_OFFSET = 0;
+
+
+    /**
      * Constructor.
      *
      * @param array $api
@@ -81,6 +87,15 @@ class CycleUnroller
          */
         $timetableAllocations = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/TimetableAllocations/TimetableAllocation[ISOYear = {$year} and Week >= {$pastThreshold} and Week <= {$futureThreshold}]");
 
+        /* Sometimes iSAMS will incorrectly tell you a school's Day Number which the school
+         * can artificially adjust via the suds control panel. Incorporate that offset.
+         */
+        $options = $this->api[DSN::MODULE_BATCHXML]->getOptions();
+
+        /* Use 0 if it never existed
+         */
+        $dayNumberOffset = (int)($options['dayNumberOffset'] ?? self::DEFAULT_DAY_NUMBER_OFFSET);
+
         /* For each of those nodes, find the WeekId that corresponds to that
          * particular week so we can start populating its Days and Periods
          * TimetableAllocation WeekId corresponds to a Structure node <Week Id="...">
@@ -105,7 +120,7 @@ class CycleUnroller
                     'index' => $weekIndex,
                     'name' => (string)$week->Name
                 ],
-                'days' => $this->findDays($week, $weekIndex, $year)
+                'days' => $this->findDays($week, $weekIndex, $year, $dayNumberOffset)
             ];
         }
 
@@ -117,11 +132,12 @@ class CycleUnroller
      * Find the Days' data corresponding to $week
      *
      * @param SimpleXMLElement $week
-     * @param int              $weekIndex
-     * @param int              $year
+     * @param int $weekIndex
+     * @param int $year
+     * @param int $dayNumberOffset
      * @return array
      */
-    private function findDays(SimpleXMLElement $week, int $weekIndex, int $year): array
+    private function findDays(SimpleXMLElement $week, int $weekIndex, int $year, int $dayNumberOffset): array
     {
         $dayStruct = [];
 
@@ -140,13 +156,21 @@ class CycleUnroller
             $dayId = (string)$day->xpath('@Id')[0];
 
             $date = (new \DateTime())->setISODate($year, $weekIndex, $dayIndex + 1)->format('Y-m-d');
+            /* Sometimes iSAMS will incorrectly tell you a school's Day Number which the school
+             * can artificially adjust via the suds control panel. Incorporate that offset.
+             */
+            if (is_numeric((string)$day->Day)) {
+                $adjustedDayNumber = (int)$day->Day + $dayNumberOffset;
+            } else {
+                $adjustedDayNumber = $day->Day;
+            }
 
             /* Assemble into stack
              */
             $dayStruct[$dayIndex] = [
                 'isamsId' => $dayId,
                 'name' => (string)$day->Name,
-                'dayNumber' => (string)$day->Day,
+                'dayNumber' => (string)$adjustedDayNumber,
                 'date' => $date,
                 'periods' => $this->findPeriods($day, $date)
             ];

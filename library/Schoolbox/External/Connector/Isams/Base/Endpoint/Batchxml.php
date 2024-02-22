@@ -34,12 +34,6 @@ class Batchxml
 
 
     /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
      * Cache the xml nodes that we downloaded so we don't end up re-fetching it
      * if we traverse the xml more than once
      *
@@ -53,9 +47,8 @@ class Batchxml
      *
      * @param IApi $api
      */
-    public function __construct(IApi $api)
+    public function __construct(private IApi $api)
     {
-        $this->api = $api;
     }
 
 
@@ -146,6 +139,15 @@ class Batchxml
         }
 
         return $this->nodes->xpath($path);
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->api->getOptions();
     }
 
 

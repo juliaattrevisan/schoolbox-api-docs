@@ -297,11 +297,17 @@ class Mapper extends \Schoolbox\Mapper
          */
         foreach ($stack as $eventId => $event) {
             foreach ($eventTuples[$eventId] as $staffExternalId) {
-                $person = $staffLookup[$staffExternalId];
+                /* Sometimes a person doesn't exist...?
+                 * I suppose this could happen when you import profiles and timetables
+                 * but try to view a timetable which references a person that hasn't
+                 * been built via UPS yet...or it's broken data. In either case we don't
+                 * really know what their name is, or what their user id is.
+                 */
+                $person = $staffLookup[$staffExternalId] ?? null;
 
                 /* $eventId for some reason wasn't hydrated; skip past it
                  */
-                if ($stack->getOffset($eventId)) {
+                if ($person && $stack->getOffset($eventId)) {
                     $stack->getOffset($eventId)->addStaff($person['id'], $person['name']);
                 }
             }

@@ -39,14 +39,15 @@ class DSN implements IDSN
 
 
     /**
-     * DSN format
-     *
-     * iSAMS Module (e.g. Batch XML, Staff Photos, Student Photos)
-     * followed by a colon
-     * followed by key-value pairs
-     * separated by comma
+     * This character separates tuples from each other
      */
-    private const DSN_FORMAT = '/([^:]+):key=([^;]*)/';
+    private const TUPLE_SEPARATOR = ';';
+
+
+    /**
+     * This character separates credentials-related tuples from option tuples
+     */
+    private const OPTION_SEPARATOR = '?';
 
 
     /**
@@ -62,6 +63,23 @@ class DSN implements IDSN
 
 
     /**
+     * Optional params we permitted in SUDS Config
+     */
+    private const OPTION_FORMAT = '/([^;]+)=([^;]*)/';
+
+
+    /**
+     * DSN format
+     *
+     * iSAMS Module (e.g. Batch XML, Staff Photos, Student Photos)
+     * followed by a colon
+     * followed by key-value pairs
+     * separated by comma
+     */
+    private const DSN_FORMAT = '/([^:]+):key=([^;]*)/';
+
+
+    /**
      * Decode a DSN string
      *
      * @param string $dsn
@@ -74,14 +92,19 @@ class DSN implements IDSN
             throw new DomainException('iSAMS API DSN: could not decode; missing some credentials.');
         }
 
-        $dsnParts = explode(self::MODULE_SEPARATOR, $dsn);
+        $bits = explode(self::OPTION_SEPARATOR, $dsn);
+        $credentials = $bits[0];
+        $options = $bits[1] ?? null;
 
         $struct = [
-            'modules' => []
+            'modules' => [],
+            'options' => []
         ];
 
         /* Break apart module config
          */
+        $dsnParts = explode(self::MODULE_SEPARATOR, $credentials);
+
         foreach ($dsnParts as $dsnPart) {
             $matches = [];
             preg_match(self::DSN_FORMAT, $dsnPart, $matches);
@@ -89,6 +112,24 @@ class DSN implements IDSN
             $struct['modules'][$matches[1]] = [
                 'key' => $matches[2]
             ];
+        }
+
+        /* Have a look at the options which may or may not exist
+         * These options might have been introduced *after* the dsn was last saved
+         * so those array elements might not exist yet. The user needs to save
+         * the form to re-encode their dsn accordingly.
+         */
+        if (null !== $options) {
+            /* No tuples, but you gave an option separator; malformed DSN
+             * Looks like there were supposed to be options, but none exist
+             */
+            if ('' === $options) {
+                throw new DomainException('Detected option separator but no options found');
+            }
+
+            preg_match(self::OPTION_FORMAT, $options, $matches);
+
+            $struct['options'][$matches[1]] = $matches[2];
         }
 
         return $struct;
@@ -103,6 +144,29 @@ class DSN implements IDSN
      */
     public function encode(#[SensitiveParameter] array $parts): string
     {
+        /* Encode option pieces
+         */
+        $options = [];
+
+        /* Arrays are serialized into a csv
+         */
+        foreach (($parts['options'] ?? []) as $key => $value) {
+            if (is_array($value)) {
+                $imploded = implode(',', $value);
+
+                $options[] = "{$key}={$imploded}";
+            } else {
+                $options[] = "{$key}={$value}";
+            }
+        }
+
+        // Only include options if some were set
+        $optionEncoding = '';
+
+        if (count($options)) {
+            $optionEncoding = '?' . implode(self::TUPLE_SEPARATOR, $options);
+        }
+
         $struct = [];
 
         foreach ($parts['modules'] as $module => $pairs) {
@@ -117,6 +181,6 @@ class DSN implements IDSN
             $struct[] = $module . implode(self::MODULE_TUPLE_SEPARATOR, $tuples);
         }
 
-        return implode(self::MODULE_SEPARATOR, $struct);
+        return implode(self::MODULE_SEPARATOR, $struct) . $optionEncoding;
     }
 }

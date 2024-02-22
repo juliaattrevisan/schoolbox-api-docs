@@ -24,4 +24,12 @@ interface IApi
      * @return string|null
      */
     public function retrieveDocument(): ?string;
+
+
+    /**
+     * Returns options that were part of the suds isams configuration screen
+     *
+     * @return array
+     */
+    public function getOptions(): array;
 }

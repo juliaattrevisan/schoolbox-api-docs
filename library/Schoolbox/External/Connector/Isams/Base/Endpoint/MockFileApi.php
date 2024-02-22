@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+
 /**
  * Class MockFileApi
  *
@@ -21,21 +23,19 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 class MockFileApi implements IApi
 {
     /**
-     * Path to the local xml file from which to read
-     *
-     * @var string
+     * @var array
      */
-    private string $file;
+    private array $options = [];
 
 
     /**
      * MockFileApi constructor.
      *
-     * @param string $file
+     * @param string $file  Path to the local xml file from which to read
+     * @param string $apiKey
      */
-    public function __construct(string $file)
+    public function __construct(private string $file, private string $apiKey)
     {
-        $this->file = $file;
     }
 
 
@@ -43,9 +43,27 @@ class MockFileApi implements IApi
      * Retrieves a XML document representing the result from the API call.
      *
      * @return string|null
+     * @throws \DomainException
      */
     public function retrieveDocument(): ?string
     {
+        $credentials = (new DSN())->decode($this->apiKey);
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $credentials['options'] ?? [];
+
         return file_get_contents($this->file);
+    }
+
+
+    /**
+     * Used to apply instance-specific configuration options
+     *
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }
