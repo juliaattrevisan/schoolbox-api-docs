@@ -32,9 +32,11 @@ const displayedActivities = window.Vue.computed((): Activity[] => {
  *
  * Use the base64encoded version of the url's pathname, so it can work in
  * conjunection with Class Redirect in the back end
+ * @param {string} url - The url to go to
+ * @returns {string} - The url with the returnUrl parameter appended
  */
-const returnUrl = function (url) {
-    return url + "?returnUrl=" + btoa(window.location.pathname);
+const returnUrl = (url: string) => {
+    return `${url}?returnUrl=${window.btoa(window.location.pathname)}`;
 };
 </script>
 
@@ -47,11 +49,11 @@ const returnUrl = function (url) {
                         <a
                             :href="
                                 returnUrl(
-                                    activity.assessmentType === 'quiz'
+                                    activity.assessmentType === 'quiz' && activity._links.modifyContent
                                         ? activity._links.modifyContent
                                         : activity.assessmentType === 'project'
-                                        ? activity._links.status
-                                        : activity._links.summary
+                                          ? activity._links.status
+                                          : activity._links.summary,
                                 )
                             "
                         >
@@ -69,7 +71,7 @@ const returnUrl = function (url) {
                             activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
                         }}</a>
                     </li>
-                    <li v-if="activity.assessmentType === 'quiz'">
+                    <li v-if="activity.assessmentType === 'quiz' && activity._links.modifyContent">
                         <a :href="returnUrl(activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
                     </li>
                 </ul>
