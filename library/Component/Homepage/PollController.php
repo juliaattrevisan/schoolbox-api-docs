@@ -73,7 +73,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             }
             /** @var \Schoolbox\User $author **/
 
-            if ($poll['id']) {
+            if (is_array($poll) && $poll['id']) {
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
                 $this->setVar(
                     [
