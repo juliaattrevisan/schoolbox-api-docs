@@ -108,12 +108,9 @@ abstract class BaseTool extends CliTool\App
         // Learnosity reference, but its content has not yet synced across.
         try {
             $importerLock = $this->acquireLock(ImporterTool::LOCK_NAME, 1);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             $this->getLogger()->warning(
-                sprintf(
-                    'Importer lock is likely held by the importer: aborting due to possible conflict (message: %s)',
-                    $e->getMessage(),
-                ),
+                'Importer lock is held by another process (likely the Learnosity importer): aborting due to possible conflict',
             );
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
@@ -125,8 +122,7 @@ abstract class BaseTool extends CliTool\App
         // more than one is running at once.
         try {
             $toolLock = $this->acquireLock($this->getLockName(), $this->getLockTimeout());
-        } catch (RuntimeException $e) {
-            $this->getLogger()->warning($e->getMessage());
+        } catch (RuntimeException) {
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
 
