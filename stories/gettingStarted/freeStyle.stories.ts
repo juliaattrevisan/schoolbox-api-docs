@@ -8,12 +8,12 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
  *
  * Once the new component is appropriately set up:
  *
- * 1. The `<style>` can also be copied into a new `.scss` file
+ * 1. The `<style>` can be copied into a new `.scss` file and replaced with an `@import` to the relevant file
  * 2. The new `.scss` file can be added where appropriate within `www/static/css/core/core.scss`
  * 3. The markup within `<template>` can also be added to the `InsideSchoolboxStyles` story within `stories/gettingStarted/freeStyle.stories.ts`
  *
  * This way we can see both how the new component looks **outside** and **inside** our current style setup. This will help us to add any relevant overrides to ensure the new styles are still completely respected within our current style setup.
- * When adding any overrides, please ensure they are marked with a comment to explain why they are needed and are prefiexed with the `^foundation-fixes^` comment. This will help us to keep track of any overrides and ensure they are removed when they are no longer needed.
+ * When adding any overrides, please ensure they are marked with a comment to explain why they are needed and are prefixed with the `^foundation-fixes^` comment. This will help us to keep track of any overrides and ensure they are removed when they are no longer needed.
  *
  * Once both **outside** and **inside** are consistent, the component can be brought into its own space within Storybook to finalise and document.
  */
@@ -57,15 +57,9 @@ export const OutsideSchoolboxStyles: Story = {
 export const InsideSchoolboxStyles: Story = {
     render: () => ({
         template: `
-            <div class="c-select">
-                <select id="standard-select">
-                    <option value="Option 1">Option 1</option>
-                    <option value="Option 2">Option 2</option>
-                    <option value="Option 3">Option 3</option>
-                    <option value="Option 4">Option 4</option>
-                    <option value="Option 5">Option 5</option>
-                    <option value="Option length">Option that has too long of a value to fit</option>
-                </select>
+            <div class="c-form-element c-form-element--inline">
+                <input id="cbx1" type="checkbox" class="c-input-checkbox" />
+                <label for="cbx1" class="c-label">Checkbox</label>
             </div>
         `,
     }),

@@ -1,10 +1,16 @@
 /*
     A single form element, such as a label and input, or a label and textarea.
+
+    Not sure we need this just yet, could potentially just use utility classes depending on how many styles we need to apply here
 */
 
 .c-form-element {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-l); // ^foundation-fixes^ - won't need once using flex gap
+    &--inline {
+        align-items: center;
+        flex-direction: row;
+        gap: var(--spacing-s);
+    }
 }
