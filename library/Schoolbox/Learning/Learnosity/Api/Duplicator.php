@@ -92,7 +92,7 @@ class Duplicator
         // I've seen empty but not null Learnosity references: not sure why they
         // happen, though.
         if (($oldLearnosityReference ?? '') === '') {
-            throw new SourceAssociationException('Destination assessment has no Learnosity reference');
+            throw new SourceAssociationException('Source assessment has no Learnosity reference');
         }
 
         /* See if there are any items in it;
