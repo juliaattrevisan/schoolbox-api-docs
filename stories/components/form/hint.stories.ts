@@ -24,9 +24,6 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-/**
- * `.c-hint`
- */
 export const Default: Story = {
     render: () => ({
         template: `

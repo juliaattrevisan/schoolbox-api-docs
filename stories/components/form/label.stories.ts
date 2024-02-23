@@ -27,24 +27,26 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-/**
- * `.c-label`
- */
 export const Default: Story = {
     render: () => ({
         template: `
-            <label class="c-label">Title</label>
+            <label class="c-label">Label</label>
             `,
     }),
 };
 
-/**
- * Adding `.c-label--required`
- */
 export const Required: Story = {
     render: () => ({
         template: `
-            <label class="c-label c-label--required">Title</label>
+            <label class="c-label c-label--required">Label</label>
+            `,
+    }),
+};
+
+export const Small: Story = {
+    render: () => ({
+        template: `
+            <label class="c-label c-label--small">Smaller Label</label>
             `,
     }),
 };
