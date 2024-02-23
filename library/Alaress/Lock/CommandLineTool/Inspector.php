@@ -30,6 +30,7 @@ use Schoolbox\Learning\Turnitin\Cli\RetrofitTool;
 use Schoolbox\Learning\Turnitin\Cli\HistoricalTool;
 use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Resource\Storage\Cli\ExpiryTool;
+use Schoolbox\Search\Api\Database\Index\CommandLineTool\IndexBuilder;
 use Schoolbox\Video\CommandLineTool\Processor;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -101,6 +102,10 @@ class Inspector extends CliTool\App
         /* Learnosity Migration
          */
         \Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool::LOCK_NAME => 'Learnosity Migration (./tools/learnosity/import.php)',
+
+        /* Search build index tool.
+         */
+        IndexBuilder::LOCK_NAME => 'Search build index tool (./tools/search/buildIndex.php)'
     ];
 
 
