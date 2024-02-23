@@ -57,10 +57,22 @@ export const OutsideSchoolboxStyles: Story = {
 export const InsideSchoolboxStyles: Story = {
     render: () => ({
         template: `
-            <div class="c-form-element c-form-element--inline">
-                <input id="cbx1" type="checkbox" class="c-input-checkbox" />
-                <label for="cbx1" class="c-label">Checkbox</label>
-            </div>
+            <fieldset class="c-fieldset">
+                <legend class="c-fieldset__legend">List of options</legend>
+                <div class="c-hint">Please select the correct option.</div>
+                <div class="l-flex-row l-flex--align-center">
+                    <input id="rad4" name="list" type="radio" class="c-input-radio" checked />
+                    <label for="rad4" class="c-label c-label--set l-pad-s--horiz">Radio 1</label>
+                </div>
+                <div class="l-flex-row l-flex--align-center">
+                    <input id="rad5" name="list" type="radio" class="c-input-radio" />
+                    <label for="rad5" class="c-label c-label--set l-pad-s--horiz">Radio 2</label>
+                </div>
+                <div class="l-flex-row l-flex--align-center">
+                    <input id="rad6" name="list" type="radio" class="c-input-radio" />
+                    <label for="rad6" class="c-label c-label--set l-pad-s--horiz">Radio 3</label>
+                </div>
+            </fieldset>
         `,
     }),
 };

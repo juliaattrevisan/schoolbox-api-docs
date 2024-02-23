@@ -10,8 +10,8 @@
 
 <template>
     <div class="c-form-element">
-        <input id="cbx1" type="checkbox" class="c-input-checkbox" />
-        <label for="cbx1" class="c-label">Checkbox</label>
+        <input id="rad1" type="radio" class="c-input-radio" />
+        <label for="rad1" class="c-label">Radio</label>
     </div>
 </template>
 
@@ -22,5 +22,5 @@
     box-sizing: border-box;
 }
 
-@import "www/static/css/core/ui/forms/_input-checkbox.scss";
+@import "www/static/css/core/ui/forms/_input-radio.scss";
 </style>
