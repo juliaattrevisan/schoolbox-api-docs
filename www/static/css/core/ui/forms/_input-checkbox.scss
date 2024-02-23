@@ -2,16 +2,17 @@
     <input> elements of type checkbox are rendered by default as boxes that are checked (ticked) when activated
     Styles primarily based from https://moderncss.dev/pure-css-custom-checkbox-style/
 */
-.c-input-checkbox[type="checkbox"] {
+.c-input-checkbox {
     -webkit-appearance: none; // Add if not using autoprefixer
     appearance: none; // Remove most all native input styles
     background-color: var(--foreground-colour); // For iOS < 15
     border: 1px solid var(--form-border-color);
     border-radius: var(--roundness-inputs);
     color: var(--form-border-color);
+    cursor: pointer;
     display: grid;
     height: 2rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
-    margin: 0; // Not removed via appearance
+    margin: 0 !important; // Not removed via appearance // ^foundation-fixes^ - won't need !important once _forms.scss is removed
     min-height: auto !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     opacity: 1 !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
     place-content: center;
@@ -19,8 +20,8 @@
     transform: translateY(-0.075em);
     width: 2rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
     &::before {
-        box-shadow: inset 1rem 1rem var(--form-border-color);
-        background-color: CanvasText; // Windows High Contrast Mode
+        background-color: CanvasText; // Windows High Contrast Mode, to ensure the tick is visible https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
+        box-shadow: inset 1rem 1rem var(--form-border-color); // using box-shadow will allow the tick to be visible when printed
         content: "";
         clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         height: 1rem;
@@ -42,9 +43,14 @@
         cursor: not-allowed;
         opacity: 0.8;
     }
+    &--intermediate::before {
+        clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
+        transform: scale(1);
+    }
 }
 
 .c-input-checkbox[type="checkbox"] + label {
+    cursor: pointer;
     display: unset; // ^foundation-fixes^ - won't need once _forms.scss is removed
     margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
     vertical-align: baseline; // ^foundation-fixes^ - won't need  once _forms.scss is removed
