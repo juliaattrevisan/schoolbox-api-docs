@@ -3,9 +3,11 @@
 */
 
 .c-label {
+    color: var(--primary-text-colour);
     display: block;
     font-size: 1rem;
     font-weight: normal;
+    line-height: 1rem;
     &--required {
         &::after {
             content: " *";

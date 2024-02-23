@@ -68,7 +68,7 @@ export const Intermediate: Story = {
 };
 
 /**
- * Checkbox list
+ * A group of checkboxes, grouped with `<fieldset>` and `<legend>`
  */
 export const List: Story = {
     render: () => ({
