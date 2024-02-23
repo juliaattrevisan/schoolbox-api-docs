@@ -68,6 +68,16 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
+        // Ignore deleted forum posts for incremental updates to the search_index table
+        // (e.g. on runs such as 'php tools/search/buildIndex.php -p --from="-10 min"').
+        // This is done because searching for and attempting to remove from the search_index table all deleted forum
+        // posts is wasteful when we only need to remove ones deleted in the past 10 minutes.
+        // An overnight full rebuild of the search_index table ensures that the search_index table will never be more
+        // than a day out of date.
+        if ($fromDate !== null || $toDate !== null) {
+            return [];
+        }
+
         // Forum posts or threads don't have deletion dates:
         // just delete all indices for deleted records regardless of date
         $queryString = "SELECT
