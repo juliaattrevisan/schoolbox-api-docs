@@ -1,0 +1,14 @@
+.c-fieldset {
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
+    margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    padding: 0;
+    &__legend {
+        font-size: 1rem;
+        font-weight: normal;
+        margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        padding: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    }
+}

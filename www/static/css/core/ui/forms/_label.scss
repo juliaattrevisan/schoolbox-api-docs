@@ -12,4 +12,8 @@
             color: var(--error-color);
         }
     }
+    &--set {
+        // for use with radio and checkbox groups
+        font-size: 0.875rem;
+    }
 }
