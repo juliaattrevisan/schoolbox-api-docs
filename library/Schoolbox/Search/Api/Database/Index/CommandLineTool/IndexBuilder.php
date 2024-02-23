@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index\CommandLineTool;
 
 use Alaress\Database\Exception;
+use Alaress\Lock\LockRefreshException;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
@@ -29,6 +30,14 @@ class IndexBuilder extends App
     private const OPT_LONG_TO = 'to:';
     private const OPT_LONG_CLEAR = 'clear';
     private const OPT_LONG_TYPE = 'type:';
+
+    /**
+     * Make sure to add your locking script to the Lock Inspector tool
+     * const LOCK_NAMES in Inspector.php
+     */
+    public const LOCK_NAME = 'search_buildIndex';
+
+    private const LOCK_TTL = 300; // 300 seconds = 5 minutes.
 
     /**
      * Short options:
@@ -68,6 +77,13 @@ class IndexBuilder extends App
         } catch (InvalidArgumentException $e) {
             $this->getLogger()->error($e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        $this->getLogger()->debug('Acquiring lock.');
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
         }
 
         if ($this->perform()) {
@@ -183,6 +199,14 @@ class IndexBuilder extends App
             if (!empty($types) && !in_array($indexBuilderType, $types, true)) {
                 continue;
             }
+
+            try {
+                $this->getLogger()->debug('Refreshing lock.');
+                $this->refreshLock($lock);
+            } catch (LockRefreshException $e) {
+                // Carry on.
+            }
+
             foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
                 if (!$this->perform()) {
                     continue;
@@ -237,13 +261,15 @@ class IndexBuilder extends App
         //    (This type of error will not be fixed by ANALYZE TABLE alone - it requires that the table be rebuilt as well,
         //     which is why we run OPTIMIZE instead of ANALYZE).
         // Both types of errors described above have been seen in testing.
-
         if ($fromDate === null && $toDate === null) {
             $time = microtime(true);
             $this->getLogger()->notice("Running OPTIMIZE TABLE search_index...");
             $this->getDatabaseInternal()->execute('OPTIMIZE TABLE search_index');
             $this->getLogger()->notice(sprintf("Finished running OPTIMIZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
         }
+
+        $this->getLogger()->debug('Releasing lock.');
+        $lock->release();
     }
 
     /**
