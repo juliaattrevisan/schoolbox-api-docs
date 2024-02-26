@@ -76,13 +76,13 @@ class Sync extends Base implements ISync
                 sups.gender                AS student_gender,
                 child.firstname            AS student_preferred,
                 child.lastname             AS student_surname
-            FROM    `sis_user_profile` `child`
-            JOIN    sis_user_profile_student sups on child.id = sups.sis_user_profile_id
-            JOIN    sis_user_profile_relation supr ON child.id = supr.child_profile_id
-            JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
-            JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
-            WHERE   (sups.leaving_date IS NULL OR sups.leaving_date >= :now)
-            ORDER BY parent.external_id ASC
+            FROM sis_user_profile_parent supp
+            INNER JOIN sis_user_profile parent ON supp.sis_user_profile_id = parent.id
+            LEFT JOIN sis_user_profile_relation supr ON supr.user_profile_id = parent.id
+            LEFT JOIN sis_user_profile `child` ON supr.child_profile_id = child.id
+            LEFT JOIN sis_user_profile_student sups ON sups.sis_user_profile_id = child.id
+            WHERE (sups.leaving_date IS NULL OR sups.leaving_date >= :now)
+            ORDER BY parent.external_id ASC 
         ';
 
         return new Iterator\Guardian(
