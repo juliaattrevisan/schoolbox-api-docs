@@ -97,3 +97,30 @@ export const WithHint: Story = {
             `,
     }),
 };
+
+export const Inline: Story = {
+    render: () => ({
+        template: `
+            <fieldset class="c-fieldset">
+                <div class="c-fieldset__container">
+                    <legend class="c-label">List of options</legend>
+                    <div class="c-hint">Please select the scorrect option.</div>
+                    <div class="l-flex-row l-gap-m">
+                        <div class="l-flex-row l-flex--align-center">
+                            <input id="rad7a" name="list" type="radio" class="c-input-radio" checked />
+                            <label for="rad7a" class="c-label c-label--small l-pad-s--horiz">Radio 1</label>
+                        </div>
+                        <div class="l-flex-row l-flex--align-center">
+                            <input id="rad8a" name="list" type="radio" class="c-input-radio" />
+                            <label for="rad8a" class="c-label c-label--small l-pad-s--horiz">Radio 2</label>
+                        </div>
+                        <div class="l-flex-row l-flex--align-center">
+                            <input id="rad9a" name="list" type="radio" class="c-input-radio" />
+                            <label for="rad9a" class="c-label c-label--small l-pad-s--horiz">Radio 3</label>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            `,
+    }),
+};

@@ -21,7 +21,7 @@
             transform: translate(100%, -50%);
         }
         &:focus + .c-toggle__display {
-            outline: 3px solid var(--color-form-accent);
+            outline: 3px solid var(--color-focus);
             outline-offset: 2px;
         }
         &:focus:not(:focus-visible) + .c-toggle__display {

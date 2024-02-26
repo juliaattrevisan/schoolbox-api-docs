@@ -110,6 +110,33 @@ export const ListWithHint: Story = {
     }),
 };
 
+export const Inline: Story = {
+    render: () => ({
+        template: `
+            <fieldset class="c-fieldset">
+                <div class="c-fieldset__container">
+                    <legend class="c-label">List of options</legend>
+                    <div class="c-hint">Please select all that apply.</div>
+                    <div class="l-flex-row l-gap-m">
+                        <div class="l-flex-row l-flex--align-center">
+                            <input id="cbx4a" type="checkbox" class="c-input-checkbox" />
+                            <label for="cbx4a" class="c-label c-label--small l-pad-s--horiz">Checkbox 1</label>
+                        </div>
+                        <div class="l-flex-row l-flex--align-center">
+                            <input id="cbx5a" type="checkbox" class="c-input-checkbox" />
+                            <label for="cbx5a" class="c-label c-label--small l-pad-s--horiz">Checkbox 2</label>
+                        </div>
+                        <div class="l-flex-row l-flex--align-center">
+                            <input id="cbx6a" type="checkbox" class="c-input-checkbox" />
+                            <label for="cbx6a" class="c-label c-label--small l-pad-s--horiz">Checkbox 3</label>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            `,
+    }),
+};
+
 /**
  * **Note**: For now the functionality of the parent checkbox is not implemented in this story, and it relies on `jquery.select-all.js` to work.
  * Refer to the example at https://vagrant.dev.schoolbox.cloud/pantry/editor for the functionality. This plugin will need to be updated to work with
