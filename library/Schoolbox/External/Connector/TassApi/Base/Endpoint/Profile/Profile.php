@@ -326,7 +326,8 @@ class Profile implements IStrategy
                     $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
                     $this->addnumFather,
                     $this->addnumMother,
-                    $this->communicationTypes
+                    $this->communicationTypes,
+                    Communications::PARENTS_CURRENT
                 ))->generate()
             ))->generate();
         }

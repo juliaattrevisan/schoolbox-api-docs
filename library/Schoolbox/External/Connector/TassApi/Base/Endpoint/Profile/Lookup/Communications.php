@@ -26,6 +26,13 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 class Communications
 {
     /**
+     * These endpoint args determine which segment of Parent data you're trying to obtain
+     */
+    public const PARENTS_CURRENT = 'current';
+    public const PARENTS_FUTURE = 'future';
+
+
+    /**
      * This add_num is always used in a pseudo-mandatory way across the fleet.
      * As far as I can tell this is consistently used as a global catch-all
      * for communications across the tass platform
@@ -34,13 +41,6 @@ class Communications
      * in whatever haphazard manner tass allows
      */
     private const ADDNUM_CORRESPONDENCE = 1;
-
-
-    /**
-     * These endpoint args determine which segment of Parent data you're trying to obtain
-     */
-    private const PARENTS_CURRENT = 'current';
-    private const PARENTS_FUTURE = 'future';
 
 
     /**
@@ -56,13 +56,15 @@ class Communications
      *                                   that refers to a mother specifically, as determined by schools' instances
      * @param string $communicationTypes TASS communication rules type codes (in comma separated format) for all guardian relationships
      *                                   that can be associated with students
+     * @param string $parentType         Whether we should process Current or Future parents' communication rules
      */
     public function __construct(
         private LoggerInterface $log,
         private IApi $api,
         private int $addnumFather,
         private int $addnumMother,
-        private string $communicationTypes
+        private string $communicationTypes,
+        private string $parentType
     ) {
     }
 
@@ -73,23 +75,23 @@ class Communications
      */
     public function generate(): array
     {
-        $stack = [];
+        if (self::PARENTS_CURRENT === $this->parentType) {
+            /* The usual guys: current parents
+             */
+            $this->log->debug('Processing Current parents');
 
-        /* The usual guys: current parents
-         */
-        $this->log->debug('Processing Current parents');
-
-        $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_CURRENT));
-
-        /* Additionally/optionally process Future Parents if turned on in SUDS Control Panel
-         */
-        if ($this->api->getOptions()['futureparents'] ?? false) {
-            $this->log->debug('Processing Future parents');
-
-            $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_FUTURE));
+            return $this->processAddresses($this->getCommRules(self::PARENTS_CURRENT));
         }
 
-        return $stack;
+        if (self::PARENTS_FUTURE === $this->parentType) {
+            /* Or process Future Parents if turned on in SUDS Control Panel
+             */
+            $this->log->debug('Processing Future parents');
+
+            return $this->processAddresses($this->getCommRules(self::PARENTS_FUTURE));
+        }
+
+        return [];
     }
 
 
@@ -114,12 +116,13 @@ class Communications
      * Process the given set of comm rules $addresses, pushing them onto the hash
      * lookup $stack
      *
-     * @param array $stack
      * @param array $addresses
      * @return array
      */
-    public function processAddresses(array $stack, array $addresses): array
+    public function processAddresses(array $addresses): array
     {
+        $stack = [];
+
         /* Inspect each element from the returned data. Family code is stored in
          * parent_code array element and we should index with that; parents in a family
          * might end up sharing phone numbers because tass
