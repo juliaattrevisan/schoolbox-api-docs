@@ -65,14 +65,42 @@ class Communications
     {
         $stack = [];
 
-        /* Use the api endpoint to get all the data, so we don't have to smash the api
-         * all day. It'll be faster, and we won't incur rate limiting wrath from tass
-         */
-        $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
-            'currentstatus' => 'current',
+        $stack = $this->processAddresses($stack, $this->getCommRules('current'));
+
+        // FIXME add if clause based on dsn config
+        $stack = $this->processAddresses($stack, $this->getCommRules('future'));
+
+        return $stack;
+    }
+
+
+    /**
+     * Use the api endpoint to get all the data, so we don't have to smash the api
+     * all day. It'll be faster, and we won't incur rate limiting wrath from tass
+     *
+     * @param string $currentStatus
+     * @return array
+     * @throws RuntimeException
+     */
+    public function getCommRules(string $currentStatus = 'current'): array
+    {
+        return $this->api->retrieveDocument('getCommunicationRulesDetails', [
+            'currentstatus' => $currentStatus,
             'commtype' => $this->communicationTypes
         ]);
+    }
 
+
+    /**
+     * Process the given set of comm rules $addresses, pushing them onto the hash
+     * lookup $stack
+     *
+     * @param array $stack
+     * @param array $addresses
+     * @return array
+     */
+    public function processAddresses(array $stack, array $addresses): array
+    {
         /* Inspect each element from the returned data. Family code is stored in
          * parent_code array element and we should index with that; parents in a family
          * might end up sharing phone numbers because tass
