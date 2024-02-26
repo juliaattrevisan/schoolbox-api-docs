@@ -380,6 +380,11 @@ class Helper
             ]
         ]);
 
+        /* Log payload data, because we're dropping attempts randomly and nobody knows why.
+         * Hopefully this init payload will helps hed light on things in SA-17302
+         */
+        (new Feedback\SuspiciousLogger())->logPayload('processAttemptCompletion() $result payload from learnosity', $result, $existingAttempt);
+
         /* The learnosityReference posted here doesn't exist
          * TODO What kind of error should we present to users? It's asynchronous
          */

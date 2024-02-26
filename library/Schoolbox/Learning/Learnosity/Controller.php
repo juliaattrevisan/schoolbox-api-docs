@@ -20,6 +20,7 @@ use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -388,14 +389,19 @@ class Controller extends Base
      * @param QuizDomainObject $assessment
      * @param User $student
      * @return void
+     * @throws ApiException
+     * @throws DefinitionException
      * @throws Deleted
      * @throws Error
      * @throws Exception
      * @throws RouteNotFound
      * @throws ValidationException
      * @throws \Alaress\Database\Exception
+     * @throws \DomainException
      * @throws \JsonException
      * @throws \PDOException
+     * @throws RandomException
+     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
@@ -572,6 +578,11 @@ class Controller extends Base
                 random_int(0, 1000000)
             );
         }
+
+        /* Log payload data, because we're dropping attempts randomly and nobody knows why.
+         * Hopefully this init payload will helps hed light on things in SA-17302
+         */
+        (new Feedback\SuspiciousLogger())->logPayload('getAttempt() init payload', $payload, $attempt);
 
         /* Breadcrumbs
          * Legacy quiz never had breadcrumbs for attempt screen; I can only presume
