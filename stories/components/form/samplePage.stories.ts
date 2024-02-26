@@ -73,6 +73,14 @@ export const Default: Story = {
                                 <sbx-icon name="close" color="var(--color-text-primary)" />
                             </span>
                         </label>
+                        <div class="l-flex-col">
+                            <label class="c-label" for="start-date">Start date</label>
+                            <input id="start-date" class="c-input-text l-flex__item--1" type="text" />
+                            <button class="c-button l-width-100 l-mar--0">
+                                <sbx-icon name="calendar"></sbx-icon>
+                                <span>Select date</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

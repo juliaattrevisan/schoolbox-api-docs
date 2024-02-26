@@ -33,3 +33,7 @@
 .c-input-text--error[type="text"] {
     border: 1px solid var(--color-form-error);
 }
+
+.c-input-text--with-button[type="text"] {
+    border-radius: var(--roundness-inputs) var(--roundness-inputs) 0 0;
+}
