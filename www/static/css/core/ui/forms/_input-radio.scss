@@ -22,7 +22,7 @@
         content: "";
         height: 1rem;
         transform: scale(0);
-        transition: 120ms transform ease-in-out;
+        transition: var(--animation--input-change) transform ease-in-out;
         width: 1rem;
     }
     &:checked::before {

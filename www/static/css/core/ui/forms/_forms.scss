@@ -1246,6 +1246,16 @@ input.invalid-data:focus {
     opacity: 1;
 }
 
+:root {
+    --animation--input-change: 200ms; // used to animate input changes like toggle switch, checkbox, radio etc
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --animation--input-change: 0ms;
+    }
+}
+
 @import "fieldset";
 @import "label";
 @import "hint";

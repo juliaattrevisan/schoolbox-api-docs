@@ -3,10 +3,9 @@
 */
 
 .c-toggle {
-    align-items: center;
     cursor: pointer;
-    display: flex;
-    flex-wrap: wrap;
+    display: inline-flex;
+    flex-direction: column;
     gap: var(--spacing-s);
     position: relative;
     &__input {
@@ -29,7 +28,7 @@
         height: calc(var(--diameter) + var(--offset) * 2);
         justify-content: space-around;
         position: relative;
-        transition: 250ms transform;
+        transition: var(--animation--input-change) transform;
         width: calc(var(--diameter) * 2 + var(--offset) * 2);
         &::before {
             // the toggle
@@ -48,6 +47,11 @@
             will-change: transform;
             z-index: 2;
         }
+    }
+    &--inline {
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
 }
 
@@ -82,8 +86,8 @@ button.c-toggle {
 
 .c-toggle[disabled] .c-toggle__display,
 .c-toggle__input:disabled + .c-toggle__display {
+    background: var(--disabled-input-background-colour);
     cursor: not-allowed;
-    filter: grayscale(40%);
     opacity: 0.8;
 }
 
@@ -95,10 +99,4 @@ button.c-toggle {
 [dir="rtl"] .c-toggle[aria-pressed="true"] + .c-toggle__display::before,
 [dir="rtl"] .c-toggle__input:checked + .c-toggle__display::before {
     transform: translate(-100%, -50%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .c-toggle__display {
-        transition-duration: 0ms;
-    }
 }

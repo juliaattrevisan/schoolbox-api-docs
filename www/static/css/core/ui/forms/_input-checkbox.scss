@@ -27,7 +27,7 @@
         height: 1rem;
         transform: scale(0);
         transform-origin: bottom left;
-        transition: 120ms transform ease-in-out;
+        transition: var(--animation--input-change) transform;
         width: 1rem;
     }
     &:checked::before {
