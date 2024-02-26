@@ -26,5 +26,5 @@
     box-sizing: border-box;
 }
 
-@import "www/static/css/core/ui/forms/_input-toggle.scss";
+// @import "www/static/css/core/ui/forms/_input-toggle.scss";
 </style>

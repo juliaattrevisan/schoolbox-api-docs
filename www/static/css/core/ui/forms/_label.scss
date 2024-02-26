@@ -5,7 +5,7 @@
     color: var(--color-text-primary);
     display: block;
     font-size: 1rem;
-    font-weight: normal;
+    font-weight: 500;
     line-height: 1rem;
     &--required {
         &::after {
@@ -15,5 +15,6 @@
     }
     &--small {
         font-size: 0.875rem;
+        font-weight: 400;
     }
 }
