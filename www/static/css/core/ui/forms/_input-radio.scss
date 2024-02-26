@@ -1,3 +1,6 @@
+/**
+ *  Input radio element
+ */
 .c-input-radio {
     -webkit-appearance: none; // Add if not using autoprefixer
     appearance: none; // Remove most all native input styles
@@ -30,15 +33,13 @@
         transform: scale(1);
     }
     &:focus {
-        outline: 3px solid var(--color-form-accent);
-        outline-offset: 2px;
+        @include form-input-focus;
+    }
+    &:focus:not(:focus-visible) {
+        @include form-input-focus-not-visible;
     }
     &:disabled {
-        background: var(--color-form-disabled-background);
-        cursor: not-allowed;
-        & + label {
-            opacity: 1 !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-        }
+        @include form-input-disabled;
     }
     &--intermediate::before {
         clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);

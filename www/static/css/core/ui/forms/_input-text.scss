@@ -1,7 +1,6 @@
-/*
-    The <input type="text"> element is used to create a text input field that can be used to input data.
-*/
-
+/**
+ *   The <input type="text"> element is used to create a text input field that can be used to input data.
+ */
 .c-input-text[type="text"] {
     background-color: var(--color-foreground);
     border: 1px solid var(--color-form-accent);
@@ -17,16 +16,17 @@
     width: 100%;
     -webkit-font-smoothing: antialiased;
     &:focus {
-        background: var(--color-foreground); // ^foundation-fixes^ - won't need once _forms.scss is removed
-        outline: 3px solid var(--color-form-accent);
-        outline-offset: 2px;
+        @include form-input-focus;
+    }
+    &:focus:not(:focus-visible) {
+        @include form-input-focus-not-visible;
     }
     &:disabled {
-        background: var(--color-form-disabled-background);
-        cursor: not-allowed;
+        @include form-input-disabled;
     }
     &[readonly] {
-        border: 2px dotted var(--color-form-accent);
+        border: none;
+        padding: 0;
     }
 }
 

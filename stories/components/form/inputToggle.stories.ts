@@ -83,3 +83,18 @@ export const Inline: Story = {
             `,
     }),
 };
+
+export const RTL: Story = {
+    render: () => ({
+        template: `
+            <label class="c-label c-toggle" for="tgl5" dir="rtl">
+                Enable Curriculum Code Tagging
+                <input id="tgl5" type="checkbox" class="c-toggle__input" checked />
+                <span class="c-toggle__display" hidden>
+                    <sbx-icon name="approve" color="var(--color-foreground)" />
+                    <sbx-icon name="close" color="var(--color-text-primary)" />
+                </span>
+            </label>
+            `,
+    }),
+};

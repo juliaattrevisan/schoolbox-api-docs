@@ -97,9 +97,9 @@
             animation-timing-function: linear;
             background: repeating-linear-gradient(
                 to right,
-                var(--loading-colour) 0%,
+                var(--color-loading) 0%,
                 var(--color-foreground) 50%,
-                var(--loading-colour) 100%
+                var(--color-loading) 100%
             );
             background-size: 200% auto;
             background-position: 0 100%;
