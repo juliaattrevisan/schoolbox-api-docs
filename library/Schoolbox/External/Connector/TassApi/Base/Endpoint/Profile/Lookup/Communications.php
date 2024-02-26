@@ -36,6 +36,13 @@ class Communications
 
 
     /**
+     * These endpoint args determine which segment of Parent data you're trying to obtain
+     */
+    private const PARENTS_CURRENT = 'current';
+    private const PARENTS_FUTURE = 'future';
+
+
+    /**
      * Phone constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
@@ -65,10 +72,10 @@ class Communications
     {
         $stack = [];
 
-        $stack = $this->processAddresses($stack, $this->getCommRules('current'));
+        $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_CURRENT));
 
         // FIXME add if clause based on dsn config
-        $stack = $this->processAddresses($stack, $this->getCommRules('future'));
+        $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_FUTURE));
 
         return $stack;
     }
@@ -82,7 +89,7 @@ class Communications
      * @return array
      * @throws RuntimeException
      */
-    public function getCommRules(string $currentStatus = 'current'): array
+    public function getCommRules(string $currentStatus): array
     {
         return $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => $currentStatus,
