@@ -11,7 +11,7 @@ const meta: Meta<typeof StorybookSlot> = {
     decorators: [
         () => ({
             template: `
-                <div class="l-pad-m">
+                <div class="c-island">
                     <story />
                 </div>
             `,
@@ -81,12 +81,26 @@ export const FullWidth: Story = {
 };
 
 /**
- * Typically to identify the primary action on a page
+ *
  */
-export const Primary: Story = {
+export const Secondary: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button c-button--primary">
+            <button type="button" class="c-button c-button--secondary">
+                <sbx-icon name="approve"></sbx-icon>
+                <span>Save</span>
+            </button>
+        `,
+    }),
+};
+
+/**
+ * Typically to identify the primary action on a page
+ */
+export const Success: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button c-button--success">
                 <sbx-icon name="approve"></sbx-icon>
                 <span>Save</span>
             </button>
@@ -115,29 +129,13 @@ export const Alert: Story = {
 export const IconOnly: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button l-pad-s" aria-label="Add Curriculum">
+            <button type="button" class="c-button c-button--secondary" aria-label="Add Curriculum">
                 <sbx-icon name="favourite"></sbx-icon>
             </button>
         `,
     }),
 };
 
-/**
- * Rely on the background it sits on, typically used when the button is an icon only
- */
-export const NoBackground: Story = {
-    render: () => ({
-        template: `
-            <button type="button" class="c-button c-button--no-bkg l-pad-s">
-                <sbx-icon name="add"></sbx-icon>
-            </button>
-        `,
-    }),
-};
-
-/**
- * A group of buttons
- */
 export const ButtonGroup: Story = {
     render: () => ({
         template: `
@@ -145,6 +143,19 @@ export const ButtonGroup: Story = {
                 <button class="c-button" type="button">Button 1</button>
                 <button class="c-button" type="button">Button 2</button>
                 <button class="c-button" type="button">Button 3</button>
+            </div>
+        `,
+    }),
+};
+
+export const SecondaryButtonGroup: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex-row l-gap-s">
+                <button class="c-button c-button--secondary" type="button">Button 1</button>
+                <button class="c-button c-button--secondary" type="button">Button 2</button>
+                <button class="c-button c-button--secondary" type="button">Button 3</button>
+                <button class="c-button c-button--secondary" type="button">Button 4</button>
             </div>
         `,
     }),
@@ -159,8 +170,8 @@ export const ButtonGroupStretch: Story = {
     render: () => ({
         template: `
             <div class="l-flex-row l-gap-s">
-                <button class="c-button l-flex__item--1" type="button">Button 1</button>
-                <button class="c-button l-flex__item--1" type="button">Button 2</button>
+                <button class="c-button c-button--secondary l-flex__item--1" type="button">Secondary Action</button>
+                <button class="c-button l-flex__item--1" type="button">Primary Action</button>
             </div>
         `,
     }),
