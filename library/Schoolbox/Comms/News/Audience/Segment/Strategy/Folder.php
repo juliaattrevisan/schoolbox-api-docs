@@ -71,6 +71,10 @@ class Folder extends SimpleStrategy
 
     /**
      * User arrays to represent muted folder
+     *
+     * This special value will work just fine so long as we check for it using ===.
+     * "=== : returns true if $a and $b have the same key/value pairs in the same order and of the same types."
+     * https://www.php.net/manual/en/language.operators.array.php
      */
     public const MUTED = ['0'];
 
@@ -517,7 +521,9 @@ class Folder extends SimpleStrategy
         ";
         $query = $this->folderMapper->getDatabase()->query($sql, $pb->getParams());
         while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
+            // Cast to strings to ensure predictable behaviour below.
             $folderId = (string)$folderId;
+            $userId = (string)$userId;
             if ($userId === '0') {
                 // Notification is disabled for this folder. Reset to '0' only.
                 $mutedUsersPerFolder[$folderId] = self::MUTED;
