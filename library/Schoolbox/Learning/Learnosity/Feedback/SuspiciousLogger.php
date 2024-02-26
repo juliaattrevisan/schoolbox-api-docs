@@ -30,13 +30,9 @@ class SuspiciousLogger
         if (0.00 === (float)$sanitisedScore['score']) {
             $suspicious = true;
         }
-        (new \Alaress_Log_File('/tmp/test.txt', 'mog'))->log('did it', (int)$suspicious);
 
         if ($suspicious) {
-//            $write = fopen('php://memory', 'rb+');
-            $write = fopen('/var/log/schoolbox/learnosity_suspicious_scores.log', 'rb+');
-
-            $logger = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
+            $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
 
             ob_start();
             var_dump($postData);
@@ -89,20 +85,16 @@ class SuspiciousLogger
             $suspicious = true;
         }
 
-        /* If the first chars of a human readable mark is '0 / '
-         * then its suspicious. There are equivalents for other
-         * mark schemes like Letter Grade, Percentage etc. so
-         * maybe add those as we encounter them
+        /* If the first chars of a human readable mark is '0 / ' then its suspicious.
+         * There are equivalents for other mark schemes like Letter Grade, Percentage etc.
+         * so maybe add those as we encounter them
          */
         if (str_starts_with((string)$humanReadableMark, '0 /')) {
             $suspicious = true;
         }
 
         if ($suspicious) {
-//            $write = fopen('php://memory', 'rb+');
-            $write = fopen('/var/log/schoolbox/learnosity_suspicious_scores.log', 'rb+');
-
-            $logger = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
+            $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
 
             $logger->debug(sprintf(
                 'Attempt %s received (float)%s/(float)%s (norm: %s; hr: %s)',
