@@ -50,7 +50,10 @@ a.c-button {
         outline-offset: 2px;
     }
     &:disabled {
+        background-color: var(--color-buttons) !important; // ^foundation-fixes^ - won't need once _button is removed
+        color: var(--color-foreground-primary) !important; // ^foundation-fixes^ - won't need once _button is removed
         cursor: not-allowed;
+        opacity: 0.8;
         pointer-events: initial; // ^foundation-fixes^ - allow pointer events to show cursor: not-allowed
     }
     &--secondary {
