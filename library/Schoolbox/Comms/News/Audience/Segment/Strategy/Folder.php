@@ -521,11 +521,18 @@ class Folder extends SimpleStrategy
         ";
         $query = $this->folderMapper->getDatabase()->query($sql, $pb->getParams());
         while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
-            // Cast to strings to ensure predictable behaviour below.
+            // Example row of msg_reroute_override table:
+            // +---------+---------------+----------+
+            // | user_id | msg_route_key | delivery |
+            // +---------+---------------+----------+
+            // |       0 | service.1.70  | MU       |
+            // +---------+---------------+----------+
+            // If msg_reroute_override.user_id is zero, then notifications for all users for the relevant route have been disabled.
+            // Cast values to strings to ensure predictable behaviour below.
             $folderId = (string)$folderId;
             $userId = (string)$userId;
             if ($userId === '0') {
-                // Notification is disabled for this folder. Reset to '0' only.
+                // Notification is disabled for this folder. Reset to self::MUTED.
                 $mutedUsersPerFolder[$folderId] = self::MUTED;
             } elseif (!isset($mutedUsersPerFolder[$folderId]) || $mutedUsersPerFolder[$folderId] !== self::MUTED) {
                 // If notification is enabled, add current muted user
