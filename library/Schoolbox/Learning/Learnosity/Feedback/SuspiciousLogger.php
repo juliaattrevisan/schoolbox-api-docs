@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Feedback;
@@ -67,8 +69,7 @@ class SuspiciousLogger
         ?float $maxMark,
         ?float $normalisedMark,
         ?string $humanReadableMark
-    ): void
-    {
+    ): void {
         $suspicious = false;
 
         /* Students getting 0 is considered suspicious; can't tell
