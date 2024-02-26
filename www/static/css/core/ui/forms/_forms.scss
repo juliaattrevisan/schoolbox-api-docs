@@ -1250,7 +1250,11 @@ input.invalid-data:focus {
  * Any custom properties specific to forms
  */
 :root {
-    --animation--input-change: 200ms; // used to animate input changes like toggle switch, checkbox, radio etc
+    --animation-form-input-change: 200ms; // used to animate input changes like toggle switch, checkbox, radio etc
+    --color-form-accent: var(--form-border-color);
+    --color-form-error: #fa4a47;
+    --color-form-hint: #767676;
+    --color-form-disabled-background: #e3e2e2;
 }
 
 input:hover {
@@ -1262,7 +1266,7 @@ input:hover {
 
 @media (prefers-reduced-motion: reduce) {
     :root {
-        --animation--input-change: 0ms;
+        --animation-form-input-change: 0ms;
     }
 }
 

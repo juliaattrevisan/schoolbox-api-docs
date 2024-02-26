@@ -4,7 +4,7 @@
 
 .c-input-text[type="text"] {
     background-color: var(--foreground-colour);
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--color-form-accent);
     border-radius: var(--roundness-inputs);
     color: var(--primary-text-colour);
     font-size: max(16px, 1rem);
@@ -16,21 +16,20 @@
     transition: none; // ^foundation-fixes^ - won't need once _forms.scss is removed
     width: 100%;
     -webkit-font-smoothing: antialiased;
-    &:disabled {
-        background: var(--disabled-input-background-scolour);
-        cursor: not-allowed;
-        opacity: 0.8;
-    }
     &:focus {
         background: var(--foreground-colour); // ^foundation-fixes^ - won't need once _forms.scss is removed
-        outline: 3px solid var(--form-border-color);
+        outline: 3px solid var(--color-form-accent);
         outline-offset: 2px;
     }
+    &:disabled {
+        background: var(--color-form-disabled-background);
+        cursor: not-allowed;
+    }
     &[readonly] {
-        border: 2px dotted var(--form-border-color);
+        border: 2px dotted var(--color-form-accent);
     }
 }
 
 .c-input-text--error[type="text"] {
-    border: 1px solid var(--error-color);
+    border: 1px solid var(--color-form-error);
 }

@@ -11,7 +11,7 @@
     &--required {
         &::after {
             content: " *";
-            color: var(--error-color);
+            color: var(--color-form-error);
         }
     }
     &--small {
