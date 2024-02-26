@@ -21,7 +21,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Communicat
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
