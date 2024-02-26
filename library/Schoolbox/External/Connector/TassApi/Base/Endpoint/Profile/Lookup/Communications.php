@@ -77,12 +77,14 @@ class Communications
 
         /* The usual guys: current parents
          */
+        $this->log->debug('Processing Current parents');
+
         $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_CURRENT));
 
         /* Additionally/optionally process Future Parents if turned on in SUDS Control Panel
          */
         if ($this->api->getOptions()['futureparents'] ?? false) {
-            $this->log->debug('Also processing Future Parents');
+            $this->log->debug('Processing Future parents');
 
             $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_FUTURE));
         }
