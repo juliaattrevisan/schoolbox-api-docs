@@ -17,10 +17,10 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Communications;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -272,6 +272,13 @@ class Profile implements IStrategy
 
     /**
      * Import user profile data into sis_user_profile*
+     *
+     * @return void
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
      */
     public function import(): void
     {
@@ -279,8 +286,24 @@ class Profile implements IStrategy
          * Import their specific parents' profile data
          */
         if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
-            $this->log->info('Processing students and their parents.');
-            $this->importStudents();
+//            $this->log->info('Processing students and their parents.');
+//            $this->importStudents();
+
+            /* Decide if we're importing Future Parents: these folks don't have any enrolled
+             * students - they're parents from the future - I'm not really sure how the school
+             * uses such people. The getParents() endpoint won't return anything for them: there
+             * aren't any students with whom they have a relation.
+             */
+            if ($this->api[Codec\DSN::MODULE_STUDENT_DETAILS]->getOptions()['futureparents'] ?? false) {
+                $this->importFutureParents((new Communications(
+                    $this->log,
+                    $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
+                    $this->addnumFather,
+                    $this->addnumMother,
+                    $this->communicationTypes,
+                    Communications::PARENTS_FUTURE
+                ))->generate());
+            }
         }
 
         /* Import staff profile data
@@ -288,6 +311,127 @@ class Profile implements IStrategy
         if ($this->validStrats->isStaffStratEnabled()) {
             $this->log->info('Processing staff.');
             $this->importStaff();
+        }
+    }
+
+
+    /**
+     * Future Parents == parents of future students
+     *
+     * These folks won't have any related students. They're just random parents from the future
+     * who have no association with any current students at the moment. We have to treat them
+     * a bit specially compared to the usual current students/current parents families
+     *
+     * @param array $commRules
+     * @return void
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function importFutureParents(array $commRules): void
+    {
+        $externalIdGenerator = new Lookup\ParentExternalId($this->spousePrefix);
+
+        foreach ($commRules as $parentId => $family) {
+            foreach (Lookup\Family::PARENT_PERSON_NODES as $node) {
+                $parent = $family[$node];
+
+                /* We don't know the split-family status of anyone here...
+                 * Use the empty string for now, for lack of any alternative
+                 */
+                $externalId = $externalIdGenerator->derive($node, $parentId, '');
+
+                /* Each parent in the family
+                 */
+                $email = trim((string)$parent['email']);
+                $firstname = trim((string)$parent['firstname']);
+                $firstnamePreferred = trim((string)$parent['firstnamePreferred']);
+                $lastname = trim((string)$parent['surname']);
+                $phoneHome = trim((string)$parent['home']);
+                $phoneMobile = trim((string)$parent['mobile']);
+                $phoneWork = trim((string)$parent['work']);
+                $title = '';
+
+                /* A shortcut for convenience in logging
+                 * (Sometimes people don't have all the parts of their name; odd but ok)
+                 */
+                $fullname = trim("{$firstname} {$lastname}");
+
+                /* $parent is an array that contains a boolean key, validCommRule
+                 * This bool decides whether $parent should be associated with the student
+                 * in schoolbox; if not, log it here and skip them
+                 */
+                if (!$parent['validCommRule']) {
+                    $this->log->debug(sprintf(
+                        'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
+                        $firstname,
+                        $lastname,
+                        $externalId
+                    ));
+
+                    continue;
+                }
+
+                /* Parents might inadvertently have the same externalId as someone else's
+                 * base profile (e.g. parent has same external id as student)
+                 *
+                 * This is not usually supposed to happen.
+                 * some sis implementations let you have broken data in this way
+                 *
+                 * Try and load a parent profile based on external id. If it exists, just reuse
+                 * those pieces. If it doesn't exist, first check if there's an existing base
+                 * profile before making a whole new one (this is how you end up with fk issues)
+                 */
+                try {
+                    $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                    $parentBaseProfile = $parentProfile->getBaseProfile();
+                } catch (Exception $e) {
+                    $parentProfile = $this->parentProfileMapper->createModel();
+
+                    try {
+                        $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    } catch (Exception $e) {
+                        $parentBaseProfile = $this->baseProfileMapper->createModel();
+                    }
+
+                    $parentProfile->setBaseProfile($parentBaseProfile);
+                }
+
+                $parentBaseProfile
+                    ->setExternalId($externalId)
+                    ->setTitle($title)
+                    ->setFirstname($firstname)
+                    ->setFirstnamePreferred($firstnamePreferred)
+                    ->setLastname($lastname);
+
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($parentBaseProfile);
+                }
+
+                $parentProfile
+                    ->setPhoneHome($phoneHome)
+                    ->setPhoneWork($phoneWork)
+                    ->setMobile($phoneMobile)
+                    ->setEmail($email);
+
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding parent profile for %s (preferred: %s) (%s)',
+                    $fullname,
+                    $firstnamePreferred,
+                    $externalId
+                ));
+
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->parentProfileMapper->save($parentProfile);
+                }
+            }
         }
     }
 
@@ -327,7 +471,7 @@ class Profile implements IStrategy
                     $this->addnumFather,
                     $this->addnumMother,
                     $this->communicationTypes,
-                    Communications::PARENTS_CURRENT
+                    Communications::PARENTS_FUTURE
                 ))->generate()
             ))->generate();
         }
@@ -344,6 +488,7 @@ class Profile implements IStrategy
             'currentstatus' => 'current',
             'includephoto'  => $this->includePhoto
         ]);
+
 
         foreach ($students['students'] as $student) {
             $externalId = trim((string)$student['general_details']['student_code']);
