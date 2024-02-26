@@ -1271,7 +1271,7 @@ input:hover {
  */
 @mixin form-input-focus {
     background: var(--color-foreground); // ^foundation-fixes^ - won't need once _forms.scss is removed
-    outline: 3px solid var(--color-form-accent);
+    outline: 3px solid var(--color-focus);
     outline-offset: 2px;
 }
 

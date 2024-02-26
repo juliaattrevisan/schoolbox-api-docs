@@ -1,0 +1,28 @@
+import { Meta, ColorItem } from "@storybook/addon-docs";
+
+<Meta title="Draft/Design Tokens/Colours" />
+
+# Proposed Colours
+
+## Existing renamed skin config colours
+
+<ColorItem
+    title="Body Background Colour"
+    subtitle="Renamed to --color-body-background"
+    colors={{ "--body-background": "rgb(229, 239, 247)" }}
+/>
+<ColorItem
+    title="Form Input Border Colour"
+    subtitle="Renamed to --color-form-accent"
+    colors={{ "--form-border-colour": "rgb(76, 148, 200)" }}
+/>
+
+## New colours
+
+<ColorItem
+    title="Foreground Colour"
+    subtitle="For any elements that sit on the --color-background, like c-island"
+    colors={{ "--color-foreground": "rgb(255, 255, 255)" }}
+/>
+<ColorItem title="Primary Text Colour" colors={{ "--color-text-primary": "rgb(0, 0, 0)" }} />
+<ColorItem title="Focus Colour" colors={{ "--color-focus": "rgb(76, 148, 200)" }} />
