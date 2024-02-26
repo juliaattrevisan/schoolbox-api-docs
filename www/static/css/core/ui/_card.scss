@@ -8,7 +8,7 @@
 }
 
 .c-card {
-    background-color: var(--foreground-colour);
+    background-color: var(--color-foreground);
     border-radius: var(--roundness-cards);
     line-height: var(--base-line-height);
     position: relative;
@@ -86,7 +86,7 @@
         animation: shine-lines 1.6s ease infinite !important;
         background-size: 400% 100% !important;
         .l-flex-row {
-            background-color: var(--foreground-colour);
+            background-color: var(--color-foreground);
         }
         .img-placeholder,
         h3,
@@ -98,7 +98,7 @@
             background: repeating-linear-gradient(
                 to right,
                 var(--loading-colour) 0%,
-                var(--foreground-colour) 50%,
+                var(--color-foreground) 50%,
                 var(--loading-colour) 100%
             );
             background-size: 200% auto;

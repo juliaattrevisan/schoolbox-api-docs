@@ -156,8 +156,8 @@ function onMouseOut(event: MouseEvent) {
 
     input[type="text"].c-search-input__field {
         border: 2px solid var(--form-border-color);
-        background-color: var(--foreground-colour);
-        color: var(--primary-text-colour);
+        background-color: var(--color-foreground);
+        color: var(--color-text-primary);
         font-size: var(--base-font-size);
         height: var(--tabbar-height);
         padding: var(--base-font-size);

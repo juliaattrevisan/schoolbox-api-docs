@@ -20,7 +20,7 @@
         --offset: 0.25rem;
         --diameter: 1.5rem;
         align-items: center;
-        background-color: var(--foreground-colour);
+        background-color: var(--color-foreground);
         border: 1px solid var(--color-form-accent);
         border-radius: 100vw;
         box-sizing: content-box;
@@ -32,7 +32,7 @@
         width: calc(var(--diameter) * 2 + var(--offset) * 2);
         &::before {
             // the toggle
-            background-color: var(--foreground-colour);
+            background-color: var(--color-foreground);
             border: 1px solid var(--color-form-accent);
             border-radius: 50%;
             box-sizing: border-box;

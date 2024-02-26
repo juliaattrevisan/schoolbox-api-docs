@@ -57,7 +57,7 @@ window.Vue.watch(
         await window.Vue.nextTick(); // I don't know why this is needed yet...
         const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
         animateHeight(targetHeight);
-    }
+    },
 );
 
 /**
@@ -127,7 +127,7 @@ function onSelected(result: Result) {
 }
 
 .search-status {
-    background: var(--foreground-colour);
+    background: var(--color-foreground);
     border-left: 1px solid var(--form-border-color);
     border-right: 1px solid var(--form-border-color);
     padding: var(--spacing-s);

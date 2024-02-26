@@ -79,11 +79,11 @@ a.c-button {
     // To highlight that this action has a destructive effect
     &--alert {
         background-color: var(--color-form-error);
-        color: var(--foreground-colour);
+        color: var(--color-foreground);
         &:hover,
         &:active {
             background-color: var(--color-form-error);
-            color: var(--foreground-colour);
+            color: var(--color-foreground);
         }
         &:focus {
             background-color: var(

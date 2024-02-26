@@ -1,7 +1,7 @@
 .c-input-radio {
     -webkit-appearance: none; // Add if not using autoprefixer
     appearance: none; // Remove most all native input styles
-    background-color: var(--foreground-colour); // For iOS < 15
+    background-color: var(--color-foreground); // For iOS < 15
     border: 1px solid var(--color-form-accent);
     border-radius: 50%;
     color: var(--color-form-accent);

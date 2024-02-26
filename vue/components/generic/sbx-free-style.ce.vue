@@ -12,8 +12,8 @@
     <label class="c-toggle" for="toggle">
         <input id="toggle" type="checkbox" name="toggle" class="c-toggle__input" checked />
         <span class="c-toggle__display" hidden>
-            <sbx-icon name="approve" color="var(--foreground-colour)" />
-            <sbx-icon name="close" color="var(--primary-text-colour)" />
+            <sbx-icon name="approve" color="var(--color-foreground)" />
+            <sbx-icon name="close" color="var(--color-text-primary)" />
         </span>
         Receive notifications
     </label>
