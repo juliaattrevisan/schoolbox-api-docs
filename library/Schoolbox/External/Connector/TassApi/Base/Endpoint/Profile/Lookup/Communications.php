@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
@@ -43,11 +44,12 @@ class Communications
 
 
     /**
-     * Phone constructor.
+     * Communication Rules constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
      *
-     * @param IApi $api                  $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
+     * @param LoggerInterface $log
+     * @param IApi $api
      * @param int $addnumFather          The add_num field in the getCommunicationRulesDetails payload
      *                                   that refers to a father specifically, as determined by schools' instances
      * @param int $addnumMother          The add_num field in the getCommunicationRulesDetails payload
@@ -56,6 +58,7 @@ class Communications
      *                                   that can be associated with students
      */
     public function __construct(
+        private LoggerInterface $log,
         private IApi $api,
         private int $addnumFather,
         private int $addnumMother,

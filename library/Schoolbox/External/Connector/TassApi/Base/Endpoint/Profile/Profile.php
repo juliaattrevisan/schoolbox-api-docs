@@ -322,6 +322,7 @@ class Profile implements IStrategy
                 $this->addnumFather,
                 $this->addnumMother,
                 (new Communications(
+                    $this->log,
                     $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
                     $this->addnumFather,
                     $this->addnumMother,
