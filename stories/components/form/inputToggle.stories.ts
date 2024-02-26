@@ -30,8 +30,8 @@ export const Default: Story = {
                 Enable Curriculum Code Tagging
                 <input id="tgl1" type="checkbox" class="c-toggle__input" checked />
                 <span class="c-toggle__display" hidden>
-                    <sbx-icon name="approve" color="var(--color-foreground)" />
-                    <sbx-icon name="close" color="var(--color-text-primary)" />
+                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                    <sbx-icon name="close" color="var(--color-text-secondary)" />
                 </span>
             </label>
             `,
@@ -45,8 +45,8 @@ export const Disabled: Story = {
                 Enable Curriculum Code Tagging
                 <input id="tgl2" type="checkbox" class="c-toggle__input" checked disabled />
                 <span class="c-toggle__display" hidden>
-                    <sbx-icon name="approve" color="var(--color-foreground)" />
-                    <sbx-icon name="close" color="var(--color-text-primary)" />
+                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                    <sbx-icon name="close" color="var(--color-text-secondary)" />
                 </span>
             </label>
             `,
@@ -61,8 +61,8 @@ export const WithHint: Story = {
                 <div class="c-hint">If toggled, curriculum codes can be applied to Courses, Units, Badges, Lesson Plans, Tasks, Quizzes, Due Work and Rubrics for the purpose of curriculum mapping.</div>
                 <input id="tgl3" type="checkbox" class="c-toggle__input" checked />
                 <span class="c-toggle__display" hidden>
-                    <sbx-icon name="approve" color="var(--color-foreground)" />
-                    <sbx-icon name="close" color="var(--color-text-primary)" />
+                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                    <sbx-icon name="close" color="var(--color-text-secondary)" />
                 </span>
             </label>
             `,
@@ -75,8 +75,8 @@ export const Inline: Story = {
             <label class="c-label c-toggle c-toggle--inline" for="tgl4">
                 <input id="tgl4" type="checkbox" class="c-toggle__input" checked />
                 <span class="c-toggle__display" hidden>
-                    <sbx-icon name="approve" color="var(--color-foreground)" />
-                    <sbx-icon name="close" color="var(--color-text-primary)" />
+                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                    <sbx-icon name="close" color="var(--color-text-secondary)" />
                 </span>
                 Enable Curriculum Code Tagging
             </label>
@@ -91,8 +91,8 @@ export const RTL: Story = {
                 Enable Curriculum Code Tagging
                 <input id="tgl5" type="checkbox" class="c-toggle__input" checked />
                 <span class="c-toggle__display" hidden>
-                    <sbx-icon name="approve" color="var(--color-foreground)" />
-                    <sbx-icon name="close" color="var(--color-text-primary)" />
+                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                    <sbx-icon name="close" color="var(--color-text-secondary)" />
                 </span>
             </label>
             `,

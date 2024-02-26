@@ -60,7 +60,7 @@ export const InsideSchoolboxStyles: Story = {
             <label class="c-label c-toggle" for="toggle">
                 <input id="toggle" type="checkbox" name="toggle" class="c-toggle__input" checked />
                 <span class="c-toggle__display" hidden>
-                    <sbx-icon name="approve" color="var(--color-foreground)" />
+                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
                     <sbx-icon name="close" color="var(--color-text-primary)" />
                 </span>
                 Receive notifications

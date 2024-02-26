@@ -1251,9 +1251,6 @@ input.invalid-data:focus {
  */
 :root {
     --animation-form-input-change: 200ms; // used to animate input changes like toggle switch, checkbox, radio etc
-    --color-form-accent: var(--form-border-color);
-    --color-form-error: #fa4a47;
-    --color-form-hint: #767676;
     --color-form-disabled-background: #edecec;
 }
 
@@ -1261,7 +1258,9 @@ input.invalid-data:focus {
  *  We don't want the hover effect on input elements, as there's potential for reduced contrast on elements
  */
 input:hover {
-    background: var(--color-foreground) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    background: var(
+        --color-foreground-primary
+    ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     color: var(--color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     border-color: var(--form-border-color) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
 }
@@ -1270,7 +1269,7 @@ input:hover {
  *  Shared form input focus styles
  */
 @mixin form-input-focus {
-    background: var(--color-foreground); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    background: var(--color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
     outline: 3px solid var(--color-focus);
     outline-offset: 2px;
 }

@@ -69,17 +69,19 @@ export const Default: Story = {
                             <div class="c-hint">If toggled, curriculum codes can be applied to Courses, Units, Badges, Lesson Plans, Tasks, Quizzes, Due Work and Rubrics for the purpose of curriculum mapping.</div>
                             <input id="tgl3" type="checkbox" class="c-toggle__input" checked />
                             <span class="c-toggle__display" hidden>
-                                <sbx-icon name="approve" color="var(--color-foreground)" />
+                                <sbx-icon name="approve" color="var(--color-foreground-primary)" />
                                 <sbx-icon name="close" color="var(--color-text-primary)" />
                             </span>
                         </label>
-                        <div class="l-flex-col">
+                        <div class="l-flex-col l-gap-s">
                             <label class="c-label" for="start-date">Start date</label>
-                            <input id="start-date" class="c-input-text l-flex__item--1" type="text" />
-                            <button class="c-button l-width-100 l-mar--0">
-                                <sbx-icon name="calendar"></sbx-icon>
-                                <span>Select date</span>
-                            </button>
+                            <div>
+                                <input id="start-date" class="c-input-text l-flex__item--1" type="text" />
+                                <button class="c-button l-width-100 l-mar--0">
+                                    <sbx-icon name="calendar"></sbx-icon>
+                                    <span>Select date</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

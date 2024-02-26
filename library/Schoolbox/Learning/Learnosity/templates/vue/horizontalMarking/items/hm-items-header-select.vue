@@ -91,7 +91,7 @@ function onItemSelected(reference: string) {
 
 <style lang="scss" scoped>
 .select-button {
-    background: var(--color-foreground);
+    background: var(--color-foreground-primary);
     border: 1px solid var(--form-border-color);
     justify-content: space-between;
     padding: var(--spacing-xs) var(--spacing-m);
@@ -106,7 +106,7 @@ function onItemSelected(reference: string) {
 }
 
 .item-list {
-    background: var(--color-foreground);
+    background: var(--color-foreground-primary);
     border-left: 1px solid var(--form-border-color);
     border-right: 1px solid var(--form-border-color);
     border-bottom: 1px solid var(--form-border-color);
@@ -117,7 +117,7 @@ function onItemSelected(reference: string) {
     position: absolute;
     z-index: 20;
     &__button {
-        background: var(--color-foreground);
+        background: var(--color-foreground-primary);
         display: inline-flex;
         justify-content: start;
         gap: var(--spacing-s);

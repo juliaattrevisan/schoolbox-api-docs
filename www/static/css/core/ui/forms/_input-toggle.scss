@@ -15,7 +15,7 @@
         position: absolute;
         width: 100%;
         &:checked + .c-toggle__display {
-            background-color: var(--color-form-accent);
+            background-color: var(--color-form-elements);
         }
         &:checked + .c-toggle__display::before {
             transform: translate(100%, -50%);
@@ -35,8 +35,8 @@
         --offset: 0.25rem;
         --diameter: 1.5rem;
         align-items: center;
-        background-color: var(--color-foreground);
-        border: 1px solid var(--color-form-accent);
+        background-color: var(--color-foreground-primary);
+        border: 1px solid var(--color-form-elements);
         border-radius: 100vw;
         box-sizing: content-box;
         display: inline-flex;
@@ -47,8 +47,8 @@
         width: calc(var(--diameter) * 2 + var(--offset) * 2);
         &::before {
             // the toggle
-            background-color: var(--color-foreground);
-            border: 1px solid var(--color-form-accent);
+            background-color: var(--color-foreground-primary);
+            border: 1px solid var(--color-form-elements);
             border-radius: 50%;
             box-sizing: border-box;
             content: "";

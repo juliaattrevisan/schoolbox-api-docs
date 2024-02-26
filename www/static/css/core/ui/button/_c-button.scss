@@ -78,17 +78,15 @@ a.c-button {
     }
     // To highlight that this action has a destructive effect
     &--alert {
-        background-color: var(--color-form-error);
-        color: var(--color-foreground);
+        background-color: var(--color-alert);
+        color: var(--color-foreground-primary);
         &:hover,
         &:active {
-            background-color: var(--color-form-error);
-            color: var(--color-foreground);
+            background-color: var(--color-alert);
+            color: var(--color-foreground-primary);
         }
         &:focus {
-            background-color: var(
-                --color-form-error
-            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+            background-color: var(--color-alert); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
     }
     // rely on the background it sits on

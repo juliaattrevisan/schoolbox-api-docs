@@ -1,9 +1,16 @@
 // new colours, some of which could be in the theme UI in the future
 :root {
-    --color-foreground: white;
-    --color-text-primary: black;
-    --color-loading: rgb(235, 234, 234);
+    --color-background: var(--body-background);
+    --color-foreground-primary: white;
+    --color-foreground-secondary: rgb(219, 219, 219);
+    --color-text-primary: rgb(0, 0, 0);
+    --color-text-secondary: rgb(82, 82, 82);
+    --color-form-elements: var(--form-border-color);
     --color-focus: rgb(105, 37, 0);
+    --color-loading: rgb(235, 234, 234);
+    --color-alert: #fa4a47;
+    --color-success: #4fa74f;
+    --color-warning: #ff7d00;
 }
 
 /*

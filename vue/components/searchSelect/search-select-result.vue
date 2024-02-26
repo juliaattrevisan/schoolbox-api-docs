@@ -51,7 +51,7 @@ function onSelected() {
 
 <style lang="scss" scoped>
 .search-result {
-    background: var(--color-foreground);
+    background: var(--color-foreground-primary);
     border-bottom: 1px solid var(--body-background);
     border-left: 1px solid var(--form-border-color);
     border-right: 1px solid var(--form-border-color);

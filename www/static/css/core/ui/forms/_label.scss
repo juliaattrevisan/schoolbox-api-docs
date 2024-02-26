@@ -10,7 +10,7 @@
     &--required {
         &::after {
             content: " *";
-            color: var(--color-form-error);
+            color: var(--color-alert);
         }
     }
     &--small {

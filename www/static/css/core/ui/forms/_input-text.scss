@@ -2,8 +2,8 @@
  *   The <input type="text"> element is used to create a text input field that can be used to input data.
  */
 .c-input-text[type="text"] {
-    background-color: var(--color-foreground);
-    border: 1px solid var(--color-form-accent);
+    background-color: var(--color-foreground-primary);
+    border: 1px solid var(--color-form-elements);
     border-radius: var(--roundness-inputs);
     color: var(--color-text-primary);
     font-size: max(16px, 1rem);
@@ -31,7 +31,7 @@
 }
 
 .c-input-text--error[type="text"] {
-    border: 1px solid var(--color-form-error);
+    border: 1px solid var(--color-alert);
 }
 
 .c-input-text--with-button[type="text"] {

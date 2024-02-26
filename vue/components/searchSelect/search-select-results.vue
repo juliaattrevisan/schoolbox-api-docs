@@ -127,7 +127,7 @@ function onSelected(result: Result) {
 }
 
 .search-status {
-    background: var(--color-foreground);
+    background: var(--color-foreground-primary);
     border-left: 1px solid var(--form-border-color);
     border-right: 1px solid var(--form-border-color);
     padding: var(--spacing-s);
