@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Family;
-
 /**
  * Builds a pair of schoolbox external ids from a tass family id, with
  * all the parent/spouse prefixes as needed.
