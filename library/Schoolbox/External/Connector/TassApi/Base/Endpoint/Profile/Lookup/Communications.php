@@ -77,8 +77,13 @@ class Communications
 
         $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_CURRENT));
 
-        // FIXME add if clause based on dsn config
-        $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_FUTURE));
+        /* Additionally/optionally process Future Parents
+         */
+        if ($this->api->getOptions()['futureparents'] ?? false) {
+            $this->log->debug('Also processing Future Parents');
+
+            $stack = $this->processAddresses($stack, $this->getCommRules(self::PARENTS_FUTURE));
+        }
 
         return $stack;
     }
