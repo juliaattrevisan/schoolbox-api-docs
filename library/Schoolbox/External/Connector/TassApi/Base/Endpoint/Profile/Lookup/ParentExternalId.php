@@ -37,6 +37,7 @@ class ParentExternalId
         $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
     }
 
+
     /**
      * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
      * I guess sfa_num stands for Split Family Access number or something
