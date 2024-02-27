@@ -352,7 +352,7 @@ class Profile implements IStrategy
                     $this->addnumFather,
                     $this->addnumMother,
                     $this->communicationTypes,
-                    Communications::PARENTS_FUTURE
+                    Communications::PARENTS_CURRENT
                 ))->generate()
             ))->generate();
         }
