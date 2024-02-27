@@ -129,7 +129,7 @@ export const Alert: Story = {
 export const IconOnly: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button c-button--secondary c-button--icon-only" aria-label="Add Curriculum">
+            <button type="button" class="c-button c-button--secondary c-button--icon-only" title="Add to favourties" aria-label="Add to favourites">
                 <sbx-icon name="favourite"></sbx-icon>
             </button>
         `,
