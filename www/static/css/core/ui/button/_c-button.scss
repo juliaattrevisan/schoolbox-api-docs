@@ -38,7 +38,10 @@ a.c-button {
     position: static; // ^foundation-fixes^ - to override the position: relative, which could impact the display inline-flex
     text-align: center;
     transition: none; // ^foundation-fixes^ - remove the transition on a tags
-    transition: 300ms ease-out;
+    transition:
+        300ms background-color ease-out,
+        300ms color ease-out,
+        300ms filter ease-out;
     &:hover,
     &:active {
         background-color: var(--color-buttons-hover); // ^foundation-fixes^ - remove the use of --content-ui-hover
@@ -46,6 +49,7 @@ a.c-button {
     }
     &:focus {
         background-color: var(--color-buttons); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+        color: var(--color-foreground-primary); // ^foundation-fixes^ - remove the change of text colour on focus
         outline: 3px solid var(--color-focus);
         outline-offset: 2px;
     }
@@ -73,6 +77,7 @@ a.c-button {
             background-color: var(
                 --color-foreground-primary
             ); // ^foundation-fixes^ - keep the same background colour on focus
+            color: var(--color-buttons); // ^foundation-fixes^ - remove the change of text colour on focus
         }
     }
     // Used to further highlight the primary action of a page
