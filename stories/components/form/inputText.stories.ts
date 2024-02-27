@@ -73,7 +73,7 @@ export const WithButton: Story = {
         template: `
             <div class="l-flex-col">
                 <input id="news_default_expiry-field" class="c-input-text c-input-text--with-button" type="text" />
-                <button class="c-button l-width-100 l-mar--0">
+                <button class="c-button c-button--with-input l-width-100">
                     <sbx-icon name="folder"></sbx-icon>
                     <span>Browse Resources</span>
                 </button>

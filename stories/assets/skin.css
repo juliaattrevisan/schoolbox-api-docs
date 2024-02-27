@@ -285,12 +285,12 @@
         var(--content-ui-background-contrast-l),
         var(--content-ui-background-contrast-a)
     );
-    --content-ui-hover-r: 48;
-    --content-ui-hover-g: 152;
-    --content-ui-hover-b: 227;
-    --content-ui-hover-h: 205.14;
-    --content-ui-hover-s: 76.17%;
-    --content-ui-hover-l: 53.92%;
+    --content-ui-hover-r: 30;
+    --content-ui-hover-g: 130;
+    --content-ui-hover-b: 201;
+    --content-ui-hover-h: 204.91;
+    --content-ui-hover-s: 74.03%;
+    --content-ui-hover-l: 45.29%;
     --content-ui-hover-a: 1;
     --content-ui-hover: hsla(
         var(--content-ui-hover-h),

@@ -38,10 +38,10 @@ a.c-button {
     position: static; // ^foundation-fixes^ - to override the position: relative, which could impact the display inline-flex
     text-align: center;
     transition: none; // ^foundation-fixes^ - remove the transition on a tags
-    transition: 200ms ease-in-out;
+    transition: 300ms ease-out;
     &:hover,
     &:active {
-        background-color: var(--content-ui-hover); // ^foundation-fixes^ - remove the use of --content-ui-hover
+        background-color: var(--color-buttons-hover); // ^foundation-fixes^ - remove the use of --content-ui-hover
         color: var(--color-foreground-primary); // ^foundation-fixes^ - remove the change of text colour on hover
     }
     &:focus {
@@ -66,8 +66,8 @@ a.c-button {
             background-color: var(
                 --color-foreground-primary
             ); // ^foundation-fixes^ - remove the use of --content-ui-hover
-            color: var(--content-ui-hover);
-            border: 1px solid var(--content-ui-hover);
+            color: var(--color-buttons-hover);
+            border: 1px solid var(--color-buttons-hover);
         }
         &:focus {
             background-color: var(
@@ -100,5 +100,8 @@ a.c-button {
         &:focus {
             background-color: var(--color-alert); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
+    }
+    &--with-input {
+        border-radius: 0 0 var(--roundness-inputs) var(--roundness-inputs);
     }
 }

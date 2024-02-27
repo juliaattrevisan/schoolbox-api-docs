@@ -70,14 +70,14 @@ export const Default: Story = {
                             <input id="tgl3" type="checkbox" class="c-toggle__input" checked />
                             <span class="c-toggle__display" hidden>
                                 <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                                <sbx-icon name="close" color="var(--color-text-primary)" />
+                                <sbx-icon name="close" color="var(--color-text-secondary)" />
                             </span>
                         </label>
                         <div class="l-flex-col l-gap-s">
                             <label class="c-label" for="start-date">Start date</label>
                             <div>
-                                <input id="start-date" class="c-input-text l-flex__item--1" type="text" />
-                                <button class="c-button l-width-100 l-mar--0">
+                                <input id="start-date" class="c-input-text c-input-text--with-button l-flex__item--1" type="text" />
+                                <button class="c-button c-button--with-input l-width-100">
                                     <sbx-icon name="calendar"></sbx-icon>
                                     <span>Select date</span>
                                 </button>
