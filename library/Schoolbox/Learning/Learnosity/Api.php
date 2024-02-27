@@ -322,7 +322,14 @@ class Api
 
                     /* Try to decode what learnosity told us
                      */
-                    $errorPayload = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+                    try {
+                        $errorPayload = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+                        $message      = $errorPayload['meta']['message'];
+                    } catch (\JsonException $e) {
+                        // Learnosity gave us something other than JSON?
+                        // Set a reasonably sensible message
+                        $message = sprintf('non-JSON response: %s', $e->getMessage());
+                    }
 
                     /* Some other unrecoverable error; retrying won't help
                      * Just surface this exception
@@ -331,7 +338,7 @@ class Api
                         "%s %s: %s.\n\nHTTP %s %s",
                         $actionType,
                         $url,
-                        $errorPayload['meta']['message'],
+                        $message,
                         $response->getStatusCode(),
                         $response->getBody()
                     ));
