@@ -27,6 +27,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'has_clickview', 'has_clickview_block');
         $this->setBlock($templateHandle, 'online_clickview', 'online_clickview_block');
         $this->setBlock($templateHandle, 'iframe_clickview', 'iframe_clickview_block');
+        $this->setBlock($templateHandle, 'iframe_clickview_net', 'iframe_clickview_net_block');
 
         $clickviewSchoolId = Config::get('clickview_school_id');
         $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
@@ -50,6 +51,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                     'has_clickview_block'    => '',
                     'online_clickview_block' => '',
                     'iframe_clickview_block' => '',
+                    'iframe_clickview_net_block' => '',
                     'HIDE_CLICKVIEW'         => '',
                 ]
             );
@@ -81,6 +83,15 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $patternRedir  = '/clickv\.ie\/w\/[a-zA-Z0-9\-]+(?:(?:\?t=([0-9]+))?(?:\&et=([0-9]+))?)?/';
             $patternIframe = '/(\?|&)shareCode=([a-zA-Z0-9\-]+)/i';
 
+            /* For handling the clickview.net links
+             * The possible formats are:
+             * - https://www.clickview.net/share/b9OaVD
+             * - https://www.clickview.net/share/embed/b9OaVD
+             *
+             * These can also come from a redirect after a clickv.ie link
+             */
+            $patternNet = '/clickview\.net\/share(?:\/embed)?\/([a-zA-Z0-9\-]+)/';
+
             $matches = [];
 
             $this->setVar(
@@ -99,6 +110,9 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             } elseif (preg_match($patternIframe, $this->getConfig('url'), $matches)) {
                 $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('iframe_clickview_block', 'iframe_clickview');
+            } elseif (preg_match($patternNet, $this->getConfig('url'), $matches)) {
+                $this->setVar('VIDEO_ID', $matches[1]);
+                $this->parse('iframe_clickview_net_block', 'iframe_clickview_net');
             } elseif (preg_match($patternRedir, $this->getConfig('url'), $matches)) {
                 // Is there a start and end?
                 // https://clickv.ie/w/idGe?t=305&et=408&i=2
@@ -113,16 +127,21 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 curl_exec($ch);
                 $curlinfo = curl_getinfo($ch);
 
-                parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY), $parts);
-                $parts = array_change_key_case($parts, CASE_LOWER);
-                if (isset($parts['sharecode'])) {
-                    $this->setVar('VIDEO_ID', $parts['sharecode']);
-                    // Pass in start/end time parameters
-                    if (count($matches) == 3) {
-                        $this->setVar('START', "&t={$matches[1]}");
-                        $this->setVar('END', "&et={$matches[2]}");
+                if (preg_match($patternNet, $curlinfo['redirect_url'], $matchesNew)) {
+                    $this->setVar('VIDEO_ID', $matchesNew[1]);
+                    $this->parse('iframe_clickview_net_block', 'iframe_clickview_net');
+                } else {
+                    parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY), $parts);
+                    $parts = array_change_key_case($parts, CASE_LOWER);
+                    if (isset($parts['sharecode'])) {
+                        $this->setVar('VIDEO_ID', $parts['sharecode']);
+                        // Pass in start/end time parameters
+                        if (count($matches) == 3) {
+                            $this->setVar('START', "&t={$matches[1]}");
+                            $this->setVar('END', "&et={$matches[2]}");
+                        }
+                        $this->parse('iframe_clickview_block', 'iframe_clickview');
                     }
-                    $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
             } else {
                 $showEmpty    = true;
