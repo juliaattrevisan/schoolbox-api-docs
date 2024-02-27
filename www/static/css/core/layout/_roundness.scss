@@ -9,6 +9,6 @@
 :root {
     --roundness-islands: var(--spacing-m);
     --roundness-images: 0px;
-    --roundness-cards: 0px;
+    --roundness-cards: var(--spacing-m);
     --roundness-inputs: var(--spacing-s);
 }

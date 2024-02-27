@@ -44,10 +44,16 @@ export const Standard: Story = {
                             <h3 class=""><a href="">School Musical Auditions & Rehearsals</a></h3>
                             <span class="meta">By <a href="/search/user/6">Willow Tenorio</a> —<time title="Monday August 7th 2023 5:00am">1 week ago</time> in <a>Extra-Curricular</a></span>
                         </div>
-                        <nav class="c-nav-actions l-flex-row">
-                            <a class="icon-view no-text" href="" title="Hide"></a>
-                            <a class="icon-modify no-text" href="" title="Modify"></a>
-                            <a class="icon-favourite no-text" href="" title="Favourite"></a>
+                        <nav class="l-flex-row l-gap-s">
+                            <button type="button" class="c-button c-button--secondary c-button--icon-only" aria-label="Hide">
+                                <sbx-icon name="view"></sbx-icon>
+                            </button>
+                            <button type="button" class="c-button c-button--secondary c-button--icon-only" aria-label="Modify">
+                                <sbx-icon name="modify-pen"></sbx-icon>
+                            </button>
+                            <button type="button" class="c-button c-button--secondary c-button--icon-only" aria-label="Favourite">
+                                <sbx-icon name="favourite"></sbx-icon>
+                            </button>
                         </nav>
                     </div>
                     <article>
@@ -61,9 +67,9 @@ export const Standard: Story = {
                         </blockquote>
                         <p>Of course tours are available at any time. Please&nbsp;<a href="http://www.schoolbox.com.au" target="_self">contact us</a>&nbsp;to arrange an appointment.</p>
                     </article>
-                    <div class="c-new-card__actions l-flex-row">
-                        <a>READ MORE</a>
-                        <a>ANOTHER ACTION</a>
+                    <div class="l-flex-row l-flex--justify-end l-gap-s">
+                        <button class="c-button c-button--secondary" type="button">Button 1</button>
+                        <button class="c-button c-button--secondary" type="button">Button 2</button>
                     </div>
                 </div>
             </div>
@@ -83,7 +89,7 @@ export const Slimline: Story = {
                 <div class="l-flex-row l-gap-m l-pad-m">
                     <div class="c-img">
                         <div class="c-img__wrapper">
-                            <div class="icon icon-calendar"></div>
+                            <sbx-icon name="calendar" size="2.5rem" color="var(--color-text-secondary)"></sbx-icon>
                         </div>
                     </div>
                     <div class="l-flex-col l-flex--justify-center f-no-margins">

@@ -5,7 +5,6 @@
  */
 
 :root {
-    --alt-foreground-colour: #f9f9f9;
     --border-colour: #aaaaaa;
 }
 
@@ -25,27 +24,9 @@
         margin-bottom: 0;
     }
 
-    // A bar that sits (generally) at the bottom of the card with actions that a user can take. Left aligned so that
-    // these actions are visually distinct if this card appears in a component and the component has actions.
-    &__actions {
-        min-inline-size: 40px;
-
-        a {
-            font-size: 13px;
-            font-weight: 600;
-            padding: var(--spacing-s) var(--spacing-m);
-            text-align: center;
-            text-transform: uppercase;
-
-            &:hover {
-                background-color: var(--content-ui-hover);
-            }
-        }
-    }
-
     // Add inline (default left) border and grey background to card.
     &--child {
-        background-color: var(--alt-foreground-colour);
+        background-color: var(--color-foreground-secondary);
         border-inline-start: var(--spacing-s) solid var(--border-colour);
     }
 
@@ -127,7 +108,7 @@
     }
 
     &--alt-bkg {
-        background-color: var(--alt-foreground-colour);
+        background-color: var(--color-foreground-secondary);
     }
 }
 

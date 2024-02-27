@@ -104,4 +104,11 @@ a.c-button {
     &--with-input {
         border-radius: 0 0 var(--roundness-inputs) var(--roundness-inputs);
     }
+    &--icon-only {
+        border: none;
+        &:hover,
+        &:active {
+            border: none;
+        }
+    }
 }
