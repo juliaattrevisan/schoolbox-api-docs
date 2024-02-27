@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+UserAgent -> Schoolbox : visits dashboard or homepage
+Schoolbox -> UserAgent : renders iframe to Paperly
+UserAgent -> Paperly : sends request to render content
+Paperly -> Schoolbox : sends request for authorization code
+Schoolbox -> UserAgent : requests approval to authorize and share data with Paperly
+UserAgent -> Schoolbox : approves Paperly
+Schoolbox -> Paperly : sends authorization code
+Paperly -> Schoolbox : sends request for access token
+Schoolbox -> Paperly : sends access token
+Paperly -> Paperly : creates session for user identified by access token
+Paperly -> UserAgent : renders Paperly content for user, sends cookie for session
+
+@enduml
