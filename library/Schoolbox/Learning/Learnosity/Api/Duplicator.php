@@ -12,9 +12,9 @@ namespace Schoolbox\Learning\Learnosity\Api;
 use Alaress\Database\Connector\IConnector;
 use Aura\Router\Generator;
 use LearnositySdk\Exceptions\ValidationException;
+use LearnositySdk\Utils\Uuid;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
-use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
@@ -91,8 +91,11 @@ class Duplicator
         // Does this not have a Learnosity reference at all? That's an error.
         // I've seen empty but not null Learnosity references: not sure why they
         // happen, though.
-        if (($oldLearnosityReference ?? '') === '') {
+        if (!isset($oldLearnosityReference)) {
             throw new SourceAssociationException('Source assessment has no Learnosity reference');
+        }
+        if (!Uuid::isValid($oldLearnosityReference)) {
+            throw new SourceAssociationException('Source assessment Learnosity reference is not a valid UUID');
         }
 
         /* See if there are any items in it;
@@ -116,7 +119,7 @@ class Duplicator
              *  or assign a random uuidv4() arbitrarily, and use that instead...
              *  ...and hope that Learnosity is okay with it
              */
-            $newLearnosityReference = (string)Uuid::uuid4();
+            $newLearnosityReference = Uuid::generate();
 
             /* Make a massive assumption that this _just worked_
              * You could lean on the polling system to find out when this cloning has finished,
