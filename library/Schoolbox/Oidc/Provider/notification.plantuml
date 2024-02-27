@@ -1,0 +1,22 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+note left of Paperly
+  It's presumed that Paperly handles logic for when to
+  generate notifications, and for whom.
+end note
+
+[-> Paperly : send notification request
+
+group oAuth client credentials grant
+    Paperly -> Schoolbox : send request with client ID + secret
+    Schoolbox -> Paperly : sends access token
+end
+Paperly -> Schoolbox : sends request to send notification, with access token as authorization
+Schoolbox ->]: sends notification via configured channels
+note right of Schoolbox
+  Schoolbox knows a user's notification preferences,
+  and can forward them appropriately.
+end note
+
+@enduml
