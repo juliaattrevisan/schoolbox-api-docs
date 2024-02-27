@@ -6,7 +6,7 @@
     --color-text-primary: rgb(0, 0, 0);
     --color-text-secondary: rgb(82, 82, 82);
     --color-form-elements: var(--form-border-color);
-    --color-focus: rgb(112, 0, 132);
+    --color-focus: var(--form-border-color);
     --color-loading: rgb(235, 234, 234);
     --color-alert: #d8201d;
     --color-success: #298129;
