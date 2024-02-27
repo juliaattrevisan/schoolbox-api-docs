@@ -31,6 +31,9 @@ use Schoolbox\Url\Uri;
 
 /**
  * Controller for OpenID Connect logins.
+ *
+ * This implements Schoolbox as a relying party (e.g. a client) for an OpenID
+ * provider.
  */
 class Controller extends Base
 {
