@@ -1255,17 +1255,6 @@ input.invalid-data:focus {
 }
 
 /**
- *  We don't want the hover effect on input elements, as there's potential for reduced contrast on elements
- */
-input:hover:not(:disabled) {
-    background: var(
-        --color-foreground-primary
-    ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-    color: var(--color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-    border-color: var(--form-border-color) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-}
-
-/**
  *  Shared form input focus styles
  */
 @mixin form-input-focus {
