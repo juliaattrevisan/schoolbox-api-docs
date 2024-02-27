@@ -3,7 +3,7 @@
  * groups of buttons with a drop down to access provided
  */
 
-import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { EditorConfig, EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
 
 /**
  * Display the AI toolbar options based on the existence of an sbProp
@@ -114,6 +114,13 @@ export function getToolbar(config: EditorConfig) {
     let removeItems: Array<string> = [];
     if (config.removeFromToolbar) {
         removeItems = config.removeFromToolbar;
+    }
+    /**
+     * Source Editing is currently only available in the classic editor
+     * https://ckeditor.com/docs/ckeditor5/latest/features/source-editing.html#installation
+     */
+    if (config.type !== EditorType.CLASSIC) {
+        removeItems = [...removeItems, "sourceEditing"];
     }
     /**
      * add any individual plugins for specific use cases for example

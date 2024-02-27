@@ -18,7 +18,7 @@
  */
 
 import { Plugin } from "@ckeditor/ckeditor5-core/src";
-import { ButtonView, ContextualBalloon, clickOutsideHandler } from "@ckeditor/ckeditor5-ui/src";
+import { ButtonView, ContextualBalloon, clickOutsideHandler } from "@ckeditor/ckeditor5-ui";
 import DomEventObserver from "@ckeditor/ckeditor5-engine/src/view/observer/domeventobserver";
 import { default as EqnEditorView } from "./dialog";
 const fxIcon =
@@ -87,7 +87,7 @@ export default class Eqneditor5 extends Plugin {
                     var sName = dat.domTarget.src.match(/(gif|svg)\.image\?(.*)/);
                     if (sName != null) this._initEqnEditor(null, sName[2]);
                 }
-            }.bind(this)
+            }.bind(this),
         );
     }
 
@@ -148,7 +148,7 @@ export default class Eqneditor5 extends Plugin {
         clickOutsideHandler({
             emitter: view,
             activator: () => this._balloon.visibleView === view,
-            contextElements: [this._balloon.view.element],
+            contextElements: () => [this._balloon.view.element],
             callback: () => this._hideUI(),
         });
 
@@ -192,7 +192,7 @@ export default class Eqneditor5 extends Plugin {
             position: this._getBalloonPositionData(),
         });
 
-        // HACK: Causes jumpy window behaviour, but techinically works
+        // HACK: Causes jumpy window behaviour, but technically works
         // TODO: Find out why positioning is initially wrong
         setTimeout(() => {
             window.dispatchEvent(new Event("resize"));
