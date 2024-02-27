@@ -70,7 +70,7 @@ export const Default: Story = {
                             <input id="tgl3" type="checkbox" class="c-toggle__input" checked />
                             <span class="c-toggle__display" hidden>
                                 <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                                <sbx-icon name="close" color="var(--color-text-secondary)" />
+                                <sbx-icon name="close" color="var(--color-form-elements)" />
                             </span>
                         </label>
                         <div class="l-flex-col l-gap-s">
