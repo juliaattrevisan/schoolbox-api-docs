@@ -131,8 +131,6 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
             background-color: var(
                 --content-ui-background
             ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
-            outline: 3px solid var(--content-ui-foreground);
-            outline-offset: 2px;
         }
     }
     &:disabled {

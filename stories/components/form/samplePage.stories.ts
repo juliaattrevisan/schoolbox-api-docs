@@ -83,6 +83,10 @@ export const Default: Story = {
                                 </button>
                             </div>
                         </div>
+                        <div class="l-flex-row l-gap-s">
+                            <button class="c-button c-button--secondary l-flex__item--1" type="button">Secondary Action</button>
+                            <button class="c-button c-button--success l-flex__item--1" type="button">Primary Action</button>
+                        </div>
                     </div>
                 </div>
             </div>
