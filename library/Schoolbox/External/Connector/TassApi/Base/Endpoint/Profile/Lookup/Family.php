@@ -59,15 +59,6 @@ class Family
 
 
     /**
-     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
-     * because tass doesn't treat parents independently of families.
-     *
-     * @var string
-     */
-    private string $spousePrefix;
-
-
-    /**
      * Set in admin, corresponds to external_tass_addnum_father
      *
      * @var int
@@ -112,7 +103,8 @@ class Family
      *
      * @param LoggerInterface $log
      * @param IApi            $api
-     * @param string          $spousePrefix
+     * @param string          $spousePrefix   Set in Admin. This var deconflicts shared usernames by putting a letter in front,
+     *                                        because tass doesn't treat parents independently of families.
      * @param int             $addnumFather
      * @param int             $addnumMother
      * @param array           $phones

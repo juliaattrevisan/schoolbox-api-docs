@@ -286,8 +286,8 @@ class Profile implements IStrategy
          * Import their specific parents' profile data
          */
         if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
-//            $this->log->info('Processing students and their parents.');
-//            $this->importStudents();
+            $this->log->info('Processing students and their parents.');
+            $this->importStudents();
 
             /* Decide if we're importing Future Parents: these folks don't have any enrolled
              * students - they're parents from the future - I'm not really sure how the school
