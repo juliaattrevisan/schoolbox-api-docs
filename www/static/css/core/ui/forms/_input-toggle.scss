@@ -43,7 +43,7 @@
         height: calc(var(--diameter) + var(--offset) * 2);
         justify-content: space-around;
         position: relative;
-        transition: var(--animation-form-input-change) transform;
+        transition: calc(var(--animation-form-input-change) * 2) transform;
         width: calc(var(--diameter) * 2 + var(--offset) * 2);
         &::before {
             // the toggle
