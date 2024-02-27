@@ -2,11 +2,13 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * **Styles**: `www/static/css/core/ui/_card.scss`
+ * **Styles**: `stories/assets/styles/_card.scss`
  *
  * Styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
  *
  * As this is also flex based, we can leverage flex modifying classes like `l-flex--center` or `l-gap` without a problem.
+ *
+ * **Note**: The `c-new-card` class is used to avoid conflicts with the existing card styles.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -19,7 +21,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Draft/Cards/Default",
+    title: "Draft/Card/Default",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -30,7 +32,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Standard: Story = {
     render: () => ({
         template: `
-            <div class="c-card">
+            <div class="c-new-card">
                 <div class="l-flex-col l-gap-m l-pad-m">
                     <div class="l-flex-row l-gap-m">
                         <div class="c-img c-img--xl">
@@ -59,7 +61,7 @@ export const Standard: Story = {
                         </blockquote>
                         <p>Of course tours are available at any time. Please&nbsp;<a href="http://www.schoolbox.com.au" target="_self">contact us</a>&nbsp;to arrange an appointment.</p>
                     </article>
-                    <div class="c-card__actions l-flex-row">
+                    <div class="c-new-card__actions l-flex-row">
                         <a>READ MORE</a>
                         <a>ANOTHER ACTION</a>
                     </div>
@@ -77,7 +79,7 @@ export const Standard: Story = {
 export const Slimline: Story = {
     render: () => ({
         template: `
-            <div class="c-card">
+            <div class="c-new-card">
                 <div class="l-flex-row l-gap-m l-pad-m">
                     <div class="c-img">
                         <div class="c-img__wrapper">
@@ -100,7 +102,7 @@ export const Slimline: Story = {
 export const SlimlineCentered: Story = {
     render: () => ({
         template: `
-            <div class="c-card">
+            <div class="c-new-card">
                 <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
                     <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
@@ -126,12 +128,12 @@ export const SlimlineCentered: Story = {
 };
 
 /**
- * The `c-card__link` modifier class can be used when the card is a link.
+ * The `c-new-card__link` modifier class can be used when the card is a link.
  */
 export const Link: Story = {
     render: () => ({
         template: `
-            <div class="c-card c-card--link">
+            <div class="c-new-card c-new-card--link">
                 <div class="l-flex-row l-gap-m l-pad-m">
                     <div class="c-img c-img--round">
                         <div class="c-img__wrapper">
@@ -154,7 +156,7 @@ export const Link: Story = {
 export const Loading: Story = {
     render: () => ({
         template: `
-            <div class="c-card c-card--loading">
+            <div class="c-new-card c-new-card--loading">
                 <div class="l-flex-row l-gap-m l-pad-m">
                     <div class="c-img">
                         <div class="c-img__wrapper">
@@ -172,12 +174,12 @@ export const Loading: Story = {
 };
 
 /**
- * The `c-card--child` modifier class is used to create a _child_ of a _parent_ card.
+ * The `c-new-card--child` modifier class is used to create a _child_ of a _parent_ card.
  */
 export const Child: Story = {
     render: () => ({
         template: `
-            <div class="c-card c-card--child">
+            <div class="c-new-card c-new-card--child">
                 <div class="l-flex-row l-gap-s l-pad-s">
                     <div class="c-img c-img--s">
                         <div class="c-img__wrapper">
@@ -194,13 +196,13 @@ export const Child: Story = {
 };
 
 /**
- * The `c-card--border-end` modifier class is used on each card except the last to create a border between cards.
+ * The `c-new-card--border-end` modifier class is used on each card except the last to create a border between cards.
  */
 export const ParentWithChildren: Story = {
     render: () => ({
         template: `
             <div class="l-flex-col">
-                <div class="c-card c-card--border-end">
+                <div class="c-new-card c-new-card--border-end">
                     <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
@@ -213,7 +215,7 @@ export const ParentWithChildren: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--child c-card--border-end">
+                <div class="c-new-card c-new-card--child c-new-card--border-end">
                     <div class="l-flex-row l-gap-s l-pad-s">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
@@ -225,7 +227,7 @@ export const ParentWithChildren: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--child c-card--border-end">
+                <div class="c-new-card c-new-card--child c-new-card--border-end">
                     <div class="l-flex-row l-gap-s l-pad-s">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
@@ -237,7 +239,7 @@ export const ParentWithChildren: Story = {
                         </div>
                     </div>
                 </div>
-                <div class="c-card c-card--child">
+                <div class="c-new-card c-new-card--child">
                     <div class="l-flex-row l-gap-s l-pad-s">
                         <div class="c-img c-img--s">
                             <div class="c-img__wrapper">
@@ -255,13 +257,13 @@ export const ParentWithChildren: Story = {
 };
 
 /**
- * To help distinguish groups of cards `c-card--alt-bkg` can be used to add alternating backgrounds.
+ * To help distinguish groups of cards `c-new-card--alt-bkg` can be used to add alternating backgrounds.
  */
 export const Grouped: Story = {
     render: () => ({
         template: `
             <div class="l-flex-col">
-                <div class="c-card c-card--border-end">
+                <div class="c-new-card c-new-card--border-end">
                     <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
@@ -279,7 +281,7 @@ export const Grouped: Story = {
                         </nav>
                     </div>
                 </div>
-                <div class="c-card c-card--alt-bkg c-card--border-end">
+                <div class="c-new-card c-new-card--alt-bkg c-new-card--border-end">
                     <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
@@ -297,7 +299,7 @@ export const Grouped: Story = {
                         </nav>
                     </div>
                 </div>
-                <div class="c-card c-card--border-end">
+                <div class="c-new-card c-new-card--border-end">
                     <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
@@ -315,7 +317,7 @@ export const Grouped: Story = {
                         </nav>
                     </div>
                 </div>
-                <div class="c-card c-card--alt-bkg c-card--border-end">
+                <div class="c-new-card c-new-card--alt-bkg c-new-card--border-end">
                     <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
@@ -333,7 +335,7 @@ export const Grouped: Story = {
                         </nav>
                     </div>
                 </div>
-                <div class="c-card">
+                <div class="c-new-card">
                     <div class="l-flex-row l-gap-m l-pad-m">
                         <div class="c-img">
                             <div class="c-img__wrapper">
