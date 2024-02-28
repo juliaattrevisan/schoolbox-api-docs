@@ -1586,11 +1586,13 @@ class Controller extends Base
         /* Fetch the response id first, because you need a bunch of stuff
          * The response id (learnosity response reference) is in POST
          */
-        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+        $payload = [
             'session_id' => [
                 $attempt->getLearnosityReference()
             ]
-        ])['data'][0]['responses'];
+        ];
+
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', $payload)['data'][0]['responses'];
 
         /* Traverse to find the one you want to change, because you don't get
          * a response_id filter in this endponit...
@@ -1626,6 +1628,13 @@ class Controller extends Base
          *  This shouldn't happen, but what do we do now?
          */
         if (null === $updatedResponse) {
+            (new Feedback\SuspiciousLogger())->logPayload(
+                'postFeedbackScore() $result payload after processing learnosity /sessions/responses/scores',
+                $payload,
+                $responses,
+                $attempt
+            );
+
             throw new \DomainException('Learnosity response identifier was not found.');
         }
 
