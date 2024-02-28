@@ -64,7 +64,7 @@ class Controller extends Base
     /**
      * Saves intermittently every 300 seconds by default
      */
-    private const LEARNOSITY_SAVE_INTERVAL = 300;
+    private const LEARNOSITY_SAVE_INTERVAL = 15;
 
 
     /**
@@ -487,9 +487,10 @@ class Controller extends Base
                         'reading_time' => $quiz->getReadingTimeDuration()
                     ],
                 ],
-                "navigation" => [
-                    "auto_save" => [
-                        "save_interval_duration" => self::LEARNOSITY_SAVE_INTERVAL
+                'navigation' => [
+                    'auto_save' => [
+                        'save_interval_duration' => self::LEARNOSITY_SAVE_INTERVAL,
+                        'ui' => true
                     ],
                     "show_intro" => false,
                     "show_outro" => false
