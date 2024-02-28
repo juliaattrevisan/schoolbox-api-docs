@@ -1,4 +1,3 @@
-/* This is a copy of the demo data set skin config */
 :root {
     --navigation-foreground-r: 255;
     --navigation-foreground-g: 255;
@@ -286,12 +285,12 @@
         var(--content-ui-background-contrast-l),
         var(--content-ui-background-contrast-a)
     );
-    --content-ui-hover-r: 204;
-    --content-ui-hover-g: 224;
-    --content-ui-hover-b: 239;
-    --content-ui-hover-h: 205.71;
-    --content-ui-hover-s: 52.24%;
-    --content-ui-hover-l: 86.86%;
+    --content-ui-hover-r: 30;
+    --content-ui-hover-g: 130;
+    --content-ui-hover-b: 201;
+    --content-ui-hover-h: 204.91;
+    --content-ui-hover-s: 74.03%;
+    --content-ui-hover-l: 45.29%;
     --content-ui-hover-a: 1;
     --content-ui-hover: hsla(
         var(--content-ui-hover-h),
@@ -299,12 +298,12 @@
         var(--content-ui-hover-l),
         var(--content-ui-hover-a)
     );
-    --content-ui-hover-contrast-r: 0;
-    --content-ui-hover-contrast-g: 0;
-    --content-ui-hover-contrast-b: 0;
+    --content-ui-hover-contrast-r: 255;
+    --content-ui-hover-contrast-g: 255;
+    --content-ui-hover-contrast-b: 255;
     --content-ui-hover-contrast-h: 0;
     --content-ui-hover-contrast-s: 0%;
-    --content-ui-hover-contrast-l: 0%;
+    --content-ui-hover-contrast-l: 100%;
     --content-ui-hover-contrast-a: 1;
     --content-ui-hover-contrast: hsla(
         var(--content-ui-hover-contrast-h),

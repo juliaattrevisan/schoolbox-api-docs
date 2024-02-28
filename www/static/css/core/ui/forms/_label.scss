@@ -1,15 +1,20 @@
-/*
-    The <label> element is used to label form inputs, and is used in conjunction with the <input> element.
-*/
-
+/**
+ *   The <label> element is used to label form inputs, and is used in conjunction with the <input> element.
+ */
 .c-label {
+    color: var(--color-text-primary);
     display: block;
     font-size: 1rem;
-    font-weight: normal;
+    font-weight: 500;
+    line-height: 1rem;
     &--required {
         &::after {
             content: " *";
-            color: var(--error-color);
+            color: var(--color-alert);
         }
+    }
+    &--small {
+        font-size: 0.875rem;
+        font-weight: 400;
     }
 }

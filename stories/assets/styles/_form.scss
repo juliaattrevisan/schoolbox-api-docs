@@ -1,0 +1,55 @@
+/**
+ * New styles for form elements
+ * Will eventually replace `www/static/css/core/ui/forms/_forms.scss`
+ */
+
+/**
+ * Any custom properties specific to forms
+ */
+:root {
+    --animation-form-input-change: 100ms; // used to animate input changes like toggle switch, checkbox, radio etc
+    --color-form-disabled-background: #edecec;
+}
+
+/**
+ *  Shared form input focus styles
+ */
+@mixin form-input-focus {
+    background: var(--color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+/**
+ *  So the focus is not active on mouse click
+ */
+@mixin form-input-focus-not-visible {
+    outline: 0;
+}
+
+/**
+ *  Shared form input disabled styles
+ */
+@mixin form-input-disabled {
+    background: var(--color-form-disabled-background);
+    color: var(--color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    cursor: not-allowed;
+    pointer-events: auto; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    & + label {
+        opacity: 1 !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --animation-form-input-change: 0ms;
+    }
+}
+
+@import "../../../www/static/css/core/ui/forms/fieldset";
+@import "../../../www/static/css/core/ui/forms/label";
+@import "../../../www/static/css/core/ui/forms/hint";
+@import "../../../www/static/css/core/ui/forms/input-text";
+@import "../../../www/static/css/core/ui/forms/input-checkbox";
+@import "../../../www/static/css/core/ui/forms/input-toggle";
+@import "../../../www/static/css/core/ui/forms/input-radio";

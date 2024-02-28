@@ -8,8 +8,8 @@
 }
 
 .c-card {
-    background-color: var(--foreground-colour);
-    border-radius: var(--roundness-cards);
+    background-color: var(--color-foreground-primary);
+    border-radius: 0;
     line-height: var(--base-line-height);
     position: relative;
     text-align: start;
@@ -86,7 +86,7 @@
         animation: shine-lines 1.6s ease infinite !important;
         background-size: 400% 100% !important;
         .l-flex-row {
-            background-color: var(--foreground-colour);
+            background-color: var(--color-foreground-primary);
         }
         .img-placeholder,
         h3,
@@ -97,9 +97,9 @@
             animation-timing-function: linear;
             background: repeating-linear-gradient(
                 to right,
-                var(--loading-colour) 0%,
-                var(--foreground-colour) 50%,
-                var(--loading-colour) 100%
+                var(--color-loading) 0%,
+                var(--color-foreground-primary) 50%,
+                var(--color-loading) 100%
             );
             background-size: 200% auto;
             background-position: 0 100%;

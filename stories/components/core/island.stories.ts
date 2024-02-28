@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
- * **Styles**: `www/static/css/core/layout/_container.scss`
+ * **Styles**: `www/static/css/core/layout/_island.scss`
  *
  * Currently our main content areas
  */
@@ -17,7 +17,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Components/Core/Island",
+    title: "Draft/Core/Island",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

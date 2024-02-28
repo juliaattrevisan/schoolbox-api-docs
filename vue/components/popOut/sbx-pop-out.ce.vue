@@ -106,7 +106,8 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background: none;
     border: none;
-    border-radius: var(--roundness-inputs);
+    // border-radius: var(--roundness-inputs); // ^foundation-fixes^ - will round in a future release
+    border-radius: 0;
     color: var(--content-ui-foreground);
     cursor: pointer;
     display: inline-flex;
@@ -130,8 +131,6 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
             background-color: var(
                 --content-ui-background
             ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
-            outline: 3px solid var(--content-ui-foreground);
-            outline-offset: 2px;
         }
     }
     &:disabled {

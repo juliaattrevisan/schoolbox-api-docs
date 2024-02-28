@@ -32,9 +32,6 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-/**
- * `.c-input-text`
- */
 export const Default: Story = {
     render: () => ({
         template: `
@@ -43,9 +40,6 @@ export const Default: Story = {
     }),
 };
 
-/**
- * Input disabled
- */
 export const Disabled: Story = {
     render: () => ({
         template: `
@@ -54,9 +48,6 @@ export const Disabled: Story = {
     }),
 };
 
-/**
- * Input read only
- */
 export const ReadOnly: Story = {
     render: () => ({
         template: `
@@ -65,9 +56,6 @@ export const ReadOnly: Story = {
     }),
 };
 
-/**
- * Has a validation error
- */
 export const HasError: Story = {
     render: () => ({
         template: `
@@ -77,18 +65,54 @@ export const HasError: Story = {
 };
 
 /**
- * With a button, typically when an action following the button selection fills the input
+ * Typically when an action following the button selection fills the input
  * For example a date picker or resource browser
  */
 export const WithButton: Story = {
     render: () => ({
         template: `
             <div class="l-flex-col">
-                <input id="news_default_expiry-field" class="c-input-text l-flex__item--1" type="text" />
-                <button class="c-button l-width-100 l-mar--0">
+                <input id="news_default_expiry-field" class="c-input-text c-input-text--with-button" type="text" />
+                <button class="c-button c-button--with-input l-width-100">
                     <sbx-icon name="folder"></sbx-icon>
                     <span>Browse Resources</span>
                 </button>
+            </div>
+            `,
+    }),
+};
+
+export const WithLabel: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex-col l-gap-s">
+                <label for="input1" class="c-label">Default News Archiving Period</label>
+                <input id="input1" class="c-input-text" type="text" />
+            </div>
+            `,
+    }),
+};
+
+export const WithHint: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex-col l-gap-s">
+                <label for="input2" class="c-label">Default News Archiving Period</label>
+                <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
+                <input id="input2" class="c-input-text" type="text" />
+            </div>
+            `,
+    }),
+};
+
+export const WithError: Story = {
+    render: () => ({
+        template: `
+            <div class="l-flex-col l-gap-s">
+                <label for="input3" class="c-label c-label--required">Default News Archiving Period</label>
+                <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
+                <input id="input3" class="c-input-text c-input-text--error" type="text" required />
+                <label id="news-title-error" class="error" for="news-title">This field is required.</label>
             </div>
             `,
     }),

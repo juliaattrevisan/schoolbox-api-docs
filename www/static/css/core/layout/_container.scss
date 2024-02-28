@@ -115,9 +115,7 @@
     }
 }
 
-// to identify 'islands' of content, sitting on --foreground-colour
+// to identify 'islands' of content, sitting on --color-foreground-primary
 .c-island {
-    background-color: var(--foreground-colour);
-    border-radius: var(--roundness-islands);
-    padding: var(--spacing-m);
+    background-color: var(--color-foreground-primary);
 }

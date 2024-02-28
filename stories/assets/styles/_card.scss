@@ -1,0 +1,123 @@
+/**
+ * Styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
+ * Will eventually replace the `c-card` in `www/static/css/core/ui/_card.scss
+ * When this is done it can be renamed
+ */
+
+:root {
+    --border-colour: #aaaaaa;
+}
+
+.c-new-card {
+    background-color: var(--color-foreground-primary);
+    border-radius: var(--roundness-cards);
+    line-height: var(--base-line-height);
+    position: relative;
+    text-align: start;
+
+    // Ensure the card title will wrap if it's too long instead of overflowing and breaking the flex layout
+    h3 {
+        word-break: break-word;
+    }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+
+    // Add inline (default left) border and grey background to card.
+    &--child {
+        background-color: var(--color-foreground-secondary);
+        border-inline-start: var(--spacing-s) solid var(--border-colour);
+    }
+
+    // When we want the whole card to be selectable
+    &--link {
+        transition: background-color 0.2s ease-in-out;
+        &:hover,
+        :focus {
+            background-color: var(--content-ui-hover);
+            filter: grayscale(0%);
+        }
+        // To make the entire card clickable, we make the anchor fill the card
+        // this aids accessibility, providing better screen reader context than
+        // wrapping the entire card in an anchor while also allowing a wider click target
+        // https://inclusive-components.design/cards/
+        // put this on hold for now, not working as expected
+        // a:first-child::before {
+        //     bottom: 0;
+        //     content: " ";
+        //     height: 100%;
+        //     left: 0;
+        //     position: absolute;
+        //     right: 0;
+        //     top: 0;
+        //     width: 100%;
+        //     z-index: 1;
+        // }
+    }
+
+    // To highlight that the card is active, could be used when the card is selected via arrow navigation for example
+    &--active {
+        background-color: var(--content-ui-hover);
+        filter: grayscale(20%);
+    }
+
+    // Used as a placeholder to show that the card data is currently being loaded
+    // Currently referencing the skeleton defined in www/static/css/core/ui/_skeleton.scss
+    // &--loading {
+    //     @include skeleton-background-gradient;
+    //     animation: shine-lines 1.6s ease infinite !important;
+    //     background-size: 400% 100% !important;
+    //     .l-flex-row {
+    //         background-color: var(--color-foreground-primary);
+    //     }
+    //     .img-placeholder,
+    //     h3,
+    //     p,
+    //     span {
+    //         animation: gradient 2s infinite;
+    //         animation-fill-mode: forwards;
+    //         animation-timing-function: linear;
+    //         background: repeating-linear-gradient(
+    //             to right,
+    //             var(--color-loading) 0%,
+    //             var(--color-foreground-primary) 50%,
+    //             var(--color-loading) 100%
+    //         );
+    //         background-size: 200% auto;
+    //         background-position: 0 100%;
+    //         margin: 0;
+    //     }
+    //     .img-placeholder {
+    //         height: var(--image-size-l);
+    //         width: var(--image-size-l);
+    //     }
+    //     h3 {
+    //         height: 1rem;
+    //         width: 30%;
+    //     }
+    //     p,
+    //     span {
+    //         height: 0.8125rem;
+    //         width: 20%;
+    //     }
+    // }
+
+    &--border-end {
+        border-block-end: 1px solid var(--border-colour);
+    }
+
+    &--alt-bkg {
+        background-color: var(--color-foreground-secondary);
+    }
+}
+
+/* Added animated gradient for loading card placeholder*/
+@keyframes gradient {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
