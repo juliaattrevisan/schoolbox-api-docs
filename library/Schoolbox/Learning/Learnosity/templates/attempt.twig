@@ -152,7 +152,7 @@
                     let payload = new FormData();
                     payload.append('message', 'itemsApp.error');
                     payload.append('learnosityReference', '{{ learnositySessionReference }}');
-                    payload.append('data', []);
+                    payload.append('data', event);
 
                     fetch('{{ attemptMonitorUrl }}', {
                         method: 'POST',

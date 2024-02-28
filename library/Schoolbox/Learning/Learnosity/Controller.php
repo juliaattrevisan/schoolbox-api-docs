@@ -2012,6 +2012,28 @@ class Controller extends Base
          * (if they happened...) along with whatever outcomes might be helpful
          */
         $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_attempt_monitor');
+
+        /* If data is empty, we probably resumed a quiz (that's what happens when you resume a quiz)
+         * Otherwise, it should contain all the response ids in the quiz, when you start a whole new attempt
+         */
+        if (is_iterable($postData['data']) && \count($postData['data'])) {
+            $logger->debug(sprintf(
+                'Assessment %s (%s) new attempt started at %s using learnosity reference %s',
+                $assessment->getTitle(),
+                $assessment->getId(),
+                \Alaress_Date_Format::now()->getDatabaseDate(),
+                $attempt->getLearnosityReference()
+            ));
+        } else {
+            $logger->debug(sprintf(
+                'Assessment %s (%s) attempt resumed at %s using learnosity reference %s',
+                $assessment->getTitle(),
+                $assessment->getId(),
+                \Alaress_Date_Format::now()->getDatabaseDate(),
+                $attempt->getLearnosityReference()
+            ));
+        }
+
         $logger->debug(json_encode($postData, JSON_THROW_ON_ERROR));
     }
 
