@@ -1187,16 +1187,35 @@ class Controller extends Base
          * Instead, redirect people to a whole other screen afterwards to
          * artificially force this behaviour
          */
-        if (\count($responseData)) {
-            $this->api->dataUpdateRequest('/sessions/responses/scores', [
-                'sessions' => [
-                    [
-                        'session_id' => $attempt->getLearnosityReference(),
-                        'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-                        'responses' => $responseData
-                    ]
+        $payload = [
+            'sessions' => [
+                [
+                    'session_id' => $attempt->getLearnosityReference(),
+                    'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
+                    'responses' => $responseData
                 ]
-            ]);
+            ]
+        ];
+
+        /* Log payload data, because we're dropping attempts randomly and nobody knows why.
+         * Hopefully this init payload will helps hed light on things in SA-17302
+         */
+        if (\count($responseData)) {
+            $result = $this->api->dataUpdateRequest('/sessions/responses/scores', $payload);
+
+            (new Feedback\SuspiciousLogger())->logPayload(
+                'postFeedback() $result payload after processing learnosity /sessions/responses/scores',
+                $payload,
+                $result,
+                $attempt
+            );
+        } else {
+            (new Feedback\SuspiciousLogger())->logPayload(
+                'postFeedback() empty $responseData via learnosity /sessions/responses/scores',
+                $payload,
+                [],
+                $attempt
+            );
         }
 
         /* Get the new result back from learnosity
