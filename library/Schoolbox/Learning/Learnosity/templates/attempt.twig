@@ -137,20 +137,27 @@
                 // Receives an array of response_ids (strings) of the saved session responses
                 success: function (responseIds) {
                     let payload = new FormData();
+                    payload.append('message', 'itemsApp.success');
                     payload.append('learnosityReference', '{{ learnositySessionReference }}');
-                    payload.append('responseIds', responseIds);
+                    payload.append('data', responseIds);
 
                     fetch('{{ attemptMonitorUrl }}', {
                         method: 'POST',
                         body: payload
                     });
-
-                    console.log('Attempt prepared.', responseIds);
                 },
 
                 // Allows you to immediately handle a save error event
                 error: function (event) {
-                    console.log('Could not prepare attempt; tell schoolbox', event);
+                    let payload = new FormData();
+                    payload.append('message', 'itemsApp.error');
+                    payload.append('learnosityReference', '{{ learnositySessionReference }}');
+                    payload.append('data', []);
+
+                    fetch('{{ attemptMonitorUrl }}', {
+                        method: 'POST',
+                        body: payload
+                    });
                 },
 
                 // Capture the progress of the current submit operation

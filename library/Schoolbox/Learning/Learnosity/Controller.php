@@ -1997,6 +1997,7 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @return void
+     * @throws \JsonException
      */
     public function postAttemptMonitor(
         QuizDomainObject $assessment,
@@ -2005,13 +2006,13 @@ class Controller extends Base
     ): void {
         /* Get the post data that the frontend asynchronously sent to us
          */
+        $postData = $this->requestPost->getArrayCopy();
 
         /* Push it into the log file so we can track when things happened,
          * (if they happened...) along with whatever outcomes might be helpful
          */
-
         $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_attempt_monitor');
-        $logger->debug('what is this');
+        $logger->debug(json_encode($postData, JSON_THROW_ON_ERROR));
     }
 
 
