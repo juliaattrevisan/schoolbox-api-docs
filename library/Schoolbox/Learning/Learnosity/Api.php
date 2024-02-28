@@ -158,7 +158,7 @@ class Api
         /* Optionally log our payloads to learnosity
          */
         $this->logger?->debug(sprintf(
-            'Accessed service %s with payload %s',
+            'Accessed learnosity service "%s" with initialisation payload %s',
             $service,
             json_encode($payload, JSON_THROW_ON_ERROR)
         ));
