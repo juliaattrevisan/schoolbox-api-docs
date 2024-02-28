@@ -2016,7 +2016,7 @@ class Controller extends Base
         /* If data is empty, we probably resumed a quiz (that's what happens when you resume a quiz)
          * Otherwise, it should contain all the response ids in the quiz, when you start a whole new attempt
          */
-        if (is_iterable($postData['data']) && \count($postData['data'])) {
+        if ('' !== $postData['data']) {
             $logger->debug(sprintf(
                 'Assessment %s (%s) new attempt started at %s using learnosity reference %s',
                 $assessment->getTitle(),
