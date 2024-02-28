@@ -131,8 +131,13 @@
                 }
             };
 
-            /* Forcibly save right at the start, hoping to counteract Learnosity not saving attempts
-             */
+            {# Forcibly save right at the start, hoping to counteract Learnosity not saving attempts.
+             #
+             # To ensure this happens multiple times per attempt, really insist it worked,
+             # you could force this even more aggressively by using
+             #
+             #     for (i = 0; i < 3; i++) { itemsApp.save({...}); }
+             #}
             itemsApp.save({
                 {# Receives an array of response_ids (strings) of the saved session responses
                  # but manifests in a different data struct in backend: a csv, not an array
