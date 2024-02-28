@@ -380,18 +380,21 @@ class Helper
     ): void {
         $student = $existingAttempt->getUser();
 
-        // Find out what they scored by the automated system
-        $result = $this->api->dataGetRequest('/sessions/scores', [
+        $payload = [
             'session_id' => [
                 $existingAttempt->getLearnosityReference()
             ]
-        ]);
+        ];
+
+        // Find out what they scored by the automated system
+        $result = $this->api->dataGetRequest('/sessions/scores', $payload);
 
         /* Log payload data, because we're dropping attempts randomly and nobody knows why.
          * Hopefully this init payload will helps hed light on things in SA-17302
          */
         (new Feedback\SuspiciousLogger())->logPayload(
             'processAttemptCompletion() $result payload from learnosity',
+            $payload,
             $result,
             $existingAttempt
         );

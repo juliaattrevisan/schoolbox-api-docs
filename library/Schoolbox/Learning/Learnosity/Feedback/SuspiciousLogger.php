@@ -123,27 +123,34 @@ class SuspiciousLogger
      * Log an arbitrary array $data with the given context prefix so you know what it's about,
      * storing the json representation of $data in a log message.
      *
-     * @param array $data
-     * @param Model $attempt
      * @param string $context
+     * @param array $payload
+     * @param array $learnosityResponse
+     * @param Model $attempt
      * @return void
      * @throws \JsonException
      */
-    public function logPayload(string $context, array $data, \Schoolbox\Learning\Quiz\Attempt\Model $attempt): void
-    {
+    public function logPayload(
+        string $context,
+        array $payload,
+        array $learnosityResponse,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
         $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_init_payload');
 
         /* Arguably you could use output buffering and var dump it as-is
          * but this should be enough for learnosity's diagnosing
          */
-        $obPayload = json_encode($data, JSON_THROW_ON_ERROR);
+        $responseEncoded = json_encode($learnosityResponse, JSON_THROW_ON_ERROR);
+        $inputEncoded = json_encode($payload, JSON_THROW_ON_ERROR);
 
         $logger->debug(sprintf(
-            '%s: attempt %s (learnosity reference %s) had data: %s',
+            '%s: attempt %s (learnosity reference %s) had data: %s. We sent this payload: %s',
             $context,
             $attempt->getId(),
             $attempt->getLearnosityReference(),
-            $obPayload
+            $responseEncoded,
+            $inputEncoded
         ));
     }
 }
