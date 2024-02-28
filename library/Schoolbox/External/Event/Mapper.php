@@ -253,6 +253,17 @@ class Mapper extends \Schoolbox\Mapper
          */
         $staffExternalIds = array_unique($staffExternalIds);
 
+        /* No ids? No trabajo; just leave early and send back the stack unchanged
+         *
+         * It's possible (though odd) that timetabled won't have any people in them, or
+         * you're coming from SudsTimetable/Room.php calendar subscription
+         * where we don't need a list of people: it's hardcoded to be an empty array
+         * which will cause this to snap.
+         */
+        if (empty($staffExternalIds)) {
+            return $stack;
+        }
+
         /* Grab the names for everyone in the mega list
          */
         $placeholders = Builder::getArrayPlaceholders($staffExternalIds, 'externalId');
