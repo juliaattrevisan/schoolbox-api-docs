@@ -82,12 +82,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         if ($this->getUser()->getRole()->isParent()) {
             $parent = $this->getUser();
             (new \Schoolbox\External\User())->loadChildren([$parent]);
-
-            $children = $parent->getChildren();
-
-            foreach ($children as $child) {
-                $userIds[] = $child['id'];
-            }
+            $userIds = array_merge($userIds, $parent->getChildren()->getPropertyValues('id'));
         }
 
         $this->matches = $this->delegate->getMatchesForUsers($userIds, $getHistorical, $this->getConfig('days'));
