@@ -393,7 +393,7 @@ class Helper
          * Hopefully this init payload will helps hed light on things in SA-17302
          */
         (new Feedback\SuspiciousLogger())->logPayload(
-            'processAttemptCompletion() $result payload from learnosity',
+            'processAttemptCompletion() $result payload from learnosity /sessions/scores',
             $payload,
             $result,
             $existingAttempt
