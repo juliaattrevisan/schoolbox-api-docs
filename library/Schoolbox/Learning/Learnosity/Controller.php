@@ -1641,7 +1641,7 @@ class Controller extends Base
         /* Use the learnosity Data API to send the revised payload which
          * should now contain all the parts Learnosity expected
          */
-        $this->api->dataUpdateRequest('/sessions/responses/scores', [
+        $payload = [
             'sessions' => [
                 [
                     'session_id' => $attempt->getLearnosityReference(),
@@ -1651,7 +1651,16 @@ class Controller extends Base
                     ]
                 ]
             ]
-        ]);
+        ];
+
+        $result = $this->api->dataUpdateRequest('/sessions/responses/scores', $payload);
+
+        (new Feedback\SuspiciousLogger())->logPayload(
+            'postFeedbackScore() final update $result payload after processing learnosity /sessions/responses/scores',
+            $payload,
+            $result,
+            $attempt
+        );
     }
 
 
