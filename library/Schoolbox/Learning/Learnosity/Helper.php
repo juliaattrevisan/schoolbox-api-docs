@@ -337,7 +337,7 @@ class Helper
 
         /* Log data that seems suspiciously broken
          */
-        (new Feedback\SuspiciousLogger())->logHumanReadable($attempt->getLearnosityReference(), $mark, $maxMark, $normalisedMark, $humanReadableMark);
+        (new Feedback\SuspiciousLogger())->logZeroScore($attempt->getLearnosityReference(), $mark, $maxMark, $normalisedMark, $humanReadableMark);
 
         /* Update the columns with newly-derived values
          */

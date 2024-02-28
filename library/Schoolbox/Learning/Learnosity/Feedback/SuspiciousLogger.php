@@ -63,7 +63,7 @@ class SuspiciousLogger
      * @param string|null $humanReadableMark
      * @return void
      */
-    public function logHumanReadable(
+    public function logZeroScore(
         string $attemptLearnosityReference,
         ?float $mark,
         ?float $maxMark,
