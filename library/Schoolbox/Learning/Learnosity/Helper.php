@@ -337,7 +337,14 @@ class Helper
 
         /* Log data that seems suspiciously broken
          */
-        (new Feedback\SuspiciousLogger())->logZeroScore($attempt->getLearnosityReference(), $mark, $maxMark, $normalisedMark, $humanReadableMark);
+        (new Feedback\SuspiciousLogger())->logZeroScore(
+            'assignMarksToAttempt() after calculating marks',
+            $attempt->getLearnosityReference(),
+            $mark,
+            $maxMark,
+            $normalisedMark,
+            $humanReadableMark
+        );
 
         /* Update the columns with newly-derived values
          */
@@ -383,7 +390,11 @@ class Helper
         /* Log payload data, because we're dropping attempts randomly and nobody knows why.
          * Hopefully this init payload will helps hed light on things in SA-17302
          */
-        (new Feedback\SuspiciousLogger())->logPayload('processAttemptCompletion() $result payload from learnosity', $result, $existingAttempt);
+        (new Feedback\SuspiciousLogger())->logPayload(
+            'processAttemptCompletion() $result payload from learnosity',
+            $result,
+            $existingAttempt
+        );
 
         /* The learnosityReference posted here doesn't exist
          * TODO What kind of error should we present to users? It's asynchronous

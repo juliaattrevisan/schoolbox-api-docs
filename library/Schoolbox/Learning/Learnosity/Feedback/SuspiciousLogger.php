@@ -18,13 +18,18 @@ class SuspiciousLogger
      * Sometimes students' marks will have computed incorrectly as being zero,
      * but we don't know where/why it happens.
      *
+     * @param string $context
      * @param string $attemptLearnosityReference
      * @param array $sanitisedScore
      * @param array $postData
      * @return void
      */
-    public function logSanitisedScore(string $attemptLearnosityReference, array $sanitisedScore, array $postData): void
-    {
+    public function logSanitisedScore(
+        string $context,
+        string $attemptLearnosityReference,
+        array $sanitisedScore,
+        array $postData
+    ): void {
         $suspicious = false;
 
         /* Students getting 0 is considered suspicious; can't tell
@@ -43,7 +48,8 @@ class SuspiciousLogger
             ob_end_clean();
 
             $logger->debug(sprintf(
-                'Attempt %s received (float)%s via data payload %s',
+                '%s: Attempt %s received (float)%s via data payload %s',
+                $context,
                 $attemptLearnosityReference,
                 $sanitisedScore['score'],
                 $obPostData
@@ -56,6 +62,7 @@ class SuspiciousLogger
      * Sometimes students' marks will have computed incorrectly as being zero,
      * but we don't know where/why it happens.
      *
+     * @param string $context
      * @param string $attemptLearnosityReference
      * @param float|null $mark
      * @param float|null $maxMark
@@ -64,6 +71,7 @@ class SuspiciousLogger
      * @return void
      */
     public function logZeroScore(
+        string $context,
         string $attemptLearnosityReference,
         ?float $mark,
         ?float $maxMark,
@@ -99,7 +107,8 @@ class SuspiciousLogger
             $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_suspicious_scores');
 
             $logger->debug(sprintf(
-                'Attempt %s received (float)%s/(float)%s (norm: %s; hr: %s)',
+                '%s: Attempt %s received (float)%s/(float)%s (norm: %s; hr: %s)',
+                $context,
                 $attemptLearnosityReference,
                 $mark,
                 $maxMark,

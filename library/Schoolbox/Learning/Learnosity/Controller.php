@@ -582,7 +582,11 @@ class Controller extends Base
         /* Log payload data, because we're dropping attempts randomly and nobody knows why.
          * Hopefully this init payload will helps hed light on things in SA-17302
          */
-        (new Feedback\SuspiciousLogger())->logPayload('getAttempt() init payload', $payload, $attempt);
+        (new Feedback\SuspiciousLogger())->logPayload(
+            'getAttempt() init payload',
+            $payload,
+            $attempt
+        );
 
         /* Breadcrumbs
          * Legacy quiz never had breadcrumbs for attempt screen; I can only presume
@@ -1051,7 +1055,12 @@ class Controller extends Base
 
         /* Log data that seems suspiciously broken
          */
-        (new Feedback\SuspiciousLogger())->logSanitisedScore($attempt->getLearnosityReference(), $sanitisedScore, $postData);
+        (new Feedback\SuspiciousLogger())->logSanitisedScore(
+            'postFeedback() score calc',
+            $attempt->getLearnosityReference(),
+            $sanitisedScore,
+            $postData
+        );
 
         // As with posting a feedback:
         // need the existing response to determine a human-readable mark.
