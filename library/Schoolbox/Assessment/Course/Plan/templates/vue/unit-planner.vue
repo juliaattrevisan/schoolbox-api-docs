@@ -212,6 +212,13 @@ window.Vue.onUnmounted(() => {
         }
     }
 
+    // Pin the header to the top of the table when scrolling
+    > thead {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
     > tbody {
         > tr {
             height: 300px;
