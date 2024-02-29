@@ -467,8 +467,26 @@ class Module extends BaseModule
                 new Rule\Any(
                     $this->buildAuthRuleHasInstructorAccess(),
                     new Rule\All(
-                        new Rule\HasRole(Role::STUDENT),
-                        new Rule\IsUser('studentId')
+                        // This section is the same as in buildAuthRuleCanAttempt().
+                        // Note that the user referenced in the url need not be a student.  Some quizzes are designed for teachers.
+
+                        /* You must be the user referenced in the url
+                         * You can't sobo a quiz attempt
+                         */
+                        new Rule\IsUser('studentId'),
+                        /* Assessment must be published in the past, closed in the future,
+                         * and you must be a participant (also, non-excluded)
+                         */
+                        new CanViewAssessable(new Visibility($this->getAccess())),
+                        /* Open Date for this particular student's Participation Plan (if extant)
+                         * must have been reached, and not yet be closed; each student can have their
+                         * own versions of Open and Close dates.
+                         */
+                        new IsAssessmentOpen(),
+                        /* Students have a set of criteria to fulfil when we're deciding if
+                         * they can make attempts (this double-checks IsAssessmentOpen again)
+                         */
+                        new CanRespondToAssessment($this->getAccess()),
                     )
                 ),
             );

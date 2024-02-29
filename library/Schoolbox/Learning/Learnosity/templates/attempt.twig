@@ -176,11 +176,17 @@
             method: 'POST',
             body: payload
         })
-        .then(response => response.text())
-        .then(body => {
-            window.location.href = '{{ outroUrl }}';
-        });
-
+        .then(response => {
+                if (response.ok) {
+                    response.text();
+                    window.location.href = '{{ outroUrl }}';
+                } else {
+                    let errorElement = document.createElement('div');
+                    errorElement.classList.add('alert-box', 'alert');
+                    errorElement.innerHTML = '<p>The quiz could not be submitted.</p>';
+                    document.getElementById('learnosity_assess').replaceWith(errorElement);
+                }
+            })
     }
 
     /* User consciously finished
