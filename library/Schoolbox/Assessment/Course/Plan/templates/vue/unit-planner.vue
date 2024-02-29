@@ -41,6 +41,29 @@ const allTextboxKeys = window.Vue.computed(() => {
     return [...keysSet];
 });
 
+const tabsEl = window.Vue.ref<HTMLElement>();
+const windowHeight = window.Vue.ref(0);
+
+/* The height of the scrollable area (table), such that no vertical scrollbar is shown for the whole page.
+ * This is to ensure the horizontal scrollbar of the unit planner table is always visible.
+ */
+const containerHeight = window.Vue.computed(() => {
+    if (!tabsEl.value) {
+        return 0; // Not loaded yet
+    }
+
+    const tabsRect = tabsEl.value.getBoundingClientRect();
+    const footerRect = document.getElementById("footer")?.getBoundingClientRect();
+
+    const mainContainerEl = document.getElementById("container");
+
+    const mainContainerPaddingBtm = mainContainerEl
+        ? parseInt(window.getComputedStyle(mainContainerEl).paddingBottom, 10)
+        : 0;
+
+    return windowHeight.value - tabsRect.bottom - (footerRect?.height || 0) - mainContainerPaddingBtm - 1;
+});
+
 window.Vue.onMounted(async () => {
     store.init(props.units, props.routeFolderSequence, toastEl);
 
@@ -61,16 +84,37 @@ window.Vue.onMounted(async () => {
             },
         });
     }
+
+    // Track window height to adjust the height of the scrollable area
+    window.addEventListener("resize", () => {
+        windowHeight.value = window.innerHeight;
+    });
+
+    // Wait for DOM render, then update height again, in case we haven't fully loaded yet
+    if (document.getElementById("footer")) {
+        windowHeight.value = window.innerHeight;
+    } else {
+        window.addEventListener("DOMContentLoaded", () => {
+            windowHeight.value = window.innerHeight;
+        });
+    }
+});
+
+window.Vue.onUnmounted(() => {
+    // Clean up event listeners
+    window.removeEventListener("resize", () => {
+        windowHeight.value = window.innerHeight;
+    });
 });
 </script>
 
 <template>
-    <dl class="tabs">
+    <dl ref="tabsEl" class="tabs">
         <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }">
             <a @click="selectedTab = tab.id">{{ tab.label }}</a>
         </dd>
     </dl>
-    <div class="scrollable">
+    <div ref="unitPlannerContainer" class="scrollable" :style="{ height: containerHeight + 'px' }">
         <table class="unit-planner" :class="{ sortable: props.routeFolderSequence }">
             <thead>
                 <tr>
