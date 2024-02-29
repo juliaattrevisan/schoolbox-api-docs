@@ -585,6 +585,7 @@ class Controller extends Base
         (new Feedback\SuspiciousLogger())->logPayload(
             'getAttempt() init payload',
             $payload,
+            [],
             $attempt
         );
 
