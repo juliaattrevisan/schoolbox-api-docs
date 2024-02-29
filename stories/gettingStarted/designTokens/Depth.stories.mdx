@@ -4,8 +4,17 @@ import { Meta } from "@storybook/addon-docs";
 
 # Depth _(z-index)_
 
+In our process, we have the capability to perform operations like adding or subtracting 1. However, if the outcome goes below -3, it signals that introducing another base number might be necessary for better management.
+
 _Draft_
 
-| Property    | Value | Description | CSS Custom Property | Example                                        |
-| ----------- | ----- | ----------- | ------------------- | ---------------------------------------------- |
-| depth-modal | `40`  | For modals  | `--depth-modal`     | ![depth modal example](/depth/depth-modal.jpg) |
+| CSS Custom Property        | Value | Description                                                              | Example                                                   |
+| -------------------------- | ----- | ----------------------------------------------------------------------   | --------------------------------------------------------- |
+|`--depth-default`           | `1`   | The default depth level.                                                 | "Breadcumbs"![depth modal example](/depth/depth-default.jpg)          |
+|`--depth-ui-overlay `       | `10`  | Items like video player ui, image gallery ui, etc.                       | "Video Player"![depth modal example](/depth/depth-ui-overlay.jpg)  "Image gallery" ![depth modal example](/depth/depth-ui-overlay-gallery.jpg)       |
+|`--depth-pop-over`          | `20`  | Small pop-out menus like sbx-pop-out or full calendar pop over           | "Calendar pop over" ![depth modal example](/depth/depth-pop-over.jpg)         |
+|`--depth-menu`              | `30`  | Core menu                                                                | "Canvas menu" ![depth modal example](/depth/depth-menu.jpg)             |
+|`--depth-modal`             | `40`  | Modal dialogs                                                            | "Browse modal" ![depth modal example](/depth/depth-modal.jpg)            |
+|`--depth-modal-ui-overlay ` | `50`  | Items like ckeditor ui in modals                                         | "CKeditor in modals" ![depth modal example](/depth/depth-modal-ui-overlay.jpg) |
+|`--depth-toast`             | `60`  | Toast notifications                                                      | "Toast notifications" ![depth modal example](/depth/depth-toast.jpg)            |
+|`--depth-intro`             | `70`  | Intro tour                                                               | "Feature Tour" ![depth modal example](/depth/depth-intro.jpg)            |
