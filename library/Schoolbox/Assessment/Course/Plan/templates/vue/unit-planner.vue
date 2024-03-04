@@ -14,6 +14,14 @@ interface Props {
     routeFolderSequence: string | null;
 }
 
+/* The default maximum height of a content container, in px
+ * Essentially, this should be based on a multiple of the height of one of the learning activities
+ * so we don't cut off a learning activity in the middle
+ * A learning activity is roughtly 41px
+ */
+const unexpandedUnitHeight = 41 * 7;
+const unexpandedUnitHeightStyle = window.Vue.computed(() => `${unexpandedUnitHeight}px`);
+
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
@@ -71,7 +79,7 @@ function updateContainerHeight(): void {
     const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
 
     // Prevent the container from being too small, this ensures one unit is always visible
-    containerHeight.value = Math.max(newHeight, 300 + tableHeaderEl.value.offsetHeight);
+    containerHeight.value = Math.max(newHeight, unexpandedUnitHeight + tableHeaderEl.value.offsetHeight);
 }
 
 window.Vue.onMounted(async () => {
@@ -155,13 +163,13 @@ window.Vue.onUnmounted(() => {
                     </td>
                     <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
                         <td v-for="(textbox, textboxKey) in unit.textboxes" :key="textboxKey">
-                            <content-container :unit-id="unit.id">
+                            <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
                                 <textbox-content v-if="textbox !== null" :textbox="textbox"></textbox-content>
                             </content-container>
                         </td>
                     </template>
                     <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
-                        <content-container :unit-id="unit.id">
+                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
                             <ul class="information-list">
                                 <activities-list-item
                                     v-for="activity in unit.activities"
@@ -173,7 +181,7 @@ window.Vue.onUnmounted(() => {
                         </content-container>
                     </td>
                     <td v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">
-                        <content-container :unit-id="unit.id">
+                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
                             <rubric-capabilities :rubric-capabilities="unit.rubricCapabilities"></rubric-capabilities>
                         </content-container>
                     </td>
@@ -181,7 +189,7 @@ window.Vue.onUnmounted(() => {
                         v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'"
                         class="curriculum-codes-container"
                     >
-                        <content-container :unit-id="unit.id">
+                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
                             <curriculum-codes-list :curriculum-codes="unit.curriculumCodes"></curriculum-codes-list>
                             <curriculum-details-modal />
                         </content-container>
@@ -234,7 +242,7 @@ window.Vue.onUnmounted(() => {
 
     > tbody {
         > tr {
-            height: 300px;
+            height: v-bind(unexpandedUnitHeightStyle);
 
             > td:not(:first-child) {
                 padding: 0px;

@@ -3,13 +3,13 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 
 interface Props {
     unitId: number;
+    unexpandedHeight: number;
 }
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 
-const maxContentHeight = 300;
-const maxContentHeightStyle = window.Vue.computed(() => `${maxContentHeight}px`);
+const unexpandedHeightStyle = window.Vue.computed(() => `${props.unexpandedHeight}px`);
 
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const isDefaultExpanded = window.Vue.ref(false);
@@ -23,7 +23,7 @@ const isExpanded = window.Vue.computed(() => {
 window.Vue.onMounted(() => {
     if (contentEl.value) {
         const height = contentEl.value.offsetHeight;
-        if (height > 300) {
+        if (height > props.unexpandedHeight) {
             isDefaultExpanded.value = false;
         } else {
             isDefaultExpanded.value = true;
@@ -44,7 +44,7 @@ window.Vue.onMounted(() => {
 
 <style scoped>
 .content-container:not(.expanded) {
-    max-height: v-bind(maxContentHeightStyle);
+    max-height: v-bind(unexpandedHeightStyle);
     overflow: hidden;
 }
 .show-more-container {
