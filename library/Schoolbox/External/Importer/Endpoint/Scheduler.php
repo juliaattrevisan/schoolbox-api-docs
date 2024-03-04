@@ -168,10 +168,7 @@ class Scheduler
     {
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
             try {
-                /* FIXME Un-repair this
-                 */
-//                $composites = $this->factory->produce($this->file, $this->type);
-                $composites = null;
+                $composites = $this->factory->produce($this->file, $this->type);
 
                 /* And also process liss data in addition to whatever else is here
                  */
