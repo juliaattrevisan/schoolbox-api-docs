@@ -140,7 +140,6 @@ class Receiver
      * @param string                                   $exclusionList     A csv list of event types that we should skip
      * @param string                                   $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
      * @param string                                   $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
-     * @param bool                                     $storageLogging    Decide whether to log actual liss payloads to local file storage
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper   Log the import in the suds control panel
      * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a local file storage record
      */
@@ -152,7 +151,6 @@ class Receiver
         private string $exclusionList,
         private string $defaultType,
         private string $teacherIdentifier,
-        private bool $storageLogging,
         private string $sourceName,
         private \Schoolbox\User $superuser,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
@@ -260,11 +258,9 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        if ($this->storageLogging) {
-            $this->log()->debug('Logging LISS payload to local storage');
+        $this->log()->debug('Logging LISS payload to local storage');
 
-            (new PayloadCache($this->storageMapper))->cache('dailydata', $this->superuser, $message);
-        }
+        (new PayloadCache($this->storageMapper))->cache('dailydata', $this->superuser, $message);
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php
          * since the liss receiver immediately processes upon receiving data
@@ -312,11 +308,9 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        if ($this->storageLogging) {
-            $this->log()->debug('Logging LISS payload to local storage');
+        $this->log()->debug('Logging LISS payload to local storage');
 
-            (new PayloadCache($this->storageMapper))->cache('classmemberships', $this->superuser, $message);
-        }
+        (new PayloadCache($this->storageMapper))->cache('classmemberships', $this->superuser, $message);
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php
          * since the liss receiver immediately processes upon receiving data
@@ -448,11 +442,9 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        if ($this->storageLogging) {
-            $this->log()->debug('Logging LISS payload to local storage');
+        $this->log()->debug('Logging LISS payload to local storage');
 
-            (new PayloadCache($this->storageMapper))->cache('belltimes', $this->superuser, $message);
-        }
+        (new PayloadCache($this->storageMapper))->cache('belltimes', $this->superuser, $message);
 
         /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
          * It turns out schools have multiple cycles of varying day lengths
@@ -573,11 +565,9 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        if ($this->storageLogging) {
-            $this->log()->debug('Logging LISS payload to local storage');
+        $this->log()->debug('Logging LISS payload to local storage');
 
-            (new PayloadCache($this->storageMapper))->cache('classes', $this->superuser, $message);
-        }
+        (new PayloadCache($this->storageMapper))->cache('classes', $this->superuser, $message);
 
         $this->log()->info('publishClasses: processing request');
 
@@ -670,11 +660,9 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        if ($this->storageLogging) {
-            $this->log()->debug('Logging LISS payload to local storage');
+        $this->log()->debug('Logging LISS payload to local storage');
 
-            (new PayloadCache($this->storageMapper))->cache('timetable', $this->superuser, $message);
-        }
+        (new PayloadCache($this->storageMapper))->cache('timetable', $this->superuser, $message);
 
         $this->log()->info('publishTimetable: processing request');
 

@@ -163,7 +163,6 @@ HELP;
             $config->get('external_liss_exclusions'),
             $config->get('external_liss_default_event_type'),
             $config->get('external_liss_teacher_identifier'),
-            (bool)$config->get('external_liss_storage_logging'),
             $sourceName,
             $superuser,
             \Schoolbox\External\Connector\Log\Mapper::getInstance(),
