@@ -12,6 +12,7 @@ namespace Schoolbox\External\Importer\Endpoint;
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\GenericCollection;
 
 /**
  * Class Scheduler
@@ -167,11 +168,21 @@ class Scheduler
     {
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
             try {
-                $composites = $this->factory->produce($this->file, $this->type);
+                /* FIXME Un-repair this
+                 */
+//                $composites = $this->factory->produce($this->file, $this->type);
+                $composites = null;
 
                 /* And also process liss data in addition to whatever else is here
                  */
-                $this->logger->info('Processing liss data');
+                $this->logger->info('Processing liss data if any exists');
+
+                /* This *could* be null if you request a suds Data Source that doesn't exist so we
+                 * should coerce this syntactically just in case...not that it should ever really happen
+                 */
+                if (null === $composites) {
+                    $composites = new GenericCollection(IStrategy::class);
+                }
 
                 $composites = $composites->merge($this->factory->produce($this->file, Factory::LISS));
             } catch (\Exception $e) {
