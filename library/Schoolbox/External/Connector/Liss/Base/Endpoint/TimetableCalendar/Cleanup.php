@@ -46,18 +46,23 @@ class Cleanup implements IStrategy
         /* Only remove profiles if we're performing
          */
         if ($this->perform) {
+            /* Delete anything to do with suds_liss that we previously imported
+             * This is a bit special, because of user-configurable source names.
+             * (Redlands)
+             */
+            $source = Factory::SOURCE_NAME;
+
             /* Remove everything that wasn't touched
              */
             $statement = $this->eventMapper->getDatabase()->prepare("
                 DELETE FROM {$this->eventMapper->getTable()}
                 WHERE (updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL)
                 AND classification = :classification
-                AND source = :source
+                AND source LIKE '{$source}%'
             ");
 
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => Factory::SOURCE_NAME
             ]);
 
             $this->log->info("Removed stale timetable events.");
