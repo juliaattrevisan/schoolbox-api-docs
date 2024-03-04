@@ -387,9 +387,9 @@ class Factory implements IFactory
                 return (new LissEndpoint\Factory(
                     $this->logger,
                     $this->perform,
-                    (string)Loader::getInstance()->get('external_liss_default_event_type'),
-                    (string)Loader::getInstance()->get('external_liss_exclusions'),
-                    (string)Loader::getInstance()->get('external_liss_teacher_identifier'),
+                    trim((string)Loader::getInstance()->get('external_liss_default_event_type')),
+                    trim((string)Loader::getInstance()->get('external_liss_exclusions')),
+                    trim((string)Loader::getInstance()->get('external_liss_teacher_identifier')),
                     $this->filesystemProxy,
                     \Schoolbox\Resource\Storage\Mapper::getInstance(),
                     /* Timetable pieces

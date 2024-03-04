@@ -86,7 +86,6 @@ class Receiver
      * @param string                                   $externalType      Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
      * @param string                                   $username          LISS username, as per config
      * @param string                                   $password          LISS password, as per config
-     * @param string                                   $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
      * @param string                                   $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper   Log the import in the suds control panel
      * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a local file storage record
@@ -96,7 +95,6 @@ class Receiver
         private string $externalType,
         private string $username,
         #[SensitiveParameter] private string $password,
-        private string $defaultType,
         private string $teacherIdentifier,
         private string $sourceName,
         private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
@@ -105,7 +103,6 @@ class Receiver
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
 
-        $this->defaultType = trim($defaultType);
         $this->teacherIdentifier = trim($teacherIdentifier);
 
         $this->log = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');

@@ -47,7 +47,6 @@ $liss = new Receiver(
     $config->get('external_type'),
     $config->get('external_liss_username'),
     $config->get('external_liss_password'),
-    $config->get('external_liss_default_event_type'),
     $config->get('external_liss_teacher_identifier'),
     $sourceName,
     $filesystemProxy,
