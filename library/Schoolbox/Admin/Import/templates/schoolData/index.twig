@@ -273,7 +273,7 @@
             </div>
         {% endif %}
 
-        {% if lissInputPayloads|length %}
+        {% if lissInputPayloads.all|length %}
             <div class="small-12 island liss-input-payloads" id="liss-input-payloads">
                 {% include '@adminImportIndex/schoolData/lissInputPayloads.twig' with {
                     lissInputPayloads: lissInputPayloads

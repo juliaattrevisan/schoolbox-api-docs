@@ -30,15 +30,21 @@
             <td>
                 {{ payload.title }}
             </td>
-            <td>
-                <a href="/storage/fetch.php?hash={{ payload.file.hash }}&save=1">{{ payload.file.filename }}</a>
-            </td>
-            <td>
-                {{ payload.file.createdAt.relativeTime }}
-            </td>
-            <td>
-                {{ payload.file.createdAt.local }}
-            </td>
+            {% if payload.file %}
+                <td>
+                    <a href="/storage/fetch.php?hash={{ payload.file.hash }}&save=1">{{ payload.file.filename }}</a>
+                </td>
+                <td>
+                    {{ payload.file.createdAt.relativeTime }}
+                </td>
+                <td>
+                    {{ payload.file.createdAt.local }}
+                </td>
+            {% else %}
+                <td></td>
+                <td></td>
+                <td></td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

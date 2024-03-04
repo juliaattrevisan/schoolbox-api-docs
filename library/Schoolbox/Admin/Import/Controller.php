@@ -165,7 +165,7 @@ class Controller extends ConfigController
 
         /* Input payloads for liss that we capture and store
          */
-        $lissPayloads = (new PayloadList($this->storageMapper))->generate();
+        $lissInputPayloads = (new PayloadList($this->storageMapper))->generate();
 
         $this->response = $this->responseFromTemplate(
             '@adminImportIndex/schoolData/index.twig',
@@ -180,7 +180,7 @@ class Controller extends ConfigController
                 'importLogs' => $this->importLogMapper->findLogsWithDuration(),
                 /* Find any LISS input payloads that we might have logged
                  */
-                'lissInputPayloads' => $lissPayloads,
+                'lissInputPayloads' => $lissInputPayloads,
                 /* Decide if the Perform Live Sync is available based on the current
                  * data source selected (you can't do it if you're using No Data Source
                  * or if you're using CSV Files)
