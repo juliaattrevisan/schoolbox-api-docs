@@ -50,7 +50,6 @@ $liss = new Receiver(
     $sourceName,
     $filesystemProxy,
     $superuser,
-    \Schoolbox\External\Connector\Log\Mapper::getInstance(),
     \Schoolbox\Resource\Storage\Mapper::getInstance()
 );
 
