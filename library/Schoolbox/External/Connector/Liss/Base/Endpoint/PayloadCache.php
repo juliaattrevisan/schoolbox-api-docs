@@ -106,7 +106,7 @@ class PayloadCache
             $pb = $this->storageMapper->getPredicateBuilder()
                 ->like('filename', $filename);
 
-            $files = $this->storageMapper->findByPredicates($pb)->sortBy('updated_at', 'desc');
+            $files = $this->storageMapper->findByPredicates($pb)->sortBy('createdAt', 'desc');
 
             if ($files->count() > 0) {
                 return true;
@@ -136,7 +136,7 @@ class PayloadCache
         $pb = $this->storageMapper->getPredicateBuilder()
             ->like('filename', "{$filename}%");
 
-        $files = $this->storageMapper->findByPredicates($pb)->sortBy('updated_at', 'desc');
+        $files = $this->storageMapper->findByPredicates($pb)->sortBy('createdAt', 'desc');
 
         /* No file found; no trabajo
          * Just return null and skip processing elsewhere
