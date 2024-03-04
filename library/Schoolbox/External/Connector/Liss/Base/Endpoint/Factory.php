@@ -119,6 +119,13 @@ class Factory
                     $this->storageMapper,
                     $this->periodMapper
                 ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    $this->classEntryMapper
+                ))
                 ->add(new TimetableCalendar\ClassMemberships(
                     $this->log,
                     true,

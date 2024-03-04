@@ -30,8 +30,9 @@ class PayloadCache
      * Part of the filename for the dailydata payload
      */
     public const PAYLOAD_DAILY_DATA = 'dailydata';
-    public const PAYLOAD_CLASS_MEMBERSHIPS = 'classmemberships';
     public const PAYLOAD_BELLTIMES = 'belltimes';
+    public const PAYLOAD_CLASSES = 'classes';
+    public const PAYLOAD_CLASS_MEMBERSHIPS = 'classmemberships';
 
 
     /**
