@@ -9,12 +9,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
-use PhpXmlRpc\Request;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\DailyData;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Cleanup;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Prepare;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 
 /**
@@ -34,54 +38,71 @@ class Factory
 
 
     /**
+     * Constructor.
+     *
      * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param string          $defaultType
-     * @param array           $exclusions
-     * @param string          $teacherIdentifier
-     * @param string          $sourceName
-     * @param Request         $message
+     * @param bool $perform
+     * @param string $defaultType
+     * @param string $exclusions
+     * @param string $teacherIdentifier
+     * @param Mapper $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper $classPeriodMapper
+     * @param TimetablePeriodMapper $periodMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     */
+    public function __construct(
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $defaultType,
+        private string $exclusions,
+        private string $teacherIdentifier,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private ClassPeriodMapper $classPeriodMapper,
+        private TimetablePeriodMapper $periodMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+    ) {
+    }
+
+
+    /**
      * @return GenericCollection
      * @throws \UnexpectedValueException
      */
-    public function produce(
-        LoggerInterface $log,
-        bool $perform,
-        string $defaultType,
-        array $exclusions,
-        string $teacherIdentifier,
-        string $sourceName,
-        Request $message
-    ): GenericCollection {
+    public function produce(): GenericCollection {
+        /* Convert exclusions csv into an array of trimmed elements
+         */
+        $exclusions = array_map('trim', explode(',', $this->exclusions));
+
         return (new GenericCollection(IStrategy::class))
             ->add(new Prepare(
-                $log,
-                $perform,
-                $sourceName,
-                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
-                \Schoolbox\External\ClassPeriodMapper::getInstance()->disableCache(),
-                \Schoolbox\External\TimetablePeriodMapper::getInstance()->disableCache(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper
             ))
             ->add(new DailyData(
-                $log,
-                $perform,
-                $defaultType,
+                $this->log,
+                $this->perform,
+                $this->defaultType,
                 $exclusions,
-                $teacherIdentifier,
-                $sourceName,
-                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
-                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache()
+                $this->teacherIdentifier,
+                $this->eventMapper,
+                $this->overridesMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
             ))
             ->add(new Cleanup(
-                $log,
-                $perform,
-                $sourceName,
-                new \Schoolbox\External\Event\Mapper()
+                $this->log,
+                $this->perform,
+                $this->eventMapper
             ));
     }
 }

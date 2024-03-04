@@ -384,7 +384,9 @@ class Factory implements IFactory
                 return (new LissEndpoint\Factory(
                     $this->logger,
                     $this->perform,
-                    Loader::getInstance()->get('external_liss_default_event_type'),
+                    (string)Loader::getInstance()->get('external_liss_default_event_type'),
+                    (string)Loader::getInstance()->get('external_liss_exclusions'),
+                    (string)Loader::getInstance()->get('external_liss_teacher_identifier'),
 
                     /* Timetable pieces
                      */
