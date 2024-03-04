@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * Takes a logged liss payload and replays it into your vagrant
@@ -146,14 +147,10 @@ HELP;
 
         $config = $this->getConfig();
 
-        /* Decide on the source name, using the specified param if supplied
-         * otherwise default to the Factory's const
+        /* This is needed to process liss data from storage files
          */
-        $sourceName = trim((string)$this->getOpt(self::OPT_LONG_SOURCE));
-
-        if ('' === $sourceName) {
-            $sourceName = Factory::SOURCE_NAME;
-        }
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
 
         $liss = new Receiver(
             (int)$config->get('external_enable'),
@@ -163,7 +160,7 @@ HELP;
             $config->get('external_liss_exclusions'),
             $config->get('external_liss_default_event_type'),
             $config->get('external_liss_teacher_identifier'),
-            $sourceName,
+            $filesystemProxy,
             $superuser,
             \Schoolbox\External\Connector\Log\Mapper::getInstance(),
             \Schoolbox\Resource\Storage\Mapper::getInstance()
@@ -192,7 +189,7 @@ HELP;
         $this->getLogger()->info(sprintf(
             'Replaying Receiver method "%s" using source identifier "%s"',
             $method,
-            $sourceName
+            Factory::SOURCE_NAME
         ));
 
         $liss->$method($mockMessage);
