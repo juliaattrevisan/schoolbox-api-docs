@@ -34,7 +34,6 @@ use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadList;
 use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\ValidStrats;
