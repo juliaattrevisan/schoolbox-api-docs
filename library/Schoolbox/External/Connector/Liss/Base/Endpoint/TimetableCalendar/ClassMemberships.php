@@ -9,13 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
-use PhpXmlRpc\Request;
+use Alaress\Database\Predicate\InvalidColumnException;
+use League\Flysystem\FilesystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Mapper;
 
 class ClassMemberships implements IStrategy
 {
@@ -38,18 +42,20 @@ class ClassMemberships implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface        $log
-     * @param bool                   $perform
-     * @param ClassEntryMapper       $classEntryMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param FilesystemProxy $filesystemProxy
+     * @param Mapper $storageMapper
+     * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
-     * @param Request                $message
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private ClassEntryMapper $classEntryMapper,
-        private ClassInvolvementMapper $classInvolvementMapper,
-        private Request $message
+        private ClassInvolvementMapper $classInvolvementMapper
     ) {
     }
 
@@ -59,12 +65,26 @@ class ClassMemberships implements IStrategy
      *
      * @return void
      * @throws Exception
+     * @throws InvalidColumnException
+     * @throws FilesystemException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     public function import(): void
     {
-        $classMemberships = $this->message->getParam(1)->me['array'];
+        /* Load data from the previously-saved liss payload
+         */
+        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
+            ->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
+
+        if (null === $message) {
+            $this->log->debug(sprintf(
+                'No payloads for %s; skipping',
+                PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS
+            ));
+        }
+
+        $classMemberships = $message->getParam(1)->me['array'];
 
         foreach ($classMemberships as $classMembership) {
             $classCode = (string)$classMembership->me['struct']['ClassCode']->me['string'];

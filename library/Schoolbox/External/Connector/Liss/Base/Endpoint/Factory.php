@@ -112,6 +112,14 @@ class Factory
                     $this->classEntryMapper,
                     $this->classInvolvementMapper
                 ))
+                ->add(new TimetableCalendar\ClassMemberships(
+                    $this->log,
+                    true,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache()
+                ))
                 ->add(new Cleanup(
                     $this->log,
                     $this->perform,

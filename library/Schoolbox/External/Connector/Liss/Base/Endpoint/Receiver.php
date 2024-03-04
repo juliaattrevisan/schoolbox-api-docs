@@ -288,25 +288,6 @@ class Receiver
 
         (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache('classmemberships', $this->superuser, $message);
 
-//        /* This is the equivalent of a combined Scheduler.php and Factory.php
-//         * since the liss receiver immediately processes upon receiving data
-//         *
-//         * Since we are receiving a push from schools,
-//         * we are always in Perform mode
-//         */
-//        $composites = (new GenericCollection(IStrategy::class))
-//            ->add(new TimetableCalendar\ClassMemberships(
-//                $this->log(),
-//                true,
-//                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-//                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
-//                $message
-//            ));
-//
-//        /* Shank a database instance
-//         */
-//        $this->transact($this->importLogMapper->getDatabase(), $composites);
-
         return $this->generateResponse('publishClassMemberships stored.');
     }
 

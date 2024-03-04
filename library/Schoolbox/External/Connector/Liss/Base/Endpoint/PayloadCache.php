@@ -30,6 +30,7 @@ class PayloadCache
      * Part of the filename for the dailydata payload
      */
     public const PAYLOAD_DAILY_DATA = 'dailydata';
+    public const PAYLOAD_CLASS_MEMBERSHIPS = 'classmemberships';
 
 
     /**
@@ -96,7 +97,8 @@ class PayloadCache
         /* Files that could potentially exist in storage at any given time
          */
         $potentialPayloads = [
-            self::PAYLOAD_DAILY_DATA
+            self::PAYLOAD_DAILY_DATA,
+            self::PAYLOAD_CLASS_MEMBERSHIPS
         ];
 
         foreach ($potentialPayloads as $potentialPayload) {

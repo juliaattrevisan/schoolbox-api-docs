@@ -108,8 +108,17 @@ class DailyData implements IStrategy
          */
         $helper = new Helper($this->log);
 
+        /* Load data from the previously-saved liss payload
+         */
         $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_DAILY_DATA);
+
+        if (null === $message) {
+            $this->log->debug(sprintf(
+                'No payloads for %s; skipping',
+                PayloadCache::PAYLOAD_DAILY_DATA
+            ));
+        }
 
         $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
 
