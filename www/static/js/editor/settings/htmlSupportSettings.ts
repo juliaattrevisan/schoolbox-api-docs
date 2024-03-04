@@ -175,7 +175,7 @@ export function getHTMLSupportSettings() {
                 },
                 // "Allow id on all div, p, h2, h3, and h4 elements"
                 {
-                    name: /^(div|p|a|h2|h3|h4)$/,
+                    name: /^(div|p|h2|h3|h4)$/,
                     attributes: {
                         id: true,
                     },
