@@ -81,6 +81,11 @@ class Factory
      */
     public function produce(): GenericCollection {
         /* Convert exclusions csv into an array of trimmed elements
+         *
+         * (configured in admin) A csv list of event types that should be ignored
+         * and a default event type that should be attributed to a liss event
+         * when it didn't specify a type (note that it will be possible that you
+         * can specify a default event type this is also excluded)
          */
         $exclusions = array_map('trim', explode(',', $this->exclusions));
 

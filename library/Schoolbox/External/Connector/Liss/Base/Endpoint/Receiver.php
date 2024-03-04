@@ -58,15 +58,6 @@ class Receiver
 
 
     /**
-     * A list of event types that we should skip,
-     * derived from a csv
-     *
-     * @var array
-     */
-    private array $exclusions;
-
-
-    /**
      * Logs the things that happened, in a text file
      *
      * @var LoggerInterface
@@ -95,7 +86,6 @@ class Receiver
      * @param string                                   $externalType      Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
      * @param string                                   $username          LISS username, as per config
      * @param string                                   $password          LISS password, as per config
-     * @param string                                   $exclusionList     A csv list of event types that we should skip
      * @param string                                   $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
      * @param string                                   $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper   Log the import in the suds control panel
@@ -106,7 +96,6 @@ class Receiver
         private string $externalType,
         private string $username,
         #[SensitiveParameter] private string $password,
-        private string $exclusionList,
         private string $defaultType,
         private string $teacherIdentifier,
         private string $sourceName,
@@ -115,12 +104,7 @@ class Receiver
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
-        /* (configured in admin) A csv list of event types that should be ignored
-         * and a default event type that should be attributed to a liss event
-         * when it didn't specify a type (note that it will be possible that you
-         * can specify a default event type this is also excluded)
-         */
-        $this->exclusions = array_map('trim', explode(',', $this->exclusionList));
+
         $this->defaultType = trim($defaultType);
         $this->teacherIdentifier = trim($teacherIdentifier);
 
