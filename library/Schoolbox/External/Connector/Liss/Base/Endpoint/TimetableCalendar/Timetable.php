@@ -144,12 +144,26 @@ class Timetable implements IStrategy
                         'teacher_external_id' => $externalId,
                         'room' => $room
                     ]);
+
+                    $this->log->debug(sprintf(
+                        'Reusing existing new class period %s on period %s, with teacher %s',
+                        $allClasses->first()->getName(),
+                        $allPeriods->first()->getTitle(),
+                        $externalId
+                    ));
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $classPeriod = $this->classPeriodMapper->createModel()
                         ->setClass($allClasses->first()->getId())
                         ->setPeriod($allPeriods->first()->getId())
                         ->setTeacher($externalId)
                         ->setRoom($room);
+
+                    $this->log->debug(sprintf(
+                        'Created new class period %s on period %s, with teacher %s',
+                        $allClasses->first()->getName(),
+                        $allPeriods->first()->getTitle(),
+                        $externalId
+                    ));
 
                     if ($this->perform) {
                         $this->classPeriodMapper->save($classPeriod);
