@@ -37,6 +37,18 @@ class PayloadCache
 
 
     /**
+     * A shortcut to all the payloads we use
+     */
+    public const PAYLOAD_ALL = [
+        self::PAYLOAD_DAILY_DATA,
+        self::PAYLOAD_BELLTIMES,
+        self::PAYLOAD_CLASSES,
+        self::PAYLOAD_CLASS_MEMBERSHIPS,
+        self::PAYLOAD_TIMETABLE
+    ];
+
+
+    /**
      * Constructor.
      *
      * @param Mapper $storageMapper
@@ -99,12 +111,7 @@ class PayloadCache
     {
         /* Files that could potentially exist in storage at any given time
          */
-        $potentialPayloads = [
-            self::PAYLOAD_DAILY_DATA,
-            self::PAYLOAD_CLASS_MEMBERSHIPS
-        ];
-
-        foreach ($potentialPayloads as $potentialPayload) {
+        foreach (self::PAYLOAD_ALL as $potentialPayload) {
             $filename = sprintf(
                 '%s_%s_',
                 self:: INPUT_PAYLOAD_PREFIX,
@@ -114,7 +121,7 @@ class PayloadCache
             $pb = $this->storageMapper->getPredicateBuilder()
                 ->like('filename', $filename);
 
-            $files = $this->storageMapper->findByPredicates($pb)->sortBy('createdAt', 'desc');
+            $files = $this->storageMapper->findByPredicates($pb)->sortBy('filename', 'desc');
 
             if ($files->count() > 0) {
                 return true;
@@ -144,7 +151,7 @@ class PayloadCache
         $pb = $this->storageMapper->getPredicateBuilder()
             ->like('filename', "{$filename}%");
 
-        $files = $this->storageMapper->findByPredicates($pb)->sortBy('createdAt', 'desc');
+        $files = $this->storageMapper->findByPredicates($pb)->sortBy('filename', 'desc');
 
         /* No file found; no trabajo
          * Just return null and skip processing elsewhere

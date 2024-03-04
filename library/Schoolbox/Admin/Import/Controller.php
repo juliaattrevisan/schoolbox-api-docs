@@ -34,6 +34,7 @@ use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadList;
 use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\ValidStrats;
@@ -163,6 +164,41 @@ class Controller extends ConfigController
             }
         }
 
+        /* Input payloads for liss that we capture and store
+         */
+        $lissPayloads = (new PayloadList($this->storageMapper))->generate();
+
+        $scheduled = [
+            PayloadCache::PAYLOAD_DAILY_DATA => [
+                'title' => 'Daily Data',
+                'file' => null
+            ],
+            PayloadCache::PAYLOAD_BELLTIMES => [
+                'title' => 'Bell Times',
+                'file' => null
+            ],
+            PayloadCache::PAYLOAD_CLASSES => [
+                'title' => 'Classes',
+                'file' => null
+            ],
+            PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS => [
+                'title' => 'Class Memberships',
+                'file' => null
+            ],
+            PayloadCache::PAYLOAD_TIMETABLE => [
+                'title' => 'Timetable',
+                'file' => null
+            ]
+        ];
+
+        foreach ($lissPayloads as $lissPayload) {
+            foreach (PayloadCache::PAYLOAD_ALL as $payloadName) {
+                if (null === $scheduled[$payloadName]['file'] && strpos($lissPayload->getFilename(), $payloadName) > -1) {
+                    $scheduled[$payloadName]['file'] = $lissPayload;
+                }
+            }
+        }
+
         $this->response = $this->responseFromTemplate(
             '@adminImportIndex/schoolData/index.twig',
             [
@@ -176,7 +212,10 @@ class Controller extends ConfigController
                 'importLogs' => $this->importLogMapper->findLogsWithDuration(),
                 /* Find any LISS input payloads that we might have logged
                  */
-                'lissInputPayloads' => (new PayloadList($this->storageMapper))->generate(),
+                'lissInputPayloads' => [
+                    'scheduled' => $scheduled,
+                    'all' => $lissPayloads
+                ],
                 /* Decide if the Perform Live Sync is available based on the current
                  * data source selected (you can't do it if you're using No Data Source
                  * or if you're using CSV Files)

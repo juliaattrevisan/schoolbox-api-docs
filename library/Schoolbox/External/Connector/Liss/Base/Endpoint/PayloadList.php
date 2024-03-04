@@ -38,6 +38,6 @@ class PayloadList
         $pb = $this->storageMapper->getPredicateBuilder()
             ->like('filename', PayloadCache::INPUT_PAYLOAD_PREFIX . '%');
 
-        return $this->storageMapper->findByPredicates($pb)->sortBy('createdAt', 'desc');
+        return $this->storageMapper->findByPredicates($pb)->sortBy('filename', 'desc');
     }
 }
