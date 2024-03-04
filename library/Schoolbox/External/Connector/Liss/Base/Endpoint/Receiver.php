@@ -227,7 +227,6 @@ class Receiver
      *
      * @param Request $message
      * @return Response
-     * @throws \JsonException
      */
     public function publishDailyData(Request $message): Response
     {
@@ -253,11 +252,6 @@ class Receiver
      *
      * @param Request $message
      * @return Response
-     * @throws Exception
-     * @throws \JsonException
-     * @throws \PDOException
-     * @throws \Throwable
-     * @throws \UnexpectedValueException
      */
     public function publishClassMemberships(Request $message): Response
     {
