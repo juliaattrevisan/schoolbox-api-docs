@@ -79,7 +79,8 @@ class Factory
      * @throws InvalidColumnException
      * @throws \UnexpectedValueException
      */
-    public function produce(): GenericCollection {
+    public function produce(): GenericCollection
+    {
         /* Convert exclusions csv into an array of trimmed elements
          *
          * (configured in admin) A csv list of event types that should be ignored
