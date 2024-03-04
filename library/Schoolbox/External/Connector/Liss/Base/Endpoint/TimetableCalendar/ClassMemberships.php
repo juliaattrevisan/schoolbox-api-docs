@@ -86,6 +86,8 @@ class ClassMemberships implements IStrategy
             return;
         }
 
+        $this->log->info('publishClassMemberships: processing request');
+
         $classMemberships = $message->getParam(1)->me['array'];
 
         foreach ($classMemberships as $classMembership) {
@@ -96,7 +98,7 @@ class ClassMemberships implements IStrategy
              */
             $edvalClassCode = (string)($classMembership->me['struct']['EdvalClassCode']->me['string'] ?? '');
 
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Enrolling student %s in class %s (Edval Class Code: %s)',
                 $externalId,
                 $classCode,
@@ -107,6 +109,8 @@ class ClassMemberships implements IStrategy
 
             $this->createEnrolment($classEntry, $externalId);
         }
+
+        $this->log->info('publishClassMemberships: completed request');
     }
 
 

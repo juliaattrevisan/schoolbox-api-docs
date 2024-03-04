@@ -152,14 +152,14 @@ class BellTimes implements IStrategy
          * Take into account non-uniform day lengths by cross-referencing with $counts
          */
         foreach ($lookup as $cycleId => $dayData) {
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'publishBellTimes: Cycle %s has %s days',
                 $cycleId,
                 \count($dayData)
             ));
 
             foreach ($dayData as $dayIndex => $periods) {
-                $this->log->info(sprintf(
+                $this->log->debug(sprintf(
                     'publishBellTimes: Cycle %s, day %s has %s periods',
                     $cycleId,
                     $dayIndex,
@@ -182,7 +182,7 @@ class BellTimes implements IStrategy
             }
         }
 
-        $this->log->info(sprintf("publishBellTimes: Saved timetable periods, process completed"));
+        $this->log->info('publishBellTimes: Saved timetable periods, process completed');
     }
 
 

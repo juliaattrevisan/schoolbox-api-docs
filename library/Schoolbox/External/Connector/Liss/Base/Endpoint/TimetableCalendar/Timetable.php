@@ -178,7 +178,7 @@ class Timetable implements IStrategy
             }
         }
 
-        $this->log->info("publishTimetable: completed request");
+        $this->log->info('publishTimetable: completed request');
     }
 
 

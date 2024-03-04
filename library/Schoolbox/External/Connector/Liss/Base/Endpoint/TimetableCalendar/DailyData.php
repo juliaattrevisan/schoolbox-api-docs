@@ -117,6 +117,8 @@ class DailyData implements IStrategy
             return;
         }
 
+        $this->log->info('publishDailyData: processing request');
+
         $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
 
         /* Keep track of all the problems we encountered
