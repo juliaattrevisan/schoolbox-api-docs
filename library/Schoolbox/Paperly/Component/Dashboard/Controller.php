@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Schoolbox\Paperly\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
