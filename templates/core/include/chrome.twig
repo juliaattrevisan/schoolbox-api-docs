@@ -116,6 +116,10 @@
         window.sbProps.hasEditorAI = true;
         {% endif %}
 
+        {% if config.firebase_public_config ?? null %}
+        window.sbProps.firebaseConfig = {{ config.firebase_public_config | json_encode | raw }};
+        {% endif %}
+
     </script>
     {% endautoescape %}
 
