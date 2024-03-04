@@ -49,3 +49,21 @@ export function addRelToNewTabLinks(sourceElementHTML: HTMLElement) {
     });
     return sourceElementHTML;
 }
+
+/**
+ *
+ * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
+ * @returns { HTMLElement } -
+ */
+export function addPrefixToElementIDs(sourceElementHTML: HTMLElement) {
+    const elementsWithId = sourceElementHTML.querySelectorAll("div[id], p[id], h2[id], h3[id], h4[id]");
+    const prefix = "page-anchor-";
+    // Filter out elements that already have an id starting with 'page-anchor-'
+    const filteredElements = Array.from(elementsWithId).filter((element) => {
+        return !element.id.startsWith(prefix);
+    });
+    filteredElements.forEach((element) => {
+        element.setAttribute("id", `${prefix}${element.id}`);
+    });
+    return sourceElementHTML;
+}
