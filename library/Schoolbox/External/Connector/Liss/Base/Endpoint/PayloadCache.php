@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
+use Alaress\Database\Predicate\InvalidColumnException;
+use DebugBar\DebugBarException;
 use PhpXmlRpc\Request;
 use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\Model;
@@ -20,6 +22,12 @@ use Schoolbox\User;
 class PayloadCache
 {
     public const INPUT_PAYLOAD_PREFIX = 'suds_liss';
+
+
+    /**
+     * Part of the filename for the dailydata payload
+     */
+    public const PAYLOAD_DAILY_DATA = 'dailydata';
 
 
     /**
@@ -62,5 +70,49 @@ class PayloadCache
         );
 
         return $this->storageMapper->acceptStream($filename, $payload, false, $expiryAt, $superuser);
+    }
+
+
+    /**
+     * Loads a previously-stored liss payload from the cache
+     *
+     * @param string $type
+     * @return null|Request
+     * @throws InvalidColumnException
+     * @throws DebugBarException
+     */
+    public function load(string $type): ?Request
+    {
+        $filename = sprintf(
+            '%s_%s_',
+            self:: INPUT_PAYLOAD_PREFIX,
+            $type,
+        );
+
+        $pb = $this->storageMapper->getPredicateBuilder()
+            ->like('filename', "{$filename}%");
+
+        $files = $this->storageMapper->findByPredicates($pb)->sortBy('updated_at', 'desc');
+
+        /* No file found; no trabajo
+         * Just return null and skip processing elsewhere
+         */
+        if (!$files->count()) {
+            return null;
+        }
+
+        $file = $files->first();
+
+        new \Alaress_Probe($file);
+        die();
+
+        /* Once we can get the saved payload, try to reconstruct it
+         * into something we can feed back into the Receiver
+         */
+        $mockMessage = unserialize(file_get_contents($filename), [
+            'allowed_classes' => true
+        ]);
+
+        return $mockMessage;
     }
 }
