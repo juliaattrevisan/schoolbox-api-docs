@@ -28,6 +28,8 @@ declare global {
             imageSlideshows: { [key: string]: any };
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
+            // Firebase config: not always set?
+            firebaseConfig?: { [key: string]: string } | null;
         };
         schoolboxUser: {
             id: number;
