@@ -75,110 +75,118 @@ class Timetable implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
+        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_TIMETABLE);
 
-        if (null === $message) {
+        if (null === $payloads) {
             return;
         }
 
-        $this->log->info('publishTimetable: processing request');
+        foreach ($payloads as $source => $payload) {
+            $this->log->info(sprintf(
+                '(%s) publishTimetable: processing request',
+                $source,
+            ));
 
-        /* Truncate everything before re-adding
-         * Note: This was supposed to already have been done via publishDailyData
-         * which is supposed to go first
-         *
-         * $classPeriodMapper->truncate();
-         */
-
-        /* Decide which externalId format to use via config var
-         */
-        $isTeacherIds = $this->isTeacherIds();
-
-        $allData = $message->getParam(1)->me['array'];
-
-        foreach ($allData as $currentData) {
-            /* An example $currentData that you can paste into a test.json
-             * so you have a meaningful example of what you're working with
-             * This came straight outta their 2020 devkit
+            /* Truncate everything before re-adding
+             * Note: This was supposed to already have been done via publishDailyData
+             * which is supposed to go first
              *
-             * {"me":{"struct":{"DayNumber":{"me":{"i4":1},"mytype":1,"_php_class":null},"Period":{"me":{"string":"3"},"mytype":1,"_php_class":null},"ClassCode":{"me":{"string":"7PDH 2"},"mytype":1,"_php_class":null},"EdvalClassCode":{"me":{"string":"7PDH2"},"mytype":1,"_php_class":null},"TeacherId":{"me":{"string":"79455"},"mytype":1,"_php_class":null},"TeacherCode":{"me":{"string":"ANDN"},"mytype":1,"_php_class":null},"RoomCode":{"me":{"string":"B3"},"mytype":1,"_php_class":null}}},"mytype":3,"_php_class":null}
+             * $classPeriodMapper->truncate();
              */
-            $struct = $currentData->me['struct'];
 
             /* Decide which externalId format to use via config var
              */
-            if ($isTeacherIds) {
-                $externalId = trim((string)($struct['TeacherId']->me['string'] ?? null));
-            } else {
-                $externalId = trim((string)($struct['TeacherCode']->me['string'] ?? null));
-            }
+            $isTeacherIds = $this->isTeacherIds();
 
-            $dayNumber = trim((string)($struct['DayNumber']->me['i4'] ?? null));
-            $periodName = trim((string)($struct['Period']->me['string'] ?? null));
-            $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
-            $room = trim((string)($struct['RoomCode']->me['string'] ?? null));
+            $allData = $payload->getParam(1)->me['array'];
 
-            /* Find the Period data
-             */
-            $allPeriods = $this->timetablePeriodMapper->findByColumnList([
-                'day' => $dayNumber,
-                'title' => $periodName
-            ]);
+            foreach ($allData as $currentData) {
+                /* An example $currentData that you can paste into a test.json
+                 * so you have a meaningful example of what you're working with
+                 * This came straight outta their 2020 devkit
+                 *
+                 * {"me":{"struct":{"DayNumber":{"me":{"i4":1},"mytype":1,"_php_class":null},"Period":{"me":{"string":"3"},"mytype":1,"_php_class":null},"ClassCode":{"me":{"string":"7PDH 2"},"mytype":1,"_php_class":null},"EdvalClassCode":{"me":{"string":"7PDH2"},"mytype":1,"_php_class":null},"TeacherId":{"me":{"string":"79455"},"mytype":1,"_php_class":null},"TeacherCode":{"me":{"string":"ANDN"},"mytype":1,"_php_class":null},"RoomCode":{"me":{"string":"B3"},"mytype":1,"_php_class":null}}},"mytype":3,"_php_class":null}
+                 */
+                $struct = $currentData->me['struct'];
 
-            /* Find the Class
-             */
-            $allClasses = $this->classEntryMapper->findByColumn('code', $classCode);
+                /* Decide which externalId format to use via config var
+                 */
+                if ($isTeacherIds) {
+                    $externalId = trim((string)($struct['TeacherId']->me['string'] ?? null));
+                } else {
+                    $externalId = trim((string)($struct['TeacherCode']->me['string'] ?? null));
+                }
 
-            /* Check that all three are provided
-             * Save it!
-             */
-            if ($allPeriods->count() && $allClasses->count()) {
-                try {
-                    $classPeriod = $this->classPeriodMapper->findOneByColumnList([
-                        'class_id' => $allClasses->first()->getId(),
-                        'period_id' => $allPeriods->first()->getId(),
-                        'teacher_external_id' => $externalId,
-                        'room' => $room
-                    ]);
+                $dayNumber = trim((string)($struct['DayNumber']->me['i4'] ?? null));
+                $periodName = trim((string)($struct['Period']->me['string'] ?? null));
+                $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
+                $room = trim((string)($struct['RoomCode']->me['string'] ?? null));
 
-                    $this->log->debug(sprintf(
-                        'Reusing existing new class period %s on period %s, with teacher %s',
-                        $allClasses->first()->getName(),
-                        $allPeriods->first()->getTitle(),
-                        $externalId
-                    ));
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $classPeriod = $this->classPeriodMapper->createModel()
-                        ->setClass($allClasses->first()->getId())
-                        ->setPeriod($allPeriods->first()->getId())
-                        ->setTeacher($externalId)
-                        ->setRoom($room);
+                /* Find the Period data
+                 */
+                $allPeriods = $this->timetablePeriodMapper->findByColumnList([
+                    'day' => $dayNumber,
+                    'title' => $periodName
+                ]);
 
-                    $this->log->debug(sprintf(
-                        'Created new class period %s on period %s, with teacher %s',
-                        $allClasses->first()->getName(),
-                        $allPeriods->first()->getTitle(),
-                        $externalId
-                    ));
+                /* Find the Class
+                 */
+                $allClasses = $this->classEntryMapper->findByColumn('code', $classCode);
 
-                    if ($this->perform) {
-                        $this->classPeriodMapper->save($classPeriod);
+                /* Check that all three are provided
+                 * Save it!
+                 */
+                if ($allPeriods->count() && $allClasses->count()) {
+                    try {
+                        $classPeriod = $this->classPeriodMapper->findOneByColumnList([
+                            'class_id' => $allClasses->first()->getId(),
+                            'period_id' => $allPeriods->first()->getId(),
+                            'teacher_external_id' => $externalId,
+                            'room' => $room
+                        ]);
+
+                        $this->log->debug(sprintf(
+                            'Reusing existing new class period %s on period %s, with teacher %s',
+                            $allClasses->first()->getName(),
+                            $allPeriods->first()->getTitle(),
+                            $externalId
+                        ));
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $classPeriod = $this->classPeriodMapper->createModel()
+                            ->setClass($allClasses->first()->getId())
+                            ->setPeriod($allPeriods->first()->getId())
+                            ->setTeacher($externalId)
+                            ->setRoom($room);
+
+                        $this->log->debug(sprintf(
+                            'Created new class period %s on period %s, with teacher %s',
+                            $allClasses->first()->getName(),
+                            $allPeriods->first()->getTitle(),
+                            $externalId
+                        ));
+
+                        if ($this->perform) {
+                            $this->classPeriodMapper->save($classPeriod);
+                        }
+                    }
+                } else {
+                    /* These ones are broken */
+                    if ($allPeriods->count() === 0) {
+                        $this->log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
+                    }
+
+                    if ($allClasses->count() === 0) {
+                        $this->log->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
                     }
                 }
-            } else {
-                /* These ones are broken */
-                if ($allPeriods->count() === 0) {
-                    $this->log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
-                }
-
-                if ($allClasses->count() === 0) {
-                    $this->log->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
-                }
             }
-        }
 
-        $this->log->info('publishTimetable: completed request');
+            $this->log->info(sprintf(
+                '(%s) publishTimetable: completed request',
+                $source
+            ));
+        }
     }
 
 

@@ -79,38 +79,46 @@ class ClassMemberships implements IStrategy
     {
         /* Load data from the previously-saved liss payload
          */
-        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
+        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
 
-        if (null === $message) {
+        if (null === $payloads) {
             return;
         }
 
-        $this->log->info('publishClassMemberships: processing request');
-
-        $classMemberships = $message->getParam(1)->me['array'];
-
-        foreach ($classMemberships as $classMembership) {
-            $classCode = (string)$classMembership->me['struct']['ClassCode']->me['string'];
-            $externalId = (string)$classMembership->me['struct']['StudentId']->me['string'];
-
-            /* This might sometimes exist; sometimes it won't be there
-             */
-            $edvalClassCode = (string)($classMembership->me['struct']['EdvalClassCode']->me['string'] ?? '');
-
-            $this->log->debug(sprintf(
-                'Enrolling student %s in class %s (Edval Class Code: %s)',
-                $externalId,
-                $classCode,
-                $edvalClassCode
+        foreach ($payloads as $source => $payload) {
+            $this->log->info(sprintf(
+                '(%s) publishClassMemberships: processing request',
+                $source
             ));
 
-            $classEntry = $this->createClassEntry($classCode);
+            $classMemberships = $payload->getParam(1)->me['array'];
 
-            $this->createEnrolment($classEntry, $externalId);
+            foreach ($classMemberships as $classMembership) {
+                $classCode = (string)$classMembership->me['struct']['ClassCode']->me['string'];
+                $externalId = (string)$classMembership->me['struct']['StudentId']->me['string'];
+
+                /* This might sometimes exist; sometimes it won't be there
+                 */
+                $edvalClassCode = (string)($classMembership->me['struct']['EdvalClassCode']->me['string'] ?? '');
+
+                $this->log->debug(sprintf(
+                    'Enrolling student %s in class %s (Edval Class Code: %s)',
+                    $externalId,
+                    $classCode,
+                    $edvalClassCode
+                ));
+
+                $classEntry = $this->createClassEntry($classCode);
+
+                $this->createEnrolment($classEntry, $externalId);
+            }
+
+            $this->log->info(sprintf(
+                '(%s) publishClassMemberships: completed request',
+                $source
+            ));
         }
-
-        $this->log->info('publishClassMemberships: completed request');
     }
 
 

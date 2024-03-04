@@ -82,107 +82,117 @@ class BellTimes implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
+        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_BELLTIMES);
 
-        if (null === $message) {
+        if (null === $payloads) {
             return;
         }
 
-        /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
-         * It turns out schools have multiple cycles of varying day lengths
-         */
-        $lookup = [];
-
-        $this->log->info('publishBellTimes: processing request');
-
-        $allData = $message->getParam(2)->me['array'];
-
-        /* Truncate everything before re-adding
-         * Note: This was supposed to already have been done via publishDailyData
-         * which is supposed to go first
-         *
-         * $timetablePeriodMapper->truncate();
-         */
-        foreach ($allData as $currentData) {
-            $struct = $currentData->me['struct'];
-
-            /* Use $currentData['TtStructure']'s value as the cycle identifier
-             * and load that if it exists, creating a new one if it doesn't
+        foreach ($payloads as $source => $payload) {
+            /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
+             * It turns out schools have multiple cycles of varying day lengths
              */
-            $cycleIdentifier = trim((string)($struct['TtStructure']->me['string'] ?? null));
-            $cycle = $this->getCycle($cycleIdentifier);
+            $lookup = [];
 
-            $dayNumber = trim((string)($struct['DayNumber']->me['i4'] ?? null));
-            $periodName = trim((string)($struct['Period']->me['string'] ?? null));
-            $startTime = trim((string)($struct['StartTime']->me['string'] ?? null));
-            $finishTime = trim((string)($struct['EndTime']->me['string'] ?? null));
-
-            try {
-                $timetablePeriod = $this->periodMapper->findOneByColumnList([
-                    'cycle_id' => $cycle->getId(),
-                    'title' => $periodName,
-                    'day' => $dayNumber,
-                    'start' => $startTime,
-                    'finish' => $finishTime,
-                ]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $timetablePeriod = $this->periodMapper->createModel()
-                    ->setCycle($cycle)
-                    ->setTitle($periodName)
-                    ->setDay($dayNumber)
-                    ->setStart(new \Alaress_Date_Format($startTime, 'H:i'))
-                    ->setFinish(new \Alaress_Date_Format($finishTime, 'H:i'));
-            }
-
-            /* TODO: Undo these hardcoded values at some point
-              */
-            $timetablePeriod->setUsable(1);
-
-            /* Build a hash lookup of cycles, days and their periods
-             */
-            if (!isset($lookup[$cycle->getId()][$dayNumber])) {
-                $lookup[$cycle->getId()][$dayNumber] = [];
-            }
-
-            $lookup[$cycle->getId()][$dayNumber][] = $timetablePeriod;
-        }
-
-        /* Now traverse $lookup and assign sequence
-         * Take into account non-uniform day lengths by cross-referencing with $counts
-         */
-        foreach ($lookup as $cycleId => $dayData) {
-            $this->log->debug(sprintf(
-                'publishBellTimes: Cycle %s has %s days',
-                $cycleId,
-                \count($dayData)
+            $this->log->info(sprintf(
+                '(%s) publishBellTimes: processing request',
+                $source
             ));
 
-            foreach ($dayData as $dayIndex => $periods) {
+            $allData = $payload->getParam(2)->me['array'];
+
+            /* Truncate everything before re-adding
+             * Note: This was supposed to already have been done via publishDailyData
+             * which is supposed to go first
+             *
+             * $timetablePeriodMapper->truncate();
+             */
+            foreach ($allData as $currentData) {
+                $struct = $currentData->me['struct'];
+
+                /* Use $currentData['TtStructure']'s value as the cycle identifier
+                 * and load that if it exists, creating a new one if it doesn't
+                 */
+                $cycleIdentifier = trim((string)($struct['TtStructure']->me['string'] ?? null));
+                $cycle = $this->getCycle($cycleIdentifier);
+
+                $dayNumber = trim((string)($struct['DayNumber']->me['i4'] ?? null));
+                $periodName = trim((string)($struct['Period']->me['string'] ?? null));
+                $startTime = trim((string)($struct['StartTime']->me['string'] ?? null));
+                $finishTime = trim((string)($struct['EndTime']->me['string'] ?? null));
+
+                try {
+                    $timetablePeriod = $this->periodMapper->findOneByColumnList([
+                        'cycle_id' => $cycle->getId(),
+                        'title' => $periodName,
+                        'day' => $dayNumber,
+                        'start' => $startTime,
+                        'finish' => $finishTime,
+                    ]);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $timetablePeriod = $this->periodMapper->createModel()
+                        ->setCycle($cycle)
+                        ->setTitle($periodName)
+                        ->setDay($dayNumber)
+                        ->setStart(new \Alaress_Date_Format($startTime, 'H:i'))
+                        ->setFinish(new \Alaress_Date_Format($finishTime, 'H:i'));
+                }
+
+                /* TODO: Undo these hardcoded values at some point
+                  */
+                $timetablePeriod->setUsable(1);
+
+                /* Build a hash lookup of cycles, days and their periods
+                 */
+                if (!isset($lookup[$cycle->getId()][$dayNumber])) {
+                    $lookup[$cycle->getId()][$dayNumber] = [];
+                }
+
+                $lookup[$cycle->getId()][$dayNumber][] = $timetablePeriod;
+            }
+
+            /* Now traverse $lookup and assign sequence
+             * Take into account non-uniform day lengths by cross-referencing with $counts
+             */
+            foreach ($lookup as $cycleId => $dayData) {
                 $this->log->debug(sprintf(
-                    'publishBellTimes: Cycle %s, day %s has %s periods',
+                    '(%s) publishBellTimes: Cycle %s has %s days',
+                    $source,
                     $cycleId,
-                    $dayIndex,
-                    \count($periods)
+                    \count($dayData)
                 ));
 
-                /* Apply sequencing to every period in this day in this cycle
-                 */
-                $i = 0;
+                foreach ($dayData as $dayIndex => $periods) {
+                    $this->log->debug(sprintf(
+                        '(%s) publishBellTimes: Cycle %s, day %s has %s periods',
+                        $source,
+                        $cycleId,
+                        $dayIndex,
+                        \count($periods)
+                    ));
 
-                foreach ($periods as $timetablePeriod) {
-                    $timetablePeriod->setSequence($i);
+                    /* Apply sequencing to every period in this day in this cycle
+                     */
+                    $i = 0;
 
-                    if ($this->perform) {
-                        $this->periodMapper->save($timetablePeriod);
+                    foreach ($periods as $timetablePeriod) {
+                        $timetablePeriod->setSequence($i);
+
+                        if ($this->perform) {
+                            $this->periodMapper->save($timetablePeriod);
+                        }
+
+                        $i++;
                     }
-
-                    $i++;
                 }
             }
-        }
 
-        $this->log->info('publishBellTimes: Saved timetable periods, process completed');
+            $this->log->info(sprintf(
+                '(%s) publishBellTimes: Saved timetable periods, process completed',
+                $source
+            ));
+        }
     }
 
 

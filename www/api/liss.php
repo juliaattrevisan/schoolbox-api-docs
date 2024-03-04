@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 
@@ -35,7 +35,7 @@ $superuser = \Schoolbox\UserMapper::getInstance()->findByUsername(\Schoolbox\Use
  * You must specifically reconnect in the sdk by clicking the Connect button again
  * after you make your change.
  */
-$sourceName = $_GET['source'] ?? Factory::SOURCE_NAME;
+$sourceName = $_GET['source'] ?? PayloadCache::INPUT_PAYLOAD_PREFIX;
 
 /* This is needed to process liss data from storage files
  */
@@ -50,6 +50,7 @@ $liss = new Receiver(
     $config->get('external_liss_exclusions'),
     $config->get('external_liss_default_event_type'),
     $config->get('external_liss_teacher_identifier'),
+    $sourceName,
     $filesystemProxy,
     $superuser,
     \Schoolbox\External\Connector\Log\Mapper::getInstance(),

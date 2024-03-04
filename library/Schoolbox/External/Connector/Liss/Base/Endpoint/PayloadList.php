@@ -35,7 +35,7 @@ class PayloadList
     public function generate(): array
     {
         $pb = $this->storageMapper->getPredicateBuilder()
-            ->like('filename', PayloadCache::INPUT_PAYLOAD_PREFIX . '%');
+            ->like('filename', Factory::SOURCE_NAME . '%');
 
         $lissPayloads = $this->storageMapper->findByPredicates($pb)->sortBy('filename', 'desc');
 

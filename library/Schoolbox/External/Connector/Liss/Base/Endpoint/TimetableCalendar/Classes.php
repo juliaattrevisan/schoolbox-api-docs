@@ -67,77 +67,86 @@ class Classes implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
+        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_CLASSES);
 
-        if (null === $message) {
+        if (null === $payloads) {
             return;
         }
 
-        $this->log->info('publishClasses: processing request');
+        foreach ($payloads as $source => $payload) {
+            $this->log->info(sprintf(
+                '(%s) publishClasses: processing request',
+                $source,
+            ));
 
-        /* Truncate everything before re-adding
-         * Note: This was supposed to already have been done via publishDailyData
-         * which is supposed to go first
-         *
-         * $classEntryMapper->truncate();
-         */
-        $allData = $message->getParam(2)->me['array'];
-        $classCount = 0;
-
-        foreach ($allData as $currentData) {
-            $struct = $currentData->me['struct'];
-            $className = trim((string)($struct['CourseName']->me['string'] ?? null));
-            $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
-
-            /* Constraints in the schema are case insensitive, unlike
-             * these array keys - class codes sometimes appear like
-             * "Speech Therapy" and "Speech therapy" so inserting them
-             * twice will cause it to pack a sad. The classEntries array
-             * treats these as unique whereas the db didn't
+            /* Truncate everything before re-adding
+             * Note: This was supposed to already have been done via publishDailyData
+             * which is supposed to go first
+             *
+             * $classEntryMapper->truncate();
              */
-            $existingKey = strtolower($classCode);
+            $allData = $payload->getParam(2)->me['array'];
+            $classCount = 0;
 
-            if (isset($this->classEntries[$existingKey])) {
-                /* Check if this class was added by this method
+            foreach ($allData as $currentData) {
+                $struct = $currentData->me['struct'];
+                $className = trim((string)($struct['CourseName']->me['string'] ?? null));
+                $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
+
+                /* Constraints in the schema are case insensitive, unlike
+                 * these array keys - class codes sometimes appear like
+                 * "Speech Therapy" and "Speech therapy" so inserting them
+                 * twice will cause it to pack a sad. The classEntries array
+                 * treats these as unique whereas the db didn't
                  */
-                $this->log->debug(sprintf(
-                    '%s was already added in publishClasses; skipping',
-                    $classCode
-                ));
-            } else {
-                try {
-                    /* Check if this class was added by a different method
-                     */
-                    $classEntry = $this->classEntryMapper->findOneByColumn('code', $classCode);
+                $existingKey = strtolower($classCode);
 
+                if (isset($this->classEntries[$existingKey])) {
+                    /* Check if this class was added by this method
+                     */
                     $this->log->debug(sprintf(
-                        '%s was already added by some other means; skipping',
+                        '%s was already added in publishClasses; skipping',
                         $classCode
                     ));
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $classEntry = $this->classEntryMapper->createModel()
-                        ->setName($className)
-                        ->setCode($classCode);
+                } else {
+                    try {
+                        /* Check if this class was added by a different method
+                         */
+                        $classEntry = $this->classEntryMapper->findOneByColumn('code', $classCode);
 
-                    if ($this->perform) {
-                        $this->classEntryMapper->save($classEntry);
+                        $this->log->debug(sprintf(
+                            '%s was already added by some other means; skipping',
+                            $classCode
+                        ));
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $classEntry = $this->classEntryMapper->createModel()
+                            ->setName($className)
+                            ->setCode($classCode);
+
+                        if ($this->perform) {
+                            $this->classEntryMapper->save($classEntry);
+                        }
+
+                        $this->log->debug(sprintf(
+                            'Adding %s',
+                            $classCode
+                        ));
                     }
 
-                    $this->log->debug(sprintf(
-                        'Adding %s',
-                        $classCode
-                    ));
+                    /* Remember we saw it, in either outcome
+                     */
+                    $this->classEntries[$existingKey] = $classEntry;
                 }
 
-                /* Remember we saw it, in either outcome
-                 */
-                $this->classEntries[$existingKey] = $classEntry;
+                $classCount++;
             }
 
-            $classCount++;
+            $this->log->info(sprintf(
+                '(%s) publishClasses: completed adding %d classes',
+                $source,
+                $classCount
+            ));
         }
-
-        $this->log->info(sprintf('publishClasses: completed adding %d classes', $classCount));
     }
 }

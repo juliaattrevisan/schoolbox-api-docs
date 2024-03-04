@@ -23,7 +23,7 @@ use Schoolbox\User;
  */
 class PayloadCache
 {
-    public const INPUT_PAYLOAD_PREFIX = 'suds_liss';
+    public const INPUT_PAYLOAD_PREFIX = 'default';
 
 
     /**
@@ -69,12 +69,14 @@ class PayloadCache
      *
      * Use $name (an arbitrary string) to help identify filenames
      *
+     * @param string|null $sourceName
      * @param string $name
      * @param User $superuser
      * @param Request $message
      * @return Model
      */
     public function cache(
+        ?string $sourceName,
         string $name,
         \Schoolbox\User $superuser,
         Request $message
@@ -84,10 +86,17 @@ class PayloadCache
         $now = \Alaress_Date_Format::now();
         $expiryAt = \Alaress_Date_Format::now()->addWeeks(1);
 
+        /* This format is as follows:
+         *   suds_liss
+         *   liss method (e.g. belltimes, classmemberships, etc)
+         *   source name (if provided by client; otherwise, "default")
+         *   date
+         */
         $filename = sprintf(
-            '%s_%s_%s.log',
-            self:: INPUT_PAYLOAD_PREFIX,
+            '%s-%s-%s-%s.log',
+            Factory::SOURCE_NAME,
             $name,
+            $sourceName,
             $now->getUsingFormat('Ymd_His')
         );
 
@@ -112,11 +121,7 @@ class PayloadCache
         /* Files that could potentially exist in storage at any given time
          */
         foreach (self::PAYLOAD_ALL as $potentialPayload) {
-            $filename = sprintf(
-                '%s_%s_',
-                self:: INPUT_PAYLOAD_PREFIX,
-                $potentialPayload
-            ) . '%';
+            $filename = Factory::SOURCE_NAME . '-%';
 
             $pb = $this->storageMapper->getPredicateBuilder()
                 ->like('filename', $filename);
@@ -135,17 +140,17 @@ class PayloadCache
     /**
      * Loads a previously-stored liss payload from the cache
      *
-     * @param string $type
-     * @return null|Request
+     * @param string $name
+     * @return null|array
      * @throws FilesystemException
      * @throws InvalidColumnException
      */
-    public function load(string $type): ?Request
+    public function load(string $name): ?array
     {
         $filename = sprintf(
-            '%s_%s_',
-            self:: INPUT_PAYLOAD_PREFIX,
-            $type,
+            '%s-%s-',
+            Factory::SOURCE_NAME,
+            $name,
         );
 
         $pb = $this->storageMapper->getPredicateBuilder()
@@ -159,24 +164,45 @@ class PayloadCache
         if (!$files->count()) {
             $this->logger?->debug(sprintf(
                 'No %s liss payloads found in storage.',
-                $type
+                $name
             ));
 
             return null;
         }
 
-        /* Announce which file we're consuming
+        /* Could return multiple files concerning $name if you had multiple sources
+         * (Redlands)
          */
-        $this->logger?->debug(sprintf(
-            'Processing liss payload %s from storage',
-            $files->first()->getFilename()
-        ));
+        $stack = [];
 
-        /* Once we can get the saved payload, try to reconstruct it
-         * into something we can feed back into the Receiver
-         */
-        return unserialize($this->filesystemProxy->read($files->first()), [
-            'allowed_classes' => true
-        ]);
+        foreach ($files as $file) {
+            $parts = explode('-', $file->getFilename());
+
+            /* "default", normally
+             *
+             * ...unless the school specified a ?source parameter in their Receiver all,
+             * in which case it'll be that. Redlands used it.
+             */
+            $source = $parts[2];
+
+            /* Announce which file we're consuming
+             */
+            $this->logger?->debug(sprintf(
+                'Processing liss payload %s from storage, using source "%s"',
+                $file->getFilename(),
+                $source
+            ));
+
+            /* Once we can get the saved payload, try to reconstruct it
+             * into something we can feed back into the Receiver
+             */
+            $mockMessage = unserialize($this->filesystemProxy->read($file), [
+                'allowed_classes' => true
+            ]);
+
+            $stack[$source] = $mockMessage;
+        }
+
+        return $stack;
     }
 }

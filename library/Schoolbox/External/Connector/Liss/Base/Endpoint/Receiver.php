@@ -109,6 +109,7 @@ class Receiver
         private string $exclusionList,
         private string $defaultType,
         private string $teacherIdentifier,
+        private string $sourceName,
         private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
         private \Schoolbox\User $superuser,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
@@ -213,7 +214,12 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_DAILY_DATA, $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
+            $this->sourceName,
+            PayloadCache::PAYLOAD_DAILY_DATA,
+            $this->superuser,
+            $message
+        );
 
         return $this->generateResponse('publishDailyData stored.');
     }
@@ -238,7 +244,12 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS, $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
+            $this->sourceName,
+            PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS,
+            $this->superuser,
+            $message
+        );
 
         return $this->generateResponse('publishClassMemberships stored.');
     }
@@ -266,7 +277,12 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_BELLTIMES, $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
+            $this->sourceName,
+            PayloadCache::PAYLOAD_BELLTIMES,
+            $this->superuser,
+            $message
+        );
 
         return $this->generateResponse('publishBellTimes stored');
     }
@@ -291,7 +307,12 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_CLASSES, $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
+            $this->sourceName,
+            PayloadCache::PAYLOAD_CLASSES,
+            $this->superuser,
+            $message
+        );
 
         return $this->generateResponse('publishClasses stored');
     }
@@ -316,7 +337,12 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_TIMETABLE, $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
+            $this->sourceName,
+            PayloadCache::PAYLOAD_TIMETABLE,
+            $this->superuser,
+            $message
+        );
 
         return $this->generateResponse('publishTimetable stored.');
     }

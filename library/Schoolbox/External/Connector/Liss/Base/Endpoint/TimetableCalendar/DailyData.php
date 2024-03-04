@@ -110,48 +110,88 @@ class DailyData implements IStrategy
 
         /* Load data from the previously-saved liss payload
          */
-        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
+        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_DAILY_DATA);
 
-        if (null === $message) {
+        if (null === $payloads) {
             return;
         }
 
-        $this->log->info('publishDailyData: processing request');
+        foreach ($payloads as $source => $payload) {
+            $this->log->info(sprintf(
+                '(%s) publishDailyData: processing request',
+                $source
+            ));
 
-        $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
+            $allDailyData = $helper->reformatAllEvents($payload->getParam(3)->me['array']);
 
-        /* Keep track of all the problems we encountered
-         */
-        $skipCount = [
-            'noClassCode' => 0,
-            'noType' => 0,
-            'excludedType' => 0,
-            'total' => 0,
-        ];
-
-        /* Let's go, trying to skip as many as we can before we try
-         * to persist data to the db
-         */
-        foreach ($allDailyData as $currentEvent) {
-            /* Event doesn't have a type; see if we specified one in config
-             * If we did, give it that event type instead, then carry onwards
+            /* Keep track of all the problems we encountered
              */
-            if ('' === $currentEvent['type']) {
-                /* Skip events that don't have a type, because we didn't define
-                 * a default event type in config
+            $skipCount = [
+                'noClassCode' => 0,
+                'noType' => 0,
+                'excludedType' => 0,
+                'total' => 0,
+            ];
+
+            /* Let's go, trying to skip as many as we can before we try
+             * to persist data to the db
+             */
+            foreach ($allDailyData as $currentEvent) {
+                /* Event doesn't have a type; see if we specified one in config
+                 * If we did, give it that event type instead, then carry onwards
                  */
-                if ('' === $this->defaultType) {
-                    $this->log->warning(sprintf(
-                        'Skipping "%s" with code "%s" (%s): no type',
+                if ('' === $currentEvent['type']) {
+                    /* Skip events that don't have a type, because we didn't define
+                     * a default event type in config
+                     */
+                    if ('' === $this->defaultType) {
+                        $this->log->debug(sprintf(
+                            'Skipping "%s" with code "%s" (%s): no type',
+                            $currentEvent['name'],
+                            $currentEvent['code'],
+                            $currentEvent['guid']
+                        ));
+
+                        /* Update counts
+                         */
+                        $skipCount['noType']++;
+                        $skipCount['total']++;
+
+                        /* Skip processing this event entirely
+                         */
+                        continue;
+                    }
+
+                    /* Assign a default one and carry on as if this event
+                     * always had this type to start with
+                     */
+                    $currentEvent['type'] = $this->defaultType;
+
+                    $this->log->debug(sprintf(
+                        'Assigning default event type "%s" to "%s" with code "%s" (%s)',
+                        $this->defaultType,
                         $currentEvent['name'],
                         $currentEvent['code'],
                         $currentEvent['guid']
                     ));
+                }
+
+                /* Skip events that have a particular type
+                 * This also applies if you exclude the default one you chose in config
+                 */
+                if (\in_array($currentEvent['type'], $this->exclusions, false)) {
+                    $this->log->warning(sprintf(
+                        'Skipping "%s" with code "%s" (%s): has excluded type "%s"',
+                        $currentEvent['name'],
+                        $currentEvent['code'],
+                        $currentEvent['guid'],
+                        $currentEvent['type']
+                    ));
 
                     /* Update counts
                      */
-                    $skipCount['noType']++;
+                    $skipCount['excludedType']++;
                     $skipCount['total']++;
 
                     /* Skip processing this event entirely
@@ -159,81 +199,47 @@ class DailyData implements IStrategy
                     continue;
                 }
 
-                /* Assign a default one and carry on as if this event
-                 * always had this type to start with
+                /* Skip events that don't have any classCode value
+                 * This supposedly never happens, but I don't trust
                  */
-                $currentEvent['type'] = $this->defaultType;
+                if ('' === $currentEvent['code']) {
+                    $this->log->warning(sprintf(
+                        'Skipping "%s" with code "%s" (%s): no class codes provided',
+                        $currentEvent['name'],
+                        $currentEvent['code'],
+                        $currentEvent['guid'],
+                    ));
 
-                $this->log->debug(sprintf(
-                    'Assigning default event type "%s" to "%s" with code "%s" (%s)',
-                    $this->defaultType,
-                    $currentEvent['name'],
-                    $currentEvent['code'],
-                    $currentEvent['guid']
-                ));
+                    /* Update counts
+                     */
+                    $skipCount['noClassCode']++;
+                    $skipCount['total']++;
+
+                    /* Skip processing this event entirely
+                     */
+                    continue;
+                }
+
+                /* Process events here
+                 */
+                $this->processClass($currentEvent);
             }
 
-            /* Skip events that have a particular type
-             * This also applies if you exclude the default one you chose in config
+            /* Log diagnostics
              */
-            if (\in_array($currentEvent['type'], $this->exclusions, false)) {
-                $this->log->warning(sprintf(
-                    'Skipping "%s" with code "%s" (%s): has excluded type "%s"',
-                    $currentEvent['name'],
-                    $currentEvent['code'],
-                    $currentEvent['guid'],
-                    $currentEvent['type']
-                ));
+            $total = \count($allDailyData);
+            $processed = $total - $skipCount['total'];
 
-                /* Update counts
-                 */
-                $skipCount['excludedType']++;
-                $skipCount['total']++;
-
-                /* Skip processing this event entirely
-                 */
-                continue;
-            }
-
-            /* Skip events that don't have any classCode value
-             * This supposedly never happens, but I don't trust
-             */
-            if ('' === $currentEvent['code']) {
-                $this->log->warning(sprintf(
-                    'Skipping "%s" with code "%s" (%s): no class codes provided',
-                    $currentEvent['name'],
-                    $currentEvent['code'],
-                    $currentEvent['guid'],
-                ));
-
-                /* Update counts
-                 */
-                $skipCount['noClassCode']++;
-                $skipCount['total']++;
-
-                /* Skip processing this event entirely
-                 */
-                continue;
-            }
-
-            /* Process events here
-             */
-            $this->processClass($currentEvent);
+            $this->log->info('');
+            $this->log->info('----------------------------------------------');
+            $this->log->info(sprintf('Source: (%s)', $source));
+            $this->log->info("Total Processed: {$processed}/{$total}");
+            $this->log->info("Total Skipped: {$skipCount['total']}/{$total}");
+            $this->log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
+            $this->log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
+            $this->log->info("Skipped (excluded type): {$skipCount['excludedType']}/{$skipCount['total']}");
+            $this->log->info('');
         }
-
-        /* Log diagnostics
-         */
-        $total = \count($allDailyData);
-        $processed = $total - $skipCount['total'];
-
-        $this->log->info('');
-        $this->log->info('----------------------------------------------');
-        $this->log->info("Total Processed: {$processed}/{$total}");
-        $this->log->info("Total Skipped: {$skipCount['total']}/{$total}");
-        $this->log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
-        $this->log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
-        $this->log->info("Skipped (excluded type): {$skipCount['excludedType']}/{$skipCount['total']}");
-        $this->log->info('');
     }
 
 
