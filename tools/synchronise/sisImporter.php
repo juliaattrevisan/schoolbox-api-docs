@@ -12,6 +12,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -180,9 +181,14 @@ NULLTYPE;
          */
         $perform = $this->perform();
 
+        /* This is needed to process liss data from storage files
+         */
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
         /* Execute scheduler
          */
-        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist, $validStrats);
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist, $validStrats, $filesystemProxy);
 
         $randomMapper = UserMapper::getInstance();
 

@@ -49,6 +49,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
 use Schoolbox\Realtime\MessageList\Unread;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Symfony\Component\Lock\LockInterface;
 use UnexpectedValueException;
 
@@ -416,6 +417,11 @@ class Controller extends ConfigController
              */
             $time = time();
 
+            /* This is needed to process liss data from storage files
+             */
+            /** @var FilesystemProxy $filesystemProxy */
+            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
             foreach ($splitStrats as $currentStrat) {
                 /* Each part of a Segregated Import gets its own run id
                  */
@@ -427,7 +433,7 @@ class Controller extends ConfigController
 
                 /* Execute scheduler: sis stuff
                  */
-                $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
+                $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats, $filesystemProxy);
 
                 /* Importer strat gets suffixed onto the end
                  */

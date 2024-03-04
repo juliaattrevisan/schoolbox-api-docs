@@ -20,6 +20,7 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * Class Factory
@@ -45,6 +46,8 @@ class Factory
      * @param string $defaultType
      * @param string $exclusions
      * @param string $teacherIdentifier
+     * @param FilesystemProxy $filesystemProxy
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      * @param Mapper $eventMapper
      * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
@@ -58,6 +61,8 @@ class Factory
         private string $defaultType,
         private string $exclusions,
         private string $teacherIdentifier,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
@@ -94,6 +99,8 @@ class Factory
                 $this->defaultType,
                 $exclusions,
                 $this->teacherIdentifier,
+                $this->filesystemProxy,
+                $this->storageMapper,
                 $this->eventMapper,
                 $this->overridesMapper,
                 $this->classEntryMapper,

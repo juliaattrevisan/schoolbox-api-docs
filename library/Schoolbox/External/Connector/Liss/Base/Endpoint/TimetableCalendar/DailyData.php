@@ -20,6 +20,7 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * Class DailyData
@@ -60,15 +61,17 @@ class DailyData implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log               Logs the things that happened, in a text file
-     * @param bool                                       $perform           Since we are receiving a push from schools, we are always in perform mode
-     * @param string                                     $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
-     * @param array                                      $exclusions        A csv list of event types that we should skip
-     * @param string                                     $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
-     * @param Mapper                                     $eventMapper
+     * @param LoggerInterface $log Logs the things that happened, in a text file
+     * @param bool $perform Since we are receiving a push from schools, we are always in perform mode
+     * @param string $defaultType A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
+     * @param array $exclusions A csv list of event types that we should skip
+     * @param string $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
+     * @param FilesystemProxy $filesystemProxy
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
      */
     public function __construct(
         private LoggerInterface $log,
@@ -76,6 +79,8 @@ class DailyData implements IStrategy
         private string $defaultType,
         private array $exclusions,
         private string $teacherIdentifier,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
@@ -99,7 +104,7 @@ class DailyData implements IStrategy
          */
         $helper = new Helper($this->log);
 
-        $message = (new PayloadCache(\Schoolbox\Resource\Storage\Mapper::getInstance()))
+        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy))
             ->load(PayloadCache::PAYLOAD_DAILY_DATA);
 
         $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);

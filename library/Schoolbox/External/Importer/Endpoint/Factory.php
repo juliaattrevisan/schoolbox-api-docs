@@ -32,6 +32,7 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use SensitiveParameter;
 use UnexpectedValueException;
@@ -126,12 +127,13 @@ class Factory implements IFactory
     /**
      * Factory constructor.
      *
-     * @param string          $host
-     * @param string          $key
-     * @param bool            $perform
+     * @param string $host
+     * @param string $key
+     * @param bool $perform
      * @param LoggerInterface $logger
-     * @param array           $watchlist
-     * @param ValidStrats     $validStrats
+     * @param array $watchlist
+     * @param ValidStrats $validStrats
+     * @param FilesystemProxy $filesystemProxy
      */
     public function __construct(
         string $host,
@@ -140,6 +142,7 @@ class Factory implements IFactory
         LoggerInterface $logger,
         array $watchlist,
         ValidStrats $validStrats,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy
     ) {
         $this->host = $host;
         $this->key = $key;
@@ -387,7 +390,8 @@ class Factory implements IFactory
                     (string)Loader::getInstance()->get('external_liss_default_event_type'),
                     (string)Loader::getInstance()->get('external_liss_exclusions'),
                     (string)Loader::getInstance()->get('external_liss_teacher_identifier'),
-
+                    $this->filesystemProxy,
+                    \Schoolbox\Resource\Storage\Mapper::getInstance(),
                     /* Timetable pieces
                      */
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),

@@ -11,7 +11,9 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use DebugBar\DebugBarException;
+use League\Flysystem\FilesystemException;
 use PhpXmlRpc\Request;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
@@ -34,9 +36,12 @@ class PayloadCache
      * Constructor.
      *
      * @param Mapper $storageMapper
+     * @param FilesystemProxy $filesystemProxy  Used when loading previously-cached payloads
      */
-    public function __construct(private \Schoolbox\Resource\Storage\Mapper $storageMapper)
-    {
+    public function __construct(
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy
+    ) {
     }
 
 
@@ -78,8 +83,8 @@ class PayloadCache
      *
      * @param string $type
      * @return null|Request
+     * @throws FilesystemException
      * @throws InvalidColumnException
-     * @throws DebugBarException
      */
     public function load(string $type): ?Request
     {
@@ -101,15 +106,10 @@ class PayloadCache
             return null;
         }
 
-        $file = $files->first();
-
-        new \Alaress_Probe($file);
-        die();
-
         /* Once we can get the saved payload, try to reconstruct it
          * into something we can feed back into the Receiver
          */
-        $mockMessage = unserialize(file_get_contents($filename), [
+        $mockMessage = unserialize($this->filesystemProxy->read($files->first()), [
             'allowed_classes' => true
         ]);
 
