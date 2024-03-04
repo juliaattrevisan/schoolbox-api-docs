@@ -11,7 +11,7 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use PhpXmlRpc\Request;
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Classes;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\DailyData;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Cleanup;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Prepare;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -65,7 +65,7 @@ class Factory
                 \Schoolbox\External\TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
             ))
-            ->add(new Classes(
+            ->add(new DailyData(
                 $log,
                 $perform,
                 $defaultType,

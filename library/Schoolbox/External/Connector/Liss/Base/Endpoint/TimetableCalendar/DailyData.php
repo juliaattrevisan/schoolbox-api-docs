@@ -21,16 +21,16 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
 
 /**
- * Class Classes
+ * Class DailyData
  *
- * Imports liss events into suds timetable, skipping what we can,
+ * Imports liss DailyData events into suds timetable, skipping what we can,
  * applying the defaults as specified in config
  *
  * This is intended to be sandwiched between Prepare and Cleanup
  * strats as per suds tradition. We take a $message as input since
  * the school pushes data to us; we don't retrieve data ourselves
  */
-class Classes implements IStrategy
+class DailyData implements IStrategy
 {
     /**
      * This const corresponds to the enum for the config var external_liss_default_event_type
