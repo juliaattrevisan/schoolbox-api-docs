@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 use Alaress\Database\Predicate\InvalidColumnException;
 use League\Flysystem\FilesystemException;
 use PhpXmlRpc\Request;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\Model;
@@ -35,11 +36,13 @@ class PayloadCache
      * Constructor.
      *
      * @param Mapper $storageMapper
-     * @param FilesystemProxy $filesystemProxy  Used when loading previously-cached payloads
+     * @param FilesystemProxy $filesystemProxy Used when loading previously-cached payloads
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -142,8 +145,20 @@ class PayloadCache
          * Just return null and skip processing elsewhere
          */
         if (!$files->count()) {
+            $this->logger?->debug(sprintf(
+                'No %s liss payloads found in storage.',
+                $type
+            ));
+
             return null;
         }
+
+        /* Announce which file we're consuming
+         */
+        $this->logger?->debug(sprintf(
+            'Processing liss payload %s from storage',
+            $files->first()->getFilename()
+        ));
 
         /* Once we can get the saved payload, try to reconstruct it
          * into something we can feed back into the Receiver

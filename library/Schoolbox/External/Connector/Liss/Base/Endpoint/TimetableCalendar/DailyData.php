@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
+use Alaress\Database\Predicate\InvalidColumnException;
+use League\Flysystem\FilesystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -94,7 +96,9 @@ class DailyData implements IStrategy
      *
      * @return void
      * @throws Exception
+     * @throws InvalidColumnException
      * @throws \InvalidArgumentException
+     * @throws FilesystemException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
@@ -104,7 +108,7 @@ class DailyData implements IStrategy
          */
         $helper = new Helper($this->log);
 
-        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy))
+        $message = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_DAILY_DATA);
 
         $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
