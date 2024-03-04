@@ -241,11 +241,7 @@ class Receiver
      *
      * @param Request $message
      * @return Response
-     * @throws Exception
      * @throws \JsonException
-     * @throws \PDOException
-     * @throws \Throwable
-     * @throws \UnexpectedValueException
      */
     public function publishDailyData(Request $message): Response
     {
@@ -260,7 +256,7 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper))->cache('dailydata', $this->superuser, $message);
+        (new PayloadCache($this->storageMapper))->cache(PayloadCache::PAYLOAD_DAILY_DATA, $this->superuser, $message);
 
         return $this->generateResponse('publishDailyData stored.');
     }
