@@ -1,11 +1,20 @@
 <?php
 
-namespace Schoolbox\Learning\Component\Dashboard;
+namespace Schoolbox\Paperly\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 
 class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
 {
+
+    /**
+     * Loads the grid component into its set configuration.
+     * @return bool
+     */
+    public function execute()
+    {
+        return true;
+    }
 
     /**
      * Output the data we collected in exec()
@@ -18,7 +27,9 @@ class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@paperlyDashboard/component.twig',
-            []
+            [
+                'componentInstanceId' => $this->getInstance()->getId(),
+            ]
         );
     }
 }
