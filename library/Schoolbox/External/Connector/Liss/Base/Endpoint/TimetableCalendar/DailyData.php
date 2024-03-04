@@ -222,7 +222,7 @@ class DailyData implements IStrategy
 
                 /* Process events here
                  */
-                $this->processClass($currentEvent);
+                $this->processClass($currentEvent, $source);
             }
 
             /* Log diagnostics
@@ -247,16 +247,17 @@ class DailyData implements IStrategy
      * Put this single $currentEvent into the SUDS Timetable
      *
      * @param array $currentEvent
+     * @param string $source
      * @return void
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $currentEvent): void
+    private function processClass(array $currentEvent, string $source): void
     {
         /* Save sis_event record
          */
-        $event = $this->createEvent($currentEvent);
+        $event = $this->createEvent($currentEvent, $source);
 
         /* Save sis_class record
          */
@@ -277,7 +278,7 @@ class DailyData implements IStrategy
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function createEvent(array $currentEvent): \Schoolbox\External\Event\Model
+    private function createEvent(array $currentEvent, string $source): \Schoolbox\External\Event\Model
     {
         /* Fill in these vars as usual
          */
@@ -320,7 +321,7 @@ class DailyData implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource(Factory::SOURCE_NAME);
+            ->setSource(Factory::SOURCE_NAME . '-' . $source);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
