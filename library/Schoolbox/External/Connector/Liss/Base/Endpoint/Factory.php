@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
@@ -75,6 +76,7 @@ class Factory
 
     /**
      * @return GenericCollection
+     * @throws InvalidColumnException
      * @throws \UnexpectedValueException
      */
     public function produce(): GenericCollection {
@@ -82,34 +84,41 @@ class Factory
          */
         $exclusions = array_map('trim', explode(',', $this->exclusions));
 
-        return (new GenericCollection(IStrategy::class))
-            ->add(new Prepare(
-                $this->log,
-                $this->perform,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->overridesMapper
-            ))
-            ->add(new DailyData(
-                $this->log,
-                $this->perform,
-                $this->defaultType,
-                $exclusions,
-                $this->teacherIdentifier,
-                $this->filesystemProxy,
-                $this->storageMapper,
-                $this->eventMapper,
-                $this->overridesMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper
-            ))
-            ->add(new Cleanup(
-                $this->log,
-                $this->perform,
-                $this->eventMapper
-            ));
+        /* Check if there are any liss payloads available:
+         * If not, just do nothing at all
+         */
+        if ((new PayloadCache($this->storageMapper, $this->filesystemProxy))->hasPayloads()) {
+            return (new GenericCollection(IStrategy::class))
+                ->add(new Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper
+                ))
+                ->add(new DailyData(
+                    $this->log,
+                    $this->perform,
+                    $this->defaultType,
+                    $exclusions,
+                    $this->teacherIdentifier,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    $this->eventMapper,
+                    $this->overridesMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper
+                ))
+                ->add(new Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ));
+        }
+
+        return new GenericCollection(IStrategy::class);
     }
 }

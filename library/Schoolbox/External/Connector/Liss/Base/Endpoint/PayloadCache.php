@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-use DebugBar\DebugBarException;
 use League\Flysystem\FilesystemException;
 use PhpXmlRpc\Request;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -55,7 +54,6 @@ class PayloadCache
      * @param User $superuser
      * @param Request $message
      * @return Model
-     * @throws \JsonException
      */
     public function cache(
         string $name,
@@ -75,6 +73,47 @@ class PayloadCache
         );
 
         return $this->storageMapper->acceptStream($filename, $payload, false, $expiryAt, $superuser);
+    }
+
+
+    /**
+     * Decide if we have any storage files corresponding to a liss payload
+     *
+     * Mega caveat: this only checks filenames. You could potentially bust stuff by circumstantially
+     * uploading a filename that matches something we look for here; we should be using the storage
+     * flags 'public' and 'private' to help prevent this problem a bit, but those haven't been
+     * implemented in storage yet. Or, we look for file ownership somehow; or make the filename even
+     * harder to accidentally collide
+     *
+     * @return bool
+     * @throws InvalidColumnException
+     */
+    public function hasPayloads(): bool
+    {
+        /* Files that could potentially exist in storage at any given time
+         */
+        $potentialPayloads = [
+            self::PAYLOAD_DAILY_DATA
+        ];
+
+        foreach ($potentialPayloads as $potentialPayload) {
+            $filename = sprintf(
+                '%s_%s_',
+                self:: INPUT_PAYLOAD_PREFIX,
+                $potentialPayload
+            ) . '%';
+
+            $pb = $this->storageMapper->getPredicateBuilder()
+                ->like('filename', $filename);
+
+            $files = $this->storageMapper->findByPredicates($pb)->sortBy('updated_at', 'desc');
+
+            if ($files->count() > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -109,10 +148,8 @@ class PayloadCache
         /* Once we can get the saved payload, try to reconstruct it
          * into something we can feed back into the Receiver
          */
-        $mockMessage = unserialize($this->filesystemProxy->read($files->first()), [
+        return unserialize($this->filesystemProxy->read($files->first()), [
             'allowed_classes' => true
         ]);
-
-        return $mockMessage;
     }
 }
