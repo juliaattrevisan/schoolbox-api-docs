@@ -4,7 +4,7 @@ namespace Schoolbox\Paperly\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 
-class CurrentLessonPlanController extends Component_Dashboard_ControllerAbstract
+class Controller extends Component_Dashboard_ControllerAbstract
 {
 
     /**

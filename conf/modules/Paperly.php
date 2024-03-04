@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
@@ -16,7 +16,7 @@ use Schoolbox\Paperly\Component\Dashboard\Module as DashboardModule;
 /**
  * Module configuration for Paperly student and class analytics.
  */
-class PaperlyAnalytics extends ModuleLoader
+class Paperly extends ModuleLoader
 {
     /**
      * @inheritdoc
