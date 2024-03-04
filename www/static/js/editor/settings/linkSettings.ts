@@ -60,7 +60,7 @@ export function addRelToNewTabLinks(sourceElementHTML: HTMLElement) {
  */
 export function addPrefixToElementIDs(sourceElementHTML: HTMLElement) {
     // these elements are allowed to have an id, specified in www/static/js/editor/settings/htmlSupportSettings.ts
-    const elementsWithId = sourceElementHTML.querySelectorAll("div[id], p[id], h2[id], h3[id], h4[id]");
+    const elementsWithId = sourceElementHTML.querySelectorAll("div[id], p[id], h2[id], h3[id], h4[id], span[id]");
     const prefix = "page-anchor-";
     // Filter out elements that already have an id starting with the prefix
     const filteredElements = Array.from(elementsWithId).filter((element) => {
