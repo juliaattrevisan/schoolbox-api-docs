@@ -75,8 +75,7 @@ class Factory
                 \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
                 \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
-                $message
+                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache()
             ))
             ->add(new Cleanup(
                 $log,
