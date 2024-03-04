@@ -86,10 +86,7 @@ class BellTimes implements IStrategy
             ->load(PayloadCache::PAYLOAD_BELLTIMES);
 
         if (null === $message) {
-            $this->log->debug(sprintf(
-                'No payloads for %s; skipping',
-                PayloadCache::PAYLOAD_BELLTIMES
-            ));
+            return;
         }
 
         /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period

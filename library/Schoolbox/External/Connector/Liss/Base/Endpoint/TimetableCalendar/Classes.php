@@ -71,10 +71,7 @@ class Classes implements IStrategy
             ->load(PayloadCache::PAYLOAD_CLASSES);
 
         if (null === $message) {
-            $this->log->debug(sprintf(
-                'No payloads for %s; skipping',
-                PayloadCache::PAYLOAD_CLASSES
-            ));
+            return;
         }
 
         $this->log->info('publishClasses: processing request');

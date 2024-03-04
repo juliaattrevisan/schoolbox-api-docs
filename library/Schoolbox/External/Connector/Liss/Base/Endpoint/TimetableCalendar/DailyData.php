@@ -114,10 +114,7 @@ class DailyData implements IStrategy
             ->load(PayloadCache::PAYLOAD_DAILY_DATA);
 
         if (null === $message) {
-            $this->log->debug(sprintf(
-                'No payloads for %s; skipping',
-                PayloadCache::PAYLOAD_DAILY_DATA
-            ));
+            return;
         }
 
         $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);

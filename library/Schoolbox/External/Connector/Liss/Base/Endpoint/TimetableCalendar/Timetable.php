@@ -79,10 +79,7 @@ class Timetable implements IStrategy
             ->load(PayloadCache::PAYLOAD_TIMETABLE);
 
         if (null === $message) {
-            $this->log->debug(sprintf(
-                'No payloads for %s; skipping',
-                PayloadCache::PAYLOAD_TIMETABLE
-            ));
+            return;
         }
 
         $this->log->info('publishTimetable: processing request');

@@ -83,10 +83,7 @@ class ClassMemberships implements IStrategy
             ->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
 
         if (null === $message) {
-            $this->log->debug(sprintf(
-                'No payloads for %s; skipping',
-                PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS
-            ));
+            return;
         }
 
         $classMemberships = $message->getParam(1)->me['array'];
