@@ -25,6 +25,7 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint as WondeEndpoint;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint as VeracrossEndpoint;
 use Schoolbox\External\Connector\Civica\Base\Endpoint as CivicaEndpoint;
+use Schoolbox\External\Connector\Liss\Base\Endpoint as LissEndpoint;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -369,6 +370,22 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance()->disableCache(),
                     UserProfile\Staff\Mapper::getInstance()->disableCache(),
                     UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                    /* Timetable pieces
+                     */
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+                ))->produce();
+
+            case self::LISS:
+                return (new LissEndpoint\Factory(
+                    $this->logger,
+                    $this->perform,
+                    Loader::getInstance()->get('external_liss_default_event_type'),
+
                     /* Timetable pieces
                      */
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),

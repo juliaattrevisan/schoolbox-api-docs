@@ -168,6 +168,12 @@ class Scheduler
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
             try {
                 $composites = $this->factory->produce($this->file, $this->type);
+
+                /* And also process liss data in addition to whatever else is here
+                 */
+                $this->logger->info('Processing liss data');
+
+                $composites = $composites->merge($this->factory->produce($this->file, Factory::LISS));
             } catch (\Exception $e) {
                 /* Specifically log when you couldn't produce the recipe, then leave
                  * Anything could have caused that, so you might as well log it
