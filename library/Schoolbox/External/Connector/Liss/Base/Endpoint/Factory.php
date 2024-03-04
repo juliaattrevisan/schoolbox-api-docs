@@ -99,51 +99,51 @@ class Factory
                     $this->periodMapper,
                     $this->overridesMapper
                 ))
-//                ->add(new DailyData(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->defaultType,
-//                    $exclusions,
-//                    $this->teacherIdentifier,
-//                    $this->filesystemProxy,
-//                    $this->storageMapper,
-//                    $this->eventMapper,
-//                    $this->overridesMapper,
-//                    $this->classEntryMapper,
-//                    $this->classInvolvementMapper
-//                ))
-//                ->add(new TimetableCalendar\BellTimes(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->filesystemProxy,
-//                    $this->storageMapper,
-//                    $this->periodMapper
-//                ))
-//                ->add(new TimetableCalendar\Classes(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->filesystemProxy,
-//                    $this->storageMapper,
-//                    $this->classEntryMapper
-//                ))
-//                ->add(new TimetableCalendar\ClassMemberships(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->filesystemProxy,
-//                    $this->storageMapper,
-//                    \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-//                    \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache()
-//                ))
-//                ->add(new TimetableCalendar\Timetable(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->teacherIdentifier,
-//                    $this->filesystemProxy,
-//                    $this->storageMapper,
-//                    $this->classEntryMapper,
-//                    $this->classPeriodMapper,
-//                    $this->periodMapper
-//                ))
+                ->add(new DailyData(
+                    $this->log,
+                    $this->perform,
+                    $this->defaultType,
+                    $exclusions,
+                    $this->teacherIdentifier,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    $this->eventMapper,
+                    $this->overridesMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper
+                ))
+                ->add(new TimetableCalendar\BellTimes(
+                    $this->log,
+                    $this->perform,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    $this->periodMapper
+                ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    $this->classEntryMapper
+                ))
+                ->add(new TimetableCalendar\ClassMemberships(
+                    $this->log,
+                    $this->perform,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache()
+                ))
+                ->add(new TimetableCalendar\Timetable(
+                    $this->log,
+                    $this->perform,
+                    $this->teacherIdentifier,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    $this->classEntryMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper
+                ))
                 ->add(new Cleanup(
                     $this->log,
                     $this->perform,
