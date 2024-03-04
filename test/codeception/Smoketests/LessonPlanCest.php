@@ -333,7 +333,7 @@ class LessonPlanCest
      * @throws Exception
      *
      */
-    private function importCourseToClass(IntegrationTester $i): string|int
+    private function importCourseToClass(IntegrationTester $i): int
     {
         #GIVEN
         $timestamp      = time();
