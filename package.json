@@ -63,6 +63,7 @@
     "datatables.net-fixedcolumns": "~4.3.0",
     "dayjs": "~1.11.10",
     "dropzone": "~6.0.0-beta.2",
+    "firebase": "^10.8.1",
     "flatpickr": "~4.6.13",
     "gsap": "npm:@gsap/business@~3.12.5",
     "highcharts": "~9.3.3",
