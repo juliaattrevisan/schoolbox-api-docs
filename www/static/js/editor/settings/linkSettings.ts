@@ -53,7 +53,7 @@ export function addRelToNewTabLinks(sourceElementHTML: HTMLElement) {
 /**
  * Add the prefix to the id of any elements that have an id already set that doesn't start with the prefix.
  * We use this so that we can ensure that the id is unique and doesn't clash with any other ids on the page.
- * Id is allowed on the elements specified so that on page anchors can be added within the editor to link to sections
+ * The id attribute is allowed on the elements specified so that page anchors can be added within the editor to link to sections
  * of content within the same page.
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } -
@@ -64,11 +64,11 @@ export function addPrefixToElementIDs(sourceElementHTML: HTMLElement) {
         "div[id], p[id], h2[id], h3[id], h4[id], h5[id], span[id]"
     );
     const prefix = "page-anchor-";
-    // Filter out elements that already have an id starting with the prefix
+    // filter out elements that already have an id starting with the prefix
     const filteredElements = Array.from(elementsWithId).filter((element) => {
         return !element.id.startsWith(prefix);
     });
-    // add the prefix to the id of each element
+    // add the prefix to the id of each element that doesn't already have it
     filteredElements.forEach((element) => {
         element.setAttribute("id", `${prefix}${element.id}`);
     });
