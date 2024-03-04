@@ -42,27 +42,37 @@ const allTextboxKeys = window.Vue.computed(() => {
 });
 
 const tabsEl = window.Vue.ref<HTMLElement>();
-const windowHeight = window.Vue.ref(0);
+const tableHeaderEl = window.Vue.ref<HTMLElement>();
+const unitPlannerContainerEl = window.Vue.ref<HTMLElement>();
+const resizeObserver = window.Vue.ref<ResizeObserver>();
 
-/* The height of the scrollable area (table), such that no vertical scrollbar is shown for the whole page.
+// Use a ref instead of a computed property so that we can force the height to be recomputed
+const containerHeight = window.Vue.ref(window.innerHeight);
+
+/**
+ * Updates the height of the scrollable area (table), such that no vertical scrollbar is shown for the whole page.
  * This is to ensure the horizontal scrollbar of the unit planner table is always visible.
+ * @returns {void}
  */
-const containerHeight = window.Vue.computed(() => {
-    if (!tabsEl.value) {
-        return 0; // Not loaded yet
+function updateContainerHeight(): void {
+    if (!tabsEl.value || !tableHeaderEl.value || !unitPlannerContainerEl.value) {
+        containerHeight.value = window.innerHeight;
+        return;
     }
 
-    const tabsRect = tabsEl.value.getBoundingClientRect();
-    const footerRect = document.getElementById("footer")?.getBoundingClientRect();
+    const tabsBottomY = tabsEl.value.getBoundingClientRect().bottom;
+    const footerHeight = document.getElementById("footer")?.getBoundingClientRect().height || 0;
 
-    const mainContainerEl = document.getElementById("container");
-
-    const mainContainerPaddingBtm = mainContainerEl
-        ? parseInt(window.getComputedStyle(mainContainerEl).paddingBottom, 10)
+    const mainSBContainerEl = document.getElementById("container");
+    const mainSBContainerPaddingBtm = mainSBContainerEl
+        ? parseInt(window.getComputedStyle(mainSBContainerEl).paddingBottom, 10)
         : 0;
 
-    return windowHeight.value - tabsRect.bottom - (footerRect?.height || 0) - mainContainerPaddingBtm - 1;
-});
+    const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
+
+    // Prevent the container from being too small, this ensures one unit is always visible
+    containerHeight.value = Math.max(newHeight, 300 + tableHeaderEl.value.offsetHeight);
+}
 
 window.Vue.onMounted(async () => {
     store.init(props.units, props.routeFolderSequence, toastEl);
@@ -85,26 +95,20 @@ window.Vue.onMounted(async () => {
         });
     }
 
-    // Track window height to adjust the height of the scrollable area
-    window.addEventListener("resize", () => {
-        windowHeight.value = window.innerHeight;
-    });
+    // Initialize the ResizeObserver
+    resizeObserver.value = new ResizeObserver(updateContainerHeight);
+    resizeObserver.value.observe(unitPlannerContainerEl.value!);
 
-    // Wait for DOM render, then update height again, in case we haven't fully loaded yet
-    if (document.getElementById("footer")) {
-        windowHeight.value = window.innerHeight;
-    } else {
-        window.addEventListener("DOMContentLoaded", () => {
-            windowHeight.value = window.innerHeight;
-        });
-    }
+    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
+    updateContainerHeight();
+    window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
 });
 
 window.Vue.onUnmounted(() => {
     // Clean up event listeners
-    window.removeEventListener("resize", () => {
-        windowHeight.value = window.innerHeight;
-    });
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+    }
 });
 </script>
 
@@ -114,9 +118,9 @@ window.Vue.onUnmounted(() => {
             <a @click="selectedTab = tab.id">{{ tab.label }}</a>
         </dd>
     </dl>
-    <div ref="unitPlannerContainer" class="scrollable" :style="{ height: containerHeight + 'px' }">
+    <div ref="unitPlannerContainerEl" class="scrollable" :style="{ height: containerHeight + 'px' }">
         <table class="unit-planner" :class="{ sortable: props.routeFolderSequence }">
-            <thead>
+            <thead ref="tableHeaderEl">
                 <tr>
                     <th>Unit</th>
                     <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
