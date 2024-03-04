@@ -7,7 +7,7 @@ import ContentContainer from "./content-container.vue";
 import RubricCapabilities from "./rubric-capabilities.vue";
 import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
-import ActivitiesList from "./activities-list.vue";
+import ActivitiesListItem from "./activities-list-item.vue";
 
 interface Props {
     units: Unit[];
@@ -161,7 +161,16 @@ window.Vue.onUnmounted(() => {
                         </td>
                     </template>
                     <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
-                        <activities-list :activities="unit.activities" :unit-id="unit.id"></activities-list>
+                        <content-container :unit-id="unit.id">
+                            <ul class="information-list">
+                                <activities-list-item
+                                    v-for="activity in unit.activities"
+                                    ref="activityListItem"
+                                    :key="activity.id"
+                                    :activity="activity"
+                                />
+                            </ul>
+                        </content-container>
                     </td>
                     <td v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">
                         <content-container :unit-id="unit.id">
