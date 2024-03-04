@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -31,7 +32,6 @@ class Prepare implements IStrategy
      *
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
-     * @param string                                     $sourceName
      * @param Mapper                                     $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
@@ -42,7 +42,6 @@ class Prepare implements IStrategy
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
-        private string $sourceName,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
@@ -72,7 +71,7 @@ class Prepare implements IStrategy
             $statement = $this->overridesMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => $this->sourceName
+                'source' => Factory::SOURCE_NAME
             ]);
 
             $this->log->debug('Purged timetable event overrides');
@@ -88,7 +87,7 @@ class Prepare implements IStrategy
             $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => $this->sourceName,
+                'source' => Factory::SOURCE_NAME,
             ]);
 
             /* Truncate other data entirely

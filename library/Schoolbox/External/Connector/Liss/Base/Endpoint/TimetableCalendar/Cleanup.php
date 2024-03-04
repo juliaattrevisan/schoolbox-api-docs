@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -27,13 +28,11 @@ class Cleanup implements IStrategy
      *
      * @param LoggerInterface $log
      * @param bool            $perform
-     * @param string          $sourceName
      * @param Mapper          $eventMapper
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
-        private string $sourceName,
         private \Schoolbox\External\Event\Mapper $eventMapper
     ) {
     }
@@ -58,7 +57,7 @@ class Cleanup implements IStrategy
 
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => $this->sourceName
+                'source' => Factory::SOURCE_NAME
             ]);
 
             $this->log->info("Removed stale timetable events.");

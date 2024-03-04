@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Event\Mapper;
@@ -64,7 +65,6 @@ class DailyData implements IStrategy
      * @param string                                     $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
      * @param array                                      $exclusions        A csv list of event types that we should skip
      * @param string                                     $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
-     * @param string                                     $sourceName
      * @param Mapper                                     $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
@@ -76,7 +76,6 @@ class DailyData implements IStrategy
         private string $defaultType,
         private array $exclusions,
         private string $teacherIdentifier,
-        private string $sourceName,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
@@ -298,7 +297,7 @@ class DailyData implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource($this->sourceName);
+            ->setSource(Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
