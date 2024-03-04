@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -44,8 +44,9 @@ class Timetable implements IStrategy
      * @param string $teacherIdentifier
      * @param FilesystemProxy $filesystemProxy
      * @param Mapper $storageMapper
-     * @param TimetablePeriodMapper $timetablePeriodMapper
+     * @param ClassEntryMapper $classEntryMapper
      * @param ClassPeriodMapper $classPeriodMapper
+     * @param TimetablePeriodMapper $timetablePeriodMapper
      */
     public function __construct(
         private LoggerInterface $log,

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -9,22 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycle;
-use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception;
 use SensitiveParameter;
 
 /**
@@ -248,92 +238,10 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache('classmemberships', $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS, $this->superuser, $message);
 
         return $this->generateResponse('publishClassMemberships stored.');
     }
-
-
-//    /**
-//     * Execute each strat in sequence, just like Scheduler does
-//     *
-//     * @param IConnector        $db
-//     * @param GenericCollection $composites
-//     * @return void
-//     * @throws \PDOException
-//     * @throws Exception
-//     * @throws \Throwable
-//     * @throws \UnexpectedValueException
-//     */
-//    private function transact(IConnector $db, GenericCollection $composites): void
-//    {
-//        /* Borrow some scheduler.php pieces
-//         */
-//        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
-//        $scriptName = \Schoolbox\External\Importer\Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME;
-//
-//        /* Always log the start of the run
-//         */
-//        $importLog = $this->importLogMapper->start($runId, $scriptName);
-//
-//        try {
-//            $this->log()->debug(sprintf(
-//                'Beginning transaction'
-//            ));
-//
-//            $db->beginTransaction();
-//
-//            foreach ($composites as $composite) {
-//                $composite->import();
-//            }
-//
-//            /* Augment the Factory's recipe with the finisher
-//             *
-//             * This way you don't have to remember doing it in every factory;
-//             * you literally cannot forget to do it. It'll only log the finish
-//             * if you didn't crash somewhere in the process
-//             */
-//            $this->importLogMapper->finish($importLog);
-//
-//            /* Trim away ancient logs
-//             */
-//            $this->importLogMapper->prune();
-//
-//            $this->log()->debug(sprintf(
-//                'Committing transaction'
-//            ));
-//
-//            $db->commit();
-//        } catch (RuntimeException $e) {
-//            $this->log()->critical("Cannot access api endpoint: {$e->getMessage()}");
-//
-//            $this->log()->debug(sprintf(
-//                'Rollback transaction'
-//            ));
-//
-//            $db->rollBack();
-//
-//            /* Something happened with the api; log it
-//             */
-//            $this->importLogMapper->error($importLog, $e->getMessage());
-//        } catch (\Throwable | \Exception $e) {
-//            $this->log()->critical("Cannot access api endpoint: {$e->getMessage()}");
-//
-//            $this->log()->debug(sprintf(
-//                'Rollback transaction'
-//            ));
-//
-//            $db->rollBack();
-//
-//            /* Some kind of unexpected fatal; log it
-//             */
-//            $this->importLogMapper->error($importLog, $e->getMessage());
-//
-//            /* Also rethrow it, so you get an error in the face
-//             */
-//            throw $e;
-//        }
-//    }
 
 
     /* Legacy liss implementation

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
