@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
-use PhpXmlRpc\Request;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -69,7 +69,6 @@ class DailyData implements IStrategy
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param Request                                    $message           The data sent to us by the school
      */
     public function __construct(
         private LoggerInterface $log,
@@ -81,8 +80,7 @@ class DailyData implements IStrategy
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
-        private ClassInvolvementMapper $classInvolvementMapper,
-        private Request $message
+        private ClassInvolvementMapper $classInvolvementMapper
     ) {
     }
 
@@ -101,7 +99,11 @@ class DailyData implements IStrategy
         /* Make all the data easier to manipulate by rearranging their guts
          */
         $helper = new Helper($this->log);
-        $allDailyData = $helper->reformatAllEvents($this->message->getParam(3)->me['array']);
+
+        $message = (new PayloadCache(\Schoolbox\Resource\Storage\Mapper::getInstance()))
+            ->load(PayloadCache::PAYLOAD_DAILY_DATA);
+
+        $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
 
         /* Keep track of all the problems we encountered
          */
