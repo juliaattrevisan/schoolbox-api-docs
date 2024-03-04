@@ -151,7 +151,7 @@ class Receiver
         private string $exclusionList,
         private string $defaultType,
         private string $teacherIdentifier,
-        private string $sourceName,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
         private \Schoolbox\User $superuser,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
@@ -256,7 +256,7 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper))->cache(PayloadCache::PAYLOAD_DAILY_DATA, $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_DAILY_DATA, $this->superuser, $message);
 
         return $this->generateResponse('publishDailyData stored.');
     }
@@ -286,7 +286,7 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper))->cache('classmemberships', $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache('classmemberships', $this->superuser, $message);
 
 //        /* This is the equivalent of a combined Scheduler.php and Factory.php
 //         * since the liss receiver immediately processes upon receiving data
@@ -420,7 +420,7 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper))->cache('belltimes', $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache('belltimes', $this->superuser, $message);
 
 //        /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
 //         * It turns out schools have multiple cycles of varying day lengths
@@ -543,7 +543,7 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper))->cache('classes', $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache('classes', $this->superuser, $message);
 
 //        $this->log()->info('publishClasses: processing request');
 //
@@ -638,7 +638,7 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper))->cache('timetable', $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache('timetable', $this->superuser, $message);
 
 //        $this->log()->info('publishTimetable: processing request');
 //
