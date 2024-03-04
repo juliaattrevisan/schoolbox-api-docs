@@ -42,30 +42,52 @@ class PayloadList
         $scheduled = [
             PayloadCache::PAYLOAD_DAILY_DATA => [
                 'title' => 'Daily Data',
-                'file' => null
+                'sources' => [
+                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                ]
             ],
             PayloadCache::PAYLOAD_BELLTIMES => [
                 'title' => 'Bell Times',
-                'file' => null
+                'sources' => [
+                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                ]
             ],
             PayloadCache::PAYLOAD_CLASSES => [
                 'title' => 'Classes',
-                'file' => null
+                'sources' => [
+                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                ]
             ],
             PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS => [
                 'title' => 'Class Memberships',
-                'file' => null
+                'sources' => [
+                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                ]
             ],
             PayloadCache::PAYLOAD_TIMETABLE => [
                 'title' => 'Timetable',
-                'file' => null
+                'sources' => [
+                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                ]
             ]
         ];
 
         foreach ($lissPayloads as $lissPayload) {
+            $parts = explode('-', $lissPayload->getFilename());
+
+            /* "default", normally
+             *
+             * ...unless the school specified a ?source parameter in their Receiver all,
+             * in which case it'll be that. Redlands used it.
+             */
+            $source = $parts[2];
+
             foreach (PayloadCache::PAYLOAD_ALL as $payloadName) {
-                if (null === $scheduled[$payloadName]['file'] && strpos($lissPayload->getFilename(), $payloadName) > -1) {
-                    $scheduled[$payloadName]['file'] = $lissPayload;
+                $neverSeen = null === ($scheduled[$payloadName]['sources'][$source] ?? null);
+                $matches = strpos($lissPayload->getFilename(), $payloadName) > -1;
+
+                if ($neverSeen && $matches) {
+                    $scheduled[$payloadName]['sources'][$source] = $lissPayload;
                 }
             }
         }

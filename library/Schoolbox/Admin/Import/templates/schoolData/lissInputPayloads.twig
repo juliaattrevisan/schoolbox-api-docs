@@ -20,32 +20,35 @@
     <tr>
         <th>Method</th>
         <th>Filename</th>
+        <th>Source</th>
         <th>Created</th>
         <th></th>
     </tr>
     </thead>
     <tbody>
     {% for payloadName, payload in lissInputPayloads.scheduled %}
-        <tr>
-            <td>
-                {{ payload.title }}
-            </td>
-            {% if payload.file %}
+        {% for source, file in payload.sources %}
+            <tr>
                 <td>
-                    <a href="/storage/fetch.php?hash={{ payload.file.hash }}&save=1">{{ payload.file.filename }}</a>
+                    {{ payload.title }}
                 </td>
-                <td>
-                    {{ payload.file.createdAt.relativeTime }}
-                </td>
-                <td>
-                    {{ payload.file.createdAt.local }}
-                </td>
-            {% else %}
-                <td></td>
-                <td></td>
-                <td></td>
-            {% endif %}
-        </tr>
+                {% if file %}
+                    <td>
+                        <a href="/storage/fetch.php?hash={{ file.hash }}&save=1">{{ file.filename }}</a>
+                    </td>
+                    <td>
+                        {{ source }}
+                    </td>
+                    <td>
+                        <time title="{{ file.createdAt.local }}">{{ file.createdAt.relativeTime }}</time>
+                    </td>
+                {% else %}
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
     {% endfor %}
     </tbody>
 </table>
