@@ -37,7 +37,7 @@ test("only those without the prefix already", () => {
 });
 
 test("check other elements", () => {
-    const testString = `<p id="test-1">P</p><h2 id="test-2">H2</h2><h3 id="test-3">H3</h3><h4 id="test-4">H4</h4><h5 id="test-5">H4</h5><span id="test-6">Span</span>`;
+    const testString = `<p id="test-1">P</p><h2 id="test-2">H2</h2><h3 id="test-3">H3</h3><h4 id="test-4">H4</h4><h5 id="test-5">H5</h5><span id="test-6">Span</span>`;
     const divElement = document.createElement("div");
     divElement.innerHTML = testString;
     const expected = `<p id="page-anchor-test-1">P</p><h2 id="page-anchor-test-2">H2</h2><h3 id="page-anchor-test-3">H3</h3><h4 id="page-anchor-test-4">H4</h4><h5 id="page-anchor-test-5">H5</h5><span id="page-anchor-test-6">Span</span>`;
