@@ -21,6 +21,11 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper;
 
+/**
+ * Class ClassMemberships
+ *
+ * Adds enrolment information to our sis_class_user table.
+ */
 class ClassMemberships implements IStrategy
 {
     /**

@@ -107,8 +107,6 @@ class BellTimes implements IStrategy
          *
          * $timetablePeriodMapper->truncate();
          */
-        $timetablePeriodMapper = $this->periodMapper;
-
         foreach ($allData as $currentData) {
             $struct = $currentData->me['struct'];
 
@@ -124,7 +122,7 @@ class BellTimes implements IStrategy
             $finishTime = trim((string)($struct['EndTime']->me['string'] ?? null));
 
             try {
-                $timetablePeriod = $timetablePeriodMapper->findOneByColumnList([
+                $timetablePeriod = $this->periodMapper->findOneByColumnList([
                     'cycle_id' => $cycle->getId(),
                     'title' => $periodName,
                     'day' => $dayNumber,
@@ -132,7 +130,7 @@ class BellTimes implements IStrategy
                     'finish' => $finishTime,
                 ]);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $timetablePeriod = $timetablePeriodMapper->createModel()
+                $timetablePeriod = $this->periodMapper->createModel()
                     ->setCycle($cycle)
                     ->setTitle($periodName)
                     ->setDay($dayNumber)
@@ -179,7 +177,7 @@ class BellTimes implements IStrategy
                     $timetablePeriod->setSequence($i);
 
                     if ($this->perform) {
-                        $timetablePeriodMapper->save($timetablePeriod);
+                        $this->periodMapper->save($timetablePeriod);
                     }
 
                     $i++;
