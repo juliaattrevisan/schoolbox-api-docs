@@ -33,6 +33,7 @@ class PayloadCache
     public const PAYLOAD_BELLTIMES = 'belltimes';
     public const PAYLOAD_CLASSES = 'classes';
     public const PAYLOAD_CLASS_MEMBERSHIPS = 'classmemberships';
+    public const PAYLOAD_TIMETABLE = 'timetable';
 
 
     /**

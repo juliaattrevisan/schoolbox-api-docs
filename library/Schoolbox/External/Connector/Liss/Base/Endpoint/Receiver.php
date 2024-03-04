@@ -99,18 +99,6 @@ class Receiver
 
 
     /**
-     * This const corresponds to the enum for the config var external_liss_default_event_type
-     * This is used to decide if we use numeric teacher ids, or alphanumeric teacher codes
-     * If you're not using teacherId, you're presumed to be using teacherCode instead
-     */
-    private const TEACHER_IDENTIFIER_ID = 'teacherId';
-
-
-
-
-
-
-    /**
      * Constructor.
      *
      * @param int                                      $externalEnable    Whether the external db was enabled
@@ -406,10 +394,6 @@ class Receiver
      *
      * @param Request $message
      * @return Response
-     * @throws Exception
-     * @throws \JsonException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      */
     public function publishTimetable(Request $message): Response
     {
@@ -424,110 +408,9 @@ class Receiver
          */
         $this->log()->debug('Logging LISS payload to local storage');
 
-        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache('timetable', $this->superuser, $message);
+        (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(PayloadCache::PAYLOAD_TIMETABLE, $this->superuser, $message);
 
-//        $this->log()->info('publishTimetable: processing request');
-//
-//        $timetablePeriodMapper = TimetablePeriodMapper::getInstance();
-//        $classEntryMapper = ClassEntryMapper::getInstance();
-//
-//        /* Truncate everything before re-adding
-//         * Note: This was supposed to already have been done via publishDailyData
-//         * which is supposed to go first
-//         *
-//         * $classPeriodMapper->truncate();
-//         */
-//        $classPeriodMapper = ClassPeriodMapper::getInstance();
-//
-//        /* Decide which externalId format to use via config var
-//         */
-//        $isTeacherIds = $this->isTeacherIds();
-//
-//        $allData = $message->getParam(1)->me['array'];
-//
-//        foreach ($allData as $currentData) {
-//            /* An example $currentData that you can paste into a test.json
-//             * so you have a meaningful example of what you're working with
-//             * This came straight outta their 2020 devkit
-//             *
-//             * {"me":{"struct":{"DayNumber":{"me":{"i4":1},"mytype":1,"_php_class":null},"Period":{"me":{"string":"3"},"mytype":1,"_php_class":null},"ClassCode":{"me":{"string":"7PDH 2"},"mytype":1,"_php_class":null},"EdvalClassCode":{"me":{"string":"7PDH2"},"mytype":1,"_php_class":null},"TeacherId":{"me":{"string":"79455"},"mytype":1,"_php_class":null},"TeacherCode":{"me":{"string":"ANDN"},"mytype":1,"_php_class":null},"RoomCode":{"me":{"string":"B3"},"mytype":1,"_php_class":null}}},"mytype":3,"_php_class":null}
-//             */
-//            $struct = $currentData->me['struct'];
-//
-//            /* Decide which externalId format to use via config var
-//             */
-//            if ($isTeacherIds) {
-//                $externalId = trim((string)($struct['TeacherId']->me['string'] ?? null));
-//            } else {
-//                $externalId = trim((string)($struct['TeacherCode']->me['string'] ?? null));
-//            }
-//
-//            $dayNumber = trim((string)($struct['DayNumber']->me['i4'] ?? null));
-//            $periodName = trim((string)($struct['Period']->me['string'] ?? null));
-//            $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
-//            $room = trim((string)($struct['RoomCode']->me['string'] ?? null));
-//
-//            /* Find the Period data
-//             */
-//            $allPeriods = $timetablePeriodMapper->findByColumnList([
-//                'day' => $dayNumber,
-//                'title' => $periodName
-//            ]);
-//
-//            /* Find the Class
-//             */
-//            $allClasses = $classEntryMapper->findByColumn('code', $classCode);
-//
-//            /* Check that all three are provided
-//             * Save it!
-//             */
-//            if ($allPeriods->count() && $allClasses->count()) {
-//                try {
-//                    $classPeriod = $classPeriodMapper->findOneByColumnList([
-//                        'class_id' => $allClasses->first()->getId(),
-//                        'period_id' => $allPeriods->first()->getId(),
-//                        'teacher_external_id' => $externalId,
-//                        'room' => $room
-//                    ]);
-//                } catch (\Schoolbox\Mapper\Exception $e) {
-//                    $classPeriod = $classPeriodMapper->createModel()
-//                        ->setClass($allClasses->first()->getId())
-//                        ->setPeriod($allPeriods->first()->getId())
-//                        ->setTeacher($externalId)
-//                        ->setRoom($room);
-//
-//                    $classPeriodMapper->save($classPeriod);
-//                }
-//            } else {
-//                /* These ones are broken */
-//                if ($allPeriods->count() === 0) {
-//                    $this->log()->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
-//                }
-//
-//                if ($allClasses->count() === 0) {
-//                    $this->log()->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
-//                }
-//            }
-//        }
-//
-//        $this->log()->info("publishTimetable: completed request");
-//
         return $this->generateResponse('publishTimetable stored.');
-    }
-
-
-
-
-
-    /**
-     * Decide if we're going to use teacherIds as the externalId for staff
-     * or whether we use teacherCodes instead
-     *
-     * @return bool
-     */
-    private function isTeacherIds(): bool
-    {
-        return self::TEACHER_IDENTIFIER_ID === $this->teacherIdentifier;
     }
 
 
