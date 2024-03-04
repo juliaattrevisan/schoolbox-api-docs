@@ -31,6 +31,7 @@ class PayloadCache
      */
     public const PAYLOAD_DAILY_DATA = 'dailydata';
     public const PAYLOAD_CLASS_MEMBERSHIPS = 'classmemberships';
+    public const PAYLOAD_BELLTIMES = 'belltimes';
 
 
     /**

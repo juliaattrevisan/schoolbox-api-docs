@@ -112,6 +112,13 @@ class Factory
                     $this->classEntryMapper,
                     $this->classInvolvementMapper
                 ))
+                ->add(new TimetableCalendar\BellTimes(
+                    $this->log,
+                    $this->perform,
+                    $this->filesystemProxy,
+                    $this->storageMapper,
+                    $this->periodMapper
+                ))
                 ->add(new TimetableCalendar\ClassMemberships(
                     $this->log,
                     true,
