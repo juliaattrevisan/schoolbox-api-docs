@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Application\Firebase\ServiceWorker;
+namespace Schoolbox\Firebase\ServiceWorker;
 
 use Alaress\Web\Controller\Base;
 

@@ -5,7 +5,7 @@
  * @link      https://schoolbox.education/
  */
 
-namespace Schoolbox\Application\Firebase\ServiceWorker;
+namespace Schoolbox\Firebase\ServiceWorker;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;

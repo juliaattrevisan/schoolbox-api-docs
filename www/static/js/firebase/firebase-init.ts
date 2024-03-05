@@ -19,8 +19,14 @@ if (firebaseConfig && firebaseWebPushPublicKey) {
                 // Should this be proxied through Schoolbox, though?
                 getToken(messaging, { vapidKey: firebaseWebPushPublicKey })
                     .then((currentToken) => {
-                        // Post this token to Schoolbox, registering it within
+                        // Post this token to Schoolbox,
+                        // registering it for the current user.
                         console.log('Current token: ' + currentToken);
+
+                        // The Firebase app will likely be a separate service to
+                        // the other mobile apps: should that happen, the
+                        // registration will be pushed to some other place.
+                        // For now, just push it to the first Firebase app.
                     })
                     .catch((error) => {
                         console.log('Error on getting token: ' + error);

@@ -19,6 +19,6 @@ class Firebase extends ModuleLoader
 {
     public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($di, \Schoolbox\Application\Firebase\ServiceWorker\Module::class, '/');
+        $this->loadModule($di, \Schoolbox\Firebase\ServiceWorker\Module::class, '/');
     }
 }
