@@ -66,6 +66,10 @@ class Factory implements IFactory
 
     /**
      * Formal naming
+     *
+     * This was first used in the User Modify screen so it could say
+     * "TASS ID" or "iSAMS ID", a connector-specific rendition of
+     * external id's label.
      */
     public const NAME = [
         self::ISAMS => 'iSAMS',
