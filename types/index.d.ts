@@ -31,6 +31,7 @@ declare global {
             // Firebase config: not always set?
             firebaseConfig?: { [key: string]: string } | null;
             firebaseWebPushPublicKey?: string | null;
+            firebaseAppIdentifiers?: Array<string> | null;
         };
         schoolboxUser: {
             id: number;

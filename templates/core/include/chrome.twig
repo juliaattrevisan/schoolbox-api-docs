@@ -116,13 +116,18 @@
         window.sbProps.hasEditorAI = true;
         {% endif %}
 
-        {% if config.firebase_public_config ?? null %}
-        {# Trust that Firebase public config is a JSON value #}
-        window.sbProps.firebaseConfig = {{ config.firebase_public_config | raw }};
+        {% if firebase.publicConfig ?? null %}
+        {# Firebase public config is a JSON value #}
+        window.sbProps.firebaseConfig = {{ firebase.publicConfig | json_encode | raw }};
         {% endif %}
 
-        {% if config.firebase_web_push_public_key ?? null %}
-        window.sbProps.firebaseWebPushPublicKey = '{{ config.firebase_web_push_public_key }}';
+        {% if firebase.WebPushPublicKey ?? null %}
+        window.sbProps.firebaseWebPushPublicKey = '{{ firebase.WebPushPublicKey }}';
+        {% endif %}
+
+        {% if firebase.appIdentifiers ?? null %}
+        {# Firebase public config is a JSON value #}
+        window.sbProps.firebaseAppIdentifiers = {{ firebase.appIdentifiers | json_encode | raw }};
         {% endif %}
 
     </script>
