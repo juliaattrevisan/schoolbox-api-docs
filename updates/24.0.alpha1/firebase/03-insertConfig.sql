@@ -17,7 +17,7 @@ INSERT INTO config (
     'firebase_public_config',
     'Firebase Public Configuration',
     '',
-    'Publicly available configuration for Firebase app for this Schoolbox instance. This is a JSON object which may be copied from Firebase, via Project Settings > General > Your apps > (your app nickname) > SDK setup and configuration > Config. Paste in only the {, } and their contents.',
+    'Publicly available configuration for Firebase app for this Schoolbox instance. This is a JavaScript object which may be copied from Firebase, via Project Settings > General > Your apps > (your app nickname) > SDK setup and configuration > Config. Paste in only the {, } and their contents.',
     @configField,
     @configType,
     'true',

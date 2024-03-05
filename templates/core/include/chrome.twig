@@ -117,12 +117,12 @@
         {% endif %}
 
         {% if firebase.publicConfig ?? null %}
-        {# Firebase public config is a JSON value #}
-        window.sbProps.firebaseConfig = {{ firebase.publicConfig | json_encode | raw }};
+        {# Firebase public config is a JavaScript object, not a JSON value #}
+        window.sbProps.firebaseConfig = {{ firebase.publicConfig | raw }};
         {% endif %}
 
-        {% if firebase.WebPushPublicKey ?? null %}
-        window.sbProps.firebaseWebPushPublicKey = '{{ firebase.WebPushPublicKey }}';
+        {% if firebase.webPushPublicKey ?? null %}
+        window.sbProps.firebaseWebPushPublicKey = '{{ firebase.webPushPublicKey }}';
         {% endif %}
 
         {% if firebase.appIdentifiers ?? null %}

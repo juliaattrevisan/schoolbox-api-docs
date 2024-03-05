@@ -41,10 +41,10 @@ class DataGenerator implements IDataGenerator
     public function generate(?array $chromeData = []): array
     {
         return [
-            'publicConfig'     => json_decode($this->config->get(ConfigMapper::NAME_FIREBASE_PUBLIC_CONFIG), true),
+            'publicConfig'     => $this->config->get(ConfigMapper::NAME_FIREBASE_PUBLIC_CONFIG),
             'privateKey'       => json_decode($this->config->get(ConfigMapper::NAME_FIREBASE_PRIVATE_KEY), true),
             'webPushPublicKey' => $this->config->get(ConfigMapper::NAME_FIREBASE_WEB_PUSH_PUBLIC_KEY),
-            'appIdentifiers'   => $this->serviceMapper->findByColumn(
+            'appIdentifiers'   => $this->serviceMapper->findScalarByPredicates(
                 'app_identifier',
                 $this->serviceMapper->getPredicateBuilder()->equals('provider', Registry::PROVIDER_FIREBASE),
             ),

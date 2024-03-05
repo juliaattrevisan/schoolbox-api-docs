@@ -3,7 +3,8 @@ import { getMessaging, getToken } from '@firebase/messaging';
 
 const firebaseConfig = window.sbProps.firebaseConfig ?? null;
 const firebaseWebPushPublicKey = window.sbProps.firebaseWebPushPublicKey ?? null;
-if (firebaseConfig && firebaseWebPushPublicKey) {
+const firebaseAppIdentifiers = window.sbProps.firebaseAppIdentifiers ?? null;
+if (firebaseConfig && firebaseWebPushPublicKey && firebaseAppIdentifiers) {
     const firebaseApp = initializeApp(firebaseConfig);
 
     // Ask for notification permission I guess?
@@ -26,7 +27,17 @@ if (firebaseConfig && firebaseWebPushPublicKey) {
                         // The Firebase app will likely be a separate service to
                         // the other mobile apps: should that happen, the
                         // registration will be pushed to some other place.
-                        // For now, just push it to the first Firebase app.
+                        // For now, just push it to the Firebase apps, if there
+                        // are any.
+                        firebaseAppIdentifiers.forEach((appIdentifier) => {
+                            let formData = new FormData();
+                            formData.append('appId', appIdentifier);
+                            formData.append('token', currentToken);
+                            fetch('/api/register/Firebase', {
+                                method: 'POST',
+                                body: formData,
+                            });
+                        });
                     })
                     .catch((error) => {
                         console.log('Error on getting token: ' + error);

@@ -103,7 +103,10 @@ class Controller extends Base
 
         // Authenticate, and if so register app
         // (For now, don't allow a query string JWT when registering)
-        $sessionUser = $this->authenticate(false);
+        // If Firebase: just use whoever's logged in at this time
+        $sessionUser = $provider === Registry::PROVIDER_FIREBASE
+            ? $this->getUser()
+            : $this->authenticate(false);
         if ($sessionUser) {
             // For Digistorm: token is always the user's username
             // Otherwise: token may be absent or blank, in which case we don't
