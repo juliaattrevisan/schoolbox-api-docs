@@ -30,6 +30,7 @@ declare global {
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             // Firebase config: not always set?
             firebaseConfig?: { [key: string]: string } | null;
+            firebaseWebPushPublicKey?: string | null;
         };
         schoolboxUser: {
             id: number;

@@ -117,7 +117,12 @@
         {% endif %}
 
         {% if config.firebase_public_config ?? null %}
-        window.sbProps.firebaseConfig = {{ config.firebase_public_config | json_encode | raw }};
+        {# Trust that Firebase public config is a JSON value #}
+        window.sbProps.firebaseConfig = {{ config.firebase_public_config | raw }};
+        {% endif %}
+
+        {% if config.firebase_web_push_public_key ?? null %}
+        window.sbProps.firebaseWebPushPublicKey = '{{ config.firebase_web_push_public_key }}';
         {% endif %}
 
     </script>
