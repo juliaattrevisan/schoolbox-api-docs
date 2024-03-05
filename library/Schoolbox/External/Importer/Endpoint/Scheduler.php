@@ -128,9 +128,12 @@ class Scheduler
                     $composites = new GenericCollection(IStrategy::class);
                 }
 
-                /* This seems extreme but I keep getting bad vibes from the assumption that the
-                 * factory always produces composites: one day I'll make a weird mistake and
-                 * it'll return a null instead.
+                /* The IFactory injected might not know about liss, such as when we're given a
+                 * CalendarFactory instance. That has nothing to do with liss, and that might snap
+                 * here unless we coalesce it to an empty collection that we can operate upon...
+                 *
+                 * ...but there was talk about having liss events being imported too; someone asked
+                 * about them, but we currently don't support that usage.
                  */
                 $lissComposites = $this->factory->produce($this->file, Factory::LISS) ?? new GenericCollection(IStrategy::class);
 
