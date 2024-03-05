@@ -1137,7 +1137,7 @@ class Controller extends Assessment\Controller
         /* Add the online submission to this response's list of files
          * only if there is content in it.
          */
-        if (trim(strip_tags($body)) !== '') {
+        if (trim(strip_tags($body ?? '')) !== '') {
             $response->attachOnlineSubmissionContent($body);
         }
 
