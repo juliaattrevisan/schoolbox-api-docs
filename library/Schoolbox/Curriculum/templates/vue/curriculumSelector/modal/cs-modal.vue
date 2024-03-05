@@ -33,7 +33,7 @@ const selectedNodeDetails = window.Vue.ref(getEmptyNode());
  * Pass the single select prop to the store
  */
 window.Vue.onMounted(() => {
-    store.isSingleSelect = props.isSingleSelect;
+    modalStore.isSingleSelect = props.isSingleSelect;
 });
 
 /**

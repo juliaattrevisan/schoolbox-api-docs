@@ -12,6 +12,7 @@ import { useModalSearchStore } from "../store/csModalSearchStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import CsModalNodeRadio from "./cs-modal-node-radio.vue";
 import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
 import CsModalNodeName from "./cs-modal-node-name.vue";
 import CsModalNodeUsageSummary from "./cs-modal-node-usage-summary.vue";
@@ -102,7 +103,7 @@ const borderBottomColour = window.Vue.computed(() => {
  * @returns { Boolean }
  */
 const showChildren = window.Vue.computed(
-    () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2
+    () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2,
 );
 
 /**
@@ -118,7 +119,7 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * @returns { String }
  */
 const title = window.Vue.computed(() =>
-    hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`
+    hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`,
 );
 
 /**
@@ -127,7 +128,7 @@ const title = window.Vue.computed(() =>
  * @returns { boolean }
  */
 const isViewingAnother = window.Vue.computed(
-    () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id
+    () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id,
 );
 
 /**
@@ -144,14 +145,15 @@ const showUsage = window.Vue.computed(() => modalStore.isOpen && props.node.id !
  * @returns { boolean }
  */
 const isViewing = window.Vue.computed(
-    () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id
+    () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id,
 );
 </script>
 
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container`" :data-is-inactive="isViewingAnother">
-            <cs-modal-node-checkbox :node="props.node" />
+            <cs-modal-node-radio v-if="modalStore.isSingleSelect" :node="props.node" />
+            <cs-modal-node-checkbox v-else :node="props.node" />
             <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
             <cs-modal-node-usage-summary
                 v-if="showUsage"
