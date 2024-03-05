@@ -151,7 +151,15 @@ function onModalClosed() {
                 <ul class="option-list">
                     <li>
                         <input id="msg-enabled" type="checkbox" v-model="settingsStore.isNotificationsEnabled" />
-                        <label for="msg-enabled" class="checkbox-label">Notifications enabled</label>
+                        <label for="msg-enabled" class="checkbox-label">
+                            Notifications enabled
+                            <span
+                                data-tooltip
+                                class="has-tip tip-top hint"
+                                title="This setting applies only to notifications due to changes to content within this group.  It does not apply to notifications due to changes of group membership."
+                                >?</span
+                            >
+                        </label>
                     </li>
                     <li>
                         <input
