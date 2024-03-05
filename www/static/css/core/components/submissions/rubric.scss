@@ -139,6 +139,7 @@ table.rb {
     th {
         border-left: 1px solid $body-bg;
         transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+        min-width: 200px;
         &:hover {
             input[type="text"],
             input[type="tel"],
@@ -577,9 +578,4 @@ span.result-rubric-label {
     margin-bottom: 0.2rem;
     margin-right: 0.2rem;
     padding: 0.5rem;
-}
-
-// Add style to prevent wrapping header for paragraphs within markdown
-table.rb th.markdown p {
-    text-wrap: nowrap;
 }
