@@ -12,8 +12,7 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-    public function __construct(
-    ) {
+    public function __construct() {
     }
 
     /**
