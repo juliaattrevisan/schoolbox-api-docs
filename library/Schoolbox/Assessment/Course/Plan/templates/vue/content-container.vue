@@ -3,49 +3,46 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 
 interface Props {
     unitId: number;
-    unexpandedHeight: number;
 }
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 
-const unexpandedHeightStyle = window.Vue.computed(() => `${props.unexpandedHeight}px`);
-
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
-const isDefaultExpanded = window.Vue.ref(false);
+const contentHeight = window.Vue.ref(0);
 
-const isExpanded = window.Vue.computed(() => {
-    if (isDefaultExpanded.value) return true;
+const showViewMore = window.Vue.computed(() => {
+    if (contentHeight.value <= store.unexpandedUnitHeight) return true;
     if (store.expandedUnits.includes(props.unitId)) return true;
     return false;
 });
 
 window.Vue.onMounted(() => {
-    if (contentEl.value) {
-        const height = contentEl.value.offsetHeight;
-        if (height > props.unexpandedHeight) {
-            isDefaultExpanded.value = false;
-        } else {
-            isDefaultExpanded.value = true;
-        }
-    }
+    contentHeight.value = contentEl.value?.offsetHeight || 0;
 });
 </script>
 
 <template>
-    <div class="content-container" :class="{ expanded: isExpanded }">
-        <div ref="contentEl"><slot></slot></div>
-    </div>
+    <div>
+        <div
+            class="content-container"
+            :style="{
+                height: store.expandedUnits.includes(props.unitId) ? 'auto' : store.unexpandedUnitHeight + 'px',
+            }"
+        >
+            <div ref="contentEl"><slot></slot></div>
+        </div>
 
-    <div v-if="!isExpanded" class="show-more-container">
-        <button @click.prevent="store.toggleExpanded(unitId)">Show More</button>
+        <div v-if="!showViewMore" class="show-more-container">
+            <button @click.prevent="store.toggleExpanded(unitId)">Show More</button>
+        </div>
     </div>
 </template>
 
 <style scoped>
-.content-container:not(.expanded) {
-    max-height: v-bind(unexpandedHeightStyle);
+.content-container {
     overflow: hidden;
+    transition: height 0.5s ease;
 }
 .show-more-container {
     bottom: 0;

@@ -14,9 +14,6 @@ interface Props {
     routeFolderSequence: string | null;
 }
 
-const unexpandedUnitHeight = 300;
-const unexpandedUnitHeightStyle = window.Vue.computed(() => `${unexpandedUnitHeight}px`);
-
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
@@ -74,7 +71,7 @@ function updateContainerHeight(): void {
     const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
 
     // Prevent the container from being too small, this ensures one unit is always visible
-    containerHeight.value = Math.max(newHeight, unexpandedUnitHeight + tableHeaderEl.value.offsetHeight);
+    containerHeight.value = Math.max(newHeight, store.unexpandedUnitHeight + tableHeaderEl.value.offsetHeight);
 }
 
 window.Vue.onMounted(async () => {
@@ -87,13 +84,27 @@ window.Vue.onMounted(async () => {
         const sortableTarget = $("[data-sortable]");
         sortableTarget.sortable({
             handle: ".grip",
+            helper: "clone",
             axis: "y",
+            placeholder: "ui-sortable-placeholder",
             update: () => {
                 // Adjust the sequence of the units
                 const unitIds: Unit["id"][] = sortableTarget
                     .sortable("toArray", { attribute: "data-unit-id" })
                     .map(Number);
                 store.resequenceUnits(unitIds);
+            },
+            start: () => {
+                store.isDragging = true;
+
+                // After transitioning to new heights, refreshPositions
+                sortableTarget.sortable("refreshPositions");
+                setTimeout(() => {
+                    sortableTarget.sortable("refreshPositions");
+                }, 500);
+            },
+            stop: () => {
+                store.isDragging = false;
             },
         });
     }
@@ -145,7 +156,9 @@ window.Vue.onUnmounted(() => {
                     v-for="unit in store.orderedUnits"
                     :key="unit.id"
                     :data-unit-id="unit.id"
-                    :class="{ collapsed: !store.expandedUnits.includes(unit.id) }"
+                    :style="{
+                        height: store.expandedUnits.includes(unit.id) ? 'auto' : store.unexpandedUnitHeight + 'px',
+                    }"
                 >
                     <td>
                         <div class="unit-wrapper">
@@ -162,13 +175,13 @@ window.Vue.onUnmounted(() => {
                     </td>
                     <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
                         <td v-for="(textbox, textboxKey) in unit.textboxes" :key="textboxKey">
-                            <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
+                            <content-container :unit-id="unit.id">
                                 <textbox-content v-if="textbox !== null" :textbox="textbox"></textbox-content>
                             </content-container>
                         </td>
                     </template>
                     <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
-                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
+                        <content-container :unit-id="unit.id">
                             <ul class="information-list">
                                 <activities-list-item
                                     v-for="activity in unit.activities"
@@ -180,7 +193,7 @@ window.Vue.onUnmounted(() => {
                         </content-container>
                     </td>
                     <td v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">
-                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
+                        <content-container :unit-id="unit.id">
                             <rubric-capabilities :rubric-capabilities="unit.rubricCapabilities"></rubric-capabilities>
                         </content-container>
                     </td>
@@ -188,7 +201,7 @@ window.Vue.onUnmounted(() => {
                         v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'"
                         class="curriculum-codes-container"
                     >
-                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
+                        <content-container :unit-id="unit.id">
                             <curriculum-codes-list :curriculum-codes="unit.curriculumCodes"></curriculum-codes-list>
                             <curriculum-details-modal />
                         </content-container>
@@ -245,7 +258,7 @@ window.Vue.onUnmounted(() => {
         overflow: hidden;
         position: relative;
         > tr {
-            height: v-bind(unexpandedUnitHeightStyle);
+            transition: height 0.5s ease;
 
             > td:not(:first-child) {
                 padding: 0px;
@@ -253,16 +266,37 @@ window.Vue.onUnmounted(() => {
 
             &.ui-sortable-helper {
                 display: table; /* Keep widths consistent */
-                border: 1px solid var(--body-background);
+                border-top: 1px solid var(--body-background);
+                border-bottom: 1px solid var(--body-background);
+                width: 100% !important;
+
+                height: v-bind('store.unexpandedUnitHeight + "px"') !important;
+
+                > td > div > .content-container {
+                    height: v-bind('store.unexpandedUnitHeight + "px"') !important;
+                }
             }
 
             &.ui-sortable-placeholder {
-                visibility: visible !important;
+                height: v-bind('store.unexpandedUnitHeight + "px"');
 
                 > td {
                     background-color: #dddddd;
                     border-left: none;
                     border-right: none;
+                }
+            }
+
+            // A unit that is currentl being sorted
+            &[style*="display: none"] {
+                display: table-row !important;
+
+                > td {
+                    background-color: #fafafa;
+
+                    > div {
+                        opacity: 0.2;
+                    }
                 }
             }
         }
