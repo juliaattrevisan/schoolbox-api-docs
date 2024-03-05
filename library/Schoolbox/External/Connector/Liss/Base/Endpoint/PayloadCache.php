@@ -23,7 +23,7 @@ use Schoolbox\User;
  */
 class PayloadCache
 {
-    public const INPUT_PAYLOAD_PREFIX = 'default';
+    public const DEFAULT_SOURCE_NAME = 'default';
 
 
     /**

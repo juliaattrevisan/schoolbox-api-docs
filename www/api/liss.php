@@ -35,7 +35,7 @@ $superuser = \Schoolbox\UserMapper::getInstance()->findByUsername(\Schoolbox\Use
  * You must specifically reconnect in the sdk by clicking the Connect button again
  * after you make your change.
  */
-$sourceName = $_GET['source'] ?? PayloadCache::INPUT_PAYLOAD_PREFIX;
+$sourceName = $_GET['source'] ?? PayloadCache::DEFAULT_SOURCE_NAME;
 
 /* This is needed to process liss data from storage files
  */

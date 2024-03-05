@@ -43,31 +43,31 @@ class PayloadList
             PayloadCache::PAYLOAD_DAILY_DATA => [
                 'title' => 'Daily Data',
                 'sources' => [
-                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                    PayloadCache::DEFAULT_SOURCE_NAME => null
                 ]
             ],
             PayloadCache::PAYLOAD_BELLTIMES => [
                 'title' => 'Bell Times',
                 'sources' => [
-                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                    PayloadCache::DEFAULT_SOURCE_NAME => null
                 ]
             ],
             PayloadCache::PAYLOAD_CLASSES => [
                 'title' => 'Classes',
                 'sources' => [
-                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                    PayloadCache::DEFAULT_SOURCE_NAME => null
                 ]
             ],
             PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS => [
                 'title' => 'Class Memberships',
                 'sources' => [
-                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                    PayloadCache::DEFAULT_SOURCE_NAME => null
                 ]
             ],
             PayloadCache::PAYLOAD_TIMETABLE => [
                 'title' => 'Timetable',
                 'sources' => [
-                    PayloadCache::INPUT_PAYLOAD_PREFIX => null
+                    PayloadCache::DEFAULT_SOURCE_NAME => null
                 ]
             ]
         ];
