@@ -87,46 +87,6 @@ class Factory implements IFactory
 
 
     /**
-     * API Endpoint url
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * API Endpoint access token
-     *
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
-
-
-    /**
-     * @var array
-     */
-    private array $watchlist;
-
-
-    /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
      * Factory constructor.
      *
      * @param string $host
@@ -138,20 +98,14 @@ class Factory implements IFactory
      * @param FilesystemProxy $filesystemProxy
      */
     public function __construct(
-        string $host,
-        #[SensitiveParameter] string $key,
-        bool $perform,
-        LoggerInterface $logger,
-        array $watchlist,
-        ValidStrats $validStrats,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private bool $perform,
+        private LoggerInterface $logger,
+        private array $watchlist,
+        private ValidStrats $validStrats,
+        private FilesystemProxy $filesystemProxy
     ) {
-        $this->host = $host;
-        $this->key = $key;
-        $this->perform = $perform;
-        $this->logger = $logger;
-        $this->watchlist = $watchlist;
-        $this->validStrats = $validStrats;
     }
 
 
