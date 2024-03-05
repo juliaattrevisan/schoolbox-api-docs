@@ -116,33 +116,6 @@ class Scheduler
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
             try {
                 $composites = $this->factory->produce($this->file, $this->type);
-
-                /* And also process liss data in addition to whatever else is here
-                 */
-                $this->logger->info('Processing liss data if any exists');
-
-                /* This *could* be null if you request a suds Data Source that doesn't exist so we
-                 * should coerce this syntactically just in case...not that it should ever really happen
-                 */
-                if (null === $composites) {
-                    $composites = new GenericCollection(IStrategy::class);
-                }
-
-                /* The IFactory injected might not know about liss, such as when we're given a
-                 * CalendarFactory instance. That has nothing to do with liss, and that might snap
-                 * here unless we coalesce it to an empty collection that we can operate upon...
-                 *
-                 * ...but there was talk about having liss events being imported too; someone asked
-                 * about them, but we currently don't support that usage.
-                 */
-                $lissComposites = $this->factory->produce($this->file, Factory::LISS) ?? new GenericCollection(IStrategy::class);
-
-                /* $composites equates to an empty collection when the factories are unable to
-                 * figure out the $type you provided, or if you chose for it to do nothing in
-                 * the suds control panel. The advent of liss being bolted on makes this always
-                 * the case now, where previously it was possible for it to be a null datatype.
-                 */
-                $composites = $composites->merge($lissComposites);
             } catch (\Exception $e) {
                 /* Specifically log when you couldn't produce the recipe, then leave
                  * Anything could have caused that, so you might as well log it
@@ -163,7 +136,7 @@ class Scheduler
              * Note this is now used in the web context, as well as the cli context
              * Treat as if it were a web request, using return instead of exit
              */
-            if (!$composites->count()) {
+            if (null === $composites || !$composites->count()) {
                 return;
             }
 

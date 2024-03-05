@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use DomainException;
+use External\Tass\Api\Exception\InvalidApiKey;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -155,256 +157,270 @@ class Factory implements IFactory
 
     /**
      * @param string|null $file
-     * @param string      $type
+     * @param string $type
      *
-     * @return null|GenericCollection
+     * @return GenericCollection|null
+     * @throws DomainException
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @throws RuntimeException
      * @throws UnexpectedValueException
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws InvalidApiKey
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \PDOException
      */
     public function produce(?string $file, string $type): ?GenericCollection
     {
-        switch ($type) {
-            /* Produce the composites with optional Mock api connection
-             * (use a locally-stored file path)
+        /* These are the usual sis Profile and sis Timetable busses.
+         *
+         * Produce the composites with optional Mock api connection
+         * (use a locally-stored file path)
+         */
+        $composites = match ($type) {
+            self::ISAMS => (new IsamsEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                $this->watchlist,
+                Loader::getInstance()->get('zip_dir'),
+                Loader::getInstance()->get('photo_sis_import'),
+                $file,
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                StorageMapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::KAMAR => (new KamarEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                Loader::getInstance()->get('stream_dir'),
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                TimetableCycleMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::SENTRAL => (new SentralEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                $this->watchlist,
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::TASS_API => (new TassApiEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                $this->watchlist,
+                (int)Loader::getInstance()->get('external_tass_addnum_father'),
+                (int)Loader::getInstance()->get('external_tass_addnum_mother'),
+                Loader::getInstance()->get('date_local'),
+                Loader::getInstance()->get('photo_sis_import'),
+                trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
+                trim((string)Loader::getInstance()->get('external_tass_commrules_typecode')),
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                StorageMapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::COMPASS => (new CompassEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                Loader::getInstance()->get('photo_sis_import'),
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                StorageMapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::WONDE => (new WondeEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                Loader::getInstance()->get('date_timezone'),
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::VERACROSS => (new VeracrossEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                $this->watchlist,
+                Loader::getInstance()->get('date_timezone'),
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::CIVICA => (new CivicaEndpoint\Factory(
+                $this->validStrats,
+                $this->logger,
+                $this->perform,
+                $this->host,
+                $this->key,
+                $this->watchlist,
+                /* Profile pieces
+                 */
+                UserProfile\Mapper::getInstance()->disableCache(),
+                UserProfile\Student\Mapper::getInstance()->disableCache(),
+                UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            self::LISS => (new LissEndpoint\Factory(
+                $this->logger,
+                $this->perform,
+                trim((string)Loader::getInstance()->get('external_liss_default_event_type')),
+                trim((string)Loader::getInstance()->get('external_liss_exclusions')),
+                trim((string)Loader::getInstance()->get('external_liss_teacher_identifier')),
+                $this->filesystemProxy,
+                \Schoolbox\Resource\Storage\Mapper::getInstance(),
+                /* Timetable pieces
+                 */
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                ClassEntryMapper::getInstance()->disableCache(),
+                ClassInvolvementMapper::getInstance()->disableCache(),
+                ClassPeriodMapper::getInstance()->disableCache(),
+                TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+            ))->produce(),
+
+            /* Use manual csv imports
              */
-            case self::ISAMS:
-                return (new IsamsEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    $this->key,
-                    $this->watchlist,
-                    Loader::getInstance()->get('zip_dir'),
-                    Loader::getInstance()->get('photo_sis_import'),
-                    $file,
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    StorageMapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
+            default => new GenericCollection(IStrategy::class),
+        };
 
-            /* We never reach out to kamar so we technically don't need the $file option
-             */
-            case self::KAMAR:
-                return (new KamarEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    Loader::getInstance()->get('stream_dir'),
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    TimetableCycleMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache()
-                ))->produce();
+        /* Always look for liss payloads and add their data if we can
+         */
+        return $composites->merge($this->produce($file, self::LISS));
 
-            case self::SENTRAL:
-                return (new SentralEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    $this->key,
-                    $this->watchlist,
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
-
-            case self::TASS_API:
-                return (new TassApiEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    $this->key,
-                    $this->watchlist,
-                    (int)Loader::getInstance()->get('external_tass_addnum_father'),
-                    (int)Loader::getInstance()->get('external_tass_addnum_mother'),
-                    Loader::getInstance()->get('date_local'),
-                    Loader::getInstance()->get('photo_sis_import'),
-                    trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
-                    trim((string)Loader::getInstance()->get('external_tass_commrules_typecode')),
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    StorageMapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
-
-            case self::COMPASS:
-                return (new CompassEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    $this->key,
-                    Loader::getInstance()->get('photo_sis_import'),
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    StorageMapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
-
-            case self::WONDE:
-                return (new WondeEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    $this->key,
-                    Loader::getInstance()->get('date_timezone'),
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
-
-            case self::VERACROSS:
-                return (new VeracrossEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    $this->key,
-                    $this->watchlist,
-                    Loader::getInstance()->get('date_timezone'),
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
-
-            case self::CIVICA:
-                return (new CivicaEndpoint\Factory(
-                    $this->validStrats,
-                    $this->logger,
-                    $this->perform,
-                    $this->host,
-                    $this->key,
-                    $this->watchlist,
-                    /* Profile pieces
-                     */
-                    UserProfile\Mapper::getInstance()->disableCache(),
-                    UserProfile\Student\Mapper::getInstance()->disableCache(),
-                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
-                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
-                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
-
-            case self::LISS:
-                return (new LissEndpoint\Factory(
-                    $this->logger,
-                    $this->perform,
-                    trim((string)Loader::getInstance()->get('external_liss_default_event_type')),
-                    trim((string)Loader::getInstance()->get('external_liss_exclusions')),
-                    trim((string)Loader::getInstance()->get('external_liss_teacher_identifier')),
-                    $this->filesystemProxy,
-                    \Schoolbox\Resource\Storage\Mapper::getInstance(),
-                    /* Timetable pieces
-                     */
-                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                    ClassEntryMapper::getInstance()->disableCache(),
-                    ClassInvolvementMapper::getInstance()->disableCache(),
-                    ClassPeriodMapper::getInstance()->disableCache(),
-                    TimetablePeriodMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-                ))->produce();
-
-            default:
-                // Use manual csv imports
-                return null;
-        }
+        /* Notes from previous findings:
+         *
+         * The IFactory injected might not know about liss, such as when we're given a
+         * CalendarFactory instance. That has nothing to do with liss, and that might snap
+         * Scheduler.php unless we coalesce it to an empty collection that we can operate upon...
+         *
+         * ...but there was talk about having liss events being imported too; someone asked
+         * about them, but we currently don't support that usage.
+         *
+         * $composites equates to an empty collection when the factories are unable to
+         * figure out the $type you provided, or if you chose for it to do nothing in
+         * the suds control panel. The advent of liss being bolted on makes this always
+         * the case now, where previously it was possible for Factories to return a null.
+         */
     }
 }
