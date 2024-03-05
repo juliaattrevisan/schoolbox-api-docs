@@ -13,7 +13,6 @@ use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Log\Mapper as ImportLogMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 
 /**
