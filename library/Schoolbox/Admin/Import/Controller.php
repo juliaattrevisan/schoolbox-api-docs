@@ -142,7 +142,7 @@ class Controller extends ConfigController
          */
         $canPerformUpdate = false;
 
-        if ('' !== $type && Factory::CSV !== $type) {
+        if ('' !== $type) {
             /* No lock? You can perform the update, but immediately release the lock
              * so you can actually do that
              */
@@ -230,6 +230,7 @@ class Controller extends ConfigController
         /* Save it
          */
         $this->updateConfig($postData, $this->buildConfigPredicate());
+
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
@@ -321,6 +322,7 @@ class Controller extends ConfigController
      * Set up the live sync
      *
      * @throws RouteNotFound
+     * @throws \Exception
      */
     public function getPerformUpdate(): void
     {
@@ -333,7 +335,7 @@ class Controller extends ConfigController
          * throw a generic error. You could perhaps get here
          * by bookmarking the url or visiting it directly.
          */
-        if ('' === $type || Factory::CSV === $type) {
+        if ('' === $type) {
             throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -349,7 +351,8 @@ class Controller extends ConfigController
         $this->postOutputCallbacks[] = function () use ($logger) {
             $this->syncCallback($logger);
         };
-        $this->response              = $this->responseEmpty();
+
+        $this->response = $this->responseEmpty();
     }
 
 
@@ -388,16 +391,16 @@ class Controller extends ConfigController
              */
             $lissAdditiveMode = (bool)$this->getConfigLoader()->get('external_liss_additive_mode');
 
-            /* Cannot do this with No Data Source, or with CSV Files
-             * Exit early if either of those are selected
+            /* Cannot do this with No Data Source
+             * Exit early if selected
              */
-            if ('' === $type || Factory::CSV === $type) {
+            if ('' === $type) {
                 return;
             }
 
             /* Nobody is on the watchlist in this context
              */
-            $watchlist   = (new Watchlist())->filter('');
+            $watchlist = (new Watchlist())->filter('');
 
             try {
                 $lock = $this->acquireLock($logger, Scheduler::LOCK_NAME, $timeout);
