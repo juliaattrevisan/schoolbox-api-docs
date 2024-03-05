@@ -507,6 +507,9 @@ class DailyData implements IStrategy
         string $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
+            /* If class enrolment was created in this import we don't need to do anything else
+             * This person was already enrolled in it
+             */
             $this->log->debug(sprintf(
                 'Reusing previous class involvement for %s in timetable event %s - %s, %s, %s-%s',
                 $externalId,
@@ -517,25 +520,46 @@ class DailyData implements IStrategy
                 $event->getFinishAt()->getDatabase()
             ));
         } else {
-            $classInvolvement = $this->classInvolvementMapper->createModel()
-                ->setClass($classEntry)
-                ->setExternalId($externalId);
+            /* Otherwise it might have been created from another part of the import
+             */
+            try {
+                $classInvolvement = $this->classInvolvementMapper->findOneByColumnList([
+                    'class_id' => $classEntry->getId(),
+                    'external_id' => $externalId
+                ]);
 
-            if ($this->perform) {
-                $this->classInvolvementMapper->save($classInvolvement);
+                $this->log->debug(sprintf(
+                    'Reusing previous class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                    $externalId,
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $classInvolvement = $this->classInvolvementMapper->createModel()
+                    ->setClass($classEntry)
+                    ->setExternalId($externalId);
+
+                $this->log->debug(sprintf(
+                    'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                    $externalId,
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
+
+                if ($this->perform) {
+                    $this->classInvolvementMapper->save($classInvolvement);
+                }
             }
 
+            /* Remember we found this
+             */
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
-
-            $this->log->debug(sprintf(
-                'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
-                $externalId,
-                $event->getTitle(),
-                $event->getDay(),
-                $event->getPeriod(),
-                $event->getStartAt()->getDatabase(),
-                $event->getFinishAt()->getDatabase()
-            ));
         }
     }
 

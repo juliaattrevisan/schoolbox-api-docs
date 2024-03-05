@@ -205,15 +205,15 @@ class ClassMemberships implements IStrategy
                     $classEntry->getCode()
                 ));
             } catch (\Schoolbox\Mapper\Exception $e) {
+                $classInvolvement = $this->classInvolvementMapper->createModel()
+                    ->setClass($classEntry)
+                    ->setExternalId($externalId);
+
                 $this->log->debug(sprintf(
                     'Creating new class involvement for %s in class %s',
                     $externalId,
                     $classEntry->getCode()
                 ));
-
-                $classInvolvement = $this->classInvolvementMapper->createModel()
-                    ->setClass($classEntry)
-                    ->setExternalId($externalId);
 
                 if ($this->perform) {
                     $this->classInvolvementMapper->save($classInvolvement);
