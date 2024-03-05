@@ -208,6 +208,8 @@ window.Vue.onUnmounted(() => {
  * component. Otherwise, they may apply to other tables nested within content containers too.
  */
 .unit-planner:deep() {
+    position: relative; // Ensure sortable placeholders are positioned correctly and cannot escape the table
+
     > thead > tr,
     > tbody > tr {
         /* Fix the unit title column to the left */
