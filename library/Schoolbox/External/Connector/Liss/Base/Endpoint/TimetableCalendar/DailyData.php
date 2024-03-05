@@ -452,7 +452,7 @@ class DailyData implements IStrategy
         /* Students are always involved
          */
         foreach ($currentEvent['students'] as $externalId) {
-            $this->saveRegularInvolvement($event, $classEntry, (string)$externalId);
+            $this->createEnrolment($event, $classEntry, (string)$externalId);
         }
     }
 
@@ -475,7 +475,7 @@ class DailyData implements IStrategy
     ): void {
         /* Shove in a regular involvement for the guy who usually teaches this
          */
-        $this->saveRegularInvolvement($event, $classEntry, $externalId);
+        $this->createEnrolment($event, $classEntry, $externalId);
 
         $involvementOverride = $this->overridesMapper->createModel()
             ->setEventId($event->getId())
@@ -501,7 +501,7 @@ class DailyData implements IStrategy
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function saveRegularInvolvement(
+    private function createEnrolment(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $externalId
