@@ -10,6 +10,8 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Connector\Log\Guid;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -122,10 +124,21 @@ HELP;
         $file        = $this->getOpt(self::OPT_LONG_FILE);
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
+        /* LISS Additive Mode
+         *
+         * If on, liss data will be **added** to whatever the sis gave to us. We don't actually
+         * know whether liss data should add, or replace, existing data; only the school can know
+         * what they meant by having their liss data here.
+         *
+         * Turning it on lets us skip the Prepare and Cleanup strats from the liss factory.
+         * It's off by default.
+         */
+        $lissAdditiveMode = (bool)$this->getConfig()->get('external_liss_additive_mode');
+
         /* Figure out what was specified in the Watchlist
          * Empty strings and spaces are filtered away etc.
          */
-        $watchlist   = (new Watchlist())->filter((string)$this->getOpt(self::OPT_LONG_WATCHLIST));
+        $watchlist = (new Watchlist())->filter((string)$this->getOpt(self::OPT_LONG_WATCHLIST));
 
         /* Importer strats can be defined by cli args
          * null or empty string means "import everything"
@@ -133,7 +146,7 @@ HELP;
          * Otherwise, whatever you specified must fit within a known vocabulary
          * and works in conjunction with whatever watchlists you have in place
          */
-        $validStrats = new \Schoolbox\External\Connector\ValidStrats((string)($this->getOpt(self::OPT_LONG_STRATS)));
+        $validStrats = new ValidStrats((string)($this->getOpt(self::OPT_LONG_STRATS)));
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
@@ -188,14 +201,23 @@ NULLTYPE;
 
         /* Execute scheduler
          */
-        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist, $validStrats, $filesystemProxy);
+        $factory = new Endpoint\Factory(
+            $host,
+            $key,
+            $perform,
+            $lissAdditiveMode,
+            $this->getLogger(),
+            $watchlist,
+            $validStrats,
+            $filesystemProxy
+        );
 
         $randomMapper = UserMapper::getInstance();
 
         // Queries should not be time-limited here
         $randomMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
 
-        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+        $runId = (new Guid())->generate();
 
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),

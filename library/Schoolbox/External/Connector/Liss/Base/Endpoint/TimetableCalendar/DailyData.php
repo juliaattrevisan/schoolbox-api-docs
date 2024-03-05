@@ -273,9 +273,10 @@ class DailyData implements IStrategy
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
      * @param array $currentEvent
+     * @param string $source
      * @return Model
-     * @throws \PDOException
      * @throws Exception
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     private function createEvent(array $currentEvent, string $source): \Schoolbox\External\Event\Model
@@ -361,20 +362,28 @@ class DailyData implements IStrategy
          * twice will cause it to pack a sad. The classEntries array
          * treats these as unique whereas the db didn't
          */
-        $existingKey = strtolower($event->getCode());
+        $existingKey = strtolower($currentEvent['code']);
 
         if (isset($this->classEntries[$existingKey])) {
+            /* If $classEntry was created in this import, get it from the local cache
+             */
             $classEntry = $this->classEntries[$existingKey];
         } else {
-            $classEntry = $this->classEntryMapper->createModel()
-                ->setName($currentEvent['name'])
-                ->setCode($currentEvent['code']);
+            /* Otherwise it might have been created from another part of the import
+             */
+            try {
+                $classEntry = $this->classEntryMapper->findOneByColumn('code', $currentEvent['code']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $classEntry = $this->classEntryMapper->createModel()
+                    ->setName($currentEvent['name'])
+                    ->setCode($currentEvent['code']);
 
-            if ($this->perform) {
-                $this->classEntryMapper->save($classEntry);
+                if ($this->perform) {
+                    $this->classEntryMapper->save($classEntry);
+                }
             }
 
-            $this->classEntries[strtolower($event->getCode())] = $classEntry;
+            $this->classEntries[$existingKey] = $classEntry;
         }
 
         return $classEntry;

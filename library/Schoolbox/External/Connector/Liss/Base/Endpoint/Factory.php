@@ -44,6 +44,7 @@ class Factory
      *
      * @param LoggerInterface $log
      * @param bool $perform
+     * @param bool $lissAdditiveMode
      * @param string $defaultType
      * @param string $exclusions
      * @param string $teacherIdentifier
@@ -59,6 +60,7 @@ class Factory
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
+        private bool $lissAdditiveMode,
         private string $defaultType,
         private string $exclusions,
         private string $teacherIdentifier,
@@ -94,8 +96,14 @@ class Factory
          * If not, just do nothing at all
          */
         if ((new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->hasPayloads()) {
-            return (new GenericCollection(IStrategy::class))
-                ->add(new Prepare(
+            $bus = new GenericCollection(IStrategy::class);
+
+            /* Additive mode just piles your data on top of whatever the sis gave you already
+             * If it's off, consider liss to be the source of truth for timetable data and just
+             * Prepare and Cleanup as usual
+             */
+            if (!$this->lissAdditiveMode) {
+                $bus->add(new Prepare(
                     $this->log,
                     $this->perform,
                     $this->eventMapper,
@@ -104,60 +112,70 @@ class Factory
                     $this->classPeriodMapper,
                     $this->periodMapper,
                     $this->overridesMapper
-                ))
-                ->add(new DailyData(
-                    $this->log,
-                    $this->perform,
-                    $this->defaultType,
-                    $exclusions,
-                    $this->teacherIdentifier,
-                    $this->filesystemProxy,
-                    $this->storageMapper,
-                    $this->eventMapper,
-                    $this->overridesMapper,
-                    $this->classEntryMapper,
-                    $this->classInvolvementMapper
-                ))
-                ->add(new TimetableCalendar\BellTimes(
-                    $this->log,
-                    $this->perform,
-                    $this->filesystemProxy,
-                    $this->storageMapper,
-                    $this->periodMapper
-                ))
-                ->add(new TimetableCalendar\Classes(
-                    $this->log,
-                    $this->perform,
-                    $this->filesystemProxy,
-                    $this->storageMapper,
-                    $this->classEntryMapper
-                ))
-                ->add(new TimetableCalendar\ClassMemberships(
-                    $this->log,
-                    $this->perform,
-                    $this->filesystemProxy,
-                    $this->storageMapper,
-                    \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache()
-                ))
-                ->add(new TimetableCalendar\Timetable(
-                    $this->log,
-                    $this->perform,
-                    $this->teacherIdentifier,
-                    $this->filesystemProxy,
-                    $this->storageMapper,
-                    $this->classEntryMapper,
-                    $this->classPeriodMapper,
-                    $this->periodMapper
-                ))
-                ->add(new Cleanup(
+                ));
+            }
+
+            $bus->add(new DailyData(
+                $this->log,
+                $this->perform,
+                $this->defaultType,
+                $exclusions,
+                $this->teacherIdentifier,
+                $this->filesystemProxy,
+                $this->storageMapper,
+                $this->eventMapper,
+                $this->overridesMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
+            ))
+            ->add(new TimetableCalendar\BellTimes(
+                $this->log,
+                $this->perform,
+                $this->filesystemProxy,
+                $this->storageMapper,
+                $this->periodMapper
+            ))
+            ->add(new TimetableCalendar\Classes(
+                $this->log,
+                $this->perform,
+                $this->filesystemProxy,
+                $this->storageMapper,
+                $this->classEntryMapper
+            ))
+            ->add(new TimetableCalendar\ClassMemberships(
+                $this->log,
+                $this->perform,
+                $this->filesystemProxy,
+                $this->storageMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
+            ))
+            ->add(new TimetableCalendar\Timetable(
+                $this->log,
+                $this->perform,
+                $this->teacherIdentifier,
+                $this->filesystemProxy,
+                $this->storageMapper,
+                $this->classEntryMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper
+            ));
+
+            /* Don't need to clean anything up in this mode
+             */
+            if (!$this->lissAdditiveMode) {
+                $bus->add(new Cleanup(
                     $this->log,
                     $this->perform,
                     $this->eventMapper
-                ))
-                ;
+                ));
+            }
+
+            return $bus;
         }
 
+        /* No liss payloads detected; nothing to do. No trabajo
+         */
         return new GenericCollection(IStrategy::class);
     }
 }

@@ -96,6 +96,7 @@ class Factory implements IFactory
      * @param string $host
      * @param string $key
      * @param bool $perform
+     * @param bool $lissAdditiveMode
      * @param LoggerInterface $logger
      * @param array $watchlist
      * @param ValidStrats $validStrats
@@ -105,6 +106,7 @@ class Factory implements IFactory
         private string $host,
         #[SensitiveParameter] private string $key,
         private bool $perform,
+        private bool $lissAdditiveMode,
         private LoggerInterface $logger,
         private array $watchlist,
         private ValidStrats $validStrats,
@@ -349,6 +351,7 @@ class Factory implements IFactory
         $lissComposites = (new LissEndpoint\Factory(
             $this->logger,
             $this->perform,
+            $this->lissAdditiveMode,
             trim((string)Loader::getInstance()->get('external_liss_default_event_type')),
             trim((string)Loader::getInstance()->get('external_liss_exclusions')),
             trim((string)Loader::getInstance()->get('external_liss_teacher_identifier')),
