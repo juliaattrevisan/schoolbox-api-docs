@@ -15,6 +15,8 @@ use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use SensitiveParameter;
 
 /**
@@ -67,6 +69,10 @@ class Receiver
 
     /* Legacy LISS Implementation w/ the Cyclic Timetable
      *
+     *     DEFAULT_CYCLE_IDENTIFIER
+     *     $cycleCache
+     *     $classEntries
+     *
      * These properties are used specifically to support by a legacy LISS implementation.
      * Data from a LISS push goes into the Cyclic Timetable using the following endpoints
      * in this order:
@@ -82,11 +88,14 @@ class Receiver
     /**
      * Constructor.
      *
-     * @param int                                      $externalEnable    Whether the external db was enabled
-     * @param string                                   $externalType      Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
-     * @param string                                   $username          LISS username, as per config
-     * @param string                                   $password          LISS password, as per config
-     * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a local file storage record
+     * @param int $externalEnable Whether the external db was enabled
+     * @param string $externalType Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
+     * @param string $username LISS username, as per config
+     * @param string $password LISS password, as per config
+     * @param string $sourceName
+     * @param FilesystemProxy $filesystemProxy
+     * @param \Schoolbox\User $superuser
+     * @param StorageMapper $storageMapper Log liss payloads to a local file storage record
      */
     public function __construct(
         private int $externalEnable,
@@ -94,9 +103,9 @@ class Receiver
         private string $username,
         #[SensitiveParameter] private string $password,
         private string $sourceName,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private FilesystemProxy $filesystemProxy,
         private \Schoolbox\User $superuser,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper
+        private StorageMapper $storageMapper
     ) {
         $this->log = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');
 
@@ -179,14 +188,14 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated(false)) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated(false)) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        $this->log()->debug('Logging LISS payload to local storage');
+        $this->log->debug('Logging LISS payload to local storage');
 
         (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
             $this->sourceName,
@@ -209,14 +218,14 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        $this->log()->debug('Logging LISS payload to local storage');
+        $this->log->debug('Logging LISS payload to local storage');
 
         (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
             $this->sourceName,
@@ -242,14 +251,14 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        $this->log()->debug('Logging LISS payload to local storage');
+        $this->log->debug('Logging LISS payload to local storage');
 
         (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
             $this->sourceName,
@@ -272,14 +281,14 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        $this->log()->debug('Logging LISS payload to local storage');
+        $this->log->debug('Logging LISS payload to local storage');
 
         (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
             $this->sourceName,
@@ -302,14 +311,14 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        $this->log()->debug('Logging LISS payload to local storage');
+        $this->log->debug('Logging LISS payload to local storage');
 
         (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->cache(
             $this->sourceName,
@@ -343,7 +352,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -361,7 +370,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -379,7 +388,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -397,7 +406,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -415,7 +424,7 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log(), $message->getParam(0)))->isAuthenticated()) {
+        if (!(new Authenticator($this->externalEnable, $this->externalType, $this->username, $this->password, $this->log, $message->getParam(0)))->isAuthenticated()) {
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
@@ -449,17 +458,5 @@ class Receiver
     private function generateResponse(string $message): Response
     {
         return new Response(new Value($message, 'string'));
-    }
-
-
-    /**
-     * Get the logger
-     * (This is also used to log random crashes in the liss.php)
-     *
-     * @return LoggerInterface
-     */
-    public function log(): LoggerInterface
-    {
-        return $this->log;
     }
 }
