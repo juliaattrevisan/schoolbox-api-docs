@@ -377,6 +377,17 @@ class Controller extends ConfigController
             $file        = null;
             $timeout     = (float)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
 
+            /* LISS Additive Mode
+             *
+             * If on, liss data will be **added** to whatever the sis gave to us. We don't actually
+             * know whether liss data should add, or replace, existing data; only the school can know
+             * what they meant by having their liss data here.
+             *
+             * Turning it on lets us skip the Prepare and Cleanup strats from the liss factory.
+             * It's off by default.
+             */
+            $lissAdditiveMode = (bool)$this->getConfigLoader()->get('external_liss_additive_mode');
+
             /* Cannot do this with No Data Source, or with CSV Files
              * Exit early if either of those are selected
              */
@@ -437,7 +448,16 @@ class Controller extends ConfigController
 
                 /* Execute scheduler: sis stuff
                  */
-                $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats, $filesystemProxy);
+                $sisFactory = new Factory(
+                    $host,
+                    $key,
+                    true,
+                    $lissAdditiveMode,
+                    $logger,
+                    $watchlist,
+                    $validStrats,
+                    $filesystemProxy
+                );
 
                 /* Importer strat gets suffixed onto the end
                  */
