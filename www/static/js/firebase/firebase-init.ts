@@ -1,5 +1,5 @@
 import { initializeApp } from '@firebase/app';
-import { getMessaging, getToken } from '@firebase/messaging';
+import { getMessaging, getToken, onMessage } from '@firebase/messaging';
 
 const firebaseConfig = window.sbProps.firebaseConfig ?? null;
 const firebaseWebPushPublicKey = window.sbProps.firebaseWebPushPublicKey ?? null;
@@ -9,12 +9,13 @@ if (firebaseConfig && firebaseWebPushPublicKey && firebaseAppIdentifiers) {
 
     // Ask for notification permission I guess?
     if ('Notification' in window) {
+        // Register I guess?
+        const messaging = getMessaging(firebaseApp);
+
         window.Notification.requestPermission().then((permission) => {
             if (permission === 'granted') {
                 console.info('Notification permission granted');
 
-                // Register I guess?
-                const messaging = getMessaging(firebaseApp);
 
                 // Generate a new token, and store it in Schoolbox I guess?
                 // Should this be proxied through Schoolbox, though?
@@ -45,6 +46,11 @@ if (firebaseConfig && firebaseWebPushPublicKey && firebaseAppIdentifiers) {
             } else if (permission === 'denied') {
                 console.warn('Notification permission denied');
             }
+        });
+
+        // Receipt of a message
+        onMessage(messaging, (payload) => {
+            console.log('Message received. ', payload);
         });
     }
 }
