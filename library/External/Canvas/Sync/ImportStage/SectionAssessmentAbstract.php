@@ -172,8 +172,6 @@ abstract class SectionAssessmentAbstract
         /** @var User[] $classTeacherCache Indexed by `section`.`sisSourceId` */
         $classTeacherCache = [];
 
-        $this->schoolboxDb->beginTransaction();
-
         foreach ($coursesSectionData as $courseCanvasId => $courseSectionsData) {
             $this->log->info("Processing Canvas Course '{$courseSectionsData['name']}' (CanvasId: $courseCanvasId)");
             try {
@@ -379,7 +377,6 @@ abstract class SectionAssessmentAbstract
 
         $this->deleteUnSynchronisedAssessableImpl($assessmentImplIdSynchronised);
         $this->deleteUnSynchronisedAssessablePlans($this->getCandidatePlanIds(), array_keys($plansSynchronised));
-        $this->schoolboxDb->commit();
         $this->printCounts();
     }
 
