@@ -8,11 +8,11 @@ namespace Schoolbox\QuickSearch;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Schoolbox\User;
 
 class Controller extends Base
 {
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /**
@@ -29,7 +29,7 @@ class Controller extends Base
             try {
                 /** @var IConnector $db */
                 $db = $this->di->get('databaseInternal');
-                $userSearchService = new User\Search\Query($db, $this->getConfigLoader(), $this->getDi()->get('l10n'));
+                $userSearchService = new Search\Query($db, $this->getConfigLoader(), $this->getDi()->get('l10n'));
                 $result = $userSearchService->fetchResults($keyword, $this->getUser());
             } catch (\Exception $exception) {
                 // noop

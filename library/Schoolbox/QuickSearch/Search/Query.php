@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\User\Search;
+namespace Schoolbox\QuickSearch\Search;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
