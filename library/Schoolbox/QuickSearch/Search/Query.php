@@ -134,9 +134,7 @@ class Query
         );
 
         foreach ($classFolders as $key => $classFolder) {
-            /**
-             * @var $classFolder FolderModel
-             */
+            /** @var $classFolder FolderModel */
             $result[$key] = [
                 'resultType' => 'classFolder',
                 'id'         => $classFolder->getId(),
