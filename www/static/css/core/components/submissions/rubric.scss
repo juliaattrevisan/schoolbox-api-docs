@@ -578,3 +578,8 @@ span.result-rubric-label {
     margin-right: 0.2rem;
     padding: 0.5rem;
 }
+
+// Add style to prevent wrapping header for paragraphs within markdown
+table.rb th.markdown p {
+    text-wrap: nowrap;
+}
