@@ -162,7 +162,7 @@ class PayloadCache
          * Just return null and skip processing elsewhere
          */
         if (!$files->count()) {
-            $this->logger?->debug(sprintf(
+            $this->logger->debug(sprintf(
                 'No %s liss payloads found in storage.',
                 $name
             ));
@@ -187,7 +187,7 @@ class PayloadCache
 
             /* Announce which file we're consuming
              */
-            $this->logger?->debug(sprintf(
+            $this->logger->debug(sprintf(
                 'Processing liss payload %s from storage, using source "%s"',
                 $file->getFilename(),
                 $source

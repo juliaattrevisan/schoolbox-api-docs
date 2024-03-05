@@ -181,7 +181,18 @@ class Scheduler
                     $composites = new GenericCollection(IStrategy::class);
                 }
 
-                $composites = $composites->merge($this->factory->produce($this->file, Factory::LISS));
+                /* This seems extreme but I keep getting bad vibes from the assumption that the
+                 * factory always produces composites: one day I'll make a weird mistake and
+                 * it'll return a null instead.
+                 */
+                $lissComposites = $this->factory->produce($this->file, Factory::LISS) ?? new GenericCollection(IStrategy::class);
+
+                /* $composites equates to an empty collection when the factories are unable to
+                 * figure out the $type you provided, or if you chose for it to do nothing in
+                 * the suds control panel. The advent of liss being bolted on makes this always
+                 * the case now, where previously it was possible for it to be a null datatype.
+                 */
+                $composites = $composites->merge($lissComposites);
             } catch (\Exception $e) {
                 /* Specifically log when you couldn't produce the recipe, then leave
                  * Anything could have caused that, so you might as well log it
@@ -202,7 +213,7 @@ class Scheduler
              * Note this is now used in the web context, as well as the cli context
              * Treat as if it were a web request, using return instead of exit
              */
-            if (null === $composites || !$composites->count()) {
+            if (!$composites->count()) {
                 return;
             }
 
