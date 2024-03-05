@@ -13,6 +13,17 @@ import CsModalHeader from "./cs-modal-header.vue";
 import CsModalNodes from "./cs-modal-nodes.vue";
 import CsModalFooter from "./cs-modal-footer.vue";
 
+const props = defineProps({
+    /**
+     * so can only select a single node
+     */
+    isSingleSelect: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+});
+
 const modalStore = useModalStore();
 const isNextSelected = window.Vue.ref(false); // to move to the next modal if a badge usage is selected
 const modalNodeUsageStore = useModalNodeUsageStore();
@@ -28,7 +39,7 @@ window.Vue.watch(
         if (newValue && newValue !== oldValue) {
             isNextSelected.value = true;
         }
-    }
+    },
 );
 
 /**

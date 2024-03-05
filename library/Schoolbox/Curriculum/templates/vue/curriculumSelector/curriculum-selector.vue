@@ -61,6 +61,14 @@ const props = defineProps({
         required: false,
         default: [],
     },
+    /**
+     * so can only select a single node
+     */
+    isSingleSelect: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 
 const store = useStore();
@@ -106,6 +114,6 @@ function onSelectedNodeModalClosed() {
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
         <cs-search-results />
     </div>
-    <cs-modal v-if="store.hasLoadedOk" />
+    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>
