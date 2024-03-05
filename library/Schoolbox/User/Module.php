@@ -15,7 +15,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Map;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -40,14 +39,7 @@ class Module extends BaseModule
             return $params['folderId'];
         }, Access::getInstance());
 
-        $loggedIn = new Rule\LazyCallback(function () {
-            return new Rule\All(
-                new Rule\IsLoggedIn()
-            );
-        });
-
         $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
-        $this->register('GET', '/search', 'search', $loggedIn);
     }
 
     /**

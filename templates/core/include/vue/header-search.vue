@@ -33,7 +33,7 @@ const formElement = window.Vue.ref<HTMLFormElement | null>(null);
 const minKeywordLength = 2;
 const paths = {
     portrait: "/portrait.php?id=",
-    searchEndpoint: "/user/search?keyword=",
+    searchEndpoint: "/quicksearch/search?keyword=",
     userPage: "/search/user/",
     searchPage: "/search",
     searchPageWithKeyword: "/search?keyword=",
