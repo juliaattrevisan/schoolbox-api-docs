@@ -9,6 +9,7 @@ export const useModalStore = defineStore(`csModal`, {
     state: () => ({
         isOpen: false, //to notify that the modal is opened / closed
         selectedBadge: null, // to display the selected badge in the modal if selected
+        isSingleSelect: false, // to notify if the modal is in single select mode
     }),
 
     actions: {

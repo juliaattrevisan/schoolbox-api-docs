@@ -30,6 +30,13 @@ const modalNodeUsageStore = useModalNodeUsageStore();
 const selectedNodeDetails = window.Vue.ref(getEmptyNode());
 
 /**
+ * Pass the single select prop to the store
+ */
+window.Vue.onMounted(() => {
+    store.isSingleSelect = props.isSingleSelect;
+});
+
+/**
  * to show the selected badge that has been selected in a linked usage
  * from cs-modal-node-usage-details
  */
