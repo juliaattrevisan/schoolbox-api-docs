@@ -335,24 +335,6 @@ class Factory implements IFactory
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
             ))->produce(),
 
-            self::LISS => (new LissEndpoint\Factory(
-                $this->logger,
-                $this->perform,
-                trim((string)Loader::getInstance()->get('external_liss_default_event_type')),
-                trim((string)Loader::getInstance()->get('external_liss_exclusions')),
-                trim((string)Loader::getInstance()->get('external_liss_teacher_identifier')),
-                $this->filesystemProxy,
-                \Schoolbox\Resource\Storage\Mapper::getInstance(),
-                /* Timetable pieces
-                 */
-                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
-                ClassEntryMapper::getInstance()->disableCache(),
-                ClassInvolvementMapper::getInstance()->disableCache(),
-                ClassPeriodMapper::getInstance()->disableCache(),
-                TimetablePeriodMapper::getInstance()->disableCache(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-            ))->produce(),
-
             /* Use manual csv imports
              */
             default => new GenericCollection(IStrategy::class),
@@ -360,7 +342,25 @@ class Factory implements IFactory
 
         /* Always look for liss payloads and add their data if we can
          */
-        return $composites->merge($this->produce($file, self::LISS));
+        $lissComposites = (new LissEndpoint\Factory(
+            $this->logger,
+            $this->perform,
+            trim((string)Loader::getInstance()->get('external_liss_default_event_type')),
+            trim((string)Loader::getInstance()->get('external_liss_exclusions')),
+            trim((string)Loader::getInstance()->get('external_liss_teacher_identifier')),
+            $this->filesystemProxy,
+            \Schoolbox\Resource\Storage\Mapper::getInstance(),
+            /* Timetable pieces
+             */
+            \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+            ClassEntryMapper::getInstance()->disableCache(),
+            ClassInvolvementMapper::getInstance()->disableCache(),
+            ClassPeriodMapper::getInstance()->disableCache(),
+            TimetablePeriodMapper::getInstance()->disableCache(),
+            \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+        ))->produce();
+
+        return $composites->merge($lissComposites);
 
         /* Notes from previous findings:
          *
