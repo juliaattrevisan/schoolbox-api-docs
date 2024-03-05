@@ -15,11 +15,13 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Query
 {
     /**
-     * Number of users that will show on autosuggest field
+     * Number of users that will show on auto-suggest field
      */
     public const AUTOSUGGEST_LIMIT = 5;
 
@@ -53,15 +55,22 @@ class Query
         $keyword = trim($keyword);
 
         $result = [
-            'results'       => [],
-            'totalCount'    => 0,
+            'users' => [],
+            'classFolders' => [],
         ];
 
         if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
             $userIds = $this->getUserIdsByKeyword($keyword, $viewer);
-            if ($userIds) {
-                $result['results']    = $this->getUserData($userIds);
-                $result['totalCount'] = $this->getTotalCount($keyword, $viewer);
+            $classFolderIds = $this->getClassFolderIdsByKeyword($keyword, $viewer);
+
+            if (count($userIds) > 0) {
+                $result['users']['rows'] = $this->getUserData($userIds);
+                $result['users']['totalCount'] = $this->getTotalCountForUsers($keyword, $viewer);
+            }
+
+            if (count($classFolderIds) > 0) {
+                $result['classFolders']['rows'] = $this->getClassFolderData($classFolderIds);
+                $result['classFolders']['totalCount'] = $this->getTotalCountForClassFolders($keyword, $viewer);
             }
         }
 
@@ -89,14 +98,51 @@ class Query
         );
 
         foreach ($users as $key => $user) {
-            $result[$key]['id']             = $user->getId();
-            $result[$key]['externalId']     = $user->getExternalId();
-            $result[$key]['firstname']      = $user->getFirstname();
-            $result[$key]['preferredName']  = $user->getPreferredName();
-            $result[$key]['lastname']       = $user->getLastname();
-            $result[$key]['formattedName']  = $user->formatName();
-            $result[$key]['metadata']       = $this->formatMetadata($user);
-            $result[$key]['year']           = $user->getYear() ? $user->getYear()->getName() : '';
+            $result[$key] = [
+                'resultType'     => 'user',
+                'id'             => $user->getId(),
+                'externalId'     => $user->getExternalId(),
+                'firstname'      => $user->getFirstname(),
+                'preferredName'  => $user->getPreferredName(),
+                'lastname'       => $user->getLastname(),
+                'formattedName'  => $user->formatName(),
+                'metadata'       => $this->formatMetadataForUser($user),
+                'year'           => $user->getYear() ? $user->getYear()->getName() : '',
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $classFolderIds
+     *
+     * @return array
+     */
+    private function getClassFolderData(array $classFolderIds): array
+    {
+        $result = [];
+
+        $classFolders = FolderMapper::getInstance()->findByColumn(
+            'id',
+            $classFolderIds,
+            [
+                'order' => [
+                    'updated_at' => 'DESC',
+                ]
+            ]
+        );
+
+        foreach ($classFolders as $key => $classFolder) {
+            /**
+             * @var $classFolder FolderModel
+             */
+            $result[$key] = [
+                'resultType' => 'classFolder',
+                'id'         => $classFolder->getId(),
+                'name'       => $classFolder->getName(),
+                'metadata'   => $this->formatMetadataForClassFolder($classFolder),
+            ];
         }
 
         return $result;
@@ -105,7 +151,7 @@ class Query
     /**
      * Find IDs for users that match the given keyword.
      *
-     * This list is subject to be filtered by `getQueryFilter`.
+     * This list is subject to be filtered by `getQueryFilterForUsers`.
      *
      * @param string $keyword
      * @param User   $viewer
@@ -114,12 +160,40 @@ class Query
      */
     private function getUserIdsByKeyword(string $keyword, User $viewer): array
     {
-        [$where, $params] = $this->getQueryFilter($keyword, $viewer);
+        [$where, $params] = $this->getQueryFilterForUsers($keyword, $viewer);
 
         $statement = $this->db->prepareQuery(
             'SELECT DISTINCT u.id FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
             . $where
-            . ' ORDER BY u.lastname, u.chosen_name ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
+            . ' ORDER BY u.lastname, u.chosen_name ASC LIMIT ' . self::AUTOSUGGEST_LIMIT
+        );
+
+        $statement->execute($params);
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Find IDs for class folders that match the given keyword.
+     *
+     * This list is subject to be filtered by `getQueryFilterForClassFolders`.
+     *
+     * @param string $keyword
+     * @param User   $viewer
+     *
+     * @return array
+     */
+    private function getClassFolderIdsByKeyword(string $keyword, User $viewer): array
+    {
+        [$where, $params] = $this->getQueryFilterForClassFolders($keyword, $viewer);
+
+        $statement = $this->db->prepareQuery(
+            'SELECT DISTINCT f.id ' .
+            ' FROM folder f' .
+            ' JOIN folder_code fc ON fc.folder_id = f.id' .
+            $where .
+            ' GROUP BY f.id ' .
+            ' ORDER BY f.updated_at, f.name LIMIT ' . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute($params);
@@ -130,18 +204,42 @@ class Query
     /**
      * Find a total count of users that match the given keyword.
      *
-     * This count is subject to be filtered by `getQueryFilter`.
+     * This count is subject to be filtered by `getQueryFilterForUsers`.
      *
      * @param string $keyword
      * @param User   $viewer
      *
      * @return int
      */
-    private function getTotalCount(string $keyword, User $viewer): int
+    private function getTotalCountForUsers(string $keyword, User $viewer): int
     {
-        [$where, $params] = $this->getQueryFilter($keyword, $viewer);
+        [$where, $params] = $this->getQueryFilterForUsers($keyword, $viewer);
         $statement = $this->db->prepareQuery(
             'SELECT COUNT(DISTINCT u.id) FROM user u INNER JOIN `groups` g ON u.group_id = g.id' . $where
+        );
+
+        $statement->execute($params);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    /**
+     * Find a total count of class folders that match the given keyword.
+     *
+     * This count is subject to be filtered by `getQueryFilterForClassFolders`.
+     *
+     * @param string $keyword
+     * @param User   $viewer
+     *
+     * @return int
+     */
+    private function getTotalCountForClassFolders(string $keyword, User $viewer): int
+    {
+        [$where, $params] = $this->getQueryFilterForClassFolders($keyword, $viewer);
+        $statement = $this->db->prepareQuery(
+            'SELECT COUNT(DISTINCT f.id) ' .
+            'FROM folder f ' .
+            'JOIN folder_code fc ON fc.folder_id = f.id ' . $where
         );
 
         $statement->execute($params);
@@ -158,7 +256,7 @@ class Query
      *
      * @return array [$where, $params]
      */
-    private function getQueryFilter(string $keyword, User $viewer): array
+    private function getQueryFilterForUsers(string $keyword, User $viewer): array
     {
         $searchString = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
 
@@ -230,6 +328,26 @@ class Query
     }
 
     /**
+     * Build the WHERE statement and query parameters which filter the list and
+     * count of users found by the search.
+     *
+     * @param string $keyword
+     * @param User   $viewer
+     *
+     * @return array [$where, $params]
+     */
+    private function getQueryFilterForClassFolders(string $keyword, User $viewer): array
+    {
+        $whereParts = [
+            'fc.code LIKE :keyword',
+            'f.deleted_at IS NULL'
+        ];
+        $params = ['keyword' => '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%'];
+
+        return [' WHERE ' . implode(' AND ', $whereParts), $params];
+    }
+
+    /**
      * Outputs a metadata line for this student.
      *
      * This is the same line that shows in search results underneath a student's name.
@@ -239,7 +357,7 @@ class Query
      * @todo allow schools to set the format as they can with `$this->formatName`
      *
      */
-    private function formatMetadata(User $user): string
+    private function formatMetadataForUser(User $user): string
     {
         // For now, just show role name
         if (!empty($user->getPositionTitle())) {
@@ -259,6 +377,19 @@ class Query
         if ($user->getYear()) {
             $metadata .= $user->getYear()->getLongName($this->l10n->translate('year', false, true));
         }
-        return "{$metadata} {$role}";
+        return "$metadata $role";
+    }
+
+    /**
+     * Outputs a metadata line for this student.
+     *
+     * This is the same line that shows in search results underneath a class folder result.
+     *
+     * @param FolderModel $classFolder
+     * @return string
+     */
+    private function formatMetadataForClassFolder(FolderModel $classFolder): string
+    {
+        return $classFolder->getName();
     }
 }
