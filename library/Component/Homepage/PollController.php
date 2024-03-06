@@ -179,8 +179,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             }
 
             $this->parse('has_poll_block', 'has_poll');
-
-            $current = $poll;
         } elseif ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             return false;
         } else {
