@@ -49,6 +49,13 @@ class PayloadCache
 
 
     /**
+     * This char separates the suds source, liss method, liss source and datetime
+     * in a liss payload's filename.
+     */
+    private const SEPARATOR = '-';
+
+
+    /**
      * Constructor.
      *
      * @param Mapper $storageMapper
@@ -86,6 +93,11 @@ class PayloadCache
         $now = \Alaress_Date_Format::now();
         $expiryAt = \Alaress_Date_Format::now()->addWeeks(1);
 
+        /* This $sourceName must not contain any special characters, such as those used by our filename
+         * encoding scheme, cos it'll snap if you do.
+         */
+        $payloadSourceName = str_replace(self::SEPARATOR, '', $sourceName);
+
         /* This format is as follows:
          *   suds_liss
          *   liss method (e.g. belltimes, classmemberships, etc)
@@ -93,10 +105,13 @@ class PayloadCache
          *   date
          */
         $filename = sprintf(
-            '%s-%s-%s-%s.log',
+            '%s%s%s%s%s%s%s.log',
             Factory::SOURCE_NAME,
+            self::SEPARATOR,
             $name,
-            $sourceName,
+            self::SEPARATOR,
+            $payloadSourceName,
+            self::SEPARATOR,
             $now->getUsingFormat('Ymd_His')
         );
 
@@ -121,7 +136,7 @@ class PayloadCache
         /* Files that could potentially exist in storage at any given time
          */
         foreach (self::PAYLOAD_ALL as $potentialPayload) {
-            $filename = Factory::SOURCE_NAME . '-%';
+            $filename = Factory::SOURCE_NAME . self::SEPARATOR . '%';
 
             $pb = $this->storageMapper->getPredicateBuilder()
                 ->like('filename', $filename);
@@ -148,9 +163,11 @@ class PayloadCache
     public function load(string $name): ?array
     {
         $filename = sprintf(
-            '%s-%s-',
+            '%s%s%s%s',
             Factory::SOURCE_NAME,
+            self::SEPARATOR,
             $name,
+            self::SEPARATOR
         );
 
         $pb = $this->storageMapper->getPredicateBuilder()
@@ -176,7 +193,7 @@ class PayloadCache
         $stack = [];
 
         foreach ($files as $file) {
-            $parts = explode('-', $file->getFilename());
+            $parts = explode(self::SEPARATOR, $file->getFilename());
 
             /* "default", normally
              *
