@@ -186,12 +186,13 @@ class Query
         [$where, $params] = $this->getQueryFilterForClassFolders($keyword, $viewer);
 
         $statement = $this->db->prepareQuery(
-            'SELECT DISTINCT f.id ' .
-            ' FROM folder f' .
-            ' JOIN folder_code fc ON fc.folder_id = f.id' .
-            $where .
-            ' GROUP BY f.id ' .
-            ' ORDER BY f.updated_at, f.name LIMIT ' . self::AUTOSUGGEST_LIMIT
+            "SELECT DISTINCT f.id
+            FROM folder f
+            JOIN folder_code fc ON fc.folder_id = f.id\n" .
+            trim($where) . "\n" .
+            "GROUP BY f.id
+            ORDER BY f.updated_at, f.name
+            LIMIT " . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute($params);
@@ -213,7 +214,10 @@ class Query
     {
         [$where, $params] = $this->getQueryFilterForUsers($keyword, $viewer);
         $statement = $this->db->prepareQuery(
-            'SELECT COUNT(DISTINCT u.id) FROM user u INNER JOIN `groups` g ON u.group_id = g.id' . $where
+            "SELECT COUNT(DISTINCT u.id)
+            FROM user u
+            INNER JOIN `groups` g ON u.group_id = g.id\n" .
+            $where
         );
 
         $statement->execute($params);
@@ -235,9 +239,10 @@ class Query
     {
         [$where, $params] = $this->getQueryFilterForClassFolders($keyword, $viewer);
         $statement = $this->db->prepareQuery(
-            'SELECT COUNT(DISTINCT f.id) ' .
-            'FROM folder f ' .
-            'JOIN folder_code fc ON fc.folder_id = f.id ' . $where
+            "SELECT COUNT(DISTINCT f.id)
+            FROM folder f
+            JOIN folder_code fc ON fc.folder_id = f.id\n" .
+            $where
         );
 
         $statement->execute($params);
