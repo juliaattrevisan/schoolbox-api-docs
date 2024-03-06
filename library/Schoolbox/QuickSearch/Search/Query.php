@@ -142,7 +142,7 @@ class Query
         foreach ($classFolderById as $classFolderId => $classFolder) {
             /* @var FolderModel $classFolder */
             $classFolderData[] = [
-                $classFolderName = $classFolder->getName(),
+                $classFolderName = $classFolderId,
                 'id'             => $classFolder->getId(),
                 'name'           => $classFolderName,
                 'codesString'    => $classFolder->getCodeString(),
@@ -416,13 +416,13 @@ class Query
     public static function compareClassFolderResultsForSortingPurposes($a, $b): int
     {
         return (
-            ($a['userIsInvolved'] && !$b['userIsInvolved'])? -1 :
+            ($a['userIsInvolved'] && !$b['userIsInvolved']) ? -1 :
             (
-                (!$a['userIsInvolved'] && $b['userIsInvolved'])? 1 :
+                (!$a['userIsInvolved'] && $b['userIsInvolved']) ? 1 :
                 (
-                    ($a['name'] > $b['name'])? 1 :
+                    ($a['name'] > $b['name']) ? 1 :
                     (
-                        ($a['name'] < $b['name'])? -1 : 0
+                        ($a['name'] < $b['name']) ? -1 : 0
                     )
                 )
             )
