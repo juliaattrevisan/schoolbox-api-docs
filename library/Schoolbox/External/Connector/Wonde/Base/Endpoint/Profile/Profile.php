@@ -688,10 +688,11 @@ class Profile implements IStrategy
          * Otherwise make a new one for the given id
          */
         foreach ($parents['data'] as $parent) {
-            /* If $parent is an emergency contact of the student,
-             * just skip over them - we're processing those elsewhere
+            /* We use portal_access to decide conclusively if this is a parent or not
+             * because parents can also be emergency contacts; those are not mutually
+             * exclusive concepts.
              */
-            if ($parent['relationship']['emergency_contact']) {
+            if (!$parent['relationship']['portal_access']) {
                 continue;
             }
 
