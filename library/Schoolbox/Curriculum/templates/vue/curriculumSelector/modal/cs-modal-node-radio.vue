@@ -3,7 +3,7 @@
  * to select a single node within the current modal session
  */
 
-import type { Node } from "@schoolboxCurriculum/js/nodeUtils";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { generateUUID } from "@js/util/jsUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
@@ -12,7 +12,7 @@ const modalSelectedNodesStore = useModalSelectedNodesStore();
 const extraId = generateUUID(); // to ensure the input/label id is unique
 
 interface Props {
-    node: Node[]; // to prefill the input
+    node: Node; // to prefill the input
 }
 const props = withDefaults(defineProps<Props>(), {
     node: () => {
