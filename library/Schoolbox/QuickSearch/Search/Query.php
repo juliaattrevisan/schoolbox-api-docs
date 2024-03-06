@@ -188,9 +188,9 @@ class Query
         $statement = $this->db->prepareQuery(
             "SELECT DISTINCT f.id
             FROM folder f
-            JOIN folder_code fc ON fc.folder_id = f.id\n" .
-            trim($where) . "\n" .
-            "GROUP BY f.id
+            JOIN folder_code fc ON fc.folder_id = f.id
+            $where
+            GROUP BY f.id
             ORDER BY f.updated_at, f.name
             LIMIT " . self::AUTOSUGGEST_LIMIT
         );
@@ -241,8 +241,8 @@ class Query
         $statement = $this->db->prepareQuery(
             "SELECT COUNT(DISTINCT f.id)
             FROM folder f
-            JOIN folder_code fc ON fc.folder_id = f.id\n" .
-            $where
+            JOIN folder_code fc ON fc.folder_id = f.id
+            $where"
         );
 
         $statement->execute($params);
