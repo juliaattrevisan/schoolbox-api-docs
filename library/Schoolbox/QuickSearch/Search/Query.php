@@ -60,16 +60,16 @@ class Query
         ];
 
         if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
-            $userIds = $this->getUserIds($keyword, $viewer);
-            $classFolderInfoById = $this->getClassFolderInfoById($keyword, $viewer);
+            $userIds = $this->getUserIdsByKeyword($keyword, $viewer);
+            $classFolderIds = $this->getClassFolderIdsByKeyword($keyword, $viewer);
 
             if (count($userIds) > 0) {
                 $result['users']['data'] = $this->getUserData($userIds);
                 $result['users']['totalCount'] = $this->getTotalCountForUsers($keyword, $viewer);
             }
 
-            if (count($classFolderInfoById) > 0) {
-                $result['classFolders']['data'] = $this->getClassFolderData($classFolderInfoById, $viewer);
+            if (count($classFolderIds) > 0) {
+                $result['classFolders']['data'] = $this->getClassFolderData($classFolderIds, $viewer);
                 $result['classFolders']['totalCount'] = $this->getTotalCountForClassFolders($keyword, $viewer);
             }
         }
@@ -87,7 +87,7 @@ class Query
      *
      * @return array
      */
-    private function getUserIds(string $keyword, User $viewer): array
+    private function getUserIdsByKeyword(string $keyword, User $viewer): array
     {
         [$where, $params] = $this->getQueryFilterForUsers($keyword, $viewer);
 
@@ -106,49 +106,32 @@ class Query
     }
 
     /**
+     * Find IDs for class folders that match the given keyword.
+     *
      * This list is subject to be filtered by `getQueryFilterForClassFolders`.
      *
      * @param string $keyword
      * @param User   $viewer
      *
-     * @return array of arrays of class folder info, indexed by folderId.
+     * @return array
      */
-    private function getClassFolderInfoById(string $keyword, User $viewer): array
+    private function getClassFolderIdsByKeyword(string $keyword, User $viewer): array
     {
-        $externalUser = new \External_User();
-        $subjectList = $externalUser->getSubjectList($viewer);
-        $subjectListNames = [];
-
-        foreach ($subjectList as $subject) {
-            $subjectListNames[] = $subject['name'];
-        }
-
         [$where, $params] = $this->getQueryFilterForClassFolders($keyword, $viewer);
 
-        // Create query parameter keys for subject names and add key:value pairs to $params array.
-        $subjectListNameParamKeys = [];
-        for ($i = 0; $i < count($subjectListNames); ++$i) {
-            $paramKey = "subjectListName$i";
-            $params[$paramKey] = $subjectListNames[$i];
-            $subjectListNameParamKeys[] = ":$paramKey";
-        }
-
         $statement = $this->db->prepareQuery(
-            // Sort first on whether the logged-in user is involved in the class, then by class name.
-            "SELECT DISTINCT
-            f.id,
-            IF(f.name IN (" . implode(", ", $subjectListNameParamKeys) . "), 1, 0) AS userIsInvolved
+            // No need to sort because sorting is done in $this->getClassFolderData().
+            "SELECT DISTINCT f.id
             FROM folder f
             JOIN folder_code fc ON fc.folder_id = f.id
             $where
             GROUP BY f.id
-            ORDER BY userIsInvolved DESC, f.name ASC
             LIMIT " . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute($params);
 
-        return $statement->fetchAll();
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     /**
@@ -192,11 +175,11 @@ class Query
      *
      * @return array of arrays containing class folder data.
      */
-    private function getClassFolderData(array $classFolderInfoById, User $viewer): array
+    private function getClassFolderData(array $classFolderIds, User $viewer): array
     {
         $classFolderById = FolderMapper::getInstance()->findByColumn(
             'id',
-            array_keys($classFolderInfoById),
+            $classFolderIds,
             [
                 'order' => [
                     'updated_at' => 'DESC',
@@ -204,16 +187,45 @@ class Query
             ]
         );
 
+        $externalUser = new \External_User();
+        $subjectList = $externalUser->getSubjectList($viewer);
+        $subjectListNamesAsKeys = [];
+
+        foreach ($subjectList as $subject) {
+            $subjectListNamesAsKeys[$subject['name']] = null;
+        }
+
         $classFolderData = [];
         foreach ($classFolderById as $classFolderId => $classFolder) {
             /* @var FolderModel $classFolder */
+            $classFolderName = $classFolder->getName();
             $classFolderData[] = [
                 'id'             => $classFolderId,
                 'name'           => $classFolder->getNameWithCodes(),
-                'userIsInvolved' => ($classFolderInfoById[$classFolderId]['userIsInvolved'] === 1), // Convert to bool.
                 'metadata'       => $this->formatMetadataForClassFolder($classFolder),
+                'userIsInvolved' => array_key_exists($classFolderName, $subjectListNamesAsKeys)
             ];
         }
+
+        usort(
+            $classFolderData,
+            function ($a, $b): int {
+                return (
+                    // Sort by userIsInvolved desc...
+                    ($a['userIsInvolved'] && !$b['userIsInvolved']) ? -1 :
+                    (
+                        (!$a['userIsInvolved'] && $b['userIsInvolved']) ? 1 :
+                        (
+                            // Then sort by name asc.
+                            ($a['name'] > $b['name']) ? 1 :
+                            (
+                                ($a['name'] < $b['name']) ? -1 : 0
+                            )
+                        )
+                    )
+                );
+            }
+        );
 
         return $classFolderData;
     }
