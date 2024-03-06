@@ -152,8 +152,8 @@ class Query
         }
 
         usort(
-            $classFolderData, function ($a, $b): int
-            {
+            $classFolderData,
+            function ($a, $b): int {
                 return (
                     // Sort by userIsInvolved desc...
                     ($a['userIsInvolved'] && !$b['userIsInvolved']) ? -1 :
