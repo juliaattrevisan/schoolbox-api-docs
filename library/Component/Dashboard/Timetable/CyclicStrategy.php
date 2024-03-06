@@ -105,7 +105,12 @@ class Component_Dashboard_Timetable_CyclicStrategy implements Component_Dashboar
     {
         /* is the user is hiding the timetable, or we aren't connected to an external db then don't show the timetable
          */
-        if ($this->user->getHideTimetable() && $this->configLoader->get('external_enable') && !$this->user->getExternalId()) {
+        if ($this->user->getHideTimetable() && $this->configLoader->get('external_enable')) {
+            return false;
+        }
+
+        // Also if the user has no external ID: don't show the timetable
+        if (!$this->user->getExternalId()) {
             return false;
         }
 
