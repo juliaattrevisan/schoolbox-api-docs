@@ -52,8 +52,9 @@ class SortForCourseMarkbook implements IAssessableComparator
     public function getCallable(): callable
     {
         return function (IAssessable $left, IAssessable $right) {
-            // 1. Unit-spec name
-            $unitSpecNameCompare = $this->compareUnitSpecName($left, $right);
+            // 1. Unit-spec sequence
+            $unitSpecNameCompare = $this->compareUnitSpecSequence($left, $right);
+
             if (0 !== $unitSpecNameCompare) {
                 return $unitSpecNameCompare;
             }
@@ -97,7 +98,7 @@ class SortForCourseMarkbook implements IAssessableComparator
 
 
     /**
-     * Sort by unit-spec name.
+     * Sort by unit-spec folder sequence.
      *
      * Doesn't matter whether assessment is impl or spec. Always punches down to unit-spec.
      *
@@ -105,24 +106,24 @@ class SortForCourseMarkbook implements IAssessableComparator
      * @param IAssessable $right
      * @return int
      */
-    private function compareUnitSpecName(IAssessable $left, IAssessable $right): int
+    private function compareUnitSpecSequence(IAssessable $left, IAssessable $right): int
     {
         if ($left->isSpecification()) {
-            $leftSpecName = $left->getBaseContext()->getTitle();
+            $leftSeqeunce = $left->getBaseContext()->getFolder()->getSequence();
         } else {
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl     = $left->getBaseContext();
-            $leftSpecName = $unitImpl->getSpecification()->getTitle();
+            $leftSeqeunce = $unitImpl->getSpecification()->getFolder()->getSequence();
         }
         if ($right->isSpecification()) {
-            $rightSpecName = $right->getBaseContext()->getTitle();
+            $rightSequence = $right->getBaseContext()->getFolder()->getSequence();
         } else {
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl      = $right->getBaseContext();
-            $rightSpecName = $unitImpl->getSpecification()->getTitle();
+            $rightSequence = $unitImpl->getSpecification()->getFolder()->getSequence();
         }
 
-        return \strnatcasecmp($leftSpecName, $rightSpecName);
+        return  $rightSequence <=> $leftSeqeunce;
     }
 
 
