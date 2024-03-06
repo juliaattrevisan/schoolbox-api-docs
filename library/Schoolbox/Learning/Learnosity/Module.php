@@ -114,6 +114,11 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{assessmentId}/attempt/{studentId}/complete', 'postCompleteAttempt', $canFinishAttempt, $preloadParticipant);
 
+        /* Monitor an attempt; learnosity has this strange issue where it drops attempts
+         * we we use this to try and log what might have gone wrong
+         */
+        $this->register('POST', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/monitor', 'postAttemptMonitor', $learnerCanComplete, $preloadAttempt);
+
         /* Conclude an attempt
          */
         $this->register('GET', '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getCompleteAttempt', $learnerCanComplete, $preloadAttempt);

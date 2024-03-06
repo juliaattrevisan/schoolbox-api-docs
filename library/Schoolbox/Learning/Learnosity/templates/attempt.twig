@@ -130,6 +130,34 @@
                     itemsApp.items().goto(parseInt(window.location.hash.replace(/^#/, "")));
                 }
             };
+
+            /* Forcibly save right at the start, hoping to counteract Learnosity not saving attempts
+             */
+            itemsApp.save({
+                // Receives an array of response_ids (strings) of the saved session responses
+                success: function (responseIds) {
+                    let payload = new FormData();
+                    payload.append('learnosityReference', '{{ learnositySessionReference }}');
+                    payload.append('responseIds', responseIds);
+
+                    fetch('{{ attemptMonitorUrl }}', {
+                        method: 'POST',
+                        body: payload
+                    });
+
+                    console.log('Attempt prepared.', responseIds);
+                },
+
+                // Allows you to immediately handle a save error event
+                error: function (event) {
+                    console.log('Could not prepare attempt; tell schoolbox', event);
+                },
+
+                // Capture the progress of the current submit operation
+                progress: function (event) {
+                    console.log('Preparing attempt...', event);
+                }
+            });
         },
 
         /* Log errors to console and to screen for users
@@ -177,16 +205,16 @@
             body: payload
         })
         .then(response => {
-                if (response.ok) {
-                    response.text();
-                    window.location.href = '{{ outroUrl }}';
-                } else {
-                    let errorElement = document.createElement('div');
-                    errorElement.classList.add('alert-box', 'alert');
-                    errorElement.innerHTML = '<p>The quiz could not be submitted.</p>';
-                    document.getElementById('learnosity_assess').replaceWith(errorElement);
-                }
-            })
+            if (response.ok) {
+                response.text();
+                window.location.href = '{{ outroUrl }}';
+            } else {
+                let errorElement = document.createElement('div');
+                errorElement.classList.add('alert-box', 'alert');
+                errorElement.innerHTML = '<p>The quiz could not be submitted.</p>';
+                document.getElementById('learnosity_assess').replaceWith(errorElement);
+            }
+        })
     }
 
     /* User consciously finished

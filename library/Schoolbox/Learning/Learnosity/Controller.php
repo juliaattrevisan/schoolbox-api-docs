@@ -28,6 +28,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -604,6 +605,13 @@ class Controller extends Base
                 ]) . ($returnUrlEncoded === null ? '' : '/?' . Redirect::RETURN_URL . "=$returnUrlEncoded")
             ),
             'learnositySessionReference' => $attempt->getLearnosityReference(),
+            /* Monitor attempt preparation
+             */
+            'attemptMonitorUrl' => $this->router->getGenerator()->generate('learnosity.postAttemptMonitor', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+                'learnositySessionReference' => $attempt->getLearnosityReference()
+            ]),
         ], "Attempt {$assessment->getTitle()}");
     }
 
@@ -1982,6 +1990,32 @@ class Controller extends Base
 
 
     /**
+     * Use this arbitrary endpoint to try and monitor attempt saving in Learnosity,
+     * to try and figure out why they *sometimes* don't work.
+     *
+     * @param QuizDomainObject $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     */
+    public function postAttemptMonitor(
+        QuizDomainObject $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* Get the post data that the frontend asynchronously sent to us
+         */
+
+        /* Push it into the log file so we can track when things happened,
+         * (if they happened...) along with whatever outcomes might be helpful
+         */
+
+        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_attempt_monitor');
+        $logger->debug('what is this');
+    }
+
+
+    /**
      * Replace tokens in $originalComment for values pertaining to $student
      * Note that $comment could be anything...
      *
@@ -2000,7 +2034,8 @@ class Controller extends Base
      * Build assessment duplicator upon request, because it cannot be built
      * in the constructor.
      *
-     * @return Api\Duplicator
+     * @return Duplicator
+     * @throws \DomainException
      */
     private function buildDuplicator(): Api\Duplicator
     {
