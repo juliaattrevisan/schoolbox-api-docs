@@ -235,6 +235,24 @@ class SanitiseScoresTest extends TestCase
                 ]
             ],
 
+            'Strings 2' => [
+                'cat',
+                123,
+                [
+                    'score' => null,
+                    'max_score' => null
+                ]
+            ],
+
+            'Strings 3' => [
+                123,
+                'cat',
+                [
+                    'score' => null,
+                    'max_score' => null
+                ]
+            ],
+
             'e' => [
                 'e',
                 'horse',

@@ -309,14 +309,15 @@ class Api
                      */
                     if (is_bool($responseBody)) {
                         throw new BooleanException(sprintf(
-                            "%s %s: boolean %s returned. Potential curl failure in sdk: %s %s. \n\nHTTP %s %s",
+                            "%s %s: boolean %s returned. Potential curl failure in sdk: %s %s. \n\nHTTP %s %s. We sent this payload: %s",
                             $actionType,
                             $url,
                             (int)$responseBody,
                             $response->getError()['code'],
                             $response->getError()['message'],
                             $response->getStatusCode(),
-                            $response->getBody()
+                            $response->getBody(),
+                            json_encode($payload, JSON_THROW_ON_ERROR)
                         ));
                     }
 
@@ -328,12 +329,13 @@ class Api
                      * Just surface this exception
                      */
                     throw new ApiException(sprintf(
-                        "%s %s: %s.\n\nHTTP %s %s",
+                        "%s %s: %s.\n\nHTTP %s %s. We sent this payload: %s",
                         $actionType,
                         $url,
                         $errorPayload['meta']['message'],
                         $response->getStatusCode(),
-                        $response->getBody()
+                        $response->getBody(),
+                        json_encode($payload, JSON_THROW_ON_ERROR)
                     ));
                 }
 
@@ -370,10 +372,11 @@ class Api
         /* Couldn't recover
          */
         throw new ApiException(sprintf(
-            '%s %s failed after %s retries',
+            '%s %s failed after %s retries. We sent this payload: %s',
             $actionType,
             $url,
-            self::NUM_RETRY
+            self::NUM_RETRY,
+            json_encode($payload, JSON_THROW_ON_ERROR)
         ));
     }
 

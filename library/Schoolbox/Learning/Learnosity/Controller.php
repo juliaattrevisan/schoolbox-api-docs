@@ -20,6 +20,7 @@ use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
+use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -389,14 +390,19 @@ class Controller extends Base
      * @param QuizDomainObject $assessment
      * @param User $student
      * @return void
+     * @throws ApiException
+     * @throws DefinitionException
      * @throws Deleted
      * @throws Error
      * @throws Exception
      * @throws RouteNotFound
      * @throws ValidationException
      * @throws \Alaress\Database\Exception
+     * @throws \DomainException
      * @throws \JsonException
      * @throws \PDOException
+     * @throws RandomException
+     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
@@ -574,6 +580,16 @@ class Controller extends Base
                 random_int(0, 1000000)
             );
         }
+
+        /* Log payload data, because we're dropping attempts randomly and nobody knows why.
+         * Hopefully this init payload will helps hed light on things in SA-17302
+         */
+        (new Feedback\SuspiciousLogger())->logPayload(
+            'getAttempt() init payload',
+            $payload,
+            [],
+            $attempt
+        );
 
         /* Breadcrumbs
          * Legacy quiz never had breadcrumbs for attempt screen; I can only presume
@@ -1047,6 +1063,15 @@ class Controller extends Base
         $mark = $sanitisedScore['score'];
         $maxMark = $sanitisedScore['max_score'];
 
+        /* Log data that seems suspiciously broken
+         */
+        (new Feedback\SuspiciousLogger())->logSanitisedScore(
+            'postFeedback() score calc',
+            $attempt->getLearnosityReference(),
+            $sanitisedScore,
+            $postData
+        );
+
         // As with posting a feedback:
         // need the existing response to determine a human-readable mark.
         $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);
@@ -1172,16 +1197,35 @@ class Controller extends Base
          * Instead, redirect people to a whole other screen afterwards to
          * artificially force this behaviour
          */
-        if (\count($responseData)) {
-            $this->api->dataUpdateRequest('/sessions/responses/scores', [
-                'sessions' => [
-                    [
-                        'session_id' => $attempt->getLearnosityReference(),
-                        'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-                        'responses' => $responseData
-                    ]
+        $payload = [
+            'sessions' => [
+                [
+                    'session_id' => $attempt->getLearnosityReference(),
+                    'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
+                    'responses' => $responseData
                 ]
-            ]);
+            ]
+        ];
+
+        /* Log payload data, because we're dropping attempts randomly and nobody knows why.
+         * Hopefully this init payload will helps hed light on things in SA-17302
+         */
+        if (\count($responseData)) {
+            $result = $this->api->dataUpdateRequest('/sessions/responses/scores', $payload);
+
+            (new Feedback\SuspiciousLogger())->logPayload(
+                'postFeedback() $result payload after processing learnosity /sessions/responses/scores',
+                $payload,
+                $result,
+                $attempt
+            );
+        } else {
+            (new Feedback\SuspiciousLogger())->logPayload(
+                'postFeedback() empty $responseData via learnosity /sessions/responses/scores',
+                $payload,
+                [],
+                $attempt
+            );
         }
 
         /* Get the new result back from learnosity
@@ -1552,11 +1596,13 @@ class Controller extends Base
         /* Fetch the response id first, because you need a bunch of stuff
          * The response id (learnosity response reference) is in POST
          */
-        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
+        $payload = [
             'session_id' => [
                 $attempt->getLearnosityReference()
             ]
-        ])['data'][0]['responses'];
+        ];
+
+        $responses = $this->api->dataGetRequest('sessions/responses/scores', $payload)['data'][0]['responses'];
 
         /* Traverse to find the one you want to change, because you don't get
          * a response_id filter in this endponit...
@@ -1592,13 +1638,20 @@ class Controller extends Base
          *  This shouldn't happen, but what do we do now?
          */
         if (null === $updatedResponse) {
+            (new Feedback\SuspiciousLogger())->logPayload(
+                'postFeedbackScore() $result payload after processing learnosity /sessions/responses/scores',
+                $payload,
+                $responses,
+                $attempt
+            );
+
             throw new \DomainException('Learnosity response identifier was not found.');
         }
 
         /* Use the learnosity Data API to send the revised payload which
          * should now contain all the parts Learnosity expected
          */
-        $this->api->dataUpdateRequest('/sessions/responses/scores', [
+        $payload = [
             'sessions' => [
                 [
                     'session_id' => $attempt->getLearnosityReference(),
@@ -1608,7 +1661,16 @@ class Controller extends Base
                     ]
                 ]
             ]
-        ]);
+        ];
+
+        $result = $this->api->dataUpdateRequest('/sessions/responses/scores', $payload);
+
+        (new Feedback\SuspiciousLogger())->logPayload(
+            'postFeedbackScore() final update $result payload after processing learnosity /sessions/responses/scores',
+            $payload,
+            $result,
+            $attempt
+        );
     }
 
 

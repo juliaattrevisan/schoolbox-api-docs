@@ -310,16 +310,16 @@ class Helper
      *                                                deriving a human-readable mark.
      * @param QuizDomainModel   $assessment           The assessment to which `$attempt` belongs: required for deriving
      *                                                a human-readable mark.
-     * @param float             $mark
-     * @param float             $maxMark
+     * @param null|float        $mark
+     * @param null|float        $maxMark
      * @return void
      */
     public function assignMarksToAttempt(
         Model $attempt,
         QuizResponse $responseDomainObject,
         QuizDomainModel $assessment,
-        float $mark,
-        float $maxMark
+        ?float $mark,
+        ?float $maxMark
     ): void {
         /* Update normalised and human-readable marks
          */
@@ -334,6 +334,17 @@ class Helper
         $responseDomainObject->setMarksAvailable($maxMark);
 
         $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark, $responseDomainObject);
+
+        /* Log data that seems suspiciously broken
+         */
+        (new Feedback\SuspiciousLogger())->logZeroScore(
+            'assignMarksToAttempt() after calculating marks',
+            $attempt->getLearnosityReference(),
+            $mark,
+            $maxMark,
+            $normalisedMark,
+            $humanReadableMark
+        );
 
         /* Update the columns with newly-derived values
          */
@@ -369,12 +380,24 @@ class Helper
     ): void {
         $student = $existingAttempt->getUser();
 
-        // Find out what they scored by the automated system
-        $result = $this->api->dataGetRequest('/sessions/scores', [
+        $payload = [
             'session_id' => [
                 $existingAttempt->getLearnosityReference()
             ]
-        ]);
+        ];
+
+        // Find out what they scored by the automated system
+        $result = $this->api->dataGetRequest('/sessions/scores', $payload);
+
+        /* Log payload data, because we're dropping attempts randomly and nobody knows why.
+         * Hopefully this init payload will helps hed light on things in SA-17302
+         */
+        (new Feedback\SuspiciousLogger())->logPayload(
+            'processAttemptCompletion() $result payload from learnosity /sessions/scores',
+            $payload,
+            $result,
+            $existingAttempt
+        );
 
         /* The learnosityReference posted here doesn't exist
          * TODO What kind of error should we present to users? It's asynchronous
