@@ -30,13 +30,16 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
         $this->setBlock($templateHandle, 'has_poll', 'has_poll_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+        $this->setBlock($templateHandle, 'deleted_state', 'deleted_state_block');
 
         $poll   = null;
         $pollId = $this->getConfig('poll') && is_numeric($this->getConfig('poll'))
             ? $this->getConfig('poll')
             : null;
+        $pollDeleted = false;
         if ($pollId) {
-            $poll = $pollHandler->getByID($this->getConfig('poll'));
+            $poll        = $pollHandler->getByID($this->getConfig('poll'));
+            $pollDeleted = !(is_array($poll) && $poll['id']);
         }
 
         if (is_array($poll) && $poll['id']) {
@@ -62,6 +65,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             $this->setVar(
                 [
                     'empty_state_block'   => '',
+                    'deleted_state_block' => '',
                     'poll_question_block' => '',
                     'show_results_block'  => '',
                     'poll_actions_block'  => '',
@@ -168,12 +172,24 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             $this->parse('has_poll_block', 'has_poll');
         } elseif ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             return false;
-        } else {
+        } elseif ($pollDeleted) {
             $this->setVar(
                 [
+                    'empty_state_block' => '',
                     'has_poll_block'    => '',
                     'empty_write_block' => '',
                     'empty_read_block'  => '',
+                ]
+            );
+
+            $this->parse('deleted_state_block', 'deleted_state');
+        } else {
+            $this->setVar(
+                [
+                    'deleted_state_block' => '',
+                    'has_poll_block'      => '',
+                    'empty_write_block'   => '',
+                    'empty_read_block'    => '',
                 ]
             );
 
