@@ -113,7 +113,7 @@ class PayloadCache
                 PayloadFilename::SEPARATOR,
                 $lissMethodName,
                 PayloadFilename::SEPARATOR
-            ) . '%s';
+            ) . '%';
 
             $pb = $this->storageMapper->getPredicateBuilder()
                 ->like('filename', $filename);
