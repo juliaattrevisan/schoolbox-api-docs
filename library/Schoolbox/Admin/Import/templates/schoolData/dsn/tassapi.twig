@@ -143,6 +143,25 @@
                         <input id='tap4start' type="text" name="dsn[tassapi][options][tap4start]" value="{{ options.tap4start ?? '' }}" data-datepicker data-datesync-enddate="#tap4end" />
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">Future Parents</h4>
+                <p class="meta">
+                    Toggle this on to additionally process Future Parents during each import.
+                </p>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div class="switch">
+                            <input id="futureParents" type="checkbox" name="dsn[tassapi][options][futureparents]" {% if (options ?? null) and options.futureparents %}checked{% endif %}>
+                            <label for="futureParents">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </fieldset>
     </section>
