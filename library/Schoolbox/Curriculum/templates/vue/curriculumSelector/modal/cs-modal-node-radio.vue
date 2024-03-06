@@ -4,7 +4,7 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateUUID } from "@js/util/jsUtils";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
 
@@ -17,6 +17,12 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     node: () => getEmptyNode(),
 });
+
+/**
+ * Only show the checkbox if the node has an id and a code
+ * @returns {boolean} - whether the checkbox is visible or not
+ */
+const isVisible = window.Vue.computed(() => props.node.id !== UNSET_ID);
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
@@ -33,7 +39,7 @@ function onChange() {
 </script>
 
 <template>
-    <div class="checklist">
+    <div v-if="isVisible" class="checklist">
         <input
             :id="`radio-${props.node.id}__${extraId}`"
             type="radio"
