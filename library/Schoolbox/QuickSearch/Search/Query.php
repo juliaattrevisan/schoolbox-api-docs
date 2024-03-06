@@ -141,9 +141,9 @@ class Query
         $classFolderData = [];
         foreach ($classFolderById as $classFolderId => $classFolder) {
             /* @var FolderModel $classFolder */
+            $classFolderName = $classFolder->getName();
             $classFolderData[] = [
-                $classFolderName = $classFolderId,
-                'id'             => $classFolder->getId(),
+                'id'             => $classFolderId,
                 'name'           => $classFolderName,
                 'codesString'    => $classFolder->getCodeString(),
                 'metadata'       => $this->formatMetadataForClassFolder($classFolder),
