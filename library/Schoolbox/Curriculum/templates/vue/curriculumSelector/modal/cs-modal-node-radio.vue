@@ -4,8 +4,8 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateUUID } from "@js/util/jsUtils";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
 
 const modalSelectedNodesStore = useModalSelectedNodesStore();
@@ -15,13 +15,7 @@ interface Props {
     node: Node; // to prefill the input
 }
 const props = withDefaults(defineProps<Props>(), {
-    node: () => {
-        return {
-            id: UNSET_ID,
-            name: "-",
-            children: [],
-        };
-    },
+    node: () => getEmptyNode(),
 });
 
 /**
@@ -31,11 +25,10 @@ const props = withDefaults(defineProps<Props>(), {
 const isChecked = window.Vue.computed(() => modalSelectedNodesStore.isSelected(props.node));
 
 /**
- * add or remove based on the current status
- * @param {boolean} $isChecked - whether the checkbox is checked or not
+ * add a single node to the selected nodes store
  */
-function onChange($isChecked: boolean) {
-    modalSelectedNodesStore.switch(props.node, $isChecked);
+function onChange() {
+    modalSelectedNodesStore.addSingle(props.node);
 }
 </script>
 
@@ -46,7 +39,7 @@ function onChange($isChecked: boolean) {
             type="radio"
             :value="props.node.id"
             :checked="isChecked"
-            @change="onChange($event.target.checked)"
+            @change="onChange"
         />
         <label :for="`radio-${props.node.id}__${extraId}`"></label>
     </div>
