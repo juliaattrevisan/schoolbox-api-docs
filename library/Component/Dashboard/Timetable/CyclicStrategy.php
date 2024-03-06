@@ -109,6 +109,11 @@ class Component_Dashboard_Timetable_CyclicStrategy implements Component_Dashboar
             return false;
         }
 
+        // Also if the user has no external ID: don't show the timetable
+        if (!$this->user->getExternalId()) {
+            return false;
+        }
+
         $timetableHandler = $this->externalTimetable;
         $this->externalAttendanceLink = new External_AttendanceLink($this->configLoader);
         $this->externalAttendanceLink->init($this->configLoader, $this->user->getRole()->isStaff());
