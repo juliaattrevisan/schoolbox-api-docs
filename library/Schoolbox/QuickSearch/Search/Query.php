@@ -151,7 +151,25 @@ class Query
             ];
         }
 
-        usort($classFolderData, [$this, 'compareClassFolderResultsForSortingPurposes']);
+        usort(
+            $classFolderData, function ($a, $b): int
+            {
+                return (
+                    // Sort by userIsInvolved desc...
+                    ($a['userIsInvolved'] && !$b['userIsInvolved']) ? -1 :
+                    (
+                        (!$a['userIsInvolved'] && $b['userIsInvolved']) ? 1 :
+                        (
+                            // Sort by name asc,
+                            ($a['name'] > $b['name']) ? 1 :
+                            (
+                                ($a['name'] < $b['name']) ? -1 : 0
+                            )
+                        )
+                    )
+                );
+            }
+        );
 
         return $classFolderData;
     }
@@ -407,25 +425,5 @@ class Query
     private function formatMetadataForClassFolder(FolderModel $classFolder): string
     {
         return $classFolder->getName();
-    }
-
-    /**
-     * For use when sorting class folder results so that classes in which the
-     * user is involved rank higher than classes in which the user is not involved.
-     */
-    public static function compareClassFolderResultsForSortingPurposes($a, $b): int
-    {
-        return (
-            ($a['userIsInvolved'] && !$b['userIsInvolved']) ? -1 :
-            (
-                (!$a['userIsInvolved'] && $b['userIsInvolved']) ? 1 :
-                (
-                    ($a['name'] > $b['name']) ? 1 :
-                    (
-                        ($a['name'] < $b['name']) ? -1 : 0
-                    )
-                )
-            )
-        );
     }
 }
