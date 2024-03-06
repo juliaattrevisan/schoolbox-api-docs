@@ -840,7 +840,7 @@ class Controller extends Base\Base
     private function findUnitImplementationsForCourseSpecId(int $courseSpecId): GenericCollection
     {
         $unitSpecs = $this->unitSpecificationMapper->findAllByCourseId($courseSpecId);
-        $unitSpecs = $unitSpecs->sortByCallback(function($a, $b) {
+        $unitSpecs = $unitSpecs->sortByCallback(function ($a, $b) {
             return  $b->getFolder()->getSequence() <=> $a->getFolder()->getSequence();
         });
 

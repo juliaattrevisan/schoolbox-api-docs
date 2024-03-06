@@ -20,10 +20,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementatio
  */
 class SortForCourseMarkbook implements IAssessableComparator
 {
-
-    /**
-     * @inheritdoc
-     */
     public function compare(IAssessable $left, IAssessable $right): int
     {
         $callable = $this->getCallable();
