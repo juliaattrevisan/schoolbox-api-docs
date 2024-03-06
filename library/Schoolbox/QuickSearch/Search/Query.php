@@ -12,7 +12,6 @@ namespace Schoolbox\QuickSearch\Search;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
