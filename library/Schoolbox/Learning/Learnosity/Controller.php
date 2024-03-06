@@ -28,6 +28,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -63,7 +64,7 @@ class Controller extends Base
     /**
      * Saves intermittently every 300 seconds by default
      */
-    private const LEARNOSITY_SAVE_INTERVAL = 300;
+    private const LEARNOSITY_SAVE_INTERVAL = 15;
 
 
     /**
@@ -486,9 +487,10 @@ class Controller extends Base
                         'reading_time' => $quiz->getReadingTimeDuration()
                     ],
                 ],
-                "navigation" => [
-                    "auto_save" => [
-                        "save_interval_duration" => self::LEARNOSITY_SAVE_INTERVAL
+                'navigation' => [
+                    'auto_save' => [
+                        'save_interval_duration' => self::LEARNOSITY_SAVE_INTERVAL,
+                        'ui' => true
                     ],
                     "show_intro" => false,
                     "show_outro" => false
@@ -604,6 +606,13 @@ class Controller extends Base
                 ]) . ($returnUrlEncoded === null ? '' : '/?' . Redirect::RETURN_URL . "=$returnUrlEncoded")
             ),
             'learnositySessionReference' => $attempt->getLearnosityReference(),
+            /* Monitor attempt preparation
+             */
+            'attemptMonitorUrl' => $this->router->getGenerator()->generate('learnosity.postAttemptMonitor', [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+                'learnositySessionReference' => $attempt->getLearnosityReference()
+            ]),
         ], "Attempt {$assessment->getTitle()}");
     }
 
@@ -1982,6 +1991,55 @@ class Controller extends Base
 
 
     /**
+     * Use this arbitrary endpoint to try and monitor attempt saving in Learnosity,
+     * to try and figure out why they *sometimes* don't work.
+     *
+     * @param QuizDomainObject $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     * @throws \JsonException
+     */
+    public function postAttemptMonitor(
+        QuizDomainObject $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* Get the post data that the frontend asynchronously sent to us
+         */
+        $postData = $this->requestPost->getArrayCopy();
+
+        /* Push it into the log file so we can track when things happened,
+         * (if they happened...) along with whatever outcomes might be helpful
+         */
+        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity_attempt_monitor');
+
+        /* If data is empty, we probably resumed a quiz (that's what happens when you resume a quiz)
+         * Otherwise, it should contain all the response ids in the quiz, when you start a whole new attempt
+         */
+        if ('' !== $postData['data']) {
+            $logger->debug(sprintf(
+                'Assessment %s (%s) new attempt started at %s using learnosity reference %s',
+                $assessment->getTitle(),
+                $assessment->getId(),
+                \Alaress_Date_Format::now()->getDatabaseDate(),
+                $attempt->getLearnosityReference()
+            ));
+        } else {
+            $logger->debug(sprintf(
+                'Assessment %s (%s) attempt resumed at %s using learnosity reference %s',
+                $assessment->getTitle(),
+                $assessment->getId(),
+                \Alaress_Date_Format::now()->getDatabaseDate(),
+                $attempt->getLearnosityReference()
+            ));
+        }
+
+        $logger->debug(json_encode($postData, JSON_THROW_ON_ERROR));
+    }
+
+
+    /**
      * Replace tokens in $originalComment for values pertaining to $student
      * Note that $comment could be anything...
      *
@@ -2000,7 +2058,8 @@ class Controller extends Base
      * Build assessment duplicator upon request, because it cannot be built
      * in the constructor.
      *
-     * @return Api\Duplicator
+     * @return Duplicator
+     * @throws \DomainException
      */
     private function buildDuplicator(): Api\Duplicator
     {

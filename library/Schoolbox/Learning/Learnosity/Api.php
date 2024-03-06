@@ -158,7 +158,7 @@ class Api
         /* Optionally log our payloads to learnosity
          */
         $this->logger?->debug(sprintf(
-            'Accessed service %s with payload %s',
+            'Accessed learnosity service "%s" with initialisation payload %s',
             $service,
             json_encode($payload, JSON_THROW_ON_ERROR)
         ));
@@ -359,7 +359,7 @@ class Api
 
                 /* Try to diagnose bools further
                  */
-                $this->logger->warning($e->getMessage());
+                $this->logger?->warning($e->getMessage());
 
                 $this->induceNap($fails, $jitter, 'Attempting retry for potentially transient bool on request %s: napping for %s seconds');
 
@@ -420,7 +420,7 @@ class Api
     {
         $napTime = self::NAP_TIMEOUT + pow(2, $fails) + $jitter;
 
-        $this->logger->debug(sprintf(
+        $this->logger?->debug(sprintf(
             $logMessage,
             $fails,
             $napTime
