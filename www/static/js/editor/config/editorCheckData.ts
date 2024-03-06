@@ -1,6 +1,6 @@
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorConfig } from "@js/editor/types/editorTypes";
-import { addRelToNewTabLinks } from "@js/editor/settings/linkSettings";
+import { addRelToNewTabLinks, addPrefixToElementIDs } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes, removeHeightFromVideoThumbs } from "@js/editor/settings/imageSettings";
 import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
 import { wrapTokens } from "@js/editor/settings/tokensSettings";
@@ -30,6 +30,7 @@ function getSourceElementHTML(sourceElement: HTMLElement) {
 function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     let sourceElementHTML = getSourceElementHTML(sourceElement);
     sourceElementHTML = addRelToNewTabLinks(sourceElementHTML);
+    sourceElementHTML = addPrefixToElementIDs(sourceElementHTML);
     sourceElementHTML = addFullWidthAttributes(sourceElementHTML);
     sourceElementHTML = removeHeightFromVideoThumbs(sourceElementHTML);
     sourceElementHTML = addFullWidthStyle(sourceElementHTML);

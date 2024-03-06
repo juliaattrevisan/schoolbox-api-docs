@@ -173,6 +173,13 @@ export function getHTMLSupportSettings() {
                 {
                     name: "pre",
                 },
+                // "Allow id on all div, p, h2, h3, h4, h5 and span elements"
+                {
+                    name: /^(div|p|h2|h3|h4|h5|span)$/,
+                    attributes: {
+                        id: true,
+                    },
+                },
             ],
         },
     };
