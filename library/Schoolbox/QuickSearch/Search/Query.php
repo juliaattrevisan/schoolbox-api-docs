@@ -79,6 +79,63 @@ class Query
     }
 
     /**
+     * Find IDs for users that match the given keyword.
+     *
+     * This list is subject to be filtered by `getQueryFilterForUsers`.
+     *
+     * @param string $keyword
+     * @param User   $viewer
+     *
+     * @return array
+     */
+    private function getUserIdsByKeyword(string $keyword, User $viewer): array
+    {
+        [$where, $params] = $this->getQueryFilterForUsers($keyword, $viewer);
+
+        $statement = $this->db->prepareQuery(
+            "SELECT DISTINCT u.id
+            FROM user u
+            INNER JOIN `groups` g ON u.group_id = g.id
+            $where
+            ORDER BY u.lastname ASC, u.chosen_name ASC
+            LIMIT " . self::AUTOSUGGEST_LIMIT
+        );
+
+        $statement->execute($params);
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Find IDs for class folders that match the given keyword.
+     *
+     * This list is subject to be filtered by `getQueryFilterForClassFolders`.
+     *
+     * @param string $keyword
+     * @param User   $viewer
+     *
+     * @return array
+     */
+    private function getClassFolderIdsByKeyword(string $keyword, User $viewer): array
+    {
+        [$where, $params] = $this->getQueryFilterForClassFolders($keyword, $viewer);
+
+        $statement = $this->db->prepareQuery(
+            // No need to sort because sorting is done in $this->getClassFolderData().
+            "SELECT DISTINCT f.id
+            FROM folder f
+            JOIN folder_code fc ON fc.folder_id = f.id
+            $where
+            GROUP BY f.id
+            LIMIT " . self::AUTOSUGGEST_LIMIT
+        );
+
+        $statement->execute($params);
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
      * @param array $userIds
      *
      * @return array of arrays containing user data.
@@ -99,7 +156,7 @@ class Query
         $userData = [];
         foreach ($userByUserId as $userId => $user) {
             $userData[] = [
-                'id'             => $user->getId(),
+                'id'             => $userId,
                 'externalId'     => $user->getExternalId(),
                 'firstname'      => $user->getFirstname(),
                 'preferredName'  => $user->getPreferredName(),
@@ -172,63 +229,6 @@ class Query
         );
 
         return $classFolderData;
-    }
-
-    /**
-     * Find IDs for users that match the given keyword.
-     *
-     * This list is subject to be filtered by `getQueryFilterForUsers`.
-     *
-     * @param string $keyword
-     * @param User   $viewer
-     *
-     * @return array
-     */
-    private function getUserIdsByKeyword(string $keyword, User $viewer): array
-    {
-        [$where, $params] = $this->getQueryFilterForUsers($keyword, $viewer);
-
-        $statement = $this->db->prepareQuery(
-            "SELECT DISTINCT u.id
-            FROM user u
-            INNER JOIN `groups` g ON u.group_id = g.id
-            $where
-            ORDER BY u.lastname ASC, u.chosen_name ASC
-            LIMIT " . self::AUTOSUGGEST_LIMIT
-        );
-
-        $statement->execute($params);
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
-    }
-
-    /**
-     * Find IDs for class folders that match the given keyword.
-     *
-     * This list is subject to be filtered by `getQueryFilterForClassFolders`.
-     *
-     * @param string $keyword
-     * @param User   $viewer
-     *
-     * @return array
-     */
-    private function getClassFolderIdsByKeyword(string $keyword, User $viewer): array
-    {
-        [$where, $params] = $this->getQueryFilterForClassFolders($keyword, $viewer);
-
-        $statement = $this->db->prepareQuery(
-            "SELECT DISTINCT f.id
-            FROM folder f
-            JOIN folder_code fc ON fc.folder_id = f.id
-            $where
-            GROUP BY f.id
-            ORDER BY f.updated_at, f.name
-            LIMIT " . self::AUTOSUGGEST_LIMIT
-        );
-
-        $statement->execute($params);
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     /**
