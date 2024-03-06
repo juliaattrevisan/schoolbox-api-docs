@@ -47,20 +47,18 @@ $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
  */
 $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');
 
-$liss = new Receiver(
-    $logger,
-    (int)$config->get('external_enable'),
-    $config->get('external_type'),
-    $config->get('external_liss_username'),
-    $config->get('external_liss_password'),
-    $sourceName,
-    $filesystemProxy,
-    $superuser,
-    \Schoolbox\Resource\Storage\Mapper::getInstance()
-);
-
 try {
-    $liss->start();
+    (new Receiver(
+        $logger,
+        (int)$config->get('external_enable'),
+        $config->get('external_type'),
+        $config->get('external_liss_username'),
+        $config->get('external_liss_password'),
+        $sourceName,
+        $filesystemProxy,
+        $superuser,
+        \Schoolbox\Resource\Storage\Mapper::getInstance()
+    ))->start();
 } catch (\Exception | \Throwable $e) {
     $logger->critical("Internal Error: {$e->getMessage()}");
 }
