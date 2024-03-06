@@ -118,127 +118,6 @@ class Query
     }
 
     /**
-     * Find IDs for folders that match the given keyword.
-     *
-     * This list is subject to be filtered by `getQueryFilterForFolders`.
-     *
-     * @param string $keyword
-     * @param array  $accessibleFolderIds
-     *
-     * @return array
-     */
-    private function getFolderIdsMatchingKeyword(string $keyword, array $accessibleFolderIds): array
-    {
-        $whereParts = [
-            '(f.name LIKE :keywordForLike OR fc.code LIKE :keywordForLike)',
-            'f.deleted_at IS NULL',
-            'f.id IN (' . implode(',', array_map('intval', $accessibleFolderIds)) . ')'
-        ];
-        $params = ['keywordForLike' => '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%'];
-
-        $statement = $this->db->prepareQuery(
-            // No need to sort because sorting is done in $this->getFolderData().
-            'SELECT DISTINCT f.id
-            FROM folder f
-            LEFT JOIN folder_code fc ON fc.folder_id = f.id
-            WHERE ' . implode(' AND ', $whereParts) . '
-            GROUP BY f.id
-            LIMIT ' . self::AUTOSUGGEST_LIMIT
-        );
-
-        $statement->execute($params);
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
-    }
-
-    /**
-     * @param array $userIds
-     *
-     * @return array of arrays containing user data.
-     */
-    private function getUserData(array $userIds): array
-    {
-        $userByUserId = UserMapper::getInstance()->findByColumn(
-            'id',
-            $userIds,
-            [
-                'order' => [
-                    'lastname'   => 'ASC',
-                    'chosen_name' => 'ASC',
-                ]
-            ]
-        );
-
-        $userData = [];
-        foreach ($userByUserId as $userId => $user) {
-            $userData[] = [
-                'id'             => $userId,
-                'externalId'     => $user->getExternalId(),
-                'firstname'      => $user->getFirstname(),
-                'preferredName'  => $user->getPreferredName(),
-                'lastname'       => $user->getLastname(),
-                'formattedName'  => $user->formatName(),
-                'metadata'       => $this->formatMetadataForUser($user),
-                'year'           => $user->getYear() ? $user->getYear()->getName() : '',
-            ];
-        }
-
-        return $userData;
-    }
-
-    /**
-     * @param array $folderIds
-     * @param Collection $permissionInfoByFolderId array of UserAccess
-     *
-     * @return array of arrays containing folder data.
-     */
-    private function getFolderData(array $folderIds, Collection $permissionInfoByFolderId): array
-    {
-        $folderById = FolderMapper::getInstance()->findByColumn(
-            'id',
-            $folderIds,
-            [
-                'order' => [
-                    'updated_at' => 'DESC',
-                ]
-            ]
-        );
-
-        $folderData = [];
-        foreach ($folderById as $folderId => $folder) {
-            /** @var FolderModel $folder */
-
-            /** @var UserAccess|null $userAccessToFolder */
-            $userAccessToFolder = $permissionInfoByFolderId[$folderId];
-
-            if ($userAccessToFolder !== null) {
-                $folderData[] = [
-                    'id'          => $folderId,
-                    'name'        => $folder->getNameWithCodes(),
-                    'metadata'    => $this->formatMetadataForFolder($folder),
-                    'accessLevel' => $userAccessToFolder->getAccessLevel(),
-                ];
-            }
-        }
-
-        usort(
-            $folderData,
-            function ($a, $b): int {
-                // If accessLevels are equal...
-                if ($a['accessLevel'] === $b['accessLevel']) {
-                    // Sort by name asc.
-                    return $a['name'] <=> $b['name'];
-                }
-
-                // Sort by accessLevel desc.
-                return $b['accessLevel'] <=> $a['accessLevel'];
-            }
-        );
-
-        return $folderData;
-    }
-
-    /**
      * Find a total count of users that match the given keyword.
      *
      * This count is subject to be filtered by `getQueryFilterForUsers`.
@@ -344,6 +223,41 @@ class Query
     }
 
     /**
+     * @param array $userIds
+     *
+     * @return array of arrays containing user data.
+     */
+    private function getUserData(array $userIds): array
+    {
+        $userByUserId = UserMapper::getInstance()->findByColumn(
+            'id',
+            $userIds,
+            [
+                'order' => [
+                    'lastname'   => 'ASC',
+                    'chosen_name' => 'ASC',
+                ]
+            ]
+        );
+
+        $userData = [];
+        foreach ($userByUserId as $userId => $user) {
+            $userData[] = [
+                'id'             => $userId,
+                'externalId'     => $user->getExternalId(),
+                'firstname'      => $user->getFirstname(),
+                'preferredName'  => $user->getPreferredName(),
+                'lastname'       => $user->getLastname(),
+                'formattedName'  => $user->formatName(),
+                'metadata'       => $this->formatMetadataForUser($user),
+                'year'           => $user->getYear() ? $user->getYear()->getName() : '',
+            ];
+        }
+
+        return $userData;
+    }
+
+    /**
      * Outputs a metadata line for this student.
      *
      * This is the same line that shows in search results underneath a student's name.
@@ -374,6 +288,92 @@ class Query
             $metadata .= $user->getYear()->getLongName($this->l10n->translate('year', false, true));
         }
         return "$metadata $role";
+    }
+
+    /**
+     * Find IDs for folders that match the given keyword.
+     *
+     * This list is subject to be filtered by `getQueryFilterForFolders`.
+     *
+     * @param string $keyword
+     * @param array  $accessibleFolderIds
+     *
+     * @return array
+     */
+    private function getFolderIdsMatchingKeyword(string $keyword, array $accessibleFolderIds): array
+    {
+        $whereParts = [
+            '(f.name LIKE :keywordForLike OR fc.code LIKE :keywordForLike)',
+            'f.deleted_at IS NULL',
+            'f.id IN (' . implode(',', array_map('intval', $accessibleFolderIds)) . ')'
+        ];
+        $params = ['keywordForLike' => '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%'];
+
+        $statement = $this->db->prepareQuery(
+            // No need to sort because sorting is done in $this->getFolderData().
+            'SELECT DISTINCT f.id
+            FROM folder f
+            LEFT JOIN folder_code fc ON fc.folder_id = f.id
+            WHERE ' . implode(' AND ', $whereParts) . '
+            GROUP BY f.id
+            LIMIT ' . self::AUTOSUGGEST_LIMIT
+        );
+
+        $statement->execute($params);
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param array $folderIds
+     * @param Collection $permissionInfoByFolderId array of UserAccess
+     *
+     * @return array of arrays containing folder data.
+     */
+    private function getFolderData(array $folderIds, Collection $permissionInfoByFolderId): array
+    {
+        $folderById = FolderMapper::getInstance()->findByColumn(
+            'id',
+            $folderIds,
+            [
+                'order' => [
+                    'updated_at' => 'DESC',
+                ]
+            ]
+        );
+
+        $folderData = [];
+        foreach ($folderById as $folderId => $folder) {
+            /** @var FolderModel $folder */
+
+            /** @var UserAccess|null $userAccessToFolder */
+            $userAccessToFolder = $permissionInfoByFolderId[$folderId];
+
+            if ($userAccessToFolder !== null) {
+                $folderData[] = [
+                    'id'          => $folderId,
+                    'name'        => $folder->getNameWithCodes(),
+                    'metadata'    => $this->formatMetadataForFolder($folder),
+                    'accessLevel' => $userAccessToFolder->getAccessLevel(),
+                ];
+            }
+        }
+
+        usort(
+            $folderData,
+            function ($a, $b): int {
+                // If accessLevels are equal...
+                if ($a['accessLevel'] === $b['accessLevel']) {
+                    // Sort by name asc.
+                    return $a['name'] <=> $b['name'];
+                }
+
+                // Sort by accessLevel desc.
+                return $b['accessLevel'] <=> $a['accessLevel'];
+            }
+        );
+
+        return $folderData;
     }
 
     /**
