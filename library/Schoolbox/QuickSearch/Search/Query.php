@@ -224,20 +224,14 @@ class Query
         usort(
             $folderData,
             function ($a, $b): int {
-                return (
-                    // Sort by accessLevel desc...
-                    ($a['accessLevel'] > $b['accessLevel']) ? -1 :
-                    (
-                        ($a['accessLevel'] && $b['accessLevel']) ? 1 :
-                        (
-                            // Then sort by name asc.
-                            ($a['name'] > $b['name']) ? 1 :
-                            (
-                                ($a['name'] < $b['name']) ? -1 : 0
-                            )
-                        )
-                    )
-                );
+                // If accessLevels are equal...
+                if ($a['accessLevel'] === $b['accessLevel']) {
+                    // Sort by name asc.
+                    return $a['name'] <=> $b['name'];
+                }
+
+                // Sort by accessLevel desc.
+                return $b['accessLevel'] <=> $a['accessLevel'];
             }
         );
 
