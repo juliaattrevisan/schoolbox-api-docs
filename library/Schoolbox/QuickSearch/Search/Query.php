@@ -12,6 +12,7 @@ namespace Schoolbox\QuickSearch\Search;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -69,7 +70,7 @@ class Query
             }
 
             if (count($classFolderIds) > 0) {
-                $result['classFolders']['data'] = $this->getClassFolder($classFolderIds, $viewer);
+                $result['classFolders']['data'] = $this->getClassFolderData($classFolderIds, $viewer);
                 $result['classFolders']['totalCount'] = $this->getTotalCountForClassFolders($keyword, $viewer);
             }
         }
@@ -118,7 +119,7 @@ class Query
      *
      * @return array of arrays containing class folder data.
      */
-    private function getClassFolder(array $classFolderIds, User $viewer): array
+    private function getClassFolderData(array $classFolderIds, User $viewer): array
     {
         $classFolderById = FolderMapper::getInstance()->findByColumn(
             'id',
@@ -144,8 +145,7 @@ class Query
             $classFolderName = $classFolder->getName();
             $classFolderData[] = [
                 'id'             => $classFolderId,
-                'name'           => $classFolderName,
-                'codesString'    => $classFolder->getCodeString(),
+                'name'           => $classFolder->getNameWithCodes(),
                 'metadata'       => $this->formatMetadataForClassFolder($classFolder),
                 'userIsInvolved' => array_key_exists($classFolderName, $subjectListNamesAsKeys)
             ];
@@ -160,7 +160,7 @@ class Query
                     (
                         (!$a['userIsInvolved'] && $b['userIsInvolved']) ? 1 :
                         (
-                            // Sort by name asc,
+                            // Then sort by name asc.
                             ($a['name'] > $b['name']) ? 1 :
                             (
                                 ($a['name'] < $b['name']) ? -1 : 0
@@ -424,6 +424,13 @@ class Query
      */
     private function formatMetadataForClassFolder(FolderModel $classFolder): string
     {
-        return $classFolder->getName();
+        $yearLevelNames = [];
+
+        // TODO: Ensure that year levels are hydrated in the $classFolder object.
+        foreach ($classFolder->getYearLevels() as $yearLevel) {
+            $yearLevelNames[] = $yearLevel->getLongName();
+        }
+
+        return implode(', ', $yearLevelNames);
     }
 }
