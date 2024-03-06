@@ -22,6 +22,14 @@ const props = defineProps({
             };
         },
     },
+    /**
+     * so can only select a single node
+     */
+    isSingleSelect: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 
 /**
@@ -77,14 +85,19 @@ const isNodeSelected = window.Vue.computed(() => {
  * the node is currently selected
  */
 function onSelected() {
-    isNodeSelected.value ? selectedNodesStore.remove(props.result) : selectedNodesStore.add(props.result);
+    if (props.isSingleSelect) {
+        selectedNodesStore.addSingle(props.result);
+    } else {
+        isNodeSelected.value ? selectedNodesStore.remove(props.result) : selectedNodesStore.add(props.result);
+    }
 }
 </script>
 
 <template>
     <button class="search-result" :title="title" @click.prevent="onSelected">
         <div class="checklist">
-            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isNodeSelected" />
+            <input v-if="props.isSingleSelect" :id="`checkbox-${result.id}`" type="radio" :checked="isNodeSelected" />
+            <input v-else :id="`checkbox-${result.id}`" type="checkbox" :checked="isNodeSelected" />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
