@@ -366,8 +366,8 @@ class Controller extends Base
         // TODO consider adding cookie setting method in response factory
         $fqdn = \trim("{$this->getConfigLoader()->get('site_hostname')}.{$this->getConfigLoader()->get('site_domain')}");
 
-        setcookie('kamiExportToken', $token, 500, '/', $fqdn, true, false);
-        setcookie('kamiExportStatus', $export->getStatus(), 500, '/', $fqdn, true, false);
+        setcookie('kamiExportToken', $token, 0, '/', $fqdn, true, false);
+        setcookie('kamiExportStatus', $export->getStatus(), 0, '/', $fqdn, true, false);
 
         // Unable to generate the export? (either due to error or timeout)
         if (!$export->isStatusDone()) {
