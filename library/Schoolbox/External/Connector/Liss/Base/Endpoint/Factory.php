@@ -99,6 +99,14 @@ class Factory
             return new GenericCollection(IStrategy::class);
         }
 
+        /* Announce that we're using additive mode if it's enabled
+         */
+        if ($this->lissAdditiveMode) {
+            $this->log->debug('Additive Mode is enabled; liss supplements whatever the sis provided.');
+        } else {
+            $this->log->debug('Additive Mode is disabled; liss is the exclusive source of truth for timetable data.');
+        }
+
         /* Otherwise there's at least one liss payload in here tha we can eat
          */
         $bus = new GenericCollection(IStrategy::class);
