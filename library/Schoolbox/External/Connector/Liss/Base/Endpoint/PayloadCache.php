@@ -70,14 +70,14 @@ class PayloadCache
      *
      * Use $name (an arbitrary string) to help identify filenames
      *
-     * @param string|null $sourceName
+     * @param string $sourceName
      * @param string $lissMethodName
      * @param User $superuser
      * @param Request $message
      * @return Model
      */
     public function cache(
-        ?string $sourceName,
+        string $sourceName,
         string $lissMethodName,
         \Schoolbox\User $superuser,
         Request $message
@@ -111,7 +111,7 @@ class PayloadCache
                 '%s%s%s%s',
                 Factory::SOURCE_NAME,
                 PayloadFilename::SEPARATOR,
-                    $lissMethodName,
+                $lissMethodName,
                 PayloadFilename::SEPARATOR
             ) . '%s';
 
