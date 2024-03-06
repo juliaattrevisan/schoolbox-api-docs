@@ -13,6 +13,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use League\Flysystem\FilesystemException;
 use PhpXmlRpc\Request;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Codec\PayloadFilename;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\Model;
@@ -49,13 +50,6 @@ class PayloadCache
 
 
     /**
-     * This char separates the suds source, liss method, liss source and datetime
-     * in a liss payload's filename.
-     */
-    private const SEPARATOR = '-';
-
-
-    /**
      * Constructor.
      *
      * @param Mapper $storageMapper
@@ -77,43 +71,20 @@ class PayloadCache
      * Use $name (an arbitrary string) to help identify filenames
      *
      * @param string|null $sourceName
-     * @param string $name
+     * @param string $lissMethodName
      * @param User $superuser
      * @param Request $message
      * @return Model
      */
     public function cache(
         ?string $sourceName,
-        string $name,
+        string $lissMethodName,
         \Schoolbox\User $superuser,
         Request $message
     ): \Schoolbox\Resource\Storage\Model {
+        $filename = (new PayloadFilename())->encode($lissMethodName, $sourceName);
         $payload = serialize($message);
-
-        $now = \Alaress_Date_Format::now();
         $expiryAt = \Alaress_Date_Format::now()->addWeeks(1);
-
-        /* This $sourceName must not contain any special characters, such as those used by our filename
-         * encoding scheme, cos it'll snap if you do.
-         */
-        $payloadSourceName = str_replace(self::SEPARATOR, '', $sourceName);
-
-        /* This format is as follows:
-         *   suds_liss
-         *   liss method (e.g. belltimes, classmemberships, etc)
-         *   source name (if provided by client; otherwise, "default")
-         *   date
-         */
-        $filename = sprintf(
-            '%s%s%s%s%s%s%s.log',
-            Factory::SOURCE_NAME,
-            self::SEPARATOR,
-            $name,
-            self::SEPARATOR,
-            $payloadSourceName,
-            self::SEPARATOR,
-            $now->getUsingFormat('Ymd_His')
-        );
 
         return $this->storageMapper->acceptStream($filename, $payload, false, $expiryAt, $superuser);
     }
@@ -135,8 +106,14 @@ class PayloadCache
     {
         /* Files that could potentially exist in storage at any given time
          */
-        foreach (self::PAYLOAD_ALL as $potentialPayload) {
-            $filename = Factory::SOURCE_NAME . self::SEPARATOR . '%';
+        foreach (self::PAYLOAD_ALL as $lissMethodName) {
+            $filename = sprintf(
+                '%s%s%s%s',
+                Factory::SOURCE_NAME,
+                PayloadFilename::SEPARATOR,
+                    $lissMethodName,
+                PayloadFilename::SEPARATOR
+            ) . '%s';
 
             $pb = $this->storageMapper->getPredicateBuilder()
                 ->like('filename', $filename);
@@ -155,19 +132,19 @@ class PayloadCache
     /**
      * Loads a previously-stored liss payload from the cache
      *
-     * @param string $name
+     * @param string $lissMethodName
      * @return null|array
      * @throws FilesystemException
      * @throws InvalidColumnException
      */
-    public function load(string $name): ?array
+    public function load(string $lissMethodName): ?array
     {
         $filename = sprintf(
             '%s%s%s%s',
             Factory::SOURCE_NAME,
-            self::SEPARATOR,
-            $name,
-            self::SEPARATOR
+            PayloadFilename::SEPARATOR,
+            $lissMethodName,
+            PayloadFilename::SEPARATOR
         );
 
         $pb = $this->storageMapper->getPredicateBuilder()
@@ -181,7 +158,7 @@ class PayloadCache
         if (!$files->count()) {
             $this->logger->debug(sprintf(
                 'No %s liss payloads found in storage.',
-                $name
+                $lissMethodName
             ));
 
             return null;
@@ -193,21 +170,14 @@ class PayloadCache
         $stack = [];
 
         foreach ($files as $file) {
-            $parts = explode(self::SEPARATOR, $file->getFilename());
-
-            /* "default", normally
-             *
-             * ...unless the school specified a ?source parameter in their Receiver all,
-             * in which case it'll be that. Redlands used it.
-             */
-            $source = $parts[2];
+            $sourceName = (new PayloadFilename())->decode($file->getFilename())['sourceName'];
 
             /* Announce which file we're consuming
              */
             $this->logger->debug(sprintf(
                 'Processing liss payload %s from storage, using source "%s"',
                 $file->getFilename(),
-                $source
+                $sourceName
             ));
 
             /* Once we can get the saved payload, try to reconstruct it
@@ -217,7 +187,7 @@ class PayloadCache
                 'allowed_classes' => true
             ]);
 
-            $stack[$source] = $mockMessage;
+            $stack[$sourceName] = $mockMessage;
         }
 
         return $stack;
