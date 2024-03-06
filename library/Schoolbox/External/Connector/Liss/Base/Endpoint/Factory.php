@@ -93,89 +93,89 @@ class Factory
         $exclusions = array_map('trim', explode(',', $this->exclusions));
 
         /* Check if there are any liss payloads available:
-         * If not, just do nothing at all
+         * If not, nothing to do. No trabajo
          */
-        if ((new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->hasPayloads()) {
-            $bus = new GenericCollection(IStrategy::class);
-
-            /* Additive mode just piles your data on top of whatever the sis gave you already
-             * If it's off, consider liss to be the source of truth for timetable data and just
-             * Prepare and Cleanup as usual
-             */
-            if (!$this->lissAdditiveMode) {
-                $bus->add(new Prepare(
-                    $this->log,
-                    $this->perform,
-                    $this->eventMapper,
-                    $this->classEntryMapper,
-                    $this->classInvolvementMapper,
-                    $this->classPeriodMapper,
-                    $this->periodMapper,
-                    $this->overridesMapper
-                ));
-            }
-
-            $bus->add(new DailyData(
-                $this->log,
-                $this->perform,
-                $this->defaultType,
-                $exclusions,
-                $this->teacherIdentifier,
-                $this->filesystemProxy,
-                $this->storageMapper,
-                $this->eventMapper,
-                $this->overridesMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper
-            ))
-            ->add(new TimetableCalendar\BellTimes(
-                $this->log,
-                $this->perform,
-                $this->filesystemProxy,
-                $this->storageMapper,
-                $this->periodMapper
-            ))
-            ->add(new TimetableCalendar\Classes(
-                $this->log,
-                $this->perform,
-                $this->filesystemProxy,
-                $this->storageMapper,
-                $this->classEntryMapper
-            ))
-            ->add(new TimetableCalendar\ClassMemberships(
-                $this->log,
-                $this->perform,
-                $this->filesystemProxy,
-                $this->storageMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper
-            ))
-            ->add(new TimetableCalendar\Timetable(
-                $this->log,
-                $this->perform,
-                $this->teacherIdentifier,
-                $this->filesystemProxy,
-                $this->storageMapper,
-                $this->classEntryMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper
-            ));
-
-            /* Don't need to clean anything up in this mode
-             */
-            if (!$this->lissAdditiveMode) {
-                $bus->add(new Cleanup(
-                    $this->log,
-                    $this->perform,
-                    $this->eventMapper
-                ));
-            }
-
-            return $bus;
+        if (!(new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->hasPayloads()) {
+            return new GenericCollection(IStrategy::class);
         }
 
-        /* No liss payloads detected; nothing to do. No trabajo
+        /* Otherwise there's at least one liss payload in here tha we can eat
          */
-        return new GenericCollection(IStrategy::class);
+        $bus = new GenericCollection(IStrategy::class);
+
+        /* Additive mode just piles your data on top of whatever the sis gave you already
+         * If it's off, consider liss to be the source of truth for timetable data and just
+         * Prepare and Cleanup as usual
+         */
+        if (!$this->lissAdditiveMode) {
+            $bus->add(new Prepare(
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper
+            ));
+        }
+
+        $bus->add(new DailyData(
+            $this->log,
+            $this->perform,
+            $this->defaultType,
+            $exclusions,
+            $this->teacherIdentifier,
+            $this->filesystemProxy,
+            $this->storageMapper,
+            $this->eventMapper,
+            $this->overridesMapper,
+            $this->classEntryMapper,
+            $this->classInvolvementMapper
+        ))
+        ->add(new TimetableCalendar\BellTimes(
+            $this->log,
+            $this->perform,
+            $this->filesystemProxy,
+            $this->storageMapper,
+            $this->periodMapper
+        ))
+        ->add(new TimetableCalendar\Classes(
+            $this->log,
+            $this->perform,
+            $this->filesystemProxy,
+            $this->storageMapper,
+            $this->classEntryMapper
+        ))
+        ->add(new TimetableCalendar\ClassMemberships(
+            $this->log,
+            $this->perform,
+            $this->filesystemProxy,
+            $this->storageMapper,
+            $this->classEntryMapper,
+            $this->classInvolvementMapper
+        ))
+        ->add(new TimetableCalendar\Timetable(
+            $this->log,
+            $this->perform,
+            $this->teacherIdentifier,
+            $this->filesystemProxy,
+            $this->storageMapper,
+            $this->classEntryMapper,
+            $this->classPeriodMapper,
+            $this->periodMapper
+        ));
+
+        /* Don't need to clean anything up in this mode
+         */
+        if (!$this->lissAdditiveMode) {
+            $bus->add(new Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper
+            ));
+        }
+
+        return $bus;
     }
 }
