@@ -153,7 +153,8 @@
                 <div class="row">
                     <div class="small-12 columns">
                         <div class="switch">
-                            <input id="futureParents" type="checkbox" name="dsn[tassapi][options][futureparents]" {% if (options ?? null) and options.futureparents %}checked{% endif %}>
+                            <input type="hidden" name="dsn[tassapi][options][futureparents]" value="0" />
+                            <input id="futureParents" type="checkbox" name="dsn[tassapi][options][futureparents]" {% if (options ?? null) and (options.futureparents ?? false) %}checked{% endif %}>
                             <label for="futureParents">
                                 <span>On</span>
                                 <span>Off</span>
