@@ -62,18 +62,18 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
             $poll = $pollHandler->getByID($this->getConfig('poll'));
 
-            $created = new Alaress_Date_Format($poll['created'], Alaress_Date_Format::DATABASE_FORMAT);
-
-            try {
-                $author = \Schoolbox\UserMapper::getInstance()->findById($poll['created_by']);
-            } catch (Deleted $de) {
-                $author = $de->getDeletedObject();
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $author = \Schoolbox\UserMapper::getInstance()->getUnknownUser();
-            }
-            /** @var \Schoolbox\User $author **/
-
             if (is_array($poll) && $poll['id']) {
+                $created = new Alaress_Date_Format($poll['created'], Alaress_Date_Format::DATABASE_FORMAT);
+
+                try {
+                    $author = \Schoolbox\UserMapper::getInstance()->findById($poll['created_by']);
+                } catch (Deleted $de) {
+                    $author = $de->getDeletedObject();
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $author = \Schoolbox\UserMapper::getInstance()->getUnknownUser();
+                }
+                /** @var \Schoolbox\User $author **/
+
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
                 $this->setVar(
                     [
