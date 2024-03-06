@@ -23,7 +23,7 @@ class Query
     /**
      * Number of users that will show on auto-suggest field
      */
-    public const AUTOSUGGEST_LIMIT = 10;
+    public const AUTOSUGGEST_LIMIT = 5;
 
     public const MIN_SEARCH_LENGTH = 2;
 
