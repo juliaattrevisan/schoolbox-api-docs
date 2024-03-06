@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
-use Alaress\Lumberjack\Logger;
 use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
@@ -17,6 +16,7 @@ use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\User;
 use SensitiveParameter;
 
 /**
@@ -59,14 +59,6 @@ class Receiver
     private const AGENT_NAME = 'Schoolbox';
 
 
-    /**
-     * Logs the things that happened, in a text file
-     *
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
     /* Legacy LISS Implementation w/ the Cyclic Timetable
      *
      *     DEFAULT_CYCLE_IDENTIFIER
@@ -88,16 +80,18 @@ class Receiver
     /**
      * Constructor.
      *
+     * @param LoggerInterface $log Logs the things that happened, in a text file
      * @param int $externalEnable Whether the external db was enabled
      * @param string $externalType Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
      * @param string $username LISS username, as per config
      * @param string $password LISS password, as per config
      * @param string $sourceName
      * @param FilesystemProxy $filesystemProxy
-     * @param \Schoolbox\User $superuser
+     * @param User $superuser
      * @param StorageMapper $storageMapper Log liss payloads to a local file storage record
      */
     public function __construct(
+        private LoggerInterface $log,
         private int $externalEnable,
         private string $externalType,
         private string $username,
@@ -107,8 +101,6 @@ class Receiver
         private \Schoolbox\User $superuser,
         private StorageMapper $storageMapper
     ) {
-        $this->log = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');
-
         $this->storageMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
     }
 

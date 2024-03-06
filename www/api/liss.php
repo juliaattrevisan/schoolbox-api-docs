@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Lumberjack\Logger;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -42,7 +43,12 @@ $sourceName = $_GET['source'] ?? PayloadCache::DEFAULT_SOURCE_NAME;
 /** @var FilesystemProxy $filesystemProxy */
 $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
 
+/* A random logger
+ */
+$logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');
+
 $liss = new Receiver(
+    $logger,
     (int)$config->get('external_enable'),
     $config->get('external_type'),
     $config->get('external_liss_username'),
@@ -53,10 +59,8 @@ $liss = new Receiver(
     \Schoolbox\Resource\Storage\Mapper::getInstance()
 );
 
-$log = $liss->log();
-
 try {
     $liss->start();
 } catch (\Exception | \Throwable $e) {
-    $log->critical("Internal Error: {$e->getMessage()}");
+    $logger->critical("Internal Error: {$e->getMessage()}");
 }
