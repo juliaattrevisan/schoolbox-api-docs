@@ -23,7 +23,7 @@ class Query
     /**
      * Number of users that will show on auto-suggest field
      */
-    public const AUTOSUGGEST_LIMIT = 5;
+    public const AUTOSUGGEST_LIMIT = 10;
 
     public const MIN_SEARCH_LENGTH = 2;
 
@@ -64,12 +64,12 @@ class Query
             $classFolderIds = $this->getClassFolderIdsByKeyword($keyword, $viewer);
 
             if (count($userIds) > 0) {
-                $result['users']['rows'] = $this->getUserData($userIds);
+                $result['users']['data'] = $this->getUserData($userIds);
                 $result['users']['totalCount'] = $this->getTotalCountForUsers($keyword, $viewer);
             }
 
             if (count($classFolderIds) > 0) {
-                $result['classFolders']['rows'] = $this->getClassFolderData($classFolderIds);
+                $result['classFolders']['data'] = $this->getClassFolder($classFolderIds, $viewer);
                 $result['classFolders']['totalCount'] = $this->getTotalCountForClassFolders($keyword, $viewer);
             }
         }
@@ -80,13 +80,11 @@ class Query
     /**
      * @param array $userIds
      *
-     * @return array
+     * @return array of arrays containing user data.
      */
     private function getUserData(array $userIds): array
     {
-        $result = [];
-
-        $users = UserMapper::getInstance()->findByColumn(
+        $userByUserId = UserMapper::getInstance()->findByColumn(
             'id',
             $userIds,
             [
@@ -97,9 +95,9 @@ class Query
             ]
         );
 
-        foreach ($users as $key => $user) {
-            $result[$key] = [
-                'resultType'     => 'user',
+        $userData = [];
+        foreach ($userByUserId as $userId => $user) {
+            $userData[] = [
                 'id'             => $user->getId(),
                 'externalId'     => $user->getExternalId(),
                 'firstname'      => $user->getFirstname(),
@@ -111,19 +109,18 @@ class Query
             ];
         }
 
-        return $result;
+        return $userData;
     }
 
     /**
      * @param array $classFolderIds
+     * @param User $viewer
      *
-     * @return array
+     * @return array of arrays containing class folder data.
      */
-    private function getClassFolderData(array $classFolderIds): array
+    private function getClassFolder(array $classFolderIds, User $viewer): array
     {
-        $result = [];
-
-        $classFolders = FolderMapper::getInstance()->findByColumn(
+        $classFolderById = FolderMapper::getInstance()->findByColumn(
             'id',
             $classFolderIds,
             [
@@ -133,17 +130,30 @@ class Query
             ]
         );
 
-        foreach ($classFolders as $key => $classFolder) {
+        $externalUser = new \External_User();
+        $subjectList = $externalUser->getSubjectList($viewer);
+        $subjectListNamesAsKeys = [];
+
+        foreach ($subjectList as $subject) {
+            $subjectListNamesAsKeys[$subject['name']] = null;
+        }
+
+        $classFolderData = [];
+        foreach ($classFolderById as $classFolderId => $classFolder) {
             /* @var FolderModel $classFolder */
-            $result[$key] = [
-                'resultType' => 'classFolder',
-                'id'         => $classFolder->getId(),
-                'name'       => $classFolder->getName(),
-                'metadata'   => $this->formatMetadataForClassFolder($classFolder),
+            $classFolderData[] = [
+                $classFolderName = $classFolder->getName(),
+                'id'             => $classFolder->getId(),
+                'name'           => $classFolderName,
+                'codesString'    => $classFolder->getCodeString(),
+                'metadata'       => $this->formatMetadataForClassFolder($classFolder),
+                'userIsInvolved' => array_key_exists($classFolderName, $subjectListNamesAsKeys)
             ];
         }
 
-        return $result;
+        usort($classFolderData, [$this, 'compareClassFolderResultsForSortingPurposes']);
+
+        return $classFolderData;
     }
 
     /**
@@ -161,9 +171,12 @@ class Query
         [$where, $params] = $this->getQueryFilterForUsers($keyword, $viewer);
 
         $statement = $this->db->prepareQuery(
-            'SELECT DISTINCT u.id FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
-            . $where
-            . ' ORDER BY u.lastname, u.chosen_name ASC LIMIT ' . self::AUTOSUGGEST_LIMIT
+            "SELECT DISTINCT u.id
+            FROM user u
+            INNER JOIN `groups` g ON u.group_id = g.id
+            $where
+            ORDER BY u.lastname ASC, u.chosen_name ASC
+            LIMIT " . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute($params);
@@ -394,5 +407,25 @@ class Query
     private function formatMetadataForClassFolder(FolderModel $classFolder): string
     {
         return $classFolder->getName();
+    }
+
+    /**
+     * For use when sorting class folder results so that classes in which the
+     * user is involved rank higher than classes in which the user is not involved.
+     */
+    public static function compareClassFolderResultsForSortingPurposes($a, $b): int
+    {
+        return (
+            ($a['userIsInvolved'] && !$b['userIsInvolved'])? -1 :
+            (
+                (!$a['userIsInvolved'] && $b['userIsInvolved'])? 1 :
+                (
+                    ($a['name'] > $b['name'])? 1 :
+                    (
+                        ($a['name'] < $b['name'])? -1 : 0
+                    )
+                )
+            )
+        );
     }
 }
