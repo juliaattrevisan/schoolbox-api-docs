@@ -3,11 +3,12 @@
  * The modal that's used to help select curriculum
  */
 
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import BadgeDetail from "@schoolboxBadge/vue/badgeDetail.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import { useModalStore } from "../store/csModalStore";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import CsModalHeader from "./cs-modal-header.vue";
 import CsModalNodes from "./cs-modal-nodes.vue";
@@ -22,9 +23,19 @@ const props = defineProps({
         required: false,
         default: false,
     },
+    /**
+     * To open on a specific node, in situations where we wish
+     * to restrict further navigation/selection to within a specific node
+     */
+    startingNodeId: {
+        type: Number,
+        required: false,
+        default: UNSET_ID,
+    },
 });
 
 const modalStore = useModalStore();
+const modalViewNodesStore = useModalViewNodesStore();
 const isNextSelected = window.Vue.ref(false); // to move to the next modal if a badge usage is selected
 const modalNodeUsageStore = useModalNodeUsageStore();
 const selectedNodeDetails = window.Vue.ref(getEmptyNode());
@@ -34,6 +45,9 @@ const selectedNodeDetails = window.Vue.ref(getEmptyNode());
  */
 window.Vue.onMounted(() => {
     modalStore.isSingleSelect = props.isSingleSelect;
+    if (props.startingNodeId !== UNSET_ID) {
+        modalViewNodesStore.toId(props.startingNodeId);
+    }
 });
 
 /**

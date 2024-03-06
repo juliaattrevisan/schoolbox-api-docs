@@ -21,7 +21,7 @@ const isDisabled = window.Vue.computed(() => modalNodeUsageStore.isOpen || nodes
 </script>
 
 <template>
-    <h2>Select Curriculum Codes</h2>
+    <h2>Select Curriculum</h2>
     <cs-modal-header-breadcrumbs :is-disabled="isDisabled" />
     <cs-modal-header-search-input :is-disabled="isDisabled" />
 </template>
