@@ -34,9 +34,10 @@ export function usePopOut(
     contentId: string,
     optimalPlacement = "bottom-end",
     isFullWidth = false,
-    isCloseOnContentClick = false
+    isCloseOnContentClick = false,
 ) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
+    let contentInitParent: HTMLElement | null = null; // The initial parent of the content
     let content: HTMLElement; // The content to display when the button is selected
     let cleanup: () => void; // The cleanup function returned by @floating-ui/dom
 
@@ -176,6 +177,17 @@ export function usePopOut(
         content = document.querySelector(`#${contentId}[data-dropdown-content]`) as HTMLElement;
         if (content) {
             content.setAttribute("aria-hidden", "true");
+
+            const moveTo = content.getAttribute("data-dropdown-move-to");
+            if (moveTo) {
+                const moveToEl = document.querySelector(moveTo);
+                if (moveToEl) {
+                    // Store the original position of the content
+                    contentInitParent = content.parentElement as HTMLElement;
+                    moveToEl.appendChild(content);
+                }
+            }
+
             // to close the content when the user clicks outside of it
             onClickOutside(button, close, {
                 ignore: isCloseOnContentClick ? [] : [`#${content.id}[data-dropdown-content]`],
@@ -205,6 +217,11 @@ export function usePopOut(
      */
     window.Vue.onBeforeUnmount(() => {
         close();
+
+        // if the content was moved, move it back to the initial parent
+        if (contentInitParent && content) {
+            contentInitParent.appendChild(content);
+        }
     });
 
     return { currentLabel, isOpen, onButtonSelected, close };

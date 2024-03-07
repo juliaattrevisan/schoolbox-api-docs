@@ -137,6 +137,10 @@ window.Vue.onUnmounted(() => {
                 </tr>
             </thead>
             <tbody v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
+                <tr id="unitplanner-dropdown-container">
+                    <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
+                        The specific placement of this element ensures that the dropdowns are still contained within the table -->
+                </tr>
                 <tr
                     v-for="unit in store.orderedUnits"
                     :key="unit.id"
@@ -217,7 +221,7 @@ window.Vue.onUnmounted(() => {
                 left: 0;
                 position: sticky;
                 width: 200px;
-                z-index: 2;
+                z-index: 2; // Behind the dropdowns and table header, but on top of the content
             }
 
             &:not(:first-child) {
@@ -232,10 +236,12 @@ window.Vue.onUnmounted(() => {
     > thead {
         position: sticky;
         top: 0;
-        z-index: 3;
+        z-index: 4; // On top of both the left column and the dropdowns
     }
 
     > tbody {
+        overflow: hidden;
+        position: relative;
         > tr {
             height: v-bind(unexpandedUnitHeightStyle);
 
@@ -267,5 +273,11 @@ window.Vue.onUnmounted(() => {
     .unit-wrapper {
         display: flex;
     }
+}
+
+#unitplanner-dropdown-container {
+    height: 0;
+    position: sticky;
+    z-index: 3; // On top of left column, but behind the header
 }
 </style>
