@@ -17,7 +17,7 @@ interface TabConfig {
     columnTypeIDs: ColumnType[];
 }
 
-interface Column extends ColumnConfig {
+export interface Column extends ColumnConfig {
     id: number;
     type: ColumnType;
     label: string;
