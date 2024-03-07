@@ -17,7 +17,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         $loggedIn = new Rule\LazyCallback(function () {
             return new Rule\All(
