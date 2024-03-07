@@ -102,7 +102,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             '@curriculum/component/curriculumOverview.twig',
             [
                 'context'           => $this->getContext(),
-                'nodes'             => $this->curriculumNodes->getAll(),
+                'nodes'             => $this->curriculumNodes,
                 'curriculumTagging' => $this->curriculumTagging,
             ]
         );

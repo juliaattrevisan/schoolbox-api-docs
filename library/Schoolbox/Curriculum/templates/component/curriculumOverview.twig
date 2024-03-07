@@ -1,50 +1,8 @@
-{% macro outputCurriculumNode(node) %}
-    <li class="row">
-        <div class="content">
-            {% if node.code %}
-                [<a title="View curriculum node details" href="#{{ node.id }}" data-display-node>{{ node.code }}</a>]
-            {% endif %}
-            {{ node.name }}
-
-            <ul class="information-list">
-                {% if node.children %}
-                    {% for subnode in node.children | filter (subnode => subnode.enabled) %}
-                        {# _self should work here even in twig 2.x #}
-                        {{ _self.outputCurriculumNode(subnode) }}
-                    {% endfor %}
-                {% endif %}
-            </ul>
-        </div>
-    </li>
-{% endmacro %}
-
-{% import _self as macros %}
-
-
-{% if nodes | length > 0 %}
-    <ul class="information-list">
-        {% for node in nodes %}
-        {{ macros.outputCurriculumNode(node) }}
-        {% endfor %}
-    </ul>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-curriculum"></i>
-        {% if not curriculumTagging %}
-
-            {% if USER.isSuperuser %}
-                <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
-            {% else %}
-                <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
-            {% endif %}
-
-        {% else %}
-            <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum code</a> to your course or {{ locale.unit }} page to display a list of all of the curriculum codes and matching skill descriptors covered in this area of the curriculum.</p>
-        {% endif %}
-    </div>
-{% endif %}
-
 <div data-overview-component>
-    <overview-component :nodes="{{nodes|json_encode}}" />
+    <overview-component
+        :is-super-user="{{ USER.isSuperuser }}"
+        :has-tagging="{{ curriculumTagging ? "true" : "false" }}"
+        locale-unit="{{ locale.unit }}"
+    />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/overviewComponent.js?v={{ config.site_version }}"></script>
