@@ -81,7 +81,7 @@ class Query
 
             if (count($matchingFolderInfoById) > 0) {
                 $result['data'] = array_merge($result['data'], $this->getFolderData($matchingFolderInfoById, $viewer));
-                $result['metadata']['totalCountFolders'] = $this->getTotalCountForFolders($keyword);
+                $result['metadata']['totalCountFolders'] = count($matchingFolderInfoById);
             }
         }
 
@@ -90,8 +90,6 @@ class Query
 
     /**
      * Find IDs for users that match the given keyword.
-     *
-     * This list is subject to be filtered by `getQueryFilterForUsers`.
      *
      * @param string $keyword
      * @param User   $viewer
@@ -118,8 +116,6 @@ class Query
 
     /**
      * Find a total count of users that match the given keyword.
-     *
-     * This count is subject to be filtered by `getQueryFilterForUsers`.
      *
      * @param string $keyword
      * @param User   $viewer
@@ -302,9 +298,7 @@ class Query
     }
 
     /**
-     * Find IDs for folders that match the given keyword.
-     *
-     * This list is subject to be filtered by `getQueryFilterForFolders`.
+     * Find IDs for folders that match the given keyword, and are accessible by the logged-in user.
      *
      * @param string $keyword
      * @param User $viewer
@@ -340,9 +334,19 @@ class Query
 
         $statement->execute($params);
 
-        // Index the rows by 'id'.
+        // Drop rows to which the user does not have access, and index the remaining rows by 'id'.
+        $access = Access::getInstance();
         $folderInfoById = [];
         foreach ($statement->fetchAll() as $row) {
+            try {
+                if ($access->getFolderAccess($viewer, $row['id']) < UserAccess::ACCESS_READ) {
+                    continue;
+                }
+            } catch (Exception) {
+                // Problem determining access, so assume no access.
+                continue;
+            }
+
             $folderInfoById[$row['id']] = $row;
         }
 
@@ -404,30 +408,6 @@ class Query
     }
 
     /**
-     * Find a total count of folders that match the given keyword.
-     *
-     * This count is subject to be filtered by `getQueryFilterForFolders`.
-     *
-     * @param string $keyword
-     *
-     * @return int
-     */
-    private function getTotalCountForFolders(string $keyword): int
-    {
-        [$where, $params] = $this->getQueryFilterForFolders($keyword);
-        $statement = $this->db->prepareQuery(
-            "SELECT COUNT(DISTINCT f.id)
-            FROM folder f
-            LEFT JOIN folder_code fc ON fc.folder_id = f.id
-            $where"
-        );
-
-        $statement->execute($params);
-
-        return (int) $statement->fetchColumn();
-    }
-
-    /**
      * Build the WHERE statement and query parameters which filter the list and
      * count of folders found by the search.
      *
@@ -454,7 +434,6 @@ class Query
      */
     private function getFolderData(array $folderInfoById, User $viewer): array
     {
-        $access = Access::getInstance();
         $folderById = FolderMapper::getInstance()->findByColumn(
             'id',
             array_keys($folderInfoById),
@@ -468,15 +447,6 @@ class Query
         $folderData = [];
         foreach ($folderById as $folderId => $folder) {
             /** @var FolderModel $folder */
-
-            try {
-                if ($access->getFolderAccess($viewer, $folder->getId()) < UserAccess::ACCESS_READ) {
-                    continue;
-                }
-            } catch (Exception) {
-                // Problem determining access, so assume no access.
-                continue;
-            }
 
             $folderType = $folderInfoById[$folderId]['folderType'];
 
