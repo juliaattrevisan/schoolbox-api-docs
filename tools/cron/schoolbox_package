@@ -16,4 +16,5 @@ MAILTO="support@schoolbox.com.au"
 # Cleanup etherpad session storage (once a week on a Sunday)
 10 2 * * 0 www-data php /usr/share/schoolbox/tools/redis/removeEtherpadSession.php -p >> /var/log/schoolbox/purge-old-sessions.log 2>&1
 
+# Restart socketd nightly to avoid memory leak issue
 51 1 * * * root systemctl restart schoolbox-cloud-socketd.service
