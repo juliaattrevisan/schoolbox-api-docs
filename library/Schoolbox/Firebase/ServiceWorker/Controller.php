@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Firebase\ServiceWorker;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Firebase\DataGenerator;
+use Schoolbox\MobileApp\ServiceMapper;
 
 /**
  * Controller for the Firebase service worker.
@@ -27,8 +29,12 @@ class Controller extends Base
     public function getServiceWorker(): void
     {
         $this->setAllowBackToTheFuture(false);
+        $dataGenerator  = new DataGenerator($this->getConfigLoader(), ServiceMapper::getInstance());
         $this->response = $this
-            ->responseFromTemplateUnthemed('@firebaseServiceWorker/service-worker.js.twig', [])
+            ->responseFromTemplateUnthemed(
+                '@firebaseServiceWorker/service-worker.js.twig',
+                ['firebase' => $dataGenerator->generate()],
+            )
             ->withHeader('Content-Type', 'application/javascript')
         ;
     }

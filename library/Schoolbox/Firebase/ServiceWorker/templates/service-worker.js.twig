@@ -1,5 +1,18 @@
-"use strict";
+
+import { initializeApp, getMessaging, onBackgroundMessage } from '/static/js/bundle/firebaseMessaging.js';
+
+{#const b = self.importScripts('/static/js/bundle/firebaseMessaging.js');#}
+{#console.log(b);#}
+
+// Build Firebase config here
+const firebaseConfig = {{ firebase.publicConfig | raw }};
 
 // Needs to know:
 // * Token for this user session: store in a long-lasting cookie?
 // * Firebase configuration?
+const firebaseApp = initializeApp(firebaseConfig);
+const messaging   = getMessaging(firebaseApp);
+console.log(messaging);
+onBackgroundMessage(messaging, (payload) => {
+    console.log(payload);
+})
