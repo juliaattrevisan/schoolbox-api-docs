@@ -1,6 +1,6 @@
 <div data-overview-component>
     <overview-component
-        :is-super-user="{{ USER.isSuperuser }}"
+        :is-super-user="{{ USER.isSuperuser ? "true" : "false" }}"
         :has-tagging="{{ curriculumTagging ? "true" : "false" }}"
         locale-unit="{{ locale.unit }}"
     />
