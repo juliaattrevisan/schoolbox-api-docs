@@ -9,22 +9,28 @@ interface Props {
     localeUnit: string; // the localised term for a Unit
 }
 const props = defineProps<Props>();
+
+/**
+ * Open the curriculum code mapping modal
+ */
+function onMapSelected() {}
 </script>
 
 <template>
     <div class="empty-state">
         <i class="icon-curriculum"></i>
-        <template v-if="props.hasTagging">
+        <p v-if="props.hasTagging">
+            <a href="#map-curriculum-codes" @click.prevent="onMapSelected">Map curriculum codes</a> to your course or
+            {{ props.localeUnit }} page to display a list of all of the curriculum codes and matching skill descriptors
+            covered in this area of the curriculum.
+        </p>
+        <template v-else>
             <p v-if="props.isSuperUser">
                 <a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the
                 Administration system to use this feature.
             </p>
             <p v-else>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
         </template>
-        <p v-else>
-            <a href="#">Map a curriculum code</a> to your course or {{ props.localeUnit }} page to display a list of all
-            of the curriculum codes and matching skill descriptors covered in this area of the curriculum.
-        </p>
     </div>
 </template>
 
