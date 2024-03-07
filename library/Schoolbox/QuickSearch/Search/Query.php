@@ -437,11 +437,9 @@ class Query
 
         try {
             $parents = $folderMapper->findParents($folder);
-        } catch (Exception $e) {
+        } catch (Exception) {
             return []; // Orphans get no metadata :(
         }
-
-        $access = Access::getInstance();
 
         $breadcrumbs = [];
         foreach ($parents as $parent) {
