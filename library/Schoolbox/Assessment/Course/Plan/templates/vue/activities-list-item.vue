@@ -4,7 +4,6 @@ import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 
 interface Props {
     activity: Activity;
-    dropdownContainerEl: HTMLElement;
 }
 
 const props = defineProps<Props>();
