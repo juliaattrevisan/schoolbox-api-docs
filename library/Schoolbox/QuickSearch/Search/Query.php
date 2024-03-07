@@ -21,8 +21,10 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
+use Schoolbox\Search\Api\Database\ResultType\Page\Hydrator;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
+use Schoolbox\User\Formatter\Factory;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -64,22 +66,22 @@ class Query
         $keyword = trim($keyword);
 
         $result = [
-            'users' => [],
-            'folders' => [],
+            'data' => [],
+            'metadata' => [],
         ];
 
         if ($keyword !== '' && strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
             $matchingUserIds = $this->getUserIdsMatchingKeyword($keyword, $viewer);
-            $matchingFolderIds = $this->getFolderIdsMatchingKeyword($keyword, $viewer);
+            $matchingFolderInfoById = $this->getFolderInfoByIdForFoldersMatchingKeyword($keyword, $viewer);
 
             if (count($matchingUserIds) > 0) {
-                $result['users']['data'] = $this->getUserData($matchingUserIds);
-                $result['users']['totalCount'] = $this->getTotalCountForUsers($keyword, $viewer);
+                $result['data'] = array_merge($result['data'], $this->getUserData($matchingUserIds));
+                $result['metadata']['totalCountUsers'] = $this->getTotalCountForUsers($keyword, $viewer);
             }
 
-            if (count($matchingFolderIds) > 0) {
-                $result['folders']['data'] = $this->getFolderData($matchingFolderIds, $viewer);
-                $result['folders']['totalCount'] = $this->getTotalCountForFolders($keyword);
+            if (count($matchingFolderInfoById) > 0) {
+                $result['data'] = array_merge($result['data'], $this->getFolderData($matchingFolderInfoById, $viewer));
+                $result['metadata']['totalCount'] = $this->getTotalCountForFolders($keyword);
             }
         }
 
@@ -237,17 +239,29 @@ class Query
             ]
         );
 
+        $userNameFormatter = (new Factory())->buildFromConfig($this->config);
+
         $userData = [];
         foreach ($userByUserId as $userId => $user) {
             $userData[] = [
-                'id'             => $userId,
-                'externalId'     => $user->getExternalId(),
-                'firstname'      => $user->getFirstname(),
-                'preferredName'  => $user->getPreferredName(),
-                'lastname'       => $user->getLastname(),
-                'formattedName'  => $user->formatName(),
-                'metadata'       => $this->formatMetadataForUser($user),
-                'year'           => $user->getYear() ? $user->getYear()->getName() : '',
+                // The keys of this array are a subset of the keys in the result
+                // array returned by the advanced search feature (see User/Hydrator.php).
+                'id'    => $userId,
+                'type'  => 'user.' . $user->getRole()->getType(),
+                'url'   => (new Uri())->withPath('/search/user/' . $user->getId()),
+                'title' => $userNameFormatter->formatObject($user),
+                'meta'  => $this->formatMetadataForUser($user),
+                'icon'  => 'staff-students',
+                'image' => (
+                    (new Uri())
+                    ->withPath('/portrait.php')
+                    ->withQuery(
+                        http_build_query([
+                            'id'   => $user->getId(),
+                            'size' => Storage::TRANSFORM_SQUARE64,
+                        ])
+                    )->__toString()
+                )
             ];
         }
 
@@ -297,7 +311,7 @@ class Query
      *
      * @return array
      */
-    private function getFolderIdsMatchingKeyword(string $keyword, User $viewer): array
+    private function getFolderInfoByIdForFoldersMatchingKeyword(string $keyword, User $viewer): array
     {
         $uam = new UserAccessMapper();
         $allPermissions = $uam->findAllForUser($viewer);
@@ -311,11 +325,12 @@ class Query
         [$where, $params] = $this->getQueryFilterForFolders($keyword);
 
         $statement = $this->db->prepareQuery(
-            "SELECT DISTINCT
+            'SELECT DISTINCT
             f.id,
-            IF(f.id IN (" . implode(',', array_map('intval', $involvedFolderIds)) . "), 1, 0) AS userIsInvolved
+            ' . $this->buildFolderTypeExpression() . ' AS folderType,
+            IF(f.id IN (' . implode(',', array_map('intval', $involvedFolderIds)) . "), 1, 0) AS userIsInvolved
             FROM folder f
-            LEFT JOIN folder_code fc ON fc.folder_id = f.id
+            " . $this->getJoinsFromFolderForFolderTypeExpression() . "
             $where
             GROUP BY f.id
             ORDER BY userIsInvolved DESC, f.name ASC"
@@ -325,7 +340,67 @@ class Query
 
         $statement->execute($params);
 
-        return $statement->fetchAll(PDO::FETCH_COLUMN);
+        // Index the rows by 'id'.
+        $folderInfoById = [];
+        foreach ($statement->fetchAll() as $row) {
+            $folderInfoById[$row['id']] = $row;
+        }
+
+        return $folderInfoById;
+    }
+
+    /**
+     * This function was copied from Search/Api/Database/ResultType/Page/IndexBuilder.php.
+     * A page's type depends on what sort of page it is, in the
+     * following order of preference:
+     * * course: pages with a related course specification
+     * * unit: pages with a related unit specification
+     * * class: pages with a class code
+     * * group: pages with a user group
+     * * homepage: pages with no class code, but a homepage
+     * * folder: pages without a homepage
+     *
+     * @return string
+     */
+    private function buildFolderTypeExpression(): string
+    {
+        // NVL2: if param 1 is not null returns param 2, otherwise param 3 (https://mariadb.com/kb/en/nvl2/)
+        return "CONCAT(
+            '" . Hydrator::BASE_TYPE . ".',
+            NVL2(
+                cs.id,
+                'course',
+                NVL2(
+                    cus.id,
+                    'unit',
+                    NVL2(
+                        fc.code,
+                        'class',
+                        NVL2(
+                            ug.cid,
+                            'group',
+                            NVL2(hc.template, 'homepage', 'folder')
+                        )
+                    )
+                )
+            )
+        )";
+    }
+
+    /**
+     * This function was copied from Search/Api/Database/ResultType/Page/IndexBuilder.php.
+     * Return the SQL JOIN clauses from table `folder` that are necessary for $this->buildTypeExpression().
+     * @returns string
+     */
+    private function getJoinsFromFolderForFolderTypeExpression(): string
+    {
+        return "
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
+            LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+            LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+            LEFT JOIN homepage_config hc ON f.id = hc.cid
+            LEFT JOIN userGroups ug ON f.id = ug.cid
+        ";
     }
 
     /**
@@ -372,17 +447,17 @@ class Query
     }
 
     /**
-     * @param array $folderIds
+     * @param array $folderInfoById array of arrays containing folder info, indexed by folderId.
      * @param User $viewer
      *
      * @return array of arrays containing folder data.
      */
-    private function getFolderData(array $folderIds, User $viewer): array
+    private function getFolderData(array $folderInfoById, User $viewer): array
     {
         $access = Access::getInstance();
         $folderById = FolderMapper::getInstance()->findByColumn(
             'id',
-            $folderIds,
+            array_keys($folderInfoById),
             [
                 'order' => [
                     'updated_at' => 'DESC',
@@ -403,13 +478,29 @@ class Query
                 continue;
             }
 
+            $folderType = $folderInfoById[$folderId]['folderType'];
+
             $folderData[] = [
-                'id'       => $folderId,
-                'name'     => $folder->getNameWithCodes(),
-                'metadata' => $this->formatMetadataForFolder($folder, $viewer, $access),
-                'image'    => $folder->getCoverImage()
+                // The keys of this array are a subset of the keys in the result
+                // array returned by the advanced search feature (see User/Hydrator.php).
+                'id'    => $folderId,
+                'type'  => $folderType,
+                'title' => $folder->getNameWithCodes(),
+                'meta'  => $this->formatMetadataForFolder($folder, $viewer, $access),
+                'icon'  => (
+                    match ($folderType) {
+                        'page.course'   => 'course',
+                        'page.unit'     => 'unit',
+                        'page.class'    => 'teacher',
+                        'page.homepage' => 'home',
+                        default         => 'folder',
+                    }
+                ),
+                'image' => (
+                    $folder->getCoverImage()
                     ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
-                    : null,
+                    : null
+                ),
             ];
 
             if (count($folderData) >= self::AUTOSUGGEST_LIMIT) {
@@ -450,12 +541,11 @@ class Query
                 $accessLevel = 0; // Problem getting access level, so assume no access.
             }
 
-            if ($accessLevel >= UserAccess::ACCESS_READ) {
-                $uri = new Uri();
-                $breadcrumbs[] = ['name' => $parent->getName(), 'url' => $uri->withPath('/homepage/' . $parent->getId())];
-            } else {
-                $breadcrumbs[] = ['name' => $parent->getName(), 'url' => ''];
-            }
+            $breadcrumbs[] = (
+                ($accessLevel >= UserAccess::ACCESS_READ)
+                ? ['name' => $parent->getName(), 'url' => (new Uri())->withPath('/homepage/' . $parent->getId())]
+                : ['name' => $parent->getName(), 'url' => '']
+            );
         }
 
         return $breadcrumbs;
@@ -471,8 +561,7 @@ class Query
     private function buildStorageImageUrl(
         IStorage $storage,
     ): UriInterface {
-        $uri = new Uri();
-        return $uri
+        return (new Uri())
             ->withPath('/storage/image.php')
             ->withQuery(
                 http_build_query([
