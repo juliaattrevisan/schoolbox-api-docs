@@ -10,11 +10,7 @@ const props = defineProps<Props>();
 
 <template>
     <!-- eslint-disable-next-line vue/no-v-html -->
-    <div class="textbox-content" v-html="props.textbox.body"></div>
+    <div v-html="props.textbox.body"></div>
 </template>
 
-<style scoped>
-.textbox-content {
-    padding: 5px;
-}
-</style>
+<style scoped></style>
