@@ -32,20 +32,20 @@ const tabs = createTabs(allTextboxKeys);
 const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
 
 const tabsEl = window.Vue.ref<HTMLElement>();
-const tableHeaderEl = window.Vue.ref<HTMLElement>();
 const unitPlannerContainerEl = window.Vue.ref<HTMLElement>();
+const headerRowEl = window.Vue.ref<HTMLElement>();
 const resizeObserver = window.Vue.ref<ResizeObserver>();
 
 // Use a ref instead of a computed property so that we can force the height to be recomputed
 const containerHeight = window.Vue.ref(window.innerHeight);
 
 /**
- * Updates the height of the scrollable area (table), such that no vertical scrollbar is shown for the whole page.
- * This is to ensure the horizontal scrollbar of the unit planner table is always visible.
+ * Updates the height of the scrollable area, such that no vertical scrollbar is shown for the whole page.
+ * This is to ensure the horizontal scrollbar of the unit planner is always visible.
  * @returns {void}
  */
 function updateContainerHeight(): void {
-    if (!tabsEl.value || !tableHeaderEl.value || !unitPlannerContainerEl.value) {
+    if (!tabsEl.value || !headerRowEl.value || !unitPlannerContainerEl.value) {
         containerHeight.value = window.innerHeight;
         return;
     }
@@ -61,7 +61,7 @@ function updateContainerHeight(): void {
     const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
 
     // Prevent the container from being too small, this ensures one unit is always visible
-    containerHeight.value = Math.max(newHeight, store.unexpandedUnitHeight + tableHeaderEl.value.offsetHeight);
+    containerHeight.value = Math.max(newHeight, store.unexpandedUnitHeight + headerRowEl.value.offsetHeight);
 }
 
 window.Vue.onMounted(async () => {
@@ -132,7 +132,7 @@ window.Vue.onUnmounted(() => {
                 The specific placement of this element ensures that the dropdowns are still contained within the table -->
         </div>
         <div class="unit-planner">
-            <div class="grid-row header-row">
+            <div ref="headerRowEl" class="grid-row header-row">
                 <div
                     v-for="column in selectedTab.columns"
                     :key="column.id"
