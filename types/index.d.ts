@@ -49,6 +49,6 @@ declare global {
 
     // Fix types when importing .vue files and using with window.Vue.createApp
     declare module "*.vue" {
-        export default Vue;
+        export default Vue.defineComponent;
     }
 }
