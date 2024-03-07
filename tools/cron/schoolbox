@@ -138,4 +138,7 @@ MAILTO="support@schoolbox.com.au"
 # reset failed quiz imports: every 15 minutes?
 */15 * * * *    www-data    php /usr/share/schoolbox/tools/learnosity/reset-failed.php -p >> /var/log/schoolbox/learnosity-reset-failed.log 2>&1
 
+# deploy new credentials: sometime overnight?
+15 0 * * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/learnosity/deploy-credentials.php -vv >> /var/log/schoolbox/learnosity-deploy-credentials.log 2>&1
+
 # End of file - do not delete

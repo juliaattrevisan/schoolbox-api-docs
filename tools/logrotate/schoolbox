@@ -46,7 +46,8 @@
 /var/log/schoolbox/*/image-processor.log
 /var/log/schoolbox/*/reload-relations.log
 /var/log/schoolbox/*/search-build-index.log
-/var/log/schoolbox/*/learnosity-reset-failed.log {
+/var/log/schoolbox/*/learnosity-reset-failed.log
+/var/log/schoolbox/*/learnosity-deploy-credentials.log {
     monthly
     missingok
     rotate 6
