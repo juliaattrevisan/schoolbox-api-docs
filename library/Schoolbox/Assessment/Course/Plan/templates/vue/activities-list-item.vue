@@ -4,6 +4,7 @@ import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 
 interface Props {
     activity: Activity;
+    dropdownContainerEl: HTMLElement;
 }
 
 const props = defineProps<Props>();
@@ -46,15 +47,13 @@ const activityLink = window.Vue.computed(() => {
             </div>
         </div>
         <nav>
-            <sbx-pop-out :content-id="'dropdown-unitplanner-activity-' + props.activity.id"></sbx-pop-out>
+            <sbx-pop-out
+                :content-id="'dropdown-unitplanner-activity-' + props.activity.id"
+                move-to="#unitplanner-dropdown-container"
+            ></sbx-pop-out>
         </nav>
         <!-- Move the dropdown content to the unit planner table so that it can get around the cell's overflow:hidden -->
-        <ul
-            :id="'dropdown-unitplanner-activity-' + props.activity.id"
-            class="f-dropdown"
-            data-dropdown-content
-            data-dropdown-move-to="#unitplanner-dropdown-container"
-        >
+        <ul :id="'dropdown-unitplanner-activity-' + props.activity.id" class="f-dropdown" data-dropdown-content>
             <li>
                 <a :href="returnUrl(props.activity._links.modify)" class="icon-modify">{{
                     props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
