@@ -482,7 +482,7 @@ class Query
 
             $folderData[] = [
                 // The keys of this array are a subset of the keys in the result
-                // array returned by the advanced search feature (see User/Hydrator.php).
+                // array returned by the advanced search feature (see Page/Hydrator.php).
                 'id'    => $folderId,
                 'type'  => $folderType,
                 'title' => $folder->getNameWithCodes(),
