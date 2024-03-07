@@ -105,7 +105,7 @@ window.Vue.onMounted(async () => {
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
-    resizeObserver.value.observe(unitPlannerContainerEl.value!);
+    resizeObserver.value.observe(document.querySelector("#container")!);
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
