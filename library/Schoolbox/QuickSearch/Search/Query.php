@@ -456,7 +456,7 @@ class Query
                 'id'    => $folderId,
                 'type'  => $folderType,
                 'title' => $folder->getNameWithCodes(),
-                'meta'  => $this->formatMetadataForFolder($folder, $viewer, $access),
+                'meta'  => $this->formatMetadataForFolder($folder, $viewer),
                 'icon'  => (
                     match ($folderType) {
                         'page.course'   => 'course',
@@ -492,7 +492,7 @@ class Query
      * @param Access $access
      * @return array
      */
-    private function formatMetadataForFolder(FolderModel $folder, User $viewer, Access $access): array
+    private function formatMetadataForFolder(FolderModel $folder, User $viewer): array
     {
         $folderMapper = new FolderMapper();
 
@@ -502,6 +502,7 @@ class Query
             return []; // Orphans get no metadata :(
         }
 
+        $access = Access::getInstance();
         $breadcrumbs = [];
         foreach ($parents as $parent) {
             /** @var FolderModel $parent */
