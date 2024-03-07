@@ -12,14 +12,15 @@ To toggle the display of further navigation or control actions.
 
 ## Properties
 
-| Property                | Type      | Description                                                                                                                                       |
-| ----------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `content-id` \*         | `string`  | The id of the content to display                                                                                                                  |
-| `button-text`           | `string`  | The text to display on the button                                                                                                                 |
-| `disabled`              | `boolean` | Whether the button is to be disabled                                                                                                              |
-| `isFullWidth`           | `boolean` | Whether the button should be full width, stretching to the width of the parent container                                                          |
-| `isArrowIcon`           | `boolean` | Whether to use an arrow icon instead of the default icon, which will switch the icon rotation depending on whether the button is opened or closed |
-| `isCloseOnContentClick` | `boolean` | Close the dropdown when the content is clicked                                                                                                    |
+| Property                | Type                    | Description                                                                                                                                       |
+| ----------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content-id` \*         | `string`                | The id of the content to display                                                                                                                  |
+| `button-text`           | `string`                | The text to display on the button                                                                                                                 |
+| `disabled`              | `boolean`               | Whether the button is to be disabled                                                                                                              |
+| `isFullWidth`           | `boolean`               | Whether the button should be full width, stretching to the width of the parent container                                                          |
+| `isArrowIcon`           | `boolean`               | Whether to use an arrow icon instead of the default icon, which will switch the icon rotation depending on whether the button is opened or closed |
+| `isCloseOnContentClick` | `boolean`               | Close the dropdown when the content is clicked                                                                                                    |
+| `moveTo`                | `HTMLElement \| string` | An optional element to move the pop out content to. This can be a direct HTMLElement reference or a string to be used as a querySelector.         |
 
 ## Slots
 
@@ -47,6 +48,30 @@ An `icon` slot is provided to allow for custom icons to be used. If no slot is p
     <li><a>Course Markbook</a></li>
     <li><a>Delete</a></li>
 </ul>
+```
+
+## The moveTo property
+The `moveTo` property can be used to move the dropdown content to a different location in the DOM.
+
+This can be useful in scenarios where the location of the content element is not ideal and could lead to styling issues, or visibility issues,
+such as being cut off by a parent element with `overflow: hidden`, but placing it there initially is not possible or not practical
+
+```
+<sbx-pop-out
+    content-id="dropdown-3"
+    button-text="Modify Participation"
+    :moveTo="#targetDropdownContainer"
+></sbx-pop-out>
+
+<!-- Dropdown content -->
+<ul id="dropdown-3" class="f-dropdown" data-dropdown-content>
+    <li class="separator">Manage</li>
+    <li><a>Course Markbook</a></li>
+    <li><a>Delete</a></li>
+</ul>
+
+<!-- Target container where the dropdown content will be moved to -->
+<div id="targetDropdownContainer"></div>
 ```
 
 <Stories />

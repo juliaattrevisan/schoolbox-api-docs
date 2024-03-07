@@ -31,6 +31,13 @@ interface Props {
      * Close the dropdown when the content is clicked
      */
     isCloseOnContentClick?: boolean;
+    /**
+     * An optional element to move the pop out content to.
+     * If a string is provided (rather than an element), it will be treated as a querySelector
+     *
+     * See moveContentToNewParent in usePopOut.ts for more details
+     */
+    moveTo?: HTMLElement | string;
 }
 const props = defineProps<Props>();
 
@@ -42,6 +49,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     props.isFullWidth ? "bottom-start" : "bottom-end",
     props.isFullWidth,
     props.isCloseOnContentClick,
+    props.moveTo,
 );
 </script>
 

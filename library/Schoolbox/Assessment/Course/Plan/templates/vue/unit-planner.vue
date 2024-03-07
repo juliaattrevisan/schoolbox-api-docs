@@ -7,12 +7,15 @@ import ContentContainer from "./content-container.vue";
 import RubricCapabilities from "./rubric-capabilities.vue";
 import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
-import ActivitiesList from "./activities-list.vue";
+import ActivitiesListItem from "./activities-list-item.vue";
 
 interface Props {
     units: Unit[];
     routeFolderSequence: string | null;
 }
+
+const unexpandedUnitHeight = 300;
+const unexpandedUnitHeightStyle = window.Vue.computed(() => `${unexpandedUnitHeight}px`);
 
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
@@ -41,6 +44,39 @@ const allTextboxKeys = window.Vue.computed(() => {
     return [...keysSet];
 });
 
+const tabsEl = window.Vue.ref<HTMLElement>();
+const tableHeaderEl = window.Vue.ref<HTMLElement>();
+const unitPlannerContainerEl = window.Vue.ref<HTMLElement>();
+const resizeObserver = window.Vue.ref<ResizeObserver>();
+
+// Use a ref instead of a computed property so that we can force the height to be recomputed
+const containerHeight = window.Vue.ref(window.innerHeight);
+
+/**
+ * Updates the height of the scrollable area (table), such that no vertical scrollbar is shown for the whole page.
+ * This is to ensure the horizontal scrollbar of the unit planner table is always visible.
+ * @returns {void}
+ */
+function updateContainerHeight(): void {
+    if (!tabsEl.value || !tableHeaderEl.value || !unitPlannerContainerEl.value) {
+        containerHeight.value = window.innerHeight;
+        return;
+    }
+
+    const tabsBottomY = tabsEl.value.getBoundingClientRect().bottom;
+    const footerHeight = document.getElementById("footer")?.getBoundingClientRect().height || 0;
+
+    const mainSBContainerEl = document.getElementById("container");
+    const mainSBContainerPaddingBtm = mainSBContainerEl
+        ? parseInt(window.getComputedStyle(mainSBContainerEl).paddingBottom, 10)
+        : 0;
+
+    const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
+
+    // Prevent the container from being too small, this ensures one unit is always visible
+    containerHeight.value = Math.max(newHeight, unexpandedUnitHeight + tableHeaderEl.value.offsetHeight);
+}
+
 window.Vue.onMounted(async () => {
     store.init(props.units, props.routeFolderSequence, toastEl);
 
@@ -61,18 +97,33 @@ window.Vue.onMounted(async () => {
             },
         });
     }
+
+    // Initialize the ResizeObserver
+    resizeObserver.value = new ResizeObserver(updateContainerHeight);
+    resizeObserver.value.observe(document.querySelector("#container")!);
+
+    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
+    updateContainerHeight();
+    window.addEventListener("DOMContentLoaded", updateContainerHeight, { once: true });
+});
+
+window.Vue.onUnmounted(() => {
+    // Clean up event listeners
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+    }
 });
 </script>
 
 <template>
-    <dl class="tabs">
+    <dl ref="tabsEl" class="tabs">
         <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }">
             <a @click="selectedTab = tab.id">{{ tab.label }}</a>
         </dd>
     </dl>
-    <div class="scrollable">
+    <div ref="unitPlannerContainerEl" class="scrollable" :style="{ height: containerHeight + 'px' }">
         <table class="unit-planner" :class="{ sortable: props.routeFolderSequence }">
-            <thead>
+            <thead ref="tableHeaderEl">
                 <tr>
                     <th>Unit</th>
                     <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
@@ -86,6 +137,10 @@ window.Vue.onMounted(async () => {
                 </tr>
             </thead>
             <tbody v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
+                <tr id="unitplanner-dropdown-container">
+                    <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
+                        The specific placement of this element ensures that the dropdowns are still contained within the table -->
+                </tr>
                 <tr
                     v-for="unit in store.orderedUnits"
                     :key="unit.id"
@@ -107,16 +162,25 @@ window.Vue.onMounted(async () => {
                     </td>
                     <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
                         <td v-for="(textbox, textboxKey) in unit.textboxes" :key="textboxKey">
-                            <content-container :unit-id="unit.id">
+                            <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
                                 <textbox-content v-if="textbox !== null" :textbox="textbox"></textbox-content>
                             </content-container>
                         </td>
                     </template>
                     <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
-                        <activities-list :activities="unit.activities" :unit-id="unit.id"></activities-list>
+                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
+                            <ul class="information-list">
+                                <activities-list-item
+                                    v-for="activity in unit.activities"
+                                    ref="activityListItem"
+                                    :key="activity.id"
+                                    :activity="activity"
+                                />
+                            </ul>
+                        </content-container>
                     </td>
                     <td v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">
-                        <content-container :unit-id="unit.id">
+                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
                             <rubric-capabilities :rubric-capabilities="unit.rubricCapabilities"></rubric-capabilities>
                         </content-container>
                     </td>
@@ -124,7 +188,7 @@ window.Vue.onMounted(async () => {
                         v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'"
                         class="curriculum-codes-container"
                     >
-                        <content-container :unit-id="unit.id">
+                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
                             <curriculum-codes-list :curriculum-codes="unit.curriculumCodes"></curriculum-codes-list>
                             <curriculum-details-modal />
                         </content-container>
@@ -157,7 +221,7 @@ window.Vue.onMounted(async () => {
                 left: 0;
                 position: sticky;
                 width: 200px;
-                z-index: 2;
+                z-index: 2; // Behind the dropdowns and table header, but on top of the content
             }
 
             &:not(:first-child) {
@@ -168,9 +232,18 @@ window.Vue.onMounted(async () => {
         }
     }
 
+    // Pin the header to the top of the table when scrolling
+    > thead {
+        position: sticky;
+        top: 0;
+        z-index: 4; // On top of both the left column and the dropdowns
+    }
+
     > tbody {
+        overflow: hidden;
+        position: relative;
         > tr {
-            height: 300px;
+            height: v-bind(unexpandedUnitHeightStyle);
 
             > td:not(:first-child) {
                 padding: 0px;
@@ -200,5 +273,11 @@ window.Vue.onMounted(async () => {
     .unit-wrapper {
         display: flex;
     }
+}
+
+#unitplanner-dropdown-container {
+    height: 0;
+    position: sticky;
+    z-index: 3; // On top of left column, but behind the header
 }
 </style>

@@ -26,6 +26,7 @@ import { onClickOutside } from "@vueuse/core";
  * @param {string} optimalPlacement - The optimal placement of the pop out content
  * @param {boolean} isFullWidth - whether to display the pop out content has full width
  * @param {boolean} isCloseOnContentClick - whether to close the pop out content when it's clicked
+ * @param {HTMLElement | string | null} moveTo - An optional element to move the pop out content to
  * @returns {object} - The isOpen ref
  */
 export function usePopOut(
@@ -34,9 +35,11 @@ export function usePopOut(
     contentId: string,
     optimalPlacement = "bottom-end",
     isFullWidth = false,
-    isCloseOnContentClick = false
+    isCloseOnContentClick = false,
+    moveTo: HTMLElement | string | null = null,
 ) {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
+    let contentInitParent: HTMLElement | null = null; // The initial parent of the content, if it was moved
     let content: HTMLElement; // The content to display when the button is selected
     let cleanup: () => void; // The cleanup function returned by @floating-ui/dom
 
@@ -170,12 +173,46 @@ export function usePopOut(
     }
 
     /**
+     * Move the content to a different parent, if requested, and keep track of the initial parent.
+     *
+     * For scenarios where the location of the content element is not ideal and could lead to issues such as being
+     * clipped by an overflow:hidden parent, but placing it there initially is not possible or not practical
+     * e.g. if the pop-out is in a iterated-over subcomponent
+     */
+    function moveContentToNewParent() {
+        if (!content || !moveTo) {
+            return;
+        }
+
+        const moveToEl = typeof moveTo === "string" ? document.querySelector(moveTo) : moveTo;
+        if (moveToEl) {
+            // Store the original position of the content
+            contentInitParent = content.parentElement as HTMLElement;
+            moveToEl.appendChild(content);
+        }
+    }
+
+    /**
+     * Returns the content back to its original parent, if it was moved
+     */
+    function restoreContentParent() {
+        if (contentInitParent && content) {
+            contentInitParent.appendChild(content);
+        }
+    }
+
+    /**
      * Get the content, the element that's displayed when the button is selected
      */
     function getContent() {
         content = document.querySelector(`#${contentId}[data-dropdown-content]`) as HTMLElement;
         if (content) {
             content.setAttribute("aria-hidden", "true");
+
+            if (moveTo) {
+                moveContentToNewParent();
+            }
+
             // to close the content when the user clicks outside of it
             onClickOutside(button, close, {
                 ignore: isCloseOnContentClick ? [] : [`#${content.id}[data-dropdown-content]`],
@@ -205,6 +242,7 @@ export function usePopOut(
      */
     window.Vue.onBeforeUnmount(() => {
         close();
+        restoreContentParent();
     });
 
     return { currentLabel, isOpen, onButtonSelected, close };
