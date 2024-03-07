@@ -1,4 +1,5 @@
 import OverviewComponent from "./overview-component";
+import { createPinia } from "pinia";
 
 const overviewComponents = document.querySelectorAll("[data-overview-component]");
 
@@ -11,7 +12,9 @@ overviewComponents.forEach((overviewComponent) => {
             components: {
                 OverviewComponent,
             },
-        }).mount(overviewComponent);
+        })
+            .use(createPinia())
+            .mount(overviewComponent);
     }
     overviewComponent.setAttribute("data-loaded", true);
 });

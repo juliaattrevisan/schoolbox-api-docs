@@ -3,6 +3,8 @@
  * Displayed when there's currently no nodes linked to the Unit
  */
 
+import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
+
 interface Props {
     isSuperUser: boolean; // Whether the user is a super user
     hasTagging: boolean; // Whether curriculum tagging is enabled
@@ -10,10 +12,14 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const modalStore = useModalStore();
+
 /**
  * Open the curriculum code mapping modal
  */
-function onMapSelected() {}
+function onMapSelected() {
+    modalStore.open();
+}
 </script>
 
 <template>
