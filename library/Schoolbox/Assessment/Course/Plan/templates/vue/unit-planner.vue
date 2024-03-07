@@ -44,7 +44,6 @@ const allTextboxKeys = window.Vue.computed(() => {
     return [...keysSet];
 });
 
-const dropdownContainerEl = window.Vue.ref<HTMLElement>();
 const tabsEl = window.Vue.ref<HTMLElement>();
 const tableHeaderEl = window.Vue.ref<HTMLElement>();
 const unitPlannerContainerEl = window.Vue.ref<HTMLElement>();
@@ -138,7 +137,7 @@ window.Vue.onUnmounted(() => {
                 </tr>
             </thead>
             <tbody v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
-                <tr ref="dropdownContainerEl" class="dropdown-container">
+                <tr id="unitplanner-dropdown-container">
                     <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
                         The specific placement of this element ensures that the dropdowns are still contained within the table -->
                 </tr>
@@ -170,13 +169,12 @@ window.Vue.onUnmounted(() => {
                     </template>
                     <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
                         <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
-                            <ul v-if="dropdownContainerEl" class="information-list">
+                            <ul class="information-list">
                                 <activities-list-item
                                     v-for="activity in unit.activities"
                                     ref="activityListItem"
                                     :key="activity.id"
                                     :activity="activity"
-                                    :dropdown-container-el="dropdownContainerEl"
                                 />
                             </ul>
                         </content-container>
@@ -277,7 +275,7 @@ window.Vue.onUnmounted(() => {
     }
 }
 
-.dropdown-container {
+#unitplanner-dropdown-container {
     height: 0;
     position: sticky;
     z-index: 3; // On top of left column, but behind the header
