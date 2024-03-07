@@ -45,6 +45,6 @@
 {% endif %}
 
 <div data-overview-component>
-    <overview-component />
+    <overview-component :nodes="{{nodes|json_encode}}" />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/overviewComponent.js?v={{ config.site_version }}"></script>

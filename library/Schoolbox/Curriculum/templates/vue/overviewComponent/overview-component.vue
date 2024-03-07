@@ -1,13 +1,16 @@
-<script setup>
+<script setup lang="ts">
 /**
  * The curriculum overview component that can be added to a home page
  * to display all or a single curriculum node (and all its children)
- *
- * @NOTE - currently we are only handling the opening of the details-modal when a link is selected
- * however this whole component is ripe for a re-do, so more could be added in the near future
  */
 
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
+
+interface Props {
+    nodes: Node[]; // The curriculum nodes to display
+}
+const props = defineProps<Props>();
 </script>
 
 <template>
