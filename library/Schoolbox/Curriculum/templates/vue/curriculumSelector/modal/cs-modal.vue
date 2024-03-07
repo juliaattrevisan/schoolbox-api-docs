@@ -46,7 +46,7 @@ const selectedNodeDetails = window.Vue.ref(getEmptyNode());
 window.Vue.onMounted(() => {
     modalStore.isSingleSelect = props.isSingleSelect;
     if (props.startingNodeId !== UNSET_ID) {
-        modalViewNodesStore.toId(props.startingNodeId);
+        modalViewNodesStore.toStartingNodeId(props.startingNodeId);
     }
 });
 
