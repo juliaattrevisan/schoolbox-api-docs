@@ -14,12 +14,7 @@ interface Props {
     routeFolderSequence: string | null;
 }
 
-/* The default maximum height of a content container, in px
- * Essentially, this should be based on a multiple of the height of one of the learning activities
- * so we don't cut off a learning activity in the middle
- * A learning activity is roughtly 41px
- */
-const unexpandedUnitHeight = 41 * 7;
+const unexpandedUnitHeight = 300;
 const unexpandedUnitHeightStyle = window.Vue.computed(() => `${unexpandedUnitHeight}px`);
 
 const props = defineProps<Props>();
