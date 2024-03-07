@@ -49,3 +49,61 @@ test("button has text when provided", async () => {
     const button = wrapper.get(`[data-test="sbx-pop-out-my-content-button"]`);
     expect(button.html()).toContain("Open My Content");
 });
+
+// moveTo tests
+test("content moves to new parent when moveTo is specified by a querySelector", async () => {
+    document.body.innerHTML += `<div id="move-to-target"></div>`;
+    const wrapper = mount(SbxPopOut, {
+        attachTo: document.getElementById("app"),
+        props: {
+            contentId: "my-content",
+            moveTo: "#move-to-target",
+        },
+    });
+    await wrapper.vm.$nextTick();
+
+    const content = document.querySelector("#my-content");
+    expect(content.parentElement.id).toBe("move-to-target");
+    wrapper.unmount();
+});
+
+test("content moves to new parent when moveTo specified by an element reference", async () => {
+    document.body.innerHTML += `<div id="move-to-target"></div>`;
+    const moveToElement = document.getElementById("move-to-target");
+    const wrapper = mount(SbxPopOut, {
+        attachTo: document.getElementById("app"),
+        props: {
+            contentId: "my-content",
+            moveTo: moveToElement,
+        },
+    });
+    await wrapper.vm.$nextTick();
+
+    const content = document.querySelector("#my-content");
+    expect(content.parentElement).toBe(moveToElement);
+    wrapper.unmount();
+});
+
+test("content moves back to original parent on unmount if moveTo is was specified", async () => {
+    document.body.innerHTML += `<div id="move-to-target"></div>`;
+    const moveToElement = document.getElementById("move-to-target");
+    const originalParent = document.getElementById("app");
+    const wrapper = mount(SbxPopOut, {
+        attachTo: originalParent,
+        props: {
+            contentId: "my-content",
+            moveTo: moveToElement,
+        },
+    });
+    await wrapper.vm.$nextTick();
+
+    // Confirm it moved to new parent first
+    let content = document.querySelector("#my-content");
+    expect(content.parentElement).toBe(moveToElement);
+
+    wrapper.unmount();
+
+    // Now, the content should be back to its original parent
+    content = document.querySelector("#my-content");
+    expect(content.parentElement.id).toBe(originalParent.parentElement.id);
+});
