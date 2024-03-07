@@ -165,7 +165,7 @@ class Controller extends Base
             /* TODO Later on we can provide a list of rubrics that exist in the whole course
              *  and diff them in some way so users can see what they haven't planned properly
              */
-            $rubricCapabilities = $rubricData['used']['capabilities'];
+            $rubricCapabilities = array_values($rubricData['used']['capabilities']);
 
             /* Curriculum nodes
              * A unique set of curriculum nodes collated from various places:
@@ -362,6 +362,7 @@ class Controller extends Base
              */
             if (!isset($rubrics['used']['capabilities'][$capabilityId])) {
                 $rubrics['used']['capabilities'][$capabilityId] = [
+                    'id' => $capabilityId,
                     'name' => Scrub::markdown($row['capability_name']),
                     'indicators' => []
                 ];
