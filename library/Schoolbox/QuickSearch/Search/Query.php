@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\QuickSearch\Search;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Collection;
+use PDO;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
@@ -57,32 +59,23 @@ class Query
     {
         $keyword = trim($keyword);
 
-        $uam = new UserAccessMapper();
-        $allPermissions = $uam->findAllForUser($viewer);
-        $permissionInfoByAccessibleFolderId = (
-            $allPermissions
-            ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
-            ->indexBy('serviceIdentifier')
-        );
-        $accessibleFolderIds = $permissionInfoByAccessibleFolderId->keys();
-
         $result = [
             'users' => [],
             'folders' => [],
         ];
 
-        if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
+        if ($keyword !== '' && strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
             $matchingUserIds = $this->getUserIdsMatchingKeyword($keyword, $viewer);
-            $matchingAccessibleFolderIds = $this->getFolderIdsMatchingKeyword($keyword, $accessibleFolderIds);
+            $matchingFolderIds = $this->getFolderIdsMatchingKeyword($keyword, $viewer);
 
             if (count($matchingUserIds) > 0) {
                 $result['users']['data'] = $this->getUserData($matchingUserIds);
                 $result['users']['totalCount'] = $this->getTotalCountForUsers($keyword, $viewer);
             }
 
-            if (count($matchingAccessibleFolderIds) > 0) {
-                $result['folders']['data'] = $this->getFolderData($matchingAccessibleFolderIds, $permissionInfoByAccessibleFolderId);
-                $result['folders']['totalCount'] = count($matchingAccessibleFolderIds);
+            if (count($matchingFolderIds) > 0) {
+                $result['folders']['data'] = $this->getFolderData($matchingFolderIds, $viewer);
+                $result['folders']['totalCount'] = $this->getTotalCountForFolders($keyword);
             }
         }
 
@@ -114,7 +107,7 @@ class Query
 
         $statement->execute($params);
 
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+        return $statement->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
@@ -296,42 +289,93 @@ class Query
      * This list is subject to be filtered by `getQueryFilterForFolders`.
      *
      * @param string $keyword
-     * @param array  $accessibleFolderIds
+     * @param User $viewer
      *
      * @return array
      */
-    private function getFolderIdsMatchingKeyword(string $keyword, array $accessibleFolderIds): array
+    private function getFolderIdsMatchingKeyword(string $keyword, User $viewer): array
     {
-        $whereParts = [
-            '(f.name LIKE :keywordForLike OR fc.code LIKE :keywordForLike)',
-            'f.deleted_at IS NULL',
-            'f.id IN (' . implode(',', array_map('intval', $accessibleFolderIds)) . ')'
-        ];
-        $params = ['keywordForLike' => '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%'];
+        $uam = new UserAccessMapper();
+        $allPermissions = $uam->findAllForUser($viewer);
+        $permissionInfoByInvolvedFolderId = (
+        $allPermissions
+            ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+            ->indexBy('serviceIdentifier')
+        );
+        $involvedFolderIds = $permissionInfoByInvolvedFolderId->keys();
+
+        [$where, $params] = $this->getQueryFilterForFolders($keyword);
 
         $statement = $this->db->prepareQuery(
-            // No need to sort because sorting is done in $this->getFolderData().
-            'SELECT DISTINCT f.id
+            "SELECT DISTINCT
+            f.id,
+            IF(f.id IN (" . implode(',', array_map('intval', $involvedFolderIds)) . "), 1, 0) AS userIsInvolved
             FROM folder f
             LEFT JOIN folder_code fc ON fc.folder_id = f.id
-            WHERE ' . implode(' AND ', $whereParts) . '
+            $where
             GROUP BY f.id
-            LIMIT ' . self::AUTOSUGGEST_LIMIT
+            ORDER BY userIsInvolved DESC, f.name ASC"
+            // No LIMIT clause here because permission checks cannot be done in the SQL query,
+            // and we don't know how many rows will remain after permission checks.
         );
 
         $statement->execute($params);
 
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+        return $statement->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Find a total count of folders that match the given keyword.
+     *
+     * This count is subject to be filtered by `getQueryFilterForFolders`.
+     *
+     * @param string $keyword
+     *
+     * @return int
+     */
+    private function getTotalCountForFolders(string $keyword): int
+    {
+        [$where, $params] = $this->getQueryFilterForFolders($keyword);
+        $statement = $this->db->prepareQuery(
+            "SELECT COUNT(DISTINCT f.id)
+            FROM folder f
+            LEFT JOIN folder_code fc ON fc.folder_id = f.id
+            $where"
+        );
+
+        $statement->execute($params);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    /**
+     * Build the WHERE statement and query parameters which filter the list and
+     * count of folders found by the search.
+     *
+     * @param $keyword
+     *
+     * @return array
+     */
+    private function getQueryFilterForFolders($keyword): array
+    {
+        $whereParts = [
+            '(f.name LIKE :keywordForLike OR fc.code LIKE :keywordForLike)',
+            'f.deleted_at IS NULL',
+        ];
+        $params = ['keywordForLike' => '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%'];
+
+        return [' WHERE ' . implode(' AND ', $whereParts), $params];
     }
 
     /**
      * @param array $folderIds
-     * @param Collection $permissionInfoByFolderId array of UserAccess
+     * @param User $viewer
      *
      * @return array of arrays containing folder data.
      */
-    private function getFolderData(array $folderIds, Collection $permissionInfoByFolderId): array
+    private function getFolderData(array $folderIds, User $viewer): array
     {
+        $access = Access::getInstance();
         $folderById = FolderMapper::getInstance()->findByColumn(
             'id',
             $folderIds,
@@ -346,33 +390,23 @@ class Query
         foreach ($folderById as $folderId => $folder) {
             /** @var FolderModel $folder */
 
-            /** @var UserAccess|null $userAccessToFolder */
-            $userAccessToFolder = $permissionInfoByFolderId[$folderId];
-
-            if ($userAccessToFolder !== null) {
-                $folderData[] = [
-                    'id'          => $folderId,
-                    'name'        => $folder->getNameWithCodes(),
-                    'metadata'    => $this->formatMetadataForFolder($folder),
-                    'accessLevel' => $userAccessToFolder->getAccessLevel(),
-                ];
+            try {
+                if ($access->getFolderAccess($viewer, $folder->getId()) < UserAccess::ACCESS_READ) {
+                    continue;
+                }
+            } catch (Exception) {
+                // Problem determining access, so assume no access.
+                continue;
             }
+
+            $folderData[] = [
+                'id'       => $folderId,
+                'name'     => $folder->getNameWithCodes(),
+                'metadata' => $this->formatMetadataForFolder($folder),
+            ];
         }
 
-        usort(
-            $folderData,
-            function ($a, $b): int {
-                // If accessLevels are equal...
-                if ($a['accessLevel'] === $b['accessLevel']) {
-                    // Sort by name asc.
-                    return $a['name'] <=> $b['name'];
-                }
-
-                // Sort by accessLevel desc.
-                return $b['accessLevel'] <=> $a['accessLevel'];
-            }
-        );
-
+        // Note $folderData is already sorted in relevance order because of ORDER BY clause in getFolderIdsMatchingKeyword().
         return $folderData;
     }
 
