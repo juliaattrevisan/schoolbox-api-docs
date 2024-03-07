@@ -10,14 +10,18 @@ declare(strict_types=1);
 namespace Schoolbox\QuickSearch\Search;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Image\Transformation\Storage;
 use PDO;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -403,6 +407,9 @@ class Query
                 'id'       => $folderId,
                 'name'     => $folder->getNameWithCodes(),
                 'metadata' => $this->formatMetadataForFolder($folder),
+                'image'    => $folder->getCoverImage()
+                    ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
+                    : null,
             ];
         }
 
@@ -423,5 +430,26 @@ class Query
         // TODO: Generate breadcrumbs to class page here.
 
         return '';
+    }
+
+    /**
+     * Helper for building a URL for an image in storage (copied from Search/Api/Hydrator/BaseHydrator.php).
+     *
+     * @param IStorage $storage The storage file.
+     *                          "square64".
+     * @return UriInterface
+     */
+    private function buildStorageImageUrl(
+        IStorage $storage,
+    ): UriInterface {
+        $uri = new Uri();
+        return $uri
+            ->withPath('/storage/image.php')
+            ->withQuery(
+                http_build_query([
+                    'hash' => $storage->getHash(),
+                    'size' => Storage::TRANSFORM_SQUARE64,
+                ])
+            );
     }
 }
