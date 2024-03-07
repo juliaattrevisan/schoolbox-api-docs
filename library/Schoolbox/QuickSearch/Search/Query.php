@@ -406,15 +406,15 @@ class Query
             $folderData[] = [
                 'id'       => $folderId,
                 'name'     => $folder->getNameWithCodes(),
-                'metadata' => $this->formatMetadataForFolder($folder),
+                'metadata' => $this->formatMetadataForFolder($folder, $viewer, $access),
                 'image'    => $folder->getCoverImage()
                     ? $this->buildStorageImageUrl($folder->getCoverImage())->__toString()
                     : null,
             ];
-        }
 
-        if (count($folderData) > self::AUTOSUGGEST_LIMIT) {
-            $folderData = array_slice($folderData, 0, self::AUTOSUGGEST_LIMIT);
+            if (count($folderData) >= self::AUTOSUGGEST_LIMIT) {
+                break;
+            }
         }
 
         // Note $folderData is already sorted in relevance order because of ORDER BY clause in getFolderIdsMatchingKeyword().
@@ -427,13 +427,40 @@ class Query
      * This is the same line that shows in search results underneath a folder result.
      *
      * @param FolderModel $folder
-     * @return string
+     * @param User $viewer
+     * @param Access $access
+     * @return array
      */
-    private function formatMetadataForFolder(FolderModel $folder): string
+    private function formatMetadataForFolder(FolderModel $folder, User $viewer, Access $access): array
     {
-        // TODO: Generate breadcrumbs to class page here.
+        $folderMapper = new FolderMapper();
 
-        return '';
+        try {
+            $parents = $folderMapper->findParents($folder);
+        } catch (Exception $e) {
+            return []; // Orphans get no metadata :(
+        }
+
+        $access = Access::getInstance();
+
+        $breadcrumbs = [];
+        foreach ($parents as $parent) {
+            /** @var FolderModel $parent */
+            try {
+                $accessLevel = $access->getFolderAccess($viewer, $parent->getId());
+            } catch (Exception) {
+                $accessLevel = 0; // Problem getting access level, so assume no access.
+            }
+
+            if ($accessLevel >= UserAccess::ACCESS_READ) {
+                $uri = new Uri();
+                $breadcrumbs[] = ['name' => $parent->getName(), 'url' => $uri->withPath('/homepage/' . $parent->getId())];
+            } else {
+                $breadcrumbs[] = ['name' => $parent->getName(), 'url' => ''];
+            }
+        }
+
+        return $breadcrumbs;
     }
 
     /**
