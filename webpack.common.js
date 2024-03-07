@@ -245,6 +245,7 @@ module.exports = {
 
         // Firebase
         firebaseInit: './www/static/js/firebase/firebase-init.ts',
+        firebaseMessaging: './www/static/js/firebase/firebase-messaging.ts',
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),
