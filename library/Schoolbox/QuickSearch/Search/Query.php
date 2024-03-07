@@ -413,6 +413,10 @@ class Query
             ];
         }
 
+        if (count($folderData) > self::AUTOSUGGEST_LIMIT) {
+            $folderData = array_slice($folderData, 0, self::AUTOSUGGEST_LIMIT);
+        }
+
         // Note $folderData is already sorted in relevance order because of ORDER BY clause in getFolderIdsMatchingKeyword().
         return $folderData;
     }
